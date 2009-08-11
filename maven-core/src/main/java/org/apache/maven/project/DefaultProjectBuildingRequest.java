@@ -34,6 +34,8 @@ public class DefaultProjectBuildingRequest
     implements ProjectBuildingRequest
 {
 
+    private boolean offline;
+
     private RepositoryCache repositoryCache;
 
     private ArtifactRepository localRepository;
@@ -82,6 +84,18 @@ public class DefaultProjectBuildingRequest
     public void setTopLevelProjectForReactor( MavenProject mavenProject )
     {
         this.topProject = mavenProject;
+    }
+
+    public DefaultProjectBuildingRequest setOffline( boolean offline )
+    {
+        this.offline = offline;
+
+        return this;
+    }
+
+    public boolean isOffline()
+    {
+        return offline;
     }
 
     public ProjectBuildingRequest setRepositoryCache( RepositoryCache repositoryCache )

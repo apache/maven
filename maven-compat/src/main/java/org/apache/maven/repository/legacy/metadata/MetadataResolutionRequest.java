@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 
 /**
@@ -33,6 +34,21 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 public interface MetadataResolutionRequest
     extends RepositoryRequest
 {
+
+    /**
+     * Indicates whether network access to remote repositories has been disabled.
+     * 
+     * @return {@code true} if remote access has been disabled, {@code false} otherwise.
+     */
+    boolean isOffline();
+
+    /**
+     * Enables/disables network access to remote repositories.
+     * 
+     * @param offline {@code true} to disable remote access, {@code false} to allow network access.
+     * @return This request, never {@code null}.
+     */
+    MetadataResolutionRequest setOffline( boolean offline );
 
     /**
      * Gets the artifact to resolve metadata for.
@@ -67,17 +83,32 @@ public interface MetadataResolutionRequest
     /**
      * Gets the remote repositories to use for the resolution.
      * 
-     * @return The remote repositories to use for the resolution or {@code null} if not set.
+     * @return The remote repositories to use for the resolution, never {@code null}.
      */
     List<ArtifactRepository> getRemoteRepositories();
 
     /**
-     * Sets the remote repository to use for the resolution.
+     * Sets the remote repositories to use for the resolution.
      * 
-     * @param remoteRepositories The remote repository to use for the resolution.
+     * @param remoteRepositories The remote repositories to use for the resolution.
      * @return This request, never {@code null}.
      */
     MetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
+
+    /**
+     * Gets the repository cache to use.
+     * 
+     * @return The repository cache to use or {@code null} if none.
+     */
+    RepositoryCache getCache();
+
+    /**
+     * Sets the repository cache to use.
+     * 
+     * @param cache The repository cache to use, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    MetadataResolutionRequest setCache( RepositoryCache cache );
 
     /**
      * Determines whether the managed version information should be retrieved.

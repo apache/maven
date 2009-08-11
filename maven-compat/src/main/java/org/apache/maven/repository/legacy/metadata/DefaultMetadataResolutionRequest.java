@@ -19,6 +19,7 @@ package org.apache.maven.repository.legacy.metadata;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -45,6 +46,8 @@ public class DefaultMetadataResolutionRequest
 
     private boolean resolveManagedVersions;
 
+    private boolean offline;
+
     public DefaultMetadataResolutionRequest()
     {
         // does nothing
@@ -55,6 +58,7 @@ public class DefaultMetadataResolutionRequest
         setLocalRepository( request.getLocalRepository() );
         setRemoteRepositories( request.getRemoteRepositories() );
         setCache( request.getCache() );
+        setOffline( request.isOffline() );
     }
 
     public Artifact getArtifact()
@@ -83,6 +87,11 @@ public class DefaultMetadataResolutionRequest
 
     public List<ArtifactRepository> getRemoteRepositories()
     {
+        if ( remoteRepositories == null )
+        {
+            remoteRepositories = new ArrayList<ArtifactRepository>();
+        }
+
         return remoteRepositories;
     }
 
@@ -98,9 +107,10 @@ public class DefaultMetadataResolutionRequest
         return resolveManagedVersions;
     }
 
-    public MetadataResolutionRequest setResolveManagedVersions( boolean resolveManagedVersions )
+    public DefaultMetadataResolutionRequest setResolveManagedVersions( boolean resolveManagedVersions )
     {
         this.resolveManagedVersions = resolveManagedVersions;
+
         return this;
     }
 
@@ -109,9 +119,21 @@ public class DefaultMetadataResolutionRequest
         return cache;
     }
 
-    public MetadataResolutionRequest setCache( RepositoryCache cache )
+    public DefaultMetadataResolutionRequest setCache( RepositoryCache cache )
     {
         this.cache = cache;
+
+        return this;
+    }
+
+    public boolean isOffline()
+    {
+        return offline;
+    }
+
+    public DefaultMetadataResolutionRequest setOffline( boolean offline )
+    {
+        this.offline = offline;
 
         return this;
     }

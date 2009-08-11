@@ -167,6 +167,7 @@ public class DefaultProjectBuilder
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setCache( configuration.getRepositoryCache() );
         repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
+        repositoryRequest.setOffline( configuration.isOffline() );
 
         ModelResolver resolver =
             new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, repositoryRequest,
@@ -504,6 +505,7 @@ public class DefaultProjectBuilder
                 repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
                 repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
                 repositoryRequest.setCache( configuration.getRepositoryCache() );
+                repositoryRequest.setOffline( configuration.isOffline() );
 
                 lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(), repositoryRequest );
             }

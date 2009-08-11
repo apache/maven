@@ -162,7 +162,7 @@ public class DefaultArtifactResolver
 
             destination = artifact.getFile();
 
-            if ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) )
+            if ( ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) ) && !request.isOffline() )
             {
                 try
                 {
@@ -174,12 +174,6 @@ public class DefaultArtifactResolver
                     else
                     {
                         wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor );
-                    }
-
-                    if ( !artifact.isResolved() && !destination.exists() )
-                    {
-                        throw new ArtifactResolutionException( "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                                                               artifact, remoteRepositories );
                     }
                 }
                 catch ( ResourceDoesNotExistException e )
@@ -195,6 +189,20 @@ public class DefaultArtifactResolver
             if ( destination.exists() )
             {
                 artifact.setResolved( true );
+            }
+            else
+            {
+                if ( request.isOffline() )
+                {
+                    throw new ArtifactResolutionException( "The repository system is offline"
+                        + " and the requested artifact is not locally available", artifact, remoteRepositories );
+                }
+                else
+                {
+                    throw new ArtifactResolutionException( "Failed to resolve artifact, possibly due to a "
+                        + "repository list that is not appropriately equipped for this artifact's metadata.", artifact,
+                                                           remoteRepositories );
+                }
             }
                                         
             // 1.0-SNAPSHOT

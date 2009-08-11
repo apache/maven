@@ -156,9 +156,7 @@ public class DefaultLifecycleExecutor
 
         MavenExecutionResult result = session.getResult();
 
-        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setLocalRepository( session.getLocalRepository() );
-        repositoryRequest.setCache( session.getRepositoryCache() );
+        RepositoryRequest repositoryRequest = getRepositoryRequest( session, null );
 
         for ( MavenProject currentProject : session.getProjects() )
         {
@@ -366,7 +364,11 @@ public class DefaultLifecycleExecutor
 
         request.setCache( session.getRepositoryCache() );
         request.setLocalRepository( session.getLocalRepository() );
-        request.setRemoteRepositories( project.getPluginArtifactRepositories() );
+        if ( project != null )
+        {
+            request.setRemoteRepositories( project.getPluginArtifactRepositories() );
+        }
+        request.setOffline( session.isOffline() );
 
         return request;
     }

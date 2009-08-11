@@ -422,6 +422,7 @@ public class DefaultPluginManager
             request.setLocalRepository( localRepository );
             request.setRemoteRepositories( remoteRepositories );
             request.setCache( session.getRepositoryCache() );
+            request.setOffline( session.isOffline() );
             pluginArtifacts = getPluginArtifacts( pluginArtifact, plugin, request );
         }
         catch ( ArtifactNotFoundException e )

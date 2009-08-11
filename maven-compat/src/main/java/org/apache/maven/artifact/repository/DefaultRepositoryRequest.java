@@ -31,11 +31,25 @@ public class DefaultRepositoryRequest
     implements RepositoryRequest
 {
 
+    private boolean offline;
+
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
 
     private RepositoryCache cache;
+
+    public boolean isOffline()
+    {
+        return offline;
+    }
+
+    public DefaultRepositoryRequest setOffline( boolean offline )
+    {
+        this.offline = offline;
+
+        return this;
+    }
 
     public ArtifactRepository getLocalRepository()
     {

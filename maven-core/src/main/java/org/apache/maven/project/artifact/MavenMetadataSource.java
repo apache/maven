@@ -469,6 +469,7 @@ public class MavenMetadataSource
                     configuration.setRepositoryCache( repositoryRequest.getCache() );
                     configuration.setLocalRepository( repositoryRequest.getLocalRepository() );
                     configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
+                    configuration.setOffline( repositoryRequest.isOffline() );
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( System.getProperties() );

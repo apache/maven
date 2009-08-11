@@ -68,6 +68,8 @@ public class ArtifactResolutionRequest
 
     private boolean resolveTransitively = false;
 
+    private boolean offline;
+
     public ArtifactResolutionRequest()
     {
         // nothing here
@@ -78,6 +80,7 @@ public class ArtifactResolutionRequest
         setLocalRepository( request.getLocalRepository() );
         setRemoteRepositories( request.getRemoteRepositories() );
         setCache( request.getCache() );
+        setOffline( request.isOffline() );
     }
 
     public Artifact getArtifact()
@@ -226,6 +229,18 @@ public class ArtifactResolutionRequest
     public ArtifactResolutionRequest setCache( RepositoryCache cache )
     {
         this.cache = cache;
+
+        return this;
+    }
+
+    public boolean isOffline()
+    {
+        return offline;
+    }
+
+    public ArtifactResolutionRequest setOffline( boolean offline )
+    {
+        this.offline = offline;
 
         return this;
     }

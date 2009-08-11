@@ -29,16 +29,64 @@ import java.util.List;
 public interface RepositoryRequest
 {
 
+    /**
+     * Indicates whether network access to remote repositories has been disabled.
+     * 
+     * @return {@code true} if remote access has been disabled, {@code false} otherwise.
+     */
+    boolean isOffline();
+
+    /**
+     * Enables/disables network access to remote repositories.
+     * 
+     * @param offline {@code true} to disable remote access, {@code false} to allow network access.
+     * @return This request, never {@code null}.
+     */
+    RepositoryRequest setOffline( boolean offline );
+
+    /**
+     * Gets the local repository to use.
+     * 
+     * @return The local repository to use or {@code null} if not set.
+     */
     ArtifactRepository getLocalRepository();
 
+    /**
+     * Sets the local repository to use.
+     * 
+     * @param localRepository The local repository to use.
+     * @return This request, never {@code null}.
+     */
     RepositoryRequest setLocalRepository( ArtifactRepository localRepository );
 
+    /**
+     * Gets the remote repositories to use.
+     * 
+     * @return The remote repositories to use, never {@code null}.
+     */
     List<ArtifactRepository> getRemoteRepositories();
 
+    /**
+     * Sets the remote repositories to use.
+     * 
+     * @param remoteRepositories The remote repositories to use.
+     * @return This request, never {@code null}.
+     */
     RepositoryRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
 
+    /**
+     * Gets the repository cache to use.
+     * 
+     * @return The repository cache to use or {@code null} if none.
+     */
     RepositoryCache getCache();
 
+    /**
+     * Sets the repository cache to use.
+     * 
+     * @param cache The repository cache to use, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
     RepositoryRequest setCache( RepositoryCache cache );
 
 }

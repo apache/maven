@@ -106,52 +106,60 @@ public class DefaultRepositoryMetadataManager
         ArtifactRepository localRepository = request.getLocalRepository();
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
 
-        for ( ArtifactRepository repository : remoteRepositories )
+        if ( !request.isOffline() )
         {
-            ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
-
-            File file = new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
-
-            if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+            for ( ArtifactRepository repository : remoteRepositories )
             {
-                getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
-                try
-                {
-                    wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
-                }
-                catch ( ResourceDoesNotExistException e )
-                {
-                    getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
+                ArtifactRepositoryPolicy policy =
+                    metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-                    // delete the local copy so the old details aren't used.
-                    if ( file.exists() )
+                File file =
+                    new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata,
+                                                                                                           repository ) );
+
+                if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+                {
+                    getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
+                    try
                     {
-                        file.delete();
+                        wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
+                    }
+                    catch ( ResourceDoesNotExistException e )
+                    {
+                        getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
+
+                        // delete the local copy so the old details aren't used.
+                        if ( file.exists() )
+                        {
+                            file.delete();
+                        }
+                    }
+                    catch ( TransferFailedException e )
+                    {
+                        getLogger().warn( metadata + " could not be retrieved from repository: " + repository.getId()
+                                              + " due to an error: " + e.getMessage() );
+                        getLogger().debug( "Exception", e );
+                    }
+                    finally
+                    {
+                        updateCheckManager.touch( metadata, repository, file );
                     }
                 }
-                catch ( TransferFailedException e )
+                else
                 {
-                    getLogger().warn( metadata + " could not be retrieved from repository: " + repository.getId() + " due to an error: " + e.getMessage() );
-                    getLogger().debug( "Exception", e );
+                    getLogger().debug( "Skipping metadata update of " + metadata.getKey() + " from "
+                                           + repository.getId() );
                 }
-                finally
-                {
-                    updateCheckManager.touch( metadata, repository, file );
-                }
-            }
-            else
-            {
-                getLogger().debug( "Skipping metadata update of " + metadata.getKey() + " from " + repository.getId() );
-            }
 
-            // TODO: should this be inside the above check?
-            // touch file so that this is not checked again until interval has passed
-            if ( file.exists() )
-            {
-                file.setLastModified( System.currentTimeMillis() );
+                // TODO: should this be inside the above check?
+                // touch file so that this is not checked again until interval has passed
+                if ( file.exists() )
+                {
+                    file.setLastModified( System.currentTimeMillis() );
+                }
             }
         }
-            
+
         try
         {
             mergeMetadata( metadata, remoteRepositories, localRepository );

@@ -33,6 +33,10 @@ import org.apache.maven.wagon.events.TransferListener;
 public interface ProjectBuildingRequest
 {
 
+    ProjectBuildingRequest setOffline( boolean offline );
+
+    boolean isOffline();
+
     ProjectBuildingRequest setRepositoryCache( RepositoryCache repositoryCache );
 
     RepositoryCache getRepositoryCache();

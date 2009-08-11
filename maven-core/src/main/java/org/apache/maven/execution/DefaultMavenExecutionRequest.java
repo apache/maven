@@ -898,6 +898,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
             projectBuildingRequest.setRepositoryCache( getRepositoryCache() );
+            projectBuildingRequest.setOffline( isOffline() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );
