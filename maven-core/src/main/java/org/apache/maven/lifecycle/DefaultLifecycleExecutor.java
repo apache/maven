@@ -257,6 +257,23 @@ public class DefaultLifecycleExecutor
     private void execute( MavenProject project, MavenSession session, MojoExecution mojoExecution )
         throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
     {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        if ( mojoDescriptor.isOnlineRequired() && session.isOffline() )
+        {
+            if ( MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) )
+            {
+                throw new MojoExecutionException( "Goal " + mojoDescriptor.getGoal()
+                    + " requires online mode for execution but Maven is currently offline." );
+            }
+            else
+            {
+                logger.warn( "Goal " + mojoDescriptor.getGoal()
+                    + " requires online mode for execution but Maven is currently offline, skipping" );
+                return;
+            }
+        }
+
         MavenProject executionProject = null;
 
         List<MojoExecution> forkedExecutions = mojoExecution.getForkedExecutions();
@@ -265,7 +282,7 @@ public class DefaultLifecycleExecutor
         {
             if ( logger.isDebugEnabled() )
             {
-                logger.debug( "Forking execution for " + mojoExecution.getMojoDescriptor().getId() );
+                logger.debug( "Forking execution for " + mojoDescriptor.getId() );
             }
 
             executionProject = project.clone();
@@ -285,7 +302,7 @@ public class DefaultLifecycleExecutor
 
             if ( logger.isDebugEnabled() )
             {
-                logger.debug( "Completed forked execution for " + mojoExecution.getMojoDescriptor().getId() );
+                logger.debug( "Completed forked execution for " + mojoDescriptor.getId() );
             }
         }
 
