@@ -195,7 +195,8 @@ public class DefaultArtifactResolver
                 if ( request.isOffline() )
                 {
                     throw new ArtifactResolutionException( "The repository system is offline"
-                        + " and the requested artifact is not locally available", artifact, remoteRepositories );
+                        + " and the requested artifact is not locally available at " + destination, artifact,
+                                                           remoteRepositories );
                 }
                 else
                 {
