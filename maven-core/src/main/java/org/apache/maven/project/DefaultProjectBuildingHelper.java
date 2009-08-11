@@ -29,6 +29,7 @@ import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -101,8 +102,7 @@ public class DefaultProjectBuildingHelper
         return artifactRepositories;
     }
 
-    public ClassRealm createProjectRealm( Model model, ArtifactRepository localRepository,
-                                          List<ArtifactRepository> remoteRepositories )
+    public ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException
     {
         ClassRealm projectRealm = null;
@@ -137,7 +137,7 @@ public class DefaultProjectBuildingHelper
                 repositorySystem.createArtifact( extension.getGroupId(), extension.getArtifactId(),
                                                  extension.getVersion(), "jar" );
 
-            populateRealm( projectRealm, artifact, null, localRepository, remoteRepositories );
+            populateRealm( projectRealm, artifact, null, repositoryRequest );
         }
 
         for ( Plugin plugin : extensionPlugins )
@@ -150,7 +150,7 @@ public class DefaultProjectBuildingHelper
                 dependencies.add( repositorySystem.createDependencyArtifact( dependency ) );
             }
 
-            populateRealm( projectRealm, artifact, dependencies, localRepository, remoteRepositories );
+            populateRealm( projectRealm, artifact, dependencies, repositoryRequest );
         }
 
         try
@@ -167,15 +167,13 @@ public class DefaultProjectBuildingHelper
     }
 
     private void populateRealm( ClassRealm realm, Artifact artifact, Set<Artifact> dependencies,
-                                ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+                                RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException
     {
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
         request.setArtifact( artifact );
         request.setArtifactDependencies( dependencies );
         request.setResolveTransitively( true );
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepositories( remoteRepositories );
         // FIXME setTransferListener
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );

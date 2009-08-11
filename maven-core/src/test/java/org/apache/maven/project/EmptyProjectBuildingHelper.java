@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
@@ -54,8 +55,7 @@ public class EmptyProjectBuildingHelper
         }
     }
 
-    public ClassRealm createProjectRealm( Model model, ArtifactRepository localRepository,
-                                       List<ArtifactRepository> remoteRepositories )
+    public ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException
     {
         return null;

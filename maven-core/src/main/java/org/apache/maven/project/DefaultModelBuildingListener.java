@@ -22,6 +22,8 @@ package org.apache.maven.project;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
@@ -132,9 +134,13 @@ class DefaultModelBuildingListener
         {
             try
             {
-                projectRealm =
-                    projectBuildingHelper.createProjectRealm( model, projectBuildingRequest.getLocalRepository(),
-                                                              pluginRepositories );
+                RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+                repositoryRequest.setCache( projectBuildingRequest.getRepositoryCache() );
+                repositoryRequest.setLocalRepository( projectBuildingRequest.getLocalRepository() );
+                repositoryRequest.setRemoteRepositories( pluginRepositories );
+                repositoryRequest.setOffline( projectBuildingRequest.isOffline() );
+
+                projectRealm = projectBuildingHelper.createProjectRealm( model, repositoryRequest );
             }
             catch ( ArtifactResolutionException e )
             {

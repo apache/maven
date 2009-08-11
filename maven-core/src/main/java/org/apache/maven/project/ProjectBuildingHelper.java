@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
@@ -55,13 +56,11 @@ public interface ProjectBuildingHelper
      * Creates the project realm that hosts the build extensions of the specified model.
      * 
      * @param model The model to create the project realm for, must not be {@code null}
-     * @param localRepository The local repository to use for artifact resolution, must not be {@code null}.
-     * @param remoteRepositories The remote repositories to use for artifact resolution, must not be {@code null}.
+     * @param repositoryRequest The repository request to use for artifact resolution, must not be {@code null}.
      * @return The project realm or {@code null} if the project uses no extensions.
      * @throws ArtifactResolutionException If any build extension could not be resolved.
      */
-    ClassRealm createProjectRealm( Model model, ArtifactRepository localRepository,
-                                   List<ArtifactRepository> remoteRepositories )
+    ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException;
 
 }
