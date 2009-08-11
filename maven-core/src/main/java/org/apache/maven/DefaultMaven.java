@@ -42,6 +42,7 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.codehaus.plexus.PlexusContainer;
@@ -215,8 +216,11 @@ public class DefaultMaven
         ExceptionHandler handler = new DefaultExceptionHandler();
         
         ExceptionSummary es = handler.handleException( e );                        
-     
-        result.addException( e );
+
+        if ( !result.getExceptions().contains( e ) )
+        {
+            result.addException( e );
+        }
         
         result.setExceptionSummary( es );    
         
@@ -288,8 +292,15 @@ public class DefaultMaven
     private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
         throws MavenExecutionException, ProjectBuildingException
     {
-        List<ProjectBuildingResult> results =
-            projectBuilder.build( files, request.isRecursive(), request.getProjectBuildingRequest() );
+        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
+
+        /*
+         * NOTE: We delay plugin configuration processing until a project is actually build to allow plugins to be
+         * resolved from the reactor.
+         */
+        projectBuildingRequest.setProcessPluginConfiguration( false );
+
+        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
 
         for ( ProjectBuildingResult result : results )
         {

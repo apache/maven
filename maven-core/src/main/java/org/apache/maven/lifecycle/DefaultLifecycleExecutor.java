@@ -176,6 +176,9 @@ public class DefaultLifecycleExecutor
             {
                 session.setCurrentProject( currentProject );
 
+                repositoryRequest.setRemoteRepositories( currentProject.getPluginArtifactRepositories() );
+                populateDefaultConfigurationForPlugins( currentProject.getBuild().getPlugins(), repositoryRequest );
+
                 ClassRealm projectRealm = currentProject.getClassRealm();
                 if ( projectRealm != null )
                 {

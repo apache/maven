@@ -52,6 +52,8 @@ public class DefaultProjectBuildingRequest
 
     private boolean processPlugins;
 
+    private boolean processPluginConfiguration;
+
     private List<Profile> profiles;
 
     private List<String> activeProfileIds;
@@ -67,6 +69,7 @@ public class DefaultProjectBuildingRequest
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
+        processPluginConfiguration = true;
         profiles = new ArrayList<Profile>();
         activeProfileIds = new ArrayList<String>();
         inactiveProfileIds = new ArrayList<String>();
@@ -218,6 +221,17 @@ public class DefaultProjectBuildingRequest
     public ProjectBuildingRequest setProcessPlugins( boolean processPlugins )
     {
         this.processPlugins = processPlugins;
+        return this;
+    }
+
+    public boolean isProcessPluginConfiguration()
+    {
+        return processPluginConfiguration;
+    }
+
+    public ProjectBuildingRequest setProcessPluginConfiguration( boolean processPluginConfiguration )
+    {
+        this.processPluginConfiguration = processPluginConfiguration;
         return this;
     }
 

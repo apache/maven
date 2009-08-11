@@ -92,10 +92,14 @@ public interface ProjectBuildingRequest
     void setTopLevelProjectForReactor(MavenProject mavenProject);
 
     MavenProject getTopLevelProjectFromReactor();
-        
+
     ProjectBuildingRequest setProcessPlugins( boolean processPlugins );
-    
+
     boolean isProcessPlugins();
+
+    ProjectBuildingRequest setProcessPluginConfiguration( boolean processPluginConfiguration );
+
+    boolean isProcessPluginConfiguration();
 
     /**
      * Controls the level of validation to perform on processed models. By default, models are validated in strict mode.

@@ -499,7 +499,7 @@ public class DefaultProjectBuilder
 
         try
         {
-            if ( configuration.isProcessPlugins() )
+            if ( configuration.isProcessPlugins() && configuration.isProcessPluginConfiguration() )
             {
                 RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
                 repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
