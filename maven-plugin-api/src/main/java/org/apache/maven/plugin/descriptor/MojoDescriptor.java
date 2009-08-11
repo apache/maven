@@ -96,7 +96,7 @@ public class MojoDescriptor
     /**  By default, the Mojo needs a Maven project to be executed */
     private boolean projectRequired = true;
 
-    /**  By default, the Mojo is online */
+    /**  By default, the Mojo is assumed to work offline as well */
     private boolean onlineRequired = false;
 
     /**  Plugin configuration */
