@@ -30,6 +30,11 @@ import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
+import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
 /**
  * @author jason van zyl
@@ -156,6 +161,63 @@ public class MavenCli
         catch ( MavenEmbedderException e )
         {
             CLIReportingUtils.showError( "Unable to start the embedder: ", e, showErrors );
+
+            return 1;
+        }
+
+        try
+        {
+            if ( commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
+            {
+                String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_MASTER_PASSWORD );
+
+                DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+
+                System.out.println( cipher.encryptAndDecorate( passwd,
+                                                               DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+
+                return 0;
+            }
+            else if ( commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
+            {
+                String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
+
+                DefaultSecDispatcher dispatcher;
+                dispatcher = (DefaultSecDispatcher) mavenEmbedder.getPlexusContainer().lookup( SecDispatcher.class );
+                String configurationFile = dispatcher.getConfigurationFile();
+                if ( configurationFile.startsWith( "~" ) )
+                {
+                    configurationFile = System.getProperty( "user.home" ) + configurationFile.substring( 1 );
+                }
+                String file = System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile );
+                mavenEmbedder.getPlexusContainer().release( dispatcher );
+
+                String master = null;
+
+                SettingsSecurity sec = SecUtil.read( file, true );
+                if ( sec != null )
+                {
+                    master = sec.getMaster();
+                }
+
+                if ( master == null )
+                {
+                    System.err.println( "Master password is not set in the setting security file" );
+
+                    return 1;
+                }
+
+                DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+                String masterPasswd =
+                    cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+                System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+
+                return 0;
+            }
+        }
+        catch ( Exception e )
+        {
+            CLIReportingUtils.showError( "FATAL ERROR: " + "Error encrypting password: " + e.getMessage(), e, showErrors );
 
             return 1;
         }

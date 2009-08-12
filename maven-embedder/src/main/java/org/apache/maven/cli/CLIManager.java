@@ -92,6 +92,10 @@ public class CLIManager
 
     public static final String LOG_FILE = "l";
 
+    public static final String ENCRYPT_MASTER_PASSWORD = "emp";
+
+    public static final String ENCRYPT_PASSWORD = "ep";
+
     private Options options;
 
     @SuppressWarnings("static-access")
@@ -128,6 +132,8 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription( "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
         options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
         options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
+        options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );
+        options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
         
         // Adding this back in for compatibility with the verifier that hard codes this option.
         
