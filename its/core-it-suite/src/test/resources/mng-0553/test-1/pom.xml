@@ -28,31 +28,35 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>test</name>
+  <name>Maven Integration Test :: MNG-533</name>
   <description>
-    Test that the auth infos given in the settings.xml are pushed into the wagon manager and are available
-    to other components/plugins.
+    Test that the auth infos given in the settings.xml are properly decrypted.
   </description>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng0553</groupId>
+      <artifactId>a</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-uses-wagon</artifactId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-          <propertiesFile>target/auth.properties</propertiesFile>
-          <serverIds>
-            <serverId>test</serverId>
-          </serverIds>
+          <compileClassPath>target/classpath.txt</compileClassPath>
         </configuration>
         <executions>
           <execution>
             <id>test</id>
             <phase>validate</phase>
             <goals>
-              <goal>dump-auth</goal>
-           </goals>
+              <goal>compile</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>

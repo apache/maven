@@ -27,4 +27,24 @@ under the License.
       <password>{BteqUEnqHecHM7MZfnj9FwLcYbdInWxou1C929Txa0A=}</password>
     </server>
   </servers>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <id>test</id>
+          <url>http://localhost:@port@/</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
 </settings>
