@@ -200,7 +200,8 @@ public class DefaultProjectBuilder
             .setArtifact( artifact )
             .setCache( configuration.getRepositoryCache() )
             .setLocalRepository( configuration.getLocalRepository() )
-            .setRemoteRepositories( configuration.getRemoteRepositories() );
+            .setRemoteRepositories( configuration.getRemoteRepositories() )
+            .setOffline( configuration.isOffline() );
         // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
