@@ -16,6 +16,7 @@ package org.apache.maven.embedder.execution;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,15 +34,21 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.toolchain.ToolchainsBuilder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
 {
+
+    @Requirement
+    private Logger logger;
+
     //TODO: this needs to be pushed up to the front-end
     @Requirement
     private MavenSettingsBuilder settingsBuilder;
@@ -49,8 +56,8 @@ public class DefaultMavenExecutionRequestPopulator
     @Requirement
     private RepositorySystem repositorySystem;
 
-    @Requirement
-    private ToolchainsBuilder toolchainsBuilder;
+    @Requirement( hint = "maven" )
+    private SecDispatcher securityDispatcher;
 
     private void pom( MavenExecutionRequest request )
     {
@@ -196,12 +203,17 @@ public class DefaultMavenExecutionRequestPopulator
                 throw new MavenEmbedderException( "Proxy in settings.xml has no host" );
             }
 
-            repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(), proxy.getPassword(), proxy.getNonProxyHosts() );
+            String password = decrypt( proxy.getPassword(), "password for proxy " + proxy.getId() );
+
+            repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                                       password, proxy.getNonProxyHosts() );
         }
 
         for ( Server server : settings.getServers() )
         {
-            repositorySystem.addAuthenticationForArtifactRepository( server.getId(), server.getUsername(), server.getPassword() );
+            String password = decrypt( server.getPassword(), "password for server " + server.getId() );
+
+            repositorySystem.addAuthenticationForArtifactRepository( server.getId(), server.getUsername(), password );
         }
 
         for ( Mirror mirror : settings.getMirrors() )
@@ -220,6 +232,35 @@ public class DefaultMavenExecutionRequestPopulator
         request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );
 
         request.setPluginArtifactRepositories( repositorySystem.getMirrors( request.getPluginArtifactRepositories() ) );
+    }
+
+    private String decrypt( String encrypted, String source )
+    {
+        try
+        {
+            return securityDispatcher.decrypt( encrypted );
+        }
+        catch ( SecDispatcherException e )
+        {
+            logger.warn( "Not decrypting " + source + " due to exception in security handler: " + e.getMessage() );
+
+            Throwable cause = e;
+
+            while ( cause.getCause() != null )
+            {
+                cause = cause.getCause();
+            }
+
+            if ( cause instanceof FileNotFoundException )
+            {
+                logger.warn( "Ensure that you have configured your master password file (and relocation if appropriate)." );
+                logger.warn( "See the installation instructions for details." );
+            }
+
+            logger.debug( "Full stack trace follows", e );
+
+            return encrypted;
+        }
     }
 
     // ------------------------------------------------------------------------
