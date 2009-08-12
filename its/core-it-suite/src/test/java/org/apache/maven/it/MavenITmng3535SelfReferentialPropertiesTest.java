@@ -32,7 +32,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest
 
     public MavenITmng3535SelfReferentialPropertiesTest()
     {
-        super( "[2.1.0-M1,3.0-alpha-1)" ); // handled differently in 3.0+
+        super( "[2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
     public void testitMNG3535_ShouldSucceed()
