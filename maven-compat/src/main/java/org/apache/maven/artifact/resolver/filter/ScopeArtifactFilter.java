@@ -62,6 +62,14 @@ public class ScopeArtifactFilter
             runtimeScope = true;
             testScope = false;
         }
+        else if ( Artifact.SCOPE_COMPILE_PLUS_RUNTIME.equals( scope ) )
+        {
+            systemScope = true;
+            providedScope = true;
+            compileScope = true;
+            runtimeScope = true;
+            testScope = false;
+        }
         else if ( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM.equals( scope ) )
         {
             systemScope = true;

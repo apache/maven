@@ -45,6 +45,8 @@ public interface Artifact
 
     String SCOPE_COMPILE = ArtifactScopeEnum.compile.toString();
 
+    String SCOPE_COMPILE_PLUS_RUNTIME = "compile+runtime";
+
     String SCOPE_TEST = ArtifactScopeEnum.test.toString();
 
     String SCOPE_RUNTIME = ArtifactScopeEnum.runtime.toString();
