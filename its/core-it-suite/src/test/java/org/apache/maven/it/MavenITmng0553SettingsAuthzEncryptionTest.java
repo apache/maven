@@ -24,6 +24,8 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.mortbay.jetty.Server;
@@ -161,6 +163,54 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.resetStreams();
 
         verifier.assertArtifactPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
+    }
+
+    /**
+     * Test that the CLI supports generation of encrypted (master) passwords.
+     */
+    public void testitEncryption()
+        throws Exception
+    {
+        Verifier verifier = new Verifier( new File( testDir, "test-3" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.getSystemProperties().setProperty( "settings.security", "settings~security.xml" );
+        verifier.getCliOptions().add( "--encrypt-master-password" );
+        verifier.getCliOptions().add( "test" );
+        verifier.setLogFileName( "log-emp.txt" );
+        verifier.executeGoal( "-e" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        List log = verifier.loadLines( verifier.getLogFileName(), null );
+        assertNotNull( findPassword( log ) );
+
+        verifier = new Verifier( new File( testDir, "test-3" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.getSystemProperties().setProperty( "settings.security", "settings-security.xml" );
+        verifier.getCliOptions().add( "--encrypt-password" );
+        verifier.getCliOptions().add( "testpass" );
+        verifier.setLogFileName( "log-ep.txt" );
+        verifier.executeGoal( "-e" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        log = verifier.loadLines( verifier.getLogFileName(), null );
+        assertNotNull( findPassword( log ) );
+    }
+
+    private String findPassword( List log )
+    {
+        for ( Iterator it = log.iterator(); it.hasNext(); )
+        {
+            String line = (String) it.next();
+
+            if ( line.matches( ".*\\{[A-Za-z0-9+/=]+\\}.*" ) )
+            {
+                return line;
+            }
+        }
+        
+        return null;
     }
 
 }
