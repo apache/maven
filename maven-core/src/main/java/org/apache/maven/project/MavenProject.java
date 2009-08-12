@@ -351,7 +351,7 @@ public class MavenProject
             {
                 try
                 {
-                    parent = mavenProjectBuilder.build( parentFile, projectBuilderConfiguration );
+                    parent = mavenProjectBuilder.build( parentFile, projectBuilderConfiguration ).getProject();
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -363,7 +363,7 @@ public class MavenProject
             {
                 try
                 {
-                    parent = mavenProjectBuilder.build( getParentArtifact(), projectBuilderConfiguration );
+                    parent = mavenProjectBuilder.build( getParentArtifact(), projectBuilderConfiguration ).getProject();
                 }
                 catch ( ProjectBuildingException e )
                 {

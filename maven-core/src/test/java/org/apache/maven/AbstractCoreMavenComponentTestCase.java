@@ -121,7 +121,7 @@ public abstract class AbstractCoreMavenComponentTestCase
 
         if ( pom != null )
         {
-            project = projectBuilder.build( pom, configuration );
+            project = projectBuilder.build( pom, configuration ).getProject();
         }
         else
         {

@@ -1696,7 +1696,7 @@ public class PomConstructionTest
         config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 
-        return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );
+        return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }
 
     protected void assertModelEquals( PomTestWrapper pom, Object expected, String expression )

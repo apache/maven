@@ -23,22 +23,22 @@ import org.apache.maven.artifact.Artifact;
 public interface ProjectBuilder
 {
 
-    MavenProject build( File projectFile, ProjectBuildingRequest request )
+    ProjectBuildingResult build( File projectFile, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
-    MavenProject build( Artifact projectArtifact, ProjectBuildingRequest request )
+    ProjectBuildingResult build( Artifact projectArtifact, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
     // TODO: this is only to provide a project for plugins that don't need a project to execute but need some
     // of the values from a MavenProject. Ideally this should be something internal and nothing outside Maven
     // would ever need this so it should not be exposed in a public API
-    MavenProject buildStandaloneSuperProject( ProjectBuildingRequest request )
+    ProjectBuildingResult buildStandaloneSuperProject( ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
     // TODO: This also doesn't really belong here as it's a mix of project builder and artifact resolution and belongs
     // in an integration component like the embedder.
     @Deprecated
-    MavenProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuildingRequest request )
+    ProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
     /**

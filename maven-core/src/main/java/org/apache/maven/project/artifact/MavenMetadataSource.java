@@ -474,7 +474,7 @@ public class MavenMetadataSource
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( System.getProperties() );
 
-                    project = getProjectBuilder().build( pomArtifact, configuration );
+                    project = getProjectBuilder().build( pomArtifact, configuration ).getProject();
                 }
                 catch ( ProjectBuildingException e )
                 {

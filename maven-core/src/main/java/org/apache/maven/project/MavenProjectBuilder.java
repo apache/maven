@@ -41,11 +41,6 @@ public interface MavenProjectBuilder
     MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
         throws ProjectBuildingException;
 
-    // TODO: This also doesn't really belong here as it's a mix of project builder and artifact resolution and belongs
-    // in an integration component like the embedder.
-    MavenProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuilderConfiguration configuration )
-        throws ProjectBuildingException;
-
     // TODO: this is only to provide a project for plugins that don't need a project to execute but need some
     // of the values from a MavenProject. Ideally this should be something internal and nothing outside Maven
     // would ever need this so it should not be exposed in a public API

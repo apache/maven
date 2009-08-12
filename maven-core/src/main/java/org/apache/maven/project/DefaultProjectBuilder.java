@@ -81,13 +81,14 @@ public class DefaultProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject build( File pomFile, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        return build( pomFile, true, configuration );
+        return build( pomFile, true, configuration, false );
     }
 
-    private MavenProject build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
+    private DefaultProjectBuildingResult build( File pomFile, boolean localProject,
+                                                ProjectBuildingRequest configuration, boolean resolveDependencies )
         throws ProjectBuildingException
     {
         ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
@@ -141,7 +142,29 @@ public class DefaultProjectBuilder
 
             MavenProject project = toProject( result, configuration, listener );
 
-            return project;
+            ArtifactResolutionResult artifactResult = null;
+
+            if ( resolveDependencies )
+            {
+                Artifact artifact = new ProjectArtifact( project );
+
+                ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
+                    .setArtifact( artifact )
+                    .setResolveRoot( false )
+                    .setResolveTransitively( true )
+                    .setCache( configuration.getRepositoryCache() )
+                    .setLocalRepository( configuration.getLocalRepository() )
+                    .setRemoteRepositories( project.getRemoteArtifactRepositories() )
+                    .setOffline( configuration.isOffline() )
+                    .setManagedVersionMap( project.getManagedVersionMap() );
+                // FIXME setTransferListener
+
+                artifactResult = repositorySystem.resolve( artifactRequest );
+
+                project.setArtifacts( artifactResult.getArtifacts() );
+            }
+
+            return new DefaultProjectBuildingResult( project, result.getProblems(), artifactResult );
         }
         finally
         {
@@ -188,7 +211,7 @@ public class DefaultProjectBuilder
         return request;
     }
 
-    public MavenProject build( Artifact artifact, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
         if ( !artifact.getType().equals( "pom" ) )
@@ -214,7 +237,7 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
 
-        return build( artifact.getFile(), false, configuration );
+        return build( artifact.getFile(), false, configuration, false );
     }
 
     /**
@@ -223,7 +246,7 @@ public class DefaultProjectBuilder
      * I am taking out the profile handling and the interpolation of the base directory until we
      * spec this out properly.
      */
-    public MavenProject buildStandaloneSuperProject( ProjectBuildingRequest config )
+    public ProjectBuildingResult buildStandaloneSuperProject( ProjectBuildingRequest config )
         throws ProjectBuildingException
     {
         ModelBuildingRequest request = getModelBuildingRequest( config, null );
@@ -252,55 +275,13 @@ public class DefaultProjectBuilder
 
         standaloneProject.setExecutionRoot( true );
 
-        return standaloneProject;
+        return new DefaultProjectBuildingResult( standaloneProject, result.getProblems(), null );
     }
 
-    public MavenProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuildingRequest request )
+    public ProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        MavenProject project = build( pomFile, request );
-
-        Artifact artifact = new ProjectArtifact( project );                     
-        
-        ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setResolveRoot( false )
-            .setResolveTransitively( true )
-            .setCache( request.getRepositoryCache() )
-            .setLocalRepository( request.getLocalRepository() )
-            .setRemoteRepositories( project.getRemoteArtifactRepositories() )
-            .setOffline( request.isOffline() )
-            .setManagedVersionMap( project.getManagedVersionMap() );
-        // FIXME setTransferListener
-        ArtifactResolutionResult result;
-
-        ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
-
-        try
-        {
-            if ( project.getClassRealm() != null )
-            {
-                Thread.currentThread().setContextClassLoader( project.getClassRealm() );
-            }
-
-            result = repositorySystem.resolve( artifactRequest );
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( oldContextClassLoader );
-        }
-
-        if ( result.hasExceptions() )
-        {
-            Exception e = result.getExceptions().get( 0 );
-
-            throw new ProjectBuildingException( safeVersionlessKey( project.getGroupId(), project.getArtifactId() ), "Unable to build project due to an invalid dependency version: " + e.getMessage(),
-                                                pomFile, e );
-        }
-
-        project.setArtifacts( result.getArtifacts() );
-        
-        return new MavenProjectBuildingResult( project, result );
+        return build( pomFile, true, request, true );
     }
 
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest config )
@@ -334,7 +315,7 @@ public class DefaultProjectBuilder
 
                     MavenProject project = toProject( result, config, interimResult.listener );
 
-                    results.add( new DefaultProjectBuildingResult( project, result.getProblems() ) );
+                    results.add( new DefaultProjectBuildingResult( project, result.getProblems(), null ) );
                 }
                 catch ( ModelBuildingException e )
                 {

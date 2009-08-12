@@ -90,7 +90,7 @@ public class PomConstructionWithSettingsTest
         config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
         
-        return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ) );        
+        return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );        
 	}  
     
     private static Settings readSettingsFile(File settingsFile) 

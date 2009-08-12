@@ -22,6 +22,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.List;
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.building.ModelProblem;
 
 /**
@@ -51,7 +52,8 @@ public interface ProjectBuildingResult
     /**
      * Gets the project that was built.
      * 
-     * @return The project that was built or {@code null} if an error occurred.
+     * @return The project that was built or {@code null} if an error occurred and this result accompanies a
+     *         {@link ProjectBuildingException}.
      */
     MavenProject getProject();
 
@@ -61,5 +63,13 @@ public interface ProjectBuildingResult
      * @return The problems that were encountered during the project building, can be empty but never {@code null}.
      */
     List<ModelProblem> getProblems();
+
+    /**
+     * Gets the result of the dependency resolution for the project.
+     * 
+     * @return The result of the dependency resolution for the project or {@code null} if the project dependencies were
+     *         not requested.
+     */
+    ArtifactResolutionResult getArtifactResolutionResult();
 
 }

@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.building.ModelProblem;
 
 /**
@@ -42,18 +43,24 @@ class DefaultProjectBuildingResult
 
     private List<ModelProblem> problems;
 
+    private ArtifactResolutionResult artifactResolutionResult;
+
     /**
      * Creates a new result with the specified contents.
      * 
      * @param project The project that was built, may be {@code null}.
      * @param problems The problems that were encouterned, may be {@code null}.
+     * @param dependencyResolutionResult The result of the artifact resolution for the project dependencies, may be
+     *            {@code null}.
      */
-    public DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems )
+    public DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems,
+                                         ArtifactResolutionResult dependencyResolutionResult )
     {
         this.projectId = ( project != null ) ? project.getId() : "";
         this.pomFile = ( project != null ) ? project.getFile() : null;
         this.project = project;
         this.problems = problems;
+        this.artifactResolutionResult = dependencyResolutionResult;
     }
 
     /**
@@ -93,6 +100,11 @@ class DefaultProjectBuildingResult
         }
 
         return problems;
+    }
+
+    public ArtifactResolutionResult getArtifactResolutionResult()
+    {
+        return artifactResolutionResult;
     }
 
 }

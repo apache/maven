@@ -51,7 +51,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
-        return projectBuilder.build( pomFile, configuration );
+        return projectBuilder.build( pomFile, configuration ).getProject();
     }
 
     public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
@@ -59,7 +59,7 @@ public class DefaultMavenProjectBuilder
     {
         normalizeToArtifactRepositories( configuration );
 
-        return projectBuilder.build( artifact, configuration );
+        return projectBuilder.build( artifact, configuration ).getProject();
     }
 
     private void normalizeToArtifactRepositories( ProjectBuilderConfiguration configuration )
@@ -143,13 +143,7 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        return projectBuilder.buildStandaloneSuperProject( config );
-    }
-
-    public MavenProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuilderConfiguration configuration )
-        throws ProjectBuildingException
-    {
-        return projectBuilder.buildProjectWithDependencies( pomFile, configuration );
+        return projectBuilder.buildStandaloneSuperProject( config ).getProject();
     }
 
 }

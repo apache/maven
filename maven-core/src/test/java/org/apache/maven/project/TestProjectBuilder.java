@@ -17,7 +17,7 @@ public class TestProjectBuilder
 {    
     
     @Override
-    public MavenProject build( Artifact artifact, ProjectBuildingRequest request )
+    public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {                       
         if ( "maven-test".equals( artifact.getGroupId() ) )
@@ -37,20 +37,20 @@ public class TestProjectBuilder
         {
             MavenProject project = new MavenProject();
             project.setArtifact( artifact );
-            return project;
+            return new DefaultProjectBuildingResult( project, null, null );
         }
         return build( artifact.getFile(), request );
     }
 
     @Override
-    public MavenProject build( File pomFile, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        MavenProject project = super.build( pomFile, configuration );
+        ProjectBuildingResult result = super.build( pomFile, configuration );
 
-        project.setRemoteArtifactRepositories( Collections.<ArtifactRepository> emptyList() );
+        result.getProject().setRemoteArtifactRepositories( Collections.<ArtifactRepository> emptyList() );
 
-        return project;
+        return result;
     }
 
 }

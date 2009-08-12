@@ -236,7 +236,7 @@ public class DefaultMaven
         //
         if ( request.getPom() == null || !request.getPom().exists() )
         {
-            MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingRequest() ); 
+            MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingRequest() ).getProject(); 
             projects.add( project );
             request.setProjectPresent( false );
             return projects;

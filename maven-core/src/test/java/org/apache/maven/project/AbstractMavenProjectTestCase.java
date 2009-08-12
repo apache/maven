@@ -158,7 +158,7 @@ public abstract class AbstractMavenProjectTestCase
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
 
-        return projectBuilder.build( pom, configuration );
+        return projectBuilder.build( pom, configuration ).getProject();
     }
 
 }
