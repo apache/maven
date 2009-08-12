@@ -52,8 +52,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
     public MavenITmng0553SettingsAuthzEncryptionTest()
     {
-        // TODO: reintroduce for 3.0
-        super( "(2.1.0-M1,3.0-alpha-1)" ); // 2.1.0-M2+
+        super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.1.0-M2+
     }
 
     public void setUp()
