@@ -204,7 +204,7 @@ public class DefaultMavenMetadataCache
     public ResolutionGroup get( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                                 List<ArtifactRepository> remoteRepositories )
     {
-        CacheKey cacheKey = new CacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
+        CacheKey cacheKey = newCacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
 
         CacheRecord cacheRecord = cache.get( cacheKey );
 
@@ -231,7 +231,17 @@ public class DefaultMavenMetadataCache
     public void put( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                      List<ArtifactRepository> remoteRepositories, ResolutionGroup result )
     {
-        CacheKey cacheKey = new CacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
+        put( newCacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories ), result );
+    }
+
+    protected CacheKey newCacheKey( Artifact artifact, boolean resolveManagedVersions,
+                                    ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    {
+        return new CacheKey( artifact, resolveManagedVersions, localRepository, remoteRepositories );
+    }
+
+    protected void put( CacheKey cacheKey, ResolutionGroup result )
+    {
         CacheRecord cacheRecord =
             new CacheRecord( result.getPomArtifact(), result.getRelocatedArtifact(), result.getArtifacts(),
                              result.getManagedVersions(), result.getResolutionRepositories() );

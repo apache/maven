@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -84,67 +83,94 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        return build( pomFile, true, configuration, false );
+        return build( pomFile, true, configuration );
     }
 
-    private ProjectBuildingResult build( File pomFile, boolean localProject, ProjectBuildingRequest configuration,
-                                         boolean resolveDependencies )
+    private ProjectBuildingResult build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
-
-        DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
-        request.setModelBuildingListeners( Arrays.asList( listener ) );
-
-        if ( localProject )
-        {
-            request.setPomFile( pomFile );
-        }
-        else
-        {
-            request.setModelSource( new FileModelSource( pomFile ) );
-        }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
         {
-            ModelBuildingResult result;
-            try
-            {
-                result = modelBuilder.build( request );
-            }
-            catch ( ModelBuildingException e )
-            {
-                throw new ProjectBuildingException( e.getModelId(), "Encountered POM errors", pomFile, e );
-            }
+            MavenProject project = configuration.getProject();
 
-            Model model = result.getEffectiveModel();
+            List<ModelProblem> modelProblems = null;
 
-            if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
+            if ( project == null )
             {
-                logger.warn( "" );
-                logger.warn( "Some problems were encountered while building the effective model for " + model.getId() );
-
-                for ( ModelProblem problem : result.getProblems() )
+                ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
+    
+                DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
+                request.setModelBuildingListeners( Arrays.asList( listener ) );
+    
+                if ( localProject )
                 {
-                    logger.warn( problem.getMessage() );
+                    request.setPomFile( pomFile );
+                }
+                else
+                {
+                    request.setModelSource( new FileModelSource( pomFile ) );
+                }
+    
+                ModelBuildingResult result;
+                try
+                {
+                    result = modelBuilder.build( request );
+                }
+                catch ( ModelBuildingException e )
+                {
+                    throw new ProjectBuildingException( e.getModelId(), "Encountered POM errors", pomFile, e );
                 }
 
-                logger.warn( "" );
-                logger.warn( "It is highly recommended to fix these problems"
-                    + " because they threaten the stability of your build." );
-                logger.warn( "" );
-                logger.warn( "For this reason, future Maven versions will no"
-                    + " longer support building such malformed projects." );
-                logger.warn( "" );
+                modelProblems = result.getProblems();
+
+                Model model = result.getEffectiveModel();
+
+                if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
+                {
+                    logger.warn( "" );
+                    logger.warn( "Some problems were encountered while building the effective model for " + model.getId() );
+    
+                    for ( ModelProblem problem : result.getProblems() )
+                    {
+                        logger.warn( problem.getMessage() );
+                    }
+    
+                    logger.warn( "" );
+                    logger.warn( "It is highly recommended to fix these problems"
+                        + " because they threaten the stability of your build." );
+                    logger.warn( "" );
+                    logger.warn( "For this reason, future Maven versions will no"
+                        + " longer support building such malformed projects." );
+                    logger.warn( "" );
+                }
+
+                project = toProject( result, configuration, listener );
             }
 
-            MavenProject project = toProject( result, configuration, listener );
+            try
+            {
+                if ( configuration.isProcessPlugins() && configuration.isProcessPluginConfiguration() )
+                {
+                    RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+                    repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
+                    repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
+                    repositoryRequest.setCache( configuration.getRepositoryCache() );
+                    repositoryRequest.setOffline( configuration.isOffline() );
+            
+                    lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), repositoryRequest );
+                }
+            }
+            catch ( LifecycleExecutionException e )
+            {
+                throw new ProjectBuildingException( project.getId(), e.getMessage(), e );
+            }
 
             ArtifactResolutionResult artifactResult = null;
 
-            if ( resolveDependencies )
+            if ( configuration.isResolveDependencies() )
             {
                 Artifact artifact = new ProjectArtifact( project );
 
@@ -164,7 +190,7 @@ public class DefaultProjectBuilder
                 project.setArtifacts( artifactResult.getArtifacts() );
             }
 
-            return new DefaultProjectBuildingResult( project, result.getProblems(), artifactResult );
+            return new DefaultProjectBuildingResult( project, modelProblems, artifactResult );
         }
         finally
         {
@@ -237,7 +263,7 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
         }
 
-        return build( artifact.getFile(), false, configuration, false );
+        return build( artifact.getFile(), false, configuration );
     }
 
     /**
@@ -276,12 +302,6 @@ public class DefaultProjectBuilder
         standaloneProject.setExecutionRoot( true );
 
         return new DefaultProjectBuildingResult( standaloneProject, result.getProblems(), null );
-    }
-
-    public ProjectBuildingResult buildProjectWithDependencies( File pomFile, ProjectBuildingRequest request )
-        throws ProjectBuildingException
-    {
-        return build( pomFile, true, request, true );
     }
 
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest config )
@@ -480,24 +500,6 @@ public class DefaultProjectBuilder
 
         project.setClassRealm( listener.getProjectRealm() );
 
-        try
-        {
-            if ( configuration.isProcessPlugins() && configuration.isProcessPluginConfiguration() )
-            {
-                RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-                repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
-                repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
-                repositoryRequest.setCache( configuration.getRepositoryCache() );
-                repositoryRequest.setOffline( configuration.isOffline() );
-
-                lifecycle.populateDefaultConfigurationForPlugins( model.getBuild().getPlugins(), repositoryRequest );
-            }
-        }
-        catch ( LifecycleExecutionException e )
-        {
-            throw new ProjectBuildingException( project.getId(), e.getMessage(), e );
-        }
-
         Build build = project.getBuild();
         project.addScriptSourceRoot( build.getScriptSourceDirectory() );
         project.addCompileSourceRoot( build.getSourceDirectory() );
@@ -515,25 +517,6 @@ public class DefaultProjectBuilder
         }
 
         return project;
-    }
-
-    private static String safeVersionlessKey( String groupId, String artifactId )
-    {
-        String gid = groupId;
-
-        if ( StringUtils.isEmpty( gid ) )
-        {
-            gid = "unknown";
-        }
-
-        String aid = artifactId;
-
-        if ( StringUtils.isEmpty( aid ) )
-        {
-            aid = "unknown";
-        }
-
-        return ArtifactUtils.versionlessKey( gid, aid );
     }
 
     private String toSourceHint( Model model )

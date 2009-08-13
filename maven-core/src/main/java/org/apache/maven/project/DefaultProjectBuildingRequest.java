@@ -46,7 +46,7 @@ public class DefaultProjectBuildingRequest
 
     private List<ModelEventListener> listeners;
 
-    private MavenProject topProject;
+    private MavenProject project;
 
     private int validationLevel = ModelBuildingRequest.VALIDATION_LEVEL_STRICT;
 
@@ -66,6 +66,8 @@ public class DefaultProjectBuildingRequest
 
     private Date buildStartTime;
 
+    private boolean resolveDependencies;
+
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
@@ -79,14 +81,14 @@ public class DefaultProjectBuildingRequest
         pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
     }
 
-    public MavenProject getTopLevelProjectFromReactor()
+    public MavenProject getProject()
     {
-        return topProject;
+        return project;
     }
 
-    public void setTopLevelProjectForReactor( MavenProject mavenProject )
+    public void setProject( MavenProject mavenProject )
     {
-        this.topProject = mavenProject;
+        this.project = mavenProject;
     }
 
     public DefaultProjectBuildingRequest setOffline( boolean offline )
@@ -233,6 +235,17 @@ public class DefaultProjectBuildingRequest
     {
         this.processPluginConfiguration = processPluginConfiguration;
         return this;
+    }
+    
+    public ProjectBuildingRequest setResolveDependencies( boolean resolveDependencies )
+    {
+        this.resolveDependencies = resolveDependencies;
+        return this;
+    }
+
+    public boolean isResolveDependencies()
+    {
+        return resolveDependencies;
     }
 
     public ProjectBuildingRequest setValidationLevel( int validationLevel )

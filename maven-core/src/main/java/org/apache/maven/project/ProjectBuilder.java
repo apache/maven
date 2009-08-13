@@ -35,12 +35,6 @@ public interface ProjectBuilder
     ProjectBuildingResult buildStandaloneSuperProject( ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
-    // TODO: This also doesn't really belong here as it's a mix of project builder and artifact resolution and belongs
-    // in an integration component like the embedder.
-    @Deprecated
-    ProjectBuildingResult buildProjectWithDependencies( File project, ProjectBuildingRequest request )
-        throws ProjectBuildingException;
-
     /**
      * Builds the projects for the specified POM files and optionally their children.
      * 

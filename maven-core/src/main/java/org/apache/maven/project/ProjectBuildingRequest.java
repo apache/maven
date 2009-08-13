@@ -23,12 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.MavenTransferListener;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.wagon.events.TransferListener;
 
 public interface ProjectBuildingRequest
 {
@@ -89,9 +87,9 @@ public interface ProjectBuildingRequest
      */
     Properties getUserProperties();
 
-    void setTopLevelProjectForReactor(MavenProject mavenProject);
+    void setProject(MavenProject mavenProject);
 
-    MavenProject getTopLevelProjectFromReactor();
+    MavenProject getProject();
 
     ProjectBuildingRequest setProcessPlugins( boolean processPlugins );
 
@@ -100,6 +98,10 @@ public interface ProjectBuildingRequest
     ProjectBuildingRequest setProcessPluginConfiguration( boolean processPluginConfiguration );
 
     boolean isProcessPluginConfiguration();
+
+    ProjectBuildingRequest setResolveDependencies( boolean resolveDependencies );
+
+    boolean isResolveDependencies();
 
     /**
      * Controls the level of validation to perform on processed models. By default, models are validated in strict mode.

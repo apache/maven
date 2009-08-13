@@ -41,9 +41,9 @@ public interface ProjectBuilderConfiguration
 
     Properties getSystemProperties();
 
-    void setTopLevelProjectForReactor(MavenProject mavenProject);
+    void setProject(MavenProject mavenProject);
 
-    MavenProject getTopLevelProjectFromReactor();
+    MavenProject getProject();
         
     ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins );
     

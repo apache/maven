@@ -129,10 +129,11 @@ public abstract class AbstractMavenProjectTestCase
         configuration.setLocalRepository( getLocalRepository() );
         configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[] {} ) );
         configuration.setProcessPlugins( false );
+        configuration.setResolveDependencies( true );
 
         try
         {
-            return projectBuilder.buildProjectWithDependencies( pom, configuration ).getProject();
+            return projectBuilder.build( pom, configuration ).getProject();
         }
         catch ( Exception e )
         {
