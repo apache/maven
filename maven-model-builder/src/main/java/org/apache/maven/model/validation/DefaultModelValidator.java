@@ -71,6 +71,10 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            validateStringNoExpression( "groupId", problems, true, model.getGroupId() );
+            validateStringNoExpression( "artifactId", problems, true, model.getArtifactId() );
+            validateStringNoExpression( "version", problems, true, model.getVersion() );
+
             validateDependencies( problems, model.getDependencies(), "dependencies.dependency", request );
 
             if ( model.getDependencyManagement() != null )
@@ -384,6 +388,24 @@ public class DefaultModelValidator
     // ----------------------------------------------------------------------
     // Field validation
     // ----------------------------------------------------------------------
+
+    private boolean validateStringNoExpression( String fieldName, ModelProblemCollector problems, boolean warning,
+                                                String string )
+    {
+        if ( !hasExpression( string ) )
+        {
+            return true;
+        }
+
+        addViolation( problems, warning, "'" + fieldName + "' contains an expression but should be a constant." );
+
+        return false;
+    }
+
+    private boolean hasExpression( String value )
+    {
+        return value != null && value.indexOf( "${" ) >= 0;
+    }
 
     private boolean validateStringNotEmpty( String fieldName, ModelProblemCollector problems, boolean warning, String string )
     {

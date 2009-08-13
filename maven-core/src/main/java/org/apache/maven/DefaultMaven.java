@@ -322,7 +322,7 @@ public class DefaultMaven
                 logger.warn( "It is highly recommended to fix these problems"
                     + " because they threaten the stability of your build." );
                 logger.warn( "" );
-                logger.warn( "For this reason, future Maven versions will no"
+                logger.warn( "For this reason, future Maven versions might no"
                     + " longer support building such malformed projects." );
                 logger.warn( "" );
             }

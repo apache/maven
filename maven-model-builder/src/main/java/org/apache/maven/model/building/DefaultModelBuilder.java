@@ -289,6 +289,7 @@ public class DefaultModelBuilder
 
         model.setPomFile( pomFile );
 
+        problems.setSourceHint( model );
         modelValidator.validateRawModel( model, request, problems );
 
         return model;
