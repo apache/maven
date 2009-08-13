@@ -47,7 +47,6 @@ import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -58,8 +57,6 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
-    @Requirement
-    private Logger logger;
 
     @Requirement
     private ModelBuilder modelBuilder;
@@ -125,27 +122,6 @@ public class DefaultProjectBuilder
                 }
 
                 modelProblems = result.getProblems();
-
-                Model model = result.getEffectiveModel();
-
-                if ( localProject && !result.getProblems().isEmpty() && logger.isWarnEnabled() )
-                {
-                    logger.warn( "" );
-                    logger.warn( "Some problems were encountered while building the effective model for " + model.getId() );
-    
-                    for ( ModelProblem problem : result.getProblems() )
-                    {
-                        logger.warn( problem.getMessage() );
-                    }
-    
-                    logger.warn( "" );
-                    logger.warn( "It is highly recommended to fix these problems"
-                        + " because they threaten the stability of your build." );
-                    logger.warn( "" );
-                    logger.warn( "For this reason, future Maven versions will no"
-                        + " longer support building such malformed projects." );
-                    logger.warn( "" );
-                }
 
                 project = toProject( result, configuration, listener );
             }
