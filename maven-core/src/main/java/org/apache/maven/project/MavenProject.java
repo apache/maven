@@ -17,8 +17,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +62,7 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.building.ModelUtils;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -1840,27 +1838,9 @@ public class MavenProject
             setScriptSourceRoots( ( new ArrayList<String>( project.getScriptSourceRoots() ) ) );
         }
 
-        /*
-         * TODO: This is temporary solution for the failure of IT mng-0471. When StartForkedExecutionMojo clones the
-         * project it really needs a deep copy of the model to make sure manipulations to the project/model during the
-         * forked execution don't pollute the main execution. It's not clear to me right now whether manipulations to
-         * the model itself should just be prohibited (say be means of UnsupportedOperationExceptions) and only have the
-         * project be mutable. If we allow model updates like in 2.x, the code below should better be replaced with the
-         * original cloning code from ModelUtils.
-         */
         if ( project.getModel() != null )
         {
-            try
-            {
-                StringWriter modelWriter = new StringWriter( 1024 * 10 );
-                project.writeModel( modelWriter );
-                MavenXpp3Reader parser = new MavenXpp3Reader();
-                setModel( parser.read( new StringReader( modelWriter.toString() ) ) );
-            }
-            catch ( Exception e )
-            {
-                throw new IllegalStateException( "in-memory cloning failed", e );
-            }
+            setModel( ModelUtils.cloneModel( project.getModel() ) );
         }
 
         if ( project.getOriginalModel() != null )

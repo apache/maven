@@ -87,8 +87,8 @@ public class DefaultProjectBuilder
         return build( pomFile, true, configuration, false );
     }
 
-    private DefaultProjectBuildingResult build( File pomFile, boolean localProject,
-                                                ProjectBuildingRequest configuration, boolean resolveDependencies )
+    private ProjectBuildingResult build( File pomFile, boolean localProject, ProjectBuildingRequest configuration,
+                                         boolean resolveDependencies )
         throws ProjectBuildingException
     {
         ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
