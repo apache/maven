@@ -19,6 +19,8 @@ package org.apache.maven.classrealm;
  * under the License.
  */
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.maven.artifact.ArtifactUtils;
@@ -31,6 +33,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -92,6 +95,11 @@ public class DefaultClassRealmManager
             importXpp3Dom( classRealm );
 
             importMavenApi( classRealm );
+
+            for ( ClassRealmManagerDelegate delegate : getDelegates() )
+            {
+                delegate.setupRealm( classRealm );
+            }
 
             return classRealm;
         }
@@ -176,6 +184,18 @@ public class DefaultClassRealmManager
     {
         String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
         return "plugin>" + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + version;
+    }
+
+    private List<ClassRealmManagerDelegate> getDelegates()
+    {
+        try
+        {
+            return container.lookupList( ClassRealmManagerDelegate.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            return Collections.emptyList();
+        }
     }
 
 }
