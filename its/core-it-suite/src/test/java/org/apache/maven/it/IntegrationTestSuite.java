@@ -173,6 +173,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3885UniqueVersionFromParentProfileTest.class );
         suite.addTestSuite( MavenITmng3877BasedirAlignedModelTest.class );
         suite.addTestSuite( MavenITmng3873MultipleExecutionGoalsTest.class );
+        suite.addTestSuite( MavenITmng3872ProfileActivationInRelocatedPomTest.class );
         suite.addTestSuite( MavenITmng3866PluginConfigInheritanceTest.class );
         suite.addTestSuite( MavenITmng3864PerExecPluginConfigTest.class );
         suite.addTestSuite( MavenITmng3863AutoPluginGroupIdTest.class );
