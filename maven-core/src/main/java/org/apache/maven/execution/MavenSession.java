@@ -34,6 +34,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * @author Jason van Zyl
@@ -100,6 +101,34 @@ public class MavenSession
     public PlexusContainer getContainer()
     {
         return container;
+    }
+
+    @Deprecated
+    public Object lookup( String role )
+        throws ComponentLookupException
+    {
+        return container.lookup( role );
+    }
+
+    @Deprecated
+    public Object lookup( String role, String roleHint )
+        throws ComponentLookupException
+    {
+        return container.lookup( role, roleHint );
+    }
+
+    @Deprecated
+    public List lookupList( String role )
+        throws ComponentLookupException
+    {
+        return container.lookupList( role );
+    }
+
+    @Deprecated
+    public Map lookupMap( String role )
+        throws ComponentLookupException
+    {
+        return container.lookupMap( role );
     }
 
     public RepositoryCache getRepositoryCache()
