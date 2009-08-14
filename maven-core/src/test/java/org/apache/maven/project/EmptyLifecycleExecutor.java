@@ -21,6 +21,7 @@ package org.apache.maven.project;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -50,9 +51,10 @@ public class EmptyLifecycleExecutor
 {
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        CycleDetectedInPluginGraphException, MojoNotFoundException
     {
-        return new MavenExecutionPlan( Collections.<MojoExecution>emptyList(), null );
+        return new MavenExecutionPlan( Collections.<MojoExecution> emptyList(), null );
     }
 
     public void execute( MavenSession session )
@@ -73,7 +75,36 @@ public class EmptyLifecycleExecutor
 
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
-        return Collections.emptySet();
+        Set<Plugin> plugins;
+
+        // NOTE: The upper-case packaging name is intentional, that's a special hinting mode used for certain tests
+        if ( "JAR".equals( packaging ) )
+        {
+            plugins = new LinkedHashSet<Plugin>();
+
+            plugins.add( newPlugin( "maven-compiler-plugin" ) );
+            plugins.add( newPlugin( "maven-resources-plugin" ) );
+            plugins.add( newPlugin( "maven-surefire-plugin" ) );
+            plugins.add( newPlugin( "maven-jar-plugin" ) );
+            plugins.add( newPlugin( "maven-install-plugin" ) );
+            plugins.add( newPlugin( "maven-deploy-plugin" ) );
+        }
+        else
+        {
+            plugins = Collections.emptySet();
+        }
+
+        return plugins;
+    }
+
+    private Plugin newPlugin( String artifactId )
+    {
+        Plugin plugin = new Plugin();
+
+        plugin.setGroupId( "org.apache.maven.plugins" );
+        plugin.setArtifactId( artifactId );
+
+        return plugin;
     }
 
     public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )

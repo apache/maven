@@ -1650,6 +1650,17 @@ public class PomConstructionTest
         }
     }
 
+    /** MNG-522, MNG-3018 */
+    public void testManagedPluginConfigurationAppliesToImplicitPluginsIntroducedByPackaging()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-management-for-implicit-plugin/child" );
+        assertEquals( "passed.txt",
+                      pom.getValue( "build/plugins[@artifactId='maven-resources-plugin']/configuration/pathname" ) );
+        assertEquals( "passed.txt",
+                      pom.getValue( "build/plugins[@artifactId='maven-it-plugin-log-file']/configuration/logFile" ) );
+    }
+
     private void assertPathSuffixEquals( String expected, Object actual )
     {
         String a = actual.toString();
