@@ -321,12 +321,6 @@ public class DefaultPluginManager
 
         Mojo mojo = null;
 
-        String goalExecId = goalName;
-        if ( mojoExecution.getExecutionId() != null )
-        {
-            goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
-        }
-
         ClassRealm pluginRealm = getPluginRealm( session, mojoDescriptor.getPluginDescriptor() );            
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
@@ -369,6 +363,12 @@ public class DefaultPluginManager
                 }
                 catch ( ComponentLifecycleException e )
                 {
+                    String goalExecId = goalName;
+                    if ( mojoExecution.getExecutionId() != null )
+                    {
+                        goalExecId += " {execution: " + mojoExecution.getExecutionId() + "}";
+                    }
+
                     logger.debug( "Error releasing mojo for: " + goalExecId, e );
                 }
             }
