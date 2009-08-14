@@ -1211,27 +1211,27 @@ public class DefaultLifecycleExecutor
         }
         catch ( PluginNotFoundException e )
         {
-            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }
         catch ( PluginResolutionException e )
         {
-            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }
         catch ( PluginDescriptorParsingException e )
         {
-            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }
         catch ( CycleDetectedInPluginGraphException e )
         {
-            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }
         catch ( MojoNotFoundException e )
         {
-            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }
         catch ( InvalidPluginDescriptorException e )
         {
-            throw new LifecycleExecutionException( "Error getting default plugin information: ", e );
+            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         } 
         
         return getMojoConfiguration( mojoDescriptor );
