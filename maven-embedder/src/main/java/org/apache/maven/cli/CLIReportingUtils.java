@@ -28,8 +28,6 @@ public final class CLIReportingUtils
 
     public static final int SEC_PER_MIN = 60;
 
-    private static final String NEWLINE = System.getProperty( "line.separator" );
-
     public static void showVersion()
     {
         Properties properties = getBuildProperties();
@@ -165,22 +163,24 @@ public final class CLIReportingUtils
         return properties;
     }
 
-    public static void showError( String message, Exception e, boolean showStackTrace )
+    public static void showError( MavenEmbedderLogger logger, String message, Exception e, boolean showStackTrace )
     {
-        System.err.println( message );
-
         if ( showStackTrace )
         {
-            e.printStackTrace();
+            logger.error( message, e );
         }
         else
         {
-            System.err.println( e.getMessage() );
+            logger.error( message );
 
-            for ( Throwable cause = e.getCause(); cause != null; cause = cause.getCause() )
+            if ( e != null )
             {
-                System.err.print( "Caused by: " );
-                System.err.println( cause.getMessage() );
+                logger.error( e.getMessage() );
+
+                for ( Throwable cause = e.getCause(); cause != null; cause = cause.getCause() )
+                {
+                    logger.error( "Caused by: " + cause.getMessage() );
+                }
             }
         }
     }

@@ -26,6 +26,7 @@ import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
+import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -87,11 +88,6 @@ public class MavenCli
 
         boolean showErrors = debug || commandLine.hasOption( CLIManager.ERRORS );
 
-        if ( showErrors )
-        {
-            System.out.println( "+ Error stacktraces are turned on." );
-        }
-
         // ----------------------------------------------------------------------
         // Process particular command line options
         // ----------------------------------------------------------------------
@@ -109,10 +105,6 @@ public class MavenCli
 
             return 0;
         }
-        else if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
-        {
-            CLIReportingUtils.showVersion();
-        }
 
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
         // Windows paths.
@@ -126,18 +118,41 @@ public class MavenCli
 
         Configuration configuration = buildEmbedderConfiguration( request, commandLine, classWorld );
 
+        MavenEmbedderLogger logger = configuration.getMavenEmbedderLogger();
+
+        if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
+        {
+            CLIReportingUtils.showVersion();
+        }
+
+        if ( showErrors )
+        {
+            logger.info( "Error stacktraces are turned on." );
+        }
+
+        if ( MavenExecutionRequest.CHECKSUM_POLICY_WARN.equals( request.getGlobalChecksumPolicy() ) )
+        {
+            logger.info( "Disabling strict checksum verification on all artifact downloads." );
+        }
+        else if ( MavenExecutionRequest.CHECKSUM_POLICY_FAIL.equals( request.getGlobalChecksumPolicy() ) )
+        {
+            logger.info( "Enabling strict checksum verification on all artifact downloads." );
+        }
+
         ConfigurationValidationResult cvr = MavenEmbedder.validateConfiguration( configuration );
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
         {
-            CLIReportingUtils.showError( "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
+            CLIReportingUtils.showError( logger, "Error reading user settings: ", cvr.getUserSettingsException(),
+                                         showErrors );
 
             return 1;
         }
 
         if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
         {
-            CLIReportingUtils.showError( "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
+            CLIReportingUtils.showError( logger, "Error reading global settings: ", cvr.getGlobalSettingsException(),
+                                         showErrors );
 
             return 1;
         }
@@ -160,7 +175,7 @@ public class MavenCli
         }
         catch ( MavenEmbedderException e )
         {
-            CLIReportingUtils.showError( "Unable to start the embedder: ", e, showErrors );
+            CLIReportingUtils.showError( logger, "Unable to start the embedder: ", e, showErrors );
 
             return 1;
         }
@@ -217,7 +232,8 @@ public class MavenCli
         }
         catch ( Exception e )
         {
-            CLIReportingUtils.showError( "FATAL ERROR: " + "Error encrypting password: " + e.getMessage(), e, showErrors );
+            System.err.println( "FATAL ERROR: " + "Error encrypting password: " + e.getMessage() );
+            e.printStackTrace();
 
             return 1;
         }
@@ -241,21 +257,23 @@ public class MavenCli
 
             if ( es == null )
             {
-                result.getExceptions().get( 0 ).printStackTrace();
+                logger.error( "", result.getExceptions().get( 0 ) );
             }
             else
             {
-                System.out.println( es.getMessage() );
-
                 if ( showErrors )
                 {
-                    es.getException().printStackTrace();
+                    logger.error( es.getMessage(), es.getException() );
+                }
+                else
+                {
+                    logger.error( es.getMessage() );
                 }
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
             {
-                System.out.println( "+ Build failures were ignored." );
+                logger.info( "Build failures were ignored." );
 
                 return 0;
             }

@@ -123,16 +123,10 @@ final class CLIRequestUtils
 
         if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
         {
-            // todo; log
-            System.out.println( "+ Enabling strict checksum verification on all artifact downloads." );
-
             globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
         }
         else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
         {
-            // todo: log
-            System.out.println( "+ Disabling strict checksum verification on all artifact downloads." );
-
             globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
         }
 
