@@ -1,4 +1,6 @@
-package org.apache.maven.embedder;/*
+package org.apache.maven.embedder;
+
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -25,84 +27,12 @@ package org.apache.maven.embedder;/*
  * @author <a href="mailto:dev@avalon.codehaus.org">Avalon Development Team</a>
  */
 public final class MavenEmbedderConsoleLogger
-    extends AbstractMavenEmbedderLogger
+    extends MavenEmbedderPrintStreamLogger
 {
-    public void debug( String message,
-                       Throwable throwable )
-    {
-        if ( isDebugEnabled() )
-        {
-            System.out.print( "[DEBUG] " );
-            System.out.println( message );
 
-            if ( null != throwable )
-            {
-                throwable.printStackTrace( System.out );
-            }
-        }
+    public MavenEmbedderConsoleLogger()
+    {
+        super( System.out );
     }
 
-    public void info( String message,
-                      Throwable throwable )
-    {
-        if ( isInfoEnabled() )
-        {
-            System.out.print( "[INFO] " );
-            System.out.println( message );
-
-            if ( null != throwable )
-            {
-                throwable.printStackTrace( System.out );
-            }
-        }
-    }
-
-    public void warn( String message,
-                      Throwable throwable )
-    {
-        if ( isWarnEnabled() )
-        {
-            System.out.print( "[WARNING] " );
-            System.out.println( message );
-
-            if ( null != throwable )
-            {
-                throwable.printStackTrace( System.out );
-            }
-        }
-    }
-
-    public void error( String message,
-                       Throwable throwable )
-    {
-        if ( isErrorEnabled() )
-        {
-            System.out.print( "[ERROR] " );
-            System.out.println( message );
-
-            if ( null != throwable )
-            {
-                throwable.printStackTrace( System.out );
-            }
-        }
-    }
-
-    public void fatalError( String message,
-                            Throwable throwable )
-    {
-        if ( isFatalErrorEnabled() )
-        {
-            System.out.print( "[ERROR] " );
-            System.out.println( message );
-
-            if ( null != throwable )
-            {
-                throwable.printStackTrace( System.out );
-            }
-        }
-    }
-
-    public void close()
-    {
-    }
 }
