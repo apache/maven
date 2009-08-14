@@ -90,7 +90,6 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.getCliOptions().add( "--fail-never" );
         verifier.setLogFileName( "log-fn.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
-        verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
