@@ -2794,6 +2794,24 @@
         return executionMap;
     }
 
+    /**
+     * Gets the identifier of the plugin.
+     * 
+     * @return The plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
+     */
+    public String getId()
+    {
+        StringBuilder id = new StringBuilder( 128 );
+
+        id.append( ( getGroupId() == null ) ? "[unknown-group-id]" : getGroupId() );
+        id.append( ":" );
+        id.append( ( getArtifactId() == null ) ? "[unknown-artifact-id]" : getArtifactId() );
+        id.append( ":" );
+        id.append( ( getVersion() == null ) ? "[unknown-version]" : getVersion() );
+
+        return id.toString();
+    }
+
     //TODO we shall reset key variable when groupId/artifactId change
     private String key = null;
     /**
