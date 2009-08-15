@@ -21,7 +21,6 @@ package org.apache.maven.settings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,21 +53,19 @@ public final class SettingsUtils
 
         recessive.setSourceLevel( recessiveSourceLevel );
 
-        List dominantActiveProfiles = dominant.getActiveProfiles();
-        List recessiveActiveProfiles = recessive.getActiveProfiles();
+        List<String> dominantActiveProfiles = dominant.getActiveProfiles();
+        List<String> recessiveActiveProfiles = recessive.getActiveProfiles();
 
         if ( recessiveActiveProfiles != null )
         {
             if ( dominantActiveProfiles == null )
             {
-                dominantActiveProfiles = new ArrayList();
+                dominantActiveProfiles = new ArrayList<String>();
                 dominant.setActiveProfiles( dominantActiveProfiles );
             }
 
-            for ( Iterator it = recessiveActiveProfiles.iterator(); it.hasNext(); )
+            for ( String profileId : recessiveActiveProfiles )
             {
-                String profileId = (String) it.next();
-
                 if ( !dominantActiveProfiles.contains( profileId ) )
                 {
                     dominantActiveProfiles.add( profileId );
@@ -76,22 +73,20 @@ public final class SettingsUtils
             }
         }
 
-        List dominantPluginGroupIds = dominant.getPluginGroups();
+        List<String> dominantPluginGroupIds = dominant.getPluginGroups();
 
-        List recessivePluginGroupIds = recessive.getPluginGroups();
+        List<String> recessivePluginGroupIds = recessive.getPluginGroups();
 
         if ( recessivePluginGroupIds != null )
         {
             if ( dominantPluginGroupIds == null )
             {
-                dominantPluginGroupIds = new ArrayList();
+                dominantPluginGroupIds = new ArrayList<String>();
                 dominant.setPluginGroups( dominantPluginGroupIds );
             }
 
-            for ( Iterator it = recessivePluginGroupIds.iterator(); it.hasNext(); )
+            for ( String pluginGroupId : recessivePluginGroupIds )
             {
-                String pluginGroupId = (String) it.next();
-
                 if ( !dominantPluginGroupIds.contains( pluginGroupId ) )
                 {
                     dominantPluginGroupIds.add( pluginGroupId );
@@ -116,14 +111,13 @@ public final class SettingsUtils
      * @param recessive
      * @param recessiveSourceLevel
      */
-    private static void shallowMergeById( List dominant, List recessive, String recessiveSourceLevel )
+    private static <T extends IdentifiableBase> void shallowMergeById( List<T> dominant, List<T> recessive,
+                                                                       String recessiveSourceLevel )
     {
-        Map dominantById = mapById( dominant );
+        Map<String, T> dominantById = mapById( dominant );
 
-        for ( Iterator it = recessive.iterator(); it.hasNext(); )
+        for ( T identifiable : recessive )
         {
-            IdentifiableBase identifiable = (IdentifiableBase) it.next();
-
             if ( !dominantById.containsKey( identifiable.getId() ) )
             {
                 identifiable.setSourceLevel( recessiveSourceLevel );
@@ -137,14 +131,12 @@ public final class SettingsUtils
      * @param identifiables
      * @return a map
      */
-    private static Map mapById( List identifiables )
+    private static <T extends IdentifiableBase> Map<String, T> mapById( List<T> identifiables )
     {
-        Map byId = new HashMap();
+        Map<String, T> byId = new HashMap<String, T>();
 
-        for ( Iterator it = identifiables.iterator(); it.hasNext(); )
+        for ( T identifiable : identifiables )
         {
-            IdentifiableBase identifiable = (IdentifiableBase) it.next();
-
             byId.put( identifiable.getId(), identifiable );
         }
 
@@ -216,21 +208,21 @@ public final class SettingsUtils
 
         profile.setProperties( settingsProfile.getProperties() );
 
-        List repos = settingsProfile.getRepositories();
+        List<Repository> repos = settingsProfile.getRepositories();
         if ( repos != null )
         {
-            for ( Iterator it = repos.iterator(); it.hasNext(); )
+            for ( Repository repo : repos )
             {
-                profile.addRepository( convertFromSettingsRepository( (Repository) it.next() ) );
+                profile.addRepository( convertFromSettingsRepository( repo ) );
             }
         }
 
-        List pluginRepos = settingsProfile.getPluginRepositories();
+        List<Repository> pluginRepos = settingsProfile.getPluginRepositories();
         if ( pluginRepos != null )
         {
-            for ( Iterator it = pluginRepos.iterator(); it.hasNext(); )
+            for ( Repository pluginRepo : pluginRepos )
             {
-                profile.addPluginRepository( convertFromSettingsRepository( (Repository) it.next() ) );
+                profile.addPluginRepository( convertFromSettingsRepository( pluginRepo ) );
             }
         }
 

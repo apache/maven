@@ -114,12 +114,12 @@ public class DefaultMavenSettingsBuilder
 
         return userSettings;
     }
-    
+
 
     private Settings interpolate( Settings settings, MavenExecutionRequest request )
         throws IOException, XmlPullParserException
     {
-        List activeProfiles = settings.getActiveProfiles();
+        List<String> activeProfiles = settings.getActiveProfiles();
 
         StringWriter writer = new StringWriter();
 
