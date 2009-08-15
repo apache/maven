@@ -19,7 +19,6 @@ package org.apache.maven.settings.validation;
  * under the License.
  */
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.settings.Profile;
@@ -37,28 +36,24 @@ public class DefaultSettingsValidator
     public SettingsValidationResult validate( Settings model )
     {
         SettingsValidationResult result = new SettingsValidationResult();
-        
-        List profiles = model.getProfiles();
-        if (profiles != null) {
-            Iterator it = profiles.iterator();
-            while (it.hasNext()) {
-                Profile prof = (Profile)it.next();
+
+        List<Profile> profiles = model.getProfiles();
+        if ( profiles != null )
+        {
+            for (Profile prof : profiles )
+            {
                 validateRepositories( result, prof.getRepositories(), "repositories.repository" );
                 validateRepositories( result, prof.getPluginRepositories(), "pluginRepositories.pluginRepository" );
             }
-            
         }
-
 
         return result;
     }
 
-    private void validateRepositories( SettingsValidationResult result, List repositories, String prefix )
+    private void validateRepositories( SettingsValidationResult result, List<Repository> repositories, String prefix )
     {
-        for ( Iterator it = repositories.iterator(); it.hasNext(); )
+        for ( Repository repository : repositories )
         {
-            Repository repository = (Repository) it.next();
-
             validateStringNotEmpty( prefix + ".id", result, repository.getId() );
 
             validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
@@ -105,7 +100,6 @@ public class DefaultSettingsValidator
         {
             result.addMessage( "'" + fieldName + "' is missing." );
         }
-
 
         return false;
     }
