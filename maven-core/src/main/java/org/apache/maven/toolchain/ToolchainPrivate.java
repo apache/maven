@@ -37,8 +37,8 @@ public interface ToolchainPrivate
      * @param requirements Map<String, String> key value pair
      * @return
      */
-    boolean matchesRequirements( Map requirements);
-    
-    ToolchainModel getModel( );
-    
+    boolean matchesRequirements( Map requirements );
+
+    ToolchainModel getModel();
+
 }

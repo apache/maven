@@ -38,5 +38,5 @@ public interface ToolchainFactory
      * if not applicable.
      * TODO keep around??
      **/
-    ToolchainPrivate createDefaultToolchain( );
+    ToolchainPrivate createDefaultToolchain();
 }

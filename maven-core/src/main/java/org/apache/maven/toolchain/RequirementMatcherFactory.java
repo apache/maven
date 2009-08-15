@@ -29,7 +29,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  */
 public final class RequirementMatcherFactory
 {
-    private RequirementMatcherFactory( )
+    private RequirementMatcherFactory()
     {
     }
 
@@ -68,21 +68,24 @@ public final class RequirementMatcherFactory
 
         private VersionMatcher( String version )
         {
-            this.version = new DefaultArtifactVersion(version);
+            this.version = new DefaultArtifactVersion( version );
         }
 
         public boolean matches( String requirement )
         {
-            try 
+            try
             {
-                VersionRange range = VersionRange.createFromVersionSpec(requirement);
-                if (range.hasRestrictions()) {
-                    return range.containsVersion(version);
-                } else {
-                    return range.getRecommendedVersion().compareTo(version) == 0;
+                VersionRange range = VersionRange.createFromVersionSpec( requirement );
+                if ( range.hasRestrictions() )
+                {
+                    return range.containsVersion( version );
                 }
-            } 
-            catch (InvalidVersionSpecificationException ex) 
+                else
+                {
+                    return range.getRecommendedVersion().compareTo( version ) == 0;
+                }
+            }
+            catch ( InvalidVersionSpecificationException ex )
             {
                 //TODO error reporting
                 ex.printStackTrace();

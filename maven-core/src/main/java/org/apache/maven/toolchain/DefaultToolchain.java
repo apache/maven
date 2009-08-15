@@ -39,15 +39,15 @@ public abstract class DefaultToolchain
     private Map<String, RequirementMatcher> provides = new HashMap<String, RequirementMatcher>();
 
     public static final String KEY_TYPE = "type"; //NOI18N
-    
+
     private ToolchainModel model;
-    
+
     private Logger logger;
 
-    protected DefaultToolchain( ToolchainModel model, Logger logger ) 
+    protected DefaultToolchain( ToolchainModel model, Logger logger )
     {
         this.model = model;
-        
+
         this.logger = logger;
     }
 
@@ -57,13 +57,13 @@ public abstract class DefaultToolchain
         this.type = type;
     }
 
-    public final String getType( )
+    public final String getType()
     {
         return type != null ? type : model.getType();
     }
 
-    
-    public final ToolchainModel getModel( ) 
+
+    public final ToolchainModel getModel()
     {
         return model;
     }
@@ -75,14 +75,15 @@ public abstract class DefaultToolchain
     }
 
 
-    public boolean matchesRequirements(Map requirements) {
+    public boolean matchesRequirements(Map requirements)
+    {
         Iterator it = requirements.keySet().iterator();
         while ( it.hasNext() )
         {
             String key = (String) it.next();
-            
+
             RequirementMatcher matcher = provides.get( key );
-            
+
             if ( matcher == null )
             {
                 getLog().debug( "Toolchain "  + this + " is missing required property: "  + key );
@@ -96,8 +97,9 @@ public abstract class DefaultToolchain
         }
         return true;
     }
-    
-    protected Logger getLog() {
+
+    protected Logger getLog()
+    {
         return logger;
     }
 }

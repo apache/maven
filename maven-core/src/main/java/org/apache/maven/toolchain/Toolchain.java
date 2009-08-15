@@ -27,7 +27,7 @@ package org.apache.maven.toolchain;
 public interface Toolchain
 {
 
-    String getType( );
+    String getType();
 
     /**
      * Gets the platform tool executable.
