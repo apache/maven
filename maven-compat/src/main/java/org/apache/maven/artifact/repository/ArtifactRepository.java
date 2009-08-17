@@ -53,7 +53,13 @@ public interface ArtifactRepository
     void setLayout( ArtifactRepositoryLayout layout );
 
     String getKey();
-    
+
+    @Deprecated
+    boolean isUniqueVersion();
+
+    @Deprecated
+    boolean isBlacklisted();
+
     //
     // New interface methods for the repository system. 
     //

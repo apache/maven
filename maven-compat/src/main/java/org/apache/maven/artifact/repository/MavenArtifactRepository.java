@@ -357,4 +357,15 @@ public class MavenArtifactRepository
     {
         this.proxy = proxy;
     }
+
+    public boolean isBlacklisted()
+    {
+        return false;
+    }
+
+    public boolean isUniqueVersion()
+    {
+        return true;
+    }
+
 }

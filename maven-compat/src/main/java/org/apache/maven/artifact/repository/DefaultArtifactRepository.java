@@ -230,4 +230,10 @@ public class DefaultArtifactRepository
     {
         // do nothing
     }
+
+    public boolean isUniqueVersion()
+    {
+        return true;
+    }
+
 }
