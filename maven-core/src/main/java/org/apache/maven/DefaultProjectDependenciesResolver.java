@@ -20,6 +20,8 @@ package org.apache.maven;
  */
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
@@ -32,6 +34,7 @@ import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.OrArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
@@ -101,7 +104,26 @@ public class DefaultProjectDependenciesResolver
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );                
         resolutionErrorHandler.throwErrors( request, result );
+
         project.setArtifacts( result.getArtifacts() );
-        return result.getArtifacts();        
-    }  
+
+        Set<String> directDependencies = new HashSet<String>( project.getDependencies().size() * 2 );
+        for ( Dependency dependency : project.getDependencies() )
+        {
+            directDependencies.add( dependency.getManagementKey() );
+        }
+
+        Set<Artifact> dependencyArtifacts = new LinkedHashSet<Artifact>( project.getDependencies().size() * 2 );
+        for ( Artifact artifact : result.getArtifacts() )
+        {
+            if ( directDependencies.contains( artifact.getDependencyConflictId() ) )
+            {
+                dependencyArtifacts.add( artifact );
+            }
+        }
+        project.setDependencyArtifacts( dependencyArtifacts );
+
+        return result.getArtifacts();
+    }
+
 }
