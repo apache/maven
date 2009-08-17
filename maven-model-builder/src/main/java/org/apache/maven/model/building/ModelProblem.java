@@ -32,12 +32,12 @@ public interface ModelProblem
     /**
      * The different severity levels for a problem, in decreasing order.
      */
-    public enum Severity
+    enum Severity
     {
 
         FATAL, //
         ERROR, //
-        WARNING, //
+        WARNING; //
 
     }
 
@@ -48,27 +48,27 @@ public interface ModelProblem
      * 
      * @return The hint about the source of the problem, never {@code null}.
      */
-    public String getSource();
+    String getSource();
 
     /**
      * Gets the exception that caused this problem (if any).
      * 
      * @return The exception that caused this problem or {@code null} if not applicable.
      */
-    public Exception getException();
+    Exception getException();
 
     /**
      * Gets the message that describes this problem.
      * 
      * @return The message describing this problem, never {@code null}.
      */
-    public String getMessage();
+    String getMessage();
 
     /**
      * Gets the severity level of this problem.
      * 
      * @return The severity level of this problem, never {@code null}.
      */
-    public Severity getSeverity();
+    Severity getSeverity();
 
 }
