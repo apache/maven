@@ -96,7 +96,7 @@ public class DefaultLegacyArtifactCollector
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
 
-        result.ListOriginatingArtifact( originatingArtifact );
+        result.setOriginatingArtifact( originatingArtifact );
 
         if ( conflictResolvers == null )
         {

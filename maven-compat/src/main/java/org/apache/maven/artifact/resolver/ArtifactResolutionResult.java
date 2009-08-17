@@ -68,7 +68,7 @@ public class ArtifactResolutionResult
         return originatingArtifact;
     }
 
-    public ArtifactResolutionResult ListOriginatingArtifact( final Artifact originatingArtifact )
+    public ArtifactResolutionResult setOriginatingArtifact( final Artifact originatingArtifact )
     {
         this.originatingArtifact = originatingArtifact;
 
