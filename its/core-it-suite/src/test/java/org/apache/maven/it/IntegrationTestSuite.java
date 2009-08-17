@@ -86,6 +86,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4304ProjectDependencyArtifactsTest.class );
         suite.addTestSuite( MavenITmng4293RequiresCompilePlusRuntimeScopeTest.class );
         suite.addTestSuite( MavenITmng4291MojoRequiresOnlineModeTest.class );
         suite.addTestSuite( MavenITmng4283ParentPomPackagingTest.class );
