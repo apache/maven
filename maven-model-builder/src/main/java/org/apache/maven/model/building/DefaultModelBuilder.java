@@ -276,14 +276,14 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            problems.add( new ModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                            ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
+            problems.add( new DefaultModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": "
+                + e.getMessage(), ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
         catch ( IOException e )
         {
-            problems.add( new ModelProblem( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                            ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
+            problems.add( new DefaultModelProblem( "Non-readable POM " + modelSource.getLocation() + ": "
+                + e.getMessage(), ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 

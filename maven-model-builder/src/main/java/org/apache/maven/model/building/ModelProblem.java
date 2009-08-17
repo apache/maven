@@ -26,7 +26,7 @@ package org.apache.maven.model.building;
  * 
  * @author Benjamin Bentmann
  */
-public class ModelProblem
+public interface ModelProblem
 {
 
     /**
@@ -41,42 +41,6 @@ public class ModelProblem
 
     }
 
-    private final String source;
-
-    private final String message;
-
-    private final Exception exception;
-
-    private final Severity severity;
-
-    /**
-     * Creates a new problem with the specified message.
-     * 
-     * @param message The message describing the problem, may be {@code null}.
-     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
-     * @param source A hint about the source of the problem, may be {@code null}.
-     */
-    public ModelProblem( String message, Severity severity, String source )
-    {
-        this( message, severity, source, null );
-    }
-
-    /**
-     * Creates a new problem with the specified message and exception.
-     * 
-     * @param message The message describing the problem, may be {@code null}.
-     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
-     * @param source A hint about the source of the problem, may be {@code null}.
-     * @param exception The exception that caused this problem, may be {@code null}.
-     */
-    public ModelProblem( String message, Severity severity, String source, Exception exception )
-    {
-        this.message = message;
-        this.severity = ( severity != null ) ? severity : Severity.ERROR;
-        this.source = ( source != null ) ? source : "";
-        this.exception = exception;
-    }
-
     /**
      * Gets the hint about the source of the problem. While the syntax of this hint is unspecified and depends on the
      * creator of the problem, the general expectation is that the hint provides sufficient information to the user to
@@ -84,66 +48,27 @@ public class ModelProblem
      * 
      * @return The hint about the source of the problem, never {@code null}.
      */
-    public String getSource()
-    {
-        return source;
-    }
+    public String getSource();
 
     /**
      * Gets the exception that caused this problem (if any).
      * 
      * @return The exception that caused this problem or {@code null} if not applicable.
      */
-    public Exception getException()
-    {
-        return exception;
-    }
+    public Exception getException();
 
     /**
      * Gets the message that describes this problem.
      * 
      * @return The message describing this problem, never {@code null}.
      */
-    public String getMessage()
-    {
-        String msg;
-
-        if ( message != null && message.length() > 0 )
-        {
-            msg = message;
-        }
-        else
-        {
-            msg = exception.getMessage();
-
-            if ( msg == null )
-            {
-                msg = "";
-            }
-        }
-
-        return msg;
-    }
+    public String getMessage();
 
     /**
      * Gets the severity level of this problem.
      * 
      * @return The severity level of this problem, never {@code null}.
      */
-    public Severity getSeverity()
-    {
-        return severity;
-    }
-
-    @Override
-    public String toString()
-    {
-        StringBuilder buffer = new StringBuilder( 128 );
-
-        buffer.append( "[" ).append( getSeverity() ).append( "] " );
-        buffer.append( getSource() ).append( ": " ).append( getMessage() );
-
-        return buffer.toString();
-    }
+    public Severity getSeverity();
 
 }

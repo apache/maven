@@ -98,32 +98,32 @@ class DefaultModelProblemCollector
 
     public void addFatalError( String message )
     {
-        problems.add( new ModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint() ) );
+        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint() ) );
     }
 
     public void addFatalError( String message, Exception cause )
     {
-        problems.add( new ModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint(), cause ) );
+        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint(), cause ) );
     }
 
     public void addError( String message )
     {
-        problems.add( new ModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint() ) );
+        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint() ) );
     }
 
     public void addError( String message, Exception cause )
     {
-        problems.add( new ModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint(), cause ) );
+        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint(), cause ) );
     }
 
     public void addWarning( String message )
     {
-        problems.add( new ModelProblem( message, ModelProblem.Severity.WARNING, getSourceHint() ) );
+        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.WARNING, getSourceHint() ) );
     }
 
     public void addWarning( String message, Exception cause )
     {
-        problems.add( new ModelProblem( message, ModelProblem.Severity.WARNING, getSourceHint(), cause ) );
+        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.WARNING, getSourceHint(), cause ) );
     }
 
 }

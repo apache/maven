@@ -35,6 +35,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelBuilder;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -382,10 +383,9 @@ public class DefaultProjectBuilder
 
                         if ( !moduleFile.isFile() )
                         {
-                            String source = toSourceHint( model );
                             ModelProblem problem =
-                                new ModelProblem( "Child module " + moduleFile + " of " + source + " does not exist",
-                                                  ModelProblem.Severity.ERROR, source );
+                                new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                                    + " does not exist", ModelProblem.Severity.ERROR, model );
                             result.getProblems().add( problem );
 
                             errors = true;
@@ -493,25 +493,6 @@ public class DefaultProjectBuilder
         }
 
         return project;
-    }
-
-    private String toSourceHint( Model model )
-    {
-        StringBuilder buffer = new StringBuilder( 192 );
-
-        buffer.append( model.getGroupId() );
-        buffer.append( ':' );
-        buffer.append( model.getArtifactId() );
-        buffer.append( ':' );
-        buffer.append( model.getVersion() );
-
-        File pomFile = model.getPomFile();
-        if ( pomFile != null )
-        {
-            buffer.append( " (" ).append( pomFile ).append( ")" );
-        }
-
-        return buffer.toString();
     }
 
 }
