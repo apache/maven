@@ -39,9 +39,10 @@ public class AndArtifactFilter
     private Set<ArtifactFilter> filters; 
 
     public AndArtifactFilter()
-    {        
+    {
+        this.filters = new LinkedHashSet<ArtifactFilter>();
     }
-    
+
     public AndArtifactFilter( List<ArtifactFilter> filters )
     {
         this.filters = new LinkedHashSet<ArtifactFilter>( filters );
@@ -63,11 +64,6 @@ public class AndArtifactFilter
 
     public void add( ArtifactFilter artifactFilter )
     {
-        if ( filters == null )
-        {
-            filters = new LinkedHashSet<ArtifactFilter>();
-        }
-        
         filters.add( artifactFilter );
     }
 

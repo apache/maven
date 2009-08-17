@@ -38,6 +38,7 @@ public class OrArtifactFilter
 
     public OrArtifactFilter()
     {
+        this.filters = new LinkedHashSet<ArtifactFilter>();
     }
 
     public OrArtifactFilter( Collection<ArtifactFilter> filters )
@@ -47,14 +48,11 @@ public class OrArtifactFilter
 
     public boolean include( Artifact artifact )
     {
-        if ( filters != null )
+        for ( ArtifactFilter filter : filters )
         {
-            for ( ArtifactFilter filter : filters )
+            if ( filter.include( artifact ) )
             {
-                if ( filter.include( artifact ) )
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
@@ -63,11 +61,6 @@ public class OrArtifactFilter
 
     public void add( ArtifactFilter artifactFilter )
     {
-        if ( filters == null )
-        {
-            filters = new LinkedHashSet<ArtifactFilter>();
-        }
-
         filters.add( artifactFilter );
     }
 
