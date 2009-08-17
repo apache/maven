@@ -1,5 +1,6 @@
 package org.apache.maven.repository;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -186,7 +187,7 @@ public class MirrorProcessorTest
         ArtifactRepository repo = repos.get( 0 );
         assertEquals( "file:///tmp", repo.getUrl() );
         assertEquals( "file", repo.getProtocol() );
-        assertEquals( "/tmp", repo.getBasedir() );
+        assertEquals( File.separator + "tmp", repo.getBasedir() );
     }
 
     /**

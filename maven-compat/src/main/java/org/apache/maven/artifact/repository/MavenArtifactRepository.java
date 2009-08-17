@@ -267,6 +267,9 @@ public class MavenArtifactRepository
             {
                 retValue = retValue.charAt( 0 ) + ":" + retValue.substring( 2 );
             }
+
+            // normalize separators
+            retValue = new File( retValue ).getPath();
         }
 
         if ( retValue == null )
