@@ -1,4 +1,4 @@
- package org.apache.maven.lifecycle;
+package org.apache.maven.lifecycle;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -122,10 +122,26 @@ public class DefaultLifecycleExecutor
      */
     @Requirement
     private Map<String, LifecycleMapping> lifecycleMappings;
-    
+
+    private void fireEvent( MavenSession session, MojoExecution mojoExecution, LifecycleEventCatapult catapult )
+    {
+        List<LifecycleListener> listeners = session.getRequest().getLifecycleListeners();
+
+        if ( !listeners.isEmpty() )
+        {
+            LifecycleEvent event = new DefaultLifecycleEvent( session, mojoExecution );
+
+            for ( LifecycleListener listener : listeners )
+            {
+                catapult.fire( listener, event );
+            }
+        }
+    }
+
     public void execute( MavenSession session )
     {
         // TODO: Use a listener here instead of loggers
+        fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
         
         logger.info( "Build Order:" );
         
@@ -160,21 +176,25 @@ public class DefaultLifecycleExecutor
 
         for ( MavenProject currentProject : session.getProjects() )
         {
-            if ( session.isBlackListed( currentProject ) )
-            {
-                logger.info( "Skipping " + currentProject.getName() );
-                logger.info( "This project has been banned from the build due to previous failures." );
-
-                continue;
-            }
-
-            logger.info( "Building " + currentProject.getName() );
-
             long buildStartTime = System.currentTimeMillis();
 
             try
             {
                 session.setCurrentProject( currentProject );
+
+                if ( session.isBlackListed( currentProject ) )
+                {
+                    fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
+
+                    logger.info( "Skipping " + currentProject.getName() );
+                    logger.info( "This project has been banned from the build due to previous failures." );
+
+                    continue;
+                }
+
+                fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
+
+                logger.info( "Building " + currentProject.getName() );
 
                 repositoryRequest.setRemoteRepositories( currentProject.getPluginArtifactRepositories() );
                 populateDefaultConfigurationForPlugins( currentProject.getBuild().getPlugins(), repositoryRequest );
@@ -219,6 +239,8 @@ public class DefaultLifecycleExecutor
                 long buildEndTime = System.currentTimeMillis();
 
                 result.addBuildSummary( new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
+
+                fireEvent( session, null, LifecycleEventCatapult.PROJECT_SUCCEEDED );
             }
             catch ( Exception e )
             {
@@ -227,6 +249,8 @@ public class DefaultLifecycleExecutor
                 long buildEndTime = System.currentTimeMillis();
 
                 result.addBuildSummary( new BuildFailure( currentProject, buildEndTime - buildStartTime, e ) );
+
+                fireEvent( session, null, LifecycleEventCatapult.PROJECT_FAILED );
 
                 if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( session.getReactorFailureBehavior() ) )
                 {
@@ -254,8 +278,10 @@ public class DefaultLifecycleExecutor
 
                 Thread.currentThread().setContextClassLoader( oldContextClassLoader );
             }
-        }        
-    }        
+        }
+
+        fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
+    }
 
     private void execute( MavenProject project, MavenSession session, MojoExecution mojoExecution )
         throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
@@ -271,6 +297,8 @@ public class DefaultLifecycleExecutor
             }
             else
             {
+                fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SKIPPED );
+
                 logger.warn( "Goal " + mojoDescriptor.getGoal()
                     + " requires online mode for execution but Maven is currently offline, skipping" );
                 return;
@@ -283,37 +311,99 @@ public class DefaultLifecycleExecutor
 
         if ( !forkedExecutions.isEmpty() )
         {
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Forking execution for " + mojoDescriptor.getId() );
-            }
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_STARTED );
 
-            executionProject = project.clone();
-
-            session.setCurrentProject( executionProject );
             try
             {
-                for ( MojoExecution forkedExecution : forkedExecutions )
+                if ( logger.isDebugEnabled() )
                 {
-                    execute( executionProject, session, forkedExecution );
+                    logger.debug( "Forking execution for " + mojoDescriptor.getId() );
+                }
+
+                executionProject = project.clone();
+
+                session.setCurrentProject( executionProject );
+                try
+                {
+                    for ( MojoExecution forkedExecution : forkedExecutions )
+                    {
+                        execute( executionProject, session, forkedExecution );
+                    }
+                }
+                finally
+                {
+                    session.setCurrentProject( project );
+                }
+
+                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_SUCCEEDED );
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "Completed forked execution for " + mojoDescriptor.getId() );
                 }
             }
-            finally
+            catch ( MojoFailureException e )
             {
-                session.setCurrentProject( project );
-            }
+                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
 
-            if ( logger.isDebugEnabled() )
+                throw e;
+            }
+            catch ( MojoExecutionException e )
             {
-                logger.debug( "Completed forked execution for " + mojoDescriptor.getId() );
+                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
+
+                throw e;
+            }
+            catch ( PluginConfigurationException e )
+            {
+                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
+
+                throw e;
+            }
+            catch ( PluginManagerException e )
+            {
+                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
+
+                throw e;
             }
         }
 
-        project.setExecutionProject( executionProject );
+        fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_STARTED );
 
-        logger.info( executionDescription( mojoExecution, project ) );
+        try
+        {
+            project.setExecutionProject( executionProject );
 
-        pluginManager.executeMojo( session, mojoExecution );
+            logger.info( executionDescription( mojoExecution, project ) );
+
+            pluginManager.executeMojo( session, mojoExecution );
+
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
+        }
+        catch ( MojoFailureException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        catch ( MojoExecutionException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        catch ( PluginConfigurationException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        catch ( PluginManagerException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
     }
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
@@ -377,7 +467,8 @@ public class DefaultLifecycleExecutor
         }
 
         return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScopes );
-    }      
+    }
+
     private RepositoryRequest getRepositoryRequest( MavenSession session, MavenProject project )
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
@@ -1074,7 +1165,7 @@ public class DefaultLifecycleExecutor
             
             lifecycleMap.put( lifecycle.getId(), lifecycle );
         }
-    }   
+    }
         
     // These methods deal with construction intact Plugin object that look like they come from a standard
     // <plugin/> block in a Maven POM. We have to do some wiggling to pull the sources of information
@@ -1125,11 +1216,11 @@ public class DefaultLifecycleExecutor
                 {
                     parseLifecyclePhaseDefinitions( plugins, null, goals );
                 }
-            }        
+            }
         }
 
         return plugins.keySet();
-    }        
+    }
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, String goals )
     {
@@ -1198,7 +1289,7 @@ public class DefaultLifecycleExecutor
         {            
             populateDefaultConfigurationForPlugin( plugin, repositoryRequest );
         }
-    }    
+    }
     
     private Xpp3Dom getDefaultPluginConfiguration( Plugin plugin, String goal, RepositoryRequest repositoryRequest ) 
         throws LifecycleExecutionException
@@ -1232,7 +1323,7 @@ public class DefaultLifecycleExecutor
         catch ( InvalidPluginDescriptorException e )
         {
             throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        } 
+        }
         
         return getMojoConfiguration( mojoDescriptor );
     }
@@ -1335,7 +1426,7 @@ public class DefaultLifecycleExecutor
                 if ( plugin != null )
                 {
                     return plugin;
-                }                
+                }
             }
         }
         
@@ -1362,7 +1453,7 @@ public class DefaultLifecycleExecutor
                     if ( plugin != null )
                     {
                         return plugin;
-                    }                                        
+                    }
                 }
                 catch ( TransferFailedException e )
                 {
@@ -1374,10 +1465,10 @@ public class DefaultLifecycleExecutor
                 }
             }
 
-        }            
+        }
                             
         throw new NoPluginFoundForPrefixException( prefix, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );
-    }  
+    }
     
     // Keep track of the repository that provided the prefix mapping
     //
@@ -1526,7 +1617,7 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-    }    
+    }
     
    private void checkRequiredParameters( MojoDescriptor goal, PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
@@ -1646,7 +1737,7 @@ public class DefaultLifecycleExecutor
                 }
             }
         }
-    }    
+    }
     
     */    
 }

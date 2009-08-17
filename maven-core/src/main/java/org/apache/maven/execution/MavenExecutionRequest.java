@@ -27,6 +27,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.lifecycle.LifecycleListener;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
@@ -263,5 +264,9 @@ public interface MavenExecutionRequest
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
+    List<LifecycleListener> getLifecycleListeners();
+    MavenExecutionRequest setLifecycleListeners( List<LifecycleListener> lifecycleListeners );
+
     ProjectBuildingRequest getProjectBuildingRequest();    
+
 }
