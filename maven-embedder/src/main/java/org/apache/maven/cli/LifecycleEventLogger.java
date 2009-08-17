@@ -21,6 +21,10 @@ package org.apache.maven.cli;
 
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.lifecycle.AbstractLifecycleListener;
+import org.apache.maven.lifecycle.LifecycleEvent;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Logs lifecycle events to a user-supplied logger.
@@ -44,5 +48,82 @@ class LifecycleEventLogger
     }
 
     // TODO: log the events
+
+    @Override
+    public void sessionStarted( LifecycleEvent event )
+    {
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( "Build Order:" );
+
+            logger.info( "" );
+
+            for ( MavenProject project : event.getSession().getProjects() )
+            {
+                logger.info( project.getName() );
+            }
+
+            logger.info( "" );
+        }
+    }
+
+    @Override
+    public void projectSkipped( LifecycleEvent event )
+    {
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( "Skipping " + event.getProject().getName() );
+            logger.info( "This project has been banned from the build due to previous failures." );
+        }
+    }
+
+    @Override
+    public void projectStarted( LifecycleEvent event )
+    {
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( "Building " + event.getProject().getName() );
+        }
+    }
+
+    @Override
+    public void mojoSkipped( LifecycleEvent event )
+    {
+        if ( logger.isWarnEnabled() )
+        {
+            logger.warn( "Goal " + event.getMojoExecution().getMojoDescriptor().getGoal()
+                + " requires online mode for execution but Maven is currently offline, skipping" );
+        }
+    }
+
+    @Override
+    public void mojoStarted( LifecycleEvent event )
+    {
+        if ( logger.isInfoEnabled() )
+        {
+            MojoDescriptor md = event.getMojoExecution().getMojoDescriptor();
+            PluginDescriptor pd = md.getPluginDescriptor();
+            logger.info( "Executing " + pd.getArtifactId() + ':' + pd.getVersion() + ':' + md.getGoal() + " on "
+                + event.getProject().getArtifactId() );
+        }
+    }
+
+    @Override
+    public void forkStarted( LifecycleEvent event )
+    {
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Forking execution for " + event.getMojoExecution().getMojoDescriptor().getId() );
+        }
+    }
+
+    @Override
+    public void forkSucceeded( LifecycleEvent event )
+    {
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Completed forked execution for " + event.getMojoExecution().getMojoDescriptor().getId() );
+        }
+    }
 
 }

@@ -140,20 +140,8 @@ public class DefaultLifecycleExecutor
 
     public void execute( MavenSession session )
     {
-        // TODO: Use a listener here instead of loggers
         fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
-        
-        logger.info( "Build Order:" );
-        
-        logger.info( "" );
-        
-        for( MavenProject project : session.getProjects() )
-        {
-            logger.info( project.getName() );
-        }
-        
-        logger.info( "" );
-        
+
         MavenProject rootProject = session.getTopLevelProject();
 
         List<String> goals = session.getGoals();
@@ -186,15 +174,10 @@ public class DefaultLifecycleExecutor
                 {
                     fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
 
-                    logger.info( "Skipping " + currentProject.getName() );
-                    logger.info( "This project has been banned from the build due to previous failures." );
-
                     continue;
                 }
 
                 fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
-
-                logger.info( "Building " + currentProject.getName() );
 
                 repositoryRequest.setRemoteRepositories( currentProject.getPluginArtifactRepositories() );
                 populateDefaultConfigurationForPlugins( currentProject.getBuild().getPlugins(), repositoryRequest );
@@ -299,8 +282,6 @@ public class DefaultLifecycleExecutor
             {
                 fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SKIPPED );
 
-                logger.warn( "Goal " + mojoDescriptor.getGoal()
-                    + " requires online mode for execution but Maven is currently offline, skipping" );
                 return;
             }
         }
@@ -315,11 +296,6 @@ public class DefaultLifecycleExecutor
 
             try
             {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Forking execution for " + mojoDescriptor.getId() );
-                }
-
                 executionProject = project.clone();
 
                 session.setCurrentProject( executionProject );
@@ -336,11 +312,6 @@ public class DefaultLifecycleExecutor
                 }
 
                 fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_SUCCEEDED );
-
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Completed forked execution for " + mojoDescriptor.getId() );
-                }
             }
             catch ( MojoFailureException e )
             {
@@ -373,8 +344,6 @@ public class DefaultLifecycleExecutor
         try
         {
             project.setExecutionProject( executionProject );
-
-            logger.info( executionDescription( mojoExecution, project ) );
 
             pluginManager.executeMojo( session, mojoExecution );
 
@@ -805,14 +774,6 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private String executionDescription( MojoExecution me, MavenProject project )
-    {
-        PluginDescriptor pd = me.getMojoDescriptor().getPluginDescriptor();
-        StringBuilder sb = new StringBuilder( 128 );
-        sb.append( "Executing " + pd.getArtifactId() + "[" + pd.getVersion() + "]: " + me.getMojoDescriptor().getGoal() + " on " + project.getArtifactId() );        
-        return sb.toString();
-    }
-        
     private void populateMojoExecutionConfiguration( MavenProject project, MojoExecution mojoExecution,
                                                      boolean allowPluginLevelConfig )
     {
