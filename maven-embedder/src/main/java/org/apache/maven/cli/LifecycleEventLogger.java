@@ -19,7 +19,16 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.apache.maven.execution.BuildFailure;
+import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.BuildSummary;
+import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.AbstractLifecycleListener;
 import org.apache.maven.lifecycle.LifecycleEvent;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -37,6 +46,8 @@ class LifecycleEventLogger
 
     private final MavenEmbedderLogger logger;
 
+    private static final int LINE_LENGTH = 72;
+
     public LifecycleEventLogger( MavenEmbedderLogger logger )
     {
         if ( logger == null )
@@ -47,7 +58,36 @@ class LifecycleEventLogger
         this.logger = logger;
     }
 
-    // TODO: log the events
+    private static String chars( char c, int count )
+    {
+        StringBuilder buffer = new StringBuilder( count );
+
+        for ( int i = count; i > 0; i-- )
+        {
+            buffer.append( c );
+        }
+
+        return buffer.toString();
+    }
+
+    private static String getFormattedTime( long time )
+    {
+        String pattern = "s.SSS's'";
+
+        if ( time / 60000L > 0 )
+        {
+            pattern = "m:s" + pattern;
+            if ( time / 3600000L > 0 )
+            {
+                pattern = "H:m" + pattern;
+            }
+        }
+
+        DateFormat fmt = new SimpleDateFormat( pattern );
+        fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+
+        return fmt.format( new Date( time ) );
+    }
 
     @Override
     public void sessionStarted( LifecycleEvent event )
@@ -64,6 +104,54 @@ class LifecycleEventLogger
             }
 
             logger.info( "" );
+        }
+    }
+
+    @Override
+    public void sessionEnded( LifecycleEvent event )
+    {
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( chars( '-', LINE_LENGTH ) );
+            logger.info( "Reactor Summary:" );
+            logger.info( chars( '-', LINE_LENGTH ) );
+
+            MavenExecutionResult result = event.getSession().getResult();
+
+            for ( MavenProject project : event.getSession().getProjects() )
+            {
+                StringBuilder buffer = new StringBuilder( 128 );
+
+                buffer.append( project.getName() );
+
+                while ( buffer.length() < LINE_LENGTH - 22 )
+                {
+                    buffer.append( '.' );
+                }
+
+                BuildSummary buildSummary = result.getBuildSummary( project );
+
+                if ( buildSummary == null )
+                {
+                    buffer.append( "SKIPPED" );
+                }
+                else if ( buildSummary instanceof BuildSuccess )
+                {
+                    buffer.append( "SUCCESS [" );
+                    buffer.append( getFormattedTime( buildSummary.getTime() ) );
+                    buffer.append( "]" );
+                }
+                else if ( buildSummary instanceof BuildFailure )
+                {
+                    buffer.append( "FAILURE [" );
+                    buffer.append( getFormattedTime( buildSummary.getTime() ) );
+                    buffer.append( "]" );
+                }
+
+                logger.info( buffer.toString() );
+            }
+
+            logger.info( chars( '-', LINE_LENGTH ) );
         }
     }
 
