@@ -217,7 +217,7 @@ public class DefaultModelBuilder
 
         pluginManagementInjector.injectBasicManagement( resultModel, request, problems );
 
-        fireBuildExtensionsAssembled( resultModel, request, problems );
+        fireEvent( resultModel, request, problems, ModelBuildingEventCatapult.BUILD_EXTENSIONS_ASSEMBLED );
 
         if ( request.isProcessPlugins() )
         {
@@ -663,19 +663,20 @@ public class DefaultModelBuilder
         return null;
     }
 
-    private void fireBuildExtensionsAssembled( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
+    private void fireEvent( Model model, ModelBuildingRequest request, ModelProblemCollector problems,
+                            ModelBuildingEventCatapult catapult )
         throws ModelBuildingException
     {
-        if ( request.getModelBuildingListeners().isEmpty() )
-        {
-            return;
-        }
+        List<ModelBuildingListener> listeners = request.getModelBuildingListeners();
 
-        ModelBuildingEvent event = new DefaultModelBuildingEvent( model, request, problems );
-
-        for ( ModelBuildingListener listener : request.getModelBuildingListeners() )
+        if ( !listeners.isEmpty() )
         {
-            listener.buildExtensionsAssembled( event );
+            ModelBuildingEvent event = new DefaultModelBuildingEvent( model, request, problems );
+
+            for ( ModelBuildingListener listener : listeners )
+            {
+                catapult.fire( listener, event );
+            }
         }
     }
 
