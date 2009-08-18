@@ -87,7 +87,12 @@ public class ArtifactResolutionResult
 
     public Set<Artifact> getArtifacts()
     {
-        return ( artifacts != null ) ? artifacts : Collections.<Artifact> emptySet();
+        if ( artifacts == null )
+        {
+            artifacts = new LinkedHashSet<Artifact>();
+        }
+
+        return artifacts;
     }
 
     public void setArtifacts( Set<Artifact> artifacts )

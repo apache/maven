@@ -53,6 +53,14 @@ public interface ArtifactResolver
 
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories,
+                                                         ArtifactMetadataSource source )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    // USED BY MAVEN ASSEMBLY PLUGIN
+    @Deprecated
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
                                                          List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
