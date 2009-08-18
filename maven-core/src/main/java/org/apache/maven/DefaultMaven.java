@@ -343,7 +343,8 @@ public class DefaultMaven
 
         for ( String notActivatedProfileId : notActivatedProfileIds )
         {
-            logger.warn( "Profile with id \"" + notActivatedProfileId + "\" has not been activated." );
+            logger.warn( "The requested profile \"" + notActivatedProfileId
+                + "\" could not be activated because it does not exist." );
         }
     }
 
