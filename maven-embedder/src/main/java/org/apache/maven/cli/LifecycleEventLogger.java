@@ -29,6 +29,7 @@ import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.AbstractLifecycleListener;
 import org.apache.maven.lifecycle.LifecycleEvent;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -77,6 +78,7 @@ class LifecycleEventLogger
         if ( time / 60000L > 0 )
         {
             pattern = "m:s" + pattern;
+
             if ( time / 3600000L > 0 )
             {
                 pattern = "H:m" + pattern;
@@ -112,47 +114,96 @@ class LifecycleEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            logger.info( chars( '-', LINE_LENGTH ) );
-            logger.info( "Reactor Summary:" );
-            logger.info( chars( '-', LINE_LENGTH ) );
-
-            MavenExecutionResult result = event.getSession().getResult();
-
-            for ( MavenProject project : event.getSession().getProjects() )
+            if ( event.getSession().getProjects().size() > 1 )
             {
-                StringBuilder buffer = new StringBuilder( 128 );
-
-                buffer.append( project.getName() );
-
-                while ( buffer.length() < LINE_LENGTH - 22 )
-                {
-                    buffer.append( '.' );
-                }
-
-                BuildSummary buildSummary = result.getBuildSummary( project );
-
-                if ( buildSummary == null )
-                {
-                    buffer.append( "SKIPPED" );
-                }
-                else if ( buildSummary instanceof BuildSuccess )
-                {
-                    buffer.append( "SUCCESS [" );
-                    buffer.append( getFormattedTime( buildSummary.getTime() ) );
-                    buffer.append( "]" );
-                }
-                else if ( buildSummary instanceof BuildFailure )
-                {
-                    buffer.append( "FAILURE [" );
-                    buffer.append( getFormattedTime( buildSummary.getTime() ) );
-                    buffer.append( "]" );
-                }
-
-                logger.info( buffer.toString() );
+                logReactorSummary( event.getSession() );
             }
+
+            logResult( event.getSession() );
+
+            logStats( event.getSession() );
 
             logger.info( chars( '-', LINE_LENGTH ) );
         }
+    }
+
+    private void logReactorSummary( MavenSession session )
+    {
+        logger.info( chars( '-', LINE_LENGTH ) );
+        logger.info( "Reactor Summary:" );
+        logger.info( chars( '-', LINE_LENGTH ) );
+
+        MavenExecutionResult result = session.getResult();
+
+        for ( MavenProject project : session.getProjects() )
+        {
+            StringBuilder buffer = new StringBuilder( 128 );
+
+            buffer.append( project.getName() );
+
+            buffer.append( ' ' );
+            while ( buffer.length() < LINE_LENGTH - 21 )
+            {
+                buffer.append( '.' );
+            }
+            buffer.append( ' ' );
+
+            BuildSummary buildSummary = result.getBuildSummary( project );
+
+            if ( buildSummary == null )
+            {
+                buffer.append( "SKIPPED" );
+            }
+            else if ( buildSummary instanceof BuildSuccess )
+            {
+                buffer.append( "SUCCESS [" );
+                buffer.append( getFormattedTime( buildSummary.getTime() ) );
+                buffer.append( "]" );
+            }
+            else if ( buildSummary instanceof BuildFailure )
+            {
+                buffer.append( "FAILURE [" );
+                buffer.append( getFormattedTime( buildSummary.getTime() ) );
+                buffer.append( "]" );
+            }
+
+            logger.info( buffer.toString() );
+        }
+    }
+
+    private void logResult( MavenSession session )
+    {
+        logger.info( chars( '-', LINE_LENGTH ) );
+
+        if ( session.getResult().hasExceptions() )
+        {
+            logger.info( "BUILD FAILURE" );
+        }
+        else
+        {
+            logger.info( "BUILD SUCCESS" );
+        }
+    }
+
+    private void logStats( MavenSession session )
+    {
+        logger.info( chars( '-', LINE_LENGTH ) );
+
+        Date finish = new Date();
+
+        long time = finish.getTime() - session.getRequest().getStartTime().getTime();
+
+        logger.info( "Total time: " + getFormattedTime( time ) );
+
+        logger.info( "Finished at: " + finish );
+
+        System.gc();
+
+        Runtime r = Runtime.getRuntime();
+
+        long MB = 1024 * 1024;
+
+        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
     }
 
     @Override
@@ -170,7 +221,9 @@ class LifecycleEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
+            logger.info( chars( '-', LINE_LENGTH ) );
             logger.info( "Building " + event.getProject().getName() );
+            logger.info( chars( '-', LINE_LENGTH ) );
         }
     }
 
