@@ -94,9 +94,11 @@ class LifecycleEventLogger
     @Override
     public void sessionStarted( LifecycleEvent event )
     {
-        if ( logger.isInfoEnabled() )
+        if ( logger.isInfoEnabled() && event.getSession().getProjects().size() > 1 )
         {
-            logger.info( "Build Order:" );
+            logger.info( chars( '-', LINE_LENGTH ) );
+
+            logger.info( "Reactor Build Order:" );
 
             logger.info( "" );
 
@@ -130,8 +132,10 @@ class LifecycleEventLogger
     private void logReactorSummary( MavenSession session )
     {
         logger.info( chars( '-', LINE_LENGTH ) );
+
         logger.info( "Reactor Summary:" );
-        logger.info( chars( '-', LINE_LENGTH ) );
+
+        logger.info( "" );
 
         MavenExecutionResult result = session.getResult();
 
@@ -211,8 +215,12 @@ class LifecycleEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
+            logger.info( chars( '-', LINE_LENGTH ) );
+
             logger.info( "Skipping " + event.getProject().getName() );
             logger.info( "This project has been banned from the build due to previous failures." );
+
+            logger.info( chars( '-', LINE_LENGTH ) );
         }
     }
 
@@ -222,7 +230,9 @@ class LifecycleEventLogger
         if ( logger.isInfoEnabled() )
         {
             logger.info( chars( '-', LINE_LENGTH ) );
+
             logger.info( "Building " + event.getProject().getName() );
+
             logger.info( chars( '-', LINE_LENGTH ) );
         }
     }
