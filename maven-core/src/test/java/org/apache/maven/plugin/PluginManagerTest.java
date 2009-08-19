@@ -240,9 +240,11 @@ public class PluginManagerTest
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository( getLocalRepository() );
         repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
-        
-        List<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, repositoryRequest );   
-        
+
+        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, getRepositoryRequest( session ) );
+        pluginManager.getPluginRealm( session, pluginDescriptor );
+        List<Artifact> artifacts = pluginDescriptor.getArtifacts();
+
         for ( Artifact a : artifacts )
         {
             if ( a.getGroupId().equals( "org.apache.maven.its.mng3586" ) && a.getArtifactId().equals( "tools" ) )

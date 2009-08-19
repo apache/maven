@@ -20,7 +20,6 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Plugin;
 
@@ -37,7 +36,8 @@ public class PluginResolutionException
 
     public PluginResolutionException( Plugin plugin, ArtifactResolutionException e )
     {
-        super( "Plugin could not be resolved: " + e.getMessage(), e.getGroupId(), e.getArtifactId(), e.getVersion(), "maven-plugin", null, e.getRemoteRepositories(), null, e.getCause() );
+        super( "Plugin or one of its dependencies could not be resolved: " + e.getMessage(), e.getGroupId(),
+               e.getArtifactId(), e.getVersion(), e.getType(), null, e.getRemoteRepositories(), null, e.getCause() );
         this.plugin = plugin;
     }
 

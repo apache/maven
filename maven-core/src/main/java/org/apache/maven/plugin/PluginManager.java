@@ -32,10 +32,6 @@ public interface PluginManager
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException;
 
     // igorf: Way too many declared exceptions!
-    MojoDescriptor getMojoDescriptor( String groupId, String artifactId, String version, String goal, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
-
-    // igorf: Way too many declared exceptions!
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
 

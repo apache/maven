@@ -59,7 +59,15 @@ public class DefaultClassRealmManager
         return ( (MutablePlexusContainer) container ).getClassWorld();
     }
 
-    private ClassRealm createRealm( String baseRealmId )
+    /**
+     * Creates a new class realm with the specified parent and imports.
+     * 
+     * @param baseRealmId The base id to use for the new realm, must not be {@code null}.
+     * @param parent The parent realm for the new realm, may be {@code null} to use the Maven core realm.
+     * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     * @return The created class realm, never {@code null}.
+     */
+    private ClassRealm createRealm( String baseRealmId, ClassLoader parent, List<String> imports )
     {
         ClassWorld world = getClassWorld();
 
@@ -90,11 +98,27 @@ public class DefaultClassRealmManager
                 }
             }
 
-            classRealm.setParentRealm( container.getContainerRealm() );
+            if ( parent != null )
+            {
+                classRealm.setParentClassLoader( parent );
+            }
+            else
+            {
+                classRealm.setParentRealm( container.getContainerRealm() );
+                importMavenApi( classRealm );
+            }
 
             importXpp3Dom( classRealm );
 
-            importMavenApi( classRealm );
+            if ( imports != null && !imports.isEmpty() )
+            {
+                ClassLoader importedRealm = classRealm.getParentClassLoader();
+
+                for ( String imp : imports )
+                {
+                    classRealm.importFrom( importedRealm, imp );
+                }
+            }
 
             for ( ClassRealmManagerDelegate delegate : getDelegates() )
             {
@@ -162,7 +186,7 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "model missing" );
         }
 
-        return createRealm( getKey( model ) );
+        return createRealm( getKey( model ), null, null );
     }
 
     private String getKey( Model model )
@@ -177,7 +201,17 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "plugin missing" );
         }
 
-        return createRealm( getKey( plugin ) );
+        return createRealm( getKey( plugin ), null, null );
+    }
+
+    public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports )
+    {
+        if ( plugin == null )
+        {
+            throw new IllegalArgumentException( "plugin missing" );
+        }
+
+        return createRealm( getKey( plugin ), parent, imports );
     }
 
     private String getKey( Plugin plugin )

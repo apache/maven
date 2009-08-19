@@ -19,6 +19,8 @@ package org.apache.maven.classrealm;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -42,11 +44,21 @@ public interface ClassRealmManager
     ClassRealm createProjectRealm( Model model );
 
     /**
-     * Creates a new class realm for the specified plugin.
+     * Creates a new class realm for the specified build plugin.
      * 
-     * @param plugin The plugin for which to create a realm, must not be {@code null}.
+     * @param plugin The build plugin for which to create a realm, must not be {@code null}.
      * @return The new plugin realm, never {@code null}.
      */
     ClassRealm createPluginRealm( Plugin plugin );
+
+    /**
+     * Creates a new class realm for the specified plugin.
+     * 
+     * @param plugin The plugin for which to create a realm, must not be {@code null}.
+     * @param parent The parent realm for the new realm, may be {@code null} to use the Maven core realm.
+     * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     * @return The new plugin realm, never {@code null}.
+     */
+    ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports );
 
 }

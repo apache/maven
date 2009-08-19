@@ -59,7 +59,7 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    protected PluginManagerException( Plugin plugin, String message, Throwable cause )
+    public PluginManagerException( Plugin plugin, String message, Throwable cause )
     {
         super( message, cause );
 
