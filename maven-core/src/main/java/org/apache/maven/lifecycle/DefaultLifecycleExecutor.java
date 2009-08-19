@@ -247,7 +247,7 @@ public class DefaultLifecycleExecutor
                 else if ( MavenExecutionRequest.REACTOR_FAIL_FAST.equals( session.getReactorFailureBehavior() ) )
                 {
                     // abort the build
-                    return;
+                    break;
                 }
                 else
                 {
