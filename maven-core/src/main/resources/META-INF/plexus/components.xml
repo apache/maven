@@ -12,7 +12,7 @@
   <!--
 
     There is currently only one component descriptor that cannot be generated from annotations because of the
-    accompanying configurationl. Our options are to embed this information programatically or use a configuration source
+    accompanying configuration. Our options are to embed this information programatically or use a configuration source
     to pull in the lifecycle information.
   -->
 <component-set>
@@ -33,7 +33,7 @@
           <field-name>logger</field-name>
         </requirement>
         <requirement>
-          <role>org.apache.maven.plugin.PluginManager</role>
+          <role>org.apache.maven.plugin.BuildPluginManager</role>
         </requirement>
         <requirement>
           <role>org.apache.maven.ProjectDependenciesResolver</role>
@@ -44,6 +44,9 @@
         <requirement>
           <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
           <field-name>lifecycleMappings</field-name>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.version.PluginVersionResolver</role>
         </requirement>
       </requirements>
       <configuration>

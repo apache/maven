@@ -17,7 +17,7 @@ public class PluginManagerTest
     extends AbstractCoreMavenComponentTestCase
 {
     @Requirement
-    private DefaultPluginManager pluginManager;
+    private DefaultBuildPluginManager pluginManager;
     
     private String plexusVersion = "1.0-beta-3.0.7";
     
@@ -25,7 +25,7 @@ public class PluginManagerTest
         throws Exception
     {
         super.setUp();
-        pluginManager = (DefaultPluginManager) lookup( PluginManager.class );
+        pluginManager = (DefaultBuildPluginManager) lookup( BuildPluginManager.class );
     }
     
     @Override

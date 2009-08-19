@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.plugin;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,29 +19,28 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-public class PluginVersionNotFoundException
-    extends Exception
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+/**
+ * Describes the result of a plugin version resolution request.
+ * 
+ * @author Benjamin Bentmann
+ */
+public interface PluginVersionResult
 {
-    private final String groupId;
 
-    private final String artifactId;
+    /**
+     * The resolved plugin version.
+     * 
+     * @return The resolved plugin version, never {@code null}.
+     */
+    String getVersion();
 
-    public PluginVersionNotFoundException( String groupId, String artifactId )
-    {
-        super( "The plugin \'" + groupId + ":" + artifactId + "\' does not exist or no valid version could be found" );
-
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-    }
-
-    public String getGroupId()
-    {
-        return groupId;
-    }
-
-    public String getArtifactId()
-    {
-        return artifactId;
-    }
+    /**
+     * The repository from which the plugin version was resolved.
+     * 
+     * @return The repository from which the plugin version was resolved, never {@code null}.
+     */
+    ArtifactRepository getRepository();
 
 }

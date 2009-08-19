@@ -32,6 +32,7 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
 /**
  * @author Jason van  Zyl
@@ -51,7 +52,7 @@ public interface LifecycleExecutor
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException,
         InvalidPluginDescriptorException, PluginManagerException, LifecyclePhaseNotFoundException,
-        LifecycleNotFoundException;
+        LifecycleNotFoundException, PluginVersionResolutionException;
         
     // For a given project packaging find all the plugins that are bound to any registered
     // lifecycles. The project builder needs to now what default plugin information needs to be
@@ -73,9 +74,6 @@ public interface LifecycleExecutor
     //
     void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
         throws LifecycleExecutionException;
-
-    void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException;
     
     void execute( MavenSession session );
 }

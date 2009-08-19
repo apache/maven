@@ -24,10 +24,11 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
@@ -142,7 +143,11 @@ class DefaultModelBuildingListener
 
                 projectRealm = projectBuildingHelper.createProjectRealm( model, repositoryRequest );
             }
-            catch ( AbstractArtifactResolutionException e )
+            catch ( ArtifactResolutionException e )
+            {
+                event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
+            }
+            catch ( PluginVersionResolutionException e )
             {
                 event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
             }

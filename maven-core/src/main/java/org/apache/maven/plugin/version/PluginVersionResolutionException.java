@@ -1,4 +1,4 @@
-package org.apache.maven.plugin;
+package org.apache.maven.plugin.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -30,6 +30,15 @@ public class PluginVersionResolutionException
     private final String artifactId;
 
     private final String baseMessage;
+
+    public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, Throwable cause )
+    {
+        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
+
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.baseMessage = baseMessage;
+    }
 
     public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, ArtifactMetadataRetrievalException cause )
     {

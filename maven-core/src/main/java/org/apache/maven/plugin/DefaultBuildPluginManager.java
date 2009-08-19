@@ -38,9 +38,9 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 // TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO: remove the coreArtifactFilterManager
 
-@Component(role = PluginManager.class)
-public class DefaultPluginManager
-    implements PluginManager
+@Component(role = BuildPluginManager.class)
+public class DefaultBuildPluginManager
+    implements BuildPluginManager
 {
 
     @Requirement

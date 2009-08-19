@@ -54,7 +54,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginManager;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -63,6 +63,10 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -92,13 +96,16 @@ public class DefaultLifecycleExecutor
     private Logger logger;
 
     @Requirement
-    private PluginManager pluginManager;
+    private BuildPluginManager pluginManager;
 
     @Requirement
     protected RepositorySystem repositorySystem;
 
     @Requirement
     private ProjectDependenciesResolver projectDependenciesResolver;
+
+    @Requirement
+    private PluginVersionResolver pluginVersionResolver;
             
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")    
     private List<Lifecycle> lifecycles;
@@ -379,7 +386,7 @@ public class DefaultLifecycleExecutor
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException,
         InvalidPluginDescriptorException, PluginManagerException, LifecyclePhaseNotFoundException,
-        LifecycleNotFoundException
+        LifecycleNotFoundException, PluginVersionResolutionException
     {
         MavenProject project = session.getCurrentProject();
 
@@ -464,7 +471,7 @@ public class DefaultLifecycleExecutor
     }
 
     private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan, String goal ) 
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
     {
         // If this is a goal like "mvn modello:java" and the POM looks like the following:
         //
@@ -623,7 +630,7 @@ public class DefaultLifecycleExecutor
                                             Collection<MojoDescriptor> alreadyForkedExecutions )
         throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
         PluginDescriptorParsingException, CycleDetectedInPluginGraphException, NoPluginFoundForPrefixException,
-        InvalidPluginDescriptorException, LifecyclePhaseNotFoundException, LifecycleNotFoundException
+        InvalidPluginDescriptorException, LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -889,7 +896,7 @@ public class DefaultLifecycleExecutor
    
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session ) 
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
     {        
         MavenProject project = session.getCurrentProject();
         
@@ -971,98 +978,11 @@ public class DefaultLifecycleExecutor
         return pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
     }
 
-    public void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException
+    private void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
+        throws PluginVersionResolutionException
     {
-        ArtifactRepository localRepository = repositoryRequest.getLocalRepository();
-
-        File artifactMetadataFile = null;
-        
-        String localPath; 
-        
-        // Search in remote repositories for a (released) version.
-        //
-        // maven-metadata-{central|nexus|...}.xml 
-        //
-        //TODO: we should cycle through the repositories but take the repository which actually
-        // satisfied the prefix.
-        for ( ArtifactRepository repository : repositoryRequest.getRemoteRepositories() )
-        {
-            localPath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-" + repository.getId() + ".xml";
-
-            artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
-
-            if ( !artifactMetadataFile.exists() /* || user requests snapshot updates */)
-            {
-                try
-                {
-                    String remotePath = plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata.xml";
-
-                    repositorySystem.retrieve( repository, artifactMetadataFile, remotePath, null );
-                }
-                catch ( TransferFailedException e )
-                {
-                    continue;
-                }
-                catch ( ResourceDoesNotExistException e )
-                {
-                    continue;
-                }
-            }
-
-            break;
-        }
-
-        // Search in the local repositiory for a (development) version
-        //
-        // maven-metadata-local.xml
-        //
-        if ( artifactMetadataFile == null || !artifactMetadataFile.exists() )
-        {
-            localPath =
-                plugin.getGroupId().replace( '.', '/' ) + "/" + plugin.getArtifactId() + "/maven-metadata-"
-                    + localRepository.getId() + ".xml";
-
-            artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
-        }
-
-        if ( artifactMetadataFile.exists() )
-        {
-            logger.debug( "Extracting version for plugin " + plugin.getKey() + " from " + artifactMetadataFile );
-
-            try
-            {
-                Metadata pluginMetadata = readMetadata( artifactMetadataFile );
-
-                if ( pluginMetadata.getVersioning() != null )
-                {
-                    String release = pluginMetadata.getVersioning().getRelease();
-
-                    if ( StringUtils.isNotEmpty( release ) )
-                    {
-                        plugin.setVersion( release );
-                    }
-                    else
-                    {
-                        String latest = pluginMetadata.getVersioning().getLatest();
-
-                        if ( StringUtils.isNotEmpty( latest ) )
-                        {
-                            plugin.setVersion( latest );
-                        }
-                    }
-                }
-            }
-            catch ( RepositoryMetadataReadException e )
-            {
-                logger.warn( "Error reading plugin metadata: ", e );
-            }
-        }
-
-        if ( StringUtils.isEmpty( plugin.getVersion() ) )
-        {
-            throw new PluginNotFoundException( plugin, repositoryRequest.getRemoteRepositories() );
-        }
+        PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, repositoryRequest );
+        plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
     }
 
     private void injectPluginDeclarationFromProject( Plugin plugin, MavenProject project )
@@ -1221,7 +1141,7 @@ public class DefaultLifecycleExecutor
             {
                 resolvePluginVersion( plugin, repositoryRequest );
             }
-            catch ( PluginNotFoundException e )
+            catch ( PluginVersionResolutionException e )
             {
                 throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin.getKey(), e );
             }
