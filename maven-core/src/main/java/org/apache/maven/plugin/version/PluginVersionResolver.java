@@ -32,7 +32,7 @@ public interface PluginVersionResolver
      * 
      * @param request The request that holds the details about the plugin and the repositories to consult, must not be
      *            {@code null}.
-     * @return The result of the version resolutioh, never {@code null}.
+     * @return The result of the version resolution, never {@code null}.
      * @throws PluginVersionResolutionException If the plugin version could not be resolved.
      */
     PluginVersionResult resolve( PluginVersionRequest request )

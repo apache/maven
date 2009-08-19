@@ -25,6 +25,9 @@ import java.util.Map;
 public interface LifecycleMapping
 {        
 
+    @Deprecated
+    String ROLE = LifecycleMapping.class.getName();
+
     Map<String, Lifecycle> getLifecycles();
 
     @Deprecated

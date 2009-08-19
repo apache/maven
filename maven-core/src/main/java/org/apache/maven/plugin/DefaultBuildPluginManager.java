@@ -52,6 +52,9 @@ public class DefaultBuildPluginManager
     @Requirement
     private MavenPluginManager mavenPluginManager;
 
+    @Requirement
+    private LegacySupport legacySupport;
+
     /**
      * 
      * @param plugin
@@ -87,11 +90,15 @@ public class DefaultBuildPluginManager
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
+        MavenSession oldSession = legacySupport.getSession();
+
         try
         {                        
             mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
+
+            legacySupport.setSession( session );
 
             // NOTE: DuplicateArtifactAttachmentException is currently unchecked, so be careful removing this try/catch!
             // This is necessary to avoid creating compatibility problems for existing plugins that use
@@ -125,6 +132,8 @@ public class DefaultBuildPluginManager
             }
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
+
+            legacySupport.setSession( oldSession );
         }
     }
 
