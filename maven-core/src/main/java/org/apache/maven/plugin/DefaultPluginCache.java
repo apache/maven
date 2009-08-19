@@ -31,7 +31,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.ModelUtils;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -88,8 +87,6 @@ public class DefaultPluginCache
         }
     }
 
-    protected final Map<CacheKey, PluginDescriptor> descriptorsCache = new HashMap<CacheKey, PluginDescriptor>();
-
     protected final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
     public CacheRecord get( Plugin plugin, ArtifactRepository localRepository,
@@ -98,41 +95,6 @@ public class DefaultPluginCache
         return cache.get( new CacheKey( plugin, localRepository, remoteRepositories ) );
     }
 
-    public PluginDescriptor getPluginDescriptor( Plugin plugin, ArtifactRepository localRepository,
-                                                 List<ArtifactRepository> remoteRepositories )
-    {
-        return clone( descriptorsCache.get( new CacheKey( plugin, localRepository, remoteRepositories ) ) );
-    }
-
-    protected static PluginDescriptor clone( PluginDescriptor original )
-    {
-        if ( original == null )
-        {
-            return null;
-        }
-
-        PluginDescriptor cloned = new PluginDescriptor();
-        cloned.setGroupId( original.getGroupId() );
-        cloned.setArtifactId( original.getArtifactId() );
-        cloned.setVersion( original.getVersion() );
-        cloned.setGoalPrefix( original.getGoalPrefix() );
-        cloned.setSource( original.getSource() );
-        cloned.setInheritedByDefault( original.isInheritedByDefault() );
-
-        cloned.setIntroducedDependencyArtifacts( original.getIntroducedDependencyArtifacts() ); // TODO do we need to clone this?
-        cloned.setName( original.getName() );
-        cloned.setDescription( original.getDescription() );
-        cloned.setPlugin( ModelUtils.clonePlugin( original.getPlugin() ) ); // TODO not sure I need to clone here
-        cloned.setPluginArtifact( original.getPluginArtifact() );
-
-        cloned.setId( original.getId() );
-        cloned.setIsolatedRealm( original.isIsolatedRealm() );
-        cloned.setComponents( original.getComponents() );
-        cloned.setDependencies( original.getDependencies() );
-
-        return cloned;
-    }
-    
     public void put( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                      ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
@@ -152,17 +114,9 @@ public class DefaultPluginCache
         cache.put( key, record );
     }
 
-    public void putPluginDescriptor( Plugin plugin, ArtifactRepository localRepository,
-                                     List<ArtifactRepository> remoteRepositories, PluginDescriptor pluginDescriptor )
-    {
-        CacheKey key = new CacheKey( plugin, localRepository, remoteRepositories );
-        descriptorsCache.put( key, clone( pluginDescriptor ) );
-    }
-
     public void flush()
     {
         cache.clear();
-        descriptorsCache.clear();
     }
 
     protected static int pluginHashCode( Plugin plugin )

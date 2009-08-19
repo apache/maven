@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 public interface PluginCache
@@ -41,12 +40,6 @@ public interface PluginCache
             this.artifacts = artifacts;
         }
     }
-
-    PluginDescriptor getPluginDescriptor( Plugin plugin, ArtifactRepository localRepository,
-                                          List<ArtifactRepository> remoteRepositories );
-
-    void putPluginDescriptor( Plugin plugin, ArtifactRepository localRepository,
-                              List<ArtifactRepository> remoteRepositories, PluginDescriptor pluginDescriptor );
 
     CacheRecord get( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories );
 
