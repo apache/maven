@@ -419,12 +419,6 @@ public class DefaultLifecycleExecutor
                 mojoExecution.setMojoDescriptor( mojoDescriptor );
             }
 
-            PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-            if ( pluginDescriptor.getPlugin().isExtensions() )
-            {
-                pluginDescriptor.setClassRealm( pluginManager.getPluginRealm( session, pluginDescriptor ) );
-            }
-
             populateMojoExecutionConfiguration( project, mojoExecution,
                                                 MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
 
