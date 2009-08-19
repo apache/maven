@@ -25,6 +25,7 @@ package org.apache.maven.plugin.descriptor;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class Requirement
+    implements Cloneable
 {
     private final String role;
 
@@ -51,4 +52,21 @@ public class Requirement
     {
         return roleHint;
     }
+
+    /**
+     * Creates a shallow copy of this requirement.
+     */
+    @Override
+    public Requirement clone()
+    {
+        try
+        {
+            return (Requirement) super.clone();
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new UnsupportedOperationException( e );
+        }
+    }
+
 }

@@ -23,6 +23,7 @@ package org.apache.maven.plugin.descriptor;
  * @author Jason van Zyl
  */
 public class Parameter
+    implements Cloneable
 {
     private String alias;
 
@@ -186,4 +187,21 @@ public class Parameter
     {
         this.since = since;
     }
+
+    /**
+     * Creates a shallow copy of this parameter.
+     */
+    @Override
+    public Parameter clone()
+    {
+        try
+        {
+            return (Parameter) super.clone();
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new UnsupportedOperationException( e );
+        }
+    }
+
 }

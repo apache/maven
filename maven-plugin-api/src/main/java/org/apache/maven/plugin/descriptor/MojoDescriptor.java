@@ -615,4 +615,21 @@ public class MojoDescriptor
     {
         return executeGoal;
     }
+
+    /**
+     * Creates a shallow copy of this mojo descriptor.
+     */
+    @Override
+    public MojoDescriptor clone()
+    {
+        try
+        {
+            return (MojoDescriptor) super.clone();
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new UnsupportedOperationException( e );
+        }
+    }
+
 }

@@ -50,6 +50,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  */
 public class PluginDescriptor
     extends ComponentSetDescriptor
+    implements Cloneable
 {
 
     private static final String LIFECYCLE_DESCRIPTOR = "META-INF/maven/lifecycle.xml";
@@ -409,6 +410,22 @@ public class PluginDescriptor
         else
         {
             return new FileInputStream( new File( pluginFile, descriptor ) );
+        }
+    }
+
+    /**
+     * Creates a shallow copy of this plugin descriptor.
+     */
+    @Override
+    public PluginDescriptor clone()
+    {
+        try
+        {
+            return (PluginDescriptor) super.clone();
+        }
+        catch ( CloneNotSupportedException e )
+        {
+            throw new UnsupportedOperationException( e );
         }
     }
 
