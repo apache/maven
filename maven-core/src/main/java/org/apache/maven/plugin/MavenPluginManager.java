@@ -37,20 +37,66 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 public interface MavenPluginManager
 {
 
+    /**
+     * Retrieves the descriptor for the specified plugin from its main artifact.
+     * 
+     * @param plugin The plugin whose descriptor should be retrieved, must not be {@code null}.
+     * @param repositoryRequest The repository request to use for resolving the plugin's main artifact, must not be
+     *            {@code null}.
+     * @return The plugin descriptor, never {@code null}.
+     */
     PluginDescriptor getPluginDescriptor( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
 
+    /**
+     * Retrieves the descriptor for the specified plugin goal from the plugin's main artifact.
+     * 
+     * @param plugin The plugin whose mojo descriptor should be retrieved, must not be {@code null}.
+     * @param goal The simple name of the mojo whose descriptor should be retrieved, must not be {@code null}.
+     * @param repositoryRequest The repository request to use for resolving the plugin's main artifact, must not be
+     *            {@code null}.
+     * @return The mojo descriptor, never {@code null}.
+     */
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
         throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         InvalidPluginDescriptorException;
 
+    /**
+     * Sets up the class realm for the specified plugin. Both the class realm and the plugin artifacts that constitute
+     * it will be stored in the plugin descriptor.
+     * 
+     * @param pluginDescriptor The plugin descriptor in which to save the class realm and the plugin artifacts, must not
+     *            be {@code null}.
+     * @param session The build session from which to pick the current project and repository settings, must not be
+     *            {@code null}.
+     * @param parent The parent class realm for the plugin, may be {@code null} to use the Maven core realm.
+     * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     */
     void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
                            List<String> imports )
         throws PluginResolutionException, PluginManagerException;
 
+    /**
+     * Looks up the mojo for the specified mojo execution and populates its parameters from the configuration given by
+     * the mojo execution. The mojo/plugin descriptor associated with the mojo execution provides the class realm to
+     * lookup the mojo from. <strong>Warning:</strong> The returned mojo instance must be released via
+     * {@link #releaseMojo(Object, MojoExecution)} when the mojo is no longer needed to free any resources allocated for
+     * it.
+     * 
+     * @param mojoInterface The component role of the mojo, must not be {@code null}.
+     * @param session The build session in whose context the mojo will be used, must not be {@code null}.
+     * @param mojoExecution The mojo execution to retrieve the mojo for, must not be {@code null}.
+     * @return The ready-to-execute mojo, never {@code null}.
+     */
     <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )
         throws PluginConfigurationException, PluginContainerException;
 
+    /**
+     * Releases the specified mojo back to the container.
+     * 
+     * @param mojo The mojo to release, may be {@code null}.
+     * @param mojoExecution The mojo execution the mojo was originally retrieved for, must not be {@code null}.
+     */
     void releaseMojo( Object mojo, MojoExecution mojoExecution );
 
 }
