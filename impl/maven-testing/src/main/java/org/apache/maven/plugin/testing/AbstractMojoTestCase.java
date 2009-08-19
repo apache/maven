@@ -19,6 +19,7 @@ package org.apache.maven.plugin.testing;
  * under the License.
  */
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -29,10 +30,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.maven.monitor.logging.DefaultLog;
-import org.apache.maven.plugin.DefaultPluginManager;
 import org.apache.maven.plugin.Mojo;
-import org.apache.maven.plugin.PluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -47,8 +47,10 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
@@ -69,8 +71,6 @@ public abstract class AbstractMojoTestCase
     extends PlexusTestCase
 {
     private ComponentConfigurator configurator;
-    // this is a little ugly using impl prior the interface 
-    private DefaultPluginManager pluginManager;
 
     private PlexusContainer container;
     
@@ -80,15 +80,20 @@ public abstract class AbstractMojoTestCase
      * to either the project stub or into the mojo directly with injection...not sure yet though.
      */
     //private MavenProjectBuilder projectBuilder;
+
     protected void setUp()
         throws Exception
     {
-
         configurator = getContainer().lookup( ComponentConfigurator.class, "basic" );
-        pluginManager = (DefaultPluginManager) getContainer().lookup( PluginManager.class );
 
-        InputStream is = getClass().getResourceAsStream( "/" + pluginManager.getComponentDescriptorLocation() );
-        PluginDescriptor pluginDescriptor = pluginManager.parsebuildPluginDescriptor( is ); // closes the stream
+        InputStream is = getClass().getResourceAsStream( "/" + getPluginDescriptorLocation() );
+
+        XmlStreamReader reader = ReaderFactory.newXmlReader( is );
+
+        InterpolationFilterReader interpolationFilterReader =
+            new InterpolationFilterReader( new BufferedReader( reader ), container.getContext().getContextData() );
+
+        PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationFilterReader );
 
         for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
         {
@@ -106,8 +111,12 @@ public abstract class AbstractMojoTestCase
     {
         return getBasedir() + "/target/classes/META-INF/maven/plugin.xml";
     }
-    
-    
+
+    protected String getPluginDescriptorLocation()
+    {
+        return "META-INF/maven/plugin.xml";
+    }
+
     protected void setupContainer()
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
