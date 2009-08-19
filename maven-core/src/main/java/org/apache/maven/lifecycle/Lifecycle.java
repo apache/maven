@@ -20,17 +20,31 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class Lifecycle.
  */
 public class Lifecycle
 {
+
+    // <lifecycle>
+    //   <id>clean</id>
+    //   <phases>
+    //     <phase>pre-clean</phase>
+    //     <phase>clean</phase>
+    //     <phase>post-clean</phase>
+    //   </phases>
+    //   <default-phases>
+    //     <clean>org.apache.maven.plugins:maven-clean-plugin:clean</clean>
+    //   </default-phases>
+    // </lifecycle>
+
     private String id;
 
     private List<String> phases;
     
-    private List<String> defaultPhases;
+    private Map<String, String> defaultPhases;
     
     public String getId()
     {
@@ -42,7 +56,7 @@ public class Lifecycle
         return this.phases;
     }
     
-    public List<String> getDefaultPhases()
+    public Map<String, String> getDefaultPhases()
     {
         return defaultPhases;
     }

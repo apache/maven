@@ -559,16 +559,6 @@ public class DefaultLifecycleExecutor
         {
             List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
 
-            // TODO: remove hard coding
-            if ( phase.equals( "clean" ) )
-            {
-                Plugin plugin = new Plugin();
-                plugin.setGroupId( "org.apache.maven.plugins" );
-                plugin.setArtifactId( "maven-clean-plugin" );
-                plugin.setVersion( "2.3" );
-                mojoExecutions.add( new MojoExecution( plugin, "clean", "default-clean" ) );
-            }
-
             lifecycleMappings.put( phase, mojoExecutions );
 
             if ( phase.equals( lifecyclePhase ) )
@@ -1067,15 +1057,24 @@ public class DefaultLifecycleExecutor
             org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
                 lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
 
+            Map<String, String> phaseToGoalMapping = null;
+
             if ( lifecycleConfiguration != null )
             {
-                Map<String, String> lifecyclePhasesForPackaging = lifecycleConfiguration.getPhases();
-
+                phaseToGoalMapping = lifecycleConfiguration.getPhases();
+            }
+            else if ( lifecycle.getDefaultPhases() != null )
+            {
+                phaseToGoalMapping = lifecycle.getDefaultPhases();
+            }
+            
+            if ( phaseToGoalMapping != null )
+            {
                 // These are of the form:
                 //
                 // compile -> org.apache.maven.plugins:maven-compiler-plugin:compile[,gid:aid:goal,...]
                 //
-                for ( Map.Entry<String, String> goalsForLifecyclePhase : lifecyclePhasesForPackaging.entrySet() )
+                for ( Map.Entry<String, String> goalsForLifecyclePhase : phaseToGoalMapping.entrySet() )
                 {
                     String phase = goalsForLifecyclePhase.getKey();
                     String goals = goalsForLifecyclePhase.getValue();
@@ -1083,13 +1082,6 @@ public class DefaultLifecycleExecutor
                     {
                         parseLifecyclePhaseDefinitions( plugins, phase, goals );
                     }
-                }
-            }
-            else if ( lifecycle.getDefaultPhases() != null )
-            {
-                for ( String goals : lifecycle.getDefaultPhases() )
-                {
-                    parseLifecyclePhaseDefinitions( plugins, null, goals );
                 }
             }
         }
