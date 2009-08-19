@@ -19,11 +19,11 @@ package org.apache.maven.repository.legacy.metadata;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 
@@ -38,27 +38,18 @@ public class DefaultMetadataResolutionRequest
 
     private Artifact artifact;
 
-    private ArtifactRepository localRepository;
-
-    private List<ArtifactRepository> remoteRepositories;
-
-    private RepositoryCache cache;
-
     private boolean resolveManagedVersions;
 
-    private boolean offline;
+    private RepositoryRequest repositoryRequest;
 
     public DefaultMetadataResolutionRequest()
     {
-        // does nothing
+        repositoryRequest = new DefaultRepositoryRequest();
     }
 
-    public DefaultMetadataResolutionRequest( RepositoryRequest request )
+    public DefaultMetadataResolutionRequest( RepositoryRequest repositoryRequest )
     {
-        setLocalRepository( request.getLocalRepository() );
-        setRemoteRepositories( request.getRemoteRepositories() );
-        setCache( request.getCache() );
-        setOffline( request.isOffline() );
+        this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
     }
 
     public Artifact getArtifact()
@@ -75,29 +66,24 @@ public class DefaultMetadataResolutionRequest
 
     public ArtifactRepository getLocalRepository()
     {
-        return localRepository;
+        return repositoryRequest.getLocalRepository();
     }
 
     public DefaultMetadataResolutionRequest setLocalRepository( ArtifactRepository localRepository )
     {
-        this.localRepository = localRepository;
+        repositoryRequest.setLocalRepository( localRepository );
 
         return this;
     }
 
     public List<ArtifactRepository> getRemoteRepositories()
     {
-        if ( remoteRepositories == null )
-        {
-            remoteRepositories = new ArrayList<ArtifactRepository>();
-        }
-
-        return remoteRepositories;
+        return repositoryRequest.getRemoteRepositories();
     }
 
     public DefaultMetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
-        this.remoteRepositories = remoteRepositories;
+        repositoryRequest.setRemoteRepositories( remoteRepositories );
 
         return this;
     }
@@ -116,24 +102,24 @@ public class DefaultMetadataResolutionRequest
 
     public RepositoryCache getCache()
     {
-        return cache;
+        return repositoryRequest.getCache();
     }
 
     public DefaultMetadataResolutionRequest setCache( RepositoryCache cache )
     {
-        this.cache = cache;
+        repositoryRequest.setCache( cache );
 
         return this;
     }
 
     public boolean isOffline()
     {
-        return offline;
+        return repositoryRequest.isOffline();
     }
 
     public DefaultMetadataResolutionRequest setOffline( boolean offline )
     {
-        this.offline = offline;
+        repositoryRequest.setOffline( offline );
 
         return this;
     }

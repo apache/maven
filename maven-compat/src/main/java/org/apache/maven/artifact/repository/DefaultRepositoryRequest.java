@@ -39,6 +39,27 @@ public class DefaultRepositoryRequest
 
     private RepositoryCache cache;
 
+    /**
+     * Creates an empty repository request.
+     */
+    public DefaultRepositoryRequest()
+    {
+        // enables no-arg constructor
+    }
+
+    /**
+     * Creates a shallow copy of the specified repository request.
+     * 
+     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
+     */
+    public DefaultRepositoryRequest( RepositoryRequest repositoryRequest )
+    {
+        setLocalRepository( repositoryRequest.getLocalRepository() );
+        setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
+        setOffline( repositoryRequest.isOffline() );
+        setCache( repositoryRequest.getCache() );
+    }
+
     public boolean isOffline()
     {
         return offline;
