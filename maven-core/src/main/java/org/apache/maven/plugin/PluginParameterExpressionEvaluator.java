@@ -28,7 +28,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.path.PathTranslator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
@@ -36,7 +36,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * @author Jason van Zyl
  */
 public class PluginParameterExpressionEvaluator
-    implements ExpressionEvaluator
+    implements TypeAwareExpressionEvaluator
 {
     private MavenSession session;
 
@@ -93,6 +93,12 @@ public class PluginParameterExpressionEvaluator
     }
 
     public Object evaluate( String expr )
+        throws ExpressionEvaluationException
+    {
+        return evaluate( expr, null );
+    }
+
+    public Object evaluate( String expr, Class<?> type )
         throws ExpressionEvaluationException
     {
         Object value = null;
@@ -293,6 +299,19 @@ public class PluginParameterExpressionEvaluator
             {
                 value = basedir + expression.substring( pathSeparator );
             }
+        }
+
+        /*
+         * MNG-4312: We neither have reserved all of the above magic expressions nor is their set fixed/well-known (it
+         * gets occasionally extended by newer Maven versions). This imposes the risk for existing plugins to
+         * unintentionally use such a magic expression for an ordinary system property. So here we check whether we
+         * ended up with a magic value that is not compatible with the type of the configured mojo parameter (a string
+         * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
+         * expression from properties only.
+         */
+        if ( value != null && type != null && !( value instanceof String ) && !type.isInstance( value ) )
+        {
+            value = null;
         }
 
         if ( value == null )
