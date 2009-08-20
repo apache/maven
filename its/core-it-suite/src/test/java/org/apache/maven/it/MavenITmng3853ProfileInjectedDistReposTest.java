@@ -63,8 +63,7 @@ public class MavenITmng3853ProfileInjectedDistReposTest
 
         Properties props = verifier.loadProperties( "target/dist.properties" );
         assertEquals( "1", props.getProperty( "listParam" ) );
-        assertNotNull( props.getProperty( "listParam.0" ) );
-        assertFalse( props.getProperty( "listParam.0" ).startsWith( "${" ) );
+        assertEquals( "maven-core-it", props.getProperty( "listParam.0" ) );
     }
 
 }

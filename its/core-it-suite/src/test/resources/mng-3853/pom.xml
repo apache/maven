@@ -51,7 +51,7 @@ under the License.
               <propertiesFile>target/dist.properties</propertiesFile>
               <listParam>
                 <!-- Get the distro repo, just like the Maven Deploy Plugin would do -->
-                <listParam>${project.distributionManagementArtifactRepository}</listParam>
+                <listParam>${project.distributionManagementArtifactRepository.id}</listParam>
               </listParam>
             </configuration>
           </execution>
