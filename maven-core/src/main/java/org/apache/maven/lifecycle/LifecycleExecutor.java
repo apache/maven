@@ -32,6 +32,7 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
 /**

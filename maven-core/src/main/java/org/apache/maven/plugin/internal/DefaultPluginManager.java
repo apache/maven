@@ -43,6 +43,11 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.prefix.DefaultPluginPrefixRequest;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.prefix.PluginPrefixRequest;
+import org.apache.maven.plugin.prefix.PluginPrefixResolver;
+import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionNotFoundException;
 import org.apache.maven.plugin.version.PluginVersionRequest;
@@ -73,6 +78,9 @@ public class DefaultPluginManager
 
     @Requirement
     private PluginVersionResolver pluginVersionResolver;
+
+    @Requirement
+    private PluginPrefixResolver pluginPrefixResolver;
 
     @Requirement
     private LegacySupport legacySupport;
@@ -165,14 +173,47 @@ public class DefaultPluginManager
 
     public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
     {
-        // TODO Auto-generated method stub
-        return null;
+        PluginPrefixRequest request = new DefaultPluginPrefixRequest( session );
+        request.setPrefix( prefix );
+        request.setPom( project.getModel() );
+
+        try
+        {
+            PluginPrefixResult result = pluginPrefixResolver.resolve( request );
+
+            Plugin plugin = new Plugin();
+            plugin.setGroupId( result.getGroupId() );
+            plugin.setArtifactId( result.getArtifactId() );
+
+            return plugin;
+        }
+        catch ( NoPluginFoundForPrefixException e )
+        {
+            return null;
+        }
     }
 
     public PluginDescriptor getPluginDescriptorForPrefix( String prefix )
     {
-        // TODO Auto-generated method stub
-        return null;
+        MavenSession session = legacySupport.getSession();
+
+        PluginPrefixRequest request = new DefaultPluginPrefixRequest( session );
+        request.setPrefix( prefix );
+
+        try
+        {
+            PluginPrefixResult result = pluginPrefixResolver.resolve( request );
+
+            Plugin plugin = new Plugin();
+            plugin.setGroupId( result.getGroupId() );
+            plugin.setArtifactId( result.getArtifactId() );
+
+            return loadPluginDescriptor( plugin, session.getCurrentProject(), session );
+        }
+        catch ( Exception e )
+        {
+            return null;
+        }
     }
 
     public PluginDescriptor loadPluginDescriptor( Plugin plugin, MavenProject project, MavenSession session )

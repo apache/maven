@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.plugin.prefix;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.lifecycle;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,24 +19,23 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.util.List;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
-public class NoPluginFoundForPrefixException
-    extends Exception
+/**
+ * Resolves a plugin prefix.
+ * 
+ * @author Benjamin Bentmann
+ */
+public interface PluginPrefixResolver
 {
-    private String prefix;
-    
-    private ArtifactRepository localRepository;
-    
-    private List<ArtifactRepository> remoteRepositories;
-    
-    public NoPluginFoundForPrefixException( String prefix, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-    {
-        super( "No plugin found for prefix '" + prefix + "'" );
-        this.prefix = prefix;
-        this.localRepository = localRepository;
-        this.remoteRepositories = remoteRepositories;        
-    }
+
+    /**
+     * Resolves the plugin prefix for the specified request.
+     * 
+     * @param request The request that holds the details about the plugin and the repositories to consult, must not be
+     *            {@code null}.
+     * @return The result of the prefix resolution, never {@code null}.
+     * @throws NoPluginFoundForPrefixException If the plugin prefix could not be resolved.
+     */
+    PluginPrefixResult resolve( PluginPrefixRequest request )
+        throws NoPluginFoundForPrefixException;
+
 }

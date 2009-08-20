@@ -21,7 +21,6 @@ package org.apache.maven.exception;
 
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.lifecycle.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -29,6 +28,7 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 

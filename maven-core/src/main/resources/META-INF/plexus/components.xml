@@ -48,6 +48,9 @@
         <requirement>
           <role>org.apache.maven.plugin.version.PluginVersionResolver</role>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.prefix.PluginPrefixResolver</role>
+        </requirement>
       </requirements>
       <configuration>
         <lifecycles>

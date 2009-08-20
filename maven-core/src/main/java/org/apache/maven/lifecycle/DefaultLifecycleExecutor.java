@@ -15,10 +15,7 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,12 +28,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.maven.ProjectDependenciesResolver;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -63,22 +56,23 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.lifecycle.Execution;
 import org.apache.maven.plugin.lifecycle.Phase;
+import org.apache.maven.plugin.prefix.DefaultPluginPrefixRequest;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.prefix.PluginPrefixRequest;
+import org.apache.maven.plugin.prefix.PluginPrefixResolver;
+import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -106,6 +100,9 @@ public class DefaultLifecycleExecutor
 
     @Requirement
     private PluginVersionResolver pluginVersionResolver;
+
+    @Requirement
+    private PluginPrefixResolver pluginPrefixResolver;
             
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")    
     private List<Lifecycle> lifecycles;
@@ -1229,9 +1226,7 @@ public class DefaultLifecycleExecutor
 
         return dom;
     }
-                   
-    private Map<String,Plugin> pluginPrefixes = new HashMap<String,Plugin>();
-    
+
     //TODO: take repo mans into account as one may be aggregating prefixes of many
     //TODO: collect at the root of the repository, read the one at the root, and fetch remote if something is missing
     //      or the user forces the issue
@@ -1240,177 +1235,16 @@ public class DefaultLifecycleExecutor
     {        
         // [prefix]:[goal]
         
-        Plugin plugin = pluginPrefixes.get( prefix );
+        PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest( session ).setPrefix( prefix );
+        PluginPrefixResult prefixResult = pluginPrefixResolver.resolve( prefixRequest );
         
-        if ( plugin != null )
-        {
-            return plugin;
-        }
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( prefixResult.getGroupId() );
+        plugin.setArtifactId( prefixResult.getArtifactId() );
 
-        MavenProject project = session.getCurrentProject();
-
-        if ( project != null )
-        {
-            RepositoryRequest repositoryRequest = getRepositoryRequest( session, project );
-
-            for ( Plugin buildPlugin : project.getBuildPlugins() )
-            {
-                try
-                {
-                    PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( buildPlugin, repositoryRequest );
-
-                    if ( prefix.equals( pluginDescriptor.getGoalPrefix() ) )
-                    {
-                        Plugin p = new Plugin();
-                        p.setGroupId( buildPlugin.getGroupId() );
-                        p.setArtifactId( buildPlugin.getArtifactId() );
-                        pluginPrefixes.put( prefix, p );
-                        return p;
-                    }
-                }
-                catch ( Exception e )
-                {
-                    logger.debug( "Failed to retrieve plugin descriptor for " + buildPlugin, e );
-                }
-            }
-        }
-
-        // Process all plugin groups in the local repository first to see if we get a hit. A developer may have been 
-        // developing a plugin locally and installing.
-        //
-        for ( String pluginGroup : session.getPluginGroups() )
-        {            
-            String localPath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata-" + session.getLocalRepository().getId() + ".xml";
-
-            File destination = new File( session.getLocalRepository().getBasedir(), localPath );
-
-            if ( destination.exists() )
-            {                
-                processPluginGroupMetadata( pluginGroup, destination, pluginPrefixes );    
-                
-                plugin = pluginPrefixes.get( prefix );
-                
-                if ( plugin != null )
-                {
-                    return plugin;
-                }
-            }
-        }
-        
-        // Process all the remote repositories.
-        //
-        for ( String pluginGroup : session.getPluginGroups() )
-        {                
-            for ( ArtifactRepository repository : session.getCurrentProject().getPluginArtifactRepositories() )
-            {
-                try
-                {
-                    String localPath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata-" + repository.getId() + ".xml";
-                    
-                    File destination = new File( session.getLocalRepository().getBasedir(), localPath );
-                    
-                    String remotePath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata.xml";
-
-                    repositorySystem.retrieve( repository, destination, remotePath, session.getRequest().getTransferListener() );
-                    
-                    processPluginGroupMetadata( pluginGroup, destination, pluginPrefixes );
-                    
-                    plugin = pluginPrefixes.get( prefix );
-                    
-                    if ( plugin != null )
-                    {
-                        return plugin;
-                    }
-                }
-                catch ( TransferFailedException e )
-                {
-                    continue;
-                }
-                catch ( ResourceDoesNotExistException e )
-                {
-                    continue;
-                }
-            }
-
-        }
-                            
-        throw new NoPluginFoundForPrefixException( prefix, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );
+        return plugin;
     }
-    
-    // Keep track of the repository that provided the prefix mapping
-    //
-    private class PluginPrefix
-    {
-        private Plugin plugin;
-        
-        private ArtifactRepository repository;
 
-        public PluginPrefix( Plugin plugin, ArtifactRepository repository )
-        {
-            this.plugin = plugin;
-            this.repository = repository;
-        }
-    }
-    
-    
-    private void processPluginGroupMetadata( String pluginGroup, File pluginGroupMetadataFile, Map<String,Plugin> pluginPrefixes )
-    {
-        try
-        {
-            Metadata pluginGroupMetadata = readMetadata( pluginGroupMetadataFile );
-
-            List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
-
-            if ( plugins != null )
-            {
-                for ( org.apache.maven.artifact.repository.metadata.Plugin metadataPlugin : plugins )
-                {
-                    Plugin p = new Plugin();
-                    p.setGroupId( pluginGroup );
-                    p.setArtifactId( metadataPlugin.getArtifactId() );
-                    pluginPrefixes.put( metadataPlugin.getPrefix(), p );
-                }
-            }
-        }
-        catch ( RepositoryMetadataReadException e )
-        {
-            logger.warn( "Error reading plugin group metadata: ", e );
-        }
-    }
-    
-    protected Metadata readMetadata( File mappingFile )
-        throws RepositoryMetadataReadException
-    {
-        Metadata result;
-
-        Reader reader = null;
-        try
-        {
-            reader = ReaderFactory.newXmlReader( mappingFile );
-
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read( reader, false );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "'", e );
-        }
-        catch ( IOException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-        return result;
-    }
-    
     // These are checks that should be available in real time to IDEs
 
     /*

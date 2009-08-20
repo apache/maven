@@ -86,7 +86,7 @@ public class DefaultPluginVersionResolver
 
             artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
 
-            if ( !artifactMetadataFile.exists() /* || user requests snapshot updates */)
+            if ( !request.isOffline() && !artifactMetadataFile.exists() /* || user requests snapshot updates */)
             {
                 String remotePath =
                     request.getGroupId().replace( '.', '/' ) + "/" + request.getArtifactId() + "/maven-metadata.xml";
@@ -99,7 +99,14 @@ public class DefaultPluginVersionResolver
                 {
                     error = e;
 
-                    logger.debug( "Failed to retrieve " + remotePath, e );
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage(), e );
+                    }
+                    else
+                    {
+                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage() );
+                    }
 
                     continue;
                 }

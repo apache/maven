@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.version;
+package org.apache.maven.plugin.prefix;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,45 +24,63 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.model.Model;
 
 /**
- * Collects settings required to resolve the version for a plugin.
+ * Collects settings required to resolve a plugin prefix.
  * 
  * @author Benjamin Bentmann
  */
-public interface PluginVersionRequest
+public interface PluginPrefixRequest
     extends RepositoryRequest
 {
 
     /**
-     * Gets the group id of the plugin.
+     * Gets the prefix of the plugin.
      * 
-     * @return The group id of the plugin.
+     * @return The prefix of the plugin.
      */
-    String getGroupId();
+    String getPrefix();
 
     /**
-     * Sets the group id of the plugin.
+     * Sets the prefix of the plugin.
      * 
-     * @param groupId The group id of the plugin.
+     * @param prefix The prefix of the plugin.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setGroupId( String groupId );
+    PluginPrefixRequest setPrefix( String prefix );
 
     /**
-     * Gets the artifact id of the plugin.
+     * Gets the list of group ids to scan for the plugin prefix.
      * 
-     * @return The artifact id of the plugin.
+     * @return The list of group ids to scan for the plugin prefix, never {@code null}.
      */
-    String getArtifactId();
+    List<String> getPluginGroups();
 
     /**
-     * Sets the artifact id of the plugin.
+     * Sets the list of group ids to scan for the plugin prefix.
      * 
-     * @param artifactId The artifact id of the plugin.
+     * @param pluginGroups The list of group ids to scan for the plugin prefix, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setArtifactId( String artifactId );
+    PluginPrefixRequest setPluginGroups( List<String> pluginGroups );
+
+    /**
+     * Gets the POM whose build plugins are to be scanned for the prefix.
+     * 
+     * @return The POM whose build plugins are to be scanned for the prefix or {@code null} to only search the plugin
+     *         repositories.
+     */
+    Model getPom();
+
+    /**
+     * Sets the POM whose build plugins are to be scanned for the prefix.
+     * 
+     * @param pom The POM whose build plugins are to be scanned for the prefix, may be {@code null} to only search the
+     *            plugin repositories.
+     * @return This request, never {@code null}.
+     */
+    PluginPrefixRequest setPom( Model pom );
 
     /**
      * Indicates whether network access to remote repositories has been disabled.
@@ -77,7 +95,7 @@ public interface PluginVersionRequest
      * @param offline {@code true} to disable remote access, {@code false} to allow network access.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setOffline( boolean offline );
+    PluginPrefixRequest setOffline( boolean offline );
 
     /**
      * Gets the local repository to use.
@@ -92,7 +110,7 @@ public interface PluginVersionRequest
      * @param localRepository The local repository to use.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setLocalRepository( ArtifactRepository localRepository );
+    PluginPrefixRequest setLocalRepository( ArtifactRepository localRepository );
 
     /**
      * Gets the remote repositories to use.
@@ -108,7 +126,7 @@ public interface PluginVersionRequest
      * @param remoteRepositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
+    PluginPrefixRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
 
     /**
      * Gets the repository cache to use.
@@ -123,6 +141,6 @@ public interface PluginVersionRequest
      * @param cache The repository cache to use, may be {@code null}.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setCache( RepositoryCache cache );
+    PluginPrefixRequest setCache( RepositoryCache cache );
 
 }
