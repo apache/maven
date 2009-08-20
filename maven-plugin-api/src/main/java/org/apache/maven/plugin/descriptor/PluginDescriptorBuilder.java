@@ -156,6 +156,13 @@ public class PluginDescriptorBuilder
             mojo.setSince( since );
         }
 
+        PlexusConfiguration deprecated = c.getChild( "deprecated", false );
+
+        if ( deprecated != null )
+        {
+            mojo.setDeprecated( deprecated.getValue() );
+        }
+
         String phase = c.getChild( "phase" ).getValue();
 
         if ( phase != null )

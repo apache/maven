@@ -93,7 +93,7 @@ public class DefaultBuildPluginManager
         MavenSession oldSession = legacySupport.getSession();
 
         try
-        {                        
+        {
             mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
 
             Thread.currentThread().setContextClassLoader( pluginRealm );
