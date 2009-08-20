@@ -94,7 +94,7 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] dependencyConfigurations = c.getChild( "dependencies" ).getChildren( "dependency" );
 
-        List dependencies = new ArrayList();
+        List<ComponentDependency> dependencies = new ArrayList<ComponentDependency>();
 
         for ( int i = 0; i < dependencyConfigurations.length; i++ )
         {
@@ -250,7 +250,7 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] parameterConfigurations = c.getChild( "parameters" ).getChildren( "parameter" );
 
-        List parameters = new ArrayList();
+        List<Parameter> parameters = new ArrayList<Parameter>();
 
         for ( int i = 0; i < parameterConfigurations.length; i++ )
         {
