@@ -563,7 +563,8 @@ public class DefaultMavenPluginManager
         catch ( ComponentConfigurationException e )
         {
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "Unable to parse the created DOM for mojo configuration", e );
+                                                    "Unable to parse the created DOM for mojo configuration: "
+                                                        + e.getMessage(), e );
         }
         catch ( ComponentLookupException e )
         {
