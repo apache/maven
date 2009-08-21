@@ -62,7 +62,7 @@ public class PluginDescriptorBuilderTest
         assertEquals( 1, pd.getMojos().size() );
         assertEquals( 1, pd.getDependencies().size() );
 
-        MojoDescriptor md = (MojoDescriptor) pd.getMojos().get( 0 );
+        MojoDescriptor md = pd.getMojos().get( 0 );
 
         assertEquals( "jar", md.getGoal() );
         assertEquals( "mojo-description", md.getDescription() );
@@ -104,7 +104,7 @@ public class PluginDescriptorBuilderTest
         assertEquals( "parameter-description", mp.getDescription() );
         assertEquals( "deprecated-parameter", mp.getDeprecated() );
 
-        ComponentRequirement cr = (ComponentRequirement) md.getRequirements().get( 0 );
+        ComponentRequirement cr = md.getRequirements().get( 0 );
 
         assertEquals( "org.codehaus.plexus.archiver.Archiver", cr.getRole() );
         assertEquals( "jar", cr.getRoleHint() );

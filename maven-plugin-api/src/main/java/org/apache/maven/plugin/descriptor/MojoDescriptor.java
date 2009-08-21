@@ -39,7 +39,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * Why not just extend ComponentDescriptor here?
  */
 public class MojoDescriptor
-    extends ComponentDescriptor
+    extends ComponentDescriptor<Mojo>
     implements Cloneable
 {
     /** The Plexus component type */

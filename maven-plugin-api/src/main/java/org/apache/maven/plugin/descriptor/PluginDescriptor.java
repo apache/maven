@@ -90,9 +90,10 @@ public class PluginDescriptor
     //
     // ----------------------------------------------------------------------
 
-    public List getMojos()
+    @SuppressWarnings( "unchecked" )
+    public List<MojoDescriptor> getMojos()
     {
-        return getComponents();
+        return (List) getComponents();
     }
 
     public void addMojo( MojoDescriptor mojoDescriptor )
@@ -102,13 +103,13 @@ public class PluginDescriptor
         // this relies heavily on the equals() and hashCode() for ComponentDescriptor,
         // which uses role:roleHint for identity...and roleHint == goalPrefix:goal.
         // role does not vary for Mojos.
-        List mojos = getComponents();
+        List<MojoDescriptor> mojos = getMojos();
 
         if ( mojos != null && mojos.contains( mojoDescriptor ) )
         {
             int indexOf = mojos.indexOf( mojoDescriptor );
 
-            existing = (MojoDescriptor) mojos.get( indexOf );
+            existing = mojos.get( indexOf );
         }
 
         if ( existing != null )
