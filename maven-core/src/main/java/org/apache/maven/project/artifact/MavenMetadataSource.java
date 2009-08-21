@@ -38,6 +38,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -478,8 +479,24 @@ public class MavenMetadataSource
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    // bad/incompatible POM
-                    logger.debug( "Invalid artifact metadata for " + artifact.getId() + ": " + e.getMessage() );
+                    String message;
+
+                    // missing/incompatible POM (e.g. a Maven 1 POM)
+                    if ( e.getCause() instanceof ArtifactResolutionException )
+                    {
+                        message = "Missing artifact metadata for " + artifact.getId();
+                    }
+                    else
+                    {
+                        message = "Invalid artifact metadata for " + artifact.getId();
+                    }
+
+                    if ( logger.isDebugEnabled() )
+                    {
+                        message += ": " + e.getMessage();
+                    }
+
+                    logger.warn( message );
                 }
 
                 if ( project != null )

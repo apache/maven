@@ -119,7 +119,7 @@ public class DefaultProjectBuilder
                 }
                 catch ( ModelBuildingException e )
                 {
-                    throw new ProjectBuildingException( e.getModelId(), "Encountered POM errors", pomFile, e );
+                    throw new ProjectBuildingException( e.getModelId(), e.getMessage(), pomFile, e );
                 }
 
                 modelProblems = result.getProblems();
@@ -237,7 +237,8 @@ public class DefaultProjectBuilder
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ProjectBuildingException( artifact.getId(), "Error resolving project artifact.", e );
+            throw new ProjectBuildingException( artifact.getId(),
+                                                "Error resolving project artifact: " + e.getMessage(), e );
         }
 
         return build( artifact.getFile(), false, configuration );

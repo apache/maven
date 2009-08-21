@@ -87,7 +87,8 @@ public class DefaultWagonManager
 
         if ( !policy.isEnabled() )
         {
-            logger.debug( "Skipping disabled repository " + repository.getId() );
+            logger.debug( "Skipping disabled repository " + repository.getId() + " for resolution of "
+                + artifact.getId() );
         }
 
         // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
@@ -95,7 +96,7 @@ public class DefaultWagonManager
         // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.        
         else if ( artifact.isSnapshot() && updateCheckIsRequired )
         {
-            logger.debug( "Trying repository " + repository.getId() );
+            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId() );
 
             try
             {
@@ -106,7 +107,7 @@ public class DefaultWagonManager
                 updateCheckManager.touch( artifact, repository );
             }
 
-            logger.debug( "  Artifact resolved" );
+            logger.debug( "  Artifact " + artifact.getId() + " resolved" );
 
             artifact.setResolved( true );
         }
@@ -120,7 +121,7 @@ public class DefaultWagonManager
             // if POM is not present locally, try and get it if it's forced, out of date, or has not been attempted yet  
             if ( updateCheckManager.isPomUpdateRequired( artifact, repository ) )
             {
-                logger.debug( "Trying repository " + repository.getId() );
+                logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId() );
 
                 try
                 {
@@ -134,7 +135,7 @@ public class DefaultWagonManager
                     throw e;
                 }
 
-                logger.debug( "  Artifact resolved" );
+                logger.debug( "  Artifact " + artifact.getId() + " resolved" );
 
                 artifact.setResolved( true );
             }
@@ -154,11 +155,11 @@ public class DefaultWagonManager
         // don't write touch-file for release artifacts.
         else if ( !artifact.isSnapshot() )
         {
-            logger.debug( "Trying repository " + repository.getId() );
+            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId() );
 
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
 
-            logger.debug( "  Artifact resolved" );
+            logger.debug( "  Artifact " + artifact.getId() + " resolved" );
 
             artifact.setResolved( true );
         }
@@ -183,7 +184,7 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                logger.debug( "Unable to get resource '" + artifact.getId() + "' from repository " + repository.getId() + " (" + repository.getUrl() + ")", e );
+                logger.debug( "Unable to find resource '" + artifact.getId() + "' in repository " + repository.getId() + " (" + repository.getUrl() + ")", e );
             }
             catch ( TransferFailedException e )
             {
@@ -385,7 +386,7 @@ public class DefaultWagonManager
                     }
                     catch ( ResourceDoesNotExistException sha1TryException )
                     {
-                        logger.debug( "SHA1 not found, trying MD5", sha1TryException );
+                        logger.debug( "SHA1 not found, trying MD5: " + sha1TryException.getMessage() );
 
                         // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
                         // file...we'll try again with the MD5 checksum.
