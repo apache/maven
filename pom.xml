@@ -389,7 +389,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-remote-resources-plugin</artifactId>
-          <version>1.0.1-SNAPSHOT</version>
+          <version>1.1-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>
