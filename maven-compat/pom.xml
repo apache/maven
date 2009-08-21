@@ -78,6 +78,7 @@
           <models>
             <model>src/main/mdo/metadata.mdo</model>
             <model>src/main/mdo/profiles.mdo</model>
+            <model>src/main/mdo/paramdoc.mdo</model>
           </models>
         </configuration>
       </plugin>
