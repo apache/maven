@@ -1,4 +1,4 @@
-package org.apache.maven.profiles;
+package org.apache.maven.profiles.activation;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

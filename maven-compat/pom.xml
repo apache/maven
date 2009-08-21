@@ -77,6 +77,7 @@
           <version>1.0.0</version>
           <models>
             <model>src/main/mdo/metadata.mdo</model>
+            <model>src/main/mdo/profiles.mdo</model>
           </models>
         </configuration>
       </plugin>

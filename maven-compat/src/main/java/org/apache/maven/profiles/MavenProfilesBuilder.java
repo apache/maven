@@ -19,40 +19,20 @@ package org.apache.maven.profiles;
  * under the License.
  */
 
-import org.apache.maven.model.Profile;
-import org.apache.maven.profiles.activation.ProfileActivationException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.io.File;
+import java.io.IOException;
 
+/**
+ * @author jdcasey
+ * @version $Id$
+ */
 @Deprecated
-public interface ProfileManager
+public interface MavenProfilesBuilder
 {
+    String ROLE = MavenProfilesBuilder.class.getName();
 
-    void addProfile( Profile profile );
-
-    void explicitlyActivate( String profileId );
-
-    void explicitlyActivate( List profileIds );
-
-    void explicitlyDeactivate( String profileId );
-
-    void explicitlyDeactivate( List profileIds );
-
-    List getActiveProfiles()
-        throws ProfileActivationException;
-
-    void addProfiles( List profiles );
-
-    Map getProfilesById();
-
-    List getExplicitlyActivatedIds();
-
-    List getExplicitlyDeactivatedIds();
-
-    List getIdsActivatedByDefault();
-
-    Properties getRequestProperties();
-
+    ProfilesRoot buildProfiles( File basedir )
+        throws IOException, XmlPullParserException;
 }

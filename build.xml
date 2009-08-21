@@ -184,6 +184,7 @@ END SNIPPET: ant-bootstrap -->
     <modello file="maven-core/src/main/mdo/settings.mdo" />
     <modello file="maven-core/src/main/mdo/toolchains.mdo" />
     <modello file="maven-compat/src/main/mdo/metadata.mdo" />
+    <modello file="maven-compat/src/main/mdo/profiles.mdo" />
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
