@@ -462,8 +462,7 @@ public class DefaultMavenPluginManager
 
             try
             {
-                // currently all mojo even reportMojo have the same role Mojo.ROLE
-                mojo = (T) container.lookup( Mojo.ROLE, mojoDescriptor.getRoleHint() );
+                mojo = container.lookup( mojoInterface, mojoDescriptor.getRoleHint() );
             }
             catch ( ComponentLookupException e )
             {
