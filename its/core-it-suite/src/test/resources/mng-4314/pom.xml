@@ -32,8 +32,8 @@ under the License.
     Verify that aggregator mojos invoked from the CLI run only once, namely at the top-level project.
   </description>
 
-	<modules>
-		<module>dependency</module>
-		<module>consumer</module>
-	</modules>
+  <modules>
+    <module>dependency</module>
+    <module>consumer</module>
+  </modules>
 </project>
