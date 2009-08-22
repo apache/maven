@@ -133,7 +133,7 @@ public class DefaultModelBuilder
 
             Model tmpModel = currentData.getModel();
 
-            Model rawModel = ModelUtils.cloneModel( tmpModel );
+            Model rawModel = tmpModel.clone();
             currentData.setRawModel( rawModel );
 
             problems.setSourceHint( tmpModel );
@@ -537,7 +537,7 @@ public class DefaultModelBuilder
 
     private Model getSuperModel()
     {
-        return ModelUtils.cloneModel( superPomProvider.getSuperModel( "4.0.0" ) );
+        return superPomProvider.getSuperModel( "4.0.0" ).clone();
     }
 
     private void importDependencyManagement( Model model, ModelBuildingRequest request,

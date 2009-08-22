@@ -62,7 +62,6 @@ import org.apache.maven.model.Reporting;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
-import org.apache.maven.model.building.ModelUtils;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -1840,7 +1839,7 @@ public class MavenProject
 
         if ( project.getModel() != null )
         {
-            setModel( ModelUtils.cloneModel( project.getModel() ) );
+            setModel( project.getModel().clone() );
         }
 
         if ( project.getOriginalModel() != null )

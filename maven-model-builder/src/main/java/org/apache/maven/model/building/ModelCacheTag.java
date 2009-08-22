@@ -82,7 +82,7 @@ interface ModelCacheTag<T>
 
         public ModelData intoCache( ModelData data )
         {
-            Model model = ModelUtils.cloneModel( data.getModel() );
+            Model model = ( data.getModel() != null ) ? data.getModel().clone() : null;
             return new ModelData( model, data.getGroupId(), data.getArtifactId(), data.getVersion() );
         }
 
@@ -111,7 +111,7 @@ interface ModelCacheTag<T>
 
         public DependencyManagement intoCache( DependencyManagement data )
         {
-            return ModelUtils.cloneDependencyManagement( data );
+            return ( data != null ) ? data.clone() : null;
         };
 
         public DependencyManagement fromCache( DependencyManagement data )

@@ -30,7 +30,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.building.ModelUtils;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -52,7 +51,7 @@ public class DefaultPluginCache
 
         public CacheKey( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         {
-            this.plugin = ModelUtils.clonePlugin( plugin );
+            this.plugin = plugin.clone();
             this.repositories.add( localRepository );
             this.repositories.addAll( remoteRepositories );
 

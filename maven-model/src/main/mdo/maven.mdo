@@ -66,7 +66,7 @@
     </default>
   </defaults>
   <classes>
-    <class rootElement="true" xml.tagName="project">
+    <class rootElement="true" xml.tagName="project" java.clone.hook="cloneHook">
       <name>Model</name>
       <superClass>ModelBase</superClass>
       <description>
@@ -566,6 +566,11 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
+    private void cloneHook( Model copy )
+    {
+        copy.pomFile = pomFile;
+    }
+
     /**
      * The POM from which this model originated. This is transient runtime state and therefore not managed by Modello.
      */
@@ -626,7 +631,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ModelBase</name>
       <version>3.0.0+</version>
       <description>
@@ -764,7 +769,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>PluginContainer</name>
       <version>3.0.0+</version>
       <description>Contains the plugins informations for the project.</description>
@@ -1029,7 +1034,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>CiManagement</name>
       <version>4.0.0</version>
       <description>
@@ -1068,7 +1073,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Notifier</name>
       <description>Configures one method for notifying users/developers when a build breaks.</description>
       <version>4.0.0</version>
@@ -1130,7 +1135,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Contributor</name>
       <description>Description of a person who has contributed to the project, but who does not have
         commit privileges. Usually, these contributions come in the form of patches submitted.</description>
@@ -1202,7 +1207,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Dependency</name>
       <version>3.0.0+</version>
       <description>
@@ -1574,7 +1579,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Exclusion</name>
       <version>4.0.0</version>
       <description>
@@ -1600,7 +1605,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>IssueManagement</name>
       <description>Information about the issue tracking (or bug tracking) system used to manage this
         project.</description>
@@ -1620,7 +1625,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>DistributionManagement</name>
       <version>4.0.0</version>
       <description>This elements describes all that pertains to distribution for a project. It is
@@ -1697,7 +1702,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>License</name>
       <description>Describes the licenses for this project. This is used to generate the license
         page of the project's web site, as well as being taken into consideration in other reporting
@@ -1741,7 +1746,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>MailingList</name>
       <version>3.0.0+</version>
       <description>This element describes all of the mailing lists associated with a project. The
@@ -1816,7 +1821,7 @@
         and maybe even a specific element for the user and scm mailing lists. Then leave the more
         lose structure for any other type of mailing list.</comment>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Organization</name>
       <description>Specifies the organization that produces this project.</description>
       <version>3.0.0+</version>
@@ -1868,7 +1873,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>PatternSet</name>
       <version>3.0.0+</version>
       <description>Definition of include or exclude patterns.</description>
@@ -1936,7 +1941,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Parent</name>
       <version>4.0.0</version>
       <description>
@@ -2063,7 +2068,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Scm</name>
       <version>4.0.0</version>
       <description>
@@ -2342,7 +2347,7 @@
       </codeSegments>
     </class>
 
-    <class>
+    <class java.clone="deep">
       <name>RepositoryBase</name>
       <version>4.0.0</version>
       <description>A repository contains the information needed for establishing connections with
@@ -2504,7 +2509,7 @@
       </codeSegments>
     </class>
 
-    <class>
+    <class java.clone="deep">
       <name>RepositoryPolicy</name>
       <version>4.0.0</version>
       <description>Download policy.</description>
@@ -2578,7 +2583,7 @@
     </class>
 
     <!--@todo find better solution for management of site deployments -->
-    <class>
+    <class java.clone="deep">
       <name>Site</name>
       <version>4.0.0</version>
       <description>Contains the information needed for deploying websites.</description>
@@ -2613,7 +2618,7 @@
       </fields>
     </class>
 
-    <class>
+    <class java.clone="deep">
       <name>ConfigurationContainer</name>
       <version>4.0.0</version>
       <description>Contains the configuration information of the container like Plugin.</description>
@@ -2924,7 +2929,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>DependencyManagement</name>
       <version>4.0.0</version>
       <description>Section for management of default dependency information for use in a group of
@@ -2950,7 +2955,7 @@
       <description>Section for management of default plugin information for use in a group of POMs.
       </description>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Reporting</name>
       <version>4.0.0</version>
       <description>Section for management of reports and their configuration.</description>
@@ -3114,7 +3119,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Activation</name>
       <version>4.0.0</version>
       <description>The conditions within the build runtime environment which will trigger the
@@ -3180,7 +3185,7 @@
         -->
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ActivationProperty</name>
       <version>4.0.0</version>
       <description>This is the property specification used to activate a profile. If the value field
@@ -3202,7 +3207,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ActivationOS</name>
       <version>4.0.0</version>
       <description>This is an activator which will detect an operating system's attributes in order
@@ -3246,7 +3251,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ActivationFile</name>
       <version>4.0.0</version>
       <description>This is the file specification used to activate the profile. The missing value
@@ -3294,7 +3299,7 @@
     </class>
     -->
     <!-- /BuildProfile support -->
-    <class xml.tagName="plugin">
+    <class xml.tagName="plugin" java.clone="deep">
       <name>ReportPlugin</name>
       <version>4.0.0</version>
       <description>
@@ -3439,7 +3444,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ReportSet</name>
       <version>4.0.0</version>
       <description>Represents a set of reports and configuration to be used to generate them.</description>
@@ -3503,7 +3508,7 @@
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Prerequisites</name>
       <version>4.0.0</version>
       <description>Describes the prerequisites a project can have.</description>
@@ -3519,7 +3524,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Relocation</name>
       <version>4.0.0</version>
       <description>Describes where an artifact has moved to. If any of the values are omitted, it is
@@ -3551,7 +3556,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Extension</name>
       <version>4.0.0</version>
       <description>Describes a build extension to utilise.</description>
