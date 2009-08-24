@@ -39,7 +39,6 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -381,9 +380,9 @@ public class DefaultLifecycleExecutor
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException,
-        InvalidPluginDescriptorException, PluginManagerException, LifecyclePhaseNotFoundException,
-        LifecycleNotFoundException, PluginVersionResolutionException
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
+        PluginVersionResolutionException
     {
         MavenProject project = session.getCurrentProject();
 
@@ -467,8 +466,11 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan, String goal ) 
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
+    private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan,
+                                                      String goal )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginVersionResolutionException
     {
         // If this is a goal like "mvn modello:java" and the POM looks like the following:
         //
@@ -515,8 +517,8 @@ public class DefaultLifecycleExecutor
     private void calculateExecutionForLifecyclePhase( MavenSession session, List<MojoExecution> lifecyclePlan,
                                                       String lifecyclePhase )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException,
-        InvalidPluginDescriptorException, LifecyclePhaseNotFoundException
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException
     {
         Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings( session, lifecyclePhase );
 
@@ -528,8 +530,7 @@ public class DefaultLifecycleExecutor
 
     private Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, String lifecyclePhase )
         throws LifecyclePhaseNotFoundException, PluginNotFoundException, PluginResolutionException,
-        PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException,
-        InvalidPluginDescriptorException
+        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException
     {
         /*
          * Determine the lifecycle that corresponds to the given phase.
@@ -616,8 +617,8 @@ public class DefaultLifecycleExecutor
     private void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session, MavenProject project,
                                             Collection<MojoDescriptor> alreadyForkedExecutions )
         throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
-        PluginDescriptorParsingException, CycleDetectedInPluginGraphException, NoPluginFoundForPrefixException,
-        InvalidPluginDescriptorException, LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -883,7 +884,7 @@ public class DefaultLifecycleExecutor
    
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session ) 
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
     {        
         MavenProject project = session.getCurrentProject();
         
@@ -1173,10 +1174,6 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }
         catch ( PluginDescriptorParsingException e )
-        {
-            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        }
-        catch ( CycleDetectedInPluginGraphException e )
         {
             throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
         }

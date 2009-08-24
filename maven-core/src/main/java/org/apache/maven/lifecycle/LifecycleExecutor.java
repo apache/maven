@@ -25,7 +25,6 @@ import java.util.Set;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
@@ -51,7 +50,7 @@ public interface LifecycleExecutor
      */
     MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        CycleDetectedInPluginGraphException, MojoNotFoundException, NoPluginFoundForPrefixException,
+        MojoNotFoundException, NoPluginFoundForPrefixException,
         InvalidPluginDescriptorException, PluginManagerException, LifecyclePhaseNotFoundException,
         LifecycleNotFoundException, PluginVersionResolutionException;
         

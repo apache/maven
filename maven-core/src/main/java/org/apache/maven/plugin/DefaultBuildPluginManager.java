@@ -32,8 +32,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 // TODO: the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO: remove the coreArtifactFilterManager
@@ -63,12 +61,9 @@ public class DefaultBuildPluginManager
      * @throws PluginNotFoundException The plugin could not be found in any repositories.
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
      * @throws InvalidPluginDescriptorException 
-     * @throws PlexusConfigurationException A discovered component descriptor cannot be read, or or can't be parsed correctly. Shouldn't 
-     *                                      happen but if someone has made a descriptor by hand it's possible.
-     * @throws CycleDetectedInComponentGraphException A cycle has been detected in the component graph for a plugin that has been dynamically loaded.
      */
     public synchronized PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
         return mavenPluginManager.getPluginDescriptor( plugin, repositoryRequest );
     }
@@ -183,7 +178,7 @@ public class DefaultBuildPluginManager
 
     public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException
+        MojoNotFoundException, InvalidPluginDescriptorException
     {
         return mavenPluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
     }

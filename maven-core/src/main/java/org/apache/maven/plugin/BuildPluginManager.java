@@ -28,11 +28,11 @@ public interface BuildPluginManager
 {
     // igorf: Way too many declared exceptions!
     PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, InvalidPluginDescriptorException;
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
 
     // igorf: Way too many declared exceptions!
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException, MojoNotFoundException, InvalidPluginDescriptorException;
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException;
 
     void executeMojo( MavenSession session, MojoExecution execution )
         throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException;

@@ -32,7 +32,6 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
@@ -52,7 +51,7 @@ public class EmptyLifecycleExecutor
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        CycleDetectedInPluginGraphException, MojoNotFoundException
+        MojoNotFoundException
     {
         return new MavenExecutionPlan( Collections.<MojoExecution> emptyList(), null );
     }
