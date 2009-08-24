@@ -17,6 +17,7 @@ package org.apache.maven.lifecycle;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -163,6 +164,20 @@ public class DefaultLifecycleExecutor
             return;
         }
 
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "=== REACTOR BUILD PLAN ===" );
+
+            for ( ProjectBuild projectBuild : projectBuilds )
+            {
+                logger.debug( "------------------" );
+                logger.debug( "Project: " + projectBuild.project.getId() );
+                logger.debug( "Tasks:   " + projectBuild.taskSegment.tasks );
+            }
+
+            logger.debug( "==========================" );
+        }
+
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         RepositoryRequest repositoryRequest = getRepositoryRequest( session, null );
@@ -196,20 +211,11 @@ public class DefaultLifecycleExecutor
                 }
 
                 MavenExecutionPlan executionPlan =
-                    calculateProjectExecutionPlan( session, currentProject, projectBuild.taskSegment );
-
-                // TODO: once we have calculated the build plan then we should accurately be able to download
-                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
-                // this later by looking at the build plan. Would be better to just batch download everything required
-                // by the reactor.
-
-                repositoryRequest.setRemoteRepositories( currentProject.getRemoteArtifactRepositories() );
-                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(),
-                                                     repositoryRequest );
+                    calculateExecutionPlan( session, currentProject, projectBuild.taskSegment );
 
                 if ( logger.isDebugEnabled() )
                 {
-                    logger.debug( "=== BUILD PLAN ===" );
+                    logger.debug( "=== PROJECT BUILD PLAN ===" );
                     logger.debug( "Project:       " + currentProject );
 
                     for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
@@ -221,8 +227,17 @@ public class DefaultLifecycleExecutor
                         logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
                     }
 
-                    logger.debug( "==================" );
+                    logger.debug( "==========================" );
                 }
+
+                // TODO: once we have calculated the build plan then we should accurately be able to download
+                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
+                // this later by looking at the build plan. Would be better to just batch download everything required
+                // by the reactor.
+
+                repositoryRequest.setRemoteRepositories( currentProject.getRemoteArtifactRepositories() );
+                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(),
+                                                     repositoryRequest );
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
@@ -428,8 +443,8 @@ public class DefaultLifecycleExecutor
         return projectBuilds;
     }
 
-    private MavenExecutionPlan calculateProjectExecutionPlan( MavenSession session, MavenProject project,
-                                                              TaskSegment taskSegment )
+    private MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project,
+                                                       TaskSegment taskSegment )
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
@@ -625,62 +640,22 @@ public class DefaultLifecycleExecutor
 
     }
 
-    // TODO: refactor this to reuse the same code as for the reactor build
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
         PluginVersionResolutionException
     {
-        MavenProject project = session.getCurrentProject();
+        List<TaskSegment> taskSegments = calculateTaskSegments( session, Arrays.asList( tasks ) );
 
-        List<MojoExecution> lifecyclePlan = new ArrayList<MojoExecution>();
+        TaskSegment mergedSegment = new TaskSegment( false );
 
-        Set<String> requiredDependencyResolutionScopes = new HashSet<String>();
-
-        for ( String task : tasks )
+        for ( TaskSegment taskSegment : taskSegments )
         {
-            if ( task.indexOf( ":" ) > 0 )
-            {
-                calculateExecutionForIndividualGoal( session, lifecyclePlan, task );
-            }
-            else
-            {
-                calculateExecutionForLifecyclePhase( session, project, lifecyclePlan, task );
-            }
+            mergedSegment.tasks.addAll( taskSegment.tasks );
         }
 
-        // 7. Now we create the correct configuration for the mojo to execute.
-        // 
-        for ( MojoExecution mojoExecution : lifecyclePlan )
-        {
-            // These are bits that look like this:
-            //
-            // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
-            //                        
-
-            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-            if ( mojoDescriptor == null )
-            {
-                mojoDescriptor =
-                    pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
-                                                     getRepositoryRequest( session, project ) );
-
-                mojoExecution.setMojoDescriptor( mojoDescriptor );
-            }
-
-            populateMojoExecutionConfiguration( project, mojoExecution,
-                                                MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
-
-            extractMojoConfiguration( mojoExecution );
-
-            calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
-
-            collectDependencyResolutionScopes( requiredDependencyResolutionScopes, mojoExecution );
-        }
-
-        return new MavenExecutionPlan( lifecyclePlan, requiredDependencyResolutionScopes );
+        return calculateExecutionPlan( session, session.getCurrentProject(), mergedSegment );
     }
 
     private RepositoryRequest getRepositoryRequest( MavenSession session, MavenProject project )
@@ -711,69 +686,6 @@ public class DefaultLifecycleExecutor
         for ( MojoExecution forkedExecution : mojoExecution.getForkedExecutions() )
         {
             collectDependencyResolutionScopes( requiredDependencyResolutionScopes, forkedExecution );
-        }
-    }
-
-    private void calculateExecutionForIndividualGoal( MavenSession session, List<MojoExecution> lifecyclePlan,
-                                                      String goal )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-        PluginVersionResolutionException
-    {
-        // If this is a goal like "mvn modello:java" and the POM looks like the following:
-        //
-        // <project>
-        //   <modelVersion>4.0.0</modelVersion>
-        //   <groupId>org.apache.maven.plugins</groupId>
-        //   <artifactId>project-plugin-level-configuration-only</artifactId>
-        //   <version>1.0.1</version>
-        //   <build>
-        //     <plugins>
-        //       <plugin>
-        //         <groupId>org.codehaus.modello</groupId>
-        //         <artifactId>modello-maven-plugin</artifactId>
-        //         <version>1.0.1</version>
-        //         <configuration>
-        //           <version>1.1.0</version>
-        //           <models>
-        //             <model>src/main/mdo/remote-resources.mdo</model>
-        //           </models>
-        //         </configuration>
-        //       </plugin>
-        //     </plugins>
-        //   </build>
-        // </project>                
-        //
-        // We want to 
-        //
-        // - take the plugin/configuration in the POM and merge it with the plugin's default configuration found in its plugin.xml
-        // - attach that to the MojoExecution for its configuration
-        // - give the MojoExecution an id of default-<goal>.
-        
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, session.getCurrentProject() );
-
-        MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
-
-        lifecyclePlan.add( mojoExecution );        
-    }
-    
-    // 1. Find the lifecycle given the phase (default lifecycle when given install)
-    // 2. Find the lifecycle mapping that corresponds to the project packaging (jar lifecycle mapping given the jar packaging)
-    // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
-    // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
-    // 5. Bind mojos specified in the project itself to the lifecycle    
-    private void calculateExecutionForLifecyclePhase( MavenSession session, MavenProject project,
-                                                      List<MojoExecution> lifecyclePlan, String lifecyclePhase )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-        LifecyclePhaseNotFoundException
-    {
-        Map<String, List<MojoExecution>> phaseToMojoMapping =
-            calculateLifecycleMappings( session, project, lifecyclePhase );
-
-        for ( List<MojoExecution> mojoExecutions : phaseToMojoMapping.values() )
-        {
-            lifecyclePlan.addAll( mojoExecutions );
         }
     }
 
