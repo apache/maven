@@ -19,6 +19,9 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
@@ -31,11 +34,33 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class AggregatorDependenciesMojo
     extends AbstractMojo
 {
-    
+
+    /**
+     * The path to the touch file, relative to the project's base directory.
+     * 
+     * @parameter expression="${aggregator.touchFile}" default-value="${project.build.directory}/touch.txt"
+     */
+    private File touchFile;
 
     public void execute()
         throws MojoExecutionException
     {
-        //nothing to do, we are checking Maven's behavior here.
+        getLog().info( "[MAVEN-CORE-IT-LOG] Touching file: " + touchFile );
+
+        if ( touchFile != null )
+        {
+            try
+            {
+                touchFile.getParentFile().mkdirs();
+                touchFile.createNewFile();
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Failed to create touch file " + touchFile, e );
+            }
+        }
+
+        getLog().info( "[MAVEN-CORE-IT-LOG] Touched file: " + touchFile );
     }
+
 }
