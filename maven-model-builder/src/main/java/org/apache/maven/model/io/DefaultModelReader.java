@@ -42,7 +42,7 @@ public class DefaultModelReader
     implements ModelReader
 {
 
-    public Model read( File input, Map<String, Object> options )
+    public Model read( File input, Map<String, ?> options )
         throws IOException
     {
         if ( input == null )
@@ -57,7 +57,7 @@ public class DefaultModelReader
         return model;
     }
 
-    public Model read( Reader input, Map<String, Object> options )
+    public Model read( Reader input, Map<String, ?> options )
         throws IOException
     {
         if ( input == null )
@@ -80,7 +80,7 @@ public class DefaultModelReader
         }
     }
 
-    public Model read( InputStream input, Map<String, Object> options )
+    public Model read( InputStream input, Map<String, ?> options )
         throws IOException
     {
         if ( input == null )
@@ -103,7 +103,7 @@ public class DefaultModelReader
         }
     }
 
-    private boolean isStrict( Map<String, Object> options )
+    private boolean isStrict( Map<String, ?> options )
     {
         Object value = ( options != null ) ? options.get( IS_STRICT ) : null;
         return value == null || Boolean.parseBoolean( value.toString() );

@@ -50,7 +50,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( File input, Map<String, Object> options )
+    Model read( File input, Map<String, ?> options )
         throws IOException, ModelParseException;
 
     /**
@@ -63,7 +63,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( Reader input, Map<String, Object> options )
+    Model read( Reader input, Map<String, ?> options )
         throws IOException, ModelParseException;
 
     /**
@@ -76,7 +76,7 @@ public interface ModelReader
      * @throws IOException If the model could not be deserialized.
      * @throws ModelParseException If the input format could not be parsed.
      */
-    Model read( InputStream input, Map<String, Object> options )
+    Model read( InputStream input, Map<String, ?> options )
         throws IOException, ModelParseException;
 
 }
