@@ -20,15 +20,14 @@ package org.apache.maven.plugin.prefix.internal;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -43,9 +42,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Resolves a plugin prefix.
@@ -65,6 +61,9 @@ public class DefaultPluginPrefixResolver
 
     @Requirement
     private RepositorySystem repositorySystem;
+
+    @Requirement
+    private MetadataReader metadataReader;
 
     public PluginPrefixResult resolve( PluginPrefixRequest request )
         throws NoPluginFoundForPrefixException
@@ -212,7 +211,9 @@ public class DefaultPluginPrefixResolver
         {
             try
             {
-                Metadata pluginGroupMetadata = readMetadata( metadataFile );
+                Map<String, ?> options = Collections.singletonMap( MetadataReader.IS_STRICT, Boolean.FALSE );
+
+                Metadata pluginGroupMetadata = metadataReader.read( metadataFile, options );
 
                 List<org.apache.maven.artifact.repository.metadata.Plugin> plugins = pluginGroupMetadata.getPlugins();
 
@@ -227,7 +228,7 @@ public class DefaultPluginPrefixResolver
                     }
                 }
             }
-            catch ( RepositoryMetadataReadException e )
+            catch ( IOException e )
             {
                 if ( logger.isDebugEnabled() )
                 {
@@ -241,42 +242,6 @@ public class DefaultPluginPrefixResolver
         }
 
         return null;
-    }
-
-    private Metadata readMetadata( File mappingFile )
-        throws RepositoryMetadataReadException
-    {
-        Metadata result;
-
-        Reader reader = null;
-        try
-        {
-            reader = ReaderFactory.newXmlReader( mappingFile );
-
-            MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
-
-            result = mappingReader.read( reader, false );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "'", e );
-        }
-        catch ( IOException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        return result;
     }
 
 }
