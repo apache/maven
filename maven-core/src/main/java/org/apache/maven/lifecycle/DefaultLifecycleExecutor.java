@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
@@ -145,28 +146,31 @@ public class DefaultLifecycleExecutor
     {
         fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
 
-        MavenProject rootProject = session.getTopLevelProject();
+        MavenExecutionResult result = session.getResult();
 
-        List<String> goals = session.getGoals();
+        List<ProjectBuild> projectBuilds;
 
-        if ( goals.isEmpty() && rootProject != null )
+        try
         {
-            String goal = rootProject.getDefaultGoal();
+            projectBuilds = calculateProjectBuilds( session );
+        }
+        catch ( Exception e )
+        {
+            result.addException( e );
 
-            if ( goal != null )
-            {
-                goals = Collections.singletonList( goal );
-            }
+            fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
+
+            return;
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        MavenExecutionResult result = session.getResult();
-
         RepositoryRequest repositoryRequest = getRepositoryRequest( session, null );
 
-        for ( MavenProject currentProject : session.getProjects() )
+        for ( ProjectBuild projectBuild : projectBuilds )
         {
+            MavenProject currentProject = projectBuild.project;
+
             long buildStartTime = System.currentTimeMillis();
 
             try
@@ -192,28 +196,31 @@ public class DefaultLifecycleExecutor
                 }
 
                 MavenExecutionPlan executionPlan =
-                    calculateExecutionPlan( session, goals.toArray( new String[goals.size()] ) );
+                    calculateProjectExecutionPlan( session, currentProject, projectBuild.taskSegment );
 
-                //TODO: once we have calculated the build plan then we should accurately be able to download
-                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize this
-                // later by looking at the build plan. Would be better to just batch download everything required by the reactor.
+                // TODO: once we have calculated the build plan then we should accurately be able to download
+                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
+                // this later by looking at the build plan. Would be better to just batch download everything required
+                // by the reactor.
 
                 repositoryRequest.setRemoteRepositories( currentProject.getRemoteArtifactRepositories() );
-                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(), repositoryRequest );
+                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(),
+                                                     repositoryRequest );
 
                 if ( logger.isDebugEnabled() )
                 {
                     logger.debug( "=== BUILD PLAN ===" );
                     logger.debug( "Project:       " + currentProject );
+
                     for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                     {
-                        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-                        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
                         logger.debug( "------------------" );
-                        logger.debug( "Goal:          " + pluginDescriptor.getGroupId() + ':' + pluginDescriptor.getArtifactId() + ':' + pluginDescriptor.getVersion() + ':' + mojoDescriptor.getGoal()
-                            + ':' + mojoExecution.getExecutionId() );
+                        logger.debug( "Goal:          " + mojoExecution.getGroupId() + ':'
+                            + mojoExecution.getArtifactId() + ':' + mojoExecution.getVersion() + ':'
+                            + mojoExecution.getGoal() + ':' + mojoExecution.getExecutionId() );
                         logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
                     }
+
                     logger.debug( "==================" );
                 }
 
@@ -378,6 +385,247 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    private List<ProjectBuild> calculateProjectBuilds( MavenSession session )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginVersionResolutionException
+    {
+        List<ProjectBuild> projectBuilds = new ArrayList<ProjectBuild>();
+
+        MavenProject rootProject = session.getTopLevelProject();
+
+        List<String> tasks = session.getGoals();
+
+        if ( tasks == null || tasks.isEmpty() )
+        {
+            if ( !StringUtils.isEmpty( rootProject.getDefaultGoal() ) )
+            {
+                tasks = Collections.singletonList( rootProject.getDefaultGoal() );
+            }
+        }
+
+        List<TaskSegment> taskSegments = calculateTaskSegments( session, tasks );
+
+        for ( TaskSegment taskSegment : taskSegments )
+        {
+            List<MavenProject> projects;
+
+            if ( taskSegment.aggregating )
+            {
+                projects = Collections.singletonList( rootProject );
+            }
+            else
+            {
+                projects = session.getProjects();
+            }
+
+            for ( MavenProject project : projects )
+            {
+                projectBuilds.add( new ProjectBuild( project, taskSegment ) );
+            }
+        }
+
+        return projectBuilds;
+    }
+
+    private MavenExecutionPlan calculateProjectExecutionPlan( MavenSession session, MavenProject project,
+                                                              TaskSegment taskSegment )
+        throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
+        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
+        NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+
+        Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
+
+        for ( Object task : taskSegment.tasks )
+        {
+            if ( task instanceof GoalTask )
+            {
+                MojoDescriptor mojoDescriptor = ( (GoalTask) task ).mojoDescriptor;
+
+                MojoExecution mojoExecution =
+                    new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
+
+                mojoExecutions.add( mojoExecution );
+            }
+            else if ( task instanceof LifecycleTask )
+            {
+                String lifecyclePhase = ( (LifecycleTask) task ).lifecyclePhase;
+
+                Map<String, List<MojoExecution>> phaseToMojoMapping =
+                    calculateLifecycleMappings( session, project, lifecyclePhase );
+
+                for ( List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values() )
+                {
+                    mojoExecutions.addAll( mojoExecutionsFromLifecycle );
+                }
+            }
+            else
+            {
+                throw new IllegalStateException( "unexpected task " + task );
+            }
+        }
+
+        for ( MojoExecution mojoExecution : mojoExecutions )
+        {
+            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+            if ( mojoDescriptor == null )
+            {
+                mojoDescriptor =
+                    pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
+                                                     getRepositoryRequest( session, project ) );
+
+                mojoExecution.setMojoDescriptor( mojoDescriptor );
+            }
+
+            populateMojoExecutionConfiguration( project, mojoExecution,
+                                                MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
+
+            extractMojoConfiguration( mojoExecution );
+
+            calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
+
+            collectDependencyResolutionScopes( requiredDependencyResolutionScopes, mojoExecution );
+        }
+
+        return new MavenExecutionPlan( mojoExecutions, requiredDependencyResolutionScopes );
+    }
+
+    private List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginVersionResolutionException
+    {
+        List<TaskSegment> taskSegments = new ArrayList<TaskSegment>( tasks.size() );
+
+        TaskSegment currentSegment = null;
+
+        for ( String task : tasks )
+        {
+            if ( isGoalSpecification( task ) )
+            {
+                // "pluginPrefix:goal" or "groupId:artifactId[:version]:goal"
+
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, session.getTopLevelProject() );
+
+                boolean aggregating = isAggregatorMojo( mojoDescriptor );
+
+                if ( currentSegment == null || currentSegment.aggregating != aggregating )
+                {
+                    currentSegment = new TaskSegment( aggregating );
+                    taskSegments.add( currentSegment );
+                }
+
+                currentSegment.tasks.add( new GoalTask( mojoDescriptor ) );
+            }
+            else
+            {
+                // lifecycle phase
+
+                if ( currentSegment == null || currentSegment.aggregating )
+                {
+                    currentSegment = new TaskSegment( false );
+                    taskSegments.add( currentSegment );
+                }
+
+                currentSegment.tasks.add( new LifecycleTask( task ) );
+            }
+        }
+
+        return taskSegments;
+    }
+
+    private boolean isGoalSpecification( String task )
+    {
+        return task.indexOf( ':' ) >= 0;
+    }
+
+    private boolean isAggregatorMojo( MojoDescriptor mojoDescriptor )
+    {
+        return mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
+    }
+
+    private static final class ProjectBuild
+    {
+
+        final MavenProject project;
+
+        final TaskSegment taskSegment;
+
+        ProjectBuild( MavenProject project, TaskSegment taskSegment )
+        {
+            this.project = project;
+            this.taskSegment = taskSegment;
+        }
+
+        @Override
+        public String toString()
+        {
+            return project.getId() + " -> " + taskSegment;
+        }
+
+    }
+
+    private static final class TaskSegment
+    {
+
+        final List<Object> tasks;
+
+        final boolean aggregating;
+
+        TaskSegment( boolean aggregating )
+        {
+            this.aggregating = aggregating;
+            tasks = new ArrayList<Object>();
+        }
+
+        @Override
+        public String toString()
+        {
+            return tasks.toString();
+        }
+
+    }
+
+    private static final class GoalTask
+    {
+
+        final MojoDescriptor mojoDescriptor;
+
+        GoalTask( MojoDescriptor mojoDescriptor )
+        {
+            this.mojoDescriptor = mojoDescriptor;
+        }
+
+        @Override
+        public String toString()
+        {
+            return mojoDescriptor.getId();
+        }
+
+    }
+
+    private static final class LifecycleTask
+    {
+
+        final String lifecyclePhase;
+
+        LifecycleTask( String lifecyclePhase )
+        {
+            this.lifecyclePhase = lifecyclePhase;
+        }
+
+        @Override
+        public String toString()
+        {
+            return lifecyclePhase;
+        }
+
+    }
+
+    // TODO: refactor this to reuse the same code as for the reactor build
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -398,7 +646,7 @@ public class DefaultLifecycleExecutor
             }
             else
             {
-                calculateExecutionForLifecyclePhase( session, lifecyclePlan, task );
+                calculateExecutionForLifecyclePhase( session, project, lifecyclePlan, task );
             }
         }
 
@@ -502,7 +750,7 @@ public class DefaultLifecycleExecutor
         // - attach that to the MojoExecution for its configuration
         // - give the MojoExecution an id of default-<goal>.
         
-        MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session );
+        MojoDescriptor mojoDescriptor = getMojoDescriptor( goal, session, session.getCurrentProject() );
 
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
 
@@ -514,13 +762,14 @@ public class DefaultLifecycleExecutor
     // 3. Find the mojos associated with the lifecycle given the project packaging (jar lifecycle mapping for the default lifecycle)
     // 4. Bind those mojos found in the lifecycle mapping for the packaging to the lifecycle
     // 5. Bind mojos specified in the project itself to the lifecycle    
-    private void calculateExecutionForLifecyclePhase( MavenSession session, List<MojoExecution> lifecyclePlan,
-                                                      String lifecyclePhase )
+    private void calculateExecutionForLifecyclePhase( MavenSession session, MavenProject project,
+                                                      List<MojoExecution> lifecyclePlan, String lifecyclePhase )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         LifecyclePhaseNotFoundException
     {
-        Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings( session, lifecyclePhase );
+        Map<String, List<MojoExecution>> phaseToMojoMapping =
+            calculateLifecycleMappings( session, project, lifecyclePhase );
 
         for ( List<MojoExecution> mojoExecutions : phaseToMojoMapping.values() )
         {
@@ -528,7 +777,8 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, String lifecyclePhase )
+    private Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
+                                                                         String lifecyclePhase )
         throws LifecyclePhaseNotFoundException, PluginNotFoundException, PluginResolutionException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException
     {
@@ -572,8 +822,6 @@ public class DefaultLifecycleExecutor
          * interested in any of the executions bound to it.
          */
 
-        MavenProject project = session.getCurrentProject();
-
         for ( Plugin plugin : project.getBuild().getPlugins() )
         {
             for ( PluginExecution execution : plugin.getExecutions() )
@@ -603,7 +851,7 @@ public class DefaultLifecycleExecutor
                         List<MojoExecution> mojoExecutions = lifecycleMappings.get( mojoDescriptor.getPhase() );
                         if ( mojoExecutions != null )
                         {
-                            MojoExecution mojoExecution = new MojoExecution( plugin, goal, execution.getId() );
+                            MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
                             mojoExecutions.add( mojoExecution );
                         }
                     }
@@ -633,7 +881,8 @@ public class DefaultLifecycleExecutor
         {
             String forkedPhase = mojoDescriptor.getExecutePhase();
 
-            Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings( session, forkedPhase );
+            Map<String, List<MojoExecution>> lifecycleMappings =
+                calculateLifecycleMappings( session, project, forkedPhase );
 
             for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
             {
@@ -697,7 +946,7 @@ public class DefaultLifecycleExecutor
                                 }
                                 else
                                 {
-                                    forkedMojoDescriptor = getMojoDescriptor( goal, session );
+                                    forkedMojoDescriptor = getMojoDescriptor( goal, session, project );
                                 }
 
                                 MojoExecution forkedExecution =
@@ -883,11 +1132,9 @@ public class DefaultLifecycleExecutor
     }
    
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
-    MojoDescriptor getMojoDescriptor( String task, MavenSession session ) 
+    MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project ) 
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
     {        
-        MavenProject project = session.getCurrentProject();
-        
         String goal = null;
         
         Plugin plugin = null;

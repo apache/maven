@@ -235,7 +235,9 @@ public class LifecycleExecutorTest
     {
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenSession session = createMavenSession( pom );
-        MojoDescriptor mojoDescriptor = lifecycleExecutor.getMojoDescriptor( "org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process", session );
+        MojoDescriptor mojoDescriptor =
+            lifecycleExecutor.getMojoDescriptor( "org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process",
+                                                 session, session.getCurrentProject() );
         Xpp3Dom dom = lifecycleExecutor.convert( mojoDescriptor );
         System.out.println( dom );
     }
