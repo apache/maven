@@ -64,32 +64,24 @@ public class DefaultPluginVersionResolver
     {
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
-        Throwable error = null;
+        Metadata mergedMetadata = new Metadata();
 
         ArtifactRepository localRepository = request.getLocalRepository();
-
-        File artifactMetadataFile = null;
-
-        String localPath;
 
         // Search in remote repositories for a (released) version.
         //
         // maven-metadata-{central|nexus|...}.xml
         //
-        // TODO: we should cycle through the repositories but take the repository which actually
-        // satisfied the prefix.
+        // TODO: we should cycle through the repositories but take the repository which actually satisfied the prefix.
         for ( ArtifactRepository repository : request.getRemoteRepositories() )
         {
-            localPath =
-                request.getGroupId().replace( '.', '/' ) + "/" + request.getArtifactId() + "/maven-metadata-"
-                    + repository.getId() + ".xml";
+            String localPath = getLocalMetadataPath( request, repository );
 
-            artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
+            File artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
 
-            if ( !request.isOffline() && !artifactMetadataFile.exists() /* || user requests snapshot updates */)
+            if ( !request.isOffline() && ( !artifactMetadataFile.exists() /* || user requests snapshot updates */) )
             {
-                String remotePath =
-                    request.getGroupId().replace( '.', '/' ) + "/" + request.getArtifactId() + "/maven-metadata.xml";
+                String remotePath = getRemoteMetadataPath( request, repository );
 
                 try
                 {
@@ -97,8 +89,6 @@ public class DefaultPluginVersionResolver
                 }
                 catch ( TransferFailedException e )
                 {
-                    error = e;
-
                     if ( logger.isDebugEnabled() )
                     {
                         logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage(), e );
@@ -116,64 +106,44 @@ public class DefaultPluginVersionResolver
                 }
             }
 
-            result.setRepository( repository );
-
-            break;
+            if ( mergeMetadata( mergedMetadata, artifactMetadataFile ) )
+            {
+                result.setRepository( repository );
+            }
         }
 
         // Search in the local repositiory for a (development) version
         //
         // maven-metadata-local.xml
         //
-        if ( artifactMetadataFile == null || !artifactMetadataFile.exists() )
         {
-            localPath =
-                request.getGroupId().replace( '.', '/' ) + "/" + request.getArtifactId() + "/maven-metadata-"
-                    + localRepository.getId() + ".xml";
+            String localPath = getLocalMetadataPath( request, localRepository );
 
-            artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
+            File artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
 
-            result.setRepository( localRepository );
+            if ( mergeMetadata( mergedMetadata, artifactMetadataFile ) )
+            {
+                result.setRepository( localRepository );
+            }
         }
 
-        if ( artifactMetadataFile.exists() )
+        if ( mergedMetadata.getVersioning() != null )
         {
-            logger.debug( "Extracting version for plugin " + request.getGroupId() + ':' + request.getArtifactId()
-                + " from " + artifactMetadataFile );
+            String release = mergedMetadata.getVersioning().getRelease();
 
-            try
+            if ( StringUtils.isNotEmpty( release ) )
             {
-                Metadata pluginMetadata = readMetadata( artifactMetadataFile );
+                result.setVersion( release );
+            }
+            else
+            {
+                String latest = mergedMetadata.getVersioning().getLatest();
 
-                if ( pluginMetadata.getVersioning() != null )
+                if ( StringUtils.isNotEmpty( latest ) )
                 {
-                    String release = pluginMetadata.getVersioning().getRelease();
-
-                    if ( StringUtils.isNotEmpty( release ) )
-                    {
-                        result.setVersion( release );
-                    }
-                    else
-                    {
-                        String latest = pluginMetadata.getVersioning().getLatest();
-
-                        if ( StringUtils.isNotEmpty( latest ) )
-                        {
-                            result.setVersion( latest );
-                        }
-                    }
+                    result.setVersion( latest );
                 }
             }
-            catch ( RepositoryMetadataReadException e )
-            {
-                throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
-                                                            e.getMessage(), e );
-            }
-        }
-        else if ( error != null )
-        {
-            throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
-                                                        error.getMessage(), error );
         }
 
         if ( StringUtils.isEmpty( result.getVersion() ) )
@@ -183,6 +153,48 @@ public class DefaultPluginVersionResolver
         }
 
         return result;
+    }
+
+    private String getLocalMetadataPath( PluginVersionRequest request, ArtifactRepository repository )
+    {
+        return request.getGroupId().replace( '.', '/' ) + '/' + request.getArtifactId() + "/maven-metadata-"
+            + repository.getId() + ".xml";
+    }
+
+    private String getRemoteMetadataPath( PluginVersionRequest request, ArtifactRepository repository )
+    {
+        return request.getGroupId().replace( '.', '/' ) + '/' + request.getArtifactId() + "/maven-metadata.xml";
+    }
+
+    private boolean mergeMetadata( Metadata target, File metadataFile )
+    {
+        if ( metadataFile.isFile() )
+        {
+            try
+            {
+                Metadata repoMetadata = readMetadata( metadataFile );
+
+                return mergeMetadata( target, repoMetadata );
+            }
+            catch ( RepositoryMetadataReadException e )
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.warn( "Failed to read metadata " + metadataFile + ": " + e.getMessage(), e );
+                }
+                else
+                {
+                    logger.warn( "Failed to read metadata " + metadataFile + ": " + e.getMessage() );
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private boolean mergeMetadata( Metadata target, Metadata source )
+    {
+        return target.merge( source );
     }
 
     private Metadata readMetadata( File mappingFile )
