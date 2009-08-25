@@ -223,30 +223,40 @@ public class MavenMetadataSource
     private Artifact createDependencyArtifact( Dependency dependency, Artifact owner, Artifact pom )
         throws ArtifactMetadataRetrievalException
     {
-        String effectiveScope = getEffectiveScope( dependency.getScope(), ( owner != null ) ? owner.getScope() : null );
-
-        if ( effectiveScope == null )
-        {
-            return null;
-        }
-
-        VersionRange versionRange;
         try
         {
-            versionRange = VersionRange.createFromVersionSpec( dependency.getVersion() );
+            String inheritedScope = ( owner != null ) ? owner.getScope() : null;
+
+            ArtifactFilter inheritedFilter = ( owner != null ) ? owner.getDependencyFilter() : null;
+
+            return createDependencyArtifact( repositorySystem, dependency, inheritedScope, inheritedFilter );
         }
         catch ( InvalidVersionSpecificationException e )
         {
             throw new ArtifactMetadataRetrievalException( "Invalid version for dependency "
                 + dependency.getManagementKey() + ": " + e.getMessage(), e, pom );
         }
+    }
+
+    private static Artifact createDependencyArtifact( ArtifactFactory factory, Dependency dependency, String inheritedScope,
+                                               ArtifactFilter inheritedFilter )
+        throws InvalidVersionSpecificationException
+    {
+        String effectiveScope = getEffectiveScope( dependency.getScope(), inheritedScope );
+
+        if ( effectiveScope == null )
+        {
+            return null;
+        }
+
+        VersionRange versionRange = VersionRange.createFromVersionSpec( dependency.getVersion() );
 
         Artifact dependencyArtifact =
-            repositorySystem.createDependencyArtifact( dependency.getGroupId(), dependency.getArtifactId(),
-                                                       versionRange, dependency.getType(), dependency.getClassifier(),
-                                                       effectiveScope, dependency.isOptional() );
+            factory.createDependencyArtifact( dependency.getGroupId(), dependency.getArtifactId(), versionRange,
+                                              dependency.getType(), dependency.getClassifier(), effectiveScope,
+                                              dependency.isOptional() );
 
-        ArtifactFilter dependencyFilter = ( owner != null ) ? owner.getDependencyFilter() : null;
+        ArtifactFilter dependencyFilter = inheritedFilter;
 
         if ( dependencyFilter != null && !dependencyFilter.include( dependencyArtifact ) )
         {
@@ -263,7 +273,7 @@ public class MavenMetadataSource
         return dependencyArtifact;
     }
 
-    private String getEffectiveScope( String originalScope, String inheritedScope )
+    private static String getEffectiveScope( String originalScope, String inheritedScope )
     {
         String effectiveScope = Artifact.SCOPE_RUNTIME;
 
@@ -304,7 +314,7 @@ public class MavenMetadataSource
         return effectiveScope;
     }
 
-    private ArtifactFilter createDependencyFilter( Dependency dependency, ArtifactFilter inheritedFilter )
+    private static ArtifactFilter createDependencyFilter( Dependency dependency, ArtifactFilter inheritedFilter )
     {
         ArtifactFilter effectiveFilter = inheritedFilter;
 
@@ -399,18 +409,21 @@ public class MavenMetadataSource
     public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
         throws InvalidDependencyVersionException
     {
-        return createArtifacts( artifactFactory, dependencies, dependencyFilter );
-    }
-
-    private static Set<Artifact> createArtifacts( ArtifactFactory factory, List<Dependency> dependencies, ArtifactFilter filter )
-    {
         Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
 
         for ( Dependency d : dependencies )
         {
-            Artifact dependencyArtifact = factory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(), d.getType() );
+            Artifact dependencyArtifact;
+            try
+            {
+                dependencyArtifact = createDependencyArtifact( artifactFactory, d, inheritedScope, dependencyFilter );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new InvalidDependencyVersionException( project.getId(), d, project.getFile(), e );
+            }
 
-            if ( filter.include( dependencyArtifact ) )
+            if ( dependencyArtifact != null )
             {
                 artifacts.add( dependencyArtifact );
             }
