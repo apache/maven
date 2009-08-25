@@ -19,10 +19,13 @@ package org.apache.maven.model.plugin;
  * under the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
@@ -48,19 +51,13 @@ public class DefaultPluginConfigurationExpander
 
         if ( build != null )
         {
-            for ( Plugin buildPlugin : build.getPlugins() )
-            {
-                Xpp3Dom parentDom = (Xpp3Dom) buildPlugin.getConfiguration();
+            expand( build.getPlugins() );
 
-                if ( parentDom != null )
-                {
-                    for ( PluginExecution execution : buildPlugin.getExecutions() )
-                    {
-                        Xpp3Dom childDom = (Xpp3Dom) execution.getConfiguration();
-                        childDom = Xpp3Dom.mergeXpp3Dom( childDom, new Xpp3Dom( parentDom ) );
-                        execution.setConfiguration( childDom );
-                    }
-                }
+            PluginManagement pluginManagement = build.getPluginManagement();
+
+            if ( pluginManagement != null )
+            {
+                expand( pluginManagement.getPlugins() );
             }
         }
 
@@ -78,6 +75,27 @@ public class DefaultPluginConfigurationExpander
                         childDom = Xpp3Dom.mergeXpp3Dom( childDom, new Xpp3Dom( parentDom ) );
                         execution.setConfiguration( childDom );
                     }
+                }
+            }
+        }
+    }
+
+    private void expand( List<Plugin> plugins )
+    {
+        for ( Plugin plugin : plugins )
+        {
+            Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
+
+            if ( pluginConfiguration != null )
+            {
+                for ( PluginExecution execution : plugin.getExecutions() )
+                {
+                    Xpp3Dom executionConfiguration = (Xpp3Dom) execution.getConfiguration();
+
+                    executionConfiguration =
+                        Xpp3Dom.mergeXpp3Dom( executionConfiguration, new Xpp3Dom( pluginConfiguration ) );
+
+                    execution.setConfiguration( executionConfiguration );
                 }
             }
         }
