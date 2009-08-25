@@ -37,7 +37,9 @@ public class LifecyclePhaseNotFoundException
      */
     public LifecyclePhaseNotFoundException( String lifecyclePhase )
     {
-        super( "Unknown lifecycle phase " + lifecyclePhase );
+        super( "Unknown lifecycle phase \"" + lifecyclePhase + "\". You must specify a valid lifecycle phase"
+            + " or a goal in the format <plugin-prefix>:<goal> or"
+            + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>" );
         this.lifecyclePhase = ( lifecyclePhase != null ) ? lifecyclePhase : "";
     }
 

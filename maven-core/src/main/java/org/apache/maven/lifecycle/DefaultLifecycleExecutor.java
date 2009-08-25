@@ -719,9 +719,6 @@ public class DefaultLifecycleExecutor
 
         if ( lifecycle == null )
         {
-            logger.info( "Invalid task '" + lifecyclePhase + "' : you must specify a valid lifecycle phase"
-                + ", or a goal in the format <plugin-prefix>:<goal> or"
-                + " <plugin-group-id>:<plugin-artifact-id>:<plugin-version>:<goal>" );
             throw new LifecyclePhaseNotFoundException( lifecyclePhase );
         }
 
