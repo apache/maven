@@ -379,7 +379,8 @@ public class DefaultMavenPluginManager
      * no file set is meant to be excluded from the plugin realm in favor of the equivalent library from the current
      * core distro.
      */
-    private List<Artifact> resolvePluginArtifacts( Plugin plugin, Artifact pluginArtifact,
+    // FIXME: only exposed to allow workaround for MNG-4194
+    protected List<Artifact> resolvePluginArtifacts( Plugin plugin, Artifact pluginArtifact,
                                                    RepositoryRequest repositoryRequest )
         throws PluginResolutionException
     {
