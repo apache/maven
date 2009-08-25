@@ -293,7 +293,8 @@ public class DefaultProjectBuilder
 
         ReactorModelCache modelCache = new ReactorModelCache();
 
-        boolean errors = build( results, interimResults, pomFiles, recursive, config, reactorModelPool, modelCache );
+        boolean errors =
+            build( results, interimResults, pomFiles, true, recursive, config, reactorModelPool, modelCache );
 
         for ( InterimResult interimResult : interimResults )
         {
@@ -312,6 +313,7 @@ public class DefaultProjectBuilder
                     ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                     MavenProject project = toProject( result, config, interimResult.listener );
+                    project.setExecutionRoot( interimResult.root );
 
                     results.add( new DefaultProjectBuildingResult( project, result.getProblems(), null ) );
                 }
@@ -338,7 +340,7 @@ public class DefaultProjectBuilder
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
-                           List<File> pomFiles, boolean recursive, ProjectBuildingRequest config,
+                           List<File> pomFiles, boolean isRoot, boolean recursive, ProjectBuildingRequest config,
                            ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
     {
         boolean errors = false;
@@ -360,7 +362,7 @@ public class DefaultProjectBuilder
 
                 Model model = result.getEffectiveModel();
 
-                interimResults.add( new InterimResult( pomFile, request, result, listener ) );
+                interimResults.add( new InterimResult( pomFile, request, result, listener, isRoot ) );
 
                 if ( recursive && !model.getModules().isEmpty() )
                 {
@@ -414,9 +416,11 @@ public class DefaultProjectBuilder
                         moduleFiles.add( moduleFile );
                     }
 
-                    errors =
-                        build( results, interimResults, moduleFiles, recursive, config, reactorModelPool, modelCache )
-                            || errors;
+                    if ( build( results, interimResults, moduleFiles, false, recursive, config, reactorModelPool,
+                                 modelCache ) )
+                    {
+                        errors = true;
+                    }
                 }
             }
             catch ( ModelBuildingException e )
@@ -441,13 +445,16 @@ public class DefaultProjectBuilder
 
         DefaultModelBuildingListener listener;
 
+        boolean root;
+
         InterimResult( File pomFile, ModelBuildingRequest request, ModelBuildingResult result,
-                       DefaultModelBuildingListener listener )
+                       DefaultModelBuildingListener listener, boolean root )
         {
             this.pomFile = pomFile;
             this.request = request;
             this.result = result;
             this.listener = listener;
+            this.root = root;
         }
 
     }
