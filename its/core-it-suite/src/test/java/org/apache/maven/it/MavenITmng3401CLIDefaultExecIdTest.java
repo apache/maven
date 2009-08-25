@@ -41,12 +41,28 @@ public class MavenITmng3401CLIDefaultExecIdTest
 
     /**
      * Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
-     * invocations of a goal as well.
+     * invocations of a goal as well if the plugin is configured under build/plugins.
      */
-    public void testitMNG3401()
+    public void testitWithoutPluginManagement()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3401" );
+        testit( "without-mgmt" );
+    }
+
+    /**
+     * Test that the configuration of an execution block with the id "default-cli" applies to direct CLI
+     * invocations of a goal as well if the plugin is configured under build/pluginManagement/plugins.
+     */
+    public void testitWithPluginManagement()
+        throws Exception
+    {
+        testit( "with-mgmt" );
+    }
+
+    private void testit( String project )
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3401/" + project );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
