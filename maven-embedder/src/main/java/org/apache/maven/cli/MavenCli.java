@@ -29,9 +29,9 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.lifecycle.LifecycleListener;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
@@ -122,7 +122,7 @@ public class MavenCli
 
         MavenEmbedderLogger logger = configuration.getMavenEmbedderLogger();
 
-        request.setLifecycleListeners( Arrays.<LifecycleListener> asList( new LifecycleEventLogger( logger ) ) );
+        request.setExecutionListeners( Arrays.<ExecutionListener> asList( new ExecutionEventLogger( logger ) ) );
 
         if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {

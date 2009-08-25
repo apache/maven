@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,42 +19,32 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
 
 /**
- * Holds data relevant for a lifecycle event.
+ * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
+ * listener.
  * 
  * @author Benjamin Bentmann
  */
-class DefaultLifecycleEvent
-    implements LifecycleEvent
+interface ExecutionEventCatapult
 {
 
-    private final MavenSession session;
+    /**
+     * Notifies the specified listener of the given event.
+     * 
+     * @param listener The listener to notify, must not be {@code null}.
+     * @param event The event to fire, must not be {@code null}.
+     */
+    void fire( ExecutionListener listener, ExecutionEvent event );
 
-    private final MojoExecution mojoExecution;
-
-    public DefaultLifecycleEvent( MavenSession session, MojoExecution mojoExecution )
+    static final ExecutionEventCatapult PROJECT_DISCOVERY_STARTED = new ExecutionEventCatapult()
     {
-        this.session = session;
-        this.mojoExecution = mojoExecution;
-    }
-
-    public MavenSession getSession()
-    {
-        return session;
-    }
-
-    public MavenProject getProject()
-    {
-        return session.getCurrentProject();
-    }
-
-    public MojoExecution getMojoExecution()
-    {
-        return mojoExecution;
-    }
+        public void fire( ExecutionListener listener, ExecutionEvent event )
+        {
+            listener.projectDiscoveryStarted( event );
+        }
+    };
 
 }

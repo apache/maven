@@ -28,28 +28,28 @@ import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.BuildSummary;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.AbstractLifecycleListener;
-import org.apache.maven.lifecycle.LifecycleEvent;
+import org.apache.maven.lifecycle.AbstractExecutionListener;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Logs lifecycle events to a user-supplied logger.
+ * Logs execution events to a user-supplied logger.
  * 
  * @author Benjamin Bentmann
  */
-class LifecycleEventLogger
-    extends AbstractLifecycleListener
+class ExecutionEventLogger
+    extends AbstractExecutionListener
 {
 
     private final MavenEmbedderLogger logger;
 
     private static final int LINE_LENGTH = 72;
 
-    public LifecycleEventLogger( MavenEmbedderLogger logger )
+    public ExecutionEventLogger( MavenEmbedderLogger logger )
     {
         if ( logger == null )
         {
@@ -92,7 +92,16 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void sessionStarted( LifecycleEvent event )
+    public void projectDiscoveryStarted( ExecutionEvent event )
+    {
+        if ( logger.isInfoEnabled() )
+        {
+            logger.info( "Scanning for projects..." );
+        }
+    }
+
+    @Override
+    public void sessionStarted( ExecutionEvent event )
     {
         if ( logger.isInfoEnabled() && event.getSession().getProjects().size() > 1 )
         {
@@ -112,7 +121,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void sessionEnded( LifecycleEvent event )
+    public void sessionEnded( ExecutionEvent event )
     {
         if ( logger.isInfoEnabled() )
         {
@@ -211,7 +220,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void projectSkipped( LifecycleEvent event )
+    public void projectSkipped( ExecutionEvent event )
     {
         if ( logger.isInfoEnabled() )
         {
@@ -225,7 +234,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void projectStarted( LifecycleEvent event )
+    public void projectStarted( ExecutionEvent event )
     {
         if ( logger.isInfoEnabled() )
         {
@@ -238,7 +247,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void mojoSkipped( LifecycleEvent event )
+    public void mojoSkipped( ExecutionEvent event )
     {
         if ( logger.isWarnEnabled() )
         {
@@ -248,7 +257,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void mojoStarted( LifecycleEvent event )
+    public void mojoStarted( ExecutionEvent event )
     {
         if ( logger.isInfoEnabled() )
         {
@@ -260,7 +269,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void forkStarted( LifecycleEvent event )
+    public void forkStarted( ExecutionEvent event )
     {
         if ( logger.isDebugEnabled() )
         {
@@ -269,7 +278,7 @@ class LifecycleEventLogger
     }
 
     @Override
-    public void forkSucceeded( LifecycleEvent event )
+    public void forkSucceeded( ExecutionEvent event )
     {
         if ( logger.isDebugEnabled() )
         {

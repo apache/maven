@@ -30,8 +30,11 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.execution.DefaultLifecycleEvent;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.DuplicateProjectException;
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -72,7 +75,22 @@ public class DefaultMaven
 
     @Requirement
     protected PlexusContainer container;
-    
+
+    private void fireEvent( MavenSession session, ExecutionEventCatapult catapult )
+    {
+        List<ExecutionListener> listeners = session.getRequest().getExecutionListeners();
+
+        if ( !listeners.isEmpty() )
+        {
+            ExecutionEvent event = new DefaultLifecycleEvent( session, null );
+
+            for ( ExecutionListener listener : listeners )
+            {
+                catapult.fire( listener, event );
+            }
+        }
+    }
+
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         //TODO: Need a general way to inject standard properties
@@ -102,6 +120,8 @@ public class DefaultMaven
         {
             return processResult( result, e );
         }
+
+        fireEvent( session, ExecutionEventCatapult.PROJECT_DISCOVERY_STARTED );
 
         //TODO: optimize for the single project or no project
         
@@ -177,7 +197,7 @@ public class DefaultMaven
         if ( result.hasExceptions() )
         {
             return result;
-        }        
+        }
 
         lifecycleExecutor.execute( session );
 

@@ -34,6 +34,9 @@ import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.DefaultLifecycleEvent;
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -130,13 +133,13 @@ public class DefaultLifecycleExecutor
 
     private void fireEvent( MavenSession session, MojoExecution mojoExecution, LifecycleEventCatapult catapult )
     {
-        List<LifecycleListener> listeners = session.getRequest().getLifecycleListeners();
+        List<ExecutionListener> listeners = session.getRequest().getExecutionListeners();
 
         if ( !listeners.isEmpty() )
         {
-            LifecycleEvent event = new DefaultLifecycleEvent( session, mojoExecution );
+            ExecutionEvent event = new DefaultLifecycleEvent( session, mojoExecution );
 
-            for ( LifecycleListener listener : listeners )
+            for ( ExecutionListener listener : listeners )
             {
                 catapult.fire( listener, event );
             }

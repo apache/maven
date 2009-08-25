@@ -1,5 +1,8 @@
 package org.apache.maven.lifecycle;
 
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,75 +23,80 @@ package org.apache.maven.lifecycle;
  */
 
 /**
- * Provides a skeleton implementation for lifecycle listeners. The methods of this class are empty.
+ * Provides a skeleton implementation for execution listeners. The methods of this class are empty.
  * 
  * @author Benjamin Bentmann
  */
-public class AbstractLifecycleListener
-    implements LifecycleListener
+public class AbstractExecutionListener
+    implements ExecutionListener
 {
 
-    public void sessionStarted( LifecycleEvent event )
+    public void projectDiscoveryStarted( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void sessionEnded( LifecycleEvent event )
+    public void sessionStarted( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void projectSkipped( LifecycleEvent event )
+    public void sessionEnded( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void projectStarted( LifecycleEvent event )
+    public void projectSkipped( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void projectSucceeded( LifecycleEvent event )
+    public void projectStarted( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void projectFailed( LifecycleEvent event )
+    public void projectSucceeded( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void forkStarted( LifecycleEvent event )
+    public void projectFailed( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void forkSucceeded( LifecycleEvent event )
+    public void forkStarted( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void forkFailed( LifecycleEvent event )
+    public void forkSucceeded( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void mojoSkipped( LifecycleEvent event )
+    public void forkFailed( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void mojoStarted( LifecycleEvent event )
+    public void mojoSkipped( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void mojoSucceeded( LifecycleEvent event )
+    public void mojoStarted( ExecutionEvent event )
     {
         // default does nothing
     }
 
-    public void mojoFailed( LifecycleEvent event )
+    public void mojoSucceeded( ExecutionEvent event )
+    {
+        // default does nothing
+    }
+
+    public void mojoFailed( ExecutionEvent event )
     {
         // default does nothing
     }

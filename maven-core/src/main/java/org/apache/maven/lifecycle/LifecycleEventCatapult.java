@@ -19,6 +19,9 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
+
 /**
  * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
  * listener.
@@ -34,11 +37,11 @@ interface LifecycleEventCatapult
      * @param listener The listener to notify, must not be {@code null}.
      * @param event The event to fire, must not be {@code null}.
      */
-    void fire( LifecycleListener listener, LifecycleEvent event );
+    void fire( ExecutionListener listener, ExecutionEvent event );
 
     static final LifecycleEventCatapult SESSION_STARTED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.sessionStarted( event );
         }
@@ -46,7 +49,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult SESSION_ENDED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.sessionEnded( event );
         }
@@ -54,7 +57,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult PROJECT_SKIPPED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.projectSkipped( event );
         }
@@ -62,7 +65,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult PROJECT_STARTED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.projectStarted( event );
         }
@@ -70,7 +73,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult PROJECT_SUCCEEDED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.projectSucceeded( event );
         }
@@ -78,7 +81,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult PROJECT_FAILED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.projectFailed( event );
         }
@@ -86,7 +89,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult MOJO_SKIPPED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.mojoSkipped( event );
         }
@@ -94,7 +97,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult MOJO_STARTED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.mojoStarted( event );
         }
@@ -102,7 +105,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult MOJO_SUCCEEDED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.mojoSucceeded( event );
         }
@@ -110,7 +113,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult MOJO_FAILED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.mojoFailed( event );
         }
@@ -118,7 +121,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult FORK_STARTED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.forkStarted( event );
         }
@@ -126,7 +129,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult FORK_SUCCEEDED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.forkSucceeded( event );
         }
@@ -134,7 +137,7 @@ interface LifecycleEventCatapult
 
     static final LifecycleEventCatapult FORK_FAILED = new LifecycleEventCatapult()
     {
-        public void fire( LifecycleListener listener, LifecycleEvent event )
+        public void fire( ExecutionListener listener, ExecutionEvent event )
         {
             listener.forkFailed( event );
         }

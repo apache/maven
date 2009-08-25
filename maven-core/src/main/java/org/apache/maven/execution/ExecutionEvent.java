@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,16 +19,15 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Holds data relevant for a lifecycle event.
+ * Holds data relevant for an execution event.
  * 
  * @author Benjamin Bentmann
  */
-public interface LifecycleEvent
+public interface ExecutionEvent
 {
 
     /**

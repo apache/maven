@@ -1,4 +1,5 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.execution;
+
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,37 +21,39 @@ package org.apache.maven.lifecycle;
  */
 
 /**
- * Defines events that the lifecycle executor fires during a session.
+ * Defines events that Maven fires during a build.
  * 
  * @author Benjamin Bentmann
  */
-public interface LifecycleListener
+public interface ExecutionListener
 {
 
-    void sessionStarted( LifecycleEvent event );
+    void projectDiscoveryStarted( ExecutionEvent event );
 
-    void sessionEnded( LifecycleEvent event );
+    void sessionStarted( ExecutionEvent event );
 
-    void projectSkipped( LifecycleEvent event );
+    void sessionEnded( ExecutionEvent event );
 
-    void projectStarted( LifecycleEvent event );
+    void projectSkipped( ExecutionEvent event );
 
-    void projectSucceeded( LifecycleEvent event );
+    void projectStarted( ExecutionEvent event );
 
-    void projectFailed( LifecycleEvent event );
+    void projectSucceeded( ExecutionEvent event );
 
-    void mojoSkipped( LifecycleEvent event );
+    void projectFailed( ExecutionEvent event );
 
-    void mojoStarted( LifecycleEvent event );
+    void mojoSkipped( ExecutionEvent event );
 
-    void mojoSucceeded( LifecycleEvent event );
+    void mojoStarted( ExecutionEvent event );
 
-    void mojoFailed( LifecycleEvent event );
+    void mojoSucceeded( ExecutionEvent event );
 
-    void forkStarted( LifecycleEvent event );
+    void mojoFailed( ExecutionEvent event );
 
-    void forkSucceeded( LifecycleEvent event );
+    void forkStarted( ExecutionEvent event );
 
-    void forkFailed( LifecycleEvent event );
+    void forkSucceeded( ExecutionEvent event );
+
+    void forkFailed( ExecutionEvent event );
 
 }

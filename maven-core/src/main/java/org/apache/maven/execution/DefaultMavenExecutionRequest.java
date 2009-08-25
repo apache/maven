@@ -23,7 +23,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
-import org.apache.maven.lifecycle.LifecycleListener;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -119,7 +118,7 @@ public class DefaultMavenExecutionRequest
 
     private List<ArtifactRepository> pluginArtifactRepositories;
 
-    private List<LifecycleListener> lifecycleListeners;
+    private List<ExecutionListener> lifecycleListeners;
 
     /**
      * Suppress SNAPSHOT updates.
@@ -164,7 +163,7 @@ public class DefaultMavenExecutionRequest
         copy.setPluginArtifactRepositories( original.getPluginArtifactRepositories() );
         copy.setRepositoryCache( original.getRepositoryCache() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
-        copy.setLifecycleListeners( original.getLifecycleListeners() );
+        copy.setExecutionListeners( original.getExecutionListeners() );
         return original;        
     }
    
@@ -945,21 +944,21 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List<LifecycleListener> getLifecycleListeners()
+    public List<ExecutionListener> getExecutionListeners()
     {
         if ( lifecycleListeners == null )
         {
-            lifecycleListeners = new ArrayList<LifecycleListener>();
+            lifecycleListeners = new ArrayList<ExecutionListener>();
         }
 
         return lifecycleListeners;
     }
 
-    public MavenExecutionRequest setLifecycleListeners( List<LifecycleListener> lifecycleListeners )
+    public MavenExecutionRequest setExecutionListeners( List<ExecutionListener> lifecycleListeners )
     {
         if ( lifecycleListeners != null )
         {
-            this.lifecycleListeners = new ArrayList<LifecycleListener>( lifecycleListeners );
+            this.lifecycleListeners = new ArrayList<ExecutionListener>( lifecycleListeners );
         }
         else
         {
