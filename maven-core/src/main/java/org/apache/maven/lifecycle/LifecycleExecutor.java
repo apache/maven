@@ -74,6 +74,9 @@ public interface LifecycleExecutor
     //
     void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
         throws LifecycleExecutionException;
+
+    void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
+        throws LifecycleExecutionException;
     
     void execute( MavenSession session );
 }

@@ -33,6 +33,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
@@ -127,22 +128,31 @@ public class DefaultProjectBuilder
                 project = toProject( result, configuration, listener );
             }
 
-            try
+            if ( configuration.isProcessPlugins() && configuration.isProcessPluginConfiguration() )
             {
-                if ( configuration.isProcessPlugins() && configuration.isProcessPluginConfiguration() )
+                RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+                repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
+                repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
+                repositoryRequest.setCache( configuration.getRepositoryCache() );
+                repositoryRequest.setOffline( configuration.isOffline() );
+
+                for ( Plugin plugin : project.getBuildPlugins() )
                 {
-                    RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-                    repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
-                    repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
-                    repositoryRequest.setCache( configuration.getRepositoryCache() );
-                    repositoryRequest.setOffline( configuration.isOffline() );
-            
-                    lifecycle.populateDefaultConfigurationForPlugins( project.getModel().getBuild().getPlugins(), repositoryRequest );
+                    try
+                    {
+                        lifecycle.populateDefaultConfigurationForPlugin( plugin, repositoryRequest );
+                    }
+                    catch ( LifecycleExecutionException e )
+                    {
+                        if ( modelProblems == null )
+                        {
+                            modelProblems = new ArrayList<ModelProblem>();
+                        }
+
+                        modelProblems.add( new DefaultModelProblem( e.getMessage(), ModelProblem.Severity.WARNING,
+                                                                    project.getModel(), e ) );
+                    }
                 }
-            }
-            catch ( LifecycleExecutionException e )
-            {
-                throw new ProjectBuildingException( project.getId(), e.getMessage(), e );
             }
 
             ArtifactResolutionResult artifactResult = null;
@@ -461,7 +471,6 @@ public class DefaultProjectBuilder
 
     private MavenProject toProject( ModelBuildingResult result, ProjectBuildingRequest configuration,
                                     DefaultModelBuildingListener listener )
-        throws ProjectBuildingException
     {
         Model model = result.getEffectiveModel();
 

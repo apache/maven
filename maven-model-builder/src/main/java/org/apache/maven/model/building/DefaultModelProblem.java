@@ -49,7 +49,20 @@ public class DefaultModelProblem
      */
     public DefaultModelProblem( String message, Severity severity, Model source )
     {
-        this( message, severity, ModelProblemUtils.toSourceHint( source ), null );
+        this( message, severity, source, null );
+    }
+
+    /**
+     * Creates a new problem with the specified message and exception.
+     * 
+     * @param message The message describing the problem, may be {@code null}.
+     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
+     * @param source The source of the problem, may be {@code null}.
+     * @param exception The exception that caused this problem, may be {@code null}.
+     */
+    public DefaultModelProblem( String message, Severity severity, Model source, Exception exception )
+    {
+        this( message, severity, ModelProblemUtils.toSourceHint( source ), exception );
     }
 
     /**

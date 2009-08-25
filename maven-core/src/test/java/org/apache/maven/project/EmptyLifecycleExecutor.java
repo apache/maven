@@ -111,6 +111,11 @@ public class EmptyLifecycleExecutor
     {
     }
 
+    public void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
+        throws LifecycleExecutionException
+    {
+    }
+
     public void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException
     {

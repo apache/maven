@@ -1310,7 +1310,7 @@ public class DefaultLifecycleExecutor
         }
     }
     
-    private void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest ) 
+    public void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest ) 
         throws LifecycleExecutionException
     {
         if ( plugin.getVersion() == null )
@@ -1325,16 +1325,59 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        for( PluginExecution pluginExecution : plugin.getExecutions() )
+        try
         {
-            for( String goal : pluginExecution.getGoals() )
+            // NOTE: Retrieve the plugin descriptor regardless whether there are any executions to verify the plugin
+            PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, repositoryRequest );
+
+            for ( PluginExecution pluginExecution : plugin.getExecutions() )
             {
-                Xpp3Dom dom = getDefaultPluginConfiguration( plugin, goal, repositoryRequest );
-                pluginExecution.setConfiguration( Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), dom, Boolean.TRUE ) );
+                for ( String goal : pluginExecution.getGoals() )
+                {
+                    MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
+
+                    if ( mojoDescriptor == null )
+                    {
+                        throw new MojoNotFoundException( goal, pluginDescriptor );
+                    }
+
+                    Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
+
+                    Xpp3Dom executionConfiguration =
+                        Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), defaultConfiguration,
+                                              Boolean.TRUE );
+
+                    pluginExecution.setConfiguration( executionConfiguration );
+                }
             }
         }
+        catch ( PluginNotFoundException e )
+        {
+            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
+                + e.getMessage(), e );
+        }
+        catch ( PluginResolutionException e )
+        {
+            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
+                + e.getMessage(), e );
+        }
+        catch ( PluginDescriptorParsingException e )
+        {
+            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
+                + e.getMessage(), e );
+        }
+        catch ( MojoNotFoundException e )
+        {
+            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
+                + e.getMessage(), e );
+        }
+        catch ( InvalidPluginDescriptorException e )
+        {
+            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
+                + e.getMessage(), e );
+        }
     }
-    
+
     public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest ) 
         throws LifecycleExecutionException
     {
@@ -1343,40 +1386,7 @@ public class DefaultLifecycleExecutor
             populateDefaultConfigurationForPlugin( plugin, repositoryRequest );
         }
     }
-    
-    private Xpp3Dom getDefaultPluginConfiguration( Plugin plugin, String goal, RepositoryRequest repositoryRequest ) 
-        throws LifecycleExecutionException
-    {
-        MojoDescriptor mojoDescriptor;
-        
-        try
-        {
-            mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
-        }
-        catch ( PluginNotFoundException e )
-        {
-            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        }
-        catch ( PluginResolutionException e )
-        {
-            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        }
-        catch ( PluginDescriptorParsingException e )
-        {
-            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        }
-        catch ( MojoNotFoundException e )
-        {
-            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        }
-        catch ( InvalidPluginDescriptorException e )
-        {
-            throw new LifecycleExecutionException( "Error getting default plugin information for " + plugin.getId(), e );
-        }
-        
-        return getMojoConfiguration( mojoDescriptor );
-    }
-    
+
     public Xpp3Dom getMojoConfiguration( MojoDescriptor mojoDescriptor )
     {
         return convert( mojoDescriptor );
