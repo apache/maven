@@ -20,6 +20,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * @author Jason van Zyl
@@ -33,6 +34,9 @@ public interface BuildPluginManager
     // igorf: Way too many declared exceptions!
     MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException;
+
+    ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )
+        throws PluginManagerException;
 
     void executeMojo( MavenSession session, MojoExecution execution )
         throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException;
