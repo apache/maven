@@ -315,9 +315,8 @@ public class DefaultArtifactResolver
                                                          ArtifactMetadataSource source, List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolveTransitively( artifacts, originatingArtifact,
-
-        Collections.EMPTY_MAP, localRepository, remoteRepositories, source, null, listeners );
+        return resolveTransitively( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository,
+                                    remoteRepositories, source, null, listeners );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,

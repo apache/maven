@@ -65,6 +65,29 @@ public interface ArtifactResolver
                                                          List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    @Deprecated
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                         List<ArtifactRepository> remoteRepositories,
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    @Deprecated
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         List<ArtifactRepository> remoteRepositories,
+                                                         ArtifactMetadataSource source, ArtifactFilter filter,
+                                                         List<ResolutionListener> listeners )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    @Deprecated
+    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                         List<ArtifactRepository> remoteRepositories,
+                                                         ArtifactRepository localRepository,
+                                                         ArtifactMetadataSource source,
+                                                         List<ResolutionListener> listeners )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
     // USED BY REMOTE RESOURCES PLUGIN
     @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
