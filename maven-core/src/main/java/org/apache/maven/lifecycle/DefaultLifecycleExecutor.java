@@ -238,9 +238,23 @@ public class DefaultLifecycleExecutor
                 // this later by looking at the build plan. Would be better to just batch download everything required
                 // by the reactor.
 
-                repositoryRequest.setRemoteRepositories( currentProject.getRemoteArtifactRepositories() );
-                projectDependenciesResolver.resolve( currentProject, executionPlan.getRequiredResolutionScopes(),
-                                                     repositoryRequest );
+                List<MavenProject> projectsToResolve;
+
+                if ( projectBuild.taskSegment.aggregating )
+                {
+                    projectsToResolve = session.getProjects();
+                }
+                else
+                {
+                    projectsToResolve = Collections.singletonList( currentProject );
+                }
+
+                for ( MavenProject project : projectsToResolve )
+                {
+                    repositoryRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
+                    projectDependenciesResolver.resolve( project, executionPlan.getRequiredResolutionScopes(),
+                                                         repositoryRequest );
+                }
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
