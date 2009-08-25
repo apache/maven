@@ -30,16 +30,16 @@ import java.io.File;
  * @author John Casey
  * @version $Id$
  */
-public class MavenITmng0522PluginMgmtConfigTest
+public class MavenITmng0522InheritedPluginMgmtConfigTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng0522PluginMgmtConfigTest()
+    public MavenITmng0522InheritedPluginMgmtConfigTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test for pluginManagement injection of plugin configuration.
+     * Test for injection of inherited plugin management into plugin configuration.
      */
     public void testitMNG522()
         throws Exception

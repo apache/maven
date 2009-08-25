@@ -28,7 +28,9 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-522</name>
-  <description>Test for pluginManagement injection of plugin configuration.</description>
+  <description>
+    Test for injection of inherited plugin management into plugin configuration.
+  </description>
 
   <modules>
     <module>child-project</module>
