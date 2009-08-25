@@ -934,7 +934,16 @@ public class DefaultLifecycleExecutor
 
         String a = mojoExecution.getArtifactId();
 
-        Plugin plugin = project.getPlugin( g + ":" + a );
+        Plugin plugin = findPlugin( g, a, project.getBuildPlugins() );
+
+        boolean managedPlugin = false;
+
+        if ( plugin == null && project.getPluginManagement() != null )
+        {
+            plugin = findPlugin( g, a, project.getPluginManagement().getPlugins() );
+
+            managedPlugin = true;
+        }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -956,7 +965,7 @@ public class DefaultLifecycleExecutor
                      * execution. For goals invoked from the CLI or a forked execution, we need to grab the default
                      * parameter values explicitly.
                      */
-                    if ( !e.getGoals().contains( mojoExecution.getGoal() ) )
+                    if ( managedPlugin || !e.getGoals().contains( mojoExecution.getGoal() ) )
                     {
                         Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
 
@@ -1157,13 +1166,19 @@ public class DefaultLifecycleExecutor
 
     private Plugin findPlugin( Plugin plugin, Collection<Plugin> plugins )
     {
-        for ( Plugin p : plugins )
+        return findPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugins );
+    }
+
+    private Plugin findPlugin( String groupId, String artifactId, Collection<Plugin> plugins )
+    {
+        for ( Plugin plugin : plugins )
         {
-            if ( p.getKey().equals( plugin.getKey() ) )
+            if ( artifactId.equals( plugin.getArtifactId() ) && groupId.equals( plugin.getGroupId() ) )
             {
-                return p;
+                return plugin;
             }
         }
+
         return null;
     }
 
