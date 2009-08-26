@@ -32,8 +32,7 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.AbstractExecutionListener;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -115,8 +114,6 @@ class ExecutionEventLogger
             {
                 logger.info( project.getName() );
             }
-
-            logger.info( "" );
         }
     }
 
@@ -224,6 +221,7 @@ class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
+            logger.info( chars( ' ', LINE_LENGTH ) );
             logger.info( chars( '-', LINE_LENGTH ) );
 
             logger.info( "Skipping " + event.getProject().getName() );
@@ -238,6 +236,7 @@ class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
+            logger.info( chars( ' ', LINE_LENGTH ) );
             logger.info( chars( '-', LINE_LENGTH ) );
 
             logger.info( "Building " + event.getProject().getName() );
@@ -251,7 +250,7 @@ class ExecutionEventLogger
     {
         if ( logger.isWarnEnabled() )
         {
-            logger.warn( "Goal " + event.getMojoExecution().getMojoDescriptor().getGoal()
+            logger.warn( "Goal " + event.getMojoExecution().getGoal()
                 + " requires online mode for execution but Maven is currently offline, skipping" );
         }
     }
@@ -261,10 +260,20 @@ class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            MojoDescriptor md = event.getMojoExecution().getMojoDescriptor();
-            PluginDescriptor pd = md.getPluginDescriptor();
-            logger.info( "Executing " + pd.getArtifactId() + ':' + pd.getVersion() + ':' + md.getGoal() + " on "
-                + event.getProject().getArtifactId() );
+            MojoExecution me = event.getMojoExecution();
+            StringBuilder buffer = new StringBuilder( 128 );
+
+            buffer.append( "--- " );
+            buffer.append( me.getArtifactId() ).append( ':' ).append( me.getVersion() );
+            buffer.append( ':' ).append( me.getGoal() );
+            if ( me.getExecutionId() != null )
+            {
+                buffer.append( " (" ).append( me.getExecutionId() ).append( ')' );
+            }
+            buffer.append( " ---" );
+
+            logger.info( "" );
+            logger.info( buffer.toString() );
         }
     }
 
