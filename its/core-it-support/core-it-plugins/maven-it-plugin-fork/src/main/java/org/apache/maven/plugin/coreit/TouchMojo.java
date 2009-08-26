@@ -36,9 +36,12 @@ import java.util.Map;
  *
  * @description Goal which cleans the build
  */
-public class CoreItMojo
+public class TouchMojo
     extends AbstractMojo
 {
+
+    static final String FINAL_NAME = "coreitified";
+
     /**
      * @parameter expression="${project}"
      */
@@ -48,7 +51,7 @@ public class CoreItMojo
      * @parameter expression="${project.build.directory}"
      * @required
      */
-    private String outputDirectory;
+    private File outputDirectory;
 
     /** Test setting of plugin-artifacts on the PluginDescriptor instance.
      * @parameter expression="${plugin.artifactMap}"
@@ -88,8 +91,12 @@ public class CoreItMojo
         {
             throw new MojoExecutionException( "Failing per \'fail\' parameter (specified in pom or system properties)" );
         }
-        
-        touch( new File( outputDirectory ), "touch.txt" );
+
+        getLog().info( "[MAVEN-CORE-IT-LOG] Project build directory " + project.getBuild().getDirectory() );
+
+        getLog().info( "[MAVEN-CORE-IT-LOG] Using output directory " + outputDirectory );
+
+        touch( outputDirectory, "touch.txt" );
 
         // This parameter should be aligned to the basedir as the parameter type is specified
         // as java.io.File
@@ -100,18 +107,16 @@ public class CoreItMojo
         }
         
         touch( basedirAlignmentDirectory, "touch.txt" );
-        
-        File outDir = new File( outputDirectory );
 
         // Test parameter setting
         if ( pluginItem != null )
         {
-            touch( outDir, pluginItem );
+            touch( outputDirectory, pluginItem );
         }
 
         if ( goalItem != null )
         {
-            touch( outDir, goalItem );
+            touch( outputDirectory, goalItem );
         }
         
         if ( artifactToFile != null )
@@ -122,10 +127,10 @@ public class CoreItMojo
             
             String filename = artifactFile.getAbsolutePath().replace('/', '_').replace(':', '_') + ".txt";
             
-            touch( outDir, filename );
+            touch( outputDirectory, filename );
         }
 
-        project.getBuild().setFinalName( "coreitified" );
+        project.getBuild().setFinalName( FINAL_NAME );
     }
 
     private static void touch( File dir, String file )

@@ -19,39 +19,53 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @goal fork
+ * @goal fork-lifecycle-aggregator
+ * @aggregator true
  *
  * @execute phase="generate-sources" lifecycle="foo"
  */
-public class CoreItForkerMojo
+public class ForkLifecycleAggregatorMojo
     extends AbstractMojo
 {
+
     /**
      * @parameter expression="${project}"
      */
     private MavenProject project;
 
     /**
-     * @parameter expression="${executedProject}"
+     * @parameter expression="${reactorProjects}"
      */
-    private MavenProject executedProject;
+    private List reactorProjects;
 
     public void execute()
         throws MojoExecutionException
     {
-        if ( !executedProject.getBuild().getFinalName().equals( "coreitified" ) )
+        for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
         {
-            throw new MojoExecutionException( "Unexpected result, final name of executed project is " + executedProject.getBuild().getFinalName() + " (should be: \'coreitified\')." );
+            MavenProject executedProject = ( (MavenProject) it.next() ).getExecutionProject();
+
+            if ( !executedProject.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
+            {
+                throw new MojoExecutionException( "Unexpected result, final name of executed project "
+                    + executedProject + " is " + executedProject.getBuild().getFinalName() + " (should be \'"
+                    + TouchMojo.FINAL_NAME + "\')." );
+            }
         }
 
-        if ( project.getBuild().getFinalName().equals( "coreitified" ) )
+        if ( project.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
         {
-            throw new MojoExecutionException( "forked project was polluted. (should NOT be: \'coreitified\')." );
+            throw new MojoExecutionException( "forked project was polluted. (should NOT be \'" + TouchMojo.FINAL_NAME
+                + "\')." );
         }
     }
+
 }

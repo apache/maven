@@ -24,11 +24,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 /**
- * @goal fork-goal
+ * @goal fork
  *
- * @execute goal="touch"
+ * @execute phase="generate-sources" lifecycle="foo"
  */
-public class CoreItGoalForkerMojo
+public class ForkLifecycleMojo
     extends AbstractMojo
 {
     /**
@@ -44,14 +44,16 @@ public class CoreItGoalForkerMojo
     public void execute()
         throws MojoExecutionException
     {
-        if ( !executedProject.getBuild().getFinalName().equals( "coreitified" ) )
+        if ( !executedProject.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
         {
-            throw new MojoExecutionException( "Unexpected result, final name of executed project is " + executedProject.getBuild().getFinalName() + " (should be: \'coreitified\')." );
+            throw new MojoExecutionException( "Unexpected result, final name of executed project is "
+                + executedProject.getBuild().getFinalName() + " (should be \'" + TouchMojo.FINAL_NAME + "\')." );
         }
 
-        if ( project.getBuild().getFinalName().equals( "coreitified" ) )
+        if ( project.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
         {
-            throw new MojoExecutionException( "forked project was polluted. (should NOT be: \'coreitified\')." );
+            throw new MojoExecutionException( "forked project was polluted. (should NOT be \'" + TouchMojo.FINAL_NAME
+                + "\')." );
         }
     }
 }
