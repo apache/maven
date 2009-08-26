@@ -20,6 +20,7 @@ package org.apache.maven.model.validation;
  */
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,6 +228,9 @@ public class DefaultModelValidator
             boolean warnOnMissingPluginVersion =
                 request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1;
 
+            boolean warnOnBadPluginDependencyScope =
+                request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
+
             Build build = model.getBuild();
             if ( build != null )
             {
@@ -244,6 +248,13 @@ public class DefaultModelValidator
 
                     validateBoolean( "build.plugins.plugin.extensions", problems, warnOnBadBoolean, p.getExtensions(),
                                      p.getKey() );
+
+                    for ( Dependency d : p.getDependencies() )
+                    {
+                        validateEnum( "build.plugins.plugin[" + p.getKey() + "].dependencies.dependency.scope",
+                                      problems, warnOnBadPluginDependencyScope, d.getScope(), d.getManagementKey(),
+                                      "compile", "runtime", "system" );
+                    }
                 }
 
                 validateResources( problems, build.getResources(), "build.resources.resource", request );
@@ -537,6 +548,33 @@ public class DefaultModelValidator
         else
         {
             addViolation( problems, warning, "'" + fieldName + "' must be 'true' or 'false'." );
+        }
+
+        return false;
+    }
+
+    private boolean validateEnum( String fieldName, ModelProblemCollector problems, boolean warning, String string,
+                                  String sourceHint, String... validValues )
+    {
+        if ( string == null || string.length() <= 0 )
+        {
+            return true;
+        }
+
+        List<String> values = Arrays.asList( validValues );
+
+        if ( values.contains( string ) )
+        {
+            return true;
+        }
+
+        if ( sourceHint != null )
+        {
+            addViolation( problems, warning, "'" + fieldName + "' must be one of " + values + " for " + sourceHint );
+        }
+        else
+        {
+            addViolation( problems, warning, "'" + fieldName + "' must be one of " + values );
         }
 
         return false;
