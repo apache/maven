@@ -270,6 +270,7 @@ class ExecutionEventLogger
             {
                 buffer.append( " (" ).append( me.getExecutionId() ).append( ')' );
             }
+            buffer.append( " @ " ).append( event.getProject().getArtifactId() );
             buffer.append( " ---" );
 
             logger.info( "" );

@@ -19,8 +19,9 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -64,7 +65,11 @@ public class MojoExecution
      */
     private String lifecyclePhase;
 
-    private List<MojoExecution> forkedExecutions = new ArrayList<MojoExecution>();
+    /**
+     * The executions to fork before this execution, indexed by the groupId:artifactId:version of the project on which
+     * the forked execution are to be run and in reactor build order.
+     */
+    private Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<String, List<MojoExecution>>();
 
     public MojoExecution( Plugin plugin, String goal, String executionId )
     {
@@ -219,19 +224,14 @@ public class MojoExecution
         this.mojoDescriptor = mojoDescriptor;
     }
 
-    public List<MojoExecution> getForkedExecutions()
+    public Map<String, List<MojoExecution>> getForkedExecutions()
     {
         return forkedExecutions;
     }
 
-    public void addForkedExecution( MojoExecution forkedExecution )
+    public void addForkedExecutions( String projectKey, List<MojoExecution> forkedExecutions )
     {
-        if ( forkedExecution == null )
-        {
-            throw new IllegalArgumentException( "forked execution missing" );
-        }
-
-        forkedExecutions.add( forkedExecution );
+        this.forkedExecutions.put( projectKey, forkedExecutions );
     }
 
 }

@@ -146,6 +146,11 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    private static String getKey( MavenProject project )
+    {
+        return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
+    }
+
     public void execute( MavenSession session )
     {
         fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
@@ -154,9 +159,13 @@ public class DefaultLifecycleExecutor
 
         List<ProjectBuild> projectBuilds;
 
+        ProjectIndex projectIndex;
+
         try
         {
             projectBuilds = calculateProjectBuilds( session );
+
+            projectIndex = new ProjectIndex( session.getProjects() );
         }
         catch ( Exception e )
         {
@@ -258,7 +267,7 @@ public class DefaultLifecycleExecutor
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
-                    execute( currentProject, session, mojoExecution );
+                    execute( session, mojoExecution, projectIndex );
                 }
 
                 long buildEndTime = System.currentTimeMillis();
@@ -308,7 +317,7 @@ public class DefaultLifecycleExecutor
         fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
     }
 
-    private void execute( MavenProject project, MavenSession session, MojoExecution mojoExecution )
+    private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex )
         throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -328,29 +337,49 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        MavenProject executionProject = null;
+        List<MavenProject> forkedProjects = Collections.emptyList();
 
-        List<MojoExecution> forkedExecutions = mojoExecution.getForkedExecutions();
+        Map<String, List<MojoExecution>> forkedExecutions = mojoExecution.getForkedExecutions();
 
         if ( !forkedExecutions.isEmpty() )
         {
             fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_STARTED );
 
+            MavenProject project = session.getCurrentProject();
+
+            forkedProjects = new ArrayList<MavenProject>( forkedExecutions.size() );
+
             try
             {
-                executionProject = project.clone();
+                for ( Map.Entry<String, List<MojoExecution>> fork : forkedExecutions.entrySet() )
+                {
+                    int index = projectIndex.indices.get( fork.getKey() );
 
-                session.setCurrentProject( executionProject );
-                try
-                {
-                    for ( MojoExecution forkedExecution : forkedExecutions )
+                    MavenProject forkedProject = projectIndex.projects.get( fork.getKey() );
+
+                    forkedProjects.add( forkedProject );
+
+                    MavenProject executedProject = forkedProject.clone();
+
+                    forkedProject.setExecutionProject( executedProject );
+
+                    try
                     {
-                        execute( executionProject, session, forkedExecution );
+                        session.setCurrentProject( executedProject );
+                        session.getProjects().set( index, executedProject );
+                        projectIndex.projects.put( fork.getKey(), executedProject );
+
+                        for ( MojoExecution forkedExecution : fork.getValue() )
+                        {
+                            execute( session, forkedExecution, projectIndex );
+                        }
                     }
-                }
-                finally
-                {
-                    session.setCurrentProject( project );
+                    finally
+                    {
+                        projectIndex.projects.put( fork.getKey(), forkedProject );
+                        session.getProjects().set( index, forkedProject );
+                        session.setCurrentProject( project );
+                    }
                 }
 
                 fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_SUCCEEDED );
@@ -385,8 +414,6 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            project.setExecutionProject( executionProject );
-
             pluginManager.executeMojo( session, mojoExecution );
 
             fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
@@ -415,6 +442,37 @@ public class DefaultLifecycleExecutor
 
             throw e;
         }
+        finally
+        {
+            for ( MavenProject forkedProject : forkedProjects )
+            {
+                forkedProject.setExecutionProject( null );
+            }
+        }
+    }
+
+    private static final class ProjectIndex
+    {
+
+        Map<String, MavenProject> projects;
+
+        Map<String, Integer> indices;
+
+        ProjectIndex( List<MavenProject> projects )
+        {
+            this.projects = new HashMap<String, MavenProject>( projects.size() * 2 );
+            this.indices = new HashMap<String, Integer>( projects.size() * 2 );
+
+            for ( int i = 0; i < projects.size(); i++ )
+            {
+                MavenProject project = projects.get( i );
+                String key = getKey( project );
+
+                this.projects.put( key, project );
+                this.indices.put( key, Integer.valueOf( i ) );
+            }
+        }
+
     }
 
     private List<ProjectBuild> calculateProjectBuilds( MavenSession session )
@@ -579,6 +637,12 @@ public class DefaultLifecycleExecutor
         return mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
     }
 
+    private boolean isForkingMojo( MojoDescriptor mojoDescriptor )
+    {
+        return StringUtils.isNotEmpty( mojoDescriptor.getExecuteGoal() )
+            || StringUtils.isNotEmpty( mojoDescriptor.getExecutePhase() );
+    }
+
     private static final class ProjectBuild
     {
 
@@ -700,9 +764,12 @@ public class DefaultLifecycleExecutor
             requiredDependencyResolutionScopes.add( requiredDependencyResolutionScope );
         }
 
-        for ( MojoExecution forkedExecution : mojoExecution.getForkedExecutions() )
+        for ( List<MojoExecution> forkedExecutions : mojoExecution.getForkedExecutions().values() )
         {
-            collectDependencyResolutionScopes( requiredDependencyResolutionScopes, forkedExecution );
+            for ( MojoExecution forkedExecution : forkedExecutions )
+            {
+                collectDependencyResolutionScopes( requiredDependencyResolutionScopes, forkedExecution );
+            }
         }
     }
 
@@ -796,145 +863,213 @@ public class DefaultLifecycleExecutor
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
+        if ( !isForkingMojo( mojoDescriptor ) )
+        {
+            return;
+        }
+
         if ( !alreadyForkedExecutions.add( mojoDescriptor ) )
         {
             return;
         }
 
+        List<MavenProject> forkedProjects;
+
+        if ( isAggregatorMojo( mojoDescriptor ) )
+        {
+            forkedProjects = session.getProjects();
+        }
+        else
+        {
+            forkedProjects = Collections.singletonList( project );
+        }
+
+        for ( MavenProject forkedProject : forkedProjects )
+        {
+            List<MojoExecution> forkedExecutions;
+
+            if ( StringUtils.isNotEmpty( mojoDescriptor.getExecutePhase() ) )
+            {
+                forkedExecutions =
+                    calculateForkedLifecycle( mojoExecution, session, forkedProject, alreadyForkedExecutions );
+            }
+            else
+            {
+                forkedExecutions = calculateForkedGoal( mojoExecution, session, forkedProject, alreadyForkedExecutions );
+            }
+
+            mojoExecution.addForkedExecutions( getKey( forkedProject ), forkedExecutions );
+        }
+    }
+
+    private List<MojoExecution> calculateForkedGoal( MojoExecution mojoExecution, MavenSession session,
+                                                     MavenProject project,
+                                                     Collection<MojoDescriptor> alreadyForkedExecutions )
+        throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-        if ( StringUtils.isNotEmpty( mojoDescriptor.getExecutePhase() ) )
+        String forkedGoal = mojoDescriptor.getExecuteGoal();
+
+        MojoDescriptor forkedMojoDescriptor = pluginDescriptor.getMojo( forkedGoal );
+        if ( forkedMojoDescriptor == null )
         {
-            String forkedPhase = mojoDescriptor.getExecutePhase();
+            throw new MojoNotFoundException( forkedGoal, pluginDescriptor );
+        }
 
-            Map<String, List<MojoExecution>> lifecycleMappings =
-                calculateLifecycleMappings( session, project, forkedPhase );
+        MojoExecution forkedExecution = new MojoExecution( forkedMojoDescriptor, forkedGoal );
 
-            for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
+        populateMojoExecutionConfiguration( project, forkedExecution, true );
+
+        extractMojoConfiguration( forkedExecution );
+
+        calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
+
+        return Collections.singletonList( forkedExecution );
+    }
+
+    private List<MojoExecution> calculateForkedLifecycle( MojoExecution mojoExecution, MavenSession session,
+                                                          MavenProject project,
+                                                          Collection<MojoDescriptor> alreadyForkedExecutions )
+        throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        String forkedPhase = mojoDescriptor.getExecutePhase();
+
+        Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings( session, project, forkedPhase );
+
+        for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
+        {
+            for ( MojoExecution forkedExecution : forkedExecutions )
             {
-                for ( MojoExecution forkedExecution : forkedExecutions )
+                if ( forkedExecution.getMojoDescriptor() == null )
                 {
-                    if ( forkedExecution.getMojoDescriptor() == null )
-                    {
-                        MojoDescriptor forkedMojoDescriptor =
-                            pluginManager.getMojoDescriptor( forkedExecution.getPlugin(), forkedExecution.getGoal(),
-                                                             getRepositoryRequest( session, project ) );
+                    MojoDescriptor forkedMojoDescriptor =
+                        pluginManager.getMojoDescriptor( forkedExecution.getPlugin(), forkedExecution.getGoal(),
+                                                         getRepositoryRequest( session, project ) );
 
-                        forkedExecution.setMojoDescriptor( forkedMojoDescriptor );
-                    }
-
-                    populateMojoExecutionConfiguration( project, forkedExecution, false );
-                }
-            }
-
-            String forkedLifecycle = mojoDescriptor.getExecuteLifecycle();
-
-            if ( StringUtils.isNotEmpty( forkedLifecycle ) )
-            {
-                org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
-
-                try
-                {
-                    lifecycleOverlay = pluginDescriptor.getLifecycleMapping( forkedLifecycle );
-                }
-                catch ( IOException e )
-                {
-                    throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), e );
-                }
-                catch ( XmlPullParserException e )
-                {
-                    throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), e );
+                    forkedExecution.setMojoDescriptor( forkedMojoDescriptor );
                 }
 
-                if ( lifecycleOverlay == null )
-                {
-                    throw new LifecycleNotFoundException( forkedLifecycle );
-                }
-
-                for ( Phase phase : lifecycleOverlay.getPhases() )
-                {
-                    List<MojoExecution> forkedExecutions = lifecycleMappings.get( phase.getId() );
-                    if ( forkedExecutions != null )
-                    {
-                        for ( Execution execution : phase.getExecutions() )
-                        {
-                            for ( String goal : execution.getGoals() )
-                            {
-                                MojoDescriptor forkedMojoDescriptor;
-
-                                if ( goal.indexOf( ':' ) < 0 )
-                                {
-                                    forkedMojoDescriptor = pluginDescriptor.getMojo( goal );
-                                    if ( forkedMojoDescriptor == null )
-                                    {
-                                        throw new MojoNotFoundException( goal, pluginDescriptor );
-                                    }
-                                }
-                                else
-                                {
-                                    forkedMojoDescriptor = getMojoDescriptor( goal, session, project );
-                                }
-
-                                MojoExecution forkedExecution =
-                                    new MojoExecution( forkedMojoDescriptor, mojoExecution.getExecutionId() );
-
-                                Xpp3Dom forkedConfiguration = (Xpp3Dom) execution.getConfiguration();
-
-                                forkedExecution.setConfiguration( forkedConfiguration );
-
-                                populateMojoExecutionConfiguration( project, forkedExecution, true );
-
-                                forkedExecutions.add( forkedExecution );
-                            }
-                        }
-
-                        Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
-                        if ( phaseConfiguration != null )
-                        {
-                            for ( MojoExecution forkedExecution : forkedExecutions )
-                            {
-                                Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
-
-                                forkedConfiguration = Xpp3Dom.mergeXpp3Dom( phaseConfiguration, forkedConfiguration );
-
-                                forkedExecution.setConfiguration( forkedConfiguration );
-                            }
-                        }
-                    }
-                }
-            }
-
-            for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
-            {
-                for ( MojoExecution forkedExecution : forkedExecutions )
-                {
-                    extractMojoConfiguration( forkedExecution );
-
-                    calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
-
-                    mojoExecution.addForkedExecution( forkedExecution );
-                }
+                populateMojoExecutionConfiguration( project, forkedExecution, false );
             }
         }
-        else if ( StringUtils.isNotEmpty( mojoDescriptor.getExecuteGoal() ) )
+
+        injectLifecycleOverlay( lifecycleMappings, mojoExecution, session, project );
+
+        List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+
+        for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
         {
-            String forkedGoal = mojoDescriptor.getExecuteGoal();
-
-            MojoDescriptor forkedMojoDescriptor = pluginDescriptor.getMojo( forkedGoal );
-            if ( forkedMojoDescriptor == null )
+            for ( MojoExecution forkedExecution : forkedExecutions )
             {
-                throw new MojoNotFoundException( forkedGoal, pluginDescriptor );
+                extractMojoConfiguration( forkedExecution );
+
+                calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
+
+                mojoExecutions.add( forkedExecution );
             }
+        }
 
-            MojoExecution forkedExecution = new MojoExecution( forkedMojoDescriptor, forkedGoal );
+        return mojoExecutions;
+    }
 
-            populateMojoExecutionConfiguration( project, forkedExecution, true );
+    private void injectLifecycleOverlay( Map<String, List<MojoExecution>> lifecycleMappings,
+                                         MojoExecution mojoExecution, MavenSession session, MavenProject project )
+        throws PluginDescriptorParsingException, LifecycleNotFoundException, MojoNotFoundException,
+        PluginNotFoundException, PluginResolutionException, NoPluginFoundForPrefixException,
+        InvalidPluginDescriptorException, PluginVersionResolutionException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-            extractMojoConfiguration( forkedExecution );
+        PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-            calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
+        String forkedLifecycle = mojoDescriptor.getExecuteLifecycle();
 
-            mojoExecution.addForkedExecution( forkedExecution );
+        if ( StringUtils.isEmpty( forkedLifecycle ) )
+        {
+            return;
+        }
+
+        org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
+
+        try
+        {
+            lifecycleOverlay = pluginDescriptor.getLifecycleMapping( forkedLifecycle );
+        }
+        catch ( IOException e )
+        {
+            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), e );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), e );
+        }
+
+        if ( lifecycleOverlay == null )
+        {
+            throw new LifecycleNotFoundException( forkedLifecycle );
+        }
+
+        for ( Phase phase : lifecycleOverlay.getPhases() )
+        {
+            List<MojoExecution> forkedExecutions = lifecycleMappings.get( phase.getId() );
+
+            if ( forkedExecutions != null )
+            {
+                for ( Execution execution : phase.getExecutions() )
+                {
+                    for ( String goal : execution.getGoals() )
+                    {
+                        MojoDescriptor forkedMojoDescriptor;
+
+                        if ( goal.indexOf( ':' ) < 0 )
+                        {
+                            forkedMojoDescriptor = pluginDescriptor.getMojo( goal );
+                            if ( forkedMojoDescriptor == null )
+                            {
+                                throw new MojoNotFoundException( goal, pluginDescriptor );
+                            }
+                        }
+                        else
+                        {
+                            forkedMojoDescriptor = getMojoDescriptor( goal, session, project );
+                        }
+
+                        MojoExecution forkedExecution =
+                            new MojoExecution( forkedMojoDescriptor, mojoExecution.getExecutionId() );
+
+                        Xpp3Dom forkedConfiguration = (Xpp3Dom) execution.getConfiguration();
+
+                        forkedExecution.setConfiguration( forkedConfiguration );
+
+                        populateMojoExecutionConfiguration( project, forkedExecution, true );
+
+                        forkedExecutions.add( forkedExecution );
+                    }
+                }
+
+                Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
+
+                if ( phaseConfiguration != null )
+                {
+                    for ( MojoExecution forkedExecution : forkedExecutions )
+                    {
+                        Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
+
+                        forkedConfiguration = Xpp3Dom.mergeXpp3Dom( phaseConfiguration, forkedConfiguration );
+
+                        forkedExecution.setConfiguration( forkedConfiguration );
+                    }
+                }
+            }
         }
     }
 
