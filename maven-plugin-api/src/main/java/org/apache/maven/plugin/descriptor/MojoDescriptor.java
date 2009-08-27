@@ -617,6 +617,23 @@ public class MojoDescriptor
     }
 
     /**
+     * @return {@code true} if this mojo is aggregating projects, {@code false} otherwise.
+     */
+    public boolean isAggregating()
+    {
+        return isAggregator() || !isProjectRequired();
+    }
+
+    /**
+     * @return {@code true} if this mojo forks either a goal or the lifecycle, {@code false} otherwise.
+     */
+    public boolean isForking()
+    {
+        return ( getExecuteGoal() != null && getExecuteGoal().length() > 0 )
+            || ( getExecutePhase() != null && getExecutePhase().length() > 0 );
+    }
+
+    /**
      * Creates a shallow copy of this mojo descriptor.
      */
     @Override

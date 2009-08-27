@@ -211,7 +211,7 @@ public class DefaultLifecycleExecutor
         logger.debug( "-----------------------------------------------------------------------" );
         logger.debug( "Goal:          " + mojoExecId );
         logger.debug( "Style:         "
-            + ( isAggregatorMojo( mojoExecution.getMojoDescriptor() ) ? "Aggregating" : "Regular" ) );
+            + ( mojoExecution.getMojoDescriptor().isAggregating() ? "Aggregating" : "Regular" ) );
         logger.debug( "Configuration: " + mojoExecution.getConfiguration() );
     }
 
@@ -643,7 +643,7 @@ public class DefaultLifecycleExecutor
 
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, session.getTopLevelProject() );
 
-                boolean aggregating = isAggregatorMojo( mojoDescriptor );
+                boolean aggregating = mojoDescriptor.isAggregating();
 
                 if ( currentSegment == null || currentSegment.aggregating != aggregating )
                 {
@@ -673,17 +673,6 @@ public class DefaultLifecycleExecutor
     private boolean isGoalSpecification( String task )
     {
         return task.indexOf( ':' ) >= 0;
-    }
-
-    private boolean isAggregatorMojo( MojoDescriptor mojoDescriptor )
-    {
-        return mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
-    }
-
-    private boolean isForkingMojo( MojoDescriptor mojoDescriptor )
-    {
-        return StringUtils.isNotEmpty( mojoDescriptor.getExecuteGoal() )
-            || StringUtils.isNotEmpty( mojoDescriptor.getExecutePhase() );
     }
 
     private static final class ProjectBuild
@@ -906,7 +895,7 @@ public class DefaultLifecycleExecutor
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        if ( !isForkingMojo( mojoDescriptor ) )
+        if ( !mojoDescriptor.isForking() )
         {
             return;
         }
@@ -918,7 +907,7 @@ public class DefaultLifecycleExecutor
 
         List<MavenProject> forkedProjects;
 
-        if ( isAggregatorMojo( mojoDescriptor ) )
+        if ( mojoDescriptor.isAggregating() )
         {
             forkedProjects = session.getProjects();
         }
