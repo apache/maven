@@ -86,6 +86,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest.class );
         suite.addTestSuite( MavenITmng4321CliUsesPluginMgmtConfigTest.class );
         suite.addTestSuite( MavenITmng4320AggregatorAndDependenciesTest.class );
         suite.addTestSuite( MavenITmng4318ProjectExecutionRootTest.class );
