@@ -138,6 +138,7 @@ public class DefaultModelValidator
         validateStringNotEmpty( "version", problems, false, model.getVersion() );
 
         boolean warnOnBadBoolean = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
+        boolean warnOnBadDependencyScope = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
 
         for ( Dependency d : model.getDependencies() )
         {
@@ -177,6 +178,9 @@ public class DefaultModelValidator
             {
                 validateBoolean( "dependencies.dependency.optional", problems, warnOnBadBoolean, d.getOptional(),
                                  d.getManagementKey() );
+
+                validateEnum( "dependencies.dependency.scope", problems, warnOnBadDependencyScope, d.getScope(),
+                              d.getManagementKey(), "provided", "compile", "runtime", "test", "system" );
             }
         }
 
@@ -228,9 +232,6 @@ public class DefaultModelValidator
             boolean warnOnMissingPluginVersion =
                 request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1;
 
-            boolean warnOnBadPluginDependencyScope =
-                request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
-
             Build build = model.getBuild();
             if ( build != null )
             {
@@ -252,7 +253,7 @@ public class DefaultModelValidator
                     for ( Dependency d : p.getDependencies() )
                     {
                         validateEnum( "build.plugins.plugin[" + p.getKey() + "].dependencies.dependency.scope",
-                                      problems, warnOnBadPluginDependencyScope, d.getScope(), d.getManagementKey(),
+                                      problems, warnOnBadDependencyScope, d.getScope(), d.getManagementKey(),
                                       "compile", "runtime", "system" );
                     }
                 }

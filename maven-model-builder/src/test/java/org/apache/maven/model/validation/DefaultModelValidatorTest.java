@@ -352,4 +352,16 @@ public class DefaultModelValidatorTest
         assertTrue( result.getErrors().get( 2 ).contains( "test:f" ) );
     }
 
+    public void testBadDependencyScope()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-dependency-scope.xml" );
+
+        assertViolations( result, 2, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:f" ) );
+
+        assertTrue( result.getErrors().get( 1 ).contains( "test:g" ) );
+    }
+
 }
