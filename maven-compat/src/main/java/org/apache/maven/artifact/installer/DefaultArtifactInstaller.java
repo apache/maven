@@ -76,7 +76,7 @@ public class DefaultArtifactInstaller
 
             getLogger().info( "Installing " + source.getPath() + " to " + destination );
 
-            FileUtils.copyFile( source, destination );
+            FileUtils.copyFileIfModified( source, destination );
 
             // must be after the artifact is installed
             for ( ArtifactMetadata metadata : artifact.getMetadataList() )
