@@ -23,6 +23,8 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
+import java.io.File;
+
 /**
  * @goal fork
  *
@@ -41,9 +43,16 @@ public class ForkLifecycleMojo
      */
     private MavenProject executedProject;
 
+    /**
+     * @parameter default-value="${project.build.directory}"
+     */
+    private File touchDirectory;
+
     public void execute()
         throws MojoExecutionException
     {
+        TouchMojo.touch( touchDirectory, "fork-lifecycle.txt", true );
+
         if ( !executedProject.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
         {
             throw new MojoExecutionException( "Unexpected result, final name of executed project is "

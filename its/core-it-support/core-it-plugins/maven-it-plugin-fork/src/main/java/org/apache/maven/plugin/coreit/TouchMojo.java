@@ -25,7 +25,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.util.Map;
 
@@ -133,7 +134,13 @@ public class TouchMojo
         project.getBuild().setFinalName( FINAL_NAME );
     }
 
-    private static void touch( File dir, String file )
+    static void touch( File dir, String file )
+        throws MojoExecutionException
+    {
+        touch( dir, file, false );
+    }
+
+    static void touch( File dir, String file, boolean append )
         throws MojoExecutionException
     {
         try
@@ -145,9 +152,10 @@ public class TouchMojo
              
              File touch = new File( dir, file );
      
-             FileWriter w = new FileWriter( touch );
+             OutputStreamWriter w = new OutputStreamWriter( new FileOutputStream( touch, append ), "UTF-8" );
              
              w.write( file );
+             w.write( "\n" );
              
              w.close();
         }
