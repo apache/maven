@@ -984,6 +984,8 @@ public class DefaultLifecycleExecutor
 
             mojoExecution.addForkedExecutions( getKey( forkedProject ), forkedExecutions );
         }
+
+        alreadyForkedExecutions.remove( mojoDescriptor );
     }
 
     private List<MojoExecution> calculateForkedGoal( MojoExecution mojoExecution, MavenSession session,
@@ -1003,6 +1005,11 @@ public class DefaultLifecycleExecutor
         if ( forkedMojoDescriptor == null )
         {
             throw new MojoNotFoundException( forkedGoal, pluginDescriptor );
+        }
+
+        if ( alreadyForkedExecutions.contains( forkedMojoDescriptor ) )
+        {
+            return Collections.emptyList();
         }
 
         MojoExecution forkedExecution = new MojoExecution( forkedMojoDescriptor, forkedGoal );
@@ -1052,13 +1059,18 @@ public class DefaultLifecycleExecutor
 
         for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
         {
-            for ( MojoExecution forkedExecution : forkedExecutions )
+            for ( Iterator<MojoExecution> it = forkedExecutions.iterator(); it.hasNext(); )
             {
-                extractMojoConfiguration( forkedExecution );
+                MojoExecution forkedExecution = it.next();
 
-                calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
+                if ( !alreadyForkedExecutions.contains( forkedExecution.getMojoDescriptor() ) )
+                {
+                    extractMojoConfiguration( forkedExecution );
 
-                mojoExecutions.add( forkedExecution );
+                    calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
+
+                    mojoExecutions.add( forkedExecution );
+                }
             }
         }
 
