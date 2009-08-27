@@ -150,6 +150,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4005UniqueDependencyKeyTest.class );
         suite.addTestSuite( MavenITmng4000MultiPluginExecutionsTest.class );
         suite.addTestSuite( MavenITmng3998PluginExecutionConfigTest.class );
+        suite.addTestSuite( MavenITmng3991ValidDependencyScopeTest.class );
         suite.addTestSuite( MavenITmng3983PluginResolutionFromProfileReposTest.class );
         suite.addTestSuite( MavenITmng3979ElementJoinTest.class );
         suite.addTestSuite( MavenITmng3974MirrorOrderingTest.class );
