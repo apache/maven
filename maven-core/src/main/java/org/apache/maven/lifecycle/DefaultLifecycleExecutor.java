@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +152,69 @@ public class DefaultLifecycleExecutor
         return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
     }
 
+    private void debugReactorPlan( List<ProjectBuild> projectBuilds )
+    {
+        logger.debug( "=== REACTOR BUILD PLAN ================================================" );
+
+        for ( Iterator<ProjectBuild> it = projectBuilds.iterator(); it.hasNext(); )
+        {
+            ProjectBuild projectBuild = it.next();
+
+            logger.debug( "Project: " + projectBuild.project.getId() );
+            logger.debug( "Tasks:   " + projectBuild.taskSegment.tasks );
+            logger.debug( "Style:   " + ( projectBuild.taskSegment.aggregating ? "Aggregating" : "Regular" ) );
+
+            if ( it.hasNext() )
+            {
+                logger.debug( "-----------------------------------------------------------------------" );
+            }
+        }
+
+        logger.debug( "=======================================================================" );
+    }
+
+    private void debugProjectPlan( MavenProject currentProject, MavenExecutionPlan executionPlan )
+    {
+        logger.debug( "=== PROJECT BUILD PLAN ================================================" );
+        logger.debug( "Project:       " + getKey( currentProject ) );
+
+        for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
+        {
+            debugMojoExecution( mojoExecution );
+        }
+
+        logger.debug( "=======================================================================" );
+    }
+
+    private void debugMojoExecution( MojoExecution mojoExecution )
+    {
+        String mojoExecId =
+            mojoExecution.getGroupId() + ':' + mojoExecution.getArtifactId() + ':' + mojoExecution.getVersion() + ':'
+                + mojoExecution.getGoal() + " (" + mojoExecution.getExecutionId() + ')';
+
+        Map<String, List<MojoExecution>> forkedExecutions = mojoExecution.getForkedExecutions();
+        if ( !forkedExecutions.isEmpty() )
+        {
+            for ( Map.Entry<String, List<MojoExecution>> fork : forkedExecutions.entrySet() )
+            {
+                logger.debug( "--- init fork of " + fork.getKey() + " for " + mojoExecId + " ---" );
+
+                for ( MojoExecution forkedExecution : fork.getValue() )
+                {
+                    debugMojoExecution( forkedExecution );
+                }
+
+                logger.debug( "--- exit fork of " + fork.getKey() + " for " + mojoExecId + " ---" );
+            }
+        }
+
+        logger.debug( "-----------------------------------------------------------------------" );
+        logger.debug( "Goal:          " + mojoExecId );
+        logger.debug( "Style:         "
+            + ( isAggregatorMojo( mojoExecution.getMojoDescriptor() ) ? "Aggregating" : "Regular" ) );
+        logger.debug( "Configuration: " + mojoExecution.getConfiguration() );
+    }
+
     public void execute( MavenSession session )
     {
         fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
@@ -178,16 +242,7 @@ public class DefaultLifecycleExecutor
 
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "=== REACTOR BUILD PLAN ===" );
-
-            for ( ProjectBuild projectBuild : projectBuilds )
-            {
-                logger.debug( "------------------" );
-                logger.debug( "Project: " + projectBuild.project.getId() );
-                logger.debug( "Tasks:   " + projectBuild.taskSegment.tasks );
-            }
-
-            logger.debug( "==========================" );
+            debugReactorPlan( projectBuilds );
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
@@ -227,19 +282,7 @@ public class DefaultLifecycleExecutor
 
                 if ( logger.isDebugEnabled() )
                 {
-                    logger.debug( "=== PROJECT BUILD PLAN ===" );
-                    logger.debug( "Project:       " + currentProject );
-
-                    for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
-                    {
-                        logger.debug( "------------------" );
-                        logger.debug( "Goal:          " + mojoExecution.getGroupId() + ':'
-                            + mojoExecution.getArtifactId() + ':' + mojoExecution.getVersion() + ':'
-                            + mojoExecution.getGoal() + ':' + mojoExecution.getExecutionId() );
-                        logger.debug( "Configuration: " + String.valueOf( mojoExecution.getConfiguration() ) );
-                    }
-
-                    logger.debug( "==========================" );
+                    debugProjectPlan( currentProject, executionPlan );
                 }
 
                 // TODO: once we have calculated the build plan then we should accurately be able to download
