@@ -52,8 +52,7 @@ public class MavenITmng3729MultiForkAggregatorsTest
 {
     public MavenITmng3729MultiForkAggregatorsTest()
     {
-        super( "(2.0.8,3.0-alpha-1)" ); // only test in 2.0.9+
-        //TODO: FIX: Disabled for 3.0.x, causes infinite looping on Mac.
+        super( "(2.0.8,3.0-alpha-1),[3.0-alpha-3,)" ); // only test in 2.0.9+
     }
 
     public void testitMNG3729 ()
