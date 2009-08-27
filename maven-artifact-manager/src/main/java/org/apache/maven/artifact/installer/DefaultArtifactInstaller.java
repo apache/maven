@@ -95,7 +95,7 @@ public class DefaultArtifactInstaller
 
             getLogger().info( "Installing " + source.getPath() + " to " + destination );
 
-            FileUtils.copyFile( source, destination );
+            FileUtils.copyFileIfModified( source, destination );
             
             // Now, we'll set the artifact's file to the one installed in the local repository,
             // to help avoid duplicate copy operations in the deployment step.
