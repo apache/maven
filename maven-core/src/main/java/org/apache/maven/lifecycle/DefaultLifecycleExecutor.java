@@ -31,8 +31,11 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 import org.apache.maven.ProjectDependenciesResolver;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultLifecycleEvent;
@@ -304,8 +307,36 @@ public class DefaultLifecycleExecutor
                 for ( MavenProject project : projectsToResolve )
                 {
                     repositoryRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
-                    projectDependenciesResolver.resolve( project, executionPlan.getRequiredResolutionScopes(),
-                                                         repositoryRequest );
+
+                    try
+                    {
+                        projectDependenciesResolver.resolve( project, executionPlan.getRequiredResolutionScopes(),
+                                                             repositoryRequest );
+                    }
+                    catch ( MultipleArtifactsNotFoundException e )
+                    {
+                        /*
+                         * MNG-2277, the check below compensates for our bad plugin support where we ended up with
+                         * aggregator plugins that require dependency resolution although they usually run in phases of
+                         * the build where project artifacts haven't been assembled yet. The prime example of this is
+                         * "mvn release:prepare".
+                         */
+                        if ( projectBuild.taskSegment.aggregating
+                            && areAllArtifactsInReactor( session.getProjects(), e.getMissingArtifacts() ) )
+                        {
+                            logger.warn( "The following artifacts could not be resolved at this point of the build"
+                                + " but seem to be part of the reactor:" );
+                            for ( Artifact artifact : e.getMissingArtifacts() )
+                            {
+                                logger.warn( "o " + artifact.getId() );
+                            }
+                            logger.warn( "Try running the build up to the lifecycle phase \"package\"" );
+                        }
+                        else
+                        {
+                            throw e;
+                        }
+                    }
                 }
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
@@ -358,6 +389,27 @@ public class DefaultLifecycleExecutor
         }
 
         fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
+    }
+
+    private boolean areAllArtifactsInReactor( Collection<MavenProject> projects, Collection<Artifact> artifacts )
+    {
+        Set<String> projectKeys = new HashSet<String>( projects.size() * 2 );
+        for ( MavenProject project : projects )
+        {
+            String key = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+            projectKeys.add( key );
+        }
+
+        for ( Artifact artifact : artifacts )
+        {
+            String key = ArtifactUtils.key( artifact );
+            if ( !projectKeys.contains( key ) )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex )

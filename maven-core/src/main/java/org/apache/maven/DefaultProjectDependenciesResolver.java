@@ -103,7 +103,6 @@ public class DefaultProjectDependenciesResolver
         // FIXME setTransferListener
         
         ArtifactResolutionResult result = repositorySystem.resolve( request );                
-        resolutionErrorHandler.throwErrors( request, result );
 
         project.setArtifacts( result.getArtifacts() );
 
@@ -122,6 +121,8 @@ public class DefaultProjectDependenciesResolver
             }
         }
         project.setDependencyArtifacts( dependencyArtifacts );
+
+        resolutionErrorHandler.throwErrors( request, result );
 
         return result.getArtifacts();
     }
