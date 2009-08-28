@@ -1896,4 +1896,12 @@ public class DefaultLifecycleExecutor
     }
     
     */    
+
+    // USED BY MAVEN HELP PLUGIN
+    @Deprecated
+    public Map<String, Lifecycle> getPhaseToLifecycleMap()
+    {
+        return phaseToLifecycleMap;
+    }
+
 }

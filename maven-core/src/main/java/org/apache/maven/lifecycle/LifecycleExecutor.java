@@ -44,7 +44,12 @@ import org.apache.maven.project.MavenProject;
  * @author Jason van  Zyl
  */
 public interface LifecycleExecutor
-{    
+{
+
+    // USED BY MAVEN HELP PLUGIN
+    @Deprecated
+    String ROLE = LifecycleExecutor.class.getName();
+
     /**
      * Calculate the list of {@link org.apache.maven.plugin.descriptor.MojoDescriptor} objects to run for the selected lifecycle phase.
      * 
