@@ -438,6 +438,59 @@ public class DefaultLifecycleExecutor
             }
         }
 
+        List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
+
+        fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_STARTED );
+
+        try
+        {
+            pluginManager.executeMojo( session, mojoExecution );
+
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
+        }
+        catch ( MojoFailureException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        catch ( MojoExecutionException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        catch ( PluginConfigurationException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        catch ( PluginManagerException e )
+        {
+            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+
+            throw e;
+        }
+        finally
+        {
+            for ( MavenProject forkedProject : forkedProjects )
+            {
+                forkedProject.setExecutionProject( null );
+            }
+        }
+    }
+
+    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+    {
+        return executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ) );
+    }
+
+    private List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session,
+                                                        ProjectIndex projectIndex )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+    {
         List<MavenProject> forkedProjects = Collections.emptyList();
 
         Map<String, List<MojoExecution>> forkedExecutions = mojoExecution.getForkedExecutions();
@@ -511,45 +564,7 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_STARTED );
-
-        try
-        {
-            pluginManager.executeMojo( session, mojoExecution );
-
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
-        }
-        catch ( MojoFailureException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        catch ( MojoExecutionException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        catch ( PluginConfigurationException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        catch ( PluginManagerException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        finally
-        {
-            for ( MavenProject forkedProject : forkedProjects )
-            {
-                forkedProject.setExecutionProject( null );
-            }
-        }
+        return forkedProjects;
     }
 
     private static final class ProjectIndex
@@ -943,6 +958,14 @@ public class DefaultLifecycleExecutor
         }
 
         return lifecycleMappings;
+    }
+
+    public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+        throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        calculateForkedExecutions( mojoExecution, session, session.getCurrentProject(), new HashSet<MojoDescriptor>() );
     }
 
     private void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session, MavenProject project,

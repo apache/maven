@@ -30,13 +30,22 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.LifecycleNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -119,6 +128,19 @@ public class EmptyLifecycleExecutor
     public void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException
     {
+    }
+
+    public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+        throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+    }
+
+    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+    {
+        return Collections.emptyList();
     }
 
 }
