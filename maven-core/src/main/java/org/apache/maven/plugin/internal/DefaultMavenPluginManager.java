@@ -366,11 +366,13 @@ public class DefaultMavenPluginManager
         }
         catch ( PlexusConfigurationException e )
         {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
+            throw new PluginManagerException( plugin, "Error in component graph of plugin " + plugin.getId() + ": "
+                + e.getMessage(), e );
         }
         catch ( CycleDetectedInComponentGraphException e )
         {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
+            throw new PluginManagerException( plugin, "Error in component graph of plugin " + plugin.getId() + ": "
+                + e.getMessage(), e );
         }
     }
 
