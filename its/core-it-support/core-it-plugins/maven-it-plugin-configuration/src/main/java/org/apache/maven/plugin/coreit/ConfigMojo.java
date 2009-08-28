@@ -104,6 +104,13 @@ public class ConfigMojo
     private Boolean booleanParam;
 
     /**
+     * A simple parameter of type {@link java.lang.Boolean#TYPE}.
+     * 
+     * @parameter expression="${config.primitiveBooleanParam}"
+     */
+    private boolean primitiveBooleanParam;
+
+    /**
      * A simple parameter of type {@link java.lang.Byte}.
      * 
      * @parameter expression="${config.byteParam}"
@@ -123,6 +130,13 @@ public class ConfigMojo
      * @parameter expression="${config.intergerParam}"
      */
     private Integer integerParam;
+
+    /**
+     * A simple parameter of type {@link java.lang.Integer#TYPE}.
+     * 
+     * @parameter expression="${config.primitiveIntegerParam}"
+     */
+    private int primitiveIntegerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Long}.
@@ -314,9 +328,17 @@ public class ConfigMojo
         dumpValue( props, "defaultParamWithExpression", defaultParamWithExpression );
         dumpValue( props, "aliasDefaultExpressionParam", aliasDefaultExpressionParam );
         dumpValue( props, "booleanParam", booleanParam );
+        if ( primitiveBooleanParam )
+        {
+            dumpValue( props, "primitiveBooleanParam", Boolean.valueOf( primitiveBooleanParam ) );
+        }
         dumpValue( props, "byteParam", byteParam );
         dumpValue( props, "shortParam", shortParam );
         dumpValue( props, "integerParam", integerParam );
+        if ( primitiveIntegerParam != 0 )
+        {
+            dumpValue( props, "primitiveIntegerParam", new Integer( primitiveIntegerParam ) );
+        }
         dumpValue( props, "longParam", longParam );
         dumpValue( props, "floatParam", floatParam );
         dumpValue( props, "doubleParam", doubleParam );
