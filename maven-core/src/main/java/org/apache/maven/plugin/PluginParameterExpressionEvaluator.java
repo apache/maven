@@ -309,7 +309,7 @@ public class PluginParameterExpressionEvaluator
          * could still be converted by the configurator so we leave those alone). If so, back off to evaluating the
          * expression from properties only.
          */
-        if ( value != null && type != null && !( value instanceof String ) && !type.isInstance( value ) )
+        if ( value != null && type != null && !( value instanceof String ) && !isTypeCompatible( type, value ) )
         {
             value = null;
         }
@@ -357,6 +357,24 @@ public class PluginParameterExpressionEvaluator
         }
 
         return value;
+    }
+
+    private static boolean isTypeCompatible( Class<?> type, Object value )
+    {
+        if ( type.isInstance( value ) )
+        {
+            return true;
+        }
+        else if ( ( type.isPrimitive() || type.getName().startsWith( "java.lang." ) )
+            && value.getClass().getName().startsWith( "java.lang." ) )
+        {
+            // likely Boolean -> boolean, Short -> int etc. conversions, it's not the problem case we try to avoid
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private String stripTokens( String expr )
