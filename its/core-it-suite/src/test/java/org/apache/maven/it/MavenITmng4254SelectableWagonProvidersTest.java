@@ -39,7 +39,8 @@ public class MavenITmng4254SelectableWagonProvidersTest
 
     public MavenITmng4254SelectableWagonProvidersTest()
     {
-        super( "(2.2.0,)" );
+        // not supported in 3.x, there will be a single HTTP wagon
+        super( "(2.2.0,3.0-alpha-1)" );
     }
 
     public void testCliUsage()
