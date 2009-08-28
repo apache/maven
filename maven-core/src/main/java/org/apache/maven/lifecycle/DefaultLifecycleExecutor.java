@@ -417,11 +417,17 @@ public class DefaultLifecycleExecutor
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
+        if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
+        {
+            throw new MojoExecutionException( "Goal " + mojoDescriptor.getId()
+                + " requires a project to execute but there is no POM in this build." );
+        }
+
         if ( mojoDescriptor.isOnlineRequired() && session.isOffline() )
         {
             if ( MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) )
             {
-                throw new MojoExecutionException( "Goal " + mojoDescriptor.getGoal()
+                throw new MojoExecutionException( "Goal " + mojoDescriptor.getId()
                     + " requires online mode for execution but Maven is currently offline." );
             }
             else
