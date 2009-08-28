@@ -68,7 +68,7 @@ import org.codehaus.plexus.logging.Logger;
 /**
  * @author Jason van Zyl
  */
-@Component(role = ArtifactMetadataSource.class)
+@Component( role = ArtifactMetadataSource.class, hint = "maven" )
 public class MavenMetadataSource
     implements ArtifactMetadataSource
 {
