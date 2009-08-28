@@ -229,7 +229,7 @@ public class MojoExecution
         return forkedExecutions;
     }
 
-    public void addForkedExecutions( String projectKey, List<MojoExecution> forkedExecutions )
+    public void setForkedExecutions( String projectKey, List<MojoExecution> forkedExecutions )
     {
         this.forkedExecutions.put( projectKey, forkedExecutions );
     }

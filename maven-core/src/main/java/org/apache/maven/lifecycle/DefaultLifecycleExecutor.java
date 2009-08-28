@@ -1011,7 +1011,7 @@ public class DefaultLifecycleExecutor
                 forkedExecutions = calculateForkedGoal( mojoExecution, session, forkedProject, alreadyForkedExecutions );
             }
 
-            mojoExecution.addForkedExecutions( getKey( forkedProject ), forkedExecutions );
+            mojoExecution.setForkedExecutions( getKey( forkedProject ), forkedExecutions );
         }
 
         alreadyForkedExecutions.remove( mojoDescriptor );
