@@ -55,6 +55,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "plexus-classworlds" );
         artifacts.add( "maven-artifact" );
         artifacts.add( "maven-artifact-manager" );
+        artifacts.add( "maven-artifact-resolver" );
         artifacts.add( "maven-build-context" );
         artifacts.add( "maven-compat" );
         artifacts.add( "maven-core" );
