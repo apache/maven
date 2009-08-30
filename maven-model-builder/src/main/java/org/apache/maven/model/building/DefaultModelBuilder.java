@@ -666,16 +666,13 @@ public class DefaultModelBuilder
                             ModelBuildingEventCatapult catapult )
         throws ModelBuildingException
     {
-        List<ModelBuildingListener> listeners = request.getModelBuildingListeners();
+        ModelBuildingListener listener = request.getModelBuildingListener();
 
-        if ( !listeners.isEmpty() )
+        if ( listener != null )
         {
             ModelBuildingEvent event = new DefaultModelBuildingEvent( model, request, problems );
 
-            for ( ModelBuildingListener listener : listeners )
-            {
-                catapult.fire( listener, event );
-            }
+            catapult.fire( listener, event );
         }
     }
 

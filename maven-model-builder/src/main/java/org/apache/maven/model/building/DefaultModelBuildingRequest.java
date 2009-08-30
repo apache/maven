@@ -61,7 +61,7 @@ public class DefaultModelBuildingRequest
 
     private ModelResolver modelResolver;
 
-    private List<ModelBuildingListener> modelBuildingListeners;
+    private ModelBuildingListener modelBuildingListener;
 
     private ModelCache modelCache;
 
@@ -271,26 +271,14 @@ public class DefaultModelBuildingRequest
         return this;
     }
 
-    public List<ModelBuildingListener> getModelBuildingListeners()
+    public ModelBuildingListener getModelBuildingListener()
     {
-        if ( modelBuildingListeners == null )
-        {
-            modelBuildingListeners = new ArrayList<ModelBuildingListener>();
-        }
-
-        return modelBuildingListeners;
+        return modelBuildingListener;
     }
 
-    public ModelBuildingRequest setModelBuildingListeners( List<? extends ModelBuildingListener> modelBuildingListeners )
+    public ModelBuildingRequest setModelBuildingListener( ModelBuildingListener modelBuildingListener )
     {
-        if ( modelBuildingListeners != null )
-        {
-            this.modelBuildingListeners = new ArrayList<ModelBuildingListener>( modelBuildingListeners );
-        }
-        else
-        {
-            this.modelBuildingListeners = null;
-        }
+        this.modelBuildingListener = modelBuildingListener;
 
         return this;
     }

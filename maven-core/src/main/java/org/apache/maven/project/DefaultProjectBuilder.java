@@ -18,7 +18,6 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.Maven;
@@ -102,7 +101,7 @@ public class DefaultProjectBuilder
                 ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
     
                 DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
-                request.setModelBuildingListeners( Arrays.asList( listener ) );
+                request.setModelBuildingListener( listener );
     
                 if ( localProject )
                 {
@@ -266,7 +265,7 @@ public class DefaultProjectBuilder
         ModelBuildingRequest request = getModelBuildingRequest( config, null );
 
         DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
-        request.setModelBuildingListeners( Arrays.asList( listener ) );
+        request.setModelBuildingListener( listener );
 
         request.setModelSource( new UrlModelSource( getClass().getResource( "standalone.xml" ) ) );
 
@@ -364,7 +363,7 @@ public class DefaultProjectBuilder
             request.setModelCache( modelCache );
 
             DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
-            request.setModelBuildingListeners( Arrays.asList( listener ) );
+            request.setModelBuildingListener( listener );
 
             try
             {
