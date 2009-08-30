@@ -34,7 +34,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
@@ -54,14 +53,28 @@ public class DefaultProjectDependenciesResolver
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
 
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, MavenSession session )
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return resolve( Collections.singleton( project ), scopes, session );
+        return resolve( Collections.singleton( project ), scopesToResolve, session );
     }
 
-    public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
+                                  Collection<String> scopesToResolve, MavenSession session )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        return resolve( Collections.singleton( project ), scopesToCollect, scopesToResolve, session );
+    }
+
+    public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopesToResolve,
                                   MavenSession session )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        return resolve( projects, null, scopesToResolve, session );
+    }
+
+    public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopesToCollect,
+                                  Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         Set<Artifact> resolved = new LinkedHashSet<Artifact>();
@@ -102,14 +115,16 @@ public class DefaultProjectDependenciesResolver
         }        
         */
 
-        ArtifactFilter scopeFilter = new CumulativeScopeArtifactFilter( scopes );
+        CumulativeScopeArtifactFilter resolutionScopeFilter = new CumulativeScopeArtifactFilter( scopesToResolve );
 
-        ArtifactFilter filter = scopeFilter; 
+        CumulativeScopeArtifactFilter collectionScopeFilter = new CumulativeScopeArtifactFilter( scopesToCollect );
+        collectionScopeFilter = new CumulativeScopeArtifactFilter( collectionScopeFilter, resolutionScopeFilter );
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setResolveRoot( false )
             .setResolveTransitively( true )
-            .setFilter( filter )
+            .setCollectionFilter( collectionScopeFilter )
+            .setResolutionFilter( resolutionScopeFilter )
             .setLocalRepository( session.getLocalRepository() )
             .setOffline( session.isOffline() )
             .setCache( session.getRepositoryCache() );

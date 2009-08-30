@@ -397,7 +397,7 @@ public class DefaultMavenPluginManager
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
         request.setArtifact( pluginArtifact );
         request.setArtifactDependencies( overrideArtifacts );
-        request.setFilter( filter );
+        request.setCollectionFilter( filter );
         request.setResolveRoot( true );
         request.setResolveTransitively( true );
 

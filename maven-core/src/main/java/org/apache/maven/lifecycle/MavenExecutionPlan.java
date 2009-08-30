@@ -38,10 +38,15 @@ public class MavenExecutionPlan
     /** For project dependency resolution, the scopes of resolution required if any. */
     private Set<String> requiredDependencyResolutionScopes;
 
-    public MavenExecutionPlan( List<MojoExecution> executions, Set<String> requiredDependencyResolutionScopes )
+    /** For project dependency collection, the scopes of collection required if any. */
+    private Set<String> requiredDependencyCollectionScopes;
+
+    public MavenExecutionPlan( List<MojoExecution> executions, Set<String> requiredDependencyResolutionScopes,
+                               Set<String> requiredDependencyCollectionScopes )
     {
         this.executions = executions;
         this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
+        this.requiredDependencyCollectionScopes = requiredDependencyCollectionScopes;
     }
 
     public List<MojoExecution> getExecutions()
@@ -52,5 +57,11 @@ public class MavenExecutionPlan
     public Set<String> getRequiredResolutionScopes()
     {
         return requiredDependencyResolutionScopes;
-    }        
+    }
+
+    public Set<String> getRequiredCollectionScopes()
+    {
+        return requiredDependencyCollectionScopes;
+    }
+
 }

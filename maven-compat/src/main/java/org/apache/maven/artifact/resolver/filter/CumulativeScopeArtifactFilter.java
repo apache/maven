@@ -48,15 +48,43 @@ public class CumulativeScopeArtifactFilter
     {
         this.scopes = new HashSet<String>();
 
+        addScopes( scopes );
+    }
+
+    /**
+     * Creates a new filter that combines the specified filters.
+     * 
+     * @param filters The filters to combine, may be {@code null}.
+     */
+    public CumulativeScopeArtifactFilter( CumulativeScopeArtifactFilter... filters )
+    {
+        this.scopes = new HashSet<String>();
+
+        if ( filters != null )
+        {
+            for ( CumulativeScopeArtifactFilter filter : filters )
+            {
+                addScopes( filter.getScopes() );
+            }
+        }
+    }
+
+    private void addScopes( Collection<String> scopes )
+    {
         if ( scopes != null )
         {
-            this.scopes.addAll( scopes );
-
             for ( String scope : scopes )
             {
                 addScope( scope );
             }
         }
+    }
+
+    private void addScope( String scope )
+    {
+        this.scopes.add( scope );
+
+        addScopeInternal( scope );
     }
 
     public Set<String> getScopes()

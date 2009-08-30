@@ -35,7 +35,7 @@ public class ScopeArtifactFilter
     {
         this.scope = scope;
 
-        addScope( scope );
+        addScopeInternal( scope );
     }
 
     public String getScope()

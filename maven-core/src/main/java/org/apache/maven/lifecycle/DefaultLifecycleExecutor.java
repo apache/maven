@@ -371,7 +371,9 @@ public class DefaultLifecycleExecutor
         {
             Collection<String> scopesToResolve = executionPlan.getRequiredResolutionScopes();
 
-            artifacts = projectDependenciesResolver.resolve( project, scopesToResolve, session );
+            Collection<String> scopesToCollect = executionPlan.getRequiredCollectionScopes();
+
+            artifacts = projectDependenciesResolver.resolve( project, scopesToCollect, scopesToResolve, session );
         }
         catch ( MultipleArtifactsNotFoundException e )
         {
@@ -672,6 +674,8 @@ public class DefaultLifecycleExecutor
 
         Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
 
+        Set<String> requiredDependencyCollectionScopes = new TreeSet<String>();
+
         for ( Object task : taskSegment.tasks )
         {
             if ( task instanceof GoalTask )
@@ -721,10 +725,12 @@ public class DefaultLifecycleExecutor
 
             calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
 
-            collectDependencyResolutionScopes( requiredDependencyResolutionScopes, mojoExecution );
+            collectDependencyRequirements( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
+                                           mojoExecution );
         }
 
-        return new MavenExecutionPlan( mojoExecutions, requiredDependencyResolutionScopes );
+        return new MavenExecutionPlan( mojoExecutions, requiredDependencyResolutionScopes,
+                                       requiredDependencyCollectionScopes );
     }
 
     private List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )
@@ -887,21 +893,32 @@ public class DefaultLifecycleExecutor
         return request;
     }
 
-    private void collectDependencyResolutionScopes( Collection<String> requiredDependencyResolutionScopes,
+    private void collectDependencyRequirements( Collection<String> requiredDependencyResolutionScopes,
+                                                    Collection<String> requiredDependencyCollectionScopes,
                                                     MojoExecution mojoExecution )
     {
-        String requiredDependencyResolutionScope = mojoExecution.getMojoDescriptor().isDependencyResolutionRequired();
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        String requiredDependencyResolutionScope = mojoDescriptor.getDependencyResolutionRequired();
 
         if ( StringUtils.isNotEmpty( requiredDependencyResolutionScope ) )
         {
             requiredDependencyResolutionScopes.add( requiredDependencyResolutionScope );
         }
 
+        String requiredDependencyCollectionScope = mojoDescriptor.getDependencyCollectionRequired();
+
+        if ( StringUtils.isNotEmpty( requiredDependencyCollectionScope ) )
+        {
+            requiredDependencyCollectionScopes.add( requiredDependencyCollectionScope );
+        }
+
         for ( List<MojoExecution> forkedExecutions : mojoExecution.getForkedExecutions().values() )
         {
             for ( MojoExecution forkedExecution : forkedExecutions )
             {
-                collectDependencyResolutionScopes( requiredDependencyResolutionScopes, forkedExecution );
+                collectDependencyRequirements( requiredDependencyResolutionScopes,
+                                                   requiredDependencyCollectionScopes, forkedExecution );
             }
         }
     }

@@ -93,6 +93,9 @@ public class MojoDescriptor
     /** Specify the required dependencies in a specified scope */
     private String dependencyResolutionRequired = null;
 
+    /** The scope of (transitive) dependencies that should be collected but not resolved. */
+    private String dependencyCollectionRequired;
+
     /**  By default, the Mojo needs a Maven project to be executed */
     private boolean projectRequired = true;
 
@@ -235,13 +238,36 @@ public class MojoDescriptor
         this.dependencyResolutionRequired = requiresDependencyResolution;
     }
 
+    public String getDependencyResolutionRequired()
+    {
+        return dependencyResolutionRequired;
+    }
+
     /**
      * @return the required dependencies in a specified scope
      * @TODO the name is not intelligible
      */
+    @Deprecated
     public String isDependencyResolutionRequired()
     {
         return dependencyResolutionRequired;
+    }
+
+    public void setDependencyCollectionRequired( String requiresDependencyCollection )
+    {
+        this.dependencyCollectionRequired = requiresDependencyCollection;
+    }
+
+    /**
+     * Gets the scope of (transitive) dependencies that should be collected. Dependency collection refers to the process
+     * of calculating the complete dependency tree in terms of artifact coordinates. In contrast to dependency
+     * resolution, this does not include the download of the files for the dependency artifacts.
+     * 
+     * @return The scope of (transitive) dependencies that should be collected or {@code null} if none.
+     */
+    public String getDependencyCollectionRequired()
+    {
+        return dependencyCollectionRequired;
     }
 
     // ----------------------------------------------------------------------

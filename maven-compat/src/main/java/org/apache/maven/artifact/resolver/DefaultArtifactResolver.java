@@ -339,7 +339,7 @@ public class DefaultArtifactResolver
             .setManagedVersionMap( managedVersions )
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories )
-            .setFilter( filter )
+            .setCollectionFilter( filter )
             .setListeners( listeners );
 
         return resolveWithExceptions( request );
@@ -379,7 +379,8 @@ public class DefaultArtifactResolver
         Set<Artifact> artifacts = request.getArtifactDependencies();
         Map managedVersions = request.getManagedVersionMap();
         List<ResolutionListener> listeners = request.getListeners();
-        ArtifactFilter filter = request.getFilter();                       
+        ArtifactFilter collectionFilter = request.getCollectionFilter();                       
+        ArtifactFilter resolutionFilter = request.getResolutionFilter();                       
         
         //TODO: hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the workspace
         if ( source == null )
@@ -489,7 +490,9 @@ public class DefaultArtifactResolver
         } 
 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
-        result = artifactCollector.collect( artifacts, rootArtifact, managedVersions, request, source, filter, listeners, null );
+        result =
+            artifactCollector.collect( artifacts, rootArtifact, managedVersions, request, source, collectionFilter,
+                                       listeners, null );
                         
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
@@ -506,7 +509,10 @@ public class DefaultArtifactResolver
             {
                 try
                 {
-                    resolve( artifact, request, request.getTransferListener(), false );
+                    if ( resolutionFilter == null || resolutionFilter.include( artifact ) )
+                    {
+                        resolve( artifact, request, request.getTransferListener(), false );
+                    }
                 }
                 catch ( ArtifactNotFoundException anfe )
                 {

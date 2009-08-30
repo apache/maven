@@ -66,7 +66,8 @@ public class PluginDescriptorBuilderTest
 
         assertEquals( "jar", md.getGoal() );
         assertEquals( "mojo-description", md.getDescription() );
-        assertEquals( "runtime", md.isDependencyResolutionRequired() );
+        assertEquals( "runtime", md.getDependencyResolutionRequired() );
+        assertEquals( "test", md.getDependencyCollectionRequired() );
         assertEquals( false, md.isAggregator() );
         assertEquals( false, md.isDirectInvocationOnly() );
         assertEquals( true, md.isInheritedByDefault() );

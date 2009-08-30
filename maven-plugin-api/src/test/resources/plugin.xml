@@ -12,6 +12,7 @@
       <goal>jar</goal>
       <description>mojo-description</description>
       <requiresDependencyResolution>runtime</requiresDependencyResolution>
+      <requiresDependencyCollection>test</requiresDependencyCollection>
       <requiresDirectInvocation>false</requiresDirectInvocation>
       <requiresProject>true</requiresProject>
       <requiresReports>false</requiresReports>

@@ -195,11 +195,18 @@ public class PluginDescriptorBuilder
 
         mojo.setDescription( c.getChild( "description" ).getValue() );
 
-        String dependencyResolution = c.getChild( "requiresDependencyResolution" ).getValue();
+        PlexusConfiguration dependencyResolution = c.getChild( "requiresDependencyResolution", false );
 
         if ( dependencyResolution != null )
         {
-            mojo.setDependencyResolutionRequired( dependencyResolution );
+            mojo.setDependencyResolutionRequired( dependencyResolution.getValue() );
+        }
+
+        PlexusConfiguration dependencyCollection = c.getChild( "requiresDependencyCollection", false );
+
+        if ( dependencyCollection != null )
+        {
+            mojo.setDependencyCollectionRequired( dependencyCollection.getValue() );
         }
 
         String directInvocationOnly = c.getChild( "requiresDirectInvocation" ).getValue();

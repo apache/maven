@@ -54,7 +54,9 @@ public class ArtifactResolutionRequest
 
     private RepositoryCache cache;
 
-    private ArtifactFilter filter;
+    private ArtifactFilter collectionFilter;
+
+    private ArtifactFilter resolutionFilter;
 
     // Needs to go away
     private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
@@ -131,14 +133,39 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public ArtifactFilter getFilter()
+    /**
+     * Gets the artifact filter that controls traversal of the dependency graph.
+     * 
+     * @return The filter used to determine which of the artifacts in the dependency graph should be traversed or
+     *         {@code null} to collect all transitive dependencies.
+     */
+    public ArtifactFilter getCollectionFilter()
     {
-        return filter;
+        return collectionFilter;
     }
 
-    public ArtifactResolutionRequest setFilter( ArtifactFilter filter )
+    public ArtifactResolutionRequest setCollectionFilter( ArtifactFilter filter )
     {
-        this.filter = filter;
+        this.collectionFilter = filter;
+
+        return this;
+    }
+
+    /**
+     * Gets the artifact filter that controls downloading of artifact files. This filter operates on those artifacts
+     * that have been included by the {@link #getCollectionFilter()}.
+     * 
+     * @return The filter used to determine which of the artifacts should have their files resolved or {@code null} to
+     *         resolve the files for all collected artifacts.
+     */
+    public ArtifactFilter getResolutionFilter()
+    {
+        return resolutionFilter;
+    }
+
+    public ArtifactResolutionRequest setResolutionFilter( ArtifactFilter filter )
+    {
+        this.resolutionFilter = filter;
 
         return this;
     }

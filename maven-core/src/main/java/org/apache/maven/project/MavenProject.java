@@ -1861,14 +1861,9 @@ public class MavenProject
     }
 
     private void addArtifactPath( Artifact artifact, List<String> classpath )
-        throws DependencyResolutionRequiredException
     {
         File file = artifact.getFile();
-        if ( file == null )
-        {
-            throw new DependencyResolutionRequiredException( artifact );
-        }
-        else
+        if ( file != null )
         {
             classpath.add( file.getPath() );
         }

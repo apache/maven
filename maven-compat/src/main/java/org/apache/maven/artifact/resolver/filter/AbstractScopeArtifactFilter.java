@@ -41,7 +41,7 @@ abstract class AbstractScopeArtifactFilter
 
     private boolean systemScope;
 
-    void addScope( String scope )
+    void addScopeInternal( String scope )
     {
         if ( Artifact.SCOPE_COMPILE.equals( scope ) )
         {

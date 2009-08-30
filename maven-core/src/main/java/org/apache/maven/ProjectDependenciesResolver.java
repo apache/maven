@@ -35,11 +35,24 @@ public interface ProjectDependenciesResolver
      * Resolves the transitive dependencies of the specified project.
      * 
      * @param project The project whose dependencies should be resolved, must not be {@code null}.
-     * @param scopes The dependency scopes that should be resolved, may be {@code null}.
+     * @param scopesToResolve The dependency scopes that should be resolved, may be {@code null}.
      * @param session The current build session, must not be {@code null}.
      * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
      */
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, MavenSession session )
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    /**
+     * Resolves the transitive dependencies of the specified project.
+     * 
+     * @param project The project whose dependencies should be resolved, must not be {@code null}.
+     * @param scopesToCollect The dependency scopes that should be collected, may be {@code null}.
+     * @param scopesToResolve The dependency scopes that should be collected and also resolved, may be {@code null}.
+     * @param session The current build session, must not be {@code null}.
+     * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
+     */
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
+                                  Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
