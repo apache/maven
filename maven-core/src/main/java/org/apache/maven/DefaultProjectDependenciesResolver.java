@@ -20,21 +20,23 @@ package org.apache.maven;
  */
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.OrArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
@@ -45,17 +47,32 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
+
     @Requirement
     private RepositorySystem repositorySystem;
-    
+
     @Requirement
     private ResolutionErrorHandler resolutionErrorHandler;
-    
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, RepositoryRequest repositoryRequest )
+
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException
-    {        
+    {
+        return resolve( Collections.singleton( project ), scopes, session );
+    }
+
+    public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
+                                  MavenSession session )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        Set<Artifact> resolved = new LinkedHashSet<Artifact>();
+
+        if ( projects == null || projects.isEmpty() )
+        {
+            return resolved;
+        }
+
         /*
-         
+        
         Logic for transitve global exclusions
          
         List<String> exclusions = new ArrayList<String>();
@@ -85,46 +102,67 @@ public class DefaultProjectDependenciesResolver
         }        
         */
 
-        OrArtifactFilter scopeFilter = new OrArtifactFilter();
-
-        for ( String scope : scopes )
-        {
-            scopeFilter.add( new ScopeArtifactFilter( scope ) );
-        }
+        ArtifactFilter scopeFilter = new CumulativeScopeArtifactFilter( scopes );
 
         ArtifactFilter filter = scopeFilter; 
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest )
-            .setArtifact( new ProjectArtifact( project ) )
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
             .setResolveRoot( false )
             .setResolveTransitively( true )
-            .setManagedVersionMap( project.getManagedVersionMap() )
-            .setFilter( filter );
+            .setFilter( filter )
+            .setLocalRepository( session.getLocalRepository() )
+            .setOffline( session.isOffline() )
+            .setCache( session.getRepositoryCache() );
         // FIXME setTransferListener
-        
-        ArtifactResolutionResult result = repositorySystem.resolve( request );                
 
-        project.setArtifacts( result.getArtifacts() );
+        Set<String> projectIds = null;
 
-        Set<String> directDependencies = new HashSet<String>( project.getDependencies().size() * 2 );
-        for ( Dependency dependency : project.getDependencies() )
+        for ( MavenProject project : projects )
         {
-            directDependencies.add( dependency.getManagementKey() );
-        }
+            request.setArtifact( new ProjectArtifact( project ) );
+            request.setManagedVersionMap( project.getManagedVersionMap() );
+            request.setRemoteRepositories( project.getRemoteArtifactRepositories() );
 
-        Set<Artifact> dependencyArtifacts = new LinkedHashSet<Artifact>( project.getDependencies().size() * 2 );
-        for ( Artifact artifact : result.getArtifacts() )
-        {
-            if ( directDependencies.contains( artifact.getDependencyConflictId() ) )
+            ArtifactResolutionResult result = repositorySystem.resolve( request );
+
+            try
             {
-                dependencyArtifacts.add( artifact );
+                resolutionErrorHandler.throwErrors( request, result );
             }
+            catch ( MultipleArtifactsNotFoundException e )
+            {
+                if ( projectIds == null )
+                {
+                    projectIds = new HashSet<String>( projects.size() * 2 );
+
+                    for ( MavenProject p : projects )
+                    {
+                        String key = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
+                        projectIds.add( key );
+                    }
+                }
+
+                Collection<Artifact> missing = new HashSet<Artifact>( e.getMissingArtifacts() );
+
+                for ( Iterator<Artifact> it = missing.iterator(); it.hasNext(); )
+                {
+                    String key = ArtifactUtils.key( it.next() );
+                    if ( projectIds.contains( key ) )
+                    {
+                        it.remove();
+                    }
+                }
+
+                if ( !missing.isEmpty() )
+                {
+                    throw e;
+                }
+            }
+
+            resolved.addAll( result.getArtifacts() );
         }
-        project.setDependencyArtifacts( dependencyArtifacts );
 
-        resolutionErrorHandler.throwErrors( request, result );
-
-        return result.getArtifacts();
+        return resolved;
     }
 
 }

@@ -19,8 +19,6 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 /**
  * Filter to only retain objects in the given artifactScope or better.
  *
@@ -28,100 +26,16 @@ import org.apache.maven.artifact.Artifact;
  * @version $Id$
  */
 public class ScopeArtifactFilter
-    implements ArtifactFilter
+    extends AbstractScopeArtifactFilter
 {
-    private final boolean compileScope;
-
-    private final boolean runtimeScope;
-
-    private final boolean testScope;
-
-    private final boolean providedScope;
-
-    private final boolean systemScope;
 
     private final String scope;
-    
+
     public ScopeArtifactFilter( String scope )
     {
         this.scope = scope;
-        
-        if ( Artifact.SCOPE_COMPILE.equals( scope ) )
-        {
-            systemScope = true;
-            providedScope = true;
-            compileScope = true;
-            runtimeScope = false;
-            testScope = false;
-        }
-        else if ( Artifact.SCOPE_RUNTIME.equals( scope ) )
-        {
-            systemScope = false;
-            providedScope = false;
-            compileScope = true;
-            runtimeScope = true;
-            testScope = false;
-        }
-        else if ( Artifact.SCOPE_COMPILE_PLUS_RUNTIME.equals( scope ) )
-        {
-            systemScope = true;
-            providedScope = true;
-            compileScope = true;
-            runtimeScope = true;
-            testScope = false;
-        }
-        else if ( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM.equals( scope ) )
-        {
-            systemScope = true;
-            providedScope = false;
-            compileScope = true;
-            runtimeScope = true;
-            testScope = false;
-        }
-        else if ( Artifact.SCOPE_TEST.equals( scope ) )
-        {
-            systemScope = true;
-            providedScope = true;
-            compileScope = true;
-            runtimeScope = true;
-            testScope = true;
-        }
-        else
-        {
-            systemScope = false;
-            providedScope = false;
-            compileScope = false;
-            runtimeScope = false;
-            testScope = false;
-        }
-    }
 
-    public boolean include( Artifact artifact )
-    {
-        if ( Artifact.SCOPE_COMPILE.equals( artifact.getScope() ) )
-        {
-            return compileScope;
-        }
-        else if ( Artifact.SCOPE_RUNTIME.equals( artifact.getScope() ) )
-        {
-            return runtimeScope;
-        }
-        else if ( Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
-        {
-            return testScope;
-        }
-        else if ( Artifact.SCOPE_PROVIDED.equals( artifact.getScope() ) )
-        {
-            return providedScope;
-        }
-        else if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
-        {
-            return systemScope;
-        }
-        else
-        {
-            return true;
-        }
+        addScope( scope );
     }
 
     public String getScope()
@@ -146,19 +60,20 @@ public class ScopeArtifactFilter
         {
             return true;
         }
-        
+
         if ( !( obj instanceof ScopeArtifactFilter ) )
         {
             return false;
         }
-        
+
         ScopeArtifactFilter other = (ScopeArtifactFilter) obj;
 
         return equals( scope, other.scope );
     }
 
-    private static boolean equals( String str1, String str2 )
+    private static <T> boolean equals( T str1, T str2 )
     {
         return str1 != null ? str1.equals( str2 ) : str2 == null;
     }
+
 }

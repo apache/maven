@@ -23,13 +23,39 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
 public interface ProjectDependenciesResolver
 {
-    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, RepositoryRequest repositoryRequest )
+
+    /**
+     * Resolves the transitive dependencies of the specified project.
+     * 
+     * @param project The project whose dependencies should be resolved, must not be {@code null}.
+     * @param scopes The dependency scopes that should be resolved, may be {@code null}.
+     * @param session The current build session, must not be {@code null}.
+     * @return The transitive dependencies of the specified project that match the requested scopes, never {@code null}.
+     */
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopes, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    /**
+     * Resolves the transitive dependencies of the specified projects. Note that dependencies which can't be resolved
+     * from any repository but are present among the set of specified projects will not cause an exception. Instead,
+     * those unresolved artifacts will be returned in the result set, allowing the caller to take special care of
+     * artifacts that haven't been build yet.
+     * 
+     * @param projects The projects whose dependencies should be resolved, may be {@code null}.
+     * @param scopes The dependency scopes that should be resolved, may be {@code null}.
+     * @param session The current build session, must not be {@code null}.
+     * @return The transitive dependencies of the specified projects that match the requested scopes, never {@code null}
+     *         .
+     */
+    public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
+                                  MavenSession session )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+
 }

@@ -126,6 +126,8 @@ public abstract class AbstractCoreMavenComponentTestCase
         else
         {
             project = createStubMavenProject();
+            project.setRemoteArtifactRepositories( request.getRemoteRepositories() );
+            project.setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
         }
 
         MavenSession session = new MavenSession( getContainer(), request, new DefaultMavenExecutionResult(), project );
@@ -166,7 +168,12 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected class ProjectBuilder
     {
         private MavenProject project;
-        
+
+        public ProjectBuilder( MavenProject project )
+        {
+            this.project = project;
+        }
+
         public ProjectBuilder( String groupId, String artifactId, String version )
         {
             Model model = new Model();

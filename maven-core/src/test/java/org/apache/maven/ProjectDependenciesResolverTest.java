@@ -7,9 +7,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
@@ -41,46 +38,40 @@ public class ProjectDependenciesResolverTest
         return "src/test/projects/project-dependencies-resolver";
     }
 
-    protected RepositoryRequest getRepositoryRequest()
-        throws InvalidRepositoryException
-    {
-        RepositoryRequest request = new DefaultRepositoryRequest();
-        request.setLocalRepository( getLocalRepository() );
-        request.setRemoteRepositories( getRemoteRepositories() );
-        return request;
-    }
-
     public void testExclusionsInDependencies()
         throws Exception
     {
+        MavenSession session = createMavenSession( null );
+        MavenProject project = session.getCurrentProject();
+
         Exclusion exclusion = new Exclusion();
         exclusion.setGroupId( "commons-lang" );
         exclusion.setArtifactId( "commons-lang" );        
-        
-        MavenProject project = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
-            .addDependency( "org.apache.maven.its", "maven-core-it-support", "1.3", Artifact.SCOPE_RUNTIME, exclusion  )
-            .get();        
+
+        new ProjectBuilder( project ).addDependency( "org.apache.maven.its", "maven-core-it-support", "1.3",
+                                                     Artifact.SCOPE_RUNTIME, exclusion );
         
         Set<Artifact> artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getRepositoryRequest() );
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session );
         assertEquals( 0, artifactDependencies.size() );
-        
-        artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), getRepositoryRequest() );
+
+        artifactDependencies = resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), session );
         assertEquals( 1, artifactDependencies.size() );
-        assertEquals( "maven-core-it-support" , artifactDependencies.iterator().next().getArtifactId() );
+        assertEquals( "maven-core-it-support", artifactDependencies.iterator().next().getArtifactId() );
     }
     
     public void testSystemScopeDependencies()
         throws Exception
     {
-        MavenProject project = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
-            .addDependency( "com.mycompany", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, new File( getBasedir(), "pom.xml" ).getAbsolutePath() )
-            .get();
+        MavenSession session = createMavenSession( null );
+        MavenProject project = session.getCurrentProject();
+
+        new ProjectBuilder( project )
+            .addDependency( "com.mycompany", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, new File( getBasedir(), "pom.xml" ).getAbsolutePath() );
 
         Set<Artifact> artifactDependencies =
-            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getRepositoryRequest() );                
-        assertEquals( 1, artifactDependencies.size() );        
+            resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session );
+        assertEquals( 1, artifactDependencies.size() );
     }  
     
     public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements()
@@ -94,7 +85,7 @@ public class ProjectDependenciesResolverTest
         MavenSession session = createMavenSession( pom, eps );
         MavenProject project = session.getCurrentProject();
 
-        resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), getRepositoryRequest() );                
+        project.setArtifacts( resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session ) );
                 
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );
