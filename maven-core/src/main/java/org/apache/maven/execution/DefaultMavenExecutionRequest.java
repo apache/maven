@@ -118,7 +118,7 @@ public class DefaultMavenExecutionRequest
 
     private List<ArtifactRepository> pluginArtifactRepositories;
 
-    private List<ExecutionListener> lifecycleListeners;
+    private ExecutionListener executionListener;
 
     /**
      * Suppress SNAPSHOT updates.
@@ -163,7 +163,7 @@ public class DefaultMavenExecutionRequest
         copy.setPluginArtifactRepositories( original.getPluginArtifactRepositories() );
         copy.setRepositoryCache( original.getRepositoryCache() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
-        copy.setExecutionListeners( original.getExecutionListeners() );
+        copy.setExecutionListener( original.getExecutionListener() );
         return original;        
     }
    
@@ -944,26 +944,14 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List<ExecutionListener> getExecutionListeners()
+    public ExecutionListener getExecutionListener()
     {
-        if ( lifecycleListeners == null )
-        {
-            lifecycleListeners = new ArrayList<ExecutionListener>();
-        }
-
-        return lifecycleListeners;
+        return executionListener;
     }
 
-    public MavenExecutionRequest setExecutionListeners( List<ExecutionListener> lifecycleListeners )
+    public MavenExecutionRequest setExecutionListener( ExecutionListener executionListener )
     {
-        if ( lifecycleListeners != null )
-        {
-            this.lifecycleListeners = new ArrayList<ExecutionListener>( lifecycleListeners );
-        }
-        else
-        {
-            this.lifecycleListeners = null;
-        }
+        this.executionListener = executionListener;
 
         return this;
     }

@@ -78,16 +78,13 @@ public class DefaultMaven
 
     private void fireEvent( MavenSession session, ExecutionEventCatapult catapult )
     {
-        List<ExecutionListener> listeners = session.getRequest().getExecutionListeners();
+        ExecutionListener listener = session.getRequest().getExecutionListener();
 
-        if ( !listeners.isEmpty() )
+        if ( listener != null )
         {
             ExecutionEvent event = new DefaultLifecycleEvent( session, null );
 
-            for ( ExecutionListener listener : listeners )
-            {
-                catapult.fire( listener, event );
-            }
+            catapult.fire( listener, event );
         }
     }
 

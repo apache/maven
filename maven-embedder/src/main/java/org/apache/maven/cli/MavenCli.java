@@ -16,7 +16,6 @@ package org.apache.maven.cli;
  */
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -29,7 +28,6 @@ import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
 import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -122,7 +120,7 @@ public class MavenCli
 
         MavenEmbedderLogger logger = configuration.getMavenEmbedderLogger();
 
-        request.setExecutionListeners( Arrays.<ExecutionListener> asList( new ExecutionEventLogger( logger ) ) );
+        request.setExecutionListener( new ExecutionEventLogger( logger ) );
 
         if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {

@@ -263,8 +263,8 @@ public interface MavenExecutionRequest
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
-    List<ExecutionListener> getExecutionListeners();
-    MavenExecutionRequest setExecutionListeners( List<ExecutionListener> executionListeners );
+    ExecutionListener getExecutionListener();
+    MavenExecutionRequest setExecutionListener( ExecutionListener executionListener );
 
     ProjectBuildingRequest getProjectBuildingRequest();    
 

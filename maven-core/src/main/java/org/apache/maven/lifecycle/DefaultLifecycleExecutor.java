@@ -140,16 +140,13 @@ public class DefaultLifecycleExecutor
 
     private void fireEvent( MavenSession session, MojoExecution mojoExecution, LifecycleEventCatapult catapult )
     {
-        List<ExecutionListener> listeners = session.getRequest().getExecutionListeners();
+        ExecutionListener listener = session.getRequest().getExecutionListener();
 
-        if ( !listeners.isEmpty() )
+        if ( listener != null )
         {
             ExecutionEvent event = new DefaultLifecycleEvent( session, mojoExecution );
 
-            for ( ExecutionListener listener : listeners )
-            {
-                catapult.fire( listener, event );
-            }
+            catapult.fire( listener, event );
         }
     }
 
