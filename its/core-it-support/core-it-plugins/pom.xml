@@ -38,6 +38,7 @@ under the License.
     <module>maven-it-plugin-configuration</module>
     <module>maven-it-plugin-context-passing</module>
     <module>maven-it-plugin-core-stubs</module>
+    <module>maven-it-plugin-dependency-collection</module>
     <module>maven-it-plugin-dependency-resolution</module>
     <module>maven-it-plugin-expression</module>
     <module>maven-it-plugin-error</module>
