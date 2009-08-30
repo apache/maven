@@ -133,14 +133,9 @@ public class ScopeArtifactFilter
     public int hashCode()
     {
         int hash = 17;
-        hash = hash * 31 + ( compileScope ? 1 : 0 );
-        hash = hash * 31 + ( runtimeScope ? 1 : 0 );
-        hash = hash * 31 + ( testScope ? 1 : 0 );
-        hash = hash * 31 + ( providedScope ? 1 : 0 );
-        hash = hash * 31 + ( systemScope ? 1 : 0 );
-        
-        hash = hash * 31 + ( scope != null ? scope.hashCode() : 0);
-        
+
+        hash = hash * 31 + ( scope != null ? scope.hashCode() : 0 );
+
         return hash;
     }
 
@@ -159,12 +154,7 @@ public class ScopeArtifactFilter
         
         ScopeArtifactFilter other = (ScopeArtifactFilter) obj;
 
-        return compileScope == other.compileScope
-                && runtimeScope == other.runtimeScope
-                && testScope == other.testScope
-                && providedScope == other.providedScope
-                && systemScope == other.systemScope
-                && equals( scope, other.scope );
+        return equals( scope, other.scope );
     }
 
     private static boolean equals( String str1, String str2 )
