@@ -124,6 +124,7 @@ public class DefaultModelBuilder
         problems.setRootModel( inputModel );
 
         ModelData resultData = new ModelData( inputModel );
+        ModelData superData = new ModelData( getSuperModel() );
 
         List<ModelData> lineage = new ArrayList<ModelData>();
 
@@ -157,15 +158,20 @@ public class DefaultModelBuilder
                 }
             }
 
+            if ( currentData == superData )
+            {
+                break;
+            }
+
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
             currentData = readParent( tmpModel, request, problems );
-        }
 
-        ModelData superData = new ModelData( getSuperModel() );
-        superData.setRawModel( superData.getModel() );
-        superData.setActiveProfiles( Collections.<Profile> emptyList() );
-        lineage.add( superData );
+            if ( currentData == null )
+            {
+                currentData = superData;
+            }
+        }
 
         assembleInheritance( lineage, request, problems );
 
