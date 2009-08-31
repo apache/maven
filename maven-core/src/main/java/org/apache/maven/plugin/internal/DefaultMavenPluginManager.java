@@ -392,16 +392,19 @@ public class DefaultMavenPluginManager
             overrideArtifacts.add( repositorySystem.createDependencyArtifact( dependency ) );
         }
 
-        ArtifactFilter filter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
+        ArtifactFilter collectionFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
+
+        ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
         request.setArtifact( pluginArtifact );
         request.setArtifactDependencies( overrideArtifacts );
-        request.setCollectionFilter( filter );
+        request.setCollectionFilter( collectionFilter );
+        request.setResolutionFilter( resolutionFilter );
         request.setResolveRoot( true );
         request.setResolveTransitively( true );
 
-        ArtifactResolutionResult result = repositorySystem.collect( request );
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
         try
         {
             resolutionErrorHandler.throwErrors( request, result );
@@ -412,31 +415,6 @@ public class DefaultMavenPluginManager
         }
 
         List<Artifact> pluginArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
-
-        request.setResolveRoot( true ).setResolveTransitively( false ).setArtifactDependencies( null );
-
-        filter = artifactFilterManager.getCoreArtifactFilter();
-
-        for ( Artifact artifact : pluginArtifacts )
-        {
-            if ( filter.include( artifact ) )
-            {
-                result = repositorySystem.resolve( request.setArtifact( artifact ) );
-                try
-                {
-                    resolutionErrorHandler.throwErrors( request, result );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    throw new PluginResolutionException( plugin, e );
-                }
-            }
-            else
-            {
-                artifact.setFile( null );
-                artifact.setResolved( false );
-            }
-        }
 
         return pluginArtifacts;
     }

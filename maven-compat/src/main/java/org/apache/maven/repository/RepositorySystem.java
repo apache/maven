@@ -90,8 +90,6 @@ public interface RepositorySystem
      */
     List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );    
 
-    ArtifactResolutionResult collect( ArtifactResolutionRequest request );
-
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
