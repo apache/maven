@@ -27,9 +27,10 @@ import java.io.File;
 public class MavenIT0051ReleaseProfileTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenIT0051ReleaseProfileTest()                                                                                                                          
     {                                                                                                                                                 
-        super( "(2.0.2,3.0-alpha-1)" ); // no longer supported in 3.0+
+        super( "(2.0.2,)" );
     }    
 
     /**
