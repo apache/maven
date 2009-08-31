@@ -34,23 +34,11 @@ public interface PluginManagementInjector
     /**
      * Merges default values from the plugin management section of the given model into itself.
      * 
-     * @param child The model into which to merge the values specified by its plugin management section, must not be
+     * @param model The model into which to merge the values specified by its plugin management section, must not be
      *            <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
-    void injectManagement( Model child, ModelBuildingRequest request, ModelProblemCollector problems );
-
-    /**
-     * Merges important default values from the plugin management section of the given model into itself. In detail,
-     * only the plugin version and the extensions flag are merged. These fields are critical in order to be able to load
-     * extensions from plugins.
-     * 
-     * @param child The model into which to merge the values specified by its plugin management section, must not be
-     *            <code>null</code>.
-     * @param request The model building request that holds further settings, must not be {@code null}.
-     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
-     */
-    void injectBasicManagement( Model child, ModelBuildingRequest request, ModelProblemCollector problems );
+    void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems );
 
 }

@@ -51,19 +51,14 @@ public class DefaultPluginManagementInjector
 
     public void injectManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        merger.mergeManagedBuildPlugins( model, false );
-    }
-
-    public void injectBasicManagement( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
-    {
-        merger.mergeManagedBuildPlugins( model, true );
+        merger.mergeManagedBuildPlugins( model );
     }
 
     private static class ManagementModelMerger
         extends MavenModelMerger
     {
 
-        public void mergeManagedBuildPlugins( Model model, boolean basic )
+        public void mergeManagedBuildPlugins( Model model )
         {
             Build build = model.getBuild();
             if ( build != null )
@@ -71,12 +66,12 @@ public class DefaultPluginManagementInjector
                 PluginManagement pluginManagement = build.getPluginManagement();
                 if ( pluginManagement != null )
                 {
-                    mergePluginContainer_Plugins( build, pluginManagement, basic );
+                    mergePluginContainer_Plugins( build, pluginManagement );
                 }
             }
         }
 
-        private void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source, boolean basic )
+        private void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source )
         {
             List<Plugin> src = source.getPlugins();
             if ( !src.isEmpty() )
@@ -101,19 +96,7 @@ public class DefaultPluginManagementInjector
                     Plugin managedPlugin = managedPlugins.get( key );
                     if ( managedPlugin != null )
                     {
-                        if ( basic )
-                        {
-                            mergePlugin_Version( element, managedPlugin, false, context );
-                            mergePlugin_Extensions( element, managedPlugin, false, context );
-                            if ( element.isExtensions() )
-                            {
-                                mergePlugin_Dependencies( element, managedPlugin, false, context );
-                            }
-                        }
-                        else
-                        {
-                            mergePlugin( element, managedPlugin, false, context );
-                        }
+                        mergePlugin( element, managedPlugin, false, context );
                     }
                 }
             }

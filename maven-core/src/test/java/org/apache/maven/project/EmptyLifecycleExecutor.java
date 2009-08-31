@@ -34,6 +34,7 @@ import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -90,12 +91,12 @@ public class EmptyLifecycleExecutor
         {
             plugins = new LinkedHashSet<Plugin>();
 
-            plugins.add( newPlugin( "maven-compiler-plugin" ) );
-            plugins.add( newPlugin( "maven-resources-plugin" ) );
-            plugins.add( newPlugin( "maven-surefire-plugin" ) );
-            plugins.add( newPlugin( "maven-jar-plugin" ) );
-            plugins.add( newPlugin( "maven-install-plugin" ) );
-            plugins.add( newPlugin( "maven-deploy-plugin" ) );
+            plugins.add( newPlugin( "maven-compiler-plugin", "compile", "testCompile" ) );
+            plugins.add( newPlugin( "maven-resources-plugin", "resources", "testResources" ) );
+            plugins.add( newPlugin( "maven-surefire-plugin", "test" ) );
+            plugins.add( newPlugin( "maven-jar-plugin", "jar" ) );
+            plugins.add( newPlugin( "maven-install-plugin", "install" ) );
+            plugins.add( newPlugin( "maven-deploy-plugin", "deploy" ) );
         }
         else
         {
@@ -105,12 +106,20 @@ public class EmptyLifecycleExecutor
         return plugins;
     }
 
-    private Plugin newPlugin( String artifactId )
+    private Plugin newPlugin( String artifactId, String... goals )
     {
         Plugin plugin = new Plugin();
 
         plugin.setGroupId( "org.apache.maven.plugins" );
         plugin.setArtifactId( artifactId );
+
+        for ( String goal : goals )
+        {
+            PluginExecution pluginExecution = new PluginExecution();
+            pluginExecution.setId( "default-" + goal );
+            pluginExecution.addGoal( goal );
+            plugin.addExecution( pluginExecution );
+        }
 
         return plugin;
     }

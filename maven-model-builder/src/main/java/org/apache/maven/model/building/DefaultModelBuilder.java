@@ -215,16 +215,14 @@ public class DefaultModelBuilder
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
-        pluginManagementInjector.injectBasicManagement( resultModel, request, problems );
+        pluginManagementInjector.injectManagement( resultModel, request, problems );
 
         fireEvent( resultModel, request, problems, ModelBuildingEventCatapult.BUILD_EXTENSIONS_ASSEMBLED );
 
         if ( request.isProcessPlugins() )
         {
-            lifecycleBindingsInjector.injectLifecycleBindings( resultModel, problems );
+            lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
-
-        pluginManagementInjector.injectManagement( resultModel, request, problems );
 
         importDependencyManagement( resultModel, request, problems );
 
