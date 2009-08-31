@@ -25,7 +25,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 /**
  * Creates a text file in the project base directory.
@@ -57,6 +59,14 @@ public class ResourcesMojo
     private String pathname = "target/resources-resources.txt";
 
     /**
+     * An optional message line to write to the output file (using UTF-8 encoding). If given, the output file will be
+     * opened in append mode.
+     * 
+     * @parameter
+     */
+    private String message;
+
+    /**
      * Runs this mojo.
      * 
      * @throws MojoExecutionException If the output file could not be created.
@@ -82,8 +92,27 @@ public class ResourcesMojo
 
         try
         {
-             outputFile.getParentFile().mkdirs();
-             outputFile.createNewFile();
+            outputFile.getParentFile().mkdirs();
+
+            if ( message != null && message.length() > 0 )
+            {
+                getLog().info( "[MAVEN-CORE-IT-LOG]   " + message );
+
+                OutputStreamWriter writer = new OutputStreamWriter( new FileOutputStream( outputFile, true ), "UTF-8" );
+                try
+                {
+                    writer.write( message );
+                    writer.write( "\n" );
+                }
+                finally
+                {
+                    writer.close();
+                }
+            }
+            else
+            {
+                outputFile.createNewFile();
+            }
         }
         catch ( IOException e )
         {
