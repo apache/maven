@@ -74,7 +74,6 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenITmng4048VersionRangeReactorResolutionTest.class );
         // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
         // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
-        // suite.addTestSuite( MavenITmng3391ImportScopeErrorScenariosTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
