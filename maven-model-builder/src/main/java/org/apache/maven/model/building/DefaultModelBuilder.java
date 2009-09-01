@@ -597,13 +597,14 @@ public class DefaultModelBuilder
 
             if ( imports.contains( imported ) )
             {
-                String message = "The dependencies of type=pom and with scope=import from a cycle: ";
+                String message = "The dependencies of type=pom and with scope=import form a cycle: ";
                 for ( String modelId : imports )
                 {
                     message += modelId + " -> ";
                 }
                 message += imported;
                 problems.addError( message );
+
                 continue;
             }
 
