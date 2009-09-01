@@ -199,14 +199,8 @@ public class DefaultProjectBuilder
     private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration,
                                                           ReactorModelPool reactorModelPool )
     {
-        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setCache( configuration.getRepositoryCache() );
-        repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
-        repositoryRequest.setOffline( configuration.isOffline() );
-
         ModelResolver resolver =
-            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, repositoryRequest,
-                                         configuration.getRemoteRepositories(), reactorModelPool );
+            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration, reactorModelPool );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 

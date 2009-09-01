@@ -27,6 +27,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
 
 public interface ProjectBuildingRequest
 {
@@ -50,6 +52,14 @@ public interface ProjectBuildingRequest
     ProjectBuildingRequest setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifacgRepositories );
 
     List<ArtifactRepository> getPluginArtifactRepositories();
+
+    ProjectBuildingRequest setServers( List<Server> servers );
+
+    List<Server> getServers();
+
+    ProjectBuildingRequest setMirrors( List<Mirror> mirrors );
+
+    List<Mirror> getMirrors();
 
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected

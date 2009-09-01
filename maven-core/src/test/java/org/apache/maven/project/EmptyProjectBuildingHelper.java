@@ -42,7 +42,8 @@ public class EmptyProjectBuildingHelper
 {
 
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
-                                                                List<ArtifactRepository> externalRepositories )
+                                                                List<ArtifactRepository> externalRepositories,
+                                                                ProjectBuildingRequest request )
         throws InvalidRepositoryException
     {
         if ( externalRepositories != null )

@@ -34,9 +34,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 // This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
 // getting the repositories from the project.
 
+@Deprecated
 public final class ProjectUtils
 {
-    static RepositorySystem rs;
         
     private ProjectUtils()
     {
@@ -53,7 +53,10 @@ public final class ProjectUtils
             remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, c ) );
         }
 
-        remoteRepositories = rs( c ).getMirrors( remoteRepositories );
+        /*
+         * FIXME: The bad dependency relation between maven-core and maven-compat prevents access to LegacySupport here
+         * which is required to get the mirror&authentication settings from the session/request.
+         */
 
         return remoteRepositories;
     }
@@ -61,6 +64,10 @@ public final class ProjectUtils
     public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
+        /*
+         * FIXME: The bad dependency relation between maven-core and maven-compat prevents access to LegacySupport here
+         * which is required to get the authentication settings from the session/request.
+         */
         return rs( c ).buildArtifactRepository( repo );
     }
 
@@ -74,12 +81,12 @@ public final class ProjectUtils
     {
         try
         {
-            rs = c.lookup( RepositorySystem.class );
+            return c.lookup( RepositorySystem.class );
         }
         catch ( ComponentLookupException e )
         {
+            throw new IllegalStateException( e );
         }
-        
-        return rs;
     }
+
 }

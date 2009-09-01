@@ -103,7 +103,6 @@
         <configuration>
           <version>1.0.0</version>
           <models>
-            <model>src/main/mdo/settings.mdo</model>
             <model>src/main/mdo/toolchains.mdo</model>
           </models>
         </configuration>

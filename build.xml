@@ -181,7 +181,7 @@ END SNIPPET: ant-bootstrap -->
     <modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0" />
     <modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo" />
     <modello file="maven-model-builder/src/main/mdo/profiles.mdo" />
-    <modello file="maven-core/src/main/mdo/settings.mdo" />
+    <modello file="maven-compat/src/main/mdo/settings.mdo" />
     <modello file="maven-core/src/main/mdo/toolchains.mdo" />
     <modello file="maven-compat/src/main/mdo/metadata.mdo" />
     <modello file="maven-compat/src/main/mdo/profiles.mdo" />

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1738,7 +1739,10 @@ public class MavenProject
         {           
             try
             {
-                setReleaseArtifactRepository( repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() ) );
+                ArtifactRepository repo =
+                    repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
+                repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuilderConfiguration.getServers() );
+                setReleaseArtifactRepository( repo );
             }
             catch ( InvalidRepositoryException e )
             {
@@ -1754,7 +1758,10 @@ public class MavenProject
         {           
             try
             {
-                setSnapshotArtifactRepository( repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() ) );
+                ArtifactRepository repo =
+                    repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
+                repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuilderConfiguration.getServers() );
+                setSnapshotArtifactRepository( repo );
             }
             catch ( InvalidRepositoryException e )
             {

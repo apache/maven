@@ -47,9 +47,10 @@ import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalArtifactRepository;
 import org.apache.maven.repository.MetadataResolutionRequest;
 import org.apache.maven.repository.MetadataResolutionResult;
-import org.apache.maven.repository.MirrorBuilder;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.legacy.WagonManager;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
@@ -77,9 +78,6 @@ public class LegacyRepositorySystem
 
     @Requirement( role = ArtifactRepositoryLayout.class )
     private Map<String, ArtifactRepositoryLayout> layouts;
-    
-    @Requirement
-    private MirrorBuilder mirrorBuilder;
 
     @Requirement
     private WagonManager wagonManager;
@@ -87,10 +85,9 @@ public class LegacyRepositorySystem
     @Requirement
     private PlexusContainer plexus;
 
-    private Map<String, Authentication> authentications = new HashMap<String, Authentication>();
-
+    // TODO: move this out, the component needs to be stateless for safe reuse
     private Map<String, Proxy> proxies = new HashMap<String,Proxy>();
-    
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
@@ -329,18 +326,6 @@ public class LegacyRepositorySystem
     }
     */
 
-    // Mirror 
-    public void addMirror( String id, String mirrorOf, String url )
-    {
-        Authentication auth = id != null ? authentications.get( id ) : null;
-        mirrorBuilder.addMirror( id, mirrorOf, url, auth );
-    }
-
-    public List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories )
-    {
-        return mirrorBuilder.getMirrors( repositories );
-    }
-
     public List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories )
     {
         if ( repositories == null )
@@ -391,6 +376,8 @@ public class LegacyRepositorySystem
 
             ArtifactRepository effectiveRepository = 
                 createArtifactRepository( aliasedRepo.getId(), aliasedRepo.getUrl(), aliasedRepo.getLayout(), snapshotPolicy, releasePolicy );
+
+            effectiveRepository.setAuthentication( aliasedRepo.getAuthentication() );
 
             effectiveRepositories.add( effectiveRepository );
         }
@@ -466,6 +453,84 @@ public class LegacyRepositorySystem
         }
     }
 
+    private Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
+    {
+        String repoId = repository.getId();
+
+        if ( repoId != null )
+        {
+            for ( Mirror mirror : mirrors )
+            {
+                if ( repoId.equals( mirror.getMirrorOf() ) )
+                {
+                    return mirror;
+                }
+            }
+
+            for ( Mirror mirror : mirrors )
+            {
+                if ( DefaultMirrorBuilder.matchPattern( repository, mirror.getMirrorOf() ) )
+                {
+                    return mirror;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors )
+    {
+        if ( repositories != null && mirrors != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                Mirror mirror = getMirror( repository, mirrors );
+
+                if ( mirror != null )
+                {
+                    repository.setId( mirror.getId() );
+                    repository.setUrl( mirror.getUrl() );
+                }
+            }
+        }
+    }
+
+    public void injectAuthentication( List<ArtifactRepository> repositories, List<Server> servers )
+    {
+        if ( repositories != null )
+        {
+            Map<String, Server> serversById = new HashMap<String, Server>();
+
+            if ( servers != null )
+            {
+                for ( Server server : servers )
+                {
+                    if ( !serversById.containsKey( server.getId() ) )
+                    {
+                        serversById.put( server.getId(), server );
+                    }
+                }
+            }
+
+            for ( ArtifactRepository repository : repositories )
+            {
+                Server server = serversById.get( repository.getId() );
+
+                if ( server != null )
+                {
+                    Authentication authentication = new Authentication( server.getUsername(), server.getPassword() );
+
+                    repository.setAuthentication( authentication );
+                }
+                else
+                {
+                    repository.setAuthentication( null );
+                }
+            }
+        }
+    }
+
     public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
     {
 
@@ -493,15 +558,6 @@ public class LegacyRepositorySystem
         throws TransferFailedException
     {
         wagonManager.putRemoteFile( repository, source, remotePath, downloadMonitor );
-    }
-
-    //
-    // serverId = repository id
-    //
-    public void addAuthenticationForArtifactRepository( String repositoryId, String username, String password )
-    {
-        Authentication authentication = new Authentication( username, password );
-        authentications.put( repositoryId, authentication );
     }
 
     //
@@ -556,14 +612,7 @@ public class LegacyRepositorySystem
 
         ArtifactRepository artifactRepository = artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots, releases );
 
-        Authentication authentication = authentications.get( repositoryId );
-        
-        if ( authentication != null )
-        {
-            artifactRepository.setAuthentication( authentication );
-        }
-        
-        Proxy proxy = proxies.get(  artifactRepository.getProtocol() );
+        Proxy proxy = proxies.get( artifactRepository.getProtocol() );
         
         if ( proxy != null )
         {

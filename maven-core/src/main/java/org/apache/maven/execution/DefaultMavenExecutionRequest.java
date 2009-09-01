@@ -965,6 +965,8 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
             projectBuildingRequest.setRepositoryCache( getRepositoryCache() );
             projectBuildingRequest.setOffline( isOffline() );
+            projectBuildingRequest.setServers( getServers() );
+            projectBuildingRequest.setMirrors( getMirrors() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );

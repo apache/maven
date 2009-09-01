@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -52,15 +51,14 @@ class RepositoryModelResolver
 
     private ResolutionErrorHandler resolutionErrorHandler;
 
-    private RepositoryRequest repositoryRequest;
+    private ProjectBuildingRequest projectBuildingRequest;
 
     private List<ArtifactRepository> remoteRepositories;
 
     private ReactorModelPool reactorModelPool;
 
     public RepositoryModelResolver( RepositorySystem repositorySystem, ResolutionErrorHandler resolutionErrorHandler,
-                                    RepositoryRequest repositoryRequest, List<ArtifactRepository> remoteRepositories,
-                                    ReactorModelPool reactorModelPool )
+                                    ProjectBuildingRequest projectBuildingRequest, ReactorModelPool reactorModelPool )
     {
         if ( repositorySystem == null )
         {
@@ -74,25 +72,25 @@ class RepositoryModelResolver
         }
         this.resolutionErrorHandler = resolutionErrorHandler;
 
-        if ( repositoryRequest == null )
+        if ( projectBuildingRequest == null )
         {
-            throw new IllegalArgumentException( "no repository request specified" );
+            throw new IllegalArgumentException( "no project building request specified" );
         }
-        this.repositoryRequest = repositoryRequest;
+        this.projectBuildingRequest = projectBuildingRequest;
 
-        if ( remoteRepositories == null )
+        if ( projectBuildingRequest.getRemoteRepositories() == null )
         {
             throw new IllegalArgumentException( "no remote repositories specified" );
         }
-        this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+        this.remoteRepositories = new ArrayList<ArtifactRepository>( projectBuildingRequest.getRemoteRepositories() );
 
         this.reactorModelPool = reactorModelPool;
     }
 
     public ModelResolver newCopy()
     {
-        return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, repositoryRequest,
-                                            remoteRepositories, reactorModelPool );
+        return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, projectBuildingRequest,
+                                            reactorModelPool );
     }
 
     public void addRepository( Repository repository )
@@ -102,9 +100,11 @@ class RepositoryModelResolver
         {
             ArtifactRepository repo = repositorySystem.buildArtifactRepository( repository );
 
-            List<ArtifactRepository> mirrors = repositorySystem.getMirrors( Arrays.asList( repo ) );
+            repositorySystem.injectMirror( Arrays.asList( repo ), projectBuildingRequest.getMirrors() );
 
-            remoteRepositories.addAll( 0, mirrors );
+            repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuildingRequest.getServers() );
+
+            remoteRepositories.add( 0, repo );
 
             remoteRepositories = repositorySystem.getEffectiveRepositories( remoteRepositories );
         }
@@ -128,9 +128,12 @@ class RepositoryModelResolver
         {
             Artifact artifactParent = repositorySystem.createProjectArtifact( groupId, artifactId, version );
 
-            ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
+            ArtifactResolutionRequest request = new ArtifactResolutionRequest();
             request.setArtifact( artifactParent );
             request.setRemoteRepositories( remoteRepositories );
+            request.setLocalRepository( projectBuildingRequest.getLocalRepository() );
+            request.setOffline( projectBuildingRequest.isOffline() );
+            request.setCache( projectBuildingRequest.getRepositoryCache() );
             // FIXME setTransferListener
             ArtifactResolutionResult result = repositorySystem.resolve( request );
 

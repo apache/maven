@@ -114,7 +114,8 @@ class DefaultModelBuildingListener
         try
         {
             remoteRepositories =
-                projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories );
+                projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories,
+                                                                  projectBuildingRequest );
         }
         catch ( Exception e )
         {
@@ -124,7 +125,8 @@ class DefaultModelBuildingListener
         try
         {
             pluginRepositories =
-                projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories );
+                projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories,
+                                                                  projectBuildingRequest );
         }
         catch ( Exception e )
         {

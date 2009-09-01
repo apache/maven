@@ -229,17 +229,6 @@ public class DefaultMavenExecutionRequestPopulator
             server.setPassword( password );
 
             request.addServer( server );
-
-            repositorySystem.addAuthenticationForArtifactRepository( server.getId(), server.getUsername(), password );
-        }
-
-        for ( Mirror mirror : settings.getMirrors() )
-        {
-            mirror = mirror.clone();
-
-            request.addMirror( mirror );
-
-            repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
         }
 
         // <mirrors>
@@ -250,9 +239,22 @@ public class DefaultMavenExecutionRequestPopulator
         //   </mirror>
         // </mirrors>        
 
-        request.setRemoteRepositories( repositorySystem.getMirrors( request.getRemoteRepositories() ) );
+        for ( Mirror mirror : settings.getMirrors() )
+        {
+            mirror = mirror.clone();
 
-        request.setPluginArtifactRepositories( repositorySystem.getMirrors( request.getPluginArtifactRepositories() ) );
+            request.addMirror( mirror );
+        }
+
+        repositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
+        repositorySystem.injectAuthentication( request.getRemoteRepositories(), request.getServers() );
+
+        request.setRemoteRepositories( repositorySystem.getEffectiveRepositories( request.getRemoteRepositories() ) );
+
+        repositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );
+        repositorySystem.injectAuthentication( request.getPluginArtifactRepositories(), request.getServers() );
+
+        request.setPluginArtifactRepositories( repositorySystem.getEffectiveRepositories( request.getPluginArtifactRepositories() ) );
     }
 
     private String decrypt( String encrypted, String source )

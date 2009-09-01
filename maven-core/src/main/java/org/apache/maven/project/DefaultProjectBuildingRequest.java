@@ -29,6 +29,8 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelEventListener;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
 
 public class DefaultProjectBuildingRequest
     implements ProjectBuildingRequest
@@ -43,6 +45,10 @@ public class DefaultProjectBuildingRequest
     private List<ArtifactRepository> remoteRepositories;
 
     private List<ArtifactRepository> pluginArtifactRepositories;
+
+    private List<Server> servers;
+
+    private List<Mirror> mirrors;
 
     private List<ModelEventListener> listeners;
 
@@ -79,6 +85,8 @@ public class DefaultProjectBuildingRequest
         userProperties = new Properties();
         remoteRepositories = new ArrayList<ArtifactRepository>();
         pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+        servers = new ArrayList<Server>();
+        mirrors = new ArrayList<Mirror>();
     }
 
     public MavenProject getProject()
@@ -162,6 +170,44 @@ public class DefaultProjectBuildingRequest
         }
 
         return this;
+    }
+
+    public ProjectBuildingRequest setServers( List<Server> servers )
+    {
+        if ( servers != null )
+        {
+            this.servers = new ArrayList<Server>( servers );
+        }
+        else
+        {
+            this.servers.clear();
+        }
+
+        return this;
+    }
+
+    public List<Server> getServers()
+    {
+        return servers;
+    }
+
+    public ProjectBuildingRequest setMirrors( List<Mirror> mirrors )
+    {
+        if ( mirrors != null )
+        {
+            this.mirrors = new ArrayList<Mirror>( mirrors );
+        }
+        else
+        {
+            this.mirrors.clear();
+        }
+
+        return this;
+    }
+
+    public List<Mirror> getMirrors()
+    {
+        return mirrors;
     }
 
     public Properties getSystemProperties()

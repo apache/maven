@@ -85,7 +85,9 @@ public class DefaultMavenProjectBuilder
                     try
                     {
                         ArtifactRepository repo = repositorySystem.buildArtifactRepository( (Repository) repository );
-                        repos.addAll( repositorySystem.getMirrors( Arrays.asList( repo ) ) );
+                        repositorySystem.injectMirror( Arrays.asList( repo ), configuration.getMirrors() );
+                        repositorySystem.injectAuthentication( Arrays.asList( repo ), configuration.getServers() );
+                        repos.add( repo );
                     }
                     catch ( InvalidRepositoryException e )
                     {

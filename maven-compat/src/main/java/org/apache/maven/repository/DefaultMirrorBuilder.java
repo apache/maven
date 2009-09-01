@@ -163,7 +163,7 @@ public class DefaultMirrorBuilder
      * @param pattern used for match. Currently only '*' is supported.
      * @return true if the repository is a match to this pattern.
      */
-    boolean matchPattern( ArtifactRepository originalRepository, String pattern )
+    static boolean matchPattern( ArtifactRepository originalRepository, String pattern )
     {
         boolean result = false;
         String originalId = originalRepository.getId();
@@ -218,7 +218,7 @@ public class DefaultMirrorBuilder
      * @param originalRepository
      * @return true if external.
      */
-    boolean isExternalRepo( ArtifactRepository originalRepository )
+    static boolean isExternalRepo( ArtifactRepository originalRepository )
     {
         try
         {

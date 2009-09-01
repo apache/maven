@@ -16,18 +16,13 @@ package org.apache.maven.repository.legacy;
  */
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collections;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.repository.LegacyRepositorySystem;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.settings.Server;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -67,11 +62,18 @@ public class LegacyRepositorySystemTest
     public void testAuthenticationHandling()
         throws Exception
     {
-        repositorySystem.addAuthenticationForArtifactRepository( "repository", "jason", "abc123" );
-        ArtifactRepository repository = repositorySystem.createArtifactRepository( "repository", "http://foo", null, null, null );
+        Server server = new Server();
+        server.setId( "repository" );
+        server.setUsername( "jason" );
+        server.setPassword( "abc123" );
+
+        ArtifactRepository repository =
+            repositorySystem.createArtifactRepository( "repository", "http://foo", null, null, null );
+        repositorySystem.injectAuthentication( Arrays.asList( repository ), Arrays.asList( server ) );
         Authentication authentication = repository.getAuthentication();
         assertNotNull( authentication );
         assertEquals( "jason", authentication.getUsername() );
         assertEquals( "abc123", authentication.getPassword() );
     }
+
 }

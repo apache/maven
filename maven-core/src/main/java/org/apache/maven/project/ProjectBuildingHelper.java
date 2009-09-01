@@ -46,11 +46,14 @@ public interface ProjectBuildingHelper
      * @param pomRepositories The POM repositories to create the artifact repositories from, must not be {@code null}.
      * @param externalRepositories The external (and already mirrored) repositories to merge into the result list, may
      *            be {@code null}.
+     * @param request The project building request holding further settings like repository settings, must not be
+     *            {@code null}.
      * @return The effective artifact repositories, never {@code null}.
      * @throws InvalidRepositoryException
      */
     List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
-                                                         List<ArtifactRepository> externalRepositories )
+                                                         List<ArtifactRepository> externalRepositories,
+                                                         ProjectBuildingRequest request )
         throws InvalidRepositoryException;
 
     /**

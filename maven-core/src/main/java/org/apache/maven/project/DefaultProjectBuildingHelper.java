@@ -87,7 +87,8 @@ public class DefaultProjectBuildingHelper
     private PluginVersionResolver pluginVersionResolver;
 
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
-                                                                List<ArtifactRepository> externalRepositories )
+                                                                List<ArtifactRepository> externalRepositories,
+                                                                ProjectBuildingRequest request )
         throws InvalidRepositoryException
     {
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
@@ -97,7 +98,9 @@ public class DefaultProjectBuildingHelper
             artifactRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
         }
 
-        artifactRepositories = repositorySystem.getMirrors( artifactRepositories );
+        repositorySystem.injectMirror( artifactRepositories, request.getMirrors() );
+
+        repositorySystem.injectAuthentication( artifactRepositories, request.getServers() );
 
         if ( externalRepositories != null )
         {

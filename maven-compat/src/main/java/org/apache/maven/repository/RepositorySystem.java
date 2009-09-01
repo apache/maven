@@ -32,6 +32,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Server;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.events.TransferListener;
@@ -90,14 +92,31 @@ public interface RepositorySystem
      */
     List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );    
 
+    /**
+     * Injects the mirroring information into the specified repositories. For each repository that is matched by a
+     * mirror, its URL and ID will be updated to match the values from the mirror specification. Repositories without a
+     * matching mirror will pass through unchanged. <em>Note:</em> This method must be called before
+     * {@link #injectAuthentication(List, List)} or the repositories will end up with the wrong credentials.
+     * 
+     * @param repositories The repositories into which to inject the mirror information, may be {@code null}.
+     * @param mirrors The available mirrors, may be {@code null}.
+     */
+    void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors );
+
+    /**
+     * Injects the authentication information into the specified repositories. For each repository that is matched by a
+     * server, its credentials will be updated to match the values from the server specification. Repositories without a
+     * matching server will have their credentials cleared. <em>Note:</em> This method must be called before
+     * {@link #injectAuthentication(List, List)} or the repositories will end up with the wrong credentials.
+     * 
+     * @param repositories The repositories into which to inject the authentication information, may be {@code null}.
+     * @param servers The available servers, may be {@code null}.
+     */
+    void injectAuthentication( List<ArtifactRepository> repositories, List<Server> servers );
+
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-           
-    //TODO: remove the request should already be processed to select the mirror for the request instead of the processing happen internally.
-    // Mirrors    
-    void addMirror( String id, String mirrorOf, String url );        
-    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );  
     
     // Install
     
@@ -113,8 +132,6 @@ public interface RepositorySystem
     
     void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
         throws TransferFailedException, ResourceDoesNotExistException; 
-        
-    void addAuthenticationForArtifactRepository( String repositoryId, String username, String password );
 
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );    
 }
