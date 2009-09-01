@@ -78,12 +78,12 @@ public interface RepositorySystem
         throws InvalidRepositoryException;
 
     ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
-    
+
     /**
-     * Calculates the effective repositories for the given input repositories. This process will essentially remove
-     * duplicate repositories by merging them into one equivalent repository. It is worth to point out that merging does
-     * not simply choose one of the input repositories and discards the others but actually combines their possibly
-     * different policies.
+     * Calculates the effective repositories for the given input repositories which are assumed to be already mirrored
+     * (if applicable). This process will essentially remove duplicate repositories by merging them into one equivalent
+     * repository. It is worth to point out that merging does not simply choose one of the input repositories and
+     * discards the others but actually combines their possibly different policies.
      * 
      * @param repositories The original repositories, may be {@code null}.
      * @return The effective repositories or {@code null} if the input was {@code null}.
