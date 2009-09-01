@@ -22,8 +22,10 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -107,6 +109,12 @@ public class DefaultModelBuilder
     private PluginConfigurationExpander pluginConfigurationExpander;
 
     public ModelBuildingResult build( ModelBuildingRequest request )
+        throws ModelBuildingException
+    {
+        return build( request, new LinkedHashSet<String>() );
+    }
+
+    private ModelBuildingResult build( ModelBuildingRequest request, Collection<String> imports )
         throws ModelBuildingException
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
@@ -213,6 +221,13 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
         throws ModelBuildingException
     {
+        return build( request, result, new LinkedHashSet<String>() );
+    }
+
+    private ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result,
+                                       Collection<String> imports )
+        throws ModelBuildingException
+    {
         Model resultModel = result.getEffectiveModel();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result.getProblems() );
@@ -230,7 +245,7 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
-        importDependencyManagement( resultModel, request, problems );
+        importDependencyManagement( resultModel, request, problems, imports );
 
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
 
@@ -544,7 +559,7 @@ public class DefaultModelBuilder
     }
 
     private void importDependencyManagement( Model model, ModelBuildingRequest request,
-                                             DefaultModelProblemCollector problems )
+                                             DefaultModelProblemCollector problems, Collection<String> imports )
     {
         DependencyManagement depMngt = model.getDependencyManagement();
 
@@ -552,6 +567,10 @@ public class DefaultModelBuilder
         {
             return;
         }
+
+        String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
+
+        imports.add( importing );
 
         ModelResolver modelResolver = request.getModelResolver();
 
@@ -573,6 +592,20 @@ public class DefaultModelBuilder
             String groupId = dependency.getGroupId();
             String artifactId = dependency.getArtifactId();
             String version = dependency.getVersion();
+
+            String imported = groupId + ':' + artifactId + ':' + version;
+
+            if ( imports.contains( imported ) )
+            {
+                String message = "The dependencies of type=pom and with scope=import from a cycle: ";
+                for ( String modelId : imports )
+                {
+                    message += modelId + " -> ";
+                }
+                message += imported;
+                problems.addError( message );
+                continue;
+            }
 
             DependencyManagement importMngt =
                 getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT );
@@ -610,7 +643,7 @@ public class DefaultModelBuilder
                 ModelBuildingResult importResult;
                 try
                 {
-                    importResult = build( importRequest );
+                    importResult = build( importRequest, imports );
                 }
                 catch ( ModelBuildingException e )
                 {
@@ -639,6 +672,8 @@ public class DefaultModelBuilder
 
             importMngts.add( importMngt );
         }
+
+        imports.remove( importing );
 
         dependencyManagementImporter.importManagement( model, importMngts, request, problems );
     }
