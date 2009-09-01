@@ -239,7 +239,7 @@ class ExecutionEventLogger
             logger.info( chars( ' ', LINE_LENGTH ) );
             logger.info( chars( '-', LINE_LENGTH ) );
 
-            logger.info( "Building " + event.getProject().getName() );
+            logger.info( "Building " + event.getProject().getName() + " " + event.getProject().getVersion() );
 
             logger.info( chars( '-', LINE_LENGTH ) );
         }
