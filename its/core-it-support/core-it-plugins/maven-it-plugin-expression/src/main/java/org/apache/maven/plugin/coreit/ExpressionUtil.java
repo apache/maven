@@ -161,6 +161,7 @@ class ExpressionUtil
             try
             {
                 Method method = type.getMethod( property, NO_PARAMS );
+                method.setAccessible( true );
                 value = method.invoke( context, NO_ARGS );
             }
             catch ( NoSuchMethodException e )
@@ -169,6 +170,7 @@ class ExpressionUtil
                 {
                     String name = "get" + Character.toUpperCase( property.charAt( 0 ) ) + property.substring( 1 );
                     Method method = type.getMethod( name, NO_PARAMS );
+                    method.setAccessible( true );
                     value = method.invoke( context, NO_ARGS );
                 }
                 catch ( NoSuchMethodException e1 )
@@ -177,6 +179,7 @@ class ExpressionUtil
                     {
                         String name = "is" + Character.toUpperCase( property.charAt( 0 ) ) + property.substring( 1 );
                         Method method = type.getMethod( name, NO_PARAMS );
+                        method.setAccessible( true );
                         value = method.invoke( context, NO_ARGS );
                     }
                     catch ( NoSuchMethodException e2 )
@@ -192,6 +195,7 @@ class ExpressionUtil
                             {
                                 method = type.getMethod( "get", OBJECT_PARAM );
                             }
+                            method.setAccessible( true );
                             value = method.invoke( context, new Object[] { property } );
                         }
                         catch ( NoSuchMethodException e3 )
@@ -199,6 +203,7 @@ class ExpressionUtil
                             try
                             {
                                 Field field = type.getField( property );
+                                field.setAccessible( true );
                                 value = field.get( context );
                             }
                             catch ( NoSuchFieldException e4 )
