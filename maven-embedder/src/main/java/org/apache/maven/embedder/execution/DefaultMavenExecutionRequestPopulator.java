@@ -272,7 +272,7 @@ public class DefaultMavenExecutionRequestPopulator
         // ------------------------------------------------------------------------
         // Settings
         //
-        // If a settings instance has been provided in the request the we use
+        // If a settings instance has been provided in the request then we use
         // that for execution, otherwise we will look in the embedder configuration
         // for a user/global settings file to use. The settings file should have
         // been validated upfront but we will still catch any parsing exception

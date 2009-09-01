@@ -195,6 +195,12 @@ public class MavenSession
         return projects;
     }
 
+    @Deprecated
+    public List<MavenProject> getSortedProjects()
+    {
+        return getProjects();
+    }
+
     public String getExecutionRootDirectory()
     {
         return request.getBaseDirectory();
