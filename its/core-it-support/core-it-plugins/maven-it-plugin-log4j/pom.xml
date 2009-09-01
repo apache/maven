@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>maven-it-plugin-core-stubs</artifactId>
+    <artifactId>maven-it-plugins</artifactId>
     <groupId>org.apache.maven.its.plugins</groupId>
     <version>2.1-SNAPSHOT</version>
   </parent>
