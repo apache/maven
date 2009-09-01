@@ -44,7 +44,7 @@
     </default>
   </defaults>
   <classes>
-    <class>
+    <class java.clone="deep">
       <name>TrackableBase</name>
       <version>1.0.0</version>
       <description>
@@ -750,7 +750,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Activation</name>
       <version>1.0.0</version>
       <description>
@@ -818,7 +818,7 @@
     </class>
 
     <!-- TODO: reproduced from maven-model/maven.mdo, instead should inherit code and link to external docs -->
-    <class>
+    <class java.clone="deep">
       <name>RepositoryBase</name>
       <version>1.0.0</version>
       <description>
@@ -945,7 +945,7 @@
       </codeSegments>
     </class>
 
-    <class>
+    <class java.clone="deep">
       <name>RepositoryPolicy</name>
       <version>1.0.0</version>
       <description>Download policy</description>
@@ -982,7 +982,7 @@
       </fields>
     </class>
 
-    <class>
+    <class java.clone="deep">
       <name>ActivationProperty</name>
       <version>1.0.0</version>
       <description>
@@ -1012,7 +1012,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ActivationOS</name>
       <version>1.0.0</version>
       <description>
@@ -1057,7 +1057,7 @@
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>ActivationFile</name>
       <version>1.0.0</version>
       <description>
