@@ -29,6 +29,9 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
@@ -207,16 +210,19 @@ public interface MavenExecutionRequest
     List<String> getInactiveProfiles();
 
     // Proxies
-    List getProxies();
-    MavenExecutionRequest setProxies( List proxies );
+    List<Proxy> getProxies();
+    MavenExecutionRequest setProxies( List<Proxy> proxies );
+    MavenExecutionRequest addProxy( Proxy proxy );
 
     // Servers
-    List getServers();
-    MavenExecutionRequest setServers( List servers );
+    List<Server> getServers();
+    MavenExecutionRequest setServers( List<Server> servers );
+    MavenExecutionRequest addServer( Server server );
 
     // Mirrors
-    List getMirrors();
-    MavenExecutionRequest setMirrors( List mirrors );
+    List<Mirror> getMirrors();
+    MavenExecutionRequest setMirrors( List<Mirror> mirrors );
+    MavenExecutionRequest addMirror( Mirror mirror );
 
     // Plugin groups
     List<String> getPluginGroups();

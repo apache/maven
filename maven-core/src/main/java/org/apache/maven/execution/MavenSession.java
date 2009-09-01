@@ -48,6 +48,8 @@ public class MavenSession
 
     private MavenExecutionResult result;
 
+    private final Settings settings;
+
     private Properties executionProperties;
 
     private MavenProject currentProject;
@@ -76,7 +78,8 @@ public class MavenSession
         this.container = container;
         this.request = request;
         this.result = result;
-        setProjects( projects );     
+        this.settings = new SettingsAdapter( request );
+        setProjects( projects );
     }
 
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result )
@@ -84,6 +87,7 @@ public class MavenSession
         this.container = container;
         this.request = request;
         this.result = result;
+        this.settings = new SettingsAdapter( request );
     }
 
     public void setProjects( List<MavenProject> projects )
@@ -118,14 +122,14 @@ public class MavenSession
     }
 
     @Deprecated
-    public List lookupList( String role )
+    public List<Object> lookupList( String role )
         throws ComponentLookupException
     {
         return container.lookupList( role );
     }
 
     @Deprecated
-    public Map lookupMap( String role )
+    public Map<String, Object> lookupMap( String role )
         throws ComponentLookupException
     {
         return container.lookupMap( role );
@@ -187,7 +191,7 @@ public class MavenSession
 
     public Settings getSettings()
     {
-        return request.getSettings();
+        return settings;
     }
     
     public List<MavenProject> getProjects()

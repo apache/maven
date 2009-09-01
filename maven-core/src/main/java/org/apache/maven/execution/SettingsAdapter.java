@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.execution;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,8 +21,11 @@ package org.apache.maven.embedder.execution;
 
 import java.util.List;
 
-import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.RuntimeInfo;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 
 /**
@@ -33,74 +36,83 @@ import org.apache.maven.settings.Settings;
  *
  * @author Jason van Zyl
  */
-public class SettingsAdapter
+class SettingsAdapter
     extends Settings
 {
+
     private MavenExecutionRequest request;
-    private Settings settings;
+
     private RuntimeInfo runtimeInfo;
-    
-    public SettingsAdapter( MavenExecutionRequest request, Settings settings )
+
+    public SettingsAdapter( MavenExecutionRequest request )
     {
         this.request = request;
-        this.settings = settings;
         this.runtimeInfo = new RuntimeInfo( request.getUserSettingsFile() );
     }
 
+    @Override
     public String getLocalRepository()
     {
         if ( request.getLocalRepositoryPath() != null )
         {
             return request.getLocalRepositoryPath().getAbsolutePath();
         }
-        
-        return settings.getLocalRepository();
+
+        return null;
     }
 
+    @Override
     public boolean isInteractiveMode()
-    {                    
-        return request.isInteractiveMode();            
+    {
+        return request.isInteractiveMode();
     }
 
+    @Override
     public boolean isOffline()
     {
         return request.isOffline();
     }
 
-    // These we are not setting in the execution request currently
-    
-    public List getProxies()
+    @Override
+    public List<Proxy> getProxies()
     {
-        return settings.getProxies();
+        return request.getProxies();
     }
 
-    public List getServers()
+    @Override
+    public List<Server> getServers()
     {
-        return settings.getServers();
+        return request.getServers();
     }
 
-    public List getMirrors()
+    @Override
+    public List<Mirror> getMirrors()
     {
-        return settings.getMirrors();
+        return request.getMirrors();
     }
 
-    public List getProfiles()
+    @Override
+    public List<Profile> getProfiles()
     {
-        return settings.getProfiles();
+        return request.getSettings().getProfiles();
     }
 
-    public List getActiveProfiles()
+    @Override
+    public List<String> getActiveProfiles()
     {
-        return settings.getActiveProfiles();
+        return request.getActiveProfiles();
     }
 
-    public List getPluginGroups()
+    @Override
+    public List<String> getPluginGroups()
     {
-        return settings.getPluginGroups();
+        return request.getPluginGroups();
     }
-    
+
+    @Override
     public RuntimeInfo getRuntimeInfo()
     {
         return runtimeInfo;
     }
+
 }

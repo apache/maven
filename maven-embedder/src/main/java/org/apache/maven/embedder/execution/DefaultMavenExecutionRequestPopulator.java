@@ -101,8 +101,6 @@ public class DefaultMavenExecutionRequestPopulator
 
         populateDefaultPluginGroups( request );
 
-        List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
-
         // We just need to keep track of what profiles are being activated by the settings. We don't need to process
         // them here. This should be taken care of by the project builder.
         //
@@ -111,6 +109,8 @@ public class DefaultMavenExecutionRequestPopulator
         // We only need to take the profiles and make sure they are available when the calculation of the active profiles
         // is determined.
         //
+        List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
+
         if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
         {
             for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
@@ -194,30 +194,51 @@ public class DefaultMavenExecutionRequestPopulator
         //    </proxy>
         //  </proxies>
 
-        Proxy proxy = settings.getActiveProxy();
+        Proxy activeProxy = settings.getActiveProxy();
 
-        if ( proxy != null )
+        if ( activeProxy != null )
         {
-            if ( proxy.getHost() == null )
+            if ( activeProxy.getHost() == null )
             {
                 throw new MavenEmbedderException( "Proxy in settings.xml has no host" );
             }
 
+            String password = decrypt( activeProxy.getPassword(), "password for proxy " + activeProxy.getId() );
+
+            repositorySystem.addProxy( activeProxy.getProtocol(), activeProxy.getHost(), activeProxy.getPort(),
+                                       activeProxy.getUsername(), password, activeProxy.getNonProxyHosts() );
+        }
+
+        for ( Proxy proxy : settings.getProxies() )
+        {
+            proxy = proxy.clone();
+
             String password = decrypt( proxy.getPassword(), "password for proxy " + proxy.getId() );
 
-            repositorySystem.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
-                                       password, proxy.getNonProxyHosts() );
+            proxy.setPassword( password );
+
+            request.addProxy( proxy );
         }
 
         for ( Server server : settings.getServers() )
         {
+            server = server.clone();
+
             String password = decrypt( server.getPassword(), "password for server " + server.getId() );
+
+            server.setPassword( password );
+
+            request.addServer( server );
 
             repositorySystem.addAuthenticationForArtifactRepository( server.getId(), server.getUsername(), password );
         }
 
         for ( Mirror mirror : settings.getMirrors() )
         {
+            mirror = mirror.clone();
+
+            request.addMirror( mirror );
+
             repositorySystem.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
         }
 
@@ -294,11 +315,11 @@ public class DefaultMavenExecutionRequestPopulator
             {
                 Settings settings = settingsBuilder.buildSettings( request );
 
-                request.setSettings( new SettingsAdapter( request, settings ) );
+                request.setSettings( settings );
             }
             catch ( Exception e )
             {
-                request.setSettings( new SettingsAdapter( request, new Settings() ) );
+                request.setSettings( new Settings() );
             }
         }
     }

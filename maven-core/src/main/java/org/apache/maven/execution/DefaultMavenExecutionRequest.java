@@ -26,6 +26,9 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 
@@ -46,11 +49,11 @@ public class DefaultMavenExecutionRequest
 
     private boolean interactiveMode = true;
 
-    private List proxies;
+    private List<Proxy> proxies;
 
-    private List servers;
+    private List<Server> servers;
 
-    private List mirrors;
+    private List<Mirror> mirrors;
 
     private List<Profile> profiles;
 
@@ -619,20 +622,20 @@ public class DefaultMavenExecutionRequest
     // Settings equivalents
     // ----------------------------------------------------------------------------
 
-    public List getProxies()
+    public List<Proxy> getProxies()
     {
         if ( proxies == null )
         {
-            proxies = new ArrayList();
+            proxies = new ArrayList<Proxy>();
         }
         return proxies;
     }
 
-    public MavenExecutionRequest setProxies( List proxies )
+    public MavenExecutionRequest setProxies( List<Proxy> proxies )
     {
         if ( proxies != null )
         {
-            this.proxies = new ArrayList( proxies );
+            this.proxies = new ArrayList<Proxy>( proxies );
         }
         else
         {
@@ -642,20 +645,40 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List getServers()
+    public MavenExecutionRequest addProxy( Proxy proxy )
+    {
+        if ( proxy == null )
+        {
+            throw new IllegalArgumentException( "proxy missing" );
+        }
+
+        for ( Proxy p : getProxies() )
+        {
+            if ( p.getId() != null && p.getId().equals( proxy.getId() ) )
+            {
+                return this;
+            }
+        }
+
+        getProxies().add( proxy );
+
+        return this;
+    }
+
+    public List<Server> getServers()
     {
         if ( servers == null )
         {
-            servers = new ArrayList();
+            servers = new ArrayList<Server>();
         }
         return servers;
     }
 
-    public MavenExecutionRequest setServers( List servers )
+    public MavenExecutionRequest setServers( List<Server> servers )
     {
         if ( servers != null )
         {
-            this.servers = new ArrayList( servers );
+            this.servers = new ArrayList<Server>( servers );
         }
         else
         {
@@ -665,25 +688,65 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public List getMirrors()
+    public MavenExecutionRequest addServer( Server server )
+    {
+        if ( server == null )
+        {
+            throw new IllegalArgumentException( "server missing" );
+        }
+
+        for ( Server p : getServers() )
+        {
+            if ( p.getId() != null && p.getId().equals( server.getId() ) )
+            {
+                return this;
+            }
+        }
+
+        getServers().add( server );
+
+        return this;
+    }
+
+    public List<Mirror> getMirrors()
     {
         if ( mirrors == null )
         {
-            mirrors = new ArrayList();
+            mirrors = new ArrayList<Mirror>();
         }
         return mirrors;
     }
 
-    public MavenExecutionRequest setMirrors( List mirrors )
+    public MavenExecutionRequest setMirrors( List<Mirror> mirrors )
     {
         if ( mirrors != null )
         {
-            this.mirrors = new ArrayList( mirrors );
+            this.mirrors = new ArrayList<Mirror>( mirrors );
         }
         else
         {
             this.mirrors = null;
         }
+
+        return this;
+    }
+
+    public MavenExecutionRequest addMirror( Mirror mirror )
+    {
+        if ( mirror == null )
+        {
+            throw new IllegalArgumentException( "mirror missing" );
+        }
+
+        for ( Mirror p : getMirrors() )
+        {
+            if ( p.getId() != null && p.getId().equals( mirror.getId() ) )
+            {
+                return this;
+            }
+        }
+
+        getMirrors().add( mirror );
 
         return this;
     }
