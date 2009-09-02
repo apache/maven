@@ -93,6 +93,15 @@ public interface RepositorySystem
     List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );    
 
     /**
+     * Determines the mirror for the specified repository.
+     * 
+     * @param repository The repository to determine the mirror for, must not be {@code null}.
+     * @param mirrors The available mirrors, may be {@code null}.
+     * @return The mirror specification for the repository or {@code null} if no mirror matched.
+     */
+    Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors );
+
+    /**
      * Injects the mirroring information into the specified repositories. For each repository that is matched by a
      * mirror, its URL and ID will be updated to match the values from the mirror specification. Repositories without a
      * matching mirror will pass through unchanged. <em>Note:</em> This method must be called before

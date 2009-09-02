@@ -452,11 +452,11 @@ public class LegacyRepositorySystem
         }
     }
 
-    private Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
+    public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
     {
         String repoId = repository.getId();
 
-        if ( repoId != null )
+        if ( repoId != null && mirrors != null )
         {
             for ( Mirror mirror : mirrors )
             {
