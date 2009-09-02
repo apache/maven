@@ -85,9 +85,6 @@ public class LegacyRepositorySystem
     @Requirement
     private PlexusContainer plexus;
 
-    // TODO: move this out, the component needs to be stateless for safe reuse
-    private Map<String, Proxy> proxies = new HashMap<String,Proxy>();
-
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
@@ -379,6 +376,8 @@ public class LegacyRepositorySystem
 
             effectiveRepository.setAuthentication( aliasedRepo.getAuthentication() );
 
+            effectiveRepository.setProxy( aliasedRepo.getProxy() );
+
             effectiveRepositories.add( effectiveRepository );
         }
 
@@ -531,6 +530,51 @@ public class LegacyRepositorySystem
         }
     }
 
+    private org.apache.maven.settings.Proxy getProxy( ArtifactRepository repository,
+                                                      List<org.apache.maven.settings.Proxy> proxies )
+    {
+        if ( proxies != null && repository.getProtocol() != null )
+        {
+            for ( org.apache.maven.settings.Proxy proxy : proxies )
+            {
+                if ( proxy.isActive() && repository.getProtocol().equalsIgnoreCase( proxy.getProtocol() ) )
+                {
+                    return proxy;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void injectProxy( List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies )
+    {
+        if ( repositories != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                org.apache.maven.settings.Proxy proxy = getProxy( repository, proxies );
+
+                if ( proxy != null )
+                {
+                    Proxy p = new Proxy();
+                    p.setHost( proxy.getHost() );
+                    p.setProtocol( proxy.getProtocol() );
+                    p.setPort( proxy.getPort() );
+                    p.setNonProxyHosts( proxy.getNonProxyHosts() );
+                    p.setUserName( proxy.getUsername() );
+                    p.setPassword( proxy.getPassword() );
+
+                    repository.setProxy( p );
+                }
+                else
+                {
+                    repository.setProxy( null );
+                }
+            }
+        }
+    }
+
     public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
     {
 
@@ -612,25 +656,7 @@ public class LegacyRepositorySystem
 
         ArtifactRepository artifactRepository = artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots, releases );
 
-        Proxy proxy = proxies.get( artifactRepository.getProtocol() );
-        
-        if ( proxy != null )
-        {
-            artifactRepository.setProxy( proxy );
-        }
-        
         return artifactRepository;
     }
 
-    public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
-    {
-        Proxy proxy = new Proxy();
-        proxy.setHost( host );
-        proxy.setProtocol( protocol );
-        proxy.setPort( port );
-        proxy.setNonProxyHosts( nonProxyHosts );
-        proxy.setUserName( username );
-        proxy.setPassword( password );
-        proxies.put( protocol, proxy );        
-    }   
 }

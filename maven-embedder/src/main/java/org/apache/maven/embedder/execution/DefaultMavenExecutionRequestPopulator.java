@@ -194,23 +194,13 @@ public class DefaultMavenExecutionRequestPopulator
         //    </proxy>
         //  </proxies>
 
-        Proxy activeProxy = settings.getActiveProxy();
-
-        if ( activeProxy != null )
-        {
-            if ( activeProxy.getHost() == null )
-            {
-                throw new MavenEmbedderException( "Proxy in settings.xml has no host" );
-            }
-
-            String password = decrypt( activeProxy.getPassword(), "password for proxy " + activeProxy.getId() );
-
-            repositorySystem.addProxy( activeProxy.getProtocol(), activeProxy.getHost(), activeProxy.getPort(),
-                                       activeProxy.getUsername(), password, activeProxy.getNonProxyHosts() );
-        }
-
         for ( Proxy proxy : settings.getProxies() )
         {
+            if ( !proxy.isActive() )
+            {
+                continue;
+            }
+
             proxy = proxy.clone();
 
             String password = decrypt( proxy.getPassword(), "password for proxy " + proxy.getId() );
@@ -247,11 +237,13 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         repositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
+        repositorySystem.injectProxy( request.getRemoteRepositories(), request.getProxies() );
         repositorySystem.injectAuthentication( request.getRemoteRepositories(), request.getServers() );
 
         request.setRemoteRepositories( repositorySystem.getEffectiveRepositories( request.getRemoteRepositories() ) );
 
         repositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );
+        repositorySystem.injectProxy( request.getPluginArtifactRepositories(), request.getProxies() );
         repositorySystem.injectAuthentication( request.getPluginArtifactRepositories(), request.getServers() );
 
         request.setPluginArtifactRepositories( repositorySystem.getEffectiveRepositories( request.getPluginArtifactRepositories() ) );

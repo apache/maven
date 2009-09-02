@@ -967,6 +967,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setOffline( isOffline() );
             projectBuildingRequest.setServers( getServers() );
             projectBuildingRequest.setMirrors( getMirrors() );
+            projectBuildingRequest.setProxies( getProxies() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );

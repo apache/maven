@@ -30,6 +30,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelEventListener;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 
 public class DefaultProjectBuildingRequest
@@ -49,6 +50,8 @@ public class DefaultProjectBuildingRequest
     private List<Server> servers;
 
     private List<Mirror> mirrors;
+
+    private List<Proxy> proxies;
 
     private List<ModelEventListener> listeners;
 
@@ -87,6 +90,7 @@ public class DefaultProjectBuildingRequest
         pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
         servers = new ArrayList<Server>();
         mirrors = new ArrayList<Mirror>();
+        proxies = new ArrayList<Proxy>();
     }
 
     public MavenProject getProject()
@@ -208,6 +212,25 @@ public class DefaultProjectBuildingRequest
     public List<Mirror> getMirrors()
     {
         return mirrors;
+    }
+
+    public ProjectBuildingRequest setProxies( List<Proxy> proxies )
+    {
+        if ( proxies != null )
+        {
+            this.proxies = new ArrayList<Proxy>( proxies );
+        }
+        else
+        {
+            this.proxies.clear();
+        }
+
+        return this;
+    }
+
+    public List<Proxy> getProxies()
+    {
+        return proxies;
     }
 
     public Properties getSystemProperties()

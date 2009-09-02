@@ -100,6 +100,8 @@ public class DefaultProjectBuildingHelper
 
         repositorySystem.injectMirror( artifactRepositories, request.getMirrors() );
 
+        repositorySystem.injectProxy( artifactRepositories, request.getProxies() );
+
         repositorySystem.injectAuthentication( artifactRepositories, request.getServers() );
 
         if ( externalRepositories != null )

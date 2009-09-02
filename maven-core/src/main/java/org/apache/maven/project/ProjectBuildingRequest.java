@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 
 public interface ProjectBuildingRequest
@@ -60,6 +61,10 @@ public interface ProjectBuildingRequest
     ProjectBuildingRequest setMirrors( List<Mirror> mirrors );
 
     List<Mirror> getMirrors();
+
+    ProjectBuildingRequest setProxies( List<Proxy> proxies );
+
+    List<Proxy> getProxies();
 
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected

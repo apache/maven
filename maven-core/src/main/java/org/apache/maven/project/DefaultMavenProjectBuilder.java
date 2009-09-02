@@ -86,6 +86,7 @@ public class DefaultMavenProjectBuilder
                     {
                         ArtifactRepository repo = repositorySystem.buildArtifactRepository( (Repository) repository );
                         repositorySystem.injectMirror( Arrays.asList( repo ), configuration.getMirrors() );
+                        repositorySystem.injectProxy( Arrays.asList( repo ), configuration.getProxies() );
                         repositorySystem.injectAuthentication( Arrays.asList( repo ), configuration.getServers() );
                         repos.add( repo );
                     }

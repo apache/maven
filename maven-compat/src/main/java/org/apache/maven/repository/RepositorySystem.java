@@ -104,10 +104,21 @@ public interface RepositorySystem
     void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors );
 
     /**
+     * Injects the proxy information into the specified repositories. For each repository that is matched by a proxy,
+     * its proxy data will be set accordingly. Repositories without a matching proxy will have their proxy cleared.
+     * <em>Note:</em> This method must be called after {@link #injectMirror(List, List)} or the repositories will end up
+     * with the wrong proxies.
+     * 
+     * @param repositories The repositories into which to inject the proxy information, may be {@code null}.
+     * @param proxies The available proxies, may be {@code null}.
+     */
+    void injectProxy( List<ArtifactRepository> repositories, List<org.apache.maven.settings.Proxy> proxies );
+
+    /**
      * Injects the authentication information into the specified repositories. For each repository that is matched by a
      * server, its credentials will be updated to match the values from the server specification. Repositories without a
-     * matching server will have their credentials cleared. <em>Note:</em> This method must be called before
-     * {@link #injectAuthentication(List, List)} or the repositories will end up with the wrong credentials.
+     * matching server will have their credentials cleared. <em>Note:</em> This method must be called after
+     * {@link #injectMirror(List, List)} or the repositories will end up with the wrong credentials.
      * 
      * @param repositories The repositories into which to inject the authentication information, may be {@code null}.
      * @param servers The available servers, may be {@code null}.
@@ -133,5 +144,4 @@ public interface RepositorySystem
     void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
         throws TransferFailedException, ResourceDoesNotExistException; 
 
-    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );    
 }

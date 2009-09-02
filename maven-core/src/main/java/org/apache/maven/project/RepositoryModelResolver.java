@@ -102,6 +102,8 @@ class RepositoryModelResolver
 
             repositorySystem.injectMirror( Arrays.asList( repo ), projectBuildingRequest.getMirrors() );
 
+            repositorySystem.injectProxy( Arrays.asList( repo ), projectBuildingRequest.getProxies() );
+
             repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuildingRequest.getServers() );
 
             remoteRepositories.add( 0, repo );
