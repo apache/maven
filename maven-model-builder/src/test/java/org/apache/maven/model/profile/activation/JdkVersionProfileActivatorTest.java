@@ -61,11 +61,11 @@ public class JdkVersionProfileActivatorTest
     {
         Profile p = new Profile();
 
-        assertFalse( activator.isActive( p, newContext( null, null ) ) );
+        assertActivation( false, p, newContext( null, null ) );
 
         p.setActivation( new Activation() );
 
-        assertFalse( activator.isActive( p, newContext( null, null ) ) );
+        assertActivation( false, p, newContext( null, null ) );
     }
 
     public void testPrefix()
@@ -73,13 +73,13 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "1.4" );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "1.4" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.4" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "1.4.2" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.4.2" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "1.3" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "1.5" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.5" ) ) );
     }
 
     public void testPrefixNegated()
@@ -87,13 +87,13 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "!1.4" );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "1.4" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "1.4.2" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "1.3" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.3" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "1.5" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
     }
 
     public void testVersionRange()
@@ -101,13 +101,13 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "(1.3,1.6)" );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "1.5.0_16" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_16" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "1.3" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "1.3.1" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.3.1" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "1.6" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.6" ) ) );
     }
 
 }

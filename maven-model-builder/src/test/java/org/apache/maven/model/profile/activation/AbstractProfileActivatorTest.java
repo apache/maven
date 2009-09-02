@@ -21,6 +21,8 @@ package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.PlexusTestCase;
@@ -75,6 +77,16 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
     {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
         return context.setUserProperties( userProperties ).setSystemProperties( systemProperties );
+    }
+
+    protected void assertActivation( boolean active, Profile profile, ProfileActivationContext context )
+    {
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        assertEquals( active, activator.isActive( profile, context, problems ) );
+
+        assertEquals( problems.getErrors().toString(), 0, problems.getErrors().size() );
+        assertEquals( problems.getWarnings().toString(), 0, problems.getWarnings().size() );
     }
 
 }

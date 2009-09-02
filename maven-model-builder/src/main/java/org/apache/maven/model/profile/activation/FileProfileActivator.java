@@ -24,9 +24,9 @@ import java.io.File;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -47,8 +47,7 @@ public class FileProfileActivator
     @Requirement
     private PathTranslator pathTranslator;
 
-    public boolean isActive( Profile profile, ProfileActivationContext context )
-        throws ProfileActivationException
+    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         Activation activation = profile.getActivation();
 
@@ -119,8 +118,9 @@ public class FileProfileActivator
         }
         catch ( Exception e )
         {
-            throw new ProfileActivationException( "Failed to interpolate file location " + path + " for profile "
-                + profile.getId() + ": " + e.getMessage(), profile, e );
+            problems.addError( "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": "
+                + e.getMessage(), e );
+            return false;
         }
 
         path = pathTranslator.alignToBaseDirectory( path, basedir );

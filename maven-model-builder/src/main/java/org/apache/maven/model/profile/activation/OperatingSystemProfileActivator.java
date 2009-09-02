@@ -22,8 +22,8 @@ package org.apache.maven.model.profile.activation;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationOS;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.Os;
 
@@ -37,8 +37,7 @@ public class OperatingSystemProfileActivator
     implements ProfileActivator
 {
 
-    public boolean isActive( Profile profile, ProfileActivationContext context )
-        throws ProfileActivationException
+    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         boolean active = false;
 

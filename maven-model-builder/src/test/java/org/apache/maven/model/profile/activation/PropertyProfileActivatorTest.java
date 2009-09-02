@@ -66,11 +66,11 @@ public class PropertyProfileActivatorTest
     {
         Profile p = new Profile();
 
-        assertFalse( activator.isActive( p, newContext( null, null ) ) );
+        assertActivation( false, p, newContext( null, null ) );
 
         p.setActivation( new Activation() );
 
-        assertFalse( activator.isActive( p, newContext( null, null ) ) );
+        assertActivation( false, p, newContext( null, null ) );
     }
 
     public void testWithNameOnly_UserProperty()
@@ -78,11 +78,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "prop", null );
 
-        assertTrue( activator.isActive( profile, newContext( newProperties( "prop", "value" ), null ) ) );
+        assertActivation( true, profile, newContext( newProperties( "prop", "value" ), null ) );
 
-        assertFalse( activator.isActive( profile, newContext( newProperties( "prop", "" ), null ) ) );
+        assertActivation( false, profile, newContext( newProperties( "prop", "" ), null ) );
 
-        assertFalse( activator.isActive( profile, newContext( newProperties( "other", "value" ), null ) ) );
+        assertActivation( false, profile, newContext( newProperties( "other", "value" ), null ) );
     }
 
     public void testWithNameOnly_SystemProperty()
@@ -90,11 +90,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "prop", null );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "prop", "value" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "prop", "value" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "prop", "" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "prop", "" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "other", "value" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "other", "value" ) ) );
     }
 
     public void testWithNegatedNameOnly_UserProperty()
@@ -102,11 +102,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "!prop", null );
 
-        assertFalse( activator.isActive( profile, newContext( newProperties( "prop", "value" ), null ) ) );
+        assertActivation( false, profile, newContext( newProperties( "prop", "value" ), null ) );
 
-        assertTrue( activator.isActive( profile, newContext( newProperties( "prop", "" ), null ) ) );
+        assertActivation( true, profile, newContext( newProperties( "prop", "" ), null ) );
 
-        assertTrue( activator.isActive( profile, newContext( newProperties( "other", "value" ), null ) ) );
+        assertActivation( true, profile, newContext( newProperties( "other", "value" ), null ) );
     }
 
     public void testWithNegatedNameOnly_SystemProperty()
@@ -114,11 +114,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "!prop", null );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "prop", "value" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "prop", "value" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "prop", "" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "prop", "" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "other", "value" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "other", "value" ) ) );
     }
 
     public void testWithValue_UserProperty()
@@ -126,11 +126,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "prop", "value" );
 
-        assertTrue( activator.isActive( profile, newContext( newProperties( "prop", "value" ), null ) ) );
+        assertActivation( true, profile, newContext( newProperties( "prop", "value" ), null ) );
 
-        assertFalse( activator.isActive( profile, newContext( newProperties( "prop", "other" ), null ) ) );
+        assertActivation( false, profile, newContext( newProperties( "prop", "other" ), null ) );
 
-        assertFalse( activator.isActive( profile, newContext( newProperties( "prop", "" ), null ) ) );
+        assertActivation( false, profile, newContext( newProperties( "prop", "" ), null ) );
     }
 
     public void testWithValue_SystemProperty()
@@ -138,11 +138,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "prop", "value" );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "prop", "value" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "prop", "value" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "prop", "other" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "prop", "other" ) ) );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "other", "" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "other", "" ) ) );
     }
 
     public void testWithNegatedValue_UserProperty()
@@ -150,11 +150,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "prop", "!value" );
 
-        assertFalse( activator.isActive( profile, newContext( newProperties( "prop", "value" ), null ) ) );
+        assertActivation( false, profile, newContext( newProperties( "prop", "value" ), null ) );
 
-        assertTrue( activator.isActive( profile, newContext( newProperties( "prop", "other" ), null ) ) );
+        assertActivation( true, profile, newContext( newProperties( "prop", "other" ), null ) );
 
-        assertTrue( activator.isActive( profile, newContext( newProperties( "prop", "" ), null ) ) );
+        assertActivation( true, profile, newContext( newProperties( "prop", "" ), null ) );
     }
 
     public void testWithNegatedValue_SystemProperty()
@@ -162,11 +162,11 @@ public class PropertyProfileActivatorTest
     {
         Profile profile = newProfile( "prop", "!value" );
 
-        assertFalse( activator.isActive( profile, newContext( null, newProperties( "prop", "value" ) ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "prop", "value" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "prop", "other" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "prop", "other" ) ) );
 
-        assertTrue( activator.isActive( profile, newContext( null, newProperties( "other", "" ) ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "other", "" ) ) );
     }
 
     public void testWithValue_UserPropertyDominantOverSystemProperty()
@@ -177,9 +177,9 @@ public class PropertyProfileActivatorTest
         Properties props1 = newProperties( "prop", "value" );
         Properties props2 = newProperties( "prop", "other" );
 
-        assertTrue( activator.isActive( profile, newContext( props1, props2 ) ) );
+        assertActivation( true, profile, newContext( props1, props2 ) );
 
-        assertFalse( activator.isActive( profile, newContext( props2, props1 ) ) );
+        assertActivation( false, profile, newContext( props2, props1 ) );
     }
 
 }

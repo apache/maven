@@ -20,8 +20,8 @@ package org.apache.maven.model.profile.activation;
  */
 
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationException;
 
 /**
  * Determines whether a profile should be activated.
@@ -37,11 +37,10 @@ public interface ProfileActivator
      * @param profile The profile whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of the profile, must not be
      *            {@code null}.
+     * @param problems The container used to collect problems (e.g. bad syntax) that were encountered, must not be
+     *            {@code null}.
      * @return {@code true} if the profile is active, {@code false} otherwise.
-     * @throws ProfileActivationException If the activation status of the profile could not be determined (e.g. due to
-     *             missing values or bad syntax).
      */
-    boolean isActive( Profile profile, ProfileActivationContext context )
-        throws ProfileActivationException;
+    boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems );
 
 }

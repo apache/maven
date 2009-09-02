@@ -94,17 +94,9 @@ public class DefaultProfileSelector
     {
         for ( ProfileActivator activator : activators )
         {
-            try
+            if ( activator.isActive( profile, context, problems ) )
             {
-                if ( activator.isActive( profile, context ) )
-                {
-                    return true;
-                }
-            }
-            catch ( ProfileActivationException e )
-            {
-                problems.addError( "Invalid activation condition for profile " + profile.getId() + ": "
-                    + e.getMessage() );
+                return true;
             }
         }
         return false;

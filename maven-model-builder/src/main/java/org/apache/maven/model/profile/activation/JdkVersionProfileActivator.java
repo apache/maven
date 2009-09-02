@@ -25,8 +25,8 @@ import java.util.List;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationException;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -39,8 +39,7 @@ public class JdkVersionProfileActivator
     implements ProfileActivator
 {
 
-    public boolean isActive( Profile profile, ProfileActivationContext context )
-        throws ProfileActivationException
+    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         boolean active = false;
 
@@ -56,8 +55,8 @@ public class JdkVersionProfileActivator
 
                 if ( version.length() <= 0 )
                 {
-                    throw new ProfileActivationException( "Failed to determine Java version for profile "
-                        + profile.getId(), profile );
+                    problems.addError( "Failed to determine Java version for profile " + profile.getId() );
+                    return false;
                 }
 
                 if ( jdk.startsWith( "!" ) )

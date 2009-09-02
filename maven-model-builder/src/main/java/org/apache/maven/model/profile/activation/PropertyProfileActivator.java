@@ -22,8 +22,8 @@ package org.apache.maven.model.profile.activation;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.profile.ProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -37,8 +37,7 @@ public class PropertyProfileActivator
     implements ProfileActivator
 {
 
-    public boolean isActive( Profile profile, ProfileActivationContext context )
-        throws ProfileActivationException
+    public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         boolean active = false;
 
@@ -53,16 +52,16 @@ public class PropertyProfileActivator
                 String name = property.getName();
                 boolean reverseName = false;
 
-                if ( name == null )
-                {
-                    throw new ProfileActivationException( "The property name is required to activate the profile "
-                        + profile.getId(), profile );
-                }
-
-                if ( name.startsWith( "!" ) )
+                if ( name != null && name.startsWith( "!" ) )
                 {
                     reverseName = true;
                     name = name.substring( 1 );
+                }
+
+                if ( name == null || name.length() <= 0 )
+                {
+                    problems.addError( "The property name is required to activate the profile " + profile.getId() );
+                    return false;
                 }
 
                 String sysValue = context.getUserProperties().getProperty( name );

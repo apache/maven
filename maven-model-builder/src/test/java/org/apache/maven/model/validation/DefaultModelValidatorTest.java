@@ -20,13 +20,12 @@ package org.apache.maven.model.validation;
  */
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -39,46 +38,6 @@ public class DefaultModelValidatorTest
 {
 
     private DefaultModelValidator validator;
-
-    private static class SimpleProblemCollector
-        implements ModelProblemCollector
-    {
-
-        private List<String> warnings = new ArrayList<String>();
-
-        private List<String> errors = new ArrayList<String>();
-
-        public void addError( String message )
-        {
-            errors.add( message );
-        }
-
-        public void addError( String message, Exception cause )
-        {
-            addError( message );
-        }
-
-        public void addWarning( String message )
-        {
-            warnings.add( message );
-        }
-
-        public void addWarning( String message, Exception cause )
-        {
-            addWarning( message );
-        }
-
-        public List<String> getWarnings()
-        {
-            return warnings;
-        }
-
-        public List<String> getErrors()
-        {
-            return errors;
-        }
-
-    }
 
     private Model read( String pom )
         throws Exception
