@@ -544,20 +544,20 @@ public class DefaultMavenPluginManager
         catch ( ComponentConfigurationException e )
         {
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "Unable to parse the created DOM for mojo configuration: "
-                                                        + e.getMessage(), e );
+                                                    "Unable to parse configuration of mojo " + mojoDescriptor.getId()
+                                                        + ": " + e.getMessage(), e );
         }
         catch ( ComponentLookupException e )
         {
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
                                                     "Unable to retrieve component configurator " + configuratorId
-                                                        + " for mojo configuration", e );
+                                                        + " for configuration of mojo " + mojoDescriptor.getId(), e );
         }
         catch ( NoClassDefFoundError e )
         {
             throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "A required class was missing during mojo configuration: "
-                                                        + e.getMessage(), e );
+                                                    "A required class was missing during configuration of mojo "
+                                                        + mojoDescriptor.getId() + ": " + e.getMessage(), e );
         }
         catch ( LinkageError e )
         {
