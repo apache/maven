@@ -47,6 +47,7 @@ under the License.
     <module>maven-it-plugin-log-file</module>
     <module>maven-it-plugin-no-project</module>
     <module>maven-it-plugin-online</module>
+    <module>maven-it-plugin-optional-mojos</module>
     <module>maven-it-plugin-packaging</module>
     <module>maven-it-plugin-parameter-implementation</module>
     <module>maven-it-plugin-plugin-dependency</module>

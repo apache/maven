@@ -1,0 +1,23 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+      <role-hint>it-packaging</role-hint>
+      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
+      <configuration>
+        <lifecycles>
+          <lifecycle>
+            <id>default</id>
+            <phases>
+              <!-- NOTE: This is intentionally a very minimalistic lifecycle -->
+              <initialize>org.apache.maven.its.plugins:maven-it-plugin-optional-mojos:touch</initialize>
+            </phases>
+            <optional-mojos>
+              <optional-mojo>org.apache.maven.its.plugins:maven-it-plugin-optional-mojos:touch</optional-mojo>
+            </optional-mojos>
+          </lifecycle>
+        </lifecycles>
+      </configuration>
+    </component>
+  </components>
+</component-set>
