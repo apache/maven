@@ -49,17 +49,6 @@ public interface Configuration
     File getGlobalSettingsFile();
 
     // ----------------------------------------------------------------------------
-    // Local Repository
-    // ----------------------------------------------------------------------------
-
-    /**
-     * This overrides anything set in a settings file.
-     */
-    Configuration setLocalRepository( File localRepository );
-
-    File getLocalRepository();
-
-    // ----------------------------------------------------------------------------
     // Logger
     // ----------------------------------------------------------------------------
 

@@ -32,7 +32,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.maven.Maven;
 import org.apache.maven.MavenTransferListener;
 import org.apache.maven.embedder.MavenEmbedder;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -44,18 +43,27 @@ final class CLIRequestUtils
     {
     }
 
-    public static MavenExecutionRequest buildRequest( CommandLine commandLine, boolean debug, boolean quiet, boolean showErrors )
+    public static void populateProperties( MavenExecutionRequest request, CommandLine commandLine )
+    {
+        Properties systemProperties = new Properties();
+        Properties userProperties = new Properties();
+        populateProperties( commandLine, systemProperties, userProperties );
+
+        request.setUserProperties( userProperties );
+        request.setSystemProperties( systemProperties );
+    }
+
+    public static MavenExecutionRequest populateRequest( MavenExecutionRequest request, CommandLine commandLine,
+                                                         boolean debug, boolean quiet, boolean showErrors )
     {
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
         // bring the maven component to life for use.
         // ----------------------------------------------------------------------
 
-        boolean interactive = true;
-
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
-            interactive = false;
+            request.setInteractiveMode( false );
         }
 
         boolean pluginUpdateOverride = false;
@@ -105,11 +113,9 @@ final class CLIRequestUtils
             reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
         }
 
-        boolean offline = false;
-
         if ( commandLine.hasOption( CLIManager.OFFLINE ) )
         {
-            offline = true;
+            request.setOffline( true );
         }
 
         boolean updateSnapshots = false;
@@ -172,7 +178,7 @@ final class CLIRequestUtils
 
         MavenTransferListener transferListener;
 
-        if ( interactive )
+        if ( request.isInteractiveMode() )
         {
             transferListener = new ConsoleDownloadMonitor();
         }
@@ -221,7 +227,7 @@ final class CLIRequestUtils
             userToolchainsFile = MavenEmbedder.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest()
+        request
             .setBaseDirectory( baseDirectory )
             .setGoals( goals )
             .setSystemProperties( systemProperties )
@@ -229,8 +235,6 @@ final class CLIRequestUtils
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false
-            .setInteractiveMode( interactive ) // default: true
-            .setOffline( offline ) // default: false
             .setUsePluginUpdateOverride( pluginUpdateOverride )
             .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional

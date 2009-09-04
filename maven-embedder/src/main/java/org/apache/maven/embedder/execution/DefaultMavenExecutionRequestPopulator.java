@@ -24,11 +24,9 @@ import java.util.Set;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -49,15 +47,115 @@ public class DefaultMavenExecutionRequestPopulator
     @Requirement
     private Logger logger;
 
-    //TODO: this needs to be pushed up to the front-end
-    @Requirement
-    private MavenSettingsBuilder settingsBuilder;
-
     @Requirement
     private RepositorySystem repositorySystem;
 
     @Requirement( hint = "maven" )
     private SecDispatcher securityDispatcher;
+
+    public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
+        throws MavenEmbedderException
+    {
+        request.setOffline( settings.isOffline() );
+        
+        request.setInteractiveMode( settings.isInteractiveMode() );
+
+        request.setPluginGroups( settings.getPluginGroups() );
+
+        request.setLocalRepositoryPath( settings.getLocalRepository() );
+
+        for ( Server server : settings.getServers() )
+        {
+            server = server.clone();
+
+            String password = decrypt( server.getPassword(), "password for server " + server.getId() );
+
+            server.setPassword( password );
+
+            request.addServer( server );
+        }
+
+        //  <proxies>
+        //    <proxy>
+        //      <active>true</active>
+        //      <protocol>http</protocol>
+        //      <host>proxy.somewhere.com</host>
+        //      <port>8080</port>
+        //      <username>proxyuser</username>
+        //      <password>somepassword</password>
+        //      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
+        //    </proxy>
+        //  </proxies>
+
+        for ( Proxy proxy : settings.getProxies() )
+        {
+            if ( !proxy.isActive() )
+            {
+                continue;
+            }
+
+            proxy = proxy.clone();
+
+            String password = decrypt( proxy.getPassword(), "password for proxy " + proxy.getId() );
+
+            proxy.setPassword( password );
+
+            request.addProxy( proxy );
+        }
+
+        // <mirrors>
+        //   <mirror>
+        //     <id>nexus</id>
+        //     <mirrorOf>*</mirrorOf>
+        //     <url>http://repository.sonatype.org/content/groups/public</url>
+        //   </mirror>
+        // </mirrors>        
+
+        for ( Mirror mirror : settings.getMirrors() )
+        {
+            mirror = mirror.clone();
+
+            request.addMirror( mirror );
+        }
+
+        request.setActiveProfiles( settings.getActiveProfiles() );
+
+        for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
+        {
+            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
+        }
+
+        return request;
+    }
+
+    private String decrypt( String encrypted, String source )
+    {
+        try
+        {
+            return securityDispatcher.decrypt( encrypted );
+        }
+        catch ( SecDispatcherException e )
+        {
+            logger.warn( "Not decrypting " + source + " due to exception in security handler: " + e.getMessage() );
+
+            Throwable cause = e;
+
+            while ( cause.getCause() != null )
+            {
+                cause = cause.getCause();
+            }
+
+            if ( cause instanceof FileNotFoundException )
+            {
+                logger.warn( "Ensure that you have configured your master password file (and relocation if appropriate)." );
+                logger.warn( "See the installation instructions for details." );
+            }
+
+            logger.debug( "Full stack trace follows", e );
+
+            return encrypted;
+        }
+    }
 
     private void pom( MavenExecutionRequest request )
     {
@@ -87,43 +185,6 @@ public class DefaultMavenExecutionRequestPopulator
     {
         request.addPluginGroup( "org.apache.maven.plugins" );
         request.addPluginGroup( "org.codehaus.mojo" );
-    }
-
-    // Process plugin groups
-    // Get profile models
-    // Get active profiles
-    private void processSettings( MavenExecutionRequest request )
-        throws MavenEmbedderException
-    {
-        Settings settings = request.getSettings();
-
-        request.addPluginGroups( settings.getPluginGroups() );
-
-        populateDefaultPluginGroups( request );
-
-        // We just need to keep track of what profiles are being activated by the settings. We don't need to process
-        // them here. This should be taken care of by the project builder.
-        //
-        request.addActiveProfiles( settings.getActiveProfiles() );
-
-        // We only need to take the profiles and make sure they are available when the calculation of the active profiles
-        // is determined.
-        //
-        List<org.apache.maven.settings.Profile> settingsProfiles = settings.getProfiles();
-
-        if ( ( settingsProfiles != null ) && !settingsProfiles.isEmpty() )
-        {
-            for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
-            {
-                request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
-            }
-        }
-
-        injectDefaultRepositories( request );
-        
-        injectDefaultPluginRepositories( request );        
-
-        processRepositoriesInSettings( request );
     }
 
     private void injectDefaultRepositories( MavenExecutionRequest request )
@@ -180,62 +241,6 @@ public class DefaultMavenExecutionRequestPopulator
     private void processRepositoriesInSettings( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
-        Settings settings = request.getSettings();
-
-        //  <proxies>
-        //    <proxy>
-        //      <active>true</active>
-        //      <protocol>http</protocol>
-        //      <host>proxy.somewhere.com</host>
-        //      <port>8080</port>
-        //      <username>proxyuser</username>
-        //      <password>somepassword</password>
-        //      <nonProxyHosts>www.google.com|*.somewhere.com</nonProxyHosts>
-        //    </proxy>
-        //  </proxies>
-
-        for ( Proxy proxy : settings.getProxies() )
-        {
-            if ( !proxy.isActive() )
-            {
-                continue;
-            }
-
-            proxy = proxy.clone();
-
-            String password = decrypt( proxy.getPassword(), "password for proxy " + proxy.getId() );
-
-            proxy.setPassword( password );
-
-            request.addProxy( proxy );
-        }
-
-        for ( Server server : settings.getServers() )
-        {
-            server = server.clone();
-
-            String password = decrypt( server.getPassword(), "password for server " + server.getId() );
-
-            server.setPassword( password );
-
-            request.addServer( server );
-        }
-
-        // <mirrors>
-        //   <mirror>
-        //     <id>nexus</id>
-        //     <mirrorOf>*</mirrorOf>
-        //     <url>http://repository.sonatype.org/content/groups/public</url>
-        //   </mirror>
-        // </mirrors>        
-
-        for ( Mirror mirror : settings.getMirrors() )
-        {
-            mirror = mirror.clone();
-
-            request.addMirror( mirror );
-        }
-
         repositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
         repositorySystem.injectProxy( request.getRemoteRepositories(), request.getProxies() );
         repositorySystem.injectAuthentication( request.getRemoteRepositories(), request.getServers() );
@@ -247,75 +252,6 @@ public class DefaultMavenExecutionRequestPopulator
         repositorySystem.injectAuthentication( request.getPluginArtifactRepositories(), request.getServers() );
 
         request.setPluginArtifactRepositories( repositorySystem.getEffectiveRepositories( request.getPluginArtifactRepositories() ) );
-    }
-
-    private String decrypt( String encrypted, String source )
-    {
-        try
-        {
-            return securityDispatcher.decrypt( encrypted );
-        }
-        catch ( SecDispatcherException e )
-        {
-            logger.warn( "Not decrypting " + source + " due to exception in security handler: " + e.getMessage() );
-
-            Throwable cause = e;
-
-            while ( cause.getCause() != null )
-            {
-                cause = cause.getCause();
-            }
-
-            if ( cause instanceof FileNotFoundException )
-            {
-                logger.warn( "Ensure that you have configured your master password file (and relocation if appropriate)." );
-                logger.warn( "See the installation instructions for details." );
-            }
-
-            logger.debug( "Full stack trace follows", e );
-
-            return encrypted;
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Settings
-    // ------------------------------------------------------------------------
-
-    private void settings( MavenExecutionRequest request )
-    {
-        // ------------------------------------------------------------------------
-        // Settings
-        //
-        // If a settings instance has been provided in the request then we use
-        // that for execution, otherwise we will look in the embedder configuration
-        // for a user/global settings file to use. The settings file should have
-        // been validated upfront but we will still catch any parsing exception
-        // ------------------------------------------------------------------------
-
-        if ( request.getSettings() == null )
-        {
-            if ( request.getGlobalSettingsFile() == null )
-            {
-                request.setGlobalSettingsFile( MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE );
-            }
-
-            if ( request.getUserSettingsFile() == null )
-            {
-                request.setUserSettingsFile( MavenEmbedder.DEFAULT_USER_SETTINGS_FILE );
-            }
-
-            try
-            {
-                Settings settings = settingsBuilder.buildSettings( request );
-
-                request.setSettings( settings );
-            }
-            catch ( Exception e )
-            {
-                request.setSettings( new Settings() );
-            }
-        }
     }
 
     private void localRepository( MavenExecutionRequest request )
@@ -331,7 +267,7 @@ public class DefaultMavenExecutionRequestPopulator
 
         if ( request.getLocalRepository() == null )
         {
-            request.setLocalRepository( createLocalRepository( request, request.getSettings() ) );
+            request.setLocalRepository( createLocalRepository( request ) );
         }
 
         if ( request.getLocalRepositoryPath() == null )
@@ -344,7 +280,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
 
-    public ArtifactRepository createLocalRepository( MavenExecutionRequest request, Settings settings )
+    public ArtifactRepository createLocalRepository( MavenExecutionRequest request )
         throws MavenEmbedderException
     {
         String localRepositoryPath = null;
@@ -352,11 +288,6 @@ public class DefaultMavenExecutionRequestPopulator
         if ( request.getLocalRepositoryPath() != null )
         {
             localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
-        }
-
-        if ( StringUtils.isEmpty( localRepositoryPath ) )
-        {
-            localRepositoryPath = settings.getLocalRepository();
         }
 
         if ( StringUtils.isEmpty( localRepositoryPath ) )
@@ -379,12 +310,17 @@ public class DefaultMavenExecutionRequestPopulator
     {
         pom( request );
 
-        settings( request );
-
         localRepository( request );
 
-        processSettings( request );
+        populateDefaultPluginGroups( request );
+
+        injectDefaultRepositories( request );
+        
+        injectDefaultPluginRepositories( request );
+
+        processRepositoriesInSettings( request );
 
         return request;
     }
+
 }

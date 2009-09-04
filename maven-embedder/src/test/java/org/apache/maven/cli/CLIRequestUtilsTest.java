@@ -27,6 +27,7 @@ import junit.framework.TestCase;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 
 public class CLIRequestUtilsTest
@@ -58,7 +59,8 @@ public class CLIRequestUtilsTest
 
         assertEquals( 1, commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY ).length );
 
-        MavenExecutionRequest request = CLIRequestUtils.buildRequest( commandLine, false, false, false );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request = CLIRequestUtils.populateRequest( request, commandLine, false, false, false );
 
         Properties userProperties = request.getUserProperties();
 
@@ -105,8 +107,8 @@ public class CLIRequestUtilsTest
     {
         String path = new File( "" ).getAbsolutePath();
 
-        MavenExecutionRequest request =
-            CLIRequestUtils.buildRequest( parse( "-Dmaven.repo.local=" + path ), false, false, false );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        CLIRequestUtils.populateRequest( request, parse( "-Dmaven.repo.local=" + path ), false, false, false );
 
         assertEquals( path, request.getLocalRepositoryPath().getAbsolutePath() );
     }

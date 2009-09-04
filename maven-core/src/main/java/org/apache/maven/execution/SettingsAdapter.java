@@ -19,6 +19,7 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.settings.Mirror;
@@ -94,7 +95,7 @@ class SettingsAdapter
     @Override
     public List<Profile> getProfiles()
     {
-        return request.getSettings().getProfiles();
+        return new ArrayList<Profile>();
     }
 
     @Override

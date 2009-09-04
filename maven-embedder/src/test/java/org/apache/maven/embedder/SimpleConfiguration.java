@@ -19,8 +19,6 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import java.io.File;
-
 /**
  * A configuration to be used for unit testing of the embedder. This basically sets some default values.
  * 
@@ -32,13 +30,6 @@ public class SimpleConfiguration
 
     public SimpleConfiguration()
     {
-        String localRepo = System.getProperty( "maven.repo.local", "" );
-
-        if ( localRepo.length() > 0 )
-        {
-            setLocalRepository( new File( localRepo ).getAbsoluteFile() );
-        }
-
         setClassLoader( Thread.currentThread().getContextClassLoader() );
 
         setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );

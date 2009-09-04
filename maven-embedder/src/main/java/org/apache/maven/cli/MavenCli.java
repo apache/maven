@@ -16,6 +16,7 @@ package org.apache.maven.cli;
  */
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -27,10 +28,17 @@ import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.embedder.MavenEmbedderFileLogger;
 import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.settings.MavenSettingsBuilder;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -114,11 +122,107 @@ public class MavenCli
             System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
         }
 
-        MavenExecutionRequest request = CLIRequestUtils.buildRequest( commandLine, debug, quiet, showErrors );
-
-        Configuration configuration = buildEmbedderConfiguration( request, commandLine, classWorld );
+        Configuration configuration = buildEmbedderConfiguration( commandLine, classWorld );
 
         MavenEmbedderLogger logger = configuration.getMavenEmbedderLogger();
+
+        MavenEmbedder mavenEmbedder;
+
+        try
+        {
+            mavenEmbedder = new MavenEmbedder( configuration );
+        }
+        catch ( MavenEmbedderException e )
+        {
+            CLIReportingUtils.showError( logger, "Unable to start the embedder: ", e, showErrors );
+
+            return 1;
+        }
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+
+        request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+        request.setUserSettingsFile( configuration.getUserSettingsFile() );
+
+        CLIRequestUtils.populateProperties( request, commandLine );
+
+        Settings settings;
+
+        try
+        {
+            MavenSettingsBuilder settingsBuilder =
+                mavenEmbedder.getPlexusContainer().lookup( MavenSettingsBuilder.class );
+
+            try
+            {
+                settings = settingsBuilder.buildSettings( request );
+            }
+            finally
+            {
+                try
+                {
+                    mavenEmbedder.getPlexusContainer().release( settingsBuilder );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    logger.debug( "Failed to release component: " + e.getMessage(), e );
+                }
+            }
+        }
+        catch ( ComponentLookupException e )
+        {
+            CLIReportingUtils.showError( logger, "Unable to lookup settings builder: ", e, showErrors );
+
+            return 1;
+        }
+        catch ( IOException e )
+        {
+            CLIReportingUtils.showError( logger, "Failed to read settings: ", e, showErrors );
+
+            return 1;
+        }
+        catch ( XmlPullParserException e )
+        {
+            CLIReportingUtils.showError( logger, "Failed to parse settings: ", e, showErrors );
+
+            return 1;
+        }
+
+        try
+        {
+            MavenExecutionRequestPopulator requestPopulator =
+                mavenEmbedder.getPlexusContainer().lookup( MavenExecutionRequestPopulator.class );
+
+            try
+            {
+                requestPopulator.populateFromSettings( request, settings );
+            }
+            finally
+            {
+                try
+                {
+                    mavenEmbedder.getPlexusContainer().release( requestPopulator );
+                }
+                catch ( ComponentLifecycleException e )
+                {
+                    logger.debug( "Failed to release component: " + e.getMessage(), e );
+                }
+            }
+        }
+        catch ( ComponentLookupException e )
+        {
+            CLIReportingUtils.showError( logger, "Unable to lookup execution request populator: ", e, showErrors );
+
+            return 1;
+        }
+        catch ( MavenEmbedderException e )
+        {
+            CLIReportingUtils.showError( logger, "Failed to process settings: ", e, showErrors );
+
+            return 1;
+        }
+
+        CLIRequestUtils.populateRequest( request, commandLine, debug, quiet, showErrors );
 
         request.setExecutionListener( new ExecutionEventLogger( logger ) );
 
@@ -167,19 +271,6 @@ public class MavenCli
         if ( configuration.getUserSettingsFile() != null )
         {
             request.setUserSettingsFile( configuration.getUserSettingsFile() );
-        }
-
-        MavenEmbedder mavenEmbedder;
-
-        try
-        {
-            mavenEmbedder = new MavenEmbedder( configuration );
-        }
-        catch ( MavenEmbedderException e )
-        {
-            CLIReportingUtils.showError( logger, "Unable to start the embedder: ", e, showErrors );
-
-            return 1;
         }
 
         try
@@ -290,7 +381,7 @@ public class MavenCli
         }
     }
 
-    private Configuration buildEmbedderConfiguration( MavenExecutionRequest request, CommandLine commandLine, ClassWorld classWorld )
+    private Configuration buildEmbedderConfiguration( CommandLine commandLine, ClassWorld classWorld )
     {
         File userSettingsFile;
 
@@ -318,20 +409,13 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
-            File logFile = new File( request.getBaseDirectory(), commandLine.getOptionValue( CLIManager.LOG_FILE ) );
+            File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) ).getAbsoluteFile();
 
             configuration.setMavenEmbedderLogger( new MavenEmbedderFileLogger( logFile ) );
         }
         else
         {
             configuration.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
-        }
-
-        String localRepoProperty = request.getUserProperties().getProperty( LOCAL_REPO_PROPERTY );
-
-        if ( localRepoProperty != null )
-        {
-            configuration.setLocalRepository( new File( localRepoProperty ) );
         }
 
         return configuration;

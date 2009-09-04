@@ -55,8 +55,6 @@ public class DefaultConfiguration
 
     private PlexusContainer parentContainer;
 
-    private File localRepository;
-
     /** Creates a new instance of DefaultConfiguration */
     public DefaultConfiguration()
     {
@@ -202,19 +200,4 @@ public class DefaultConfiguration
         return this;
     }
 
-    // ----------------------------------------------------------------------------
-    // Local Repository
-    // ----------------------------------------------------------------------------
-
-    public Configuration setLocalRepository( File localRepository )
-    {
-        this.localRepository = localRepository;
-
-        return this;
-    }
-
-    public File getLocalRepository()
-    {
-        return localRepository;
-    }
 }

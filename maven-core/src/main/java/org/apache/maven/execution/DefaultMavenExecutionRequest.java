@@ -29,7 +29,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 
 /**
@@ -264,7 +263,7 @@ public class DefaultMavenExecutionRequest
         return interactiveMode;
     }
 
-    public void setActiveProfiles( List<String> activeProfiles )
+    public MavenExecutionRequest setActiveProfiles( List<String> activeProfiles )
     {
         if ( activeProfiles != null )
         {
@@ -274,9 +273,11 @@ public class DefaultMavenExecutionRequest
         {
             this.activeProfiles = null;
         }
+
+        return this;
     }
 
-    public void setInactiveProfiles( List<String> inactiveProfiles )
+    public MavenExecutionRequest setInactiveProfiles( List<String> inactiveProfiles )
     {
         if ( inactiveProfiles != null )
         {
@@ -286,6 +287,8 @@ public class DefaultMavenExecutionRequest
         {
             this.inactiveProfiles = null;
         }
+
+        return this;
     }
 
     public MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
@@ -429,7 +432,7 @@ public class DefaultMavenExecutionRequest
 
     public MavenExecutionRequest setLocalRepositoryPath( String localRepository )
     {
-        localRepositoryPath = new File( localRepository );
+        localRepositoryPath = ( localRepository != null ) ? new File( localRepository ) : null;
 
         return this;
     }
@@ -837,22 +840,8 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    private Settings settings;
-
     // calculated from request attributes.
     private ProjectBuildingRequest projectBuildingRequest;
-
-    public MavenExecutionRequest setSettings( Settings settings )
-    {
-        this.settings = settings;
-
-        return this;
-    }
-
-    public Settings getSettings()
-    {
-        return settings;
-    }
 
     public boolean isProjectPresent()
     {

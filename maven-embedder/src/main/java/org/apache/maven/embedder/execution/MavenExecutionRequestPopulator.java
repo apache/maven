@@ -21,9 +21,19 @@ package org.apache.maven.embedder.execution;
 
 import org.apache.maven.embedder.MavenEmbedderException;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.settings.Settings;
 
+/**
+ * Assists in populating an execution request for invocation of Maven.
+ * 
+ * @author Benjamin Bentmann
+ */
 public interface MavenExecutionRequestPopulator
 {
+
+    MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
+        throws MavenEmbedderException;
+
     MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenEmbedderException;
 

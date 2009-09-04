@@ -32,7 +32,6 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
 
@@ -204,9 +203,11 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setProfiles( List<Profile> profiles );
     MavenExecutionRequest addActiveProfile( String profile );
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
+    MavenExecutionRequest setActiveProfiles( List<String> profiles );
     List<String> getActiveProfiles();
     MavenExecutionRequest addInactiveProfile( String profile );
     MavenExecutionRequest addInactiveProfiles( List<String> profiles );
+    MavenExecutionRequest setInactiveProfiles( List<String> profiles );
     List<String> getInactiveProfiles();
 
     // Proxies
@@ -232,10 +233,6 @@ public interface MavenExecutionRequest
 
     boolean isUsePluginUpdateOverride();
     MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
-
-    // Setting
-    Settings getSettings();
-    MavenExecutionRequest setSettings( Settings settings );
 
     boolean isProjectPresent();
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );
