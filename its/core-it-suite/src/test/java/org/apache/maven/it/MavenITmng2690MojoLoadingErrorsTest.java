@@ -104,7 +104,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
 
         List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
-        int msg = indexOf( lines, "(?i).*required class was missing during mojo configuration.*" );
+        int msg = indexOf( lines, "(?i).*required class was missing during (mojo )?configuration.*" );
         assertTrue( "User-friendly message was not found in output.", msg >= 0 );
 
         int cls = lines.get( msg ).toString().replace( '/', '.' ).indexOf( TestCase.class.getName() );
