@@ -19,6 +19,7 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,11 +37,13 @@ public class Lifecycle
      */
     private Map<String,String> phases;
 
-    /**
-     * default phases.
+    /*
+     * NOTE: This exists merely for backward-compat with legacy-style lifecycle definitions and allows configuration
+     * injection to work instead of failing.
      */
-    private Map defaultPhases;
-    
+    @SuppressWarnings( "unused" )
+    private List<String> optionalMojos;
+
     /**
      * Method getId
      */
@@ -77,8 +80,4 @@ public class Lifecycle
         this.phases = phases;
     } //-- void setPhases(java.util.List) 
 
-    public Map getDefaultPhases()
-    {
-        return defaultPhases;
-    }    
 }
