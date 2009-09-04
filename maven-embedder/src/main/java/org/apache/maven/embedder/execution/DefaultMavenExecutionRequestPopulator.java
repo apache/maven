@@ -56,6 +56,11 @@ public class DefaultMavenExecutionRequestPopulator
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenEmbedderException
     {
+        if ( settings == null )
+        {
+            return request;
+        }
+
         request.setOffline( settings.isOffline() );
         
         request.setInteractiveMode( settings.isInteractiveMode() );
