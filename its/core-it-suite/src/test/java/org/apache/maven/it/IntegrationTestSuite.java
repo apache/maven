@@ -101,6 +101,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4305LocalRepoBasedirTest.class );
         suite.addTestSuite( MavenITmng4304ProjectDependencyArtifactsTest.class );
         suite.addTestSuite( MavenITmng4293RequiresCompilePlusRuntimeScopeTest.class );
+        suite.addTestSuite( MavenITmng4292EnumTypeMojoParametersTest.class );
         suite.addTestSuite( MavenITmng4291MojoRequiresOnlineModeTest.class );
         suite.addTestSuite( MavenITmng4283ParentPomPackagingTest.class );
         suite.addTestSuite( MavenITmng4281PreferLocalSnapshotTest.class );
