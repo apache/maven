@@ -23,8 +23,10 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
@@ -43,6 +45,9 @@ public class DefaultMavenProjectBuilder
 
     @Requirement
     private RepositorySystem repositorySystem;
+
+    @Requirement
+    private LegacySupport legacySupport;
 
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -133,7 +138,18 @@ public class DefaultMavenProjectBuilder
             .setRemoteRepositories( remoteRepositories );
         configuration.setProcessPlugins( false );
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-        
+
+        MavenSession session = legacySupport.getSession();
+        if ( session != null )
+        {
+            configuration.setSystemProperties( session.getSystemProperties() );
+            configuration.setUserProperties( session.getUserProperties() );
+        }
+        else
+        {
+            configuration.setSystemProperties( System.getProperties() );
+        }
+
         return buildFromRepository( artifact, configuration );
     }
 
