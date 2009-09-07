@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4341PluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4338OptionalMojosTest.class );
         suite.addTestSuite( MavenITmng4335SettingsOfflineModeTest.class );
         suite.addTestSuite( MavenITmng4332DefaultPluginExecutionOrderTest.class );
