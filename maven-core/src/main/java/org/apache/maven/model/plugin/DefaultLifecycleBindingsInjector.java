@@ -22,6 +22,7 @@ package org.apache.maven.model.plugin;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -102,7 +103,7 @@ public class DefaultLifecycleBindingsInjector
             {
                 List<Plugin> tgt = target.getPlugins();
 
-                Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
 
                 for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
                 {
@@ -113,6 +114,10 @@ public class DefaultLifecycleBindingsInjector
 
                 Map<Object, Plugin> unmanaged = new LinkedHashMap<Object, Plugin>( merged );
 
+                Map<Object, List<Plugin>> predecessors = new HashMap<Object, List<Plugin>>();
+
+                List<Plugin> pending = new ArrayList<Plugin>( tgt.size() );
+
                 for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
                 {
                     Plugin element = it.next();
@@ -122,8 +127,18 @@ public class DefaultLifecycleBindingsInjector
                     {
                         mergePlugin( element, existing, sourceDominant, context );
                         unmanaged.remove( key );
+                        merged.put( key, element );
+
+                        if ( !pending.isEmpty() )
+                        {
+                            predecessors.put( key, pending );
+                            pending = new ArrayList<Plugin>();
+                        }
                     }
-                    merged.put( key, element );
+                    else
+                    {
+                        pending.add( element );
+                    }
                 }
 
                 if ( !unmanaged.isEmpty() )
@@ -146,7 +161,23 @@ public class DefaultLifecycleBindingsInjector
                     }
                 }
 
-                target.setPlugins( new ArrayList<Plugin>( merged.values() ) );
+                List<Plugin> result = new ArrayList<Plugin>( src.size() + tgt.size() );
+
+                for ( Map.Entry<Object, Plugin> entry : merged.entrySet() )
+                {
+                    List<Plugin> pre = predecessors.get( entry.getKey() );
+
+                    if ( pre != null )
+                    {
+                        result.addAll( pre );
+                    }
+
+                    result.add( entry.getValue() );
+                }
+
+                result.addAll( pending );
+
+                target.setPlugins( result );
             }
         }
     }
