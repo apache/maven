@@ -33,6 +33,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -180,6 +181,16 @@ public class DefaultLifecycleBindingsInjector
                 target.setPlugins( result );
             }
         }
+
+        @Override
+        protected void mergePluginExecution( PluginExecution target, PluginExecution source, boolean sourceDominant,
+                                             Map<Object, Object> context )
+        {
+            super.mergePluginExecution( target, source, sourceDominant, context );
+
+            target.setPriority( Math.min( target.getPriority(), source.getPriority() ) );
+        }
+
     }
 
 }
