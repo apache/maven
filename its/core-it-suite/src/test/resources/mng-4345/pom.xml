@@ -65,6 +65,12 @@ under the License.
           <pathname>target/log.txt</pathname>
           <message>first</message>
         </configuration>
+        <executions>
+          <execution>
+            <!-- NOTE: The id of this execution has been chosen to test interaction of MNG-3203 and execution order -->
+            <id>default-resources</id>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
