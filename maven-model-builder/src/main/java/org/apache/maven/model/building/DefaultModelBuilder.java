@@ -518,6 +518,8 @@ public class DefaultModelBuilder
                                             DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
+        problems.setSourceHint( childModel );
+
         Parent parent = childModel.getParent();
 
         String groupId = parent.getGroupId();
@@ -648,11 +650,11 @@ public class DefaultModelBuilder
                 }
                 catch ( ModelBuildingException e )
                 {
-                    problems.getProblems().addAll( e.getProblems() );
+                    problems.addAll( e.getProblems() );
                     continue;
                 }
 
-                problems.getProblems().addAll( importResult.getProblems() );
+                problems.addAll( importResult.getProblems() );
 
                 Model importModel = importResult.getEffectiveModel();
 

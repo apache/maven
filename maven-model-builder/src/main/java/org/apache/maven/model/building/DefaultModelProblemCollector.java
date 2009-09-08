@@ -96,6 +96,11 @@ class DefaultModelProblemCollector
         problems.add( problem );
     }
 
+    public void addAll( List<ModelProblem> problems )
+    {
+        problems.addAll( problems );
+    }
+
     public void addFatalError( String message )
     {
         problems.add( new DefaultModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint() ) );
