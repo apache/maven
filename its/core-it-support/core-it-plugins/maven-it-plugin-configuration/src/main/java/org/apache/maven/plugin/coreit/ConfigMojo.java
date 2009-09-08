@@ -20,17 +20,9 @@ package org.apache.maven.plugin.coreit;
  */
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -278,35 +270,12 @@ public class ConfigMojo
         }
 
         Properties configProps = new Properties();
+
         dumpConfiguration( configProps );
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file: " + propertiesFile );
 
-        OutputStream out = null;
-        try
-        {
-            propertiesFile.getParentFile().mkdirs();
-            out = new FileOutputStream( propertiesFile );
-            configProps.store( out, "MAVEN-CORE-IT-LOG" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Output file could not be created: " + propertiesFile, e );
-        }
-        finally
-        {
-            if ( out != null )
-            {
-                try
-                {
-                    out.close();
-                }
-                catch ( IOException e )
-                {
-                    // just ignore
-                }
-            }
-        }
+        PropertiesUtil.write( propertiesFile, configProps );
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Created output file: " + propertiesFile );
     }
@@ -322,119 +291,44 @@ public class ConfigMojo
          * NOTE: This intentionally does not dump the absolute path of a file to check the actual value that was
          * injected by Maven.
          */
-        dumpValue( props, "propertiesFile", propertiesFile );
-        dumpValue( props, "aliasParam", aliasParam );
-        dumpValue( props, "defaultParam", defaultParam );
-        dumpValue( props, "defaultParamWithExpression", defaultParamWithExpression );
-        dumpValue( props, "aliasDefaultExpressionParam", aliasDefaultExpressionParam );
-        dumpValue( props, "booleanParam", booleanParam );
+        PropertiesUtil.serialize( props, "propertiesFile", propertiesFile );
+        PropertiesUtil.serialize( props, "aliasParam", aliasParam );
+        PropertiesUtil.serialize( props, "defaultParam", defaultParam );
+        PropertiesUtil.serialize( props, "defaultParamWithExpression", defaultParamWithExpression );
+        PropertiesUtil.serialize( props, "aliasDefaultExpressionParam", aliasDefaultExpressionParam );
+        PropertiesUtil.serialize( props, "booleanParam", booleanParam );
         if ( primitiveBooleanParam )
         {
-            dumpValue( props, "primitiveBooleanParam", Boolean.valueOf( primitiveBooleanParam ) );
+            PropertiesUtil.serialize( props, "primitiveBooleanParam", Boolean.valueOf( primitiveBooleanParam ) );
         }
-        dumpValue( props, "byteParam", byteParam );
-        dumpValue( props, "shortParam", shortParam );
-        dumpValue( props, "integerParam", integerParam );
+        PropertiesUtil.serialize( props, "byteParam", byteParam );
+        PropertiesUtil.serialize( props, "shortParam", shortParam );
+        PropertiesUtil.serialize( props, "integerParam", integerParam );
         if ( primitiveIntegerParam != 0 )
         {
-            dumpValue( props, "primitiveIntegerParam", new Integer( primitiveIntegerParam ) );
+            PropertiesUtil.serialize( props, "primitiveIntegerParam", new Integer( primitiveIntegerParam ) );
         }
-        dumpValue( props, "longParam", longParam );
-        dumpValue( props, "floatParam", floatParam );
-        dumpValue( props, "doubleParam", doubleParam );
-        dumpValue( props, "characterParam", characterParam );
-        dumpValue( props, "stringParam", stringParam );
-        dumpValue( props, "fileParam", fileParam );
-        dumpValue( props, "dateParam", dateParam );
-        dumpValue( props, "urlParam", urlParam );
-        dumpValue( props, "uriParam", uriParam );
-        dumpValue( props, "stringParams", stringParams );
-        dumpValue( props, "fileParams", fileParams );
-        dumpValue( props, "listParam", listParam );
-        dumpValue( props, "setParam", setParam );
-        dumpValue( props, "mapParam", mapParam );
-        dumpValue( props, "propertiesParam", propertiesParam );
-        dumpValue( props, "domParam", domParam );
+        PropertiesUtil.serialize( props, "longParam", longParam );
+        PropertiesUtil.serialize( props, "floatParam", floatParam );
+        PropertiesUtil.serialize( props, "doubleParam", doubleParam );
+        PropertiesUtil.serialize( props, "characterParam", characterParam );
+        PropertiesUtil.serialize( props, "stringParam", stringParam );
+        PropertiesUtil.serialize( props, "fileParam", fileParam );
+        PropertiesUtil.serialize( props, "dateParam", dateParam );
+        PropertiesUtil.serialize( props, "urlParam", urlParam );
+        PropertiesUtil.serialize( props, "uriParam", uriParam );
+        PropertiesUtil.serialize( props, "stringParams", stringParams );
+        PropertiesUtil.serialize( props, "fileParams", fileParams );
+        PropertiesUtil.serialize( props, "listParam", listParam );
+        PropertiesUtil.serialize( props, "setParam", setParam );
+        PropertiesUtil.serialize( props, "mapParam", mapParam );
+        PropertiesUtil.serialize( props, "propertiesParam", propertiesParam );
+        PropertiesUtil.serialize( props, "domParam", domParam );
         if ( beanParam != null )
         {
-            dumpValue( props, "beanParam.fieldParam", beanParam.fieldParam );
-            dumpValue( props, "beanParam.setterParam", beanParam.setterParam );
-            dumpValue( props, "beanParam.setterCalled", Boolean.valueOf( beanParam.setterCalled ) );
-        }
-    }
-
-    private void dumpValue( Properties props, String key, Object value )
-    {
-        if ( value != null && value.getClass().isArray() )
-        {
-            props.setProperty( key, Integer.toString( Array.getLength( value ) ) );
-            for ( int i = Array.getLength( value ) - 1; i >= 0; i-- )
-            {
-                dumpValue( props, key + "." + i, Array.get( value, i ) );
-            }
-        }
-        else if ( value instanceof Collection )
-        {
-            Collection collection = (Collection) value;
-            props.setProperty( key, Integer.toString( collection.size() ) );
-            int i = 0;
-            for ( Iterator it = collection.iterator(); it.hasNext(); i++ )
-            {
-                dumpValue( props, key + "." + i, it.next() );
-            }
-        }
-        else if ( value instanceof Map )
-        {
-            Map map = (Map) value;
-            props.setProperty( key, Integer.toString( map.size() ) );
-            int i = 0;
-            for ( Iterator it = map.keySet().iterator(); it.hasNext(); i++ )
-            {
-                Object k = it.next();
-                Object v = map.get( k );
-                dumpValue( props, key + "." + k, v );
-            }
-        }
-        else if ( value instanceof PlexusConfiguration )
-        {
-            PlexusConfiguration config = (PlexusConfiguration) value;
-
-            String val = config.getValue( null );
-            if ( val != null )
-            {
-                props.setProperty( key + ".value", val );
-            }
-
-            String[] attributes = config.getAttributeNames();
-            props.setProperty( key + ".attributes", Integer.toString( attributes.length ) );
-            for ( int i = attributes.length - 1; i >= 0; i-- )
-            {
-                props.setProperty( key + ".attributes." + attributes[i], config.getAttribute( attributes[i], "" ) );
-            }
-
-            PlexusConfiguration children[] = config.getChildren();
-            props.setProperty( key + ".children", Integer.toString( children.length ) );
-            Map indices = new HashMap();
-            for ( int i = 0; i < children.length; i++ )
-            {
-                PlexusConfiguration child = children[i];
-                String name = child.getName();
-                Integer index = (Integer) indices.get( name );
-                if ( index == null )
-                {
-                    index = new Integer( 0 );
-                }
-                dumpValue( props, key + ".children." + name + "." + index, child );
-                indices.put( name, new Integer( index.intValue() + 1 ) );
-            }
-        }
-        else if ( value instanceof Date )
-        {
-            props.setProperty( key, new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" ).format( (Date) value ) );
-        }
-        else if ( value != null )
-        {
-            props.setProperty( key, value.toString() );
+            PropertiesUtil.serialize( props, "beanParam.fieldParam", beanParam.fieldParam );
+            PropertiesUtil.serialize( props, "beanParam.setterParam", beanParam.setterParam );
+            PropertiesUtil.serialize( props, "beanParam.setterCalled", Boolean.valueOf( beanParam.setterCalled ) );
         }
     }
 
