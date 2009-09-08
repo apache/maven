@@ -22,7 +22,6 @@ package org.apache.maven.model.plugin;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -104,41 +103,30 @@ public class DefaultLifecycleBindingsInjector
             {
                 List<Plugin> tgt = target.getPlugins();
 
-                Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
+                Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
+                for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
                 {
                     Plugin element = it.next();
                     Object key = getPluginKey( element );
                     merged.put( key, element );
                 }
 
-                Map<Object, Plugin> unmanaged = new LinkedHashMap<Object, Plugin>( merged );
+                Map<Object, Plugin> unmanaged = new LinkedHashMap<Object, Plugin>();
 
-                Map<Object, List<Plugin>> predecessors = new HashMap<Object, List<Plugin>>();
-
-                List<Plugin> pending = new ArrayList<Plugin>( tgt.size() );
-
-                for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
+                for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
                 {
                     Plugin element = it.next();
                     Object key = getPluginKey( element );
                     Plugin existing = merged.get( key );
                     if ( existing != null )
                     {
-                        mergePlugin( element, existing, sourceDominant, context );
-                        unmanaged.remove( key );
-                        merged.put( key, element );
-
-                        if ( !pending.isEmpty() )
-                        {
-                            predecessors.put( key, pending );
-                            pending = new ArrayList<Plugin>();
-                        }
+                        mergePlugin( existing, element, sourceDominant, context );
                     }
                     else
                     {
-                        pending.add( element );
+                        merged.put( key, element );
+                        unmanaged.put( key, element );
                     }
                 }
 
@@ -162,21 +150,7 @@ public class DefaultLifecycleBindingsInjector
                     }
                 }
 
-                List<Plugin> result = new ArrayList<Plugin>( src.size() + tgt.size() );
-
-                for ( Map.Entry<Object, Plugin> entry : merged.entrySet() )
-                {
-                    List<Plugin> pre = predecessors.get( entry.getKey() );
-
-                    if ( pre != null )
-                    {
-                        result.addAll( pre );
-                    }
-
-                    result.add( entry.getValue() );
-                }
-
-                result.addAll( pending );
+                List<Plugin> result = new ArrayList<Plugin>( merged.values() );
 
                 target.setPlugins( result );
             }
