@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.maven.ProjectDependenciesResolver;
@@ -944,13 +945,14 @@ public class DefaultLifecycleExecutor
          * is interested in, i.e. all phases up to and including the specified phase.
          */
 
-        Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<String, List<MojoExecution>>();
+        Map<String, Map<Integer, List<MojoExecution>>> mappings =
+            new LinkedHashMap<String, Map<Integer, List<MojoExecution>>>();
 
         for ( String phase : lifecycle.getPhases() )
         {
-            List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+            Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<Integer, List<MojoExecution>>();
 
-            lifecycleMappings.put( phase, mojoExecutions );
+            mappings.put( phase, phaseBindings );
 
             if ( phase.equals( lifecyclePhase ) )
             {
@@ -973,13 +975,13 @@ public class DefaultLifecycleExecutor
                 // to examine the phase it is associated to.
                 if ( execution.getPhase() != null )
                 {
-                    List<MojoExecution> mojoExecutions = lifecycleMappings.get( execution.getPhase() );
-                    if ( mojoExecutions != null )
+                    Map<Integer, List<MojoExecution>> phaseBindings = mappings.get( execution.getPhase() );
+                    if ( phaseBindings != null )
                     {
                         for ( String goal : execution.getGoals() )
                         {
                             MojoExecution mojoExecution = new MojoExecution( plugin, goal, execution.getId() );
-                            mojoExecutions.add( mojoExecution );
+                            addMojoExecution( phaseBindings, mojoExecution, execution.getPriority() );
                         }
                     }
                 }
@@ -991,18 +993,46 @@ public class DefaultLifecycleExecutor
                         MojoDescriptor mojoDescriptor =
                             pluginManager.getMojoDescriptor( plugin, goal, getRepositoryRequest( session, project ) );
 
-                        List<MojoExecution> mojoExecutions = lifecycleMappings.get( mojoDescriptor.getPhase() );
-                        if ( mojoExecutions != null )
+                        Map<Integer, List<MojoExecution>> phaseBindings = mappings.get( mojoDescriptor.getPhase() );
+                        if ( phaseBindings != null )
                         {
                             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
-                            mojoExecutions.add( mojoExecution );
+                            addMojoExecution( phaseBindings, mojoExecution, execution.getPriority() );
                         }
                     }
                 }
             }
         }
 
+        Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<String, List<MojoExecution>>();
+
+        for ( Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet() )
+        {
+            List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+
+            for ( List<MojoExecution> executions : entry.getValue().values() )
+            {
+                mojoExecutions.addAll( executions );
+            }
+
+            lifecycleMappings.put( entry.getKey(), mojoExecutions );
+        }
+
         return lifecycleMappings;
+    }
+
+    private void addMojoExecution( Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution,
+                                   int priority )
+    {
+        List<MojoExecution> mojoExecutions = phaseBindings.get( priority );
+
+        if ( mojoExecutions == null )
+        {
+            mojoExecutions = new ArrayList<MojoExecution>();
+            phaseBindings.put( priority, mojoExecutions );
+        }
+
+        mojoExecutions.add( mojoExecution );
     }
 
     public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
@@ -1591,6 +1621,7 @@ public class DefaultLifecycleExecutor
             PluginExecution execution = new PluginExecution();
             execution.setId( "default-" + p[p.length - 1] );
             execution.setPhase( phase );
+            execution.setPriority( -1 );
             execution.getGoals().add( p[p.length - 1] );
 
             Plugin plugin = new Plugin();
