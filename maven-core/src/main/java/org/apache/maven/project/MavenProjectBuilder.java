@@ -47,4 +47,10 @@ public interface MavenProjectBuilder
     MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
+    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
+        throws ProjectBuildingException;
+
+    MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
+        throws ProjectBuildingException;
+
 }

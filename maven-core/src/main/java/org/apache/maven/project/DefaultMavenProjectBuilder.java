@@ -36,6 +36,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @version $Id$
  */
 @Component(role = MavenProjectBuilder.class)
+@Deprecated
 public class DefaultMavenProjectBuilder
     implements MavenProjectBuilder
 {
@@ -163,6 +164,29 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         return projectBuilder.buildStandaloneSuperProject( config ).getProject();
+    }
+
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        return buildStandaloneSuperProject( localRepository, null );
+    }
+
+    public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
+        throws ProjectBuildingException
+    {
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+        configuration.setLocalRepository( localRepository );
+        configuration.setProcessPlugins( false );
+        configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+
+        if ( profileManager != null )
+        {
+            configuration.setActiveProfileIds( profileManager.getExplicitlyActivatedIds() );
+            configuration.setInactiveProfileIds( profileManager.getExplicitlyDeactivatedIds() );
+        }
+
+        return buildStandaloneSuperProject( configuration );
     }
 
 }

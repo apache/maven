@@ -1679,11 +1679,26 @@ public class MavenProject
         return sb.toString();
     }
 
+    /**
+     * @deprecated Use {@link org.apache.maven.model.io.ModelWriter}.
+     */
+    @Deprecated
     public void writeModel( Writer writer )
         throws IOException
     {
         MavenXpp3Writer pomWriter = new MavenXpp3Writer();
         pomWriter.write( writer, getModel() );
+    }
+
+    /**
+     * @deprecated Use {@link org.apache.maven.model.io.ModelWriter}.
+     */
+    @Deprecated
+    public void writeOriginalModel( Writer writer )
+        throws IOException
+    {
+        MavenXpp3Writer pomWriter = new MavenXpp3Writer();
+        pomWriter.write( writer, getOriginalModel() );
     }
 
     /**
