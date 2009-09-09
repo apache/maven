@@ -162,6 +162,8 @@ public class MavenMetadataSource
 
             pomArtifact = rel.pomArtifact;
 
+            relocatedArtifact = rel.relocatedArtifact;
+
             if ( rel.project == null )
             {
                 // When this happens we have a Maven 1.x POM, or some invalid POM. There is still a pile of
@@ -171,8 +173,6 @@ public class MavenMetadataSource
             }
             else
             {
-                relocatedArtifact = rel.relocatedArtifact;
-
                 dependencies = rel.project.getDependencies();
 
                 DependencyManagement depMngt = rel.project.getDependencyManagement();
@@ -454,13 +454,15 @@ public class MavenMetadataSource
     private ProjectRelocation retrieveRelocatedProject( Artifact artifact, RepositoryRequest repositoryRequest )
         throws ArtifactMetadataRetrievalException
     {
-        MavenProject project = null;
+        MavenProject project;
 
         Artifact pomArtifact;
         Artifact relocatedArtifact = artifact;
         boolean done = false;
         do
         {
+            project = null;
+
             pomArtifact =
                 repositorySystem.createProjectArtifact( relocatedArtifact.getGroupId(),
                                                         relocatedArtifact.getArtifactId(),
@@ -497,11 +499,11 @@ public class MavenMetadataSource
                     // missing/incompatible POM (e.g. a Maven 1 POM)
                     if ( e.getCause() instanceof ArtifactResolutionException )
                     {
-                        message = "Missing artifact metadata for " + artifact.getId();
+                        message = "Missing artifact metadata for " + relocatedArtifact.getId();
                     }
                     else
                     {
-                        message = "Invalid artifact metadata for " + artifact.getId();
+                        message = "Invalid artifact metadata for " + relocatedArtifact.getId();
                     }
 
                     if ( logger.isDebugEnabled() )
