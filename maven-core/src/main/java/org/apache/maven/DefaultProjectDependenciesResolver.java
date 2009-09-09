@@ -84,6 +84,12 @@ public class DefaultProjectDependenciesResolver
             return resolved;
         }
 
+        if ( ( scopesToCollect == null || scopesToCollect.isEmpty() )
+            && ( scopesToResolve == null || scopesToResolve.isEmpty() ) )
+        {
+            return resolved;
+        }
+
         /*
         
         Logic for transitve global exclusions

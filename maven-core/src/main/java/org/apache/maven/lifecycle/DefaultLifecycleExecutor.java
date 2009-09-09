@@ -181,6 +181,8 @@ public class DefaultLifecycleExecutor
     {
         logger.debug( "=== PROJECT BUILD PLAN ================================================" );
         logger.debug( "Project:       " + getKey( currentProject ) );
+        logger.debug( "Dependencies (collect): " + executionPlan.getRequiredCollectionScopes() );
+        logger.debug( "Dependencies (resolve): " + executionPlan.getRequiredResolutionScopes() );
 
         for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
         {
