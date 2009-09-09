@@ -53,6 +53,7 @@ import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.InvalidProjectModelException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.validation.ModelValidationResult;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -78,8 +79,29 @@ public class MavenMetadataSource
     // lazily instantiated and cached.
     private MavenProject superProject;
     
-    private Set warnedPoms = new HashSet();
-
+    // cache
+    private final Set<String> warnedPoms;
+    
+    // per-session information
+    private ProjectBuilderConfiguration projectBuilderConfig;
+    
+    public MavenMetadataSource()
+    {
+        warnedPoms = new HashSet<String>();
+    }
+    
+    public MavenMetadataSource( MavenMetadataSource mms, ProjectBuilderConfiguration configuration )
+    {
+        mavenProjectBuilder = mms.mavenProjectBuilder;
+        artifactFactory = mms.artifactFactory;
+        repositoryMetadataManager = mms.repositoryMetadataManager;
+        superProject = mms.superProject;
+        warnedPoms = mms.warnedPoms;
+        
+        projectBuilderConfig = configuration;
+        projectBuilderConfig.setMetadataSource( this );
+    }
+    
     /**
      * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
      */
@@ -143,6 +165,12 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         MavenProject project = null;
+        
+        ProjectBuilderConfiguration config = projectBuilderConfig;
+        if ( config == null )
+        {
+            config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
+        }
 
         Artifact pomArtifact;
         boolean done = false;
@@ -160,7 +188,7 @@ public class MavenMetadataSource
             {
                 try
                 {
-                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository,
+                    project = mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, config,
                                                                        true );
                 }
                 catch ( InvalidProjectModelException e )
@@ -352,11 +380,17 @@ public class MavenMetadataSource
     private List aggregateRepositoryLists( List remoteRepositories, List remoteArtifactRepositories )
         throws ArtifactMetadataRetrievalException
     {
+        ProjectBuilderConfiguration config = projectBuilderConfig;
+        if ( config == null )
+        {
+            config = new DefaultProjectBuilderConfiguration();
+        }
+        
         if ( superProject == null )
         {
             try
             {
-                superProject = mavenProjectBuilder.buildStandaloneSuperProject( new DefaultProjectBuilderConfiguration() );
+                superProject = mavenProjectBuilder.buildStandaloneSuperProject( config );
             }
             catch ( ProjectBuildingException e )
             {

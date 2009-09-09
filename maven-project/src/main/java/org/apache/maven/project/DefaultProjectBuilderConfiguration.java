@@ -1,5 +1,6 @@
 package org.apache.maven.project;
 
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.profiles.ProfileManager;
 
@@ -19,6 +20,8 @@ public class DefaultProjectBuilderConfiguration
     private Properties executionProperties = System.getProperties();
 
     private Date buildStartTime;
+
+    private ArtifactMetadataSource metadataSource;
 
     public DefaultProjectBuilderConfiguration()
     {
@@ -82,6 +85,17 @@ public class DefaultProjectBuilderConfiguration
     {
         this.buildStartTime = buildStartTime;
         return this;
+    }
+
+    public ProjectBuilderConfiguration setMetadataSource( ArtifactMetadataSource metadataSource )
+    {
+        this.metadataSource = metadataSource;
+        return this;
+    }
+    
+    public ArtifactMetadataSource getMetadataSource()
+    {
+        return metadataSource;
     }
 
 }

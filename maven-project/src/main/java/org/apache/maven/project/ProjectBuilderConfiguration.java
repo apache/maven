@@ -1,5 +1,6 @@
 package org.apache.maven.project;
 
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.profiles.ProfileManager;
 
@@ -28,5 +29,9 @@ public interface ProjectBuilderConfiguration
     Date getBuildStartTime();
 
     ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime );
+
+    ProjectBuilderConfiguration setMetadataSource( ArtifactMetadataSource mms );
+    
+    ArtifactMetadataSource getMetadataSource();
 
 }

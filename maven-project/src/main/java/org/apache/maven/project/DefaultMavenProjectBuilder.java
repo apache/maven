@@ -239,6 +239,17 @@ public class DefaultMavenProjectBuilder
                                              boolean allowStubModel )
         throws ProjectBuildingException
     {
+        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
+        
+        return buildFromRepository( artifact, remoteArtifactRepositories, config, allowStubModel );
+    }
+
+    public MavenProject buildFromRepository( Artifact artifact,
+                                             List remoteArtifactRepositories,
+                                             ProjectBuilderConfiguration config,
+                                             boolean allowStubModel )
+        throws ProjectBuildingException
+    {
         String cacheKey = createCacheKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
 
         MavenProject project = (MavenProject) processedProjectCache.get( cacheKey );
@@ -248,9 +259,7 @@ public class DefaultMavenProjectBuilder
             return project;
         }
 
-        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, localRepository, allowStubModel );
-
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
+        Model model = findModelFromRepository( artifact, remoteArtifactRepositories, config, allowStubModel );
 
         return buildInternal( "Artifact [" + artifact + "]", model, config, remoteArtifactRepositories,
                               null, false );
@@ -526,7 +535,7 @@ public class DefaultMavenProjectBuilder
 
     private Model findModelFromRepository( Artifact artifact,
                                            List remoteArtifactRepositories,
-                                           ArtifactRepository localRepository,
+                                           ProjectBuilderConfiguration config,
                                            boolean allowStubModel )
         throws ProjectBuildingException
     {
@@ -555,7 +564,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, localRepository );
+            artifactResolver.resolve( projectArtifact, remoteArtifactRepositories, config.getLocalRepository() );
 
             File file = projectArtifact.getFile();
 
@@ -574,7 +583,7 @@ public class DefaultMavenProjectBuilder
                 status = ArtifactStatus.valueOf( distributionManagement.getStatus() );
             }
 
-            checkStatusAndUpdate( projectArtifact, status, file, remoteArtifactRepositories, localRepository );
+            checkStatusAndUpdate( projectArtifact, status, file, remoteArtifactRepositories, config.getLocalRepository() );
 
             // TODO: this is gross. Would like to give it the whole model, but maven-artifact shouldn't depend on that
             // Can a maven-core implementation of the Artifact interface store it, and be used in the exceptions?
@@ -859,6 +868,7 @@ public class DefaultMavenProjectBuilder
 
         // only add the super repository if it wasn't overridden by a profile or project
         List repositories = new ArrayList( aggregatedRemoteWagonRepositories );
+        repositories.addAll( parentSearchRepositories );
 
         List superRepositories = buildArtifactRepositories( superModel );
 
@@ -996,7 +1006,7 @@ public class DefaultMavenProjectBuilder
         // MNG-3482: Make sure depMgmt is interpolated before merging.
         if ( !isSuperPom )
         {
-            mergeManagedDependencies( model, config.getLocalRepository(), remoteRepositories );
+            mergeManagedDependencies( model, config, remoteRepositories );
         }
 
         // interpolation is before injection, because interpolation is off-limits in the injected variables
@@ -1389,7 +1399,7 @@ public class DefaultMavenProjectBuilder
 
                 try
                 {
-                    model = findModelFromRepository( parentArtifact, remoteRepositories, config.getLocalRepository(), false );
+                    model = findModelFromRepository( parentArtifact, remoteRepositories, config, false );
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -1422,7 +1432,7 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private void mergeManagedDependencies(Model model, ArtifactRepository localRepository, List parentSearchRepositories)
+    private void mergeManagedDependencies(Model model, ProjectBuilderConfiguration config, List parentSearchRepositories)
         throws ProjectBuildingException
     {
         DependencyManagement modelDepMgmt = model.getDependencyManagement();
@@ -1453,7 +1463,7 @@ public class DefaultMavenProjectBuilder
                     {
                         Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),
                                                                                   dep.getVersion(), dep.getScope() );
-                        MavenProject project = buildFromRepository(artifact, parentSearchRepositories, localRepository, false);
+                        MavenProject project = buildFromRepository(artifact, parentSearchRepositories, config, false);
 
                         DependencyManagement depMgmt = project.getDependencyManagement();
 

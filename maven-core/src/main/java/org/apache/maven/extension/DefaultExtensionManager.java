@@ -21,7 +21,7 @@ package org.apache.maven.extension;
 
 import static org.apache.maven.container.ContainerUtils.findChildComponentHints;
 
-import org.apache.maven.MavenArtifactFilterManager; 
+import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -38,7 +38,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Extension;
 import org.apache.maven.plugin.DefaultPluginManager;
+import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.apache.maven.wagon.Wagon;
 import org.codehaus.classworlds.ClassRealm;
 import org.codehaus.classworlds.ClassWorld;
@@ -61,7 +63,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -99,6 +100,14 @@ public class DefaultExtensionManager
                               ArtifactRepository localRepository )
         throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
     {
+        addExtension( extension, project, new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository ) );
+    }
+    
+    public void addExtension( Extension extension,
+                              MavenProject project,
+                              ProjectBuilderConfiguration builderConfig )
+        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException
+    {
         String extensionId = ArtifactUtils.versionlessKey( extension.getGroupId(), extension.getArtifactId() );
 
         getLogger().debug( "Initialising extension: " + extensionId );
@@ -108,11 +117,17 @@ public class DefaultExtensionManager
         if ( artifact != null )
         {
             ArtifactFilter filter = new ProjectArtifactExceptionFilter( artifactFilter, project.getArtifact() );
+            
+            ArtifactMetadataSource metadataSource = builderConfig.getMetadataSource();
+            if ( metadataSource == null )
+            {
+                metadataSource = artifactMetadataSource;
+            }
 
             ResolutionGroup resolutionGroup;
             try
             {
-                resolutionGroup = artifactMetadataSource.retrieve( artifact, localRepository,
+                resolutionGroup = metadataSource.retrieve( artifact, builderConfig.getLocalRepository(),
                                                                    project.getRemoteArtifactRepositories() );
             }
             catch ( ArtifactMetadataRetrievalException e )
@@ -123,10 +138,10 @@ public class DefaultExtensionManager
 
             // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
             // not declare plexus-utils but need it. MNG-2900
-            Set rgArtifacts = resolutionGroup.getArtifacts();
+            Set<Artifact> rgArtifacts = resolutionGroup.getArtifacts();
             rgArtifacts = DefaultPluginManager.checkPlexusUtils( rgArtifacts, artifactFactory );
 
-            Set dependencies = new LinkedHashSet();
+            Set<Artifact> dependencies = new LinkedHashSet<Artifact>();
             dependencies.add( artifact );
             dependencies.addAll( rgArtifacts );
 
@@ -136,16 +151,16 @@ public class DefaultExtensionManager
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, project.getArtifact(),
                                                                                     Collections.EMPTY_MAP,
                                                                                     //project.getManagedVersionMap(),
-                                                                                    localRepository,
+                                                                                    builderConfig.getLocalRepository(),
                                                                                     project.getRemoteArtifactRepositories(),
-                                                                                    artifactMetadataSource, filter );
+                                                                                    metadataSource, filter );
 
             // gross hack for some backwards compat (MNG-2749)
             // if it is a lone artifact, then we assume it to be a resource package, and put it in the main container
             // as before. If it has dependencies, that's when we risk conflict and exile to the child container
             // jvz: we have to make this 2 because plexus is always added now.
 
-            Set artifacts = result.getArtifacts();
+            Set<Artifact> artifacts = result.getArtifacts();
 
             // Lifecycles are loaded by the Lifecycle executor by looking up lifecycle definitions from the
             // core container. So we need to look if an extension has a lifecycle mapping and use the container
@@ -153,10 +168,8 @@ public class DefaultExtensionManager
 
             if ( extensionContainsLifeycle( artifact.getFile() ) )
             {
-                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                for ( Artifact a : artifacts )
                 {
-                    Artifact a = (Artifact) i.next();
-
                     if ( artifactFilter.include( a ) )
                     {
                         getLogger().debug( "Adding extension to core container: " + a.getFile() );
@@ -167,10 +180,8 @@ public class DefaultExtensionManager
             }
             else if ( artifacts.size() == 2 )
             {
-                for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+                for ( Artifact a : artifacts )
                 {
-                    Artifact a = (Artifact) i.next();
-
                     if ( !a.getArtifactId().equals( "plexus-utils" ) )
                     {
                         a = project.replaceWithActiveArtifact( a );
@@ -191,10 +202,8 @@ public class DefaultExtensionManager
                     extensionContainer = createContainer();
                 }
 
-                for ( Iterator i = result.getArtifacts().iterator(); i.hasNext(); )
+                for ( Artifact a : (Set<Artifact>) result.getArtifacts() )
                 {
-                    Artifact a = (Artifact) i.next();
-
                     a = project.replaceWithActiveArtifact( a );
 
                     getLogger().debug( "Adding to extension classpath: " + a.getFile() );

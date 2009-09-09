@@ -91,6 +91,22 @@ public interface MavenProjectBuilder
         throws ProjectBuildingException;
 
     /**
+     * Build the artifact using the local repository and profile manager from the project-builder 
+     * configuration, resolving it if necessary.
+     *
+     * @param artifact the artifact description
+     * @param configuration The {@link ProjectBuilderConfiguration} instance containing local 
+     *                      repository, profile manager, etc.
+     * @param remoteArtifactRepositories the remote repository list
+     * @param allowStubModel return a stub if the POM is not found
+     * @return the built project
+     * @throws ProjectBuildingException
+     */
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
+                                      ProjectBuilderConfiguration configuration, boolean allowStubModel )
+        throws ProjectBuildingException;
+
+    /**
      * @deprecated Use {@link MavenProjectBuilder#buildStandaloneSuperProject(ProjectBuilderConfiguration)} instead.
      */
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )

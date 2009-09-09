@@ -25,6 +25,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DefaultProjectBuilderConfiguration;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilderConfiguration;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -44,7 +45,7 @@ public class MavenSession
 
     private ArtifactRepository localRepository;
 
-    private List goals;
+    private List<String> goals;
 
     private EventDispatcher eventDispatcher;
 
@@ -65,15 +66,17 @@ public class MavenSession
 
     private MavenProject currentProject;
 
+    private ProjectBuilderConfiguration projectBuilderConfig;
+
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List<String> goals,
                          String executionRootDir, Properties executionProperties, Date startTime )
     {
         this( container, settings, localRepository, eventDispatcher, reactorManager, goals, executionRootDir, executionProperties, null, startTime );
     }
 
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
-                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List goals,
+                         EventDispatcher eventDispatcher, ReactorManager reactorManager, List<String> goals,
                          String executionRootDir, Properties executionProperties, Properties userProperties, Date startTime )
     {
         this.container = container;
@@ -97,6 +100,21 @@ public class MavenSession
         this.startTime = startTime;
     }
 
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, ReactorManager rpm )
+    {
+        this.container = container;
+        this.settings = request.getSettings();
+        this.localRepository = request.getLocalRepository();
+        this.eventDispatcher = request.getEventDispatcher();
+        this.reactorManager = rpm;
+        this.goals = request.getGoals();
+        this.executionRootDir = request.getBaseDirectory();
+        this.executionProperties = request.getExecutionProperties();
+        this.userProperties = request.getUserProperties();
+        this.startTime = request.getStartTime();
+        this.projectBuilderConfig = request.getProjectBuilderConfiguration();
+    }
+    
     public Map getPluginContext( PluginDescriptor pluginDescriptor, MavenProject project )
     {
         return reactorManager.getPluginContext( pluginDescriptor, project );
@@ -112,7 +130,7 @@ public class MavenSession
         return localRepository;
     }
 
-    public List getGoals()
+    public List<String> getGoals()
     {
         return goals;
     }
@@ -138,13 +156,13 @@ public class MavenSession
         return container.lookup( role, roleHint );
     }
 
-    public List lookupList( String role )
+    public List<?> lookupList( String role )
         throws ComponentLookupException
     {
         return container.lookupList( role );
     }
 
-    public Map lookupMap( String role )
+    public Map<String, ?> lookupMap( String role )
         throws ComponentLookupException
     {
         return container.lookupMap( role );
@@ -209,18 +227,19 @@ public class MavenSession
         this.userProperties = userProperties;
     }
 
-    /**
-     * NOTE: This varies from {@link DefaultMavenExecutionRequest#getProjectBuilderConfiguration()} in that
-     * it doesn't supply a global profile manager.
-     */
     public ProjectBuilderConfiguration getProjectBuilderConfiguration()
     {
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-        config.setLocalRepository( getLocalRepository() )
-              .setExecutionProperties( getExecutionProperties() )
-              .setUserProperties( getUserProperties() )
-              .setBuildStartTime( getStartTime() );
+        if ( projectBuilderConfig == null )
+        {
+            ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+            config.setLocalRepository( getLocalRepository() )
+                  .setExecutionProperties( getExecutionProperties() )
+                  .setUserProperties( getUserProperties() )
+                  .setBuildStartTime( getStartTime() );
+            
+            this.projectBuilderConfig = config;
+        }
 
-        return config;
+        return projectBuilderConfig;
     }
 }
