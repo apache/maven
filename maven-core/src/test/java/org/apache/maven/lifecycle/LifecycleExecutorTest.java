@@ -146,8 +146,8 @@ public class LifecycleExecutorTest
         //[11] resources:testResources
         //[12] compiler:testCompile
         //[13] surefire:test
-        //[14] plugin:addPluginArtifactMetadata        
-        //[15] jar:jar
+        //[14] jar:jar
+        //[15] plugin:addPluginArtifactMetadata        
         //[16] install:install
         //
         
@@ -166,8 +166,8 @@ public class LifecycleExecutorTest
         assertEquals( "resources:testResources", executions.get( 10 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:testCompile", executions.get( 11 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "surefire:test", executions.get( 12 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plugin:addPluginArtifactMetadata", executions.get( 13 ).getMojoDescriptor().getFullGoalName() );                
-        assertEquals( "jar:jar", executions.get( 14 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "jar:jar", executions.get( 13 ).getMojoDescriptor().getFullGoalName() );                
+        assertEquals( "plugin:addPluginArtifactMetadata", executions.get( 14 ).getMojoDescriptor().getFullGoalName() );                
         assertEquals( "install:install", executions.get( 15 ).getMojoDescriptor().getFullGoalName() );
         
         assertEquals( "src/main/mdo/remote-resources.mdo", new MojoExecutionXPathContainer( executions.get( 1 ) ).getValue( "configuration/models[1]/model" ) );

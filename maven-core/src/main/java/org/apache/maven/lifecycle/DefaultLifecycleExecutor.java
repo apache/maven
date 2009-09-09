@@ -1609,16 +1609,18 @@ public class DefaultLifecycleExecutor
 
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, String goals )
     {
-        for ( StringTokenizer tok = new StringTokenizer( goals, "," ); tok.hasMoreTokens(); )
+        String[] mojos = StringUtils.split( goals, "," );
+
+        for ( int i = 0; i < mojos.length; i++ )
         {
             // either <groupId>:<artifactId>:<goal> or <groupId>:<artifactId>:<version>:<goal>
-            String goal = tok.nextToken().trim();
+            String goal = mojos[i].trim();
             String[] p = StringUtils.split( goal, ":" );
 
             PluginExecution execution = new PluginExecution();
             execution.setId( "default-" + p[p.length - 1] );
             execution.setPhase( phase );
-            execution.setPriority( -1 );
+            execution.setPriority( i - mojos.length );
             execution.getGoals().add( p[p.length - 1] );
 
             Plugin plugin = new Plugin();
