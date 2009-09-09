@@ -273,7 +273,7 @@ public class DefaultLifecycleExecutor
                 fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
 
                 repositoryRequest.setRemoteRepositories( currentProject.getPluginArtifactRepositories() );
-                populateDefaultConfigurationForPlugins( currentProject.getBuild().getPlugins(), repositoryRequest );
+                resolveMissingPluginVersions( currentProject.getBuildPlugins(), repositoryRequest );
 
                 ClassRealm projectRealm = currentProject.getClassRealm();
                 if ( projectRealm != null )
@@ -722,7 +722,7 @@ public class DefaultLifecycleExecutor
             populateMojoExecutionConfiguration( project, mojoExecution,
                                                 MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
 
-            extractMojoConfiguration( mojoExecution );
+            finalizeMojoConfiguration( mojoExecution );
 
             calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
 
@@ -1120,7 +1120,7 @@ public class DefaultLifecycleExecutor
 
         populateMojoExecutionConfiguration( project, forkedExecution, true );
 
-        extractMojoConfiguration( forkedExecution );
+        finalizeMojoConfiguration( forkedExecution );
 
         calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
 
@@ -1163,13 +1163,11 @@ public class DefaultLifecycleExecutor
 
         for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
         {
-            for ( Iterator<MojoExecution> it = forkedExecutions.iterator(); it.hasNext(); )
+            for ( MojoExecution forkedExecution : forkedExecutions )
             {
-                MojoExecution forkedExecution = it.next();
-
                 if ( !alreadyForkedExecutions.contains( forkedExecution.getMojoDescriptor() ) )
                 {
-                    extractMojoConfiguration( forkedExecution );
+                    finalizeMojoConfiguration( forkedExecution );
 
                     calculateForkedExecutions( forkedExecution, session, project, alreadyForkedExecutions );
 
@@ -1282,13 +1280,9 @@ public class DefaultLifecycleExecutor
 
         Plugin plugin = findPlugin( g, a, project.getBuildPlugins() );
 
-        boolean managedPlugin = false;
-
         if ( plugin == null && project.getPluginManagement() != null )
         {
             plugin = findPlugin( g, a, project.getPluginManagement().getPlugins() );
-
-            managedPlugin = true;
         }
 
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
@@ -1305,18 +1299,6 @@ public class DefaultLifecycleExecutor
                         ( executionConfiguration != null ) ? new Xpp3Dom( executionConfiguration ) : null;
 
                     mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
-
-                    /*
-                     * The model only contains the default configuration for those goals that are present in the plugin
-                     * execution. For goals invoked from the CLI or a forked execution, we need to grab the default
-                     * parameter values explicitly.
-                     */
-                    if ( managedPlugin || !e.getGoals().contains( mojoExecution.getGoal() ) )
-                    {
-                        Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
-
-                        mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoConfiguration, defaultConfiguration );
-                    }
 
                     mojoExecution.setConfiguration( mojoConfiguration );
 
@@ -1344,13 +1326,26 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void extractMojoConfiguration( MojoExecution mojoExecution )
+    /**
+     * Post-processes the effective configuration for the specified mojo execution. This step discards all parameters
+     * from the configuration that are not applicable to the mojo and injects the default values for any missing
+     * parameters.
+     * 
+     * @param mojoExecution The mojo execution whose configuration should be finalized, must not be {@code null}.
+     */
+    private void finalizeMojoConfiguration( MojoExecution mojoExecution )
     {
-        Xpp3Dom configuration = mojoExecution.getConfiguration();
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        configuration = extractMojoConfiguration( configuration, mojoExecution.getMojoDescriptor() );
+        Xpp3Dom mojoConfiguration = mojoExecution.getConfiguration();
 
-        mojoExecution.setConfiguration( configuration );
+        mojoConfiguration = extractMojoConfiguration( mojoConfiguration, mojoDescriptor );
+
+        Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
+
+        mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoConfiguration, defaultConfiguration, Boolean.TRUE );
+
+        mojoExecution.setConfiguration( mojoConfiguration );
     }
 
     /**
@@ -1645,81 +1640,24 @@ public class DefaultLifecycleExecutor
             plugin.getExecutions().add( execution );
         }
     }
-    
-    public void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest ) 
+
+    private void resolveMissingPluginVersions( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
         throws LifecycleExecutionException
     {
-        if ( plugin.getVersion() == null )
+        for ( Plugin plugin : plugins )
         {
-            try
+            if ( plugin.getVersion() == null )
             {
-                resolvePluginVersion( plugin, repositoryRequest );
-            }
-            catch ( PluginVersionResolutionException e )
-            {
-                throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin.getKey(), e );
-            }
-        }
-
-        try
-        {
-            // NOTE: Retrieve the plugin descriptor regardless whether there are any executions to verify the plugin
-            PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, repositoryRequest );
-
-            for ( PluginExecution pluginExecution : plugin.getExecutions() )
-            {
-                for ( String goal : pluginExecution.getGoals() )
+                try
                 {
-                    MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
-
-                    if ( mojoDescriptor == null )
-                    {
-                        throw new MojoNotFoundException( goal, pluginDescriptor );
-                    }
-
-                    Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
-
-                    Xpp3Dom executionConfiguration =
-                        Xpp3Dom.mergeXpp3Dom( (Xpp3Dom) pluginExecution.getConfiguration(), defaultConfiguration,
-                                              Boolean.TRUE );
-
-                    pluginExecution.setConfiguration( executionConfiguration );
+                    resolvePluginVersion( plugin, repositoryRequest );
+                }
+                catch ( PluginVersionResolutionException e )
+                {
+                    throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin.getKey()
+                        + ": " + e.getMessage(), e );
                 }
             }
-        }
-        catch ( PluginNotFoundException e )
-        {
-            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
-                + e.getMessage(), e );
-        }
-        catch ( PluginResolutionException e )
-        {
-            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
-                + e.getMessage(), e );
-        }
-        catch ( PluginDescriptorParsingException e )
-        {
-            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
-                + e.getMessage(), e );
-        }
-        catch ( MojoNotFoundException e )
-        {
-            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
-                + e.getMessage(), e );
-        }
-        catch ( InvalidPluginDescriptorException e )
-        {
-            throw new LifecycleExecutionException( "Error getting plugin information for " + plugin.getId() + ": "
-                + e.getMessage(), e );
-        }
-    }
-
-    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest ) 
-        throws LifecycleExecutionException
-    {
-        for( Plugin plugin : plugins )
-        {            
-            populateDefaultConfigurationForPlugin( plugin, repositoryRequest );
         }
     }
 

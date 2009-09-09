@@ -19,11 +19,9 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -80,15 +78,6 @@ public interface LifecycleExecutor
      */
     Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
 
-    // Given a set of {@link org.apache.maven.Plugin} objects where the GAV is set we can lookup the plugin
-    // descriptor and populate the default configuration.
-    //
-    void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
-        throws LifecycleExecutionException;
-
-    void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws LifecycleExecutionException;
-    
     void execute( MavenSession session );
 
     /**

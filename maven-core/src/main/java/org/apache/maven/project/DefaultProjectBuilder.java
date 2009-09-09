@@ -22,17 +22,12 @@ import java.util.List;
 
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
@@ -64,9 +59,6 @@ public class DefaultProjectBuilder
 
     @Requirement
     private ProjectBuildingHelper projectBuildingHelper;
-
-    @Requirement
-    private LifecycleExecutor lifecycle;
 
     @Requirement
     private RepositorySystem repositorySystem;
@@ -125,33 +117,6 @@ public class DefaultProjectBuilder
                 modelProblems = result.getProblems();
 
                 project = toProject( result, configuration, listener );
-            }
-
-            if ( configuration.isProcessPlugins() && configuration.isProcessPluginConfiguration() )
-            {
-                RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-                repositoryRequest.setLocalRepository( configuration.getLocalRepository() );
-                repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
-                repositoryRequest.setCache( configuration.getRepositoryCache() );
-                repositoryRequest.setOffline( configuration.isOffline() );
-
-                for ( Plugin plugin : project.getBuildPlugins() )
-                {
-                    try
-                    {
-                        lifecycle.populateDefaultConfigurationForPlugin( plugin, repositoryRequest );
-                    }
-                    catch ( LifecycleExecutionException e )
-                    {
-                        if ( modelProblems == null )
-                        {
-                            modelProblems = new ArrayList<ModelProblem>();
-                        }
-
-                        modelProblems.add( new DefaultModelProblem( e.getMessage(), ModelProblem.Severity.WARNING,
-                                                                    project.getModel(), e ) );
-                    }
-                }
             }
 
             ArtifactResolutionResult artifactResult = null;

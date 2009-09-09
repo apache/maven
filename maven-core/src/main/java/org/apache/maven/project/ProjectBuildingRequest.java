@@ -110,10 +110,6 @@ public interface ProjectBuildingRequest
 
     boolean isProcessPlugins();
 
-    ProjectBuildingRequest setProcessPluginConfiguration( boolean processPluginConfiguration );
-
-    boolean isProcessPluginConfiguration();
-
     ProjectBuildingRequest setResolveDependencies( boolean resolveDependencies );
 
     boolean isResolveDependencies();

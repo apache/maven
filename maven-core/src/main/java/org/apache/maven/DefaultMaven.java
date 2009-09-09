@@ -311,12 +311,6 @@ public class DefaultMaven
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        /*
-         * NOTE: We delay plugin configuration processing until a project is actually build to allow plugins to be
-         * resolved from the reactor.
-         */
-        projectBuildingRequest.setProcessPluginConfiguration( false );
-
         List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
 
         for ( ProjectBuildingResult result : results )
