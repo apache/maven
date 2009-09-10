@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -189,9 +188,8 @@ public class DefaultMavenSettingsBuilder
     {
         List<String> activeProfiles = settings.getActiveProfiles();
 
-        for ( Iterator profiles = settings.getProfiles().iterator(); profiles.hasNext(); )
+        for ( Profile profile : settings.getProfiles() )
         {
-            Profile profile = (Profile) profiles.next();
             if ( profile.getActivation() != null && profile.getActivation().isActiveByDefault()
                 && !activeProfiles.contains( profile.getId() ) )
             {

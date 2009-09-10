@@ -43,11 +43,11 @@ public class RuntimeInfo
     // using Boolean for 3VL (null for not-set, otherwise override with value)
 //    private Boolean checkLatest;
 
-    private Map activeProfileToSourceLevel = new HashMap();
+    private Map<String, String> activeProfileToSourceLevel = new HashMap<String, String>();
 
     private String localRepositorySourceLevel = TrackableBase.USER_LEVEL;
 
-    private Map pluginGroupIdSourceLevels = new HashMap();
+    private Map<String, String> pluginGroupIdSourceLevels = new HashMap<String, String>();
 
     private final Settings settings;
 
