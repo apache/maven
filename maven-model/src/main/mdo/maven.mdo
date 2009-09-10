@@ -578,7 +578,7 @@
 
     /**
      * Gets the POM file for the corresponding project (if any).
-     * 
+     *
      * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
@@ -594,7 +594,7 @@
 
     /**
      * Gets the base directory for the corresponding project (if any).
-     * 
+     *
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
      */
@@ -2216,7 +2216,7 @@
             setMergeId( "resource-" + (mergeIdCounter++) );
         }
     }
-    
+
     public boolean isFiltering()
     {
         return ( filtering != null ) ? Boolean.parseBoolean( filtering ) : false;
@@ -2225,8 +2225,8 @@
     public void setFiltering( boolean filtering )
     {
         this.filtering = String.valueOf( filtering );
-    }  
-    
+    }
+
     /**
      * @see java.lang.Object#toString()
      */
@@ -2406,7 +2406,8 @@
      */
     public boolean equals( Object obj )
     {
-        if ( obj instanceof RepositoryBase ) {
+        if ( obj instanceof RepositoryBase )
+        {
 
             final RepositoryBase other =  (RepositoryBase) obj;
 
@@ -2579,7 +2580,7 @@
             ]]>
           </code>
         </codeSegment>
-      </codeSegments>      
+      </codeSegments>
     </class>
 
     <!--@todo find better solution for management of site deployments -->
@@ -2801,7 +2802,7 @@
 
     /**
      * Gets the identifier of the plugin.
-     * 
+     *
      * @return The plugin id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
      */
     public String getId()
