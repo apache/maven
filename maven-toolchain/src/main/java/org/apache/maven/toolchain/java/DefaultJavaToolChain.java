@@ -43,7 +43,7 @@ public class DefaultJavaToolChain
         super( model, "jdk", logger );
     }
 
-    public String getJavaHome( )
+    public String getJavaHome()
     {
         return javaHome;
     }
@@ -53,18 +53,17 @@ public class DefaultJavaToolChain
         this.javaHome = javaHome;
     }
 
-    public String toString( )
+    public String toString()
     {
-        return "JDK[" + getJavaHome(  ) + "]";
+        return "JDK[" + getJavaHome() + "]";
     }
 
     public String findTool( String toolName )
     {
-        File toRet = findTool( toolName,
-            new File( FileUtils.normalize( getJavaHome(  ) ) ) );
+        File toRet = findTool( toolName, new File( FileUtils.normalize( getJavaHome() ) ) );
         if ( toRet != null )
         {
-            return toRet.getAbsolutePath(  );
+            return toRet.getAbsolutePath();
         }
         return null;
     }
@@ -73,15 +72,14 @@ public class DefaultJavaToolChain
     private static File findTool( String toolName, File installFolder )
     {
         File bin = new File( installFolder, "bin" ); //NOI18N
-        if ( bin.exists(  ) )
+        if ( bin.exists() )
         {
-            File tool = new File( bin,
-                toolName + (Os.isFamily( "windows" ) ? ".exe" : "") ); //NOI18N
-            if ( tool.exists(  ) )
+            File tool = new File( bin, toolName + ( Os.isFamily( "windows" ) ? ".exe" : "" ) ); // NOI18N
+            if ( tool.exists() )
             {
                 return tool;
             }
         }
         return null;
-    }
+   }
 }

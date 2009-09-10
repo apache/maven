@@ -40,22 +40,24 @@ public class DefaultJavaToolchainFactory
 
     private Logger logger;
 
-    public DefaultJavaToolchainFactory( )
+    public DefaultJavaToolchainFactory()
     {
     }
-    
+
     public ToolchainPrivate createToolchain( ToolchainModel model )
         throws MisconfiguredToolchainException
     {
-        if (model == null) {
+        if ( model == null )
+        {
             return null;
         }
-        DefaultJavaToolChain jtc = new DefaultJavaToolChain( model , logger);
+        DefaultJavaToolChain jtc = new DefaultJavaToolChain( model, logger );
         Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
         Xpp3Dom javahome = dom.getChild( DefaultJavaToolChain.KEY_JAVAHOME );
         if ( javahome == null )
         {
-            throw new MisconfiguredToolchainException( "Java toolchain without the " + DefaultJavaToolChain.KEY_JAVAHOME + " configuration element." );
+            throw new MisconfiguredToolchainException( "Java toolchain without the "
+                + DefaultJavaToolChain.KEY_JAVAHOME + " configuration element." );
         }
         File normal = new File( FileUtils.normalize( javahome.getValue() ) );
         if ( normal.exists() )
@@ -64,7 +66,8 @@ public class DefaultJavaToolchainFactory
         }
         else
         {
-            throw new MisconfiguredToolchainException( "Non-existing JDK home configuration at " + normal.getAbsolutePath(  ) );
+            throw new MisconfiguredToolchainException( "Non-existing JDK home configuration at "
+                + normal.getAbsolutePath() );
         }
 
         //now populate the provides section.
@@ -96,10 +99,10 @@ public class DefaultJavaToolchainFactory
     public ToolchainPrivate createDefaultToolchain()
     {
         //not sure it's necessary to provide a default toolchain here.
-        //only version can be eventually supplied, and 
+        //only version can be eventually supplied, and
         return null;
     }
-    
+
     protected Logger getLogger()
     {
         return logger;
@@ -109,5 +112,4 @@ public class DefaultJavaToolchainFactory
     {
         this.logger = logger;
     }
-    
 }
