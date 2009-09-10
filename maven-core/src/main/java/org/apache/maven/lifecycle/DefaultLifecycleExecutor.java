@@ -1341,11 +1341,11 @@ public class DefaultLifecycleExecutor
 
         Xpp3Dom mojoConfiguration = mojoExecution.getConfiguration();
 
-        mojoConfiguration = extractMojoConfiguration( mojoConfiguration, mojoDescriptor );
-
         Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
 
         mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoConfiguration, defaultConfiguration, Boolean.TRUE );
+
+        mojoConfiguration = extractMojoConfiguration( mojoConfiguration, mojoDescriptor );
 
         mojoExecution.setConfiguration( mojoConfiguration );
     }

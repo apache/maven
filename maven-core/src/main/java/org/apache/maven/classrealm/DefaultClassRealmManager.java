@@ -83,7 +83,7 @@ public class DefaultClassRealmManager
             {
                 try
                 {
-                    classRealm = world.newRealm( realmId );
+                    classRealm = world.newRealm( realmId, null );
 
                     if ( logger.isDebugEnabled() )
                     {
@@ -158,6 +158,9 @@ public class DefaultClassRealmManager
 
         // plexus-classworlds
         importingRealm.importFromParent( "org.codehaus.plexus.classworlds" );
+
+        // classworlds (for legacy code)
+        importingRealm.importFromParent( "org.codehaus.classworlds" );
 
         // plexus-container, plexus-component-annotations
         importingRealm.importFromParent( "org.codehaus.plexus.component" );
