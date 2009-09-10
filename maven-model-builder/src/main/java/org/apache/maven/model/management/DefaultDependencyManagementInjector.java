@@ -21,7 +21,6 @@ package org.apache.maven.model.management;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles injection of dependency management into the model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = DependencyManagementInjector.class )
@@ -90,9 +89,8 @@ public class DefaultDependencyManagementInjector
             {
                 List<Exclusion> src = source.getExclusions();
 
-                for ( Iterator<Exclusion> it = src.iterator(); it.hasNext(); )
+                for ( Exclusion element : src )
                 {
-                    Exclusion element = it.next();
                     Exclusion clone = new Exclusion();
                     mergeExclusion( clone, element, true, context );
                     target.addExclusion( clone );

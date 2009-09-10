@@ -21,7 +21,6 @@ package org.apache.maven.model.management;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles injection of plugin management into the model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = PluginManagementInjector.class )
@@ -82,16 +81,14 @@ public class DefaultPluginManagementInjector
 
                 Map<Object, Object> context = Collections.emptyMap();
 
-                for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
+                for ( Plugin element : src )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     managedPlugins.put( key, element );
                 }
 
-                for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
+                for ( Plugin element : tgt )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     Plugin managedPlugin = managedPlugins.get( key );
                     if ( managedPlugin != null )
@@ -114,18 +111,16 @@ public class DefaultPluginManagementInjector
                 Map<Object, PluginExecution> merged =
                     new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<PluginExecution> it = src.iterator(); it.hasNext(); )
+                for ( PluginExecution element : src )
                 {
-                    PluginExecution element = it.next();
                     Object key = getPluginExecutionKey( element );
                     PluginExecution clone = new PluginExecution();
                     mergePluginExecution( clone, element, true, context );
                     merged.put( key, clone );
                 }
 
-                for ( Iterator<PluginExecution> it = tgt.iterator(); it.hasNext(); )
+                for ( PluginExecution element : tgt )
                 {
-                    PluginExecution element = it.next();
                     Object key = getPluginExecutionKey( element );
                     PluginExecution existing = merged.get( key );
                     if ( existing != null )

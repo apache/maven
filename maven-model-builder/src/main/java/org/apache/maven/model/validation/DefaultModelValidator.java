@@ -121,15 +121,15 @@ public class DefaultModelValidator
 
         if ( !model.getModules().isEmpty() && !"pom".equals( model.getPackaging() ) )
         {
-            addViolation( problems, false, "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects " +
-                "require 'pom' as packaging." );
+            addViolation( problems, false, "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects "
+                + "require 'pom' as packaging." );
         }
 
         Parent parent = model.getParent();
         if ( parent != null )
         {
-            if ( parent.getGroupId().equals( model.getGroupId() ) &&
-                parent.getArtifactId().equals( model.getArtifactId() ) )
+            if ( parent.getGroupId().equals( model.getGroupId() )
+                && parent.getArtifactId().equals( model.getArtifactId() ) )
             {
                 addViolation( problems, false, "The parent element cannot have the same ID as the project." );
             }
@@ -163,8 +163,8 @@ public class DefaultModelValidator
                 {
                     if ( !new File( systemPath ).isAbsolute() )
                     {
-                        addViolation( problems, false, "For dependency " + d + ": system-scoped dependency must " +
-                            "specify an absolute path systemPath." );
+                        addViolation( problems, false, "For dependency " + d + ": system-scoped dependency must "
+                            + "specify an absolute path systemPath." );
                     }
                 }
             }
@@ -208,8 +208,8 @@ public class DefaultModelValidator
                     {
                         if ( !new File( systemPath ).isAbsolute() )
                         {
-                            addViolation( problems, false, "For managed dependency " + d + ": system-scoped dependency must " +
-                                "specify an absolute path systemPath." );
+                            addViolation( problems, false, "For managed dependency " + d + ": system-scoped dependency must "
+                                + "specify an absolute path systemPath." );
                         }
                     }
                 }

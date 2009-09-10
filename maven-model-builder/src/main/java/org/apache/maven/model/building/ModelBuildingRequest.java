@@ -29,7 +29,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 
 /**
  * Collects settings that control the building of effective models.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelBuildingRequest
@@ -39,32 +39,32 @@ public interface ModelBuildingRequest
      * Denotes minimal validation of POMs. This validation level is meant for processing of POMs from repositories
      * during metadata retrieval.
      */
-    static final int VALIDATION_LEVEL_MINIMAL = 0;
+    int VALIDATION_LEVEL_MINIMAL = 0;
 
     /**
      * Denotes validation as performed by Maven 2.0. This validation level is meant as a compatibility mode to allow
      * users to migrate their projects.
      */
-    static final int VALIDATION_LEVEL_MAVEN_2_0 = 20;
+    int VALIDATION_LEVEL_MAVEN_2_0 = 20;
 
     /**
      * Denotes validation as performed by Maven 3.0. This validation level is meant for existing projects.
      */
-    static final int VALIDATION_LEVEL_MAVEN_3_0 = 30;
+    int VALIDATION_LEVEL_MAVEN_3_0 = 30;
 
     /**
      * Denotes validation as performed by Maven 3.1. This validation level is meant for new projects.
      */
-    static final int VALIDATION_LEVEL_MAVEN_3_1 = 31;
+    int VALIDATION_LEVEL_MAVEN_3_1 = 31;
 
     /**
      * Denotes strict validation as recommended by the current Maven version.
      */
-    static final int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+    int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
 
     /**
      * Gets the source of the POM to process.
-     * 
+     *
      * @return The source of the POM or {@code null} if not set.
      */
     ModelSource getModelSource();
@@ -72,7 +72,7 @@ public interface ModelBuildingRequest
     /**
      * Sets the source of the POM to process. Eventually, either {@link #setModelSource(ModelSource)} or
      * {@link #setPomFile(File)} must be set.
-     * 
+     *
      * @param modelSource The source of the POM to process, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -80,7 +80,7 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the POM file of the project to build.
-     * 
+     *
      * @return The POM file of the project or {@code null} if not applicable (i.e. when processing a POM from the
      *         repository).
      */
@@ -92,7 +92,7 @@ public interface ModelBuildingRequest
      * build process of a local project. Hence the effective model will support the notion of a project directory. To
      * build the model for a POM from the repository, use {@link #setModelSource(ModelSource)} in combination with a
      * {@link FileModelSource} instead.
-     * 
+     *
      * @param pomFile The POM file of the project to build the effective model for, may be {@code null} to build the
      *            model of some POM from the repository.
      * @return This request, never {@code null}.
@@ -101,7 +101,7 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the level of validation to perform on processed models.
-     * 
+     *
      * @return The level of validation to perform on processed models.
      */
     int getValidationLevel();
@@ -111,7 +111,7 @@ public interface ModelBuildingRequest
      * {@link #VALIDATION_LEVEL_STRICT} should be used to ensure proper building. For the mere retrievel of dependencies
      * during artifact resolution, {@link #VALIDATION_LEVEL_MINIMAL} should be used to account for models of poor
      * quality. By default, models are validated in strict mode.
-     * 
+     *
      * @param validationLevel The level of validation to perform on processed models.
      * @return This request, never {@code null}.
      */
@@ -121,14 +121,14 @@ public interface ModelBuildingRequest
      * Indicates whether plugin executions and configurations should be processed. If enabled, lifecycle-induced plugin
      * executions will be injected into the model and common plugin configuration will be propagated to individual
      * executions.
-     * 
+     *
      * @return {@code true} if plugins should be processed, {@code false} otherwise.
      */
     boolean isProcessPlugins();
 
     /**
      * Controls the processing of plugin executions and configurations.
-     * 
+     *
      * @param processPlugins {@code true} to enable plugin processing, {@code false} otherwise.
      * @return This request, never {@code null}.
      */
@@ -138,7 +138,7 @@ public interface ModelBuildingRequest
      * Indicates whether the model building should happen in two phases. If enabled, the initial invocation of the model
      * builder will only produce an interim result which may be used to analyze inter-model dependencies before the
      * final invocation of the model builder is performed.
-     * 
+     *
      * @return {@code true} if two-phase building is enabled, {@code false} if the model should be build in a single
      *         step.
      */
@@ -148,7 +148,7 @@ public interface ModelBuildingRequest
      * Enables/disables two-phase building. If enabled, the initial invocation of the model builder will only produce an
      * interim result which may be used to analyze inter-model dependencies before the final invocation of the model
      * builder is performed.
-     * 
+     *
      * @param twoPhaseBuilding {@code true} to enable two-phase building, {@code false} if the model should be build in
      *            a single step.
      * @return This request, never {@code null}.
@@ -157,14 +157,14 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the external profiles that should be considered for model building.
-     * 
+     *
      * @return The external profiles that should be considered for model building, never {@code null}.
      */
     List<Profile> getProfiles();
 
     /**
      * Sets the external profiles that should be considered for model building.
-     * 
+     *
      * @param profiles The external profiles that should be considered for model building, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -172,14 +172,14 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the identifiers of those profiles that should be activated by explicit demand.
-     * 
+     *
      * @return The identifiers of those profiles to activate, never {@code null}.
      */
     List<String> getActiveProfileIds();
 
     /**
      * Sets the identifiers of those profiles that should be activated by explicit demand.
-     * 
+     *
      * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -187,14 +187,14 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the identifiers of those profiles that should be deactivated by explicit demand.
-     * 
+     *
      * @return The identifiers of those profiles to deactivate, never {@code null}.
      */
     List<String> getInactiveProfileIds();
 
     /**
      * Sets the identifiers of those profiles that should be deactivated by explicit demand.
-     * 
+     *
      * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -203,7 +203,7 @@ public interface ModelBuildingRequest
     /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @return The system properties, never {@code null}.
      */
     Properties getSystemProperties();
@@ -211,7 +211,7 @@ public interface ModelBuildingRequest
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -221,7 +221,7 @@ public interface ModelBuildingRequest
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @return The user properties, never {@code null}.
      */
     Properties getUserProperties();
@@ -230,7 +230,7 @@ public interface ModelBuildingRequest
      * Sets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @param userProperties The user properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -238,14 +238,14 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the start time of the build.
-     * 
+     *
      * @return The start time of the build or {@code null} if unknown.
      */
     Date getBuildStartTime();
 
     /**
      * Sets the start time of the build.
-     * 
+     *
      * @param buildStartTime The start time of the build, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -254,7 +254,7 @@ public interface ModelBuildingRequest
     /**
      * Gets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
      * project directory.
-     * 
+     *
      * @return The model resolver or {@code null} if not set.
      */
     ModelResolver getModelResolver();
@@ -262,7 +262,7 @@ public interface ModelBuildingRequest
     /**
      * Sets the model resolver to use for resolution of mixins or parents that are not locally reachable from the
      * project directory.
-     * 
+     *
      * @param modelResolver The model resolver to use, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -270,14 +270,14 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the model building listener to notify during the build process.
-     * 
+     *
      * @return The model building listener to notify or {@code null} if none.
      */
     ModelBuildingListener getModelBuildingListener();
 
     /**
      * Sets the model building listener to notify during the build process.
-     * 
+     *
      * @param modelBuildingListener The model building listener to notify, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -285,7 +285,7 @@ public interface ModelBuildingRequest
 
     /**
      * Gets the model cache to use for reuse of previously built models.
-     * 
+     *
      * @return The model cache or {@code null} if not set.
      */
     ModelCache getModelCache();
@@ -293,7 +293,7 @@ public interface ModelBuildingRequest
     /**
      * Sets the model cache to use for reuse of previously built models. This is an optional component that serves
      * performance optimizations.
-     * 
+     *
      * @param modelCache The model cache to use, may be {@code null}.
      * @return This request, never {@code null}.
      */

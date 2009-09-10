@@ -54,7 +54,7 @@ import org.apache.maven.model.Site;
 
 /**
  * The domain-specific model merger for the Maven POM.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenModelMerger
@@ -78,7 +78,7 @@ public class MavenModelMerger
 
         super.mergeModel( target, source, sourceDominant, context );
     }
-    
+
     @Override
     protected void mergeModel_Name( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
@@ -124,7 +124,8 @@ public class MavenModelMerger
             Organization tgt = target.getOrganization();
             if ( tgt == null )
             {
-                target.setOrganization( tgt = new Organization() );
+                tgt = new Organization();
+                target.setOrganization( tgt );
                 mergeOrganization( tgt, src, sourceDominant, context );
             }
         }
@@ -140,7 +141,8 @@ public class MavenModelMerger
             IssueManagement tgt = target.getIssueManagement();
             if ( tgt == null )
             {
-                target.setIssueManagement( tgt = new IssueManagement() );
+                tgt = new IssueManagement();
+                target.setIssueManagement( tgt );
                 mergeIssueManagement( tgt, src, sourceDominant, context );
             }
         }
@@ -156,7 +158,8 @@ public class MavenModelMerger
             CiManagement tgt = target.getCiManagement();
             if ( tgt == null )
             {
-                target.setCiManagement( tgt = new CiManagement() );
+                tgt = new CiManagement();
+                target.setCiManagement( tgt );
                 mergeCiManagement( tgt, src, sourceDominant, context );
             }
         }
@@ -261,16 +264,14 @@ public class MavenModelMerger
                 recessive = src;
             }
 
-            for ( Iterator<Repository> it = dominant.iterator(); it.hasNext(); )
+            for ( Repository element : dominant )
             {
-                Repository element = it.next();
                 Object key = getRepositoryKey( element );
                 merged.put( key, element );
             }
 
-            for ( Iterator<Repository> it = recessive.iterator(); it.hasNext(); )
+            for ( Repository element : recessive )
             {
-                Repository element = it.next();
                 Object key = getRepositoryKey( element );
                 if ( !merged.containsKey( key ) )
                 {
@@ -338,7 +339,8 @@ public class MavenModelMerger
             DeploymentRepository tgt = target.getRepository();
             if ( tgt == null )
             {
-                target.setRepository( tgt = new DeploymentRepository() );
+                tgt = new DeploymentRepository();
+                target.setRepository( tgt );
                 mergeDeploymentRepository( tgt, src, sourceDominant, context );
             }
         }
@@ -355,7 +357,8 @@ public class MavenModelMerger
             DeploymentRepository tgt = target.getSnapshotRepository();
             if ( tgt == null )
             {
-                target.setSnapshotRepository( tgt = new DeploymentRepository() );
+                tgt = new DeploymentRepository();
+                target.setSnapshotRepository( tgt );
                 mergeDeploymentRepository( tgt, src, sourceDominant, context );
             }
         }
@@ -371,7 +374,8 @@ public class MavenModelMerger
             Site tgt = target.getSite();
             if ( tgt == null )
             {
-                target.setSite( tgt = new Site() );
+                tgt = new Site();
+                target.setSite( tgt );
                 mergeSite( tgt, src, sourceDominant, context );
             }
         }
@@ -461,9 +465,8 @@ public class MavenModelMerger
             Map<Object, PluginExecution> merged =
                 new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
 
-            for ( Iterator<PluginExecution> it = src.iterator(); it.hasNext(); )
+            for ( PluginExecution element : src )
             {
-                PluginExecution element = it.next();
                 if ( sourceDominant || ( source.isInherited() && element.isInherited() ) )
                 {
                     Object key = getPluginExecutionKey( element );
@@ -471,9 +474,8 @@ public class MavenModelMerger
                 }
             }
 
-            for ( Iterator<PluginExecution> it = tgt.iterator(); it.hasNext(); )
+            for ( PluginExecution element : tgt )
             {
-                PluginExecution element = it.next();
                 Object key = getPluginExecutionKey( element );
                 PluginExecution existing = merged.get( key );
                 if ( existing != null )

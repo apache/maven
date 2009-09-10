@@ -21,7 +21,6 @@ package org.apache.maven.model.profile;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles profile injection into the model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ProfileInjector.class )
@@ -94,16 +93,14 @@ public class DefaultProfileInjector
                 List<Plugin> tgt = target.getPlugins();
                 Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
+                for ( Plugin element : tgt )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     merged.put( key, element );
                 }
 
-                for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
+                for ( Plugin element : src )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     Plugin existing = merged.get( key );
                     if ( existing == null )
@@ -131,16 +128,14 @@ public class DefaultProfileInjector
                 Map<Object, ReportPlugin> merged =
                     new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<ReportPlugin> it = tgt.iterator(); it.hasNext(); )
+                for ( ReportPlugin element : tgt )
                 {
-                    ReportPlugin element = it.next();
                     Object key = getReportPluginKey( element );
                     merged.put( key, element );
                 }
 
-                for ( Iterator<ReportPlugin> it = src.iterator(); it.hasNext(); )
+                for ( ReportPlugin element : src )
                 {
-                    ReportPlugin element = it.next();
                     Object key = getReportPluginKey( element );
                     ReportPlugin existing = merged.get( key );
                     if ( existing == null )

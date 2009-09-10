@@ -38,7 +38,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles inheritance of model values.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = InheritanceAssembler.class )
@@ -64,7 +64,7 @@ public class DefaultInheritanceAssembler
      * point at the POM rather than its base directory if the path ends with ".xml" (ignoring case). The name of the
      * child's base directory matches the artifact id of the child. Note that for the sake of independence from the user
      * environment, the filesystem is intentionally not used for the calculation.
-     * 
+     *
      * @param child The child model, must not be <code>null</code>.
      * @param parent The parent model, may be <code>null</code>.
      * @return The path adjustment, can be empty but never <code>null</code>.
@@ -121,9 +121,8 @@ public class DefaultInheritanceAssembler
                 List<Plugin> tgt = target.getPlugins();
                 Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
+                for ( Plugin element : src )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     if ( element.isInherited() )
                     {
@@ -137,9 +136,8 @@ public class DefaultInheritanceAssembler
                     }
                 }
 
-                for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
+                for ( Plugin element : tgt )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     Plugin existing = merged.get( key );
                     if ( existing != null )
@@ -164,9 +162,8 @@ public class DefaultInheritanceAssembler
                 Map<Object, ReportPlugin> merged =
                     new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<ReportPlugin> it = src.iterator(); it.hasNext(); )
+                for ( ReportPlugin element :  src )
                 {
-                    ReportPlugin element = it.next();
                     Object key = getReportPluginKey( element );
                     if ( element.isInherited() )
                     {
@@ -180,9 +177,8 @@ public class DefaultInheritanceAssembler
                     }
                 }
 
-                for ( Iterator<ReportPlugin> it = tgt.iterator(); it.hasNext(); )
+                for ( ReportPlugin element : tgt )
                 {
-                    ReportPlugin element = it.next();
                     Object key = getReportPluginKey( element );
                     ReportPlugin existing = merged.get( key );
                     if ( existing != null )

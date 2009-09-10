@@ -93,11 +93,11 @@ public abstract class AbstractStringBasedModelInterpolator
 
     @Requirement
     private PathTranslator pathTranslator;
-    
+
     private Interpolator interpolator;
-    
+
     private RecursionInterceptor recursionInterceptor;
-    
+
     public AbstractStringBasedModelInterpolator()
     {
         interpolator = createInterpolator();
@@ -170,7 +170,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
         return valueSources;
     }
-    
+
     protected List<? extends InterpolationPostProcessor> createPostProcessors( final Model model,
                                                                                final File projectDir,
                                                                                final ModelBuildingRequest config )
@@ -186,7 +186,7 @@ public abstract class AbstractStringBasedModelInterpolator
             return Collections.emptyList();
         }
     }
-    
+
     protected String interpolateInternal( String src, List<? extends ValueSource> valueSources,
                                           List<? extends InterpolationPostProcessor> postProcessors,
                                           ModelProblemCollector problems )
@@ -197,14 +197,14 @@ public abstract class AbstractStringBasedModelInterpolator
         }
 
         String result = src;
-        synchronized( this )
+        synchronized ( this )
         {
-            
+
             for ( ValueSource vs : valueSources )
             {
                 interpolator.addValueSource( vs );
             }
-            
+
             for ( InterpolationPostProcessor postProcessor : postProcessors )
             {
                 interpolator.addPostProcessor( postProcessor );
@@ -229,7 +229,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     interpolator.removeValuesSource( vs );
                 }
-                
+
                 for ( InterpolationPostProcessor postProcessor : postProcessors )
                 {
                     interpolator.removePostProcessor( postProcessor );
@@ -239,7 +239,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
         return result;
     }
-    
+
     protected RecursionInterceptor getRecursionInterceptor()
     {
         return recursionInterceptor;
@@ -251,7 +251,7 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     protected abstract Interpolator createInterpolator();
-    
+
     protected final Interpolator getInterpolator()
     {
         return interpolator;
