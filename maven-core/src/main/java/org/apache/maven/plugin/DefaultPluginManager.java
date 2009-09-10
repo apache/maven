@@ -1498,6 +1498,12 @@ public class DefaultPluginManager
         {
             project.resolveActiveArtifacts();
         }
+        
+        ArtifactMetadataSource metadataSource = context.getProjectBuilderConfiguration().getMetadataSource();
+        if ( metadataSource == null )
+        {
+            metadataSource = artifactMetadataSource;
+        }
 
         Set resolvedArtifacts;
         try
@@ -1507,7 +1513,7 @@ public class DefaultPluginManager
                                                                                 project.getManagedVersionMap(),
                                                                                 context.getLocalRepository(),
                                                                                 project.getRemoteArtifactRepositories(),
-                                                                                artifactMetadataSource, filter );
+                                                                                metadataSource, filter );
             resolvedArtifacts = result.getArtifacts();
         }
         catch ( MultipleArtifactsNotFoundException me )

@@ -77,6 +77,9 @@ public class DefaultMavenExecutionRequest
     
     private List selectedProjects;
 
+    // lazily initialized.
+    private ProjectBuilderConfiguration projectBuilderConfig;
+
     public DefaultMavenExecutionRequest( ArtifactRepository localRepository, Settings settings,
                                          EventDispatcher eventDispatcher, List goals, String baseDirectory,
                                          ProfileManager globalProfileManager, Properties executionProperties,
@@ -215,14 +218,19 @@ public class DefaultMavenExecutionRequest
 
     public ProjectBuilderConfiguration getProjectBuilderConfiguration()
     {
-        ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
-        config.setLocalRepository( getLocalRepository() )
-              .setGlobalProfileManager( getGlobalProfileManager() )
-              .setExecutionProperties( getExecutionProperties() )
-              .setUserProperties( getUserProperties() )
-              .setBuildStartTime( startTime );
+        if ( projectBuilderConfig == null )
+        {
+            ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration();
+            config.setLocalRepository( getLocalRepository() )
+                  .setGlobalProfileManager( getGlobalProfileManager() )
+                  .setExecutionProperties( getExecutionProperties() )
+                  .setUserProperties( getUserProperties() )
+                  .setBuildStartTime( startTime );
+            
+            projectBuilderConfig = config;
+        }
 
-        return config;
+        return projectBuilderConfig;
     }
     
     public String getMakeBehavior()
