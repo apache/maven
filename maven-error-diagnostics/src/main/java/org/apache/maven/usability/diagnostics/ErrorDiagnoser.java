@@ -21,10 +21,10 @@ package org.apache.maven.usability.diagnostics;
 
 public interface ErrorDiagnoser
 {
-    public static final String ROLE = ErrorDiagnoser.class.getName();
+    static final String ROLE = ErrorDiagnoser.class.getName();
 
-    public boolean canDiagnose( Throwable error );
+    boolean canDiagnose( Throwable error );
 
-    public String diagnose( Throwable error );
+    String diagnose( Throwable error );
 
 }
