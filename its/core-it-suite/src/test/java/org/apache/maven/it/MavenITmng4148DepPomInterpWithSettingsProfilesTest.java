@@ -19,46 +19,38 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4347">MNG-4347</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4148">MNG-4148</a>.
  * 
  * @author John Casey
  */
-public class MavenITmng4347ImportScopeWithSettingsProfilesTest
+public class MavenITmng4148DepPomInterpWithSettingsProfilesTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4347ImportScopeWithSettingsProfilesTest()
+    public MavenITmng4148DepPomInterpWithSettingsProfilesTest()
     {
         super( "(2.2.1,]" );
     }
 
     /**
-     * Test that profiles from settings.xml will be used to resolve import-scoped dependency POMs.
-     * In this case, the settings profile enables snapshot resolution on the central repository, which
-     * is required to resolve the import-scoped POM with a SNAPSHOT version.
+     * Test that a property from the settings profile that used in the
+     * version for a dependency is interpolated when the spec is a transitive dependency
+     * (declared in the POM of a direct dependency of the current project).
      */
     public void testit()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4347" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4148" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         
-        String localRepo = verifier.localRepo;
-        File dest = new File( localRepo );
-        File src = new File( testDir, "local-repository" );
-        
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.it.mng4347" );
-        
-        FileUtils.copyDirectoryStructure( src, dest );
+        verifier.deleteArtifacts( "org.apache.maven.it.mng4148" );
         
         verifier.setAutoclean( false );
         
@@ -72,4 +64,5 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
+
 }

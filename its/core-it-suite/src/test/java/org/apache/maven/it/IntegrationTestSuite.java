@@ -138,6 +138,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4172EmptyDependencySetTest.class );
         suite.addTestSuite( MavenITmng4166HideCoreCommonsCliTest.class );
         suite.addTestSuite( MavenITmng4150VersionRangeTest.class );
+        suite.addTestSuite( MavenITmng4148DepPomInterpWithSettingsProfilesTest.class );
         suite.addTestSuite( MavenITmng4129PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng4126ParentProfilesXmlTest.class );
         suite.addTestSuite( MavenITmng4116UndecodedUrlsTest.class );

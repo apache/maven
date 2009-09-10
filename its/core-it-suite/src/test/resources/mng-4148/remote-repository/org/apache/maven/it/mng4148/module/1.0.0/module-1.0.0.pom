@@ -4,21 +4,11 @@
   <groupId>org.apache.maven.it.mng4148</groupId>
   <artifactId>module</artifactId>
   <version>1.0.0</version>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-        <groupId>org.apache.maven.it.mng4148</groupId>
-        <artifactId>dependencies</artifactId>
-        <version>1.0.0</version>
-				<scope>import</scope>
-				<type>pom</type>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>  
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven.it.mng4148</groupId>
 			<artifactId>dep</artifactId>
+			<version>${depVersion}</version>
 		</dependency>
 	</dependencies>	
 </project>
