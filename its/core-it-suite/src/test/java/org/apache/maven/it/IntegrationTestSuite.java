@@ -88,6 +88,10 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4350LifecycleMappingExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4349RelocatedArtifactWithInvalidPomTest.class );
         suite.addTestSuite( MavenITmng4348NoUnnecessaryRepositoryAccessTest.class );
+
+        // TODO: enable after maven-2.2.x-MNG-4347 is merged.
+        // http://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x-MNG-4347/
+        // suite.addTestSuite( MavenITmng4347ImportScopeWithSettingsProfilesTest.class );
         suite.addTestSuite( MavenITmng4345DefaultPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4344ManagedPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4342IndependentMojoParameterDefaultValuesTest.class );
