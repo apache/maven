@@ -113,7 +113,7 @@ public class DefaultLifecycleExecutor
     private MavenProjectBuilder mavenProjectBuilder;
 
     private ModelInterpolator modelInterpolator;
-    
+
     private ConfigurationInterpolator configInterpolator;
 
     // ----------------------------------------------------------------------
@@ -210,9 +210,9 @@ public class DefaultLifecycleExecutor
             }
 
         }
-        
+
         extensionManager.registerWagons();
-        
+
         handlers.putAll( extensionManager.getArtifactTypeHandlers() );
 
         for ( MavenProject project : session.getSortedProjects() )
@@ -227,7 +227,7 @@ public class DefaultLifecycleExecutor
                     if ( project.getPackaging().equals( handler.getPackaging() ) )
                     {
                         project.getArtifact().setArtifactHandler( handler );
-                        
+
                         // NOTE: Adding this (maven 2.2.1) to short-circuit things. This means first match is used, NOT LAST.
                         break;
                     }
@@ -238,7 +238,7 @@ public class DefaultLifecycleExecutor
                 throw new LifecycleExecutionException( e.getMessage(), e );
             }
         }
-        
+
         artifactHandlerManager.addHandlers( handlers );
     }
 
@@ -578,10 +578,10 @@ public class DefaultLifecycleExecutor
             MojoExecution mojoExecution = (MojoExecution) i.next();
 
             MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-            
+
             PlexusConfiguration configuration = mojoDescriptor.getMojoConfiguration();
             boolean usesReactorProjects = mojoDescriptor.isAggregator() || usesSessionOrReactorProjects( configuration );
-            
+
             if ( usesReactorProjects )
             {
                 calculateAllConcreteStates( session );
@@ -590,15 +590,15 @@ public class DefaultLifecycleExecutor
             {
                 calculateConcreteState( project, session, true );
             }
-            
+
             calculateConcreteConfiguration( mojoExecution, project, session );
-            
+
             List reportExecutions = null;
             if ( mojoDescriptor.isRequiresReports() )
             {
                 reportExecutions = getReportExecutions( project, forkEntryPoints, mojoExecution, session );
             }
-            
+
             boolean hasFork = false;
             if ( mojoDescriptor.getExecutePhase() != null || mojoDescriptor.getExecuteGoal() != null )
             {
@@ -616,7 +616,7 @@ public class DefaultLifecycleExecutor
                     }
                 }
             }
-            
+
             if ( hasFork )
             {
                 // NOTE: This must always happen, regardless of treatment of reactorProjects below, because
@@ -624,7 +624,7 @@ public class DefaultLifecycleExecutor
                 // something in the reactorProjects list, and won't have a next-stage executionProject created
                 // for it otherwise, which leaves the project == null for the upcoming forked execution.
                 createExecutionProject( project, session, true );
-                
+
                 if ( usesReactorProjects )
                 {
                     List reactorProjects = session.getSortedProjects();
@@ -644,7 +644,7 @@ public class DefaultLifecycleExecutor
 
                 forkEntryPoints.pop();
             }
-            
+
             if ( mojoDescriptor.isRequiresReports() )
             {
                 List reports = getReports( reportExecutions, project, mojoExecution, session );
@@ -666,15 +666,15 @@ public class DefaultLifecycleExecutor
                     }
                 }
             }
-            
+
             if ( hasFork )
             {
                 // NOTE: This must always happen, regardless of treatment of reactorProjects below, because
                 // if we're in a forked execution right now, the current project will itself be an execution project of
-                // something in the reactorProjects list, and may not have had its own executionProject instance reset to 
+                // something in the reactorProjects list, and may not have had its own executionProject instance reset to
                 // a concrete state again after the previous forked executions.
                 calculateConcreteState( project.getExecutionProject(), session, true );
-                
+
                 // FIXME: Would be nice to find a way to cause the execution project to stay in a concrete state...
                 // TODO: Test this! It should be fixed, but I don't want to destabilize until I have the issue I'm working on fixed.
                 if ( usesReactorProjects )
@@ -695,8 +695,8 @@ public class DefaultLifecycleExecutor
             }
             catch ( PluginManagerException e )
             {
-                throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '" +
-                    mojoDescriptor.getId() + "': " + e.getMessage(), e );
+                throw new LifecycleExecutionException( "Internal error in the plugin manager executing goal '"
+                    + mojoDescriptor.getId() + "': " + e.getMessage(), e );
             }
             catch ( ArtifactNotFoundException e )
             {
@@ -724,21 +724,21 @@ public class DefaultLifecycleExecutor
             }
         }
     }
-    
+
     private void createExecutionProject( final MavenProject project, final MavenSession session, final boolean processProjectReferences )
         throws LifecycleExecutionException
     {
         MavenProject executionProject = new MavenProject( project );
-        
+
         calculateConcreteState( executionProject, session, processProjectReferences );
-        
+
         project.setExecutionProject( executionProject );
     }
 
     private boolean usesSessionOrReactorProjects( final PlexusConfiguration configuration )
     {
         String value = configuration != null ? String.valueOf( configuration ) : null;
-        
+
         if ( value != null )
         {
             if ( value.indexOf( "${session" ) > -1 || value.indexOf( "${reactorProjects}" ) > -1 )
@@ -746,7 +746,7 @@ public class DefaultLifecycleExecutor
                 return true;
             }
         }
-        
+
         return false;
     }
 
@@ -757,7 +757,7 @@ public class DefaultLifecycleExecutor
         {
             return;
         }
-        
+
         try
         {
             mojoExecution.setConfiguration( (Xpp3Dom) configInterpolator.interpolate(
@@ -767,11 +767,11 @@ public class DefaultLifecycleExecutor
         }
         catch ( ConfigurationInterpolationException e )
         {
-            throw new LifecycleExecutionException( "Error interpolating configuration for: '" + mojoExecution.getMojoDescriptor().getRoleHint() +
-                                                   "' (execution: '" + mojoExecution.getExecutionId() + "')", e );
+            throw new LifecycleExecutionException( "Error interpolating configuration for: '" + mojoExecution.getMojoDescriptor().getRoleHint()
+                                                   + "' (execution: '" + mojoExecution.getExecutionId() + "')", e );
         }
     }
-    
+
     private void calculateAllConcreteStates( final MavenSession session )
         throws LifecycleExecutionException
     {
@@ -801,7 +801,7 @@ public class DefaultLifecycleExecutor
             }
         }
     }
-    
+
 //    private void restoreAllDynamicStates( MavenSession session )
 //        throws LifecycleExecutionException
 //    {
@@ -871,8 +871,8 @@ public class DefaultLifecycleExecutor
                     for ( Iterator j = reportPlugins.iterator(); j.hasNext() && !found; )
                     {
                         ReportPlugin reportPlugin = (ReportPlugin) j.next();
-                        if ( reportPlugin.getGroupId().equals( groupId ) &&
-                            reportPlugin.getArtifactId().equals( artifactId ) )
+                        if ( reportPlugin.getGroupId().equals( groupId )
+                            && reportPlugin.getArtifactId().equals( artifactId ) )
                         {
                             found = true;
                         }
@@ -916,7 +916,7 @@ public class DefaultLifecycleExecutor
         }
         return reports;
     }
-    
+
     private List getReportExecutions( final ReportPlugin reportPlugin,
                              final Stack forkEntryPoints,
                              final ReportSet reportSet,
@@ -950,7 +950,7 @@ public class DefaultLifecycleExecutor
                 {
                     id = mojoExecution.getExecutionId();
                 }
-                
+
                 MojoExecution reportExecution;
                 if ( id.startsWith( MojoExecution.DEFAULT_EXEC_ID_PREFIX ) )
                 {
@@ -971,12 +971,12 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException
     {
         List reports = new ArrayList();
-        
+
         for ( Iterator it = reportExecutions.iterator(); it.hasNext(); )
         {
             MojoExecution reportExecution = (MojoExecution) it.next();
             PluginDescriptor pluginDescriptor = reportExecution.getMojoDescriptor().getPluginDescriptor();
-            
+
             try
             {
                 MavenReport reportMojo = pluginManager.getReport( project, reportExecution, session );
@@ -1007,7 +1007,7 @@ public class DefaultLifecycleExecutor
                 throw new LifecycleExecutionException( e.getMessage(), e );
             }
         }
-        
+
         return reports;
     }
 
@@ -1023,7 +1023,7 @@ public class DefaultLifecycleExecutor
             for ( Iterator i = session.getSortedProjects().iterator(); i.hasNext(); )
             {
                 MavenProject reactorProject = (MavenProject) i.next();
-                
+
                 line();
 
                 getLogger().info( "Building " + reactorProject.getName() );
@@ -1044,7 +1044,7 @@ public class DefaultLifecycleExecutor
         throws LifecycleExecutionException, BuildFailureException, PluginNotFoundException
     {
         project = project.getExecutionProject();
-        
+
         forkEntryPoints.push( mojoDescriptor );
 
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
@@ -1165,7 +1165,7 @@ public class DefaultLifecycleExecutor
                             {
                                 mojoExecution = new MojoExecution( desc, configuration, executionId );
                             }
-                            
+
                             addToLifecycleMappings( lifecycleMappings, phase.getId(), mojoExecution,
                                                     session.getSettings() );
                         }
@@ -1318,9 +1318,9 @@ public class DefaultLifecycleExecutor
 
                     if ( mojoDescriptor.isDirectInvocationOnly() )
                     {
-                        throw new LifecycleExecutionException( "Mojo: \'" + goal +
-                            "\' requires direct invocation. It cannot be used as part of lifecycle: \'" +
-                            project.getPackaging() + "\'." );
+                        throw new LifecycleExecutionException( "Mojo: \'" + goal
+                            + "\' requires direct invocation. It cannot be used as part of lifecycle: \'"
+                            + project.getPackaging() + "\'." );
                     }
 
                     addToLifecycleMappings( lifecycleMappings, phase, new MojoExecution( mojoDescriptor ),
@@ -1406,8 +1406,8 @@ public class DefaultLifecycleExecutor
             }
             catch ( ComponentLookupException e )
             {
-                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: " +
-                    lifecycle.getId() + ". Error: " + e.getMessage(), e );
+                getLogger().debug( "Error looking up lifecycle mapping to retrieve optional mojos. Lifecycle ID: "
+                    + lifecycle.getId() + ". Error: " + e.getMessage(), e );
             }
         }
 
@@ -1479,8 +1479,8 @@ public class DefaultLifecycleExecutor
                 }
                 catch ( PluginManagerException e )
                 {
-                    throw new LifecycleExecutionException( "Error looking up available components from plugin '" +
-                        plugin.getKey() + "': " + e.getMessage(), e );
+                    throw new LifecycleExecutionException( "Error looking up available components from plugin '"
+                        + plugin.getKey() + "': " + e.getMessage(), e );
                 }
             }
         }
@@ -1685,8 +1685,8 @@ public class DefaultLifecycleExecutor
                 {
                     if ( mojoDescriptor.isDirectInvocationOnly() )
                     {
-                        throw new LifecycleExecutionException( "Mojo: \'" + goal +
-                            "\' requires direct invocation. It cannot be used as part of the lifecycle (it was included via the POM)." );
+                        throw new LifecycleExecutionException( "Mojo: \'" + goal
+                            + "\' requires direct invocation. It cannot be used as part of the lifecycle (it was included via the POM)." );
                     }
 
                     addToLifecycleMappings( phaseMap, phase, mojoExecution, settings );
@@ -1757,9 +1757,9 @@ public class DefaultLifecycleExecutor
             {
                 if ( !canUsePrefix )
                 {
-                    String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. " +
-                        "Please use specification of the form groupId:artifactId[:version]:goal instead. " +
-                        "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
+                    String msg = "Mapped-prefix lookup of mojos are only supported from direct invocation. "
+                        + "Please use specification of the form groupId:artifactId[:version]:goal instead. "
+                        + "(Offending mojo: \'" + task + "\', invoked via: \'" + invokedVia + "\')";
                     throw new LifecycleExecutionException( msg );
                 }
 
@@ -1825,8 +1825,8 @@ public class DefaultLifecycleExecutor
             }
             else
             {
-                String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or" +
-                    " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
+                String message = "Invalid task '" + task + "': you must specify a valid lifecycle phase, or"
+                    + " a goal in the format plugin:goal or pluginGroupId:pluginArtifactId:pluginVersion:goal";
                 throw new BuildFailureException( message );
             }
 
@@ -1910,9 +1910,9 @@ public class DefaultLifecycleExecutor
                     if ( phaseToLifecycleMap.containsKey( phase ) )
                     {
                         Lifecycle prevLifecycle = (Lifecycle) phaseToLifecycleMap.get( phase );
-                        throw new LifecycleExecutionException( "Phase '" + phase +
-                            "' is defined in more than one lifecycle: '" + lifecycle.getId() + "' and '" +
-                            prevLifecycle.getId() + "'" );
+                        throw new LifecycleExecutionException( "Phase '" + phase
+                            + "' is defined in more than one lifecycle: '" + lifecycle.getId() + "' and '"
+                            + prevLifecycle.getId() + "'" );
                     }
                     else
                     {
@@ -1983,7 +1983,7 @@ public class DefaultLifecycleExecutor
             return tasks;
         }
     }
-    
+
     public List getLifecycles()
     {
         return lifecycles;
@@ -2009,7 +2009,7 @@ public class DefaultLifecycleExecutor
                 throw new InitializationException( "Failed to lookup project builder after it was NOT injected via component requirement." );
             }
         }
-        
+
         if ( modelInterpolator == null )
         {
             warnOfIncompleteComponentConfiguration( ModelInterpolator.ROLE );
@@ -2022,7 +2022,7 @@ public class DefaultLifecycleExecutor
                 throw new InitializationException( "Failed to lookup model interpolator after it was NOT injected via component requirement." );
             }
         }
-        
+
         if ( configInterpolator == null )
         {
             warnOfIncompleteComponentConfiguration( ConfigurationInterpolator.ROLE );
@@ -2036,7 +2036,7 @@ public class DefaultLifecycleExecutor
             }
         }
     }
-    
+
     private void warnOfIncompleteComponentConfiguration( final String role )
     {
         StringBuffer buffer = new StringBuffer();
@@ -2049,7 +2049,7 @@ public class DefaultLifecycleExecutor
         buffer.append( "\nnotify the developers for this derivative project of the problem. The Apache Maven team is not" );
         buffer.append( "\nresponsible for maintaining the integrity of third-party component overrides." );
         buffer.append( "\n\n" );
-        
+
         getLogger().warn( buffer.toString() );
     }
 

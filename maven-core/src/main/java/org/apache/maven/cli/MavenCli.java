@@ -110,7 +110,7 @@ public class MavenCli
         // ----------------------------------------------------------------------
         // Setup the command line parser
         // ----------------------------------------------------------------------
-        
+
         CLIManager cliManager = new CLIManager();
 
         CommandLine commandLine;
@@ -143,7 +143,7 @@ public class MavenCli
             cliManager.displayHelp();
             return 0;
         }
-        
+
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
             showVersion();
@@ -225,13 +225,13 @@ public class MavenCli
 
                     System.out.println( cipher.encryptAndDecorate( passwd,
                                                                    DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
-                    
+
                     return 0;
                 }
                 else if ( commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
                 {
                     String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
-                    
+
                     dispatcher = (DefaultSecDispatcher) embedder.lookup( SecDispatcher.ROLE );
                     String configurationFile = dispatcher.getConfigurationFile();
                     if ( configurationFile.startsWith( "~" ) )
@@ -240,9 +240,9 @@ public class MavenCli
                     }
                     String file = System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile );
                     embedder.release( dispatcher );
-                    
+
                     String master = null;
-                    
+
                     SettingsSecurity sec = SecUtil.read( file, true );
                     if ( sec != null )
                     {
@@ -252,25 +252,25 @@ public class MavenCli
                     if ( master == null )
                     {
                         System.err.println( "Master password is not set in the setting security file" );
-                        
+
                         return 1;
                     }
-                    
+
                     DefaultPlexusCipher cipher = new DefaultPlexusCipher();
                     String masterPasswd =
                         cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
                     System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
-                    
+
                     return 0;
                 }
             }
             catch ( Exception e )
             {
                 showFatalError( "Error encrypting password: " + e.getMessage(), e, showErrors );
-                
+
                 return 1;
             }
-                
+
             Maven maven = null;
 
             MavenExecutionRequest request = null;
@@ -302,7 +302,7 @@ public class MavenCli
 
                     if ( profileOptionValues != null )
                     {
-                        for ( int i=0; i < profileOptionValues.length; ++i )
+                        for ( int i = 0; i < profileOptionValues.length; ++i )
                         {
                             StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i], "," );
 
@@ -413,8 +413,8 @@ public class MavenCli
                 }
                 else
                 {
-                    System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath +
-                        " is invalid. Using default path." );
+                    System.out.println( "WARNING: Alternate user settings file: " + userSettingsPath
+                        + " is invalid. Using default path." );
                 }
             }
 
@@ -456,8 +456,8 @@ public class MavenCli
     {
         RuntimeInfo runtimeInfo = new RuntimeInfo( settings );
 
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
-            commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES )
+            || commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
         {
             runtimeInfo.setPluginUpdateOverride( Boolean.TRUE );
         }
@@ -551,19 +551,19 @@ public class MavenCli
         {
             request.setPomFile( commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE ) );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
         {
             request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
         {
             String projectList = commandLine.getOptionValue( CLIManager.PROJECT_LIST );
             String[] projects = StringUtils.split( projectList, "," );
             request.setSelectedProjects( Arrays.asList( projects ) );
         }
-        
+
         if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
         {
             request.setMakeBehavior( ReactorManager.MAKE_MODE );
@@ -706,8 +706,8 @@ public class MavenCli
         System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
                             + System.getProperty( "file.encoding", "<unknown encoding>" ) );
 
-        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
-                            "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
+        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION
+                            + "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
     }
 
     private static String reduce( String s )

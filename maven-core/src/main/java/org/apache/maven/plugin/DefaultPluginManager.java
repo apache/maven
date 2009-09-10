@@ -131,7 +131,7 @@ public class DefaultPluginManager
     protected RuntimeInformation runtimeInformation;
 
     protected MavenProjectBuilder mavenProjectBuilder;
-    
+
     protected PluginMappingManager pluginMappingManager;
 
     // END component requirements
@@ -247,8 +247,8 @@ public class DefaultPluginManager
             {
                 throw new PluginNotFoundException( e );
             }
-            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() ) &&
-                version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
+            else if ( groupId.equals( e.getGroupId() ) && artifactId.equals( e.getArtifactId() )
+                && version.equals( e.getVersion() ) && "maven-plugin".equals( e.getType() ) )
             {
                 throw new PluginNotFoundException( e );
             }
@@ -411,15 +411,15 @@ public class DefaultPluginManager
         // anything that wants to execute a mojo.
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal() +
-                ". It requires a project with an existing pom.xml, but the build is not using one." );
+            throw new MojoExecutionException( "Cannot execute mojo: " + mojoDescriptor.getGoal()
+                + ". It requires a project with an existing pom.xml, but the build is not using one." );
         }
 
         if ( mojoDescriptor.isOnlineRequired() && session.getSettings().isOffline() )
         {
             // TODO: Should we error out, or simply warn and skip??
-            throw new MojoExecutionException( "Mojo: " + mojoDescriptor.getGoal() +
-                " requires online mode for execution. Maven is currently offline." );
+            throw new MojoExecutionException( "Mojo: " + mojoDescriptor.getGoal()
+                + " requires online mode for execution. Maven is currently offline." );
         }
 
         if ( mojoDescriptor.isDependencyResolutionRequired() != null )
@@ -581,7 +581,7 @@ public class DefaultPluginManager
         }
 
         MavenReport report = (MavenReport) getConfiguredMojo( session, dom, project, true, mojoExecution );
-        
+
         return report;
     }
 
@@ -659,20 +659,20 @@ public class DefaultPluginManager
         catch ( ComponentLookupException e )
         {
             Throwable cause = e.getCause();
-            while( cause != null && !(cause instanceof NoClassDefFoundError ) )
+            while ( cause != null && !( cause instanceof NoClassDefFoundError ) )
             {
                 cause = cause.getCause();
             }
-            
+
             if ( cause != null && ( cause instanceof NoClassDefFoundError ) )
             {
                 throw new PluginManagerException( "Unable to load the mojo '" + mojoDescriptor.getRoleHint()
                                                   + "' in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'. A required class is missing: "
                                                   + cause.getMessage(), e );
             }
-            
-            throw new PluginManagerException( "Unable to find the mojo '" + mojoDescriptor.getGoal() +
-                "' (or one of its required components) in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'", e );
+
+            throw new PluginManagerException( "Unable to find the mojo '" + mojoDescriptor.getGoal()
+                + "' (or one of its required components) in the plugin '" + pluginDescriptor.getPluginLookupKey() + "'", e );
         }
         catch ( NoClassDefFoundError e )
         {
@@ -748,8 +748,8 @@ public class DefaultPluginManager
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
-                    pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
+                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '"
+                    + pluginArtifact.getId() + "': " + e.getMessage(), pluginArtifact, e );
             }
 
             Set rgArtifacts = resolutionGroup.getArtifacts();
@@ -854,8 +854,8 @@ public class DefaultPluginManager
                     }
                     catch ( PlexusContainerException e )
                     {
-                        throw new PluginManagerException( "Error adding plugin dependency '" +
-                            artifact.getDependencyConflictId() + "' into plugin manager: " + e.getMessage(), e );
+                        throw new PluginManagerException( "Error adding plugin dependency '"
+                            + artifact.getDependencyConflictId() + "' into plugin manager: " + e.getMessage(), e );
                     }
                 }
             }
@@ -925,8 +925,8 @@ public class DefaultPluginManager
         {
             Artifact a = (Artifact) i.next();
 
-            if ( a.getArtifactId().equals( "plexus-utils" ) &&
-                vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
+            if ( a.getArtifactId().equals( "plexus-utils" )
+                && vr.containsVersion( new DefaultArtifactVersion( a.getVersion() ) ) )
             {
                 plexusUtilsPresent = true;
 
@@ -1034,8 +1034,8 @@ public class DefaultPluginManager
                 // ideally, this would be elevated above the true debug output, but below the default INFO level...
                 // [BP] (2004-07-18): need to understand the context more but would prefer this could be either WARN or
                 // removed - shouldn't need DEBUG to diagnose a problem most of the time.
-                getLogger().debug( "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'" +
-                    mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
+                getLogger().debug( "*** WARNING: Configuration \'" + child.getName() + "\' is not used in goal \'"
+                    + mojoDescriptor.getFullGoalName() + "; this may indicate a typo... ***" );
             }
         }
 
@@ -1504,14 +1504,14 @@ public class DefaultPluginManager
                                                                                 artifactMetadataSource, filter );
             resolvedArtifacts = result.getArtifacts();
         }
-        catch (MultipleArtifactsNotFoundException me)
+        catch ( MultipleArtifactsNotFoundException me )
         {
             /*only do this if we are an aggregating plugin: MNG-2277
             if the dependency doesn't yet exist but is in the reactor, then
             all we can do is warn and skip it. A better fix can be inserted into 2.1*/
-            if (isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), me.getMissingArtifacts() ))
+            if ( isAggregator && checkMissingArtifactsInReactor( context.getSortedProjects(), me.getMissingArtifacts() ) )
             {
-                resolvedArtifacts = new HashSet(me.getResolvedArtifacts());
+                resolvedArtifacts = new HashSet( me.getResolvedArtifacts() );
             }
             else
             {
@@ -1531,25 +1531,25 @@ public class DefaultPluginManager
      * @param missing the artifacts that can't be found
      * @return true if ALL missing artifacts are found in the reactor.
      */
-    private boolean checkMissingArtifactsInReactor(Collection projects, Collection missing)
+    private boolean checkMissingArtifactsInReactor( Collection projects, Collection missing )
     {
         Collection foundInReactor = new HashSet();
         Iterator iter = missing.iterator();
-        while (iter.hasNext())
+        while ( iter.hasNext() )
         {
             Artifact mArtifact = (Artifact) iter.next();
             Iterator pIter = projects.iterator();
-            while (pIter.hasNext())
+            while ( pIter.hasNext() )
             {
                 MavenProject p = (MavenProject) pIter.next();
-                if (p.getArtifactId().equals( mArtifact.getArtifactId()) &&
-                    p.getGroupId().equals( mArtifact.getGroupId()) &&
-                    p.getVersion().equals( mArtifact.getVersion()))
+                if ( p.getArtifactId().equals( mArtifact.getArtifactId() )
+                    && p.getGroupId().equals( mArtifact.getGroupId() )
+                    && p.getVersion().equals( mArtifact.getVersion() ) )
                 {
                     //TODO: the packaging could be different, but the exception doesn't contain that info
                     //most likely it would be produced by the project we just found in the reactor since all
                     //the other info matches. Assume it's ok.
-                    getLogger().warn( "The dependency: "+ p.getId()+" can't be resolved but has been found in the reactor.\nThis dependency has been excluded from the plugin execution. You should rerun this mojo after executing mvn install.\n" );
+                    getLogger().warn( "The dependency: " + p.getId() + " can't be resolved but has been found in the reactor.\nThis dependency has been excluded from the plugin execution. You should rerun this mojo after executing mvn install.\n" );
 
                     //found it, move on.
                     foundInReactor.add( p );
@@ -1591,7 +1591,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
-        
+
         return pluginContainer.lookup( role, roleHint );
     }
 
@@ -1603,7 +1603,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor = pluginCollector.getPluginDescriptor( plugin );
 
         PlexusContainer pluginContainer = getPluginContainer( pluginDescriptor );
-        
+
         Set<String> pluginHints = findChildComponentHints( role, container, pluginContainer );
         Map<String, Object> components = new HashMap<String, Object>( pluginHints.size() );
         for ( String hint : pluginHints )
@@ -1614,7 +1614,7 @@ public class DefaultPluginManager
 
         return components;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1624,10 +1624,10 @@ public class DefaultPluginManager
         PluginVersionNotFoundException
     {
         PluginDescriptor pd = verifyPlugin( plugin, project, session.getSettings(), session.getLocalRepository() );
-        
+
         PlexusContainer pluginContainer = getPluginContainer( pd );
         ensurePluginContainerIsComplete( pd, pluginContainer, project, session );
-        
+
         return pd;
     }
 

@@ -148,8 +148,8 @@ public class DefaultPluginVersionManager
                 //  a. the CLI switch to force plugin updates is set, OR BOTH OF THE FOLLOWING:
                 //  b. the CLI switch to suppress plugin updates is NOT set, AND
                 //  c. the update interval for the plugin has triggered an update check.
-                if ( Boolean.TRUE.equals( pluginUpdateOverride ) ||
-                    ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
+                if ( Boolean.TRUE.equals( pluginUpdateOverride )
+                    || ( !Boolean.FALSE.equals( pluginUpdateOverride ) && shouldCheckForUpdates( groupId, artifactId ) ) )
                 {
                     updatedVersion =
                         resolveMetaVersion( groupId, artifactId, project, localRepository, Artifact.LATEST_VERSION );
@@ -217,8 +217,8 @@ public class DefaultPluginVersionManager
 
         // if we're still empty here, and the current project matches the plugin in question, use the current project's
         // version, I guess...
-        if ( StringUtils.isEmpty( version ) && project.getGroupId().equals( groupId ) &&
-            project.getArtifactId().equals( artifactId ) )
+        if ( StringUtils.isEmpty( version ) && project.getGroupId().equals( groupId )
+            && project.getArtifactId().equals( artifactId ) )
         {
             version = project.getVersion();
         }
@@ -260,8 +260,8 @@ public class DefaultPluginVersionManager
             //      a. the registry is declared to be in autoUpdate mode
             //
             // NOTE: This is only the default value; it may be changed as the result of prompting the user.
-            boolean persistUpdate = forcePersist || ( promptToPersist &&
-                !Boolean.FALSE.equals( pluginUpdateOverride ) && ( inInteractiveMode || autoUpdate ) );
+            boolean persistUpdate = forcePersist || ( promptToPersist
+                && !Boolean.FALSE.equals( pluginUpdateOverride ) && ( inInteractiveMode || autoUpdate ) );
 
             // retrieve the apply-to-all flag, if it's been set previously.
             Boolean applyToAll = settings.getRuntimeInfo().getApplyToAllPluginUpdates();
@@ -273,7 +273,7 @@ public class DefaultPluginVersionManager
             // don't prompt if the CLI pluginUpdateOverride is set (either suppression or force mode will stop prompting)
             // don't prompt if the user has selected ALL/NONE previously in this session
             //
-            // NOTE: We're incorporating here, to make the usages of this check more consistent and 
+            // NOTE: We're incorporating here, to make the usages of this check more consistent and
             // resistant to change.
             promptToPersist =
                 promptToPersist && pluginUpdateOverride == null && applyToAll == null && inInteractiveMode;
@@ -338,8 +338,8 @@ public class DefaultPluginVersionManager
                 }
                 catch ( ParseException e )
                 {
-                    getLogger().warn( "Last-checked date for plugin {" + constructPluginKey( groupId, artifactId ) +
-                        "} is invalid. Checking for updates." );
+                    getLogger().warn( "Last-checked date for plugin {" + constructPluginKey( groupId, artifactId )
+                        + "} is invalid. Checking for updates." );
 
                     return true;
                 }
@@ -614,8 +614,8 @@ public class DefaultPluginVersionManager
             catch ( IOException e )
             {
                 getLogger().warn(
-                    "Cannot rewrite user-level plugin-registry.xml with new plugin version of plugin: \'" + groupId +
-                        ":" + artifactId + "\'.", e );
+                    "Cannot rewrite user-level plugin-registry.xml with new plugin version of plugin: \'" + groupId
+                        + ":" + artifactId + "\'.", e );
             }
             finally
             {
@@ -702,8 +702,8 @@ public class DefaultPluginVersionManager
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new InvalidPluginException( "Unable to build project information for plugin '" +
-                        ArtifactUtils.versionlessKey( groupId, artifactId ) + "': " + e.getMessage(), e );
+                    throw new InvalidPluginException( "Unable to build project information for plugin '"
+                        + ArtifactUtils.versionlessKey( groupId, artifactId ) + "': " + e.getMessage(), e );
                 }
 
                 // if we don't have the required Maven version, then ignore an update
@@ -714,8 +714,8 @@ public class DefaultPluginVersionManager
 
                     if ( runtimeInformation.getApplicationVersion().compareTo( requiredVersion ) < 0 )
                     {
-                        getLogger().info( "Ignoring available plugin update: " + artifactVersion +
-                            " as it requires Maven version " + requiredVersion );
+                        getLogger().info( "Ignoring available plugin update: " + artifactVersion
+                            + " as it requires Maven version " + requiredVersion );
 
                         VersionRange vr;
                         try
@@ -725,8 +725,8 @@ public class DefaultPluginVersionManager
                         catch ( InvalidVersionSpecificationException e )
                         {
                             throw new PluginVersionResolutionException( groupId, artifactId,
-                                                                        "Error getting available plugin versions: " +
-                                                                            e.getMessage(), e );
+                                                                        "Error getting available plugin versions: "
+                                                                            + e.getMessage(), e );
                         }
 
                         getLogger().debug( "Trying " + vr );
@@ -740,8 +740,8 @@ public class DefaultPluginVersionManager
                         catch ( ArtifactMetadataRetrievalException e )
                         {
                             throw new PluginVersionResolutionException( groupId, artifactId,
-                                                                        "Error getting available plugin versions: " +
-                                                                            e.getMessage(), e );
+                                                                        "Error getting available plugin versions: "
+                                                                            + e.getMessage(), e );
                         }
 
                         if ( artifactVersion != null )

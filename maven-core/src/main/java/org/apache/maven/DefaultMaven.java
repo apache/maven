@@ -280,15 +280,15 @@ public class DefaultMaven
         try
         {
             String resumeFrom = request.getResumeFrom();
-            
+
             List projectList = request.getSelectedProjects();
-            
+
             String makeBehavior = request.getMakeBehavior();
-            
+
             rm = new ReactorManager( projects, projectList, resumeFrom, makeBehavior );
 
             rm.setFailureBehavior( request.getFailureBehavior() );
-            
+
         }
         catch ( CycleDetectedException e )
         {
@@ -496,8 +496,8 @@ public class DefaultMaven
                 DefaultArtifactVersion version = new DefaultArtifactVersion( project.getPrerequisites().getMaven() );
                 if ( runtimeInformation.getApplicationVersion().compareTo( version ) < 0 )
                 {
-                    throw new BuildFailureException( "Unable to build project '" + project.getFile() +
-                        "; it requires Maven version " + version.toString() );
+                    throw new BuildFailureException( "Unable to build project '" + project.getFile()
+                        + "; it requires Maven version " + version.toString() );
                 }
             }
 
@@ -596,8 +596,8 @@ public class DefaultMaven
         {
             if ( pom.length() == 0 )
             {
-                throw new ProjectBuildingException( "unknown", "The file " + pom.getAbsolutePath() +
-                    " you specified has zero length." );
+                throw new ProjectBuildingException( "unknown", "The file " + pom.getAbsolutePath()
+                    + " you specified has zero length." );
             }
         }
 
@@ -637,21 +637,21 @@ public class DefaultMaven
             if ( settings.isOffline() )
             {
                 getLogger().info( SystemWarnings.getOfflineWarning() );
-    
+
                 wagonManager.setOnline( false );
             }
 
             try
             {
                 DefaultWagonManager wm = (DefaultWagonManager) wagonManager;
-            
+
                 String oldUserAgent = wm.getHttpUserAgent();
                 int firstSpace = oldUserAgent == null ? -1 : oldUserAgent.indexOf( " " );
-            
+
                 StringBuffer buffer = new StringBuffer();
-            
+
                 buffer.append( "Apache-Maven/" );
-            
+
                 ArtifactVersion version = runtimeInformation.getApplicationVersion();
                 if ( version != null )
                 {
@@ -663,7 +663,7 @@ public class DefaultMaven
                 {
                     buffer.append( "unknown" );
                 }
-                
+
                 buffer.append( ' ' );
                 if ( firstSpace > -1 )
                 {
@@ -675,7 +675,7 @@ public class DefaultMaven
                 {
                     buffer.append( oldUserAgent );
                 }
-                
+
                 wm.setHttpUserAgent( buffer.toString() );
             }
             catch ( ClassCastException e )
@@ -684,31 +684,31 @@ public class DefaultMaven
             }
 
             SecDispatcher sd = null;
-        
+
             try
             {
                 Proxy proxy = settings.getActiveProxy();
-            
+
                 try
                 {
                     sd = (SecDispatcher) container.lookup( SecDispatcher.ROLE, "maven" );
                 }
-                catch (Exception e)
+                catch ( Exception e )
                 {
-                    getLogger().warn( "Security features are disabled. Cannot find plexus component "+SecDispatcher.ROLE + ":maven" );
-                    
+                    getLogger().warn( "Security features are disabled. Cannot find plexus component " + SecDispatcher.ROLE + ":maven" );
+
                     line();
                 }
-    
+
                 if ( proxy != null )
                 {
                     if ( proxy.getHost() == null )
                     {
                         throw new SettingsConfigurationException( "Proxy in settings.xml has no host" );
                     }
-                    
+
                     String pass = proxy.getPassword();
-                    
+
                     if ( sd != null )
                     {
                         try
@@ -720,17 +720,17 @@ public class DefaultMaven
                             reportSecurityConfigurationError( "password for proxy '" + proxy.getId() + "'", e );
                         }
                     }
-    
+
                     wagonManager.addProxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), proxy.getUsername(),
                                            pass, proxy.getNonProxyHosts() );
                 }
-                
+
                 for ( Iterator i = settings.getServers().iterator(); i.hasNext(); )
                 {
                     Server server = (Server) i.next();
-                    
+
                     String passWord = server.getPassword();
-    
+
                     if ( sd != null )
                     {
                         try
@@ -742,9 +742,9 @@ public class DefaultMaven
                             reportSecurityConfigurationError( "password for server '" + server.getId() + "'", e );
                         }
                     }
-                    
+
                     String passPhrase = server.getPassphrase();
-    
+
                     if ( sd != null )
                     {
                         try
@@ -756,23 +756,23 @@ public class DefaultMaven
                             reportSecurityConfigurationError( "passphrase for server '" + server.getId() + "'", e );
                         }
                     }
-    
+
                     wagonManager.addAuthenticationInfo( server.getId(), server.getUsername(), passWord,
                                                         server.getPrivateKey(), passPhrase );
-    
+
                     wagonManager.addPermissionInfo( server.getId(), server.getFilePermissions(),
                                                     server.getDirectoryPermissions() );
-    
+
                     if ( server.getConfiguration() != null )
                     {
                         wagonManager.addConfiguration( server.getId(), (Xpp3Dom) server.getConfiguration() );
                     }
                 }
-    
+
                 for ( Iterator i = settings.getMirrors().iterator(); i.hasNext(); )
                 {
                     Mirror mirror = (Mirror) i.next();
-    
+
                     wagonManager.addMirror( mirror.getId(), mirror.getMirrorOf(), mirror.getUrl() );
                 }
             }
@@ -788,7 +788,7 @@ public class DefaultMaven
         {
             container.release( wagonManager );
         }
-        
+
         WagonProviderMapping mapping = (WagonProviderMapping) container.lookup( WagonProviderMapping.ROLE );
         try
         {
@@ -803,7 +803,7 @@ public class DefaultMaven
                 {
                     String provider = executionProperties.getProperty( key );
                     key = key.substring( "maven.wagon.provider.".length() );
-                    
+
                     mapping.setWagonProvider( key, provider );
                 }
             }
@@ -831,7 +831,7 @@ public class DefaultMaven
             {
                 getLogger().warn( "Invalid number of threads '" + numThreads + "' will be ignored: " + e.getMessage() );
             }
-            
+
             if ( threads > 0 )
             {
                 DefaultArtifactResolver artifactResolver = (DefaultArtifactResolver) container.lookup( ArtifactResolver.ROLE );

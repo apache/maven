@@ -118,7 +118,7 @@ public class PluginParameterExpressionEvaluator
         {
             return null;
         }
-        
+
         String expression = stripTokens( expr );
         if ( expression.equals( expr ) )
         {
@@ -129,7 +129,7 @@ public class PluginParameterExpressionEvaluator
                 if ( lastIndex >= 0 )
                 {
                     String retVal = expr.substring( 0, index );
-                    
+
                     if ( index > 0 && expr.charAt( index - 1 ) == '$' )
                     {
                         retVal += expr.substring( index + 1, lastIndex + 1 );
@@ -138,7 +138,7 @@ public class PluginParameterExpressionEvaluator
                     {
                         retVal += evaluate( expr.substring( index, lastIndex + 1 ) );
                     }
-                    
+
                     retVal += evaluate( expr.substring( lastIndex + 1 ) );
                     return retVal;
                 }
@@ -158,15 +158,15 @@ public class PluginParameterExpressionEvaluator
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         if ( BANNED_EXPRESSIONS.containsKey( expression ) )
         {
-            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression +
-                "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'" +
-                BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
+            throw new ExpressionEvaluationException( "The parameter expression: \'" + expression
+                + "\' used in mojo: \'" + mojoDescriptor.getGoal() + "\' is banned. Use \'"
+                + BANNED_EXPRESSIONS.get( expression ) + "\' instead." );
         }
         else if ( DEPRECATED_EXPRESSIONS.containsKey( expression ) )
         {
-            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'" +
-                mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression ) +
-                "\' instead." );
+            logger.warn( "The parameter expression: \'" + expression + "\' used in mojo: \'"
+                + mojoDescriptor.getGoal() + "\' has been deprecated. Use \'" + DEPRECATED_EXPRESSIONS.get( expression )
+                + "\' instead." );
         }
 
         if ( "localRepository".equals( expression ) )
@@ -185,7 +185,7 @@ public class PluginParameterExpressionEvaluator
         {
             value = mojoExecution.getReports();
         }
-        else if ("mojoExecution".equals(expression)) 
+        else if ( "mojoExecution".equals( expression ) )
         {
         	value = mojoExecution;
         }

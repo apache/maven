@@ -48,7 +48,7 @@ public class ReactorManager
 
     // make projects that depend on me, and projects that I depend on
     public static final String MAKE_BOTH_MODE = "make-both";
-    
+
     private List blackList = new ArrayList();
 
     private Map buildFailuresByProject = new HashMap();
@@ -66,7 +66,7 @@ public class ReactorManager
     {
         this.sorter = new ProjectSorter( projects );
     }
-    
+
     public ReactorManager( List projects, List selectedProjects, String resumeFrom, String makeBehavior )
         throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
@@ -127,15 +127,15 @@ public class ReactorManager
             this.failureBehavior = FAIL_FAST; // default
             return;
         }
-        if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior ) ||
-            FAIL_NEVER.equals( failureBehavior ) )
+        if ( FAIL_FAST.equals( failureBehavior ) || FAIL_AT_END.equals( failureBehavior )
+            || FAIL_NEVER.equals( failureBehavior ) )
         {
             this.failureBehavior = failureBehavior;
         }
         else
         {
-            throw new IllegalArgumentException( "Invalid failure behavior (must be one of: \'" + FAIL_FAST + "\', \'" +
-                FAIL_AT_END + "\', \'" + FAIL_NEVER + "\')." );
+            throw new IllegalArgumentException( "Invalid failure behavior (must be one of: \'" + FAIL_FAST + "\', \'"
+                + FAIL_AT_END + "\', \'" + FAIL_NEVER + "\')." );
         }
     }
 
@@ -163,8 +163,8 @@ public class ReactorManager
                 {
                     String dependentId = (String) it.next();
 
-                    if ( !buildSuccessesByProject.containsKey( dependentId ) &&
-                        !buildFailuresByProject.containsKey( dependentId ) )
+                    if ( !buildSuccessesByProject.containsKey( dependentId )
+                        && !buildFailuresByProject.containsKey( dependentId ) )
                     {
                         blackList( dependentId );
                     }

@@ -167,9 +167,9 @@ public class PluginConfigurationException
             }
 
             messageBuffer
-                .append( "NOTE: One or more purely derived expression elements were detected in \'" + expression +
-                    "\'.\n    If you continue to get this error after any other expression elements are specified correctly," +
-                    "\n    please report this issue to the Maven development team.\n" );
+                .append( "NOTE: One or more purely derived expression elements were detected in \'" + expression
+                    + "\'.\n    If you continue to get this error after any other expression elements are specified correctly,"
+                    + "\n    please report this issue to the Maven development team.\n" );
         }
     }
 

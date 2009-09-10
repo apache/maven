@@ -44,8 +44,8 @@ public class SettingsConfigurationException
 
     public SettingsConfigurationException( String message, Throwable cause, int lineNumber, int columnNumber )
     {
-        super( message + ( lineNumber > 0 ? "\n  Line:   " + lineNumber : "" ) +
-            ( columnNumber > 0 ? "\n  Column: " + columnNumber : "" ), cause );
+        super( message + ( lineNumber > 0 ? "\n  Line:   " + lineNumber : "" )
+            + ( columnNumber > 0 ? "\n  Column: " + columnNumber : "" ), cause );
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
@@ -59,6 +59,6 @@ public class SettingsConfigurationException
     {
         return lineNumber;
     }
-    
+
 
 }

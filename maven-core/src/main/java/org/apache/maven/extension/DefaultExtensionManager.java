@@ -21,7 +21,7 @@ package org.apache.maven.extension;
 
 import static org.apache.maven.container.ContainerUtils.findChildComponentHints;
 
-import org.apache.maven.MavenArtifactFilterManager; 
+import org.apache.maven.MavenArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -117,8 +117,8 @@ public class DefaultExtensionManager
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '" +
-                    artifact.getId() + "': " + e.getMessage(), artifact, e );
+                throw new ArtifactResolutionException( "Unable to download metadata from repository for plugin '"
+                    + artifact.getId() + "': " + e.getMessage(), artifact, e );
             }
 
             // We use the same hack here to make sure that plexus 1.1 is available for extensions that do
@@ -281,12 +281,12 @@ public class DefaultExtensionManager
             getLogger().debug( "Wagons could not be registered as the extension container was never created" );
         }
     }
-    
+
     @SuppressWarnings( "unchecked" )
     public Map<String, ArtifactHandler> getArtifactTypeHandlers()
     {
         Map<String, ArtifactHandler> result = new HashMap<String, ArtifactHandler>();
-        
+
         if ( extensionContainer != null )
         {
             try
@@ -309,7 +309,7 @@ public class DefaultExtensionManager
                 getLogger().debug( "ArtifactHandler extensions could not be loaded: " + e.getMessage(), e );
             }
         }
-        
+
         return result;
     }
 
@@ -368,7 +368,7 @@ public class DefaultExtensionManager
                 }
             }
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             // do nothing
         }
