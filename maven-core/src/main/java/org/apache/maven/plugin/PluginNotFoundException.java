@@ -40,7 +40,7 @@ public class PluginNotFoundException
     public PluginNotFoundException( Plugin plugin, ArtifactNotFoundException e )
     {
         super( "Plugin could not be found - check that the goal name is correct: " + e.getMessage(), e.getGroupId(),
-               e.getArtifactId(), e.getVersion(), "maven-plugin",null, e.getRemoteRepositories(), null, e.getCause() );
+               e.getArtifactId(), e.getVersion(), "maven-plugin", null, e.getRemoteRepositories(), null, e.getCause() );
         this.plugin = plugin;
     }
 
