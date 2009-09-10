@@ -75,7 +75,7 @@ public class DefaultArtifactResolver
     public DefaultArtifactResolver()
     {
         super();
-        resolveArtifactPool = 
+        resolveArtifactPool =
             new ThreadPoolExecutor( DEFAULT_POOL_SIZE, DEFAULT_POOL_SIZE, 3, TimeUnit.SECONDS,
                                     new LinkedBlockingQueue() );
     }
@@ -172,8 +172,8 @@ public class DefaultArtifactResolver
             List repositories = remoteRepositories;
 
             // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
-            if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
-                destination.exists() && !localCopy && wagonManager.isOnline() )
+            if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() )
+                && destination.exists() && !localCopy && wagonManager.isOnline() )
             {
                 Date comparisonDate = new Date( destination.lastModified() );
 
@@ -354,7 +354,7 @@ public class DefaultArtifactResolver
         {
             throw (ArtifactResolutionException) resolutionExceptions.get( 0 );
         }
-        
+
         if ( missingArtifacts.size() > 0 )
         {
             throw new MultipleArtifactsNotFoundException( originatingArtifact, resolvedArtifacts, missingArtifacts,
@@ -436,7 +436,7 @@ public class DefaultArtifactResolver
             {
                 resolutionExceptions.add( e );
             }
-            finally 
+            finally
             {
                 latch.countDown();
 

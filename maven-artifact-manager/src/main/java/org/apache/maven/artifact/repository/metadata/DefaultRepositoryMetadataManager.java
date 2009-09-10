@@ -112,8 +112,8 @@ public class DefaultRepositoryMetadataManager
                             }
                             catch ( TransferFailedException e )
                             {
-                                getLogger().warn( metadata + " could not be retrieved from repository: " +
-                                    repository.getId() + " due to an error: " + e.getMessage() );
+                                getLogger().warn( metadata + " could not be retrieved from repository: "
+                                    + repository.getId() + " due to an error: " + e.getMessage() );
                                 getLogger().debug( "Exception", e );
 
                                 getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
@@ -149,8 +149,8 @@ public class DefaultRepositoryMetadataManager
                         }
                         else
                         {
-                            getLogger().debug( "System is offline. Cannot resolve metadata:\n" +
-                                metadata.extendedToString() + "\n\n" );
+                            getLogger().debug( "System is offline. Cannot resolve metadata:\n"
+                                + metadata.extendedToString() + "\n\n" );
                         }
                     }
                 }
@@ -247,8 +247,8 @@ public class DefaultRepositoryMetadataManager
                 }
                 else
                 {
-                    if ( ( m.getVersioning() != null ) && ( m.getVersioning().getSnapshot() != null ) &&
-                        m.getVersioning().getSnapshot().isLocalCopy() )
+                    if ( ( m.getVersioning() != null ) && ( m.getVersioning().getSnapshot() != null )
+                        && m.getVersioning().getSnapshot().isLocalCopy() )
                     {
                         m.getVersioning().getSnapshot().setLocalCopy( false );
                         metadata.setMetadata( m );
@@ -348,8 +348,8 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( TransferFailedException e )
         {
-            throw new RepositoryMetadataResolutionException( metadata + " could not be retrieved from repository: " +
-                remoteRepository.getId() + " due to an error: " + e.getMessage(), e );
+            throw new RepositoryMetadataResolutionException( metadata + " could not be retrieved from repository: "
+                + remoteRepository.getId() + " due to an error: " + e.getMessage(), e );
         }
 
         try
@@ -419,9 +419,9 @@ public class DefaultRepositoryMetadataManager
             }
             catch ( TransferFailedException e )
             {
-                throw new RepositoryMetadataDeploymentException( metadata +
-                    " could not be retrieved from repository: " + deploymentRepository.getId() + " due to an error: " +
-                    e.getMessage(), e );
+                throw new RepositoryMetadataDeploymentException( metadata
+                    + " could not be retrieved from repository: " + deploymentRepository.getId() + " due to an error: "
+                    + e.getMessage(), e );
             }
         }
         else

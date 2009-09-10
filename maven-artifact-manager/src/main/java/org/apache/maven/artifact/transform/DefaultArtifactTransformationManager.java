@@ -34,19 +34,22 @@ public class DefaultArtifactTransformationManager
     implements ArtifactTransformationManager, Initializable
 {
     private List<ArtifactTransformation> artifactTransformations;
-    
-	public void initialize() throws InitializationException {
-		// TODO this is a hack until plexus can fix the ordering of the arrays
-		ArtifactTransformation transforms[] = artifactTransformations.toArray( new ArtifactTransformation[]{} );
-		for (int x = 0; x < transforms.length; x++)
-		{
-			if (transforms[x].getClass().getName().indexOf("Snapshot") != -1) {
-				artifactTransformations.remove(transforms[x]);
-				artifactTransformations.add(transforms[x]);
-			}
-		}
-	}
-    
+
+    public void initialize()
+        throws InitializationException
+    {
+        // TODO this is a hack until plexus can fix the ordering of the arrays
+        ArtifactTransformation transforms[] = artifactTransformations.toArray( new ArtifactTransformation[] {} );
+        for ( int x = 0; x < transforms.length; x++ )
+        {
+            if ( transforms[x].getClass().getName().indexOf( "Snapshot" ) != -1 )
+            {
+                artifactTransformations.remove( transforms[x] );
+                artifactTransformations.add( transforms[x] );
+            }
+        }
+    }
+
     public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {

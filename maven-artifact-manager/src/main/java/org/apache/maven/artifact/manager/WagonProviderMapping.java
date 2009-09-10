@@ -23,9 +23,9 @@ public interface WagonProviderMapping
 {
 
     String ROLE = WagonProviderMapping.class.getName();
-    
-    public void setWagonProvider( String protocol, String provider );
-    
-    public String getWagonProvider( String protocol );
+
+    void setWagonProvider( String protocol, String provider );
+
+    String getWagonProvider( String protocol );
 
 }

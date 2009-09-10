@@ -228,7 +228,7 @@ public abstract class AbstractArtifactComponentTestCase
 
         Writer writer = new FileWriter( artifactFile );
 
-        if( content == null )
+        if ( content == null )
         {
             writer.write( artifact.getId() );
         }
@@ -238,9 +238,9 @@ public abstract class AbstractArtifactComponentTestCase
         }
 
         writer.close();
-        
+
         artifactFile = new File( repository.getBasedir(), path );
-        
+
         artifact.setFile( artifactFile );
     }
 

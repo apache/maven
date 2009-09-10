@@ -46,7 +46,6 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -86,7 +85,7 @@ public class DefaultWagonManager
     private static final String WAGON_PROVIDER_CONFIGURATION = "wagonProvider";
 
     private static int anonymousMirrorIdSeed = 0;
-    
+
     private PlexusContainer container;
 
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
@@ -118,7 +117,7 @@ public class DefaultWagonManager
     private RepositoryPermissions defaultRepositoryPermissions;
 
     private String httpUserAgent;
-    
+
     private WagonProviderMapping providerMapping = new DefaultWagonProviderMapping();
 
     // TODO: this leaks the component in the public api - it is never released back to the container
@@ -138,13 +137,13 @@ public class DefaultWagonManager
 
         return wagon;
     }
-    
+
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
         return getWagon( protocol, null );
     }
-    
+
     private Wagon getWagon( String protocol, String repositoryId )
         throws UnsupportedProtocolException
     {
@@ -166,12 +165,12 @@ public class DefaultWagonManager
 
         return wagon;
     }
-    
+
     private String getWagonHint( String protocol, String repositoryId )
     {
         // TODO: Implement a better way to get the hint, via settings.xml or something.
         String impl = null;
-        
+
         if ( repositoryId != null && serverWagonProviderMap.containsKey( repositoryId ) )
         {
             impl = serverWagonProviderMap.get( repositoryId );
@@ -185,7 +184,7 @@ public class DefaultWagonManager
                 getLogger().debug( "Using Wagon implementation " + impl + " from default mapping for protocol " + protocol );
             }
         }
-        
+
         String hint;
         if ( impl != null )
         {
@@ -204,7 +203,7 @@ public class DefaultWagonManager
         {
             hint = protocol;
         }
-        
+
         return hint;
     }
 
@@ -215,7 +214,7 @@ public class DefaultWagonManager
         {
             container = availableWagons.get( hint );
         }
-        
+
         return container;
     }
 
@@ -312,7 +311,7 @@ public class DefaultWagonManager
                 {
                     return getProxy( protocol );
                 }
-            });
+            } );
 
             wagon.put( source, remotePath );
 
@@ -388,13 +387,13 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                getLogger().info( "Unable to find resource '" + artifact.getId() + "' in repository " +
-                    repository.getId() + " (" + repository.getUrl() + ")" );
+                getLogger().info( "Unable to find resource '" + artifact.getId() + "' in repository "
+                    + repository.getId() + " (" + repository.getUrl() + ")" );
             }
             catch ( TransferFailedException e )
             {
-                getLogger().warn( "Unable to get resource '" + artifact.getId() + "' from repository " +
-                    repository.getId() + " (" + repository.getUrl() + "): " + e.getMessage() );
+                getLogger().warn( "Unable to get resource '" + artifact.getId() + "' from repository "
+                    + repository.getId() + " (" + repository.getUrl() + "): " + e.getMessage() );
             }
         }
 
@@ -490,7 +489,7 @@ public class DefaultWagonManager
         try
         {
             getLogger().debug( "Connecting to repository: \'" + repository.getId() + "\' with url: \'" + repository.getUrl() + "\'." );
-            
+
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
                            getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
             {
@@ -498,7 +497,7 @@ public class DefaultWagonManager
                 {
                     return getProxy( protocol );
                 }
-            });
+            } );
 
             boolean firstRun = true;
             boolean retry = true;
@@ -694,7 +693,7 @@ public class DefaultWagonManager
                 // TODO: this should be illegal in settings.xml
                 id = repository.getId();
             }
-            
+
             getLogger().debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
 
             repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
@@ -780,8 +779,8 @@ public class DefaultWagonManager
             }
             else
             {
-                throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum +
-                    "'; remote = '" + expectedChecksum + "'" );
+                throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum
+                    + "'; remote = '" + expectedChecksum + "'" );
             }
         }
         catch ( IOException e )
@@ -807,7 +806,7 @@ public class DefaultWagonManager
                                Wagon wagon, String repositoryId )
     {
         String hint = getWagonHint( protocol, repositoryId );
-        
+
         PlexusContainer container = getWagonContainer( hint );
         try
         {
@@ -822,12 +821,12 @@ public class DefaultWagonManager
     public ProxyInfo getProxy( String protocol )
     {
         ProxyInfo info = (ProxyInfo) proxies.get( protocol );
-        
+
         if ( info != null )
         {
             getLogger().debug( "Using Proxy: " + info.getHost() );
         }
-        
+
         return info;
     }
 
@@ -1047,11 +1046,11 @@ public class DefaultWagonManager
             id = "mirror-" + anonymousMirrorIdSeed++;
             getLogger().warn( "You are using a mirror that doesn't declare an <id/> element. Using \'" + id + "\' instead:\nId: " + id + "\nmirrorOf: " + mirrorOf + "\nurl: " + url + "\n" );
         }
-        
+
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
         //to preserve first wins, don't add repeated mirrors.
-        if (!mirrors.containsKey( mirrorOf ))
+        if ( !mirrors.containsKey( mirrorOf ) )
         {
             mirrors.put( mirrorOf, mirror );
         }
@@ -1099,12 +1098,12 @@ public class DefaultWagonManager
     private void configureWagon( Wagon wagon, String repositoryId, String protocol )
         throws WagonConfigurationException
     {
-        PlexusConfiguration config = (PlexusConfiguration) serverConfigurationMap.get( repositoryId ); 
+        PlexusConfiguration config = (PlexusConfiguration) serverConfigurationMap.get( repositoryId );
         if ( protocol.startsWith( "http" ) || protocol.startsWith( "dav" ) )
         {
             config = updateUserAgentForHttp( wagon, config );
         }
-        
+
         if ( config != null )
         {
             ComponentConfigurator componentConfigurator = null;
@@ -1148,17 +1147,17 @@ public class DefaultWagonManager
         {
             config = new XmlPlexusConfiguration( "configuration" );
         }
-        
+
         if ( httpUserAgent != null )
         {
             try
             {
                 wagon.getClass().getMethod( "setHttpHeaders", new Class[]{ Properties.class } );
-                
+
                 PlexusConfiguration headerConfig = config.getChild( "httpHeaders", true );
                 PlexusConfiguration[] children = headerConfig.getChildren( "property" );
                 boolean found = false;
-                
+
                 getLogger().debug( "Checking for pre-existing User-Agent configuration." );
                 for ( int i = 0; i < children.length; i++ )
                 {
@@ -1169,17 +1168,17 @@ public class DefaultWagonManager
                         break;
                     }
                 }
-                
+
                 if ( !found )
                 {
                     getLogger().debug( "Adding User-Agent configuration." );
                     XmlPlexusConfiguration propertyConfig = new XmlPlexusConfiguration( "property" );
                     headerConfig.addChild( propertyConfig );
-                    
+
                     XmlPlexusConfiguration nameConfig = new XmlPlexusConfiguration( "name" );
                     nameConfig.setValue( "User-Agent" );
                     propertyConfig.addChild( nameConfig );
-                    
+
                     XmlPlexusConfiguration versionConfig = new XmlPlexusConfiguration( "value" );
                     versionConfig.setValue( httpUserAgent );
                     propertyConfig.addChild( versionConfig );
@@ -1200,7 +1199,7 @@ public class DefaultWagonManager
                 // forget it.
             }
         }
-        
+
         return config;
     }
 
@@ -1223,13 +1222,13 @@ public class DefaultWagonManager
                 configuration.removeChild( i );
                 break;
             }
-            
+
             i++;
         }
 
         serverConfigurationMap.put( repositoryId, xmlConf );
     }
-    
+
     public void setDefaultRepositoryPermissions( RepositoryPermissions defaultRepositoryPermissions )
     {
         this.defaultRepositoryPermissions = defaultRepositoryPermissions;
@@ -1272,7 +1271,7 @@ public class DefaultWagonManager
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1280,7 +1279,7 @@ public class DefaultWagonManager
     {
         this.httpUserAgent = userAgent;
     }
-    
+
     /**
      * {@inheritDoc}
      */

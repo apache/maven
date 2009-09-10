@@ -19,8 +19,6 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import java.io.File;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +31,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringOutputStream;
 
@@ -41,7 +38,7 @@ public class StringWagon
     extends StreamWagon
 {
     private Map expectedContent = new HashMap();
-    
+
     public void addExpectedContent( String resourceName, String expectedContent )
     {
         this.expectedContent.put( resourceName, expectedContent );
@@ -63,7 +60,7 @@ public class StringWagon
         Resource resource = inputData.getResource();
 
         String content = (String) expectedContent.get( resource.getName() );
-        
+
         if ( content != null )
         {
             resource.setContentLength( content.length() );
@@ -90,6 +87,6 @@ public class StringWagon
 
     public void clearExpectedContent()
     {
-        expectedContent.clear();        
+        expectedContent.clear();
     }
 }
