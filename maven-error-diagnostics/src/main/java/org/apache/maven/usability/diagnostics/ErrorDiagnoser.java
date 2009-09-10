@@ -21,7 +21,7 @@ package org.apache.maven.usability.diagnostics;
 
 public interface ErrorDiagnoser
 {
-    static final String ROLE = ErrorDiagnoser.class.getName();
+    String ROLE = ErrorDiagnoser.class.getName();
 
     boolean canDiagnose( Throwable error );
 
