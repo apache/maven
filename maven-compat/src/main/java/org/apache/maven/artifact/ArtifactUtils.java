@@ -87,7 +87,7 @@ public final class ArtifactUtils
     public static String key( Artifact artifact )
     {
         return key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
-    }    
+    }
 
     public static String key( String groupId, String artifactId, String version )
     {
@@ -103,19 +103,19 @@ public final class ArtifactUtils
         {
             throw new NullPointerException( "version is null" );
         }
-        
+
         return groupId + ":" + artifactId + ":" + version;
-    }    
-    
+    }
+
     public static Map<String,Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
         Map<String,Artifact> artifactMap = new LinkedHashMap<String,Artifact>();
 
         if ( artifacts != null )
         {
-            for (Artifact artifact : artifacts) 
+            for ( Artifact artifact : artifacts )
             {
-                artifactMap.put(versionlessKey(artifact), artifact);
+                artifactMap.put( versionlessKey( artifact ), artifact );
             }
         }
 
