@@ -63,16 +63,16 @@ public class ProjectInheritanceTest
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
         Set set = project1.getArtifacts();
-        assertNotNull("No artifacts", set);
-        assertTrue("No Artifacts", set.size() > 0);
+        assertNotNull( "No artifacts", set );
+        assertTrue( "No Artifacts", set.size() > 0 );
         Iterator iter = set.iterator();
 
-        while (iter.hasNext())
+        while ( iter.hasNext() )
         {
-            Artifact artifact = (Artifact)iter.next();
-            System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " +
-                    artifact.getVersion() + " Scope: " + artifact.getScope());
-            assertTrue("Incorrect version for " + artifact.getDependencyConflictId(), artifact.getVersion().equals("1.0"));
+            Artifact artifact = (Artifact) iter.next();
+            System.out.println( "Artifact: " + artifact.getDependencyConflictId() + " "
+                    + artifact.getVersion() + " Scope: " + artifact.getScope() );
+            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(), artifact.getVersion().equals( "1.0" ) );
         }
 
     }

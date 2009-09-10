@@ -24,22 +24,24 @@ import org.codehaus.plexus.PlexusTestCase;
 
 public class MavenMetadataSourceTest
     extends PlexusTestCase
-{    
+{
     private RepositorySystem repositorySystem;
-    
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
         repositorySystem = lookup( RepositorySystem.class );
     }
-    
+
     @Override
-    protected void tearDown() throws Exception {
-            repositorySystem = null;
-            super.tearDown();
+    protected void tearDown()
+        throws Exception
+    {
+        repositorySystem = null;
+        super.tearDown();
     }
-    
+
     public void testShouldNotCarryExclusionsOverFromDependencyToDependency()
         throws Exception
     {
@@ -49,39 +51,39 @@ public class MavenMetadataSourceTest
         dep1.setArtifactId( "test-artifact" );
         dep1.setVersion( "1" );
         dep1.setType( "jar" );
-        
+
         Exclusion exc = new Exclusion();
         exc.setGroupId( "test" );
         exc.setArtifactId( "test-artifact3" );
-        
+
         dep1.addExclusion( exc );
-        
+
         Dependency dep2 = new Dependency();
         dep2.setGroupId( "test" );
         dep2.setArtifactId( "test-artifact2" );
         dep2.setVersion( "1" );
         dep2.setType( "jar" );
-        
+
         List deps = new ArrayList();
         deps.add( dep1 );
         deps.add( dep2 );
-        
+
         ArtifactFactory factory = lookup( ArtifactFactory.class );
-        
+
         ArtifactFilter dependencyFilter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
-        
+
         MavenProject project = new MavenProject( new Model() );
-        
+
         Set result = project.createArtifacts( dependencyFilter );
-        
+
         for ( Iterator it = result.iterator(); it.hasNext(); )
         {
             Artifact artifact = ( Artifact ) it.next();
-            
+
             if ( "test-artifact2".equals( artifact.getArtifactId() ) )
             {
                 ArtifactFilter filter = artifact.getDependencyFilter();
-                
+
                 assertSame( dependencyFilter, filter );
             }
         }
@@ -158,9 +160,9 @@ public class MavenMetadataSourceTest
         TestModelDefaultsInjector injector = new TestModelDefaultsInjector();
 
         injector.injectDefaults( model );
-        
+
         project.setArtifacts( project.createArtifacts( null ) );
-        
+
         String key = ArtifactUtils.versionlessKey( groupId, artifactId );
 
         Map artifactMap = project.getArtifactMap();

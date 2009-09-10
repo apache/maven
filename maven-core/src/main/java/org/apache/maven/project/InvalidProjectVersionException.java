@@ -42,8 +42,8 @@ public class InvalidProjectVersionException
     private static String formatMessage( String projectId, String locationInPom, String offendingVersion,
                                          InvalidVersionSpecificationException cause )
     {
-        return "Invalid version: " + offendingVersion + " found for: " + locationInPom + " in project: " + projectId +
-            ". Reason: " + cause.getMessage();
+        return "Invalid version: " + offendingVersion + " found for: " + locationInPom + " in project: " + projectId
+            + ". Reason: " + cause.getMessage();
     }
 
     public String getOffendingVersion()

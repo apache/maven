@@ -25,37 +25,42 @@ import junit.framework.TestCase;
  *
  * @author mkleint
  */
-public class RequirementMatcherFactoryTest extends TestCase {
-    
-    public RequirementMatcherFactoryTest(String testName) {
-        super(testName);
+public class RequirementMatcherFactoryTest
+    extends TestCase
+{
+
+    public RequirementMatcherFactoryTest( String testName )
+    {
+        super( testName );
     }
 
     /**
      * Test of createExactMatcher method, of class RequirementMatcherFactory.
      */
-    public void testCreateExactMatcher() {
+    public void testCreateExactMatcher()
+    {
         RequirementMatcher matcher;
-        matcher = RequirementMatcherFactory.createExactMatcher("foo");
-        assertFalse(matcher.matches("bar"));
-        assertFalse(matcher.matches("foobar"));
-        assertFalse(matcher.matches("foob"));
-        assertTrue(matcher.matches("foo"));
+        matcher = RequirementMatcherFactory.createExactMatcher( "foo" );
+        assertFalse( matcher.matches( "bar" ) );
+        assertFalse( matcher.matches( "foobar" ) );
+        assertFalse( matcher.matches( "foob" ) );
+        assertTrue( matcher.matches( "foo" ) );
     }
 
     /**
      * Test of createVersionMatcher method, of class RequirementMatcherFactory.
      */
-    public void testCreateVersionMatcher() {
+    public void testCreateVersionMatcher()
+    {
         RequirementMatcher matcher;
-        matcher = RequirementMatcherFactory.createVersionMatcher("1.5.2");
-        assertFalse(matcher.matches("1.5"));
-        assertTrue(matcher.matches("1.5.2"));
-        assertFalse(matcher.matches("[1.4,1.5)"));
-        assertFalse(matcher.matches("[1.5,1.5.2)"));
-        assertFalse(matcher.matches("(1.5.2,1.6)"));
-        assertTrue(matcher.matches("(1.4,1.5.2]"));
-        assertTrue(matcher.matches("(1.5,)"));
+        matcher = RequirementMatcherFactory.createVersionMatcher( "1.5.2" );
+        assertFalse( matcher.matches( "1.5" ) );
+        assertTrue( matcher.matches( "1.5.2" ) );
+        assertFalse( matcher.matches( "[1.4,1.5)" ) );
+        assertFalse( matcher.matches( "[1.5,1.5.2)" ) );
+        assertFalse( matcher.matches( "(1.5.2,1.6)" ) );
+        assertTrue( matcher.matches( "(1.4,1.5.2]" ) );
+        assertTrue( matcher.matches( "(1.5,)" ) );
     }
 
 }

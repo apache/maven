@@ -62,19 +62,20 @@ public class ProjectInheritanceTest
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
-        System.out.println("Project " + project1.getId() + " " + project1);
+        System.out.println( "Project " + project1.getId() + " " + project1 );
         Set set = project1.getArtifacts();
-        assertNotNull("No artifacts", set);
-        assertTrue("No Artifacts", set.size() > 0);
+        assertNotNull( "No artifacts", set );
+        assertTrue( "No Artifacts", set.size() > 0 );
         Iterator iter = set.iterator();
-        assertTrue("Set size should be 4, is " + set.size(), set.size() == 4);
+        assertTrue( "Set size should be 4, is " + set.size(), set.size() == 4 );
 
-        while (iter.hasNext())
+        while ( iter.hasNext() )
         {
-            Artifact artifact = (Artifact)iter.next();
-            System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() +
-              " Optional=" + (artifact.isOptional() ? "true" : "false"));
-            assertTrue("Incorrect version for " + artifact.getDependencyConflictId(), artifact.getVersion().equals("1.0"));
+            Artifact artifact = (Artifact) iter.next();
+            System.out.println( "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
+              + " Optional=" + ( artifact.isOptional() ? "true" : "false" ) );
+            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(),
+                        artifact.getVersion().equals( "1.0" ) );
         }
 
     }

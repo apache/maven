@@ -19,7 +19,6 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +32,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -69,16 +67,18 @@ public class PluginParameterExpressionEvaluatorTest
         throws Exception
     {
         super.setUp();
-        factory = lookup( ArtifactFactory.class );        
-        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );        
+        factory = lookup( ArtifactFactory.class );
+        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
     }
-    
+
     @Override
-    protected void tearDown() throws Exception {
-            factory = null;
-            super.tearDown();
+    protected void tearDown()
+        throws Exception
+    {
+        factory = null;
+        super.tearDown();
     }
-    
+
     public void testPluginDescriptorExpressionReference()
         throws Exception
     {
@@ -445,7 +445,7 @@ public class PluginParameterExpressionEvaluatorTest
     private MavenSession newMavenSession()
         throws Exception
     {
-        return createMavenSession( null );        
+        return createMavenSession( null );
     }
 
     @Override

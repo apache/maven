@@ -29,42 +29,50 @@ import org.apache.maven.settings.Settings;
  *
  * @author mkleint
  */
-public class DefaultSettingsValidatorTest extends TestCase {
-    
-    public DefaultSettingsValidatorTest(String testName) {
-        super(testName);
+public class DefaultSettingsValidatorTest
+    extends TestCase
+{
+
+    public DefaultSettingsValidatorTest( String testName )
+    {
+        super( testName );
     }
-    
-    protected void setUp() throws Exception {
+
+    protected void setUp()
+        throws Exception
+    {
         super.setUp();
     }
 
-    protected void tearDown() throws Exception {
+    protected void tearDown()
+        throws Exception
+    {
         super.tearDown();
     }
 
-    public void testValidate() {
+    public void testValidate()
+    {
         Settings model = new Settings();
         Profile prof = new Profile();
-        prof.setId("xxx");
-        model.addProfile(prof);
+        prof.setId( "xxx" );
+        model.addProfile( prof );
         DefaultSettingsValidator instance = new DefaultSettingsValidator();
-        SettingsValidationResult result = instance.validate(model);
-        assertEquals(0, result.getMessageCount());
-        
+        SettingsValidationResult result = instance.validate( model );
+        assertEquals( 0, result.getMessageCount() );
+
         Repository repo = new Repository();
-        prof.addRepository(repo);
-        result = instance.validate(model);
-        assertEquals(2, result.getMessageCount());
-        
-        repo.setUrl("http://xxx.xxx.com");
-        result = instance.validate(model);
-        assertEquals(1, result.getMessageCount());
-        
-        repo.setId("xxx");
-        result = instance.validate(model);
-        assertEquals(0, result.getMessageCount());
-        
+        prof.addRepository( repo );
+        result = instance.validate( model );
+        assertEquals( 2, result.getMessageCount() );
+
+        repo.setUrl( "http://xxx.xxx.com" );
+        result = instance.validate( model );
+        assertEquals( 1, result.getMessageCount() );
+
+        repo.setId( "xxx" );
+        result = instance.validate( model );
+        assertEquals( 0, result.getMessageCount() );
+
     }
 
 }
