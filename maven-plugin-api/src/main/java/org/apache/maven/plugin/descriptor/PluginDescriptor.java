@@ -232,7 +232,7 @@ public class PluginDescriptor
     /**
      * Gets the artifacts that make up the plugin's class realm, excluding artifacts shadowed by the Maven core realm
      * like {@code maven-project}.
-     * 
+     *
      * @return The plugin artifacts, never {@code null}.
      */
     public List<Artifact> getArtifacts()
@@ -284,11 +284,11 @@ public class PluginDescriptor
         // changes above not being propogated to the map
 
         MojoDescriptor mojoDescriptor = null;
-        
+
         for ( Iterator<?> i = getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
         {
             MojoDescriptor desc = (MojoDescriptor) i.next();
-                        
+
             if ( goal.equals( desc.getGoal() ) )
             {
                 mojoDescriptor = desc;
@@ -342,7 +342,7 @@ public class PluginDescriptor
     {
         this.plugin = plugin;
     }
-    
+
     public Plugin getPlugin()
     {
         return plugin;

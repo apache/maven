@@ -43,7 +43,7 @@ public class MojoDescriptor
     implements Cloneable
 {
     /** The Plexus component type */
-    public static String MAVEN_PLUGIN = "maven-plugin";
+    public static final String MAVEN_PLUGIN = "maven-plugin";
 
     /** "once-per-session" execution strategy */
     public static final String SINGLE_PASS_EXEC_STRATEGY = "once-per-session";
@@ -57,7 +57,7 @@ public class MojoDescriptor
 
     private List<Parameter> parameters;
 
-    private Map<String,Parameter> parameterMap;
+    private Map<String, Parameter> parameterMap;
 
     /** By default, the execution strategy is "once-per-session" */
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
@@ -192,9 +192,9 @@ public class MojoDescriptor
     {
         if ( parameters != null && parameters.contains( parameter ) )
         {
-            throw new DuplicateParameterException( parameter.getName() +
-                " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: " +
-                getImplementation() + ")" );
+            throw new DuplicateParameterException( parameter.getName()
+                + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
+                + getImplementation() + ")" );
         }
 
             if ( parameters == null )
@@ -208,11 +208,11 @@ public class MojoDescriptor
     /**
      * @return the list parameters as a Map
      */
-    public Map<String,Parameter> getParameterMap()
+    public Map<String, Parameter> getParameterMap()
     {
         if ( parameterMap == null )
         {
-            parameterMap = new HashMap<String,Parameter>();
+            parameterMap = new HashMap<String, Parameter>();
 
             if ( parameters != null )
             {
@@ -262,7 +262,7 @@ public class MojoDescriptor
      * Gets the scope of (transitive) dependencies that should be collected. Dependency collection refers to the process
      * of calculating the complete dependency tree in terms of artifact coordinates. In contrast to dependency
      * resolution, this does not include the download of the files for the dependency artifacts.
-     * 
+     *
      * @return The scope of (transitive) dependencies that should be collected or {@code null} if none.
      */
     public String getDependencyCollectionRequired()
