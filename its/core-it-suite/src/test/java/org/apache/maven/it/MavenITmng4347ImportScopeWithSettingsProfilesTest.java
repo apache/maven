@@ -41,8 +41,10 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
 
     /**
      * Test that profiles from settings.xml will be used to resolve import-scoped dependency POMs.
+     * In this case, the settings profile enables snapshot resolution on the central repository, which
+     * is required to resolve the import-scoped POM with a SNAPSHOT version.
      */
-    public void testit()
+    public void testMNG4347()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4347" );
@@ -60,12 +62,42 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
         
         verifier.setAutoclean( false );
         
-        verifier.getCliOptions().add( "-V" );
-        verifier.getCliOptions().add( "-X" );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
         
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        
+        verifier.executeGoal( "validate" );
+        
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+
+    /**
+     * Test that profiles from settings.xml will be used to resolve import-scoped dependency POMs.
+     * In this case, it's a property from the settings profile that needs to be used to resolve the
+     * version for a dependency in the import-scoped POM.
+     */
+    public void testMNG4148()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4148" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        
+        String localRepo = verifier.localRepo;
+        File dest = new File( localRepo );
+        File src = new File( testDir, "local-repository" );
+        
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.it.mng4148" );
+        
+        FileUtils.copyDirectoryStructure( src, dest );
+        
+        verifier.setAutoclean( false );
+        
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
         
         verifier.executeGoal( "validate" );
         
