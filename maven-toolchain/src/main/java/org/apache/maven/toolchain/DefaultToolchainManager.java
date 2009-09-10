@@ -185,7 +185,7 @@ public class DefaultToolchainManager extends AbstractLogEnabled
     public void storeToolchainToBuildContext( ToolchainPrivate toolchain,
                                               MavenSession session )
     {
-        Map context = retrieveContext( session );
+        Map<String, Object> context = retrieveContext( session );
         context.put( getStorageKey( toolchain.getType() ), toolchain.getModel () );
     }
     
