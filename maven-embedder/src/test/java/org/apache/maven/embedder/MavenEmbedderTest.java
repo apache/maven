@@ -86,14 +86,14 @@ public class MavenEmbedderTest
         }
 
         System.err.println( "Encountered " + exceptions.size() + " exception(s)." );
-        for (Exception exception : exceptions)
+        for ( Exception exception : exceptions )
         {
             exception.printStackTrace( System.err );
         }
 
         fail( "Encountered Exceptions in MavenExecutionResult during " + getName() );
     }
-        
+
     /*MNG-3919*/
     public void testWithInvalidGoal()
         throws Exception
@@ -104,16 +104,16 @@ public class MavenEmbedderTest
 
         FileUtils.copyDirectoryStructure( testDirectory, targetDirectory );
 
-        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );        
+        MavenExecutionRequest request = createMavenExecutionRequest( new File( targetDirectory, "pom.xml" ) );
         request.setGoals( Arrays.asList( new String[]{"validate"} ) );
 
         MavenExecutionResult result = mavenEmbedder.execute( request );
         List<Exception> exceptions = result.getExceptions();
-        assertEquals("Incorrect number of exceptions", 1, exceptions.size());
+        assertEquals( "Incorrect number of exceptions", 1, exceptions.size() );
 
         if ( ( exceptions.get( 0 ) instanceof NullPointerException ) )
         {
-            fail("Null Pointer on Exception");
+            fail( "Null Pointer on Exception" );
         }
     }
 
@@ -147,7 +147,7 @@ public class MavenEmbedderTest
         writer.close();
 
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
-        
+
         MavenExecutionResult result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );
@@ -164,7 +164,7 @@ public class MavenEmbedderTest
         writer.close();
 
         request = createMavenExecutionRequest( pom );
-                    
+
         result = mavenEmbedder.execute( request );
 
         assertNoExceptions( result );

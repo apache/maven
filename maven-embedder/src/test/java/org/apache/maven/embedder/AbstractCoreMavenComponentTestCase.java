@@ -39,7 +39,7 @@ public abstract class AbstractCoreMavenComponentTestCase
 
     @Requirement
     protected Maven maven;
-    
+
     protected void setUp()
         throws Exception
     {
@@ -75,7 +75,7 @@ public abstract class AbstractCoreMavenComponentTestCase
      * We need to customize the standard Plexus container with the plugin discovery listener which
      * is what looks for the META-INF/maven/plugin.xml resources that enter the system when a Maven
      * plugin is loaded.
-     * 
+     *
      * We also need to customize the Plexus container with a standard plugin discovery listener
      * which is the MavenPluginCollector. When a Maven plugin is discovered the MavenPluginCollector
      * collects the plugin descriptors which are found.
@@ -88,7 +88,7 @@ public abstract class AbstractCoreMavenComponentTestCase
 
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
         throws Exception
-    {        
+    {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setPom( pom )
             .setProjectPresent( true )
@@ -107,16 +107,16 @@ public abstract class AbstractCoreMavenComponentTestCase
     // a Maven subclass because we don't want to couple maven to the project builder which we need to
     // separate.
     protected MavenSession createMavenSession( File pom )
-        throws Exception        
+        throws Exception
     {
         return createMavenSession( pom, new Properties() );
     }
-    
+
     protected MavenSession createMavenSession( File pom, Properties executionProperties )
         throws Exception
     {
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
-        
+
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest()
             .setLocalRepository( request.getLocalRepository() )
             .setRemoteRepositories( request.getRemoteRepositories() )
@@ -147,7 +147,7 @@ public abstract class AbstractCoreMavenComponentTestCase
         model.setVersion( "1.0" );
         return new MavenProject( model );
     }
-    
+
     protected List<ArtifactRepository> getRemoteRepositories()
         throws InvalidRepositoryException
     {
@@ -162,28 +162,28 @@ public abstract class AbstractCoreMavenComponentTestCase
         itRepo.setUrl( "http://repository.sonatype.org/content/repositories/maven.snapshots" );
         return Arrays.asList(  repositorySystem.createDefaultRemoteRepository(), repositorySystem.buildArtifactRepository( itRepo ) );
     }
-        
-    protected ArtifactRepository getLocalRepository() 
+
+    protected ArtifactRepository getLocalRepository()
         throws InvalidRepositoryException
-    {        
-        return repositorySystem.createDefaultLocalRepository();        
+    {
+        return repositorySystem.createDefaultLocalRepository();
     }
-    
+
     protected class ProjectBuilder
     {
         private MavenProject project;
-        
+
         public ProjectBuilder( String groupId, String artifactId, String version )
         {
             Model model = new Model();
             model.setModelVersion( "4.0.0" );
             model.setGroupId( groupId );
             model.setArtifactId( artifactId );
-            model.setVersion( version );  
+            model.setVersion( version );
             model.setBuild(  new Build() );
-            project = new MavenProject( model );            
+            project = new MavenProject( model );
         }
-        
+
         public ProjectBuilder setGroupId( String groupId )
         {
             project.setGroupId( groupId );
@@ -195,30 +195,30 @@ public abstract class AbstractCoreMavenComponentTestCase
             project.setArtifactId( artifactId );
             return this;
         }
-        
+
         public ProjectBuilder setVersion( String version )
         {
             project.setVersion( version );
             return this;
         }
-        
+
         // Dependencies
         //
         public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope )
         {
-            return addDependency( groupId, artifactId, version, scope, (Exclusion)null );
+            return addDependency( groupId, artifactId, version, scope, (Exclusion) null );
         }
-        
+
         public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope, Exclusion exclusion )
         {
-            return addDependency( groupId, artifactId, version, scope, null, exclusion );            
+            return addDependency( groupId, artifactId, version, scope, null, exclusion );
         }
 
         public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope, String systemPath )
         {
-            return addDependency( groupId, artifactId, version, scope, systemPath, null );         
+            return addDependency( groupId, artifactId, version, scope, systemPath, null );
         }
-        
+
         public ProjectBuilder addDependency( String groupId, String artifactId, String version, String scope, String systemPath, Exclusion exclusion )
         {
             Dependency d = new Dependency();
@@ -226,60 +226,60 @@ public abstract class AbstractCoreMavenComponentTestCase
             d.setArtifactId( artifactId );
             d.setVersion( version );
             d.setScope( scope );
-            
+
             if ( systemPath != null && scope.equals(  Artifact.SCOPE_SYSTEM ) )
             {
                 d.setSystemPath( systemPath );
             }
-            
+
             if ( exclusion != null )
             {
                 d.addExclusion( exclusion );
             }
-            
+
             project.getDependencies().add( d );
-            
+
             return this;
         }
-        
+
         // Plugins
         //
         public ProjectBuilder addPlugin( Plugin plugin )
         {
-            project.getBuildPlugins().add( plugin );            
+            project.getBuildPlugins().add( plugin );
             return this;
         }
-        
+
         public MavenProject get()
         {
             return project;
-        }        
-    }    
-    
+        }
+    }
+
     protected class PluginBuilder
     {
         private Plugin plugin;
-        
+
         public PluginBuilder( String groupId, String artifactId, String version )
         {
             plugin = new Plugin();
             plugin.setGroupId( groupId );
             plugin.setArtifactId( artifactId );
-            plugin.setVersion( version );                         
+            plugin.setVersion( version );
         }
-                
+
         // Dependencies
         //
         public PluginBuilder addDependency( String groupId, String artifactId, String version, String scope, Exclusion exclusion )
         {
-            return addDependency( groupId, artifactId, version, scope, exclusion );            
+            return addDependency( groupId, artifactId, version, scope, exclusion );
         }
 
         public PluginBuilder addDependency( String groupId, String artifactId, String version, String scope, String systemPath )
         {
-            return addDependency( groupId, artifactId, version, scope, systemPath, null );         
+            return addDependency( groupId, artifactId, version, scope, systemPath, null );
         }
-        
+
         public PluginBuilder addDependency( String groupId, String artifactId, String version, String scope, String systemPath, Exclusion exclusion )
         {
             Dependency d = new Dependency();
@@ -287,25 +287,25 @@ public abstract class AbstractCoreMavenComponentTestCase
             d.setArtifactId( artifactId );
             d.setVersion( version );
             d.setScope( scope );
-            
+
             if ( systemPath != null && scope.equals(  Artifact.SCOPE_SYSTEM ) )
             {
                 d.setSystemPath( systemPath );
             }
-            
+
             if ( exclusion != null )
             {
                 d.addExclusion( exclusion );
             }
-            
+
             plugin.getDependencies().add( d );
-            
+
             return this;
         }
-                
+
         public Plugin get()
         {
             return plugin;
-        }        
-    }        
+        }
+    }
 }

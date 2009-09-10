@@ -68,8 +68,8 @@ final class CLIRequestUtils
 
         boolean pluginUpdateOverride = false;
 
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) ||
-            commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES )
+            || commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
         {
             pluginUpdateOverride = true;
         }
@@ -151,7 +151,7 @@ final class CLIRequestUtils
             String [] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
             if ( profileOptionValues != null )
             {
-                for ( int i=0; i < profileOptionValues.length; ++i )
+                for ( int i = 0; i < profileOptionValues.length; ++i )
                 {
                     StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i] , "," );
 
@@ -244,22 +244,22 @@ final class CLIRequestUtils
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setUserToolchainsFile( userToolchainsFile );
-        
+
         File pom;
-        
+
         if ( alternatePomFile != null )
         {
             pom = new File( alternatePomFile );
         }
         else
         {
-            pom = new File( baseDirectory, Maven.POMv4 ); 
+            pom = new File( baseDirectory, Maven.POMv4 );
         }
-                
+
         if ( pom.exists() )
         {
             request.setPom( pom );
-        }        
+        }
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
         {

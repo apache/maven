@@ -1,5 +1,24 @@
 package org.apache.maven.cli;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DateFormat;
@@ -15,9 +34,9 @@ import org.codehaus.plexus.util.Os;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
- * 
+ *
  * @author jdcasey
- * 
+ *
  */
 public final class CLIReportingUtils
 {
@@ -60,8 +79,8 @@ public final class CLIReportingUtils
         System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
                             + System.getProperty( "file.encoding", "<unknown encoding>" ) );
 
-        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION +
-                            "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
+        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION
+                            + "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
     }
 
     private static String reduce( String s )
@@ -69,7 +88,7 @@ public final class CLIReportingUtils
         return ( s != null ? ( s.startsWith( "${" ) && s.endsWith( "}" ) ? null : s ) : null );
     }
 
-    
+
     private static void stats( Date start, MavenEmbedderLogger logger )
     {
         Date finish = new Date();
@@ -137,7 +156,7 @@ public final class CLIReportingUtils
         fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
         return fmt.format( new Date( time ) );
     }
-    
+
     static Properties getBuildProperties()
     {
         Properties properties = new Properties();

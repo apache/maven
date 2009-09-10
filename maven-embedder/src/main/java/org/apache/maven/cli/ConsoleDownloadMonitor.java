@@ -43,18 +43,18 @@ public class ConsoleDownloadMonitor
     {
         long total = transferEvent.getResource().getContentLength();
         complete += length;
-        
+
         if ( !showEvent( transferEvent ) )
         {
             return;
         }
-        
+
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )
         {
             System.out.print(
-                ( complete / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" ) +
-                    "\r" );
+                ( complete / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" )
+                    + "\r" );
         }
         else
         {
