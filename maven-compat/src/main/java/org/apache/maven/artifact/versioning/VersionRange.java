@@ -279,8 +279,8 @@ public class VersionRange
                     version = recommendedVersion;
                     found = true;
                 }
-                else if ( version == null && restriction.getRecommendedVersion() != null &&
-                    r.containsVersion( restriction.getRecommendedVersion() ) )
+                else if ( version == null && restriction.getRecommendedVersion() != null
+                    && r.containsVersion( restriction.getRecommendedVersion() ) )
                 {
                     // use this if we can, but prefer the original if possible
                     version = restriction.getRecommendedVersion();
@@ -320,11 +320,11 @@ public class VersionRange
         boolean done = false;
         while ( !done )
         {
-            if ( res1.getLowerBound() == null || res2.getUpperBound() == null ||
-                res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
+            if ( res1.getLowerBound() == null || res2.getUpperBound() == null
+                || res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
             {
-                if ( res1.getUpperBound() == null || res2.getLowerBound() == null ||
-                    res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
+                if ( res1.getUpperBound() == null || res2.getLowerBound() == null
+                    || res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
                 {
                     ArtifactVersion lower;
                     ArtifactVersion upper;
@@ -525,10 +525,13 @@ public class VersionRange
         // TODO: could be more efficient by sorting the list and then moving along the restrictions in order?
 
         ArtifactVersion matched = null;
-        for (ArtifactVersion version : versions) {
-            if (containsVersion(version)) {
+        for ( ArtifactVersion version : versions )
+        {
+            if ( containsVersion( version ) )
+            {
                 // valid - check if it is greater than the currently matched version
-                if (matched == null || version.compareTo(matched) > 0) {
+                if ( matched == null || version.compareTo( matched ) > 0 )
+                {
                     matched = version;
                 }
             }
@@ -538,8 +541,10 @@ public class VersionRange
 
     public boolean containsVersion( ArtifactVersion version )
     {
-        for (Restriction restriction : restrictions) {
-            if (restriction.containsVersion(version)) {
+        for ( Restriction restriction : restrictions )
+        {
+            if ( restriction.containsVersion( version ) )
+            {
                 return true;
             }
         }
@@ -553,21 +558,22 @@ public class VersionRange
 
     public boolean equals( Object obj )
     {
-        if (this == obj){
+        if ( this == obj )
+        {
             return true;
         }
-        if (!(obj instanceof VersionRange ))
+        if ( !( obj instanceof VersionRange ) )
         {
             return false;
         }
         VersionRange other = (VersionRange) obj;
-        
+
         boolean equals =
-            recommendedVersion == other.recommendedVersion ||
-                ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
+            recommendedVersion == other.recommendedVersion
+                || ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
         equals &=
-            restrictions == other.restrictions ||
-                ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
+            restrictions == other.restrictions
+                || ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
         return equals;
     }
 

@@ -90,13 +90,13 @@ public class MultipleArtifactsNotFoundException
 
         int counter = 0;
 
-        for (Artifact artifact : artifacts) {
-            String message = (++counter) + ") " + artifact.getId();
+        for ( Artifact artifact : artifacts )
+        {
+            String message = ( ++counter ) + ") " + artifact.getId();
 
-            buffer.append(constructMissingArtifactMessage(message, "  ", artifact.getGroupId(), artifact
-                    .getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
-                    artifact.getDownloadUrl(), artifact
-                    .getDependencyTrail()));
+            buffer.append( constructMissingArtifactMessage( message, "  ", artifact.getGroupId(),
+                    artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
+                    artifact.getDownloadUrl(), artifact.getDependencyTrail() ) );
         }
 
         buffer.append( "----------\n" );

@@ -73,7 +73,7 @@ public class DefaultUpdateCheckManager
         // we can safely assume that we're calculating based on the snapshot policy here if we've made it past the
         // release-artifact short circuit above.
         ArtifactRepositoryPolicy policy = repository.getSnapshots();
-        
+
         return isUpdateRequired( artifact, repository, policy );
     }
 
@@ -194,8 +194,8 @@ public class DefaultUpdateCheckManager
         {
             if ( !touchfile.getParentFile().exists() && !touchfile.getParentFile().mkdirs() )
             {
-                getLogger().debug( "Failed to create directory: " + touchfile.getParent() +
-                                       " for tracking artifact metadata resolution." );
+                getLogger().debug( "Failed to create directory: " + touchfile.getParent()
+                                       + " for tracking artifact metadata resolution." );
                 return;
             }
 
@@ -237,8 +237,8 @@ public class DefaultUpdateCheckManager
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Failed to record lastUpdated information for resolution.\nFile: " +
-                                       touchfile.toString() + "; key: " + key, e );
+                getLogger().debug( "Failed to record lastUpdated information for resolution.\nFile: "
+                                       + touchfile.toString() + "; key: " + key, e );
             }
             finally
             {
@@ -250,8 +250,8 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: " +
-                                               touchfile, e );
+                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: "
+                                               + touchfile, e );
                     }
                 }
 
@@ -263,8 +263,8 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " +
-                                               touchfile, e );
+                        getLogger().debug( "Error closing FileChannel for resolution tracking file: "
+                                               + touchfile, e );
                     }
                 }
             }
@@ -314,8 +314,8 @@ public class DefaultUpdateCheckManager
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Failed to read lastUpdated information.\nFile: " +
-                                       touchfile.toString() + "; key: " + key, e );
+                getLogger().debug( "Failed to read lastUpdated information.\nFile: "
+                                       + touchfile.toString() + "; key: " + key, e );
             }
             finally
             {
@@ -327,8 +327,8 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " +
-                                               touchfile, e );
+                        getLogger().debug( "Error releasing shared lock for resolution tracking file: "
+                                               + touchfile, e );
                     }
                 }
 
@@ -340,8 +340,8 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " +
-                                           touchfile, e );
+                        getLogger().debug( "Error closing FileChannel for resolution tracking file: "
+                                           + touchfile, e );
                     }
                 }
             }

@@ -78,14 +78,14 @@ public class DefaultArtifact
     private List<ArtifactVersion> availableVersions;
 
     private Map<Object,ArtifactMetadata> metadataMap;
-    
+
     private boolean optional;
 
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type, String classifier, ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, VersionRange.createFromVersion( version ), scope, type, classifier, artifactHandler, false );
     }
-    
+
     public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type, String classifier, ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
@@ -263,7 +263,8 @@ public class DefaultArtifact
 
     public Collection<ArtifactMetadata> getMetadataList()
     {
-        if (metadataMap == null) {
+        if ( metadataMap == null )
+        {
             return Collections.emptyList();
         }
 
@@ -385,7 +386,7 @@ public class DefaultArtifact
     protected void setBaseVersionInternal( String baseVersion )
     {
         Matcher m = VERSION_FILE_PATTERN.matcher( baseVersion );
-        
+
         if ( m.matches() )
         {
             this.baseVersion = m.group( 1 ) + "-" + SNAPSHOT_VERSION;
@@ -528,7 +529,8 @@ public class DefaultArtifact
 
     public boolean isSnapshot()
     {
-        return getBaseVersion() != null && (getBaseVersion().endsWith(SNAPSHOT_VERSION) || getBaseVersion().equals(LATEST_VERSION));
+        return getBaseVersion() != null
+            && ( getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION ) );
     }
 
     public void setResolved( boolean resolved )

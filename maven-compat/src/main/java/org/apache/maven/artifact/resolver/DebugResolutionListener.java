@@ -86,15 +86,15 @@ public class DebugResolutionListener
                                        String ignoredScope )
     {
         logger.debug(
-            indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope " + artifact.getScope() +
-                " wins)" );
+            indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope " + artifact.getScope()
+                + " wins)" );
 
         // TODO: better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
         {
-            logger.warn( "\n\tArtifact " + artifact + " retains local artifactScope '" + artifact.getScope() +
-                "' overriding broader artifactScope '" + ignoredScope + "'\n" +
-                "\tgiven by a dependency. If this is not intended, modify or remove the local artifactScope.\n" );
+            logger.warn( "\n\tArtifact " + artifact + " retains local artifactScope '" + artifact.getScope()
+                + "' overriding broader artifactScope '" + ignoredScope + "'\n"
+                + "\tgiven by a dependency. If this is not intended, modify or remove the local artifactScope.\n" );
             ignoredArtifacts.add( artifact );
         }
     }
@@ -107,16 +107,16 @@ public class DebugResolutionListener
 
     public void selectVersionFromRange( Artifact artifact )
     {
-        logger.debug( indent + artifact + " (setting version to: " + artifact.getVersion() + " from range: " +
-            artifact.getVersionRange() + ")" );
+        logger.debug( indent + artifact + " (setting version to: " + artifact.getVersion() + " from range: "
+            + artifact.getVersionRange() + ")" );
     }
 
     public void restrictRange( Artifact artifact,
                                Artifact replacement,
                                VersionRange newRange )
     {
-        logger.debug( indent + artifact + " (range restricted from: " + artifact.getVersionRange() + " and: " +
-            replacement.getVersionRange() + " to: " + newRange + " )" );
+        logger.debug( indent + artifact + " (range restricted from: " + artifact.getVersionRange() + " and: "
+            + replacement.getVersionRange() + " to: " + newRange + " )" );
     }
 
     /**

@@ -82,16 +82,18 @@ public class ArtifactRepositoryPolicy
 
     public void setUpdatePolicy( String updatePolicy )
     {
-        if(updatePolicy != null) {
-        	this.updatePolicy = updatePolicy;
+        if ( updatePolicy != null )
+        {
+            this.updatePolicy = updatePolicy;
         }
     }
 
     public void setChecksumPolicy( String checksumPolicy )
     {
-    	if(checksumPolicy != null) {
-    		this.checksumPolicy = checksumPolicy;	
-    	}       
+        if ( checksumPolicy != null )
+        {
+            this.checksumPolicy = checksumPolicy;
+        }
     }
 
     public boolean isEnabled()
@@ -135,7 +137,7 @@ public class ArtifactRepositoryPolicy
         else if ( updatePolicy.startsWith( UPDATE_POLICY_INTERVAL ) )
         {
             String s = updatePolicy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
-            int minutes = Integer.valueOf(s);
+            int minutes = Integer.valueOf( s );
             Calendar cal = Calendar.getInstance();
             cal.add( Calendar.MINUTE, -minutes );
             if ( cal.getTime().after( lastModified ) )

@@ -155,8 +155,8 @@ public class DefaultModelInheritanceAssembler
                     appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
             }
 
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
-                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() )
+                && !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm
                     .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(),
@@ -388,8 +388,8 @@ public class DefaultModelInheritanceAssembler
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || ( parentInherited == null ) ||
-                    Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || ( parentInherited == null )
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;
@@ -545,9 +545,8 @@ public class DefaultModelInheritanceAssembler
 
         if ( deps != null )
         {
-            for ( Iterator<Dependency> it = deps.iterator(); it.hasNext(); )
+            for ( Dependency dependency : deps )
             {
-                Dependency dependency = it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
@@ -556,9 +555,8 @@ public class DefaultModelInheritanceAssembler
 
         if ( deps != null )
         {
-            for ( Iterator<Dependency> it = deps.iterator(); it.hasNext(); )
+            for ( Dependency dependency : deps )
             {
-                Dependency dependency = it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
@@ -753,9 +751,8 @@ public class DefaultModelInheritanceAssembler
 
     private static void mergeExtensionLists( Build childBuild, Build parentBuild )
     {
-        for ( Iterator i = parentBuild.getExtensions().iterator(); i.hasNext(); )
+        for ( Extension e : parentBuild.getExtensions() )
         {
-            Extension e = (Extension) i.next();
             if ( !childBuild.getExtensions().contains( e ) )
             {
                 childBuild.addExtension( e );

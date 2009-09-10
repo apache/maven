@@ -28,7 +28,6 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -44,7 +43,7 @@ import java.util.Properties;
 public class DefaultProfileManager
     implements ProfileManager
 {
-    
+
     @Requirement
     private Logger logger;
 
@@ -67,7 +66,7 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container )
     {
-        this( container, null);
+        this( container, null );
     }
 
     /**
@@ -89,7 +88,8 @@ public class DefaultProfileManager
         this.requestProperties = props;
     }
 
-    public Properties getRequestProperties() {
+    public Properties getRequestProperties()
+    {
         return requestProperties;
     }
 
@@ -108,8 +108,8 @@ public class DefaultProfileManager
         Profile existing = (Profile) profilesById.get( profileId );
         if ( existing != null )
         {
-            logger.warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource() +
-                ") with new instance from source: " + profile.getSource() );
+            logger.warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource()
+                + ") with new instance from source: " + profile.getSource() );
         }
 
         profilesById.put( profile.getId(), profile );

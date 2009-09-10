@@ -97,8 +97,8 @@ public final class ModelUtils
                 // 1. we're not processing the plugins in an inheritance-based merge
                 // 2. the parent's <inherited/> flag is not set
                 // 3. the parent's <inherited/> flag is set to true
-                if ( !handleAsInheritance || ( parentInherited == null ) ||
-                    Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || ( parentInherited == null )
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
                     Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
 

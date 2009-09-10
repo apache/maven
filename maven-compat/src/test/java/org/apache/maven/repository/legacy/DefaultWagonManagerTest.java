@@ -34,10 +34,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.repository.legacy.ChecksumFailedException;
-import org.apache.maven.repository.legacy.DefaultWagonManager;
-import org.apache.maven.repository.legacy.UpdateCheckManager;
-import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
@@ -63,48 +59,59 @@ public class DefaultWagonManagerTest
     private TransferListener transferListener = new Debug();
 
     private ArtifactFactory artifactFactory;
-    
+
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        wagonManager = (DefaultWagonManager) lookup( WagonManager.class );        
+        wagonManager = (DefaultWagonManager) lookup( WagonManager.class );
         artifactFactory = lookup( ArtifactFactory.class );
         artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
     }
-    
+
     @Override
-    protected void tearDown() throws Exception {
-            wagonManager = null;
-            artifactFactory = null;
-            super.tearDown();
+    protected void tearDown()
+        throws Exception
+    {
+        wagonManager = null;
+        artifactFactory = null;
+        super.tearDown();
     }
-        
-    public void testUnnecessaryRepositoryLookup() throws Exception {
+
+    public void testUnnecessaryRepositoryLookup()
+        throws Exception
+    {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
 
         List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-        repos.add(artifactRepositoryFactory.createArtifactRepository( "repo1", "string://url1", new ArtifactRepositoryLayoutStub(), null, null ));
-        repos.add(artifactRepositoryFactory.createArtifactRepository( "repo2", "string://url2", new ArtifactRepositoryLayoutStub(), null, null ));
+        repos.add( artifactRepositoryFactory.createArtifactRepository( "repo1", "string://url1",
+                                                                       new ArtifactRepositoryLayoutStub(), null, null ) );
+        repos.add( artifactRepositoryFactory.createArtifactRepository( "repo2", "string://url2",
+                                                                       new ArtifactRepositoryLayoutStub(), null, null ) );
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
-        wagon.addExpectedContent( repos.get(0).getLayout().pathOf( artifact ), "expected" );
-        wagon.addExpectedContent( repos.get(1).getLayout().pathOf( artifact ), "expected" );
-        
-        class TransferListener extends AbstractTransferListener {
-        	public List<TransferEvent> events = new ArrayList<TransferEvent>();
-        	@Override
-        	public void transferInitiated(TransferEvent transferEvent) {
-        		events.add(transferEvent);
-        	}
-        };
+        wagon.addExpectedContent( repos.get( 0 ).getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repos.get( 1 ).getLayout().pathOf( artifact ), "expected" );
+
+        class TransferListener
+            extends AbstractTransferListener
+        {
+            public List<TransferEvent> events = new ArrayList<TransferEvent>();
+
+            @Override
+            public void transferInitiated( TransferEvent transferEvent )
+            {
+                events.add( transferEvent );
+            }
+        }
+
         TransferListener listener = new TransferListener();
         wagonManager.getArtifact( artifact, repos, listener );
-        assertEquals(1, listener.events.size());
+        assertEquals( 1, listener.events.size() );
     }
-    
+
     public void testGetPomExistsLocallyForced()
         throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
     {
@@ -131,43 +138,43 @@ public class DefaultWagonManagerTest
     public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-missing-jar", "jar" );
-        
+
         ArtifactRepository repo = createStringRepo();
-        
+
         try
         {
             wagonManager.getArtifact( artifact, repo, null );
-            
+
             fail();
         }
         catch ( ResourceDoesNotExistException e )
         {
             assertTrue( true );
         }
-        
+
         assertFalse( artifact.getFile().exists() );
     }
 
     public void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException
     {
         Artifact artifact = createTestArtifact( "target/test-data/get-missing-jar", "jar" );
-        
+
         ArtifactRepository repo = createStringRepo();
-        
+
         try
         {
             wagonManager.getArtifact( artifact, repo, null );
-            
+
             fail();
         }
         catch ( ResourceDoesNotExistException e )
         {
             assertTrue( true );
         }
-        
+
         assertFalse( artifact.getFile().exists() );
     }
-    
+
     public void testGetRemoteJar()
         throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException,
         AuthorizationException
@@ -249,10 +256,10 @@ public class DefaultWagonManagerTest
     {
         return artifactRepositoryFactory.createArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), null, null );
     }
-    
+
     /**
      * Build an ArtifactRepository object.
-     * 
+     *
      * @param id
      * @param url
      * @return
@@ -264,7 +271,7 @@ public class DefaultWagonManagerTest
 
     /**
      * Build an ArtifactRepository object.
-     * 
+     *
      * @param id
      * @return
      */
@@ -311,7 +318,7 @@ public class DefaultWagonManagerTest
         /* getArtifact */
         assertFalse( "Transfer listener is registered before test",
                      wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
-        wagonManager.getArtifact( artifact, repo, transferListener);
+        wagonManager.getArtifact( artifact, repo, transferListener );
         assertFalse( "Transfer listener still registered after getArtifact",
                      wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
 
@@ -331,16 +338,16 @@ public class DefaultWagonManagerTest
         throws Exception
     {
         ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
-        
+
         ArtifactRepository repo = artifactRepositoryFactory.createArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
 
         Artifact artifact =
             new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",
                                  "jar", "classifier", null );
-        artifact.setFile( getTestFile( "target/sample-art" ) );            
+        artifact.setFile( getTestFile( "target/sample-art" ) );
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
-        
+
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
@@ -437,7 +444,7 @@ public class DefaultWagonManagerTest
         {
             return "test";
         }
-        
+
         public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
         {
             return "path";

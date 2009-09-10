@@ -55,7 +55,8 @@ public class DefaultArtifactTransformationManager
                                      ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        for (ArtifactTransformation transform : artifactTransformations) {
+        for ( ArtifactTransformation transform : artifactTransformations )
+        {
             transform.transformForResolve( artifact, remoteRepositories, localRepository );
         }
     }
@@ -64,7 +65,8 @@ public class DefaultArtifactTransformationManager
                                      ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        for (ArtifactTransformation transform : artifactTransformations) {
+        for ( ArtifactTransformation transform : artifactTransformations )
+        {
             transform.transformForInstall( artifact, localRepository );
         }
     }
@@ -74,7 +76,8 @@ public class DefaultArtifactTransformationManager
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        for (ArtifactTransformation transform : artifactTransformations) {
+        for ( ArtifactTransformation transform : artifactTransformations )
+        {
             transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }
     }

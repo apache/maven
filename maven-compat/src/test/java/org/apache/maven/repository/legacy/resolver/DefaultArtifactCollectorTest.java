@@ -48,7 +48,6 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.apache.maven.repository.legacy.resolver.LegacyArtifactCollector;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -84,10 +83,12 @@ public class DefaultArtifactCollectorTest
     }
 
     @Override
-    protected void tearDown() throws Exception {
-            artifactCollector = null;
-            artifactFactory = null;
-            super.tearDown();
+    protected void tearDown()
+        throws Exception
+    {
+        artifactCollector = null;
+        artifactFactory = null;
+        super.tearDown();
     }
 
     // works, but we don't fail on cycles presently
@@ -738,7 +739,7 @@ public class DefaultArtifactCollectorTest
 
     private ArtifactResolutionResult collect( Set artifacts, ArtifactFilter filter )
         throws ArtifactResolutionException
-    {        
+    {
         return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, null, source, filter,
                                           Collections.EMPTY_LIST, null );
     }

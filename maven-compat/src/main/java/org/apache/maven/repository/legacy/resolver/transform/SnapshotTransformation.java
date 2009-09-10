@@ -46,7 +46,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  * @version $Id$
  */
-@Component(role=ArtifactTransformation.class, hint="snapshot") 
+@Component(role=ArtifactTransformation.class, hint="snapshot")
 public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
@@ -105,7 +105,7 @@ public class SnapshotTransformation
         if ( artifact.isSnapshot() )
         {
             Snapshot snapshot = new Snapshot();
-            
+
             snapshot.setTimestamp( getDeploymentTimestamp() );
 
             // we update the build number anyway so that it doesn't get lost. It requires the timestamp to take effect
@@ -117,8 +117,8 @@ public class SnapshotTransformation
             }
             catch ( RepositoryMetadataResolutionException e )
             {
-                throw new ArtifactDeploymentException( "Error retrieving previous build number for artifact '" +
-                    artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+                throw new ArtifactDeploymentException( "Error retrieving previous build number for artifact '"
+                    + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
             }
 
             RepositoryMetadata metadata = new SnapshotArtifactRepositoryMetadata( artifact, snapshot );
