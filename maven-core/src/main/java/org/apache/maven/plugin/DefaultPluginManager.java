@@ -740,10 +740,16 @@ public class DefaultPluginManager
 
             ArtifactRepository localRepository = session.getLocalRepository();
 
+            ArtifactMetadataSource metadataSource = session.getProjectBuilderConfiguration().getMetadataSource();
+            if ( metadataSource == null )
+            {
+                 metadataSource = artifactMetadataSource;
+            }
+            
             ResolutionGroup resolutionGroup;
             try
             {
-                resolutionGroup = artifactMetadataSource.retrieve( pluginArtifact, localRepository,
+                resolutionGroup = metadataSource.retrieve( pluginArtifact, localRepository,
                                                                    project.getPluginArtifactRepositories() );
             }
             catch ( ArtifactMetadataRetrievalException e )
@@ -835,7 +841,7 @@ public class DefaultPluginManager
             ArtifactResolutionResult result = artifactResolver.resolveTransitively( dependencies, pluginArtifact,
                                                                                     pluginManagedDependencies,
                                                                                     localRepository, repositories,
-                                                                                    artifactMetadataSource,
+                                                                                    metadataSource,
                                                                                     artifactFilter );
 
             Set resolved = result.getArtifacts();

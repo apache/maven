@@ -193,7 +193,7 @@ public class DefaultLifecycleExecutor
                 try
                 {
                     getLogger().debug( "Adding extension: " + extension );
-                    extensionManager.addExtension( extension, project, session.getLocalRepository() );
+                    extensionManager.addExtension( extension, project, session.getProjectBuilderConfiguration() );
                 }
                 catch ( PlexusContainerException e )
                 {

@@ -63,6 +63,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MissingProjectException;
 import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.reactor.MavenExecutionException;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -107,6 +108,8 @@ public class DefaultMaven
     protected ErrorDiagnostics errorDiagnostics;
 
     protected RuntimeInformation runtimeInformation;
+    
+    protected MavenMetadataSource mavenMetadataSource;
 
     private static final long MB = 1024 * 1024;
 
@@ -267,6 +270,9 @@ public class DefaultMaven
         globalProfileManager.loadSettingsProfiles( request.getSettings() );
 
         getLogger().info( "Scanning for projects..." );
+        
+        request.getProjectBuilderConfiguration()
+               .setMetadataSource( new MavenMetadataSource( mavenMetadataSource, request.getProjectBuilderConfiguration() ) );
 
         boolean foundProjects = true;
         List projects = getProjects( request );
@@ -616,9 +622,7 @@ public class DefaultMaven
     protected MavenSession createSession( MavenExecutionRequest request,
                                           ReactorManager rpm )
     {
-        return new MavenSession( container, request.getSettings(), request.getLocalRepository(),
-                                 request.getEventDispatcher(), rpm, request.getGoals(), request.getBaseDirectory(),
-                                 request.getExecutionProperties(), request.getUserProperties(), request.getStartTime() );
+        return new MavenSession( container, request, rpm );
     }
 
     /**

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Extension;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilderConfiguration;
 import org.codehaus.plexus.PlexusContainerException;
 
 import java.util.Map;
@@ -43,4 +44,7 @@ public interface ExtensionManager
     void registerWagons();
 
     Map<String, ArtifactHandler> getArtifactTypeHandlers();
+
+    void addExtension( Extension extension, MavenProject project, ProjectBuilderConfiguration builderConfig )
+        throws ArtifactResolutionException, PlexusContainerException, ArtifactNotFoundException;
 }
