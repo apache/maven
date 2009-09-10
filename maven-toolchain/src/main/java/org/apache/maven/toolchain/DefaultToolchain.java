@@ -56,13 +56,12 @@ public abstract class DefaultToolchain
         this.type = type;
     }
 
-    public final String getType( )
+    public final String getType()
     {
         return type != null ? type : model.getType();
     }
 
-
-    public final ToolchainModel getModel( )
+    public final ToolchainModel getModel()
     {
         return model;
     }
@@ -74,13 +73,14 @@ public abstract class DefaultToolchain
     }
 
 
-    public boolean matchesRequirements(Map requirements) {
+    public boolean matchesRequirements(Map requirements)
+    {
         Iterator it = requirements.keySet().iterator();
         while ( it.hasNext() )
         {
             String key = (String) it.next();
 
-            RequirementMatcher matcher = provides.get(key);
+            RequirementMatcher matcher = provides.get( key );
 
             if ( matcher == null )
             {
@@ -96,7 +96,8 @@ public abstract class DefaultToolchain
         return true;
     }
 
-    protected Logger getLog() {
+    protected Logger getLog()
+    {
         return logger;
     }
 }
