@@ -51,16 +51,16 @@ public abstract class AbstractArtifactMetadata
     {
         return artifact.getArtifactId();
     }
-    
+
     public String extendedToString()
     {
         StringBuffer buffer = new StringBuffer();
-        
+
         buffer.append( "\nArtifact Metadata\n--------------------------" );
         buffer.append( "\nGroupId: " ).append( getGroupId() );
         buffer.append( "\nArtifactId: " ).append( getArtifactId() );
-        buffer.append( "\nMetadata Type: " ).append(getClass().getName() );
-        
+        buffer.append( "\nMetadata Type: " ).append( getClass().getName() );
+
         return buffer.toString();
     }
 }

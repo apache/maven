@@ -1,6 +1,5 @@
 package org.apache.maven.artifact.versioning;
 
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -133,7 +132,7 @@ public class Restriction
             return true;
         }
 
-        if ( !(other instanceof Restriction ) )
+        if ( !( other instanceof Restriction ) )
         {
             return false;
         }

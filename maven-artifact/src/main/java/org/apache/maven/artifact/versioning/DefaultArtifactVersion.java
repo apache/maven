@@ -246,7 +246,7 @@ public class DefaultArtifactVersion
             return true;
         }
 
-        if ( false == ( other instanceof ArtifactVersion ) )
+        if ( !( other instanceof ArtifactVersion ) )
         {
             return false;
         }

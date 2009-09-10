@@ -33,7 +33,7 @@ public class ArtifactResolutionResult
 
     // calculated.
     private Set artifacts;
-    
+
     public ArtifactResolutionResult()
     {
     }
@@ -43,17 +43,17 @@ public class ArtifactResolutionResult
         if ( artifacts == null )
         {
             artifacts = new LinkedHashSet();
-            
+
             for ( Iterator it = resolutionNodes.iterator(); it.hasNext(); )
             {
                 ResolutionNode node = (ResolutionNode) it.next();
                 artifacts.add( node.getArtifact() );
             }
         }
-        
+
         return artifacts;
     }
-    
+
     public Set getArtifactResolutionNodes()
     {
         return resolutionNodes;
@@ -62,13 +62,13 @@ public class ArtifactResolutionResult
     public void setArtifactResolutionNodes( Set resolutionNodes )
     {
         this.resolutionNodes = resolutionNodes;
-        
+
         // clear the cache
         this.artifacts = null;
     }
-    
+
     public String toString()
     {
-        return "Artifacts: "+this.artifacts+" Nodes: "+ this.resolutionNodes;
+        return "Artifacts: " + this.artifacts + " Nodes: " + this.resolutionNodes;
     }
 }

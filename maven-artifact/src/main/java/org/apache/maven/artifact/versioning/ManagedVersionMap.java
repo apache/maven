@@ -25,26 +25,26 @@ import java.util.Iterator;
 
 public class ManagedVersionMap extends HashMap
 {
-    public ManagedVersionMap(Map map)
+    public ManagedVersionMap( Map map )
     {
         super();
-        if (map != null)
+        if ( map != null )
         {
-            putAll(map);
+            putAll( map );
         }
     }
 
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer("ManagedVersionMap\n");
+        StringBuffer buffer = new StringBuffer( "ManagedVersionMap\n" );
         Iterator iter = this.keySet().iterator();
-        while (iter.hasNext())
+        while ( iter.hasNext() )
         {
-            String key = (String)iter.next();
-            buffer.append(key).append("=").append(get(key));
-            if (iter.hasNext())
+            String key = (String) iter.next();
+            buffer.append( key ).append( "=" ).append( get( key ) );
+            if ( iter.hasNext() )
             {
-                buffer.append("\n");
+                buffer.append( "\n" );
             }
         }
         return buffer.toString();

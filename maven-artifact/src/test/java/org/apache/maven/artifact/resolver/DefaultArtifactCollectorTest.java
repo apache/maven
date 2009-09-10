@@ -330,11 +330,11 @@ public class DefaultArtifactCollectorTest
 
         //put it in the repo
         ArtifactSpec c = createArtifactSpec( "c", "2.5" );
-        source.addArtifact( createArtifactSpec( "c", "2.5" ));
+        source.addArtifact( createArtifactSpec( "c", "2.5" ) );
 
         ArtifactResolutionResult res = collect( a );
 
-        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact,b1.artifact,c.artifact } ),
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, b1.artifact, c.artifact } ),
                       res.getArtifacts() );
         assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
@@ -349,12 +349,12 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec b = a.addDependency( "b", "1.0" );
         ArtifactSpec e = a.addDependency( "e", "1.0" );
         ArtifactSpec c1 = b.addDependency( "c", "3.2" );
-        ArtifactSpec d1 = c1.addDependency( "d","1.1" );
+        ArtifactSpec d1 = c1.addDependency( "d", "1.1" );
         e.addDependency( "c", "[1.0,3.0]" );
 
         // put it in the repo
         ArtifactSpec c = createArtifactSpec( "c", "2.5" );
-        ArtifactSpec d = c.addDependency( "d","1.0" );
+        ArtifactSpec d = c.addDependency( "d", "1.0" );
 
         source.addArtifact( c );
         source.addArtifact( d );
@@ -364,7 +364,7 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( a );
 
         assertEquals( "Check artifact list",
-                      createSet( new Object[] { a.artifact, b.artifact, e.artifact, c.artifact,d.artifact } ), res.getArtifacts() );
+                      createSet( new Object[] { a.artifact, b.artifact, e.artifact, c.artifact, d.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
@@ -821,8 +821,8 @@ public class DefaultArtifactCollectorTest
         }
         catch ( OverConstrainedVersionException e )
         {
-            assertTrue( "Versions unordered", e.getMessage().indexOf( "[3.2.1-v3235e, 3.3.0-v3346]" ) != -1);
-            assertTrue( "DependencyTrail not resolved", e.getMessage().indexOf( "Path to dependency:" ) != -1);
+            assertTrue( "Versions unordered", e.getMessage().indexOf( "[3.2.1-v3235e, 3.3.0-v3346]" ) != -1 );
+            assertTrue( "DependencyTrail not resolved", e.getMessage().indexOf( "Path to dependency:" ) != -1 );
         }
     }
 

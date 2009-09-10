@@ -38,9 +38,9 @@ public final class ArtifactUtils
 
     public static boolean isSnapshot( String version )
     {
-        return version != null &&
-            ( version.toUpperCase().endsWith( Artifact.SNAPSHOT_VERSION ) || Artifact.VERSION_FILE_PATTERN.matcher( version )
-                .matches() );
+        return version != null
+            && ( version.toUpperCase().endsWith( Artifact.SNAPSHOT_VERSION )
+                            || Artifact.VERSION_FILE_PATTERN.matcher( version ).matches() );
     }
 
     public static String toSnapshotVersion( String version )
@@ -82,8 +82,8 @@ public final class ArtifactUtils
     public static String artifactId( String groupId, String artifactId, String type, String classifier,
                                      String baseVersion )
     {
-        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" ) + ":" +
-            baseVersion;
+        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" ) + ":"
+            + baseVersion;
     }
 
     public static Map artifactMapByVersionlessId( Collection artifacts )
@@ -140,21 +140,21 @@ public final class ArtifactUtils
 
         return clone;
     }
-    
+
     private static List copyList( List original )
     {
         List copy = null;
-        
+
         if ( original != null )
         {
             copy = new ArrayList();
-            
+
             if ( !original.isEmpty() )
             {
                 copy.addAll( original );
             }
         }
-        
+
         return copy;
     }
 

@@ -39,7 +39,7 @@ public class ArtifactResolutionException
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
                                         String classifier, Throwable t )
     {
-        super( message, groupId, artifactId, version, type, classifier,null, null, t );
+        super( message, groupId, artifactId, version, type, classifier, null, null, t );
     }
 
     public ArtifactResolutionException( String message, Artifact artifact )

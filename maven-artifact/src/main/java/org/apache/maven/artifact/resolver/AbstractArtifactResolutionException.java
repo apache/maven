@@ -90,7 +90,7 @@ public class AbstractArtifactResolutionException
                                                    Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              artifact.getClassifier(),remoteRepositories, artifact.getDependencyTrail(), t );
+              artifact.getClassifier(), remoteRepositories, artifact.getDependencyTrail(), t );
         this.artifact = artifact;
     }
 
@@ -246,7 +246,7 @@ public class AbstractArtifactResolutionException
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
-            if (classifier !=null && !classifier.equals( "" ))
+            if ( classifier != null && !classifier.equals( "" ) )
             {
                 sb.append( " -Dclassifier=" );
                 sb.append( classifier );
@@ -271,7 +271,7 @@ public class AbstractArtifactResolutionException
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
-            if (classifier !=null && !classifier.equals( "" ))
+            if ( classifier != null && !classifier.equals( "" ) )
             {
                 sb.append( " -Dclassifier=" );
                 sb.append( classifier );

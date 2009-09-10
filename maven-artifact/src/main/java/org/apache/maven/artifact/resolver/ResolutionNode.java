@@ -146,13 +146,14 @@ public class ResolutionNode
                     ArtifactVersion selected = artifact.getSelectedVersion();
                     //MNG-2123: null is a valid response to getSelectedVersion, don't
                     //assume it won't ever be.
-                    if (selected != null)
+                    if ( selected != null )
                     {
                         artifact.selectVersion( selected.toString() );
                     }
                     else
                     {
-                        throw new OverConstrainedVersionException("Unable to get a selected Version for "+ artifact.getArtifactId(),artifact);
+                        throw new OverConstrainedVersionException( "Unable to get a selected Version for "
+                            + artifact.getArtifactId(), artifact );
                     }
                 }
 

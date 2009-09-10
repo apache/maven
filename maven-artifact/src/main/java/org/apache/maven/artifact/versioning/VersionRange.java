@@ -53,27 +53,27 @@ public class VersionRange
     {
         return restrictions;
     }
-    
+
     public VersionRange cloneOf()
     {
         List copiedRestrictions = null;
-        
+
         if ( restrictions != null )
         {
             copiedRestrictions = new ArrayList();
-            
+
             if ( !restrictions.isEmpty() )
             {
                 copiedRestrictions.addAll( restrictions );
             }
         }
-        
+
         return new VersionRange( recommendedVersion, copiedRestrictions );
     }
 
     /**
      * Create a version range from a string representation
-     * 
+     *
      * Some spec examples are
      * <ul>
      *   <li><code>1.0</code> Version 1.0</li>
@@ -82,7 +82,7 @@ public class VersionRange
      *   <li><code>[1.5,)</code> Versions 1.5 and higher</li>
      *   <li><code>(,1.0],[1.2,)</code> Versions up to 1.0 (included) and 1.2 or higher</li>
      * </ul>
-     * 
+     *
      * @param spec string representation of a version or version range
      * @return a new {@link VersionRange} object that represents the spec
      * @throws InvalidVersionSpecificationException
@@ -220,30 +220,30 @@ public class VersionRange
     }
 
     /**
-     * Creates and returns a new <code>VersionRange</code> that is a restriction of this 
+     * Creates and returns a new <code>VersionRange</code> that is a restriction of this
      * version range and the specified version range.
      * <p>
-     * Note: Precedence is given to the recommended version from this version range over the 
+     * Note: Precedence is given to the recommended version from this version range over the
      * recommended version from the specified version range.
      * </p>
      * @param restriction the <code>VersionRange</code> that will be used to restrict this version
      * range.
-     * @return the <code>VersionRange</code> that is a restriction of this version range and the 
+     * @return the <code>VersionRange</code> that is a restriction of this version range and the
      * specified version range.
      * <p>
      * The restrictions of the returned version range will be an intersection of the restrictions
-     * of this version range and the specified version range if both version ranges have 
+     * of this version range and the specified version range if both version ranges have
      * restrictions. Otherwise, the restrictions on the returned range will be empty.
      * </p>
      * <p>
      * The recommended version of the returned version range will be the recommended version of
-     * this version range, provided that ranges falls within the intersected restrictions. If 
+     * this version range, provided that ranges falls within the intersected restrictions. If
      * the restrictions are empty, this version range's recommended version is used if it is not
      * <code>null</code>. If it is <code>null</code>, the specified version range's recommended
-     * version is used (provided it is non-<code>null</code>). If no recommended version can be 
+     * version is used (provided it is non-<code>null</code>). If no recommended version can be
      * obtained, the returned version range's recommended version is set to <code>null</code>.
      * </p>
-     * @throws NullPointerException if the specified <code>VersionRange</code> is 
+     * @throws NullPointerException if the specified <code>VersionRange</code> is
      * <code>null</code>.
      */
     public VersionRange restrict( VersionRange restriction )
@@ -274,8 +274,8 @@ public class VersionRange
                     version = recommendedVersion;
                     found = true;
                 }
-                else if ( version == null && restriction.getRecommendedVersion() != null &&
-                    r.containsVersion( restriction.getRecommendedVersion() ) )
+                else if ( version == null && restriction.getRecommendedVersion() != null
+                    && r.containsVersion( restriction.getRecommendedVersion() ) )
                 {
                     // use this if we can, but prefer the original if possible
                     version = restriction.getRecommendedVersion();
@@ -288,7 +288,7 @@ public class VersionRange
             // Use the original recommended version since it exists
             version = recommendedVersion;
         }
-        else if (restriction.recommendedVersion != null)
+        else if ( restriction.recommendedVersion != null )
         {
             // Use the recommended version from the specified VersionRange since there is no
             // original recommended version
@@ -315,11 +315,11 @@ public class VersionRange
         boolean done = false;
         while ( !done )
         {
-            if ( res1.getLowerBound() == null || res2.getUpperBound() == null ||
-                res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
+            if ( res1.getLowerBound() == null || res2.getUpperBound() == null
+                || res1.getLowerBound().compareTo( res2.getUpperBound() ) <= 0 )
             {
-                if ( res1.getUpperBound() == null || res2.getLowerBound() == null ||
-                    res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
+                if ( res1.getUpperBound() == null || res2.getLowerBound() == null
+                    || res1.getUpperBound().compareTo( res2.getLowerBound() ) >= 0 )
                 {
                     ArtifactVersion lower;
                     ArtifactVersion upper;
@@ -555,21 +555,22 @@ public class VersionRange
 
     public boolean equals( Object obj )
     {
-        if (this == obj){
+        if ( this == obj )
+        {
             return true;
         }
-        if (!(obj instanceof VersionRange ))
+        if ( !( obj instanceof VersionRange ) )
         {
             return false;
         }
         VersionRange other = (VersionRange) obj;
-        
+
         boolean equals =
-            recommendedVersion == other.recommendedVersion ||
-                ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
+            recommendedVersion == other.recommendedVersion
+                || ( ( recommendedVersion != null ) && recommendedVersion.equals( other.recommendedVersion ) );
         equals &=
-            restrictions == other.restrictions ||
-                ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
+            restrictions == other.restrictions
+                || ( ( restrictions != null ) && restrictions.equals( other.restrictions ) );
         return equals;
     }
 
