@@ -493,15 +493,21 @@ public class DefaultArtifactResolver
             return result;
         }
                 
-        if ( result.getArtifacts() != null )
+        if ( result.getResolutionNodes() != null )
         {
-            for ( Artifact artifact : result.getArtifacts() )
+            ArtifactResolutionRequest childRequest = new ArtifactResolutionRequest( request );
+
+            for ( ResolutionNode node : result.getResolutionNodes() )
             {
+                Artifact artifact = node.getArtifact();
+
                 try
                 {
                     if ( resolutionFilter == null || resolutionFilter.include( artifact ) )
                     {
-                        resolve( artifact, request, request.getTransferListener(), false );
+                        childRequest.setRemoteRepositories( node.getRemoteRepositories() );
+
+                        resolve( artifact, childRequest, request.getTransferListener(), false );
                     }
                 }
                 catch ( ArtifactNotFoundException anfe )

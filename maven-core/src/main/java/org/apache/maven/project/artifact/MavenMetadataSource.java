@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +138,8 @@ public class MavenMetadataSource
 
         List<Dependency> managedDependencies = null;
 
+        List<ArtifactRepository> pomRepositories = null;
+
         Artifact pomArtifact;
 
         Artifact relocatedArtifact = null;
@@ -177,6 +180,8 @@ public class MavenMetadataSource
 
                 DependencyManagement depMngt = rel.project.getDependencyManagement();
                 managedDependencies = ( depMngt != null ) ? depMngt.getDependencies() : null;
+
+                pomRepositories = rel.project.getRemoteArtifactRepositories();
             }
         }
 
@@ -211,13 +216,47 @@ public class MavenMetadataSource
             }
         }
 
+        List<ArtifactRepository> aggregatedRepositories =
+            aggregateRepositories( request.getRemoteRepositories(), pomRepositories );
+
         ResolutionGroup result =
-            new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions, request.getRemoteRepositories() );
+            new ResolutionGroup( pomArtifact, relocatedArtifact, artifacts, managedVersions, aggregatedRepositories );
 
         cache.put( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
                    request.getRemoteRepositories(), result );
 
         return result;
+    }
+
+    private List<ArtifactRepository> aggregateRepositories( List<ArtifactRepository> requestRepositories,
+                                                            List<ArtifactRepository> pomRepositories )
+    {
+        List<ArtifactRepository> repositories = requestRepositories;
+
+        if ( pomRepositories != null && !pomRepositories.isEmpty() )
+        {
+            Map<String, ArtifactRepository> repos = new LinkedHashMap<String, ArtifactRepository>();
+
+            for ( ArtifactRepository repo : requestRepositories )
+            {
+                if ( !repos.containsKey( repo.getId() ) )
+                {
+                    repos.put( repo.getId(), repo );
+                }
+            }
+
+            for ( ArtifactRepository repo : pomRepositories )
+            {
+                if ( !repos.containsKey( repo.getId() ) )
+                {
+                    repos.put( repo.getId(), repo );
+                }
+            }
+
+            repositories = new ArrayList<ArtifactRepository>( repos.values() );
+        }
+
+        return repositories;
     }
 
     private Artifact createDependencyArtifact( Dependency dependency, Artifact owner, Artifact pom )

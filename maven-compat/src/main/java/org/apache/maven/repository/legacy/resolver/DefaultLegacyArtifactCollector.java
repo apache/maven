@@ -170,7 +170,6 @@ public class DefaultLegacyArtifactCollector
                                 
                                 // This is required right now.
                                 result.addArtifact( artifact );
-                                result.addRequestedArtifact( artifact );
                             }
                         }
                     }
@@ -181,6 +180,8 @@ public class DefaultLegacyArtifactCollector
                 }
             }
         }
+
+        result.setResolutionNodes( set );
 
         return result;
     }

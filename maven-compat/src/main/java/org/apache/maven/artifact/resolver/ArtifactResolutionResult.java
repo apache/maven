@@ -59,9 +59,9 @@ public class ArtifactResolutionResult
 
     private List<ArtifactRepository> repositories;
 
-    private Set<Artifact> requestedArtifacts;
-
     private Set<Artifact> artifacts;
+
+    private Set<ResolutionNode> resolutionNodes;
 
     public Artifact getOriginatingArtifact()
     {
@@ -100,19 +100,19 @@ public class ArtifactResolutionResult
         this.artifacts = artifacts;
     }
 
-    public void addRequestedArtifact( Artifact artifact )
+    public Set<ResolutionNode> getResolutionNodes()
     {
-        if ( requestedArtifacts == null )
+        if ( resolutionNodes == null )
         {
-            requestedArtifacts = new LinkedHashSet<Artifact>();
+            resolutionNodes = new LinkedHashSet<ResolutionNode>();
         }
 
-        requestedArtifacts.add( artifact );
+        return resolutionNodes;
     }
 
-    public Set<Artifact> getRequestedArtifacts()
+    public void setResolutionNodes( Set<ResolutionNode> resolutionNodes )
     {
-        return requestedArtifacts;
+        this.resolutionNodes = resolutionNodes;
     }
 
     public boolean hasMissingArtifacts()
