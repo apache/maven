@@ -493,11 +493,11 @@ public class DefaultArtifactResolver
             return result;
         }
                 
-        if ( result.getResolutionNodes() != null )
+        if ( result.getArtifactResolutionNodes() != null )
         {
             ArtifactResolutionRequest childRequest = new ArtifactResolutionRequest( request );
 
-            for ( ResolutionNode node : result.getResolutionNodes() )
+            for ( ResolutionNode node : result.getArtifactResolutionNodes() )
             {
                 Artifact artifact = node.getArtifact();
 

@@ -181,7 +181,7 @@ public class DefaultLegacyArtifactCollector
             }
         }
 
-        result.setResolutionNodes( set );
+        result.setArtifactResolutionNodes( set );
 
         return result;
     }

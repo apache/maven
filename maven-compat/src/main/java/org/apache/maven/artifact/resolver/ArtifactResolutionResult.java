@@ -100,7 +100,7 @@ public class ArtifactResolutionResult
         this.artifacts = artifacts;
     }
 
-    public Set<ResolutionNode> getResolutionNodes()
+    public Set<ResolutionNode> getArtifactResolutionNodes()
     {
         if ( resolutionNodes == null )
         {
@@ -110,7 +110,7 @@ public class ArtifactResolutionResult
         return resolutionNodes;
     }
 
-    public void setResolutionNodes( Set<ResolutionNode> resolutionNodes )
+    public void setArtifactResolutionNodes( Set<ResolutionNode> resolutionNodes )
     {
         this.resolutionNodes = resolutionNodes;
     }
