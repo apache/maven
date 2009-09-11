@@ -30,7 +30,7 @@ import org.apache.maven.artifact.Artifact;
 /**
  * Verifies the version of a dependency listed in a parent's
  * dependencyManagement section is chosen over another version of the same
- * dependency, listed transitively.	
+ * dependency, listed transitively.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
  * @version $Id$
@@ -67,16 +67,18 @@ public class ProjectInheritanceTest
 
         assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         Set set = project1.getArtifacts();
-        assertNotNull("No artifacts", set);
-        assertTrue("No Artifacts", set.size() > 0);
-        assertTrue("Set size should be 3, is " + set.size(), set.size() == 3);
-        
+        assertNotNull( "No artifacts", set );
+        assertTrue( "No Artifacts", set.size() > 0 );
+        assertTrue( "Set size should be 3, is " + set.size(), set.size() == 3 );
+
         Iterator iter = set.iterator();
-        while (iter.hasNext()) {
-            Artifact artifact = (Artifact)iter.next();
-            System.out.println("Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() +
-              " Optional=" + (artifact.isOptional() ? "true" : "false"));
-            assertTrue("Incorrect version for " + artifact.getDependencyConflictId(), artifact.getVersion().equals("1.0"));
+        while ( iter.hasNext() )
+        {
+            Artifact artifact = (Artifact) iter.next();
+            System.out.println( "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion()
+                + " Optional=" + ( artifact.isOptional() ? "true" : "false" ) );
+            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(),
+                        artifact.getVersion().equals( "1.0" ) );
         }
 
     }

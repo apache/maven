@@ -49,7 +49,7 @@ import org.codehaus.plexus.util.dag.Vertex;
 public class ProjectSorter
 {
     private final DAG dag;
-    
+
     private final Map projectMap;
 
     private final List<MavenProject> sortedProjects;
@@ -67,14 +67,14 @@ public class ProjectSorter
      * <li>do a topo sort on the graph that remains.</li>
      * </ul>
      * @throws DuplicateProjectException if any projects are duplicated by id
-     * @throws MissingProjectException 
+     * @throws MissingProjectException
      */
     public ProjectSorter( List projects )
         throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
         this( projects, null, null, false, false );
     }
-    
+
     public ProjectSorter( List projects, List selectedProjectNames, String resumeFrom, boolean make, boolean makeDependents )
         throws CycleDetectedException, DuplicateProjectException, MissingProjectException
     {
@@ -146,7 +146,8 @@ public class ProjectSorter
                         addEdgeWithParentCheck( projectMap, pluginId, project, id );
                     }
 
-                    if ( !pluginId.equals( id ) ) {
+                    if ( !pluginId.equals( id ) )
+                    {
                         for ( Iterator k = plugin.getDependencies().iterator(); k.hasNext(); )
                         {
                           Dependency dependency = (Dependency) k.next();
@@ -169,12 +170,12 @@ public class ProjectSorter
                                   project.addProjectReference( (MavenProject) projectMap.get( dependencyId ) );
 
                                   addEdgeWithParentCheck( projectMap, dependencyId, project, id );
-                                  
+
                                   // TODO: Shouldn't we add an edge between the plugin and its dependency?
-                                  // Note that doing this may result in cycles...run 
-                                  // ProjectSorterTest.testPluginDependenciesInfluenceSorting_DeclarationInParent() 
+                                  // Note that doing this may result in cycles...run
+                                  // ProjectSorterTest.testPluginDependenciesInfluenceSorting_DeclarationInParent()
                                   // for more information, if you change this:
-                                  
+
                                   // dag.addEdge( pluginId, dependencyId );
                               }
                           }
@@ -216,7 +217,7 @@ public class ProjectSorter
 
             sortedProjects.add( projectMap.get( id ) );
         }
-        
+
         // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
         for ( Iterator i = sortedProjects.iterator(); i.hasNext() && topLevelProject == null; )
         {
@@ -226,19 +227,22 @@ public class ProjectSorter
                 topLevelProject = project;
             }
         }
-        
+
         sortedProjects = applyMakeFilter( sortedProjects, dag, projectMap, topLevelProject, selectedProjectNames, make, makeDependents );
-        
+
         resumeFrom( resumeFrom, sortedProjects, projectMap, topLevelProject );
 
         this.sortedProjects = Collections.unmodifiableList( sortedProjects );
     }
 
-    // make selected projects and possibly projects they depend on, or projects that depend on them 
+    // make selected projects and possibly projects they depend on, or projects that depend on them
     private static List applyMakeFilter( List sortedProjects, DAG dag, Map projectMap, MavenProject topLevelProject, List selectedProjectNames, boolean make, boolean makeDependents ) throws MissingProjectException
     {
-        if ( selectedProjectNames == null ) return sortedProjects;
-        
+        if ( selectedProjectNames == null )
+        {
+            return sortedProjects;
+        }
+
         MavenProject[] selectedProjects = new MavenProject[selectedProjectNames.size()];
         for ( int i = 0; i < selectedProjects.length; i++ )
         {
@@ -269,15 +273,22 @@ public class ProjectSorter
         }
         return sortedProjects;
     }
-    
+
     private static void resumeFrom( String resumeFrom, List sortedProjects, Map projectMap, MavenProject topLevelProject ) throws MissingProjectException
     {
-        if ( resumeFrom == null ) return;
+        if ( resumeFrom == null )
+        {
+            return;
+        }
+
         MavenProject resumeFromProject = findProject( resumeFrom, projectMap, topLevelProject );
         for ( Iterator i = sortedProjects.iterator(); i.hasNext(); )
         {
             MavenProject project = (MavenProject) i.next();
-            if ( resumeFromProject.equals( project ) ) break;
+            if ( resumeFromProject.equals( project ) )
+            {
+                break;
+            }
             i.remove();
         }
         if ( sortedProjects.isEmpty() )
@@ -285,40 +296,54 @@ public class ProjectSorter
             throw new MissingProjectException( "Couldn't resume, project was not scheduled to run: " + resumeFrom );
         }
     }
-    
+
     private static MavenProject findProject( String projectName, Map projectMap, MavenProject topLevelProject ) throws MissingProjectException
     {
         MavenProject project = (MavenProject) projectMap.get( projectName );
-        if ( project != null ) return project;
+        if ( project != null )
+        {
+            return project;
+        }
         // in that case, it must be a file path
         File baseDir;
-        if ( topLevelProject == null ) {
+        if ( topLevelProject == null )
+        {
             baseDir = new File( System.getProperty( "user.dir" ) );
-        } else {
+        }
+        else
+        {
             baseDir = topLevelProject.getBasedir();
             // or should this be .getFile().getParentFile() ?
         }
-        
+
         File projectDir = new File( baseDir, projectName );
-        if ( !projectDir.exists() ) {
+        if ( !projectDir.exists() )
+        {
             throw new MissingProjectException( "Couldn't find specified project dir: " + projectDir.getAbsolutePath() );
         }
-        if ( !projectDir.isDirectory() ) {
+        if ( !projectDir.isDirectory() )
+        {
             throw new MissingProjectException( "Couldn't find specified project dir (not a directory): " + projectDir.getAbsolutePath() );
         }
-        
+
         for ( Iterator i = projectMap.values().iterator(); i.hasNext(); )
         {
             project = (MavenProject) i.next();
-            if ( projectDir.equals( project.getFile().getParentFile() ) ) return project;
+            if ( projectDir.equals( project.getFile().getParentFile() ) )
+            {
+                return project;
+            }
         }
-        
+
         throw new MissingProjectException( "Couldn't find specified project in module list: " + projectDir.getAbsolutePath() );
     }
-    
+
     private static void gatherDescendents ( Vertex v, Map projectMap, Set out, Set visited )
     {
-        if ( visited.contains( v ) ) return;
+        if ( visited.contains( v ) )
+        {
+            return;
+        }
         visited.add( v );
         out.add( projectMap.get( v.getLabel() ) );
         for ( Iterator i = v.getChildren().iterator(); i.hasNext(); )
@@ -327,10 +352,13 @@ public class ProjectSorter
             gatherDescendents( child, projectMap, out, visited );
         }
     }
-    
+
     private static void gatherAncestors ( Vertex v, Map projectMap, Set out, Set visited )
     {
-        if ( visited.contains( v ) ) return;
+        if ( visited.contains( v ) )
+        {
+            return;
+        }
         visited.add( v );
         out.add( projectMap.get( v.getLabel() ) );
         for ( Iterator i = v.getParents().iterator(); i.hasNext(); )
@@ -339,12 +367,12 @@ public class ProjectSorter
             gatherAncestors( parent, projectMap, out, visited );
         }
     }
-    
+
     private void addEdgeWithParentCheck( Map projectMap, String projectRefId, MavenProject project, String id )
         throws CycleDetectedException
     {
         MavenProject extProject = (MavenProject) projectMap.get( projectRefId );
-        
+
         if ( extProject == null )
         {
             return;
@@ -383,12 +411,12 @@ public class ProjectSorter
     {
         return dag.getParentLabels( id );
     }
-    
+
     public DAG getDAG()
     {
         return dag;
     }
-    
+
     public Map getProjectMap()
     {
         return projectMap;

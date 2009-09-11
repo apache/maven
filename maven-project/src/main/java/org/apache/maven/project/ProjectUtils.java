@@ -154,8 +154,8 @@ public final class ProjectUtils
         }
         catch ( ComponentLookupException e )
         {
-            throw new InvalidRepositoryException( "Cannot find layout implementation corresponding to: \'" + layout +
-                "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
+            throw new InvalidRepositoryException( "Cannot find layout implementation corresponding to: \'" + layout
+                + "\' for remote repository with id: \'" + mavenRepo.getId() + "\'.", e );
         }
         return repositoryLayout;
     }

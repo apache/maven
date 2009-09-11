@@ -32,7 +32,6 @@ import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -372,8 +371,8 @@ public class DefaultModelInheritanceAssembler
                     appendPath( parentScm.getConnection(), child.getArtifactId(), childPathAdjustment, appendPaths ) );
             }
 
-            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() ) &&
-                !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
+            if ( StringUtils.isEmpty( childScm.getDeveloperConnection() )
+                && !StringUtils.isEmpty( parentScm.getDeveloperConnection() ) )
             {
                 childScm
                     .setDeveloperConnection( appendPath( parentScm.getDeveloperConnection(), child.getArtifactId(),

@@ -59,18 +59,18 @@ public class DefaultModelValidator
         validateId( "artifactId", result, model.getArtifactId() );
 
         validateStringNotEmpty( "packaging", result, model.getPackaging() );
-        
+
         if ( !model.getModules().isEmpty() && !"pom".equals( model.getPackaging() ) )
         {
-            result.addMessage( "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects " +
-                    "require 'pom' as packaging." );
+            result.addMessage( "Packaging '" + model.getPackaging() + "' is invalid. Aggregator projects "
+                    + "require 'pom' as packaging." );
         }
-        
+
         Parent parent = model.getParent();
         if ( parent != null )
         {
-            if ( parent.getGroupId().equals( model.getGroupId() ) && 
-                    parent.getArtifactId().equals( model.getArtifactId() ) )
+            if ( parent.getGroupId().equals( model.getGroupId() )
+                && parent.getArtifactId().equals( model.getArtifactId() ) )
             {
                 result.addMessage( "The parent element cannot have the same ID as the project." );
             }
@@ -93,7 +93,7 @@ public class DefaultModelValidator
             if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
             {
                 String systemPath = d.getSystemPath();
-                
+
                 if ( StringUtils.isEmpty( systemPath ) )
                 {
                     result.addMessage( "For dependency " + d + ": system-scoped dependency must specify systemPath." );
@@ -102,8 +102,8 @@ public class DefaultModelValidator
                 {
                     if ( ! new File( systemPath ).isAbsolute() )
                     {
-                        result.addMessage( "For dependency " + d + ": system-scoped dependency must " +
-                                "specify an absolute path systemPath." );
+                        result.addMessage( "For dependency " + d + ": system-scoped dependency must "
+                                + "specify an absolute path systemPath." );
                     }
                 }
             }
@@ -130,7 +130,7 @@ public class DefaultModelValidator
                 if ( Artifact.SCOPE_SYSTEM.equals( d.getScope() ) )
                 {
                     String systemPath = d.getSystemPath();
-                    
+
                     if ( StringUtils.isEmpty( systemPath ) )
                     {
                         result.addMessage( "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
@@ -139,8 +139,8 @@ public class DefaultModelValidator
                     {
                         if ( ! new File( systemPath ).isAbsolute() )
                         {
-                            result.addMessage( "For managed dependency " + d + ": system-scoped dependency must " +
-                                    "specify an absolute path systemPath." );
+                            result.addMessage( "For managed dependency " + d + ": system-scoped dependency must "
+                                    + "specify an absolute path systemPath." );
                         }
                     }
                 }

@@ -58,7 +58,7 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container )
     {
-        this( container, (Settings)null);
+        this( container, (Settings) null );
     }
 
     /**
@@ -68,7 +68,7 @@ public class DefaultProfileManager
      */
     public DefaultProfileManager( PlexusContainer container, Properties props )
     {
-        this( container, (Settings)null, props );
+        this( container, (Settings) null, props );
 
     }
 
@@ -100,7 +100,8 @@ public class DefaultProfileManager
         }
     }
 
-    public Properties getRequestProperties() {
+    public Properties getRequestProperties()
+    {
         return requestProperties;
     }
 
@@ -119,8 +120,8 @@ public class DefaultProfileManager
         Profile existing = (Profile) profilesById.get( profileId );
         if ( existing != null )
         {
-            container.getLogger().warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource() +
-                ") with new instance from source: " + profile.getSource() );
+            container.getLogger().warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource()
+                + ") with new instance from source: " + profile.getSource() );
         }
 
         profilesById.put( profile.getId(), profile );
@@ -234,7 +235,7 @@ public class DefaultProfileManager
                 {
                     continue;
                 }
-                
+
                 Profile profile = (Profile) profilesById.get( profileId );
 
                 activeFromPom.add( profile );
@@ -259,7 +260,7 @@ public class DefaultProfileManager
             systemProperties.putAll( requestProperties );
         }
 
-        container.addContextValue("SystemProperties", systemProperties);
+        container.addContextValue( "SystemProperties", systemProperties );
         try
         {
             activators = container.lookupList( ProfileActivator.ROLE );
@@ -285,7 +286,7 @@ public class DefaultProfileManager
         }
         finally
         {
-            container.getContext().put("SystemProperties", null);
+            container.getContext().put( "SystemProperties", null );
             if ( activators != null )
             {
                 try

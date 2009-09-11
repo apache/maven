@@ -171,7 +171,7 @@ public class DefaultMavenProjectBuilder
     private ModelDefaultsInjector modelDefaultsInjector;
 
     private ModelInterpolator modelInterpolator;
-    
+
     private ArtifactRepositoryFactory artifactRepositoryFactory;
 
     // ----------------------------------------------------------------------
@@ -240,7 +240,7 @@ public class DefaultMavenProjectBuilder
         throws ProjectBuildingException
     {
         ProjectBuilderConfiguration config = new DefaultProjectBuilderConfiguration().setLocalRepository( localRepository );
-        
+
         return buildFromRepository( artifact, remoteArtifactRepositories, config, allowStubModel );
     }
 
@@ -394,8 +394,8 @@ public class DefaultMavenProjectBuilder
         catch ( InvalidDependencyVersionException e )
         {
             throw new ProjectBuildingException( projectId,
-                                                "Unable to build project due to an invalid dependency version: " +
-                                                    e.getMessage(), e );
+                                                "Unable to build project due to an invalid dependency version: "
+                                                    + e.getMessage(), e );
         }
 
         if ( transferListener != null )
@@ -442,8 +442,8 @@ public class DefaultMavenProjectBuilder
     {
         Map map = null;
         List deps;
-        if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) &&
-            ( deps.size() > 0 ) )
+        if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null )
+            && ( deps.size() > 0 ) )
         {
             map = new ManagedVersionMap( map );
 
@@ -494,8 +494,8 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion() +
-                        "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + d.getVersion()
+                        + "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
                 }
             }
         }
@@ -520,8 +520,8 @@ public class DefaultMavenProjectBuilder
 
         if ( checkDistributionManagementStatus )
         {
-            if ( ( project.getDistributionManagement() != null ) &&
-                ( project.getDistributionManagement().getStatus() != null ) )
+            if ( ( project.getDistributionManagement() != null )
+                && ( project.getDistributionManagement().getStatus() != null ) )
             {
                 String projectId = safeVersionlessKey( project.getGroupId(), project.getArtifactId() );
 
@@ -598,8 +598,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( ArtifactResolutionException e )
         {
-            throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId +
-                "' from the repository: " + e.getMessage(), e );
+            throw new ProjectBuildingException( projectId, "Error getting POM for '" + projectId
+                + "' from the repository: " + e.getMessage(), e );
         }
         catch ( ArtifactNotFoundException e )
         {
@@ -611,8 +611,8 @@ public class DefaultMavenProjectBuilder
             }
             else
             {
-                throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: " +
-                    e.getMessage(), e );
+                throw new ProjectBuildingException( projectId, "POM '" + projectId + "' not found in repository: "
+                    + e.getMessage(), e );
             }
         }
 
@@ -856,8 +856,8 @@ public class DefaultMavenProjectBuilder
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of " +
-                    previousProject.getId() + ". Reason: " + e.getMessage(), e );
+                getLogger().debug( "Cannot determine whether " + currentProject.getId() + " is a module of "
+                    + previousProject.getId() + ". Reason: " + e.getMessage(), e );
             }
 
             modelInheritanceAssembler.assembleModelInheritance( current, previous, pathAdjustment );
@@ -916,7 +916,7 @@ public class DefaultMavenProjectBuilder
             // Only track the file of a POM in the source tree
             project.setFile( projectDescriptor );
         }
-        
+
         project.setManagedVersionMap( createManagedVersionMap( projectId,
                                                                project.getDependencyManagement(),
                                                                project.getParent() ) );
@@ -990,9 +990,9 @@ public class DefaultMavenProjectBuilder
         List injectedProfiles = injectActiveProfiles( profileMgr, model );
 
         activeProfiles.addAll( injectedProfiles );
-        
+
         // --------------------------------------------------------------------------------
-        
+
         Build dynamicBuild = model.getBuild();
 
         model.setBuild( ModelUtils.cloneBuild( dynamicBuild ) );
@@ -1002,7 +1002,7 @@ public class DefaultMavenProjectBuilder
         mergeDeterministicBuildElements( model.getBuild(), dynamicBuild );
 
         model.setBuild( dynamicBuild );
-        
+
         // MNG-3482: Make sure depMgmt is interpolated before merging.
         if ( !isSuperPom )
         {
@@ -1020,12 +1020,12 @@ public class DefaultMavenProjectBuilder
         project = new MavenProject( model, getLogger() );
 
         project.setOriginalModel( originalModel );
-        
+
         project.setActiveProfiles( activeProfiles );
 
         // TODO: maybe not strictly correct, while we should enfore that packaging has a type handler of the same id, we don't
         Artifact projectArtifact = artifactFactory.create( project );
-        
+
         project.setArtifact( projectArtifact );
         project.setProjectBuilderConfiguration( config );
 
@@ -1097,7 +1097,7 @@ public class DefaultMavenProjectBuilder
         project.setReportArtifacts( createReportArtifacts( projectId, project.getReportPlugins() ) );
 
         project.setExtensionArtifacts( createExtensionArtifacts( projectId, project.getBuildExtensions() ) );
-        
+
         return project;
     }
 
@@ -1132,19 +1132,19 @@ public class DefaultMavenProjectBuilder
                 dPlugin.setGroupId( iPlugin.getGroupId() );
                 dPlugin.setArtifactId( iPlugin.getArtifactId() );
                 dPlugin.setVersion( iPlugin.getVersion() );
-                
+
                 dPlugin.setDependencies( iPlugin.getDependencies() );
-                
+
                 List dExecutions = dPlugin.getExecutions();
                 if ( dExecutions != null )
                 {
                     List iExecutions = iPlugin.getExecutions();
-                    
+
                     for ( int j = 0; j < dExecutions.size(); j++ )
                     {
                         PluginExecution dExec = (PluginExecution) dExecutions.get( j );
                         PluginExecution iExec = (PluginExecution) iExecutions.get( j );
-                        
+
                         dExec.setId( iExec.getId() );
                     }
                 }
@@ -1207,8 +1207,8 @@ public class DefaultMavenProjectBuilder
         {
             String projectId = safeVersionlessKey( model.getGroupId(), model.getArtifactId() );
 
-            throw new ProjectBuildingException( projectId, "Failed to activate local (project-level) build profiles: " +
-                e.getMessage(), e );
+            throw new ProjectBuildingException( projectId, "Failed to activate local (project-level) build profiles: "
+                + e.getMessage(), e );
         }
 
         if ( !model.getRepositories().isEmpty() )
@@ -1248,8 +1248,8 @@ public class DefaultMavenProjectBuilder
             {
                 throw new ProjectBuildingException( projectId, "Missing artifactId element from parent element" );
             }
-            else if ( parentModel.getGroupId().equals( model.getGroupId() ) &&
-                parentModel.getArtifactId().equals( model.getArtifactId() ) )
+            else if ( parentModel.getGroupId().equals( model.getGroupId() )
+                && parentModel.getArtifactId().equals( model.getArtifactId() ) )
             {
                 throw new ProjectBuildingException( projectId,
                                                     "Parent element is a duplicate of " + "the current project " );
@@ -1285,16 +1285,16 @@ public class DefaultMavenProjectBuilder
 
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: " +
-                        project.getId() + " in relative path: " + parentRelativePath );
+                    getLogger().debug( "Searching for parent-POM: " + parentModel.getId() + " of project: "
+                        + project.getId() + " in relative path: " + parentRelativePath );
                 }
 
                 if ( parentDescriptor.isDirectory() )
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug( "Path specified in <relativePath/> (" + parentRelativePath +
-                            ") is a directory. Searching for 'pom.xml' within this directory." );
+                        getLogger().debug( "Path specified in <relativePath/> (" + parentRelativePath
+                            + ") is a directory. Searching for 'pom.xml' within this directory." );
                     }
 
                     parentDescriptor = new File( parentDescriptor, "pom.xml" );
@@ -1303,9 +1303,9 @@ public class DefaultMavenProjectBuilder
                     {
                         if ( getLogger().isDebugEnabled() )
                         {
-                            getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: " +
-                                project.getId() + " cannot be loaded from relative path: " + parentDescriptor +
-                                "; path does not exist." );
+                            getLogger().debug( "Parent-POM: " + parentModel.getId() + " for project: "
+                                + project.getId() + " cannot be loaded from relative path: " + parentDescriptor
+                                + "; path does not exist." );
                         }
                     }
                 }
@@ -1341,20 +1341,20 @@ public class DefaultMavenProjectBuilder
                         candidateParentVersion = candidateParent.getParent().getVersion();
                     }
 
-                    if ( parentModel.getGroupId().equals( candidateParentGroupId ) &&
-                        parentModel.getArtifactId().equals( candidateParent.getArtifactId() ) &&
-                        parentModel.getVersion().equals( candidateParentVersion ) )
+                    if ( parentModel.getGroupId().equals( candidateParentGroupId )
+                        && parentModel.getArtifactId().equals( candidateParent.getArtifactId() )
+                        && parentModel.getVersion().equals( candidateParentVersion ) )
                     {
                         model = candidateParent;
 
-                        getLogger().debug( "Using parent-POM from the project hierarchy at: \'" +
-                            parentModel.getRelativePath() + "\' for project: " + project.getId() );
+                        getLogger().debug( "Using parent-POM from the project hierarchy at: \'"
+                            + parentModel.getRelativePath() + "\' for project: " + project.getId() );
                     }
                     else
                     {
-                        getLogger().debug( "Invalid parent-POM referenced by relative path '" +
-                            parentModel.getRelativePath() + "' in parent specification in " + project.getId() + ":" +
-                            "\n  Specified: " + parentModel.getId() + "\n  Found:     " + candidateParent.getId() );
+                        getLogger().debug( "Invalid parent-POM referenced by relative path '"
+                            + parentModel.getRelativePath() + "' in parent specification in " + project.getId() + ":"
+                            + "\n  Specified: " + parentModel.getId() + "\n  Found:     " + candidateParent.getId() );
                     }
                 }
                 else if ( getLogger().isDebugEnabled() )
@@ -1389,8 +1389,8 @@ public class DefaultMavenProjectBuilder
 
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Retrieving parent-POM: " + parentModel.getId() + " for project: " +
-                        project.getId() + " from the repository." );
+                    getLogger().debug( "Retrieving parent-POM: " + parentModel.getId() + " for project: "
+                        + project.getId() + " from the repository." );
                 }
 
                 parentArtifact = artifactFactory.createParentArtifact( parentModel.getGroupId(),
@@ -1403,15 +1403,15 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new ProjectBuildingException( project.getId(), "Cannot find parent: " + e.getProjectId() +
-                        " for project: " + project.getId(), e );
+                    throw new ProjectBuildingException( project.getId(), "Cannot find parent: " + e.getProjectId()
+                        + " for project: " + project.getId(), e );
                 }
             }
 
             if ( ( model != null ) && !"pom".equals( model.getPackaging() ) )
             {
-                throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: " +
-                    projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
+                throw new ProjectBuildingException( projectId, "Parent: " + model.getId() + " of project: "
+                    + projectId + " has wrong packaging: " + model.getPackaging() + ". Must be 'pom'." );
             }
 
             MavenProject parent = assembleLineage( model,
@@ -1432,17 +1432,17 @@ public class DefaultMavenProjectBuilder
         return project;
     }
 
-    private void mergeManagedDependencies(Model model, ProjectBuilderConfiguration config, List parentSearchRepositories)
+    private void mergeManagedDependencies( Model model, ProjectBuilderConfiguration config, List parentSearchRepositories )
         throws ProjectBuildingException
     {
         DependencyManagement modelDepMgmt = model.getDependencyManagement();
 
-        if (modelDepMgmt != null)
+        if ( modelDepMgmt != null )
         {
             Map depsMap = new TreeMap();
             Iterator iter = modelDepMgmt.getDependencies().iterator();
             boolean doInclude = false;
-            while (iter.hasNext())
+            while ( iter.hasNext() )
             {
                 Dependency dep = (Dependency) iter.next();
                 depsMap.put( dep.getManagementKey(), dep );
@@ -1451,23 +1451,23 @@ public class DefaultMavenProjectBuilder
                     doInclude = true;
                 }
             }
-            Map newDeps = new TreeMap(depsMap);
+            Map newDeps = new TreeMap( depsMap );
             iter = modelDepMgmt.getDependencies().iterator();
-            if (doInclude)
+            if ( doInclude )
             {
-                while (iter.hasNext())
+                while ( iter.hasNext() )
                 {
-                    Dependency dep = (Dependency)iter.next();
+                    Dependency dep = (Dependency) iter.next();
                     if ( dep.getType().equals( "pom" )
                          && Artifact.SCOPE_IMPORT.equals( dep.getScope() ) )
                     {
                         Artifact artifact = artifactFactory.createProjectArtifact( dep.getGroupId(), dep.getArtifactId(),
                                                                                   dep.getVersion(), dep.getScope() );
-                        MavenProject project = buildFromRepository(artifact, parentSearchRepositories, config, false);
+                        MavenProject project = buildFromRepository( artifact, parentSearchRepositories, config, false );
 
                         DependencyManagement depMgmt = project.getDependencyManagement();
 
-                        if (depMgmt != null)
+                        if ( depMgmt != null )
                         {
                             if ( getLogger().isDebugEnabled() )
                             {
@@ -1478,17 +1478,17 @@ public class DefaultMavenProjectBuilder
                             {
                                 Dependency includedDep = (Dependency) it.next();
                                 String key = includedDep.getManagementKey();
-                                if (!newDeps.containsKey(key))
+                                if ( !newDeps.containsKey( key ) )
                                 {
                                     newDeps.put( includedDep.getManagementKey(), includedDep );
                                 }
                             }
-                            newDeps.remove(dep.getManagementKey());
+                            newDeps.remove( dep.getManagementKey() );
                         }
                     }
                 }
-                List deps = new ArrayList(newDeps.values());
-                modelDepMgmt.setDependencies(deps);
+                List deps = new ArrayList( newDeps.values() );
+                modelDepMgmt.setDependencies( deps );
             }
         }
     }
@@ -1587,8 +1587,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( projectId, "Failed to build model from file '" +
-                file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
+            throw new ProjectBuildingException( projectId, "Failed to build model from file '"
+                + file.getAbsolutePath() + "'.\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
@@ -1635,8 +1635,8 @@ public class DefaultMavenProjectBuilder
         }
         catch ( IOException e )
         {
-            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm() +
-                "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
+            throw new ProjectBuildingException( projectId, "Failed build model from URL \'" + url.toExternalForm()
+                + "\'\nError: \'" + e.getLocalizedMessage() + "\'", e );
         }
         finally
         {
@@ -1679,9 +1679,9 @@ public class DefaultMavenProjectBuilder
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
-                    "' for plugin '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
-                    e.getMessage(), e );
+                throw new ProjectBuildingException( projectId, "Unable to parse version '" + version
+                    + "' for plugin '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': "
+                    + e.getMessage(), e );
             }
 
             if ( artifact != null )
@@ -1724,9 +1724,9 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
-                        "' for report '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': " +
-                        e.getMessage(), e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version
+                        + "' for report '" + ArtifactUtils.versionlessKey( p.getGroupId(), p.getArtifactId() ) + "': "
+                        + e.getMessage(), e );
                 }
 
                 if ( artifact != null )
@@ -1771,9 +1771,9 @@ public class DefaultMavenProjectBuilder
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
-                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version +
-                        "' for extension '" + ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() ) +
-                        "': " + e.getMessage(), e );
+                    throw new ProjectBuildingException( projectId, "Unable to parse version '" + version
+                        + "' for extension '" + ArtifactUtils.versionlessKey( ext.getGroupId(), ext.getArtifactId() )
+                        + "': " + e.getMessage(), e );
                 }
 
                 if ( artifact != null )
@@ -1814,7 +1814,7 @@ public class DefaultMavenProjectBuilder
     {
         calculateConcreteStateInternal( project, config, true, new HashSet() );
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1823,11 +1823,11 @@ public class DefaultMavenProjectBuilder
     {
         calculateConcreteStateInternal( project, config, processProjectReferences, ( processProjectReferences ? new HashSet() : null ) );
     }
-    
+
     /*
      * NOTE: This is a code hotspot, PLEASE be careful about the performance of logic inside or
-     * called from this method. 
-     * 
+     * called from this method.
+     *
      * NOTE: If processProjectReferences == false, processedProjects MUST NOT BE USED. It will be null.
      */
     private void calculateConcreteStateInternal( MavenProject project, ProjectBuilderConfiguration config, boolean processProjectReferences, Set processedProjects )
@@ -1837,16 +1837,16 @@ public class DefaultMavenProjectBuilder
         {
             processedProjects.add( project.getId() );
         }
-        
+
         restoreDynamicStateInternal( project, config, processProjectReferences, processProjectReferences ? new HashSet( processedProjects ) : null );
-        
+
         if ( !project.isConcrete() )
         {
             if ( project.getParent() != null )
             {
                 calculateConcreteStateInternal( project.getParent(), config, processProjectReferences, processedProjects );
             }
-            
+
             Build build = project.getBuild();
             if ( build != null )
             {
@@ -1893,7 +1893,7 @@ public class DefaultMavenProjectBuilder
                                                                               getLogger().isDebugEnabled() );
 
             project.preserveScriptSourceRoots( originalInterpolatedScriptSourceRoots );
-            
+
             // TODO: MNG-3731
             project.setScriptSourceRoots( originalInterpolatedScriptSourceRoots );
 //            project.setScriptSourceRoots( originalInterpolatedScriptSourceRoots == null ? null
@@ -1908,12 +1908,12 @@ public class DefaultMavenProjectBuilder
             project.preserveProperties();
             project.preserveBasedir();
             project.setBuild( model.getBuild() );
-            
+
             if ( project.getExecutionProject() != null )
             {
                 calculateConcreteStateInternal( project.getExecutionProject(), config, processProjectReferences, processedProjects );
             }
-            
+
             project.setConcrete( true );
         }
 
@@ -1988,7 +1988,7 @@ public class DefaultMavenProjectBuilder
     {
         restoreDynamicStateInternal( project, config, true, new HashSet() );
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -1997,11 +1997,11 @@ public class DefaultMavenProjectBuilder
     {
         restoreDynamicStateInternal( project, config, processProjectReferences, ( processProjectReferences ? new HashSet() : null ) );
     }
-    
+
     /*
      * NOTE: This is a code hotspot, PLEASE be careful about the performance of logic inside or
-     * called from this method. 
-     * 
+     * called from this method.
+     *
      * NOTE: If processProjectReferences == false, processedProjects MUST NOT BE USED. It will be null.
      */
     private void restoreDynamicStateInternal( MavenProject project, ProjectBuilderConfiguration config, boolean processProjectReferences, Set processedProjects )
@@ -2011,22 +2011,22 @@ public class DefaultMavenProjectBuilder
         {
             processedProjects.add( project.getId() );
         }
-        
+
         if ( project.isConcrete() && projectWasChanged( project ) )
         {
             if ( project.getParent() != null )
             {
                 restoreDynamicStateInternal( project.getParent(), config, processProjectReferences, processedProjects );
             }
-            
+
             restoreBuildRoots( project, config, getLogger().isDebugEnabled() );
             restoreModelBuildSection( project, config, getLogger().isDebugEnabled() );
-            
+
             if ( project.getExecutionProject() != null )
             {
                 restoreDynamicStateInternal( project.getExecutionProject(), config, processProjectReferences, processedProjects );
             }
-            
+
             project.setConcrete( false );
         }
 
@@ -2042,40 +2042,40 @@ public class DefaultMavenProjectBuilder
         {
             return true;
         }
-        
+
         if ( !objectEquals( project.getProperties(), project.getPreservedProperties() ) )
         {
             return true;
         }
-        
+
         Build oBuild = project.getOriginalInterpolatedBuild();
         Build build = project.getBuild();
-        
+
         if ( !objectEquals( oBuild.getDirectory(), build.getDirectory() ) )
         {
             return true;
         }
-        
+
         if ( !objectEquals( oBuild.getOutputDirectory(), build.getOutputDirectory() ) )
         {
             return true;
         }
-        
+
         if ( !objectEquals( oBuild.getSourceDirectory(), build.getSourceDirectory() ) )
         {
             return true;
         }
-        
+
         if ( !objectEquals( oBuild.getTestSourceDirectory(), build.getTestSourceDirectory() ) )
         {
             return true;
         }
-        
+
         if ( !objectEquals( oBuild.getScriptSourceDirectory(), build.getScriptSourceDirectory() ) )
         {
             return true;
         }
-        
+
         return false;
     }
 
@@ -2088,15 +2088,15 @@ public class DefaultMavenProjectBuilder
     {
         Build changedBuild = project.getBuild();
         Build dynamicBuild = project.getDynamicBuild();
-        
+
         if ( changedBuild == null || dynamicBuild == null )
         {
             return;
         }
-        
+
         List changedPlugins = changedBuild.getPlugins();
         List dynamicPlugins = dynamicBuild.getPlugins();
-        
+
         if ( changedPlugins != null && dynamicPlugins != null && changedPlugins.size() != dynamicPlugins.size() )
         {
             changedPlugins.removeAll( dynamicPlugins );
@@ -2105,12 +2105,12 @@ public class DefaultMavenProjectBuilder
                 for ( Iterator it = changedPlugins.iterator(); it.hasNext(); )
                 {
                     Plugin plugin = (Plugin) it.next();
-                    
+
                     dynamicBuild.addPlugin( plugin );
                 }
             }
         }
-        
+
         dynamicBuild.flushPluginMap();
     }
 
@@ -2249,7 +2249,7 @@ public class DefaultMavenProjectBuilder
                                                       debugMessages ) );
 
         propagateNewPlugins( project );
-        
+
         project.setBuild( dynamicBuild );
 
         project.clearRestorableBuild();
@@ -2314,7 +2314,7 @@ public class DefaultMavenProjectBuilder
                                                                      project.getBasedir(),
                                                                      config,
                                                                      debugMessages );
-        
+
         interpolatedOriginal = pathTranslator.unalignFromBaseDirectory( interpolatedOriginal, project.getBasedir() );
 
         String interpolatedOriginal2 = modelInterpolator.interpolate( originalInterpolatedString,
@@ -2322,7 +2322,7 @@ public class DefaultMavenProjectBuilder
                                                                       project.getBasedir(),
                                                                       config,
                                                                       debugMessages );
-        
+
         interpolatedOriginal2 = pathTranslator.alignToBaseDirectory( interpolatedOriginal2, project.getBasedir() );
 
         String interpolatedChanged = modelInterpolator.interpolate( changedString,
@@ -2330,7 +2330,7 @@ public class DefaultMavenProjectBuilder
                                                                     project.getBasedir(),
                                                                     config,
                                                                     debugMessages );
-        
+
         interpolatedChanged = pathTranslator.alignToBaseDirectory( interpolatedChanged, project.getBasedir() );
 
         String relativeInterpolatedChanged = modelInterpolator.interpolate( relativeChangedString,
@@ -2400,7 +2400,7 @@ public class DefaultMavenProjectBuilder
                                                                  project.getBasedir(),
                                                                  config,
                                                                  debugMessages );
-            
+
             interpolated = pathTranslator.alignToBaseDirectory( interpolated, project.getBasedir() );
 
             String relativeInterpolated = modelInterpolator.interpolate( relativeChangedString,
@@ -2408,7 +2408,7 @@ public class DefaultMavenProjectBuilder
                                                                          project.getBasedir(),
                                                                          config,
                                                                          debugMessages );
-            
+
             String[] original = (String[]) orig.get( interpolated );
             if ( original == null )
             {

@@ -78,7 +78,7 @@ public class MavenMetadataSource
 
     // lazily instantiated and cached.
     private MavenProject superProject;
-    
+
     // cache
     private final Set<String> warnedPoms;
     
@@ -114,20 +114,20 @@ public class MavenMetadataSource
         }
 
         ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
-        
+
         if ( rel == null )
         {
             return artifact;
         }
-        
+
         MavenProject project = rel.project;
         if ( project == null || getRelocationKey( artifact ).equals( getRelocationKey( project.getArtifact() ) ) )
         {
             return artifact;
         }
 
-        
-        // NOTE: Using artifact information here, since some POMs are deployed 
+
+        // NOTE: Using artifact information here, since some POMs are deployed
         // to central with one version in the filename, but another in the <version> string!
         // Case in point: org.apache.ws.commons:XmlSchema:1.1:pom.
         //
@@ -194,7 +194,7 @@ public class MavenMetadataSource
                 catch ( InvalidProjectModelException e )
                 {
                     String id = pomArtifact.getId();
-                    
+
                     if ( !warnedPoms.contains( id ) )
                     {
                         warnedPoms.add( pomArtifact.getId() );
@@ -225,8 +225,8 @@ public class MavenMetadataSource
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '" +
-                        artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
+                    throw new ArtifactMetadataRetrievalException( "Unable to read the metadata file for artifact '"
+                        + artifact.getDependencyConflictId() + "': " + e.getMessage(), e, artifact );
                 }
 
                 if ( project != null )
@@ -261,8 +261,8 @@ public class MavenMetadataSource
                             project.setVersion( relocation.getVersion() );
                         }
 
-                        if ( artifact.getDependencyFilter() != null &&
-                            !artifact.getDependencyFilter().include( artifact ) )
+                        if ( artifact.getDependencyFilter() != null
+                            && !artifact.getDependencyFilter().include( artifact ) )
                         {
                             return null;
                         }
@@ -277,8 +277,8 @@ public class MavenMetadataSource
 
                         }
 
-                        String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":" +
-                            artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
+                        String message = "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
+                            + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
                         if ( relocation.getMessage() != null )
                         {
@@ -287,13 +287,13 @@ public class MavenMetadataSource
 
                         if ( artifact.getDependencyTrail() != null && artifact.getDependencyTrail().size() == 1 )
                         {
-                            getLogger().warn( "While downloading " + pomArtifact.getGroupId() + ":" +
-                                pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                            getLogger().warn( "While downloading " + pomArtifact.getGroupId() + ":"
+                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
                         }
                         else
                         {
-                            getLogger().debug( "While downloading " + pomArtifact.getGroupId() + ":" +
-                                pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
+                            getLogger().debug( "While downloading " + pomArtifact.getGroupId() + ":"
+                                + pomArtifact.getArtifactId() + ":" + pomArtifact.getVersion() + message + "\n" );
                         }
                     }
                     else
@@ -312,7 +312,7 @@ public class MavenMetadataSource
         ProjectRelocation rel = new ProjectRelocation();
         rel.project = project;
         rel.pomArtifact = pomArtifact;
-        
+
         return rel;
     }
 
@@ -325,12 +325,12 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         ProjectRelocation rel = retrieveRelocatedProject( artifact, localRepository, remoteRepositories );
-        
+
         if ( rel == null )
         {
             return null;
         }
-        
+
         MavenProject project = rel.project;
         Artifact pomArtifact = rel.pomArtifact;
 
@@ -364,8 +364,8 @@ public class MavenMetadataSource
                 }
                 catch ( InvalidDependencyVersionException e )
                 {
-                    throw new ArtifactMetadataRetrievalException( "Error in metadata for artifact '" +
-                        artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
+                    throw new ArtifactMetadataRetrievalException( "Error in metadata for artifact '"
+                        + artifact.getDependencyConflictId() + "': " + e.getMessage(), e );
                 }
             }
 
@@ -467,8 +467,8 @@ public class MavenMetadataSource
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new InvalidDependencyVersionException( "Unable to parse version '" + d.getVersion() +
-                    "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
+                throw new InvalidDependencyVersionException( "Unable to parse version '" + d.getVersion()
+                    + "' for dependency '" + d.getManagementKey() + "': " + e.getMessage(), e );
             }
             Artifact artifact = artifactFactory.createDependencyArtifact( d.getGroupId(), d.getArtifactId(),
                                                                           versionRange, d.getType(), d.getClassifier(),
@@ -481,10 +481,10 @@ public class MavenMetadataSource
 
             ArtifactFilter artifactFilter = dependencyFilter;
 
-            // MNG-3769: It would be nice to be able to process relocations here, 
+            // MNG-3769: It would be nice to be able to process relocations here,
             // so we could have this filtering step apply to post-relocated dependencies.
             // HOWEVER, this would require a much more invasive POM resolution process
-            // in order to look for relocations, which would make the early steps in 
+            // in order to look for relocations, which would make the early steps in
             // a Maven build way too heavy.
             if ( artifact != null && ( artifactFilter == null || artifactFilter.include( artifact ) ) )
             {
@@ -559,11 +559,11 @@ public class MavenMetadataSource
 
         return versions;
     }
-    
+
     private static final class ProjectRelocation
     {
         private MavenProject project;
         private Artifact pomArtifact;
     }
-    
+
 }

@@ -232,7 +232,7 @@ public final class ModelUtils
                 // MNG-3719: merge currentPlugin with firstPlugin as parent,
                 // then use updated currentPlugin as new parent
                 mergePluginDefinitions( currentPlugin, firstPlugin, false );
-                normalized.set(idx, currentPlugin);
+                normalized.set( idx, currentPlugin );
             }
             else
             {
@@ -249,14 +249,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         ReportSet result = new ReportSet();
-        
+
         result.setConfiguration( cloneConfiguration( src.getConfiguration() ) );
         result.setId( src.getId() );
         result.setInherited( src.getInherited() );
         result.setReports( cloneListOfStrings( src.getReports() ) );
-        
+
         return result;
     }
 
@@ -266,16 +266,16 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         ReportPlugin result = new ReportPlugin();
-        
+
         result.setArtifactId( src.getArtifactId() );
         result.setConfiguration( cloneConfiguration( src.getConfiguration() ) );
         result.setGroupId( src.getGroupId() );
         result.setInherited( src.getInherited() );
         result.setReportSets( cloneList( src.getReportSets(), REPORT_SET_CLONER ) );
         result.setVersion( src.getVersion() );
-        
+
         return result;
     }
 
@@ -285,13 +285,13 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Profile result = new Profile();
-        
+
         cloneModelBaseFields( src, result );
-        
+
         result.setActivation( cloneActivation( src.getActivation() ) );
-        
+
         BuildBase resultBuild = null;
         if ( src.getBuild() != null )
         {
@@ -299,10 +299,10 @@ public final class ModelUtils
             cloneBuildBaseFields( src.getBuild(), resultBuild );
         }
         result.setBuild( resultBuild );
-        
+
         result.setId( src.getId() );
         result.setSource( src.getSource() );
-        
+
         return result;
     }
 
@@ -311,7 +311,7 @@ public final class ModelUtils
         result.setDependencies( cloneList( src.getDependencies(), DEPENDENCY_CLONER ) );
         result.setDependencyManagement( cloneDependencyManagement( src.getDependencyManagement() ) );
         result.setDistributionManagement( cloneDistributionManagement( src.getDistributionManagement() ) );
-        
+
         result.setModules( cloneListOfStrings( src.getModules() ) );
 
         result.setPluginRepositories( cloneList( src.getPluginRepositories(), REPOSITORY_CLONER ) );
@@ -326,13 +326,13 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Reporting result = new Reporting();
-        
+
         result.setExcludeDefaults( src.isExcludeDefaults() );
         result.setOutputDirectory( src.getOutputDirectory() );
         result.setPlugins( cloneList( src.getPlugins(), REPORT_PLUGIN_CLONER ) );
-        
+
         return result;
     }
 
@@ -342,14 +342,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Activation result = new Activation();
         result.setActiveByDefault( src.isActiveByDefault() );
         result.setFile( cloneActivationFile( src.getFile() ) );
         result.setJdk( src.getJdk() );
         result.setOs( cloneActivationOs( src.getOs() ) );
         result.setProperty( cloneActivationProperty( src.getProperty() ) );
-        
+
         return result;
     }
 
@@ -359,12 +359,12 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         ActivationProperty result = new ActivationProperty();
-        
+
         result.setName( src.getName() );
         result.setValue( src.getValue() );
-        
+
         return result;
     }
 
@@ -374,14 +374,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         ActivationOS result = new ActivationOS();
-        
+
         result.setArch( src.getArch() );
         result.setFamily( src.getFamily() );
         result.setName( src.getName() );
         result.setVersion( src.getVersion() );
-        
+
         return result;
     }
 
@@ -391,9 +391,9 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         ActivationFile result = new ActivationFile();
-        
+
         result.setExists( src.getExists() );
         result.setMissing( src.getMissing() );
 
@@ -406,14 +406,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Repository result = new Repository();
-        
+
         result.setReleases( cloneRepositoryPolicy( src.getReleases() ) );
         result.setSnapshots( cloneRepositoryPolicy( src.getSnapshots() ) );
-        
+
         cloneRepositoryBaseFields( src, result );
-        
+
         return result;
     }
 
@@ -423,13 +423,13 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         RepositoryPolicy result = new RepositoryPolicy();
-        
+
         result.setChecksumPolicy( src.getChecksumPolicy() );
         result.setEnabled( src.isEnabled() );
         result.setUpdatePolicy( src.getUpdatePolicy() );
-        
+
         return result;
     }
 
@@ -439,16 +439,16 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         MailingList result = new MailingList();
-        
+
         result.setArchive( src.getArchive() );
         result.setName( src.getName() );
         result.setOtherArchives( src.getOtherArchives() );
         result.setPost( src.getPost() );
         result.setSubscribe( src.getSubscribe() );
         result.setUnsubscribe( src.getUnsubscribe() );
-        
+
         return result;
     }
 
@@ -511,8 +511,8 @@ public final class ModelUtils
                 // 1. we're not processing the plugins in an inheritance-based merge
                 // 2. the parent's <inherited/> flag is not set
                 // 3. the parent's <inherited/> flag is set to true
-                if ( !handleAsInheritance || ( parentInherited == null ) ||
-                    Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || ( parentInherited == null )
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
                     Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
 
@@ -608,7 +608,7 @@ public final class ModelUtils
     /**
      * Merge the list of reporting plugins from parent pom and child pom
      * TODO it's pretty much a copy of {@link #mergePluginLists(PluginContainer, PluginContainer, boolean)}
-     * 
+     *
      * @param child
      * @param parent
      * @param handleAsInheritance
@@ -659,8 +659,8 @@ public final class ModelUtils
                 // 1. we're not processing the plugins in an inheritance-based merge
                 // 2. the parent's <inherited/> flag is not set
                 // 3. the parent's <inherited/> flag is set to true
-                if ( !handleAsInheritance || ( parentInherited == null ) ||
-                    Boolean.valueOf( parentInherited ).booleanValue() )
+                if ( !handleAsInheritance || ( parentInherited == null )
+                    || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
                     ReportPlugin childPlugin = (ReportPlugin) childPlugins.get( parentPlugin.getKey() );
 
@@ -763,21 +763,21 @@ public final class ModelUtils
                     }
 
                     assembledExecutions.put( assembled.getId(), assembled );
-                    mergedExecutions.add(assembled);
+                    mergedExecutions.add( assembled );
                 }
             }
 
             for ( Iterator it = child.getExecutions().iterator(); it.hasNext(); )
             {
-                PluginExecution childExecution = (PluginExecution)it.next();
+                PluginExecution childExecution = (PluginExecution) it.next();
 
                 if ( !assembledExecutions.containsKey( childExecution.getId() ) )
                 {
-                    mergedExecutions.add(childExecution);
+                    mergedExecutions.add( childExecution );
                 }
             }
 
-            child.setExecutions(mergedExecutions);
+            child.setExecutions( mergedExecutions );
 
             child.flushExecutionMap();
         }
@@ -802,7 +802,7 @@ public final class ModelUtils
 
         boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
 
-        // merge configuration just like with build plugins	
+        // merge configuration just like with build plugins
         if ( parentIsInherited )
         {
             Xpp3Dom childConfiguration = (Xpp3Dom) child.getConfiguration();
@@ -947,35 +947,35 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Model result = new Model();
-        
+
         cloneModelBaseFields( src, result );
 
         result.setArtifactId( src.getArtifactId() );
         result.setBuild( cloneBuild( src.getBuild() ) );
         result.setCiManagement( cloneCiManagement( src.getCiManagement() ) );
-        
+
         result.setContributors( cloneList( src.getContributors(), CONTRIBUTOR_CLONER ) );
-        
+
         result.setDescription( src.getDescription() );
         result.setDevelopers( cloneList( src.getDevelopers(), DEVELOPER_CLONER ) );
-        
+
         result.setGroupId( src.getGroupId() );
         result.setInceptionYear( src.getInceptionYear() );
         result.setIssueManagement( cloneIssueManagement( src.getIssueManagement() ) );
         result.setLicenses( cloneList( src.getLicenses(), LICENSE_CLONER ) );
-        
+
         result.setMailingLists( cloneList( src.getMailingLists(), MAILING_LIST_CLONER ) );
         result.setModelVersion( src.getModelVersion() );
         result.setName( src.getName() );
         result.setOrganization( cloneOrganization( src.getOrganization() ) );
         result.setPackaging( src.getPackaging() );
         result.setParent( cloneParent( src.getParent() ) );
-        
+
         result.setPrerequisites( clonePrerequisites( src.getPrerequisites() ) );
         result.setProfiles( cloneList( src.getProfiles(), PROFILE_CLONER ) );
-        
+
         result.setScm( cloneScm( src.getScm() ) );
         result.setUrl( src.getUrl() );
         result.setVersion( src.getVersion() );
@@ -989,14 +989,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Scm result = new Scm();
-        
+
         result.setConnection( src.getConnection() );
         result.setDeveloperConnection( src.getDeveloperConnection() );
         result.setTag( src.getTag() );
         result.setUrl( src.getUrl() );
-        
+
         return result;
     }
 
@@ -1006,9 +1006,9 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Prerequisites result = new Prerequisites();
-        
+
         result.setMaven( src.getMaven() );
 
         return result;
@@ -1020,12 +1020,12 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Organization result = new Organization();
-        
+
         result.setName( src.getName() );
         result.setUrl( src.getUrl() );
-        
+
         return result;
     }
 
@@ -1035,14 +1035,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         License result = new License();
-        
+
         result.setComments( src.getComments() );
         result.setDistribution( src.getDistribution() );
         result.setName( src.getName() );
         result.setUrl( src.getUrl() );
-        
+
         return result;
     }
 
@@ -1052,12 +1052,12 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         IssueManagement result = new IssueManagement();
-        
+
         result.setSystem( src.getSystem() );
         result.setUrl( src.getUrl() );
-        
+
         return result;
     }
 
@@ -1067,16 +1067,16 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         DistributionManagement result = new DistributionManagement();
-        
+
         result.setDownloadUrl( src.getDownloadUrl() );
         result.setRelocation( cloneRelocation( src.getRelocation() ) );
         result.setRepository( cloneDeploymentRepository( src.getRepository() ) );
         result.setSite( cloneSite( src.getSite() ) );
         result.setSnapshotRepository( cloneDeploymentRepository( src.getSnapshotRepository() ) );
         result.setStatus( src.getStatus() );
-        
+
         return result;
     }
 
@@ -1086,13 +1086,13 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Site result = new Site();
-        
+
         result.setId( src.getId() );
         result.setName( src.getName() );
         result.setUrl( src.getUrl() );
-        
+
         return result;
     }
 
@@ -1102,13 +1102,13 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         DeploymentRepository result = new DeploymentRepository();
-        
+
         result.setUniqueVersion( src.isUniqueVersion() );
-        
+
         cloneRepositoryBaseFields( src, result );
-        
+
         return result;
     }
 
@@ -1126,14 +1126,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Relocation result = new Relocation();
-        
+
         result.setArtifactId( src.getArtifactId() );
         result.setGroupId( src.getGroupId() );
         result.setMessage( src.getMessage() );
         result.setVersion( src.getVersion() );
-        
+
         return result;
     }
 
@@ -1143,10 +1143,10 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         DependencyManagement result = new DependencyManagement();
         result.setDependencies( cloneList( src.getDependencies(), DEPENDENCY_CLONER ) );
-        
+
         return result;
     }
 
@@ -1161,7 +1161,7 @@ public final class ModelUtils
                 result.add( cloner.cloneModelPart( (Object) it.next() ) );
             }
         }
-        
+
         return result;
     }
 
@@ -1171,29 +1171,29 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Contributor result = new Contributor();
         cloneContributorFields( src, result );
-        
+
         return result;
     }
-    
+
     public static Developer cloneDeveloper( Developer src )
     {
         if ( src == null )
         {
             return null;
         }
-        
+
         Developer result = new Developer();
-        
+
         result.setId( src.getId() );
-        
+
         cloneContributorFields( src, result );
-        
+
         return result;
     }
-    
+
     private static void cloneContributorFields( Contributor src, Contributor result )
     {
         result.setEmail( src.getEmail() );
@@ -1212,9 +1212,9 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         CiManagement result = new CiManagement();
-        
+
         List notifiers = null;
         if ( src.getNotifiers() != null )
         {
@@ -1225,10 +1225,10 @@ public final class ModelUtils
             }
         }
         result.setNotifiers( cloneList( src.getNotifiers(), NOTIFIER_CLONER ) );
-        
+
         result.setSystem( src.getSystem() );
         result.setUrl( src.getUrl() );
-        
+
         return result;
     }
 
@@ -1238,7 +1238,7 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Notifier result = new Notifier();
         result.setAddress( src.getAddress() );
         result.setConfiguration( cloneProperties( src.getConfiguration() ) );
@@ -1246,7 +1246,7 @@ public final class ModelUtils
         result.setSendOnFailure( result.isSendOnFailure() );
         result.setSendOnSuccess( result.isSendOnSuccess() );
         result.setSendOnWarning( result.isSendOnWarning() );
-        
+
         return result;
     }
 
@@ -1256,14 +1256,14 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Properties result = new Properties();
-        for( Enumeration e = src.propertyNames(); e.hasMoreElements(); )
+        for ( Enumeration e = src.propertyNames(); e.hasMoreElements(); )
         {
             String key = (String) e.nextElement();
             result.setProperty( key, src.getProperty( key ) );
         }
-        
+
         return result;
     }
 
@@ -1275,17 +1275,17 @@ public final class ModelUtils
         }
 
         Build result = new Build();
-        
+
         cloneBuildBaseFields( src, result );
-        
+
         result.setExtensions( cloneList( src.getExtensions(), EXTENSION_CLONER ) );
         result.setOutputDirectory( src.getOutputDirectory() );
-        
+
         result.setScriptSourceDirectory( src.getScriptSourceDirectory() );
         result.setSourceDirectory( src.getSourceDirectory() );
         result.setTestOutputDirectory( src.getTestOutputDirectory() );
         result.setTestSourceDirectory( src.getTestSourceDirectory() );
-        
+
         return result;
     }
 
@@ -1293,15 +1293,15 @@ public final class ModelUtils
     {
         result.setDefaultGoal( src.getDefaultGoal() );
         result.setDirectory( src.getDirectory() );
-        
+
         result.setFilters( cloneListOfStrings( src.getFilters() ) );
         result.setFinalName( src.getFinalName() );
-        
+
         result.setPluginManagement( clonePluginManagement( src.getPluginManagement() ) );
         result.setPlugins( cloneList( src.getPlugins(), PLUGIN_CLONER ) );
- 
+
         result.setResources( cloneList( src.getResources(), RESOURCE_CLONER ) );
-        
+
         result.setTestResources( cloneList( src.getTestResources(), RESOURCE_CLONER ) );
     }
 
@@ -1313,7 +1313,7 @@ public final class ModelUtils
             pMgmt = new PluginManagement();
             pMgmt.setPlugins( cloneList( src.getPlugins(), PLUGIN_CLONER ) );
         }
-        
+
         return pMgmt;
     }
 
@@ -1323,7 +1323,7 @@ public final class ModelUtils
         if ( src != null )
         {
             result = new Resource();
-            
+
             result.setDirectory( src.getDirectory() );
             result.setExcludes( cloneListOfStrings( src.getExcludes() ) );
             result.setFiltering( src.isFiltering() );
@@ -1331,7 +1331,7 @@ public final class ModelUtils
             result.setMergeId( src.getMergeId() );
             result.setTargetPath( src.getTargetPath() );
         }
-        
+
         return result;
     }
 
@@ -1342,36 +1342,36 @@ public final class ModelUtils
         {
             result = new Plugin();
             result.setArtifactId( src.getArtifactId() );
-            
+
             result.setConfiguration( cloneConfiguration( src.getConfiguration() ) );
-            
+
             result.setDependencies( cloneList( src.getDependencies(), DEPENDENCY_CLONER ) );
             result.setExecutions( cloneList( src.getExecutions(), PLUGIN_EXECUTION_CLONER ) );
-            
+
             result.setExtensions( src.isExtensions() );
             result.setGroupId( src.getGroupId() );
             result.setInherited( src.getInherited() );
             result.setVersion( src.getVersion() );
         }
-        
+
         return result;
     }
 
     public static PluginExecution clonePluginExecution( PluginExecution src )
     {
         PluginExecution result = null;
-        
+
         if ( src != null )
         {
             result = new PluginExecution();
-            
+
             result.setId( src.getId() );
             result.setGoals( cloneListOfStrings( src.getGoals() ) );
             result.setConfiguration( cloneConfiguration( src.getConfiguration() ) );
             result.setInherited( src.getInherited() );
             result.setPhase( src.getPhase() );
         }
-        
+
         return result;
     }
 
@@ -1382,7 +1382,7 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         return new Xpp3Dom( (Xpp3Dom) configuration );
     }
 
@@ -1392,7 +1392,7 @@ public final class ModelUtils
         if ( src != null )
         {
             result = new Dependency();
-            
+
             result.setArtifactId( src.getArtifactId() );
             result.setClassifier( src.getClassifier() );
             result.setExclusions( cloneList( src.getExclusions(), DEPENDENCY_EXCLUSION_CLONER ) );
@@ -1403,7 +1403,7 @@ public final class ModelUtils
             result.setType( src.getType() );
             result.setVersion( src.getVersion() );
         }
-        
+
         return result;
     }
 
@@ -1416,7 +1416,7 @@ public final class ModelUtils
             result.setArtifactId( src.getArtifactId() );
             result.setGroupId( src.getGroupId() );
         }
-        
+
         return result;
     }
 
@@ -1432,7 +1432,7 @@ public final class ModelUtils
                 result.add( item );
             }
         }
-        
+
         return result;
     }
 
@@ -1442,7 +1442,7 @@ public final class ModelUtils
         rExt.setArtifactId( src.getArtifactId() );
         rExt.setGroupId( src.getGroupId() );
         rExt.setVersion( src.getVersion() );
-        
+
         return rExt;
     }
 
@@ -1452,12 +1452,12 @@ public final class ModelUtils
         {
             return null;
         }
-        
+
         Exclusion result = new Exclusion();
 
         result.setArtifactId( src.getArtifactId() );
         result.setGroupId( src.getGroupId() );
-        
+
         return result;
     }
 
@@ -1473,7 +1473,7 @@ public final class ModelUtils
         result.setGroupId( src.getGroupId() );
         result.setRelativePath( src.getRelativePath() );
         result.setVersion( src.getVersion() );
-        
+
         return result;
     }
 
@@ -1584,11 +1584,11 @@ public final class ModelUtils
 
         return new ArrayList( depsMap.values() );
     }
-    
+
     public static interface ModelPartCloner
     {
         Object cloneModelPart( Object src );
     }
-    
+
 
 }
