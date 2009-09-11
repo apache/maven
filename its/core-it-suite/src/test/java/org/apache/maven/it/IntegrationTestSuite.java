@@ -85,10 +85,10 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4353PluginDependencyResolutionFromPomRepoTest.class );
         suite.addTestSuite( MavenITmng4350LifecycleMappingExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4349RelocatedArtifactWithInvalidPomTest.class );
         suite.addTestSuite( MavenITmng4348NoUnnecessaryRepositoryAccessTest.class );
-
         suite.addTestSuite( MavenITmng4347ImportScopeWithSettingsProfilesTest.class );
         suite.addTestSuite( MavenITmng4345DefaultPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4344ManagedPluginExecutionOrderTest.class );
