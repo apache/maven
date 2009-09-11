@@ -67,8 +67,8 @@ TODO:
 
   <target name="read-poms" depends="initTaskDefs,initLocalRepo" unless="pom.version">
     <copy file="pom.xml" tofile="dependencies.xml"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--start--&gt;" value="&lt;!--"/>
-    <replace file="${basedir}/dependencies.xml" token="&lt;!--end--&gt;" value="--&gt;"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--"/>
+    <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;"/>
     <artifact:pom file="${basedir}/dependencies.xml" id="pom">
       <localRepository path="${maven.repo.local}"/>
     </artifact:pom>
