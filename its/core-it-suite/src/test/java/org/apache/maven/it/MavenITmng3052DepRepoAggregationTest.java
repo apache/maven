@@ -48,8 +48,7 @@ public class MavenITmng3052DepRepoAggregationTest
 
     public MavenITmng3052DepRepoAggregationTest()
     {
-        // TODO: fate of POM repositories in 3.x is unclear, disabled for now
-        super( "(2.0.9,3.0-alpha-1)" ); // only test in 2.0.10+
+        super( "(2.0.9,)" ); // only test in 2.0.10+
     }
 
     public void testitMNG3052 ()
