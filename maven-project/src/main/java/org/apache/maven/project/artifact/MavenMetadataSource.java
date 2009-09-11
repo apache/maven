@@ -100,6 +100,7 @@ public class MavenMetadataSource
         
         projectBuilderConfig = configuration;
         projectBuilderConfig.setMetadataSource( this );
+        enableLogging( getLogger() );
     }
     
     /**
