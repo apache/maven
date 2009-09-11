@@ -141,6 +141,11 @@ public class ArtifactResolutionResult
         return this;
     }
 
+    public boolean isSuccess()
+    {
+        return !( hasMissingArtifacts() || hasExceptions() );
+    }
+
     // ------------------------------------------------------------------------
     // Exceptions
     // ------------------------------------------------------------------------
