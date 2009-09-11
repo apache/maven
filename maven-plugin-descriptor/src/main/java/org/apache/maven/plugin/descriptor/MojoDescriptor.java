@@ -45,7 +45,7 @@ public class MojoDescriptor
     implements Cloneable
 {
     /** The Plexus component type */
-    public static String MAVEN_PLUGIN = "maven-plugin";
+    public static final String MAVEN_PLUGIN = "maven-plugin";
 
     /** "once-per-session" execution strategy */
     public static final String SINGLE_PASS_EXEC_STRATEGY = "once-per-session";
@@ -192,9 +192,9 @@ public class MojoDescriptor
     {
         if ( parameters != null && parameters.contains( parameter ) )
         {
-            throw new DuplicateParameterException( parameter.getName() +
-                " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: " +
-                getImplementation() + ")" );
+            throw new DuplicateParameterException( parameter.getName()
+                + " has been declared multiple times in mojo with goal: " + getGoal() + " (implementation: "
+                + getImplementation() + ")" );
         }
 
         if ( parameters == null )
@@ -203,7 +203,7 @@ public class MojoDescriptor
         }
 
         parameters.add( parameter );
-        
+
         parameterMap = null;
     }
 

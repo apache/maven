@@ -50,7 +50,7 @@ public class LifecycleXpp3ReaderTest
         assertEquals( "check id", "generate-sources", p.getId() );
         assertEquals( "check number of executions", 1, p.getExecutions().size() );
         Execution e = (Execution) p.getExecutions().iterator().next();
-        assertEquals( "check configuration", "true", ((Xpp3Dom) e.getConfiguration()).getChild( "debug" ).getValue() );
+        assertEquals( "check configuration", "true", ( (Xpp3Dom) e.getConfiguration() ).getChild( "debug" ).getValue() );
         assertEquals( "check number of goals", 1, e.getGoals().size() );
         String g = (String) e.getGoals().iterator().next();
         assertEquals( "check goal", "clover:compiler", g );

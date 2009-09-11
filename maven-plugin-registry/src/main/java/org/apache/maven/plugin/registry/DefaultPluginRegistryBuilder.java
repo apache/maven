@@ -62,8 +62,8 @@ public class DefaultPluginRegistryBuilder
 
         getLogger().debug( "Building Maven user-level plugin registry from: '" + userRegistryFile.getAbsolutePath() + "'" );
 
-        if ( System.getProperty( "maven.home" ) != null ||
-             System.getProperty( MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION ) != null )
+        if ( System.getProperty( "maven.home" ) != null
+             || System.getProperty( MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION ) != null )
         {
             globalRegistryFile = getFile( globalRegistryPath, "maven.home", MavenPluginRegistryBuilder.ALT_GLOBAL_PLUGIN_REG_LOCATION );
 
@@ -130,13 +130,13 @@ public class DefaultPluginRegistryBuilder
         // -------------------------------------------------------------------------------------
         // Alright, here's the justification for all the regexp wizardry below...
         //
-        // Continuum and other server-like apps may need to locate the user-level and 
+        // Continuum and other server-like apps may need to locate the user-level and
         // global-level settings somewhere other than ${user.home} and ${maven.home},
         // respectively. Using a simple replacement of these patterns will allow them
         // to specify the absolute path to these files in a customized components.xml
         // file. Ideally, we'd do full pattern-evaluation against the sysprops, but this
         // is a first step. There are several replacements below, in order to normalize
-        // the path character before we operate on the string as a regex input, and 
+        // the path character before we operate on the string as a regex input, and
         // in order to avoid surprises with the File construction...
         // -------------------------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ public class DefaultPluginRegistryBuilder
             String basedir = System.getProperty( basedirSysProp );
 
             basedir = basedir.replaceAll( "\\\\", "/" );
-            basedir = basedir.replaceAll("\\$", "\\\\\\$");
+            basedir = basedir.replaceAll( "\\$", "\\\\\\$" );
 
             path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
             path = path.replaceAll( "\\\\", "/" );
