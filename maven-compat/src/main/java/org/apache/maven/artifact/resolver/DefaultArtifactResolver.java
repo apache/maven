@@ -421,7 +421,9 @@ public class DefaultArtifactResolver
                 return result;
             }
         }
-        
+
+        RepositoryRequest collectionRequest = request;
+
         if ( request.isResolveTransitively() )
         {
             MetadataResolutionRequest metadataRequest = new DefaultMetadataResolutionRequest( request );
@@ -462,6 +464,9 @@ public class DefaultArtifactResolver
 
                     artifacts = new LinkedHashSet<Artifact>( mergedArtifacts.values() );
                 }
+
+                collectionRequest = new DefaultRepositoryRequest( request );
+                collectionRequest.setRemoteRepositories( resolutionGroup.getResolutionRepositories() );
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
@@ -481,8 +486,8 @@ public class DefaultArtifactResolver
 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result =
-            artifactCollector.collect( artifacts, rootArtifact, managedVersions, request, source, collectionFilter,
-                                       listeners, null );
+            artifactCollector.collect( artifacts, rootArtifact, managedVersions, collectionRequest, source,
+                                       collectionFilter, listeners, null );
                         
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
