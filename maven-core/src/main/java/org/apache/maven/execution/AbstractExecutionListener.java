@@ -1,7 +1,5 @@
-package org.apache.maven.lifecycle;
+package org.apache.maven.execution;
 
-import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.ExecutionListener;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
