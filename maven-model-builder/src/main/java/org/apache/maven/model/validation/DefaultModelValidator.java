@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -278,6 +279,25 @@ public class DefaultModelValidator
             }
 
             forcePluginExecutionIdCollision( model, problems );
+
+            for ( Repository repository : model.getRepositories() )
+            {
+                validateRepositoryLayout( problems, repository, "repositories.repository", request );
+            }
+
+            for ( Repository repository : model.getPluginRepositories() )
+            {
+                validateRepositoryLayout( problems, repository, "pluginRepositories.pluginRepository", request );
+            }
+
+            DistributionManagement distMgmt = model.getDistributionManagement();
+            if ( distMgmt != null )
+            {
+                validateRepositoryLayout( problems, distMgmt.getRepository(), "distributionManagement.repository",
+                                          request );
+                validateRepositoryLayout( problems, distMgmt.getSnapshotRepository(),
+                                          "distributionManagement.snapshotRepository", request );
+            }
         }
     }
 
@@ -355,6 +375,15 @@ public class DefaultModelValidator
             {
                 index.put( key, repository );
             }
+        }
+    }
+
+    private void validateRepositoryLayout( ModelProblemCollector problems, Repository repository, String prefix,
+                                           ModelBuildingRequest request )
+    {
+        if ( repository != null && "legacy".equals( repository.getLayout() ) )
+        {
+            addViolation( problems, true, "'" + prefix + ".layout = legacy' is deprecated: " + repository.getId() );
         }
     }
 
