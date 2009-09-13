@@ -34,6 +34,12 @@ public class DefaultModelProblem
 
     private final String source;
 
+    private final int lineNumber;
+
+    private final int columnNumber;
+
+    private final String modelId;
+
     private final String message;
 
     private final Exception exception;
@@ -41,15 +47,20 @@ public class DefaultModelProblem
     private final Severity severity;
 
     /**
-     * Creates a new problem with the specified message.
+     * Creates a new problem with the specified message and exception.
      * 
      * @param message The message describing the problem, may be {@code null}.
      * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
      * @param source The source of the problem, may be {@code null}.
+     * @param lineNumber The one-based index of the line containing the error or {@code -1} if unknown.
+     * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
+     * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public DefaultModelProblem( String message, Severity severity, Model source )
+    public DefaultModelProblem( String message, Severity severity, Model source, int lineNumber, int columnNumber,
+                                Exception exception )
     {
-        this( message, severity, source, null );
+        this( message, severity, ModelProblemUtils.toPath( source ), lineNumber, columnNumber,
+              ModelProblemUtils.toId( source ), exception );
     }
 
     /**
@@ -57,45 +68,78 @@ public class DefaultModelProblem
      * 
      * @param message The message describing the problem, may be {@code null}.
      * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
-     * @param source The source of the problem, may be {@code null}.
+     * @param source A hint about the source of the problem like a file path, may be {@code null}.
+     * @param lineNumber The one-based index of the line containing the problem or {@code -1} if unknown.
+     * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.
+     * @param modelId The identifier of the model that exhibits the problem, may be {@code null}.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public DefaultModelProblem( String message, Severity severity, Model source, Exception exception )
-    {
-        this( message, severity, ModelProblemUtils.toSourceHint( source ), exception );
-    }
-
-    /**
-     * Creates a new problem with the specified message.
-     * 
-     * @param message The message describing the problem, may be {@code null}.
-     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
-     * @param source A hint about the source of the problem, may be {@code null}.
-     */
-    public DefaultModelProblem( String message, Severity severity, String source )
-    {
-        this( message, severity, source, null );
-    }
-
-    /**
-     * Creates a new problem with the specified message and exception.
-     * 
-     * @param message The message describing the problem, may be {@code null}.
-     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
-     * @param source A hint about the source of the problem, may be {@code null}.
-     * @param exception The exception that caused this problem, may be {@code null}.
-     */
-    public DefaultModelProblem( String message, Severity severity, String source, Exception exception )
+    public DefaultModelProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
+                                String modelId, Exception exception )
     {
         this.message = message;
         this.severity = ( severity != null ) ? severity : Severity.ERROR;
         this.source = ( source != null ) ? source : "";
+        this.lineNumber = lineNumber;
+        this.columnNumber = columnNumber;
+        this.modelId = ( modelId != null ) ? modelId : "";
         this.exception = exception;
     }
 
     public String getSource()
     {
         return source;
+    }
+
+    public int getLineNumber()
+    {
+        return lineNumber;
+    }
+
+    public int getColumnNumber()
+    {
+        return columnNumber;
+    }
+
+    public String getModelId()
+    {
+        return modelId;
+    }
+
+    public String getLocation()
+    {
+        StringBuilder buffer = new StringBuilder( 256 );
+
+        buffer.append( getModelId() );
+
+        if ( getSource().length() > 0 )
+        {
+            if ( buffer.length() > 0 )
+            {
+                buffer.append( ", " );
+            }
+            buffer.append( getSource() );
+        }
+
+        if ( getLineNumber() > 0 )
+        {
+            if ( buffer.length() > 0 )
+            {
+                buffer.append( ", " );
+            }
+            buffer.append( "line " ).append( getLineNumber() );
+        }
+
+        if ( getColumnNumber() > 0 )
+        {
+            if ( buffer.length() > 0 )
+            {
+                buffer.append( ", " );
+            }
+            buffer.append( "column " ).append( getColumnNumber() );
+        }
+
+        return buffer.toString();
     }
 
     public Exception getException()
@@ -135,7 +179,8 @@ public class DefaultModelProblem
         StringBuilder buffer = new StringBuilder( 128 );
 
         buffer.append( "[" ).append( getSeverity() ).append( "] " );
-        buffer.append( getSource() ).append( ": " ).append( getMessage() );
+        buffer.append( getMessage() );
+        buffer.append( " @ " ).append( getLocation() );
 
         return buffer.toString();
     }

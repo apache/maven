@@ -39,7 +39,7 @@ class DefaultModelProblemCollector
 
     private List<ModelProblem> problems;
 
-    private String sourceHint;
+    private String source;
 
     private Model sourceModel;
 
@@ -55,25 +55,30 @@ class DefaultModelProblemCollector
         return problems;
     }
 
-    public void setSourceHint( String sourceHint )
+    public void setSource( String source )
     {
-        this.sourceHint = sourceHint;
+        this.source = source;
         this.sourceModel = null;
     }
 
-    public void setSourceHint( Model sourceModel )
+    public void setSource( Model source )
     {
-        this.sourceModel = sourceModel;
-        this.sourceHint = null;
+        this.sourceModel = source;
+        this.source = null;
     }
 
-    private String getSourceHint()
+    private String getSource()
     {
-        if ( sourceHint == null && sourceModel != null )
+        if ( source == null && sourceModel != null )
         {
-            sourceHint = ModelProblemUtils.toSourceHint( sourceModel );
+            source = ModelProblemUtils.toPath( sourceModel );
         }
-        return sourceHint;
+        return source;
+    }
+
+    private String getModelId()
+    {
+        return ModelProblemUtils.toId( sourceModel );
     }
 
     public void setRootModel( Model rootModel )
@@ -101,34 +106,34 @@ class DefaultModelProblemCollector
         problems.addAll( problems );
     }
 
-    public void addFatalError( String message )
+    public void addFatalError( String message, int line, int column, Exception cause )
     {
-        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint() ) );
-    }
-
-    public void addFatalError( String message, Exception cause )
-    {
-        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.FATAL, getSourceHint(), cause ) );
+        add( message, ModelProblem.Severity.FATAL, line, column, cause );
     }
 
     public void addError( String message )
     {
-        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint() ) );
+        addError( message, null );
     }
 
     public void addError( String message, Exception cause )
     {
-        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.ERROR, getSourceHint(), cause ) );
+        add( message, ModelProblem.Severity.ERROR, -1, -1, cause );
     }
 
     public void addWarning( String message )
     {
-        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.WARNING, getSourceHint() ) );
+        addWarning( message, null );
     }
 
     public void addWarning( String message, Exception cause )
     {
-        problems.add( new DefaultModelProblem( message, ModelProblem.Severity.WARNING, getSourceHint(), cause ) );
+        add( message, ModelProblem.Severity.WARNING, -1, -1, cause );
+    }
+
+    private void add( String message, ModelProblem.Severity severity, int line, int column, Exception cause )
+    {
+        problems.add( new DefaultModelProblem( message, severity, getSource(), line, column, getModelId(), cause ) );
     }
 
 }

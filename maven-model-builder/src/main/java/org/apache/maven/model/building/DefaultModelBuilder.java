@@ -123,7 +123,7 @@ public class DefaultModelBuilder
 
         ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
-        problems.setSourceHint( "(external profiles)" );
+        problems.setSource( "(external profiles)" );
         List<Profile> activeExternalProfiles =
             profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext, problems );
 
@@ -145,7 +145,7 @@ public class DefaultModelBuilder
             Model rawModel = tmpModel.clone();
             currentData.setRawModel( rawModel );
 
-            problems.setSourceHint( tmpModel );
+            problems.setSource( tmpModel );
 
             modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
@@ -185,7 +185,7 @@ public class DefaultModelBuilder
 
         Model resultModel = resultData.getModel();
 
-        problems.setSourceHint( resultModel );
+        problems.setSource( resultModel );
         problems.setRootModel( resultModel );
 
         resultModel = interpolateModel( resultModel, request, problems );
@@ -231,7 +231,7 @@ public class DefaultModelBuilder
         Model resultModel = result.getEffectiveModel();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result.getProblems() );
-        problems.setSourceHint( resultModel );
+        problems.setSource( resultModel );
         problems.setRootModel( resultModel );
 
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
@@ -284,6 +284,7 @@ public class DefaultModelBuilder
             }
         }
 
+        problems.setSource( modelSource.getLocation() );
         try
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
@@ -294,20 +295,19 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            problems.add( new DefaultModelProblem( "Non-parseable POM " + modelSource.getLocation() + ": "
-                + e.getMessage(), ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
+            problems.addFatalError( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                                    e.getLineNumber(), e.getColumnNumber(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
         catch ( IOException e )
         {
-            problems.add( new DefaultModelProblem( "Non-readable POM " + modelSource.getLocation() + ": "
-                + e.getMessage(), ModelProblem.Severity.FATAL, modelSource.getLocation(), e ) );
+            problems.addFatalError( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), -1, -1, e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
         model.setPomFile( pomFile );
 
-        problems.setSourceHint( model );
+        problems.setSource( model );
         modelValidator.validateRawModel( model, request, problems );
 
         return model;
@@ -349,7 +349,7 @@ public class DefaultModelBuilder
             return;
         }
 
-        problems.setSourceHint( model );
+        problems.setSource( model );
 
         List<Repository> repositories = model.getRepositories();
         Collections.reverse( repositories );
@@ -518,7 +518,7 @@ public class DefaultModelBuilder
                                             DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        problems.setSourceHint( childModel );
+        problems.setSource( childModel );
 
         Parent parent = childModel.getParent();
 
@@ -543,7 +543,7 @@ public class DefaultModelBuilder
         catch ( UnresolvableModelException e )
         {
             problems.addFatalError( "Non-resolvable parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), -1, -1, e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 

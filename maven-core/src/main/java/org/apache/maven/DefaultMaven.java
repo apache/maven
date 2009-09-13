@@ -326,7 +326,7 @@ public class DefaultMaven
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
-                    logger.warn( problem.getMessage() + " @ " + problem.getSource() );
+                    logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
                 }
 
                 logger.warn( "" );

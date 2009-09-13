@@ -57,6 +57,23 @@ class ModelProblemUtils
         return buffer.toString();
     }
 
+    public static String toPath( Model model )
+    {
+        String path = "";
+
+        if ( model != null )
+        {
+            File pomFile = model.getPomFile();
+
+            if ( pomFile != null )
+            {
+                path = pomFile.getAbsolutePath();
+            }
+        }
+
+        return path;
+    }
+
     public static String toId( Model model )
     {
         if ( model == null )

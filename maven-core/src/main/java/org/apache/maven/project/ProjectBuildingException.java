@@ -320,7 +320,7 @@ public class ProjectBuildingException
                 writer.print( "] " );
                 writer.print( problem.getMessage() );
                 writer.print( " @ " );
-                writer.println( problem.getSource() );
+                writer.println( problem.getLocation() );
             }
         }
         writer.close();

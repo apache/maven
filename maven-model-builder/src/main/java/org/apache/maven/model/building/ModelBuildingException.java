@@ -103,7 +103,7 @@ public class ModelBuildingException
             writer.print( "] " );
             writer.print( problem.getMessage() );
             writer.print( " @ " );
-            writer.println( problem.getSource() );
+            writer.println( problem.getLocation() );
         }
 
         return buffer.toString();

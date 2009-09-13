@@ -356,7 +356,7 @@ public class DefaultProjectBuilder
                         {
                             ModelProblem problem =
                                 new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                    + " does not exist", ModelProblem.Severity.ERROR, model );
+                                    + " does not exist", ModelProblem.Severity.ERROR, model, -1, -1, null );
                             result.getProblems().add( problem );
 
                             errors = true;
