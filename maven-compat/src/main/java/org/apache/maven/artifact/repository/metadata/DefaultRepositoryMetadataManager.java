@@ -82,7 +82,7 @@ public class DefaultRepositoryMetadataManager
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger().debug( "Resolved metadata from cache: " + metadata );
+                    getLogger().debug( "Resolved metadata from cache: " + metadata + " @ " + cacheRecord.repository );
                 }
 
                 metadata.setMetadata( MetadataUtils.cloneMetadata( cacheRecord.metadata ) );
