@@ -145,6 +145,14 @@ public class DefaultProjectBuildingHelper
 
         for ( Extension extension : build.getExtensions() )
         {
+            if ( extension.getVersion() == null )
+            {
+                PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( repositoryRequest );
+                versionRequest.setGroupId( extension.getGroupId() );
+                versionRequest.setArtifactId( extension.getArtifactId() );
+                extension.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
+            }
+
             Artifact artifact =
                 repositorySystem.createArtifact( extension.getGroupId(), extension.getArtifactId(),
                                                  extension.getVersion(), "jar" );
