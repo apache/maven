@@ -89,6 +89,13 @@ TODO:
     <property name="surefire.useFile" value="true"/>
     <echo>maven.home = ${maven.home}</echo>
     <echo>maven.assembly = ${maven.assembly}</echo>
+    <fail message="Expected M2_HOME to end in ${maven.home.basename.expected} but was ${maven.home}">
+      <condition>
+        <not>
+          <equals arg1="${maven.home}" arg2="${maven.home.dirname}/${maven.home.basename.expected}" />
+        </not>
+      </condition>
+    </fail>
   </target>
 
   <target name="clean-bootstrap" description="cleans up generated bootstrap classes">
