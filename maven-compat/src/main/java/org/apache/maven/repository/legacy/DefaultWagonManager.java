@@ -96,7 +96,8 @@ public class DefaultWagonManager
         // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.        
         else if ( artifact.isSnapshot() && updateCheckIsRequired )
         {
-            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId() );
+            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
+                + " from " + remotePath );
 
             try
             {
@@ -107,7 +108,7 @@ public class DefaultWagonManager
                 updateCheckManager.touch( artifact, repository );
             }
 
-            logger.debug( "  Artifact " + artifact.getId() + " resolved" );
+            logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
 
             artifact.setResolved( true );
         }
@@ -121,7 +122,8 @@ public class DefaultWagonManager
             // if POM is not present locally, try and get it if it's forced, out of date, or has not been attempted yet  
             if ( updateCheckManager.isPomUpdateRequired( artifact, repository ) )
             {
-                logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId() );
+                logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
+                    + " from " + remotePath );
 
                 try
                 {
@@ -135,7 +137,7 @@ public class DefaultWagonManager
                     throw e;
                 }
 
-                logger.debug( "  Artifact " + artifact.getId() + " resolved" );
+                logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
 
                 artifact.setResolved( true );
             }
@@ -155,11 +157,12 @@ public class DefaultWagonManager
         // don't write touch-file for release artifacts.
         else if ( !artifact.isSnapshot() )
         {
-            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId() );
+            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
+                + " from " + remotePath );
 
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
 
-            logger.debug( "  Artifact " + artifact.getId() + " resolved" );
+            logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
 
             artifact.setResolved( true );
         }
