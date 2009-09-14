@@ -34,6 +34,12 @@ public class PluginExecutionException
         this.mojoExecution = mojoExecution;
     }
 
+    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, String message, Throwable cause )
+    {
+        super( mojoExecution.getMojoDescriptor(), project, message, cause );
+        this.mojoExecution = mojoExecution;
+    }
+
     public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, Exception cause )
     {
         super( mojoExecution.getMojoDescriptor(), project, constructMessage( cause ), cause );

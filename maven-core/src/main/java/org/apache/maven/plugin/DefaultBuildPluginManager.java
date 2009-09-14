@@ -15,6 +15,8 @@ package org.apache.maven.plugin;
  * the License.
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,9 +115,13 @@ public class DefaultBuildPluginManager
         }
         catch ( LinkageError e )
         {
-            pluginRealm.display();
+            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+            PrintStream ps = new PrintStream( os );
+            ps.println( "A linkage error occured while executing " + mojoDescriptor.getId() );
+            ps.println( e );
+            pluginRealm.display( ps );
 
-            throw e;
+            throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
         }
         finally
         {
