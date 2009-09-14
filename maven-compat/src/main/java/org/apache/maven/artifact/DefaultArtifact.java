@@ -397,10 +397,8 @@ public class DefaultArtifact
         }
     }
 
-    public int compareTo( Object o )
+    public int compareTo( Artifact a )
     {
-        Artifact a = (Artifact) o;
-
         int result = groupId.compareTo( a.getGroupId() );
         if ( result == 0 )
         {

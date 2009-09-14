@@ -33,7 +33,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 public interface Artifact
-    extends Comparable
+    extends Comparable<Artifact>
 {
     String LATEST_VERSION = "LATEST";
 
