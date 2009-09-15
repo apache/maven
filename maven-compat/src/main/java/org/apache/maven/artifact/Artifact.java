@@ -35,6 +35,9 @@ import org.apache.maven.artifact.versioning.VersionRange;
 public interface Artifact
     extends Comparable<Artifact>
 {
+
+    String RELEASE_VERSION = "RELEASE";
+
     String LATEST_VERSION = "LATEST";
 
     String SNAPSHOT_VERSION = "SNAPSHOT";
@@ -58,8 +61,6 @@ public interface Artifact
     String SCOPE_SYSTEM = ArtifactScopeEnum.system.toString();
 
     String SCOPE_IMPORT = "import";   // Used to import dependencyManagement dependencies
-
-    String RELEASE_VERSION = "RELEASE";
 
     String getGroupId();
 

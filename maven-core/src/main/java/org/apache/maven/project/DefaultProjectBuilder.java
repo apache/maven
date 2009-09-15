@@ -209,7 +209,9 @@ public class DefaultProjectBuilder
                                                 "Error resolving project artifact: " + e.getMessage(), e );
         }
 
-        return build( artifact.getFile(), false, configuration );
+        boolean localProject = artifact.getRepository() != null && "reactor".equals( artifact.getRepository().getId() );
+
+        return build( artifact.getFile(), localProject, configuration );
     }
 
     /**

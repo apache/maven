@@ -46,9 +46,7 @@ public class ReactorArtifactRepository
         {
             if ( "pom".equals( artifact.getType() ) )
             {
-                artifact.setFile( project.getFile() );
-
-                artifact.setResolved( true );
+                resolve( artifact, project.getFile() );
             }
             else
             {
@@ -62,9 +60,7 @@ public class ReactorArtifactRepository
                     // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
                     // we shouldn't even take the archive anyway.
 
-                    artifact.setFile( projectArtifact.getFile() );
-
-                    artifact.setResolved( true );
+                    resolve( artifact, projectArtifact.getFile() );
                 }
                 else if ( isProjectOutputValid( project ) )
                 {
@@ -81,15 +77,22 @@ public class ReactorArtifactRepository
 
                     if ( classesDir.isDirectory() )
                     {
-                        artifact.setFile( classesDir );
-
-                        artifact.setResolved( true );
+                        resolve( artifact, classesDir );
                     }
                 }
             }
         }
 
         return artifact;
+    }
+
+    private void resolve( Artifact artifact, File file )
+    {
+        artifact.setFile( file );
+
+        artifact.setResolved( true );
+
+        artifact.setRepository( this );
     }
 
     @Override

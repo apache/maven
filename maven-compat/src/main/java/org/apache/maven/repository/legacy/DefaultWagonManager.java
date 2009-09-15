@@ -179,6 +179,7 @@ public class DefaultWagonManager
 
                 if ( artifact.isResolved() )
                 {
+                    artifact.setRepository( repository );
                     break;
                 }
             }
