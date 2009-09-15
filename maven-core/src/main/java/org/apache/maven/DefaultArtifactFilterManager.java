@@ -76,10 +76,14 @@ public class DefaultArtifactFilterManager
         artifacts.add( "plexus-component-api" );
         artifacts.add( "plexus-container-default" );
         artifacts.add( "wagon-provider-api" );
-        artifacts.add( "wagon-file" );
-        artifacts.add( "wagon-http-lightweight" );
-        artifacts.add( "wagon-http-shared" );
         artifacts.add( "wagon-manager" );
+
+        /*
+         * NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise
+         * provoke linkage errors for wagons contributed by build extensions. We also don't need to exclude the wagons
+         * from plugins. Plugins that use wagons directly and declare the corresponding dependency will simply use a
+         * wagon from their plugin realm.
+         */
 
         DEFAULT_EXCLUSIONS = artifacts;
     }
