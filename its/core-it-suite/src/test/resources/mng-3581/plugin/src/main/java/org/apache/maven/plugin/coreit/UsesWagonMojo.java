@@ -4,6 +4,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.providers.ssh.jsch.ScpWagon;
 
 /**
@@ -23,9 +24,9 @@ public class UsesWagonMojo
     {
         try
         {
-            Wagon wagon = wagonManager.getWagon( "scp" );
+            FileWagon fileWagon = (FileWagon) wagonManager.getWagon( "file" );
 
-            ScpWagon myWagon = (ScpWagon) wagon;
+            ScpWagon scpWagon = (ScpWagon) wagonManager.getWagon( "scp" );
         }
         catch( Exception e )
         {
