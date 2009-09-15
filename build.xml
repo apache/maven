@@ -92,7 +92,7 @@ TODO:
     <fail message="Expected M2_HOME to end in ${maven.home.basename.expected} but was ${maven.home}">
       <condition>
         <not>
-          <equals arg1="${maven.home}" arg2="${maven.home.dirname}/${maven.home.basename.expected}" />
+          <equals arg1="${maven.home.basename}" arg2="${maven.home.basename.expected}" />
         </not>
       </condition>
     </fail>
