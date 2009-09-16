@@ -1,0 +1,83 @@
+package org.apache.maven.it;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
+import java.util.Properties;
+
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4361">MNG-4361</a>.
+ * 
+ * @author Benjamin Bentmann
+ */
+public class MavenITmng4361ForceSnapshotUpdateTest
+    extends AbstractMavenIntegrationTestCase
+{
+
+    public MavenITmng4361ForceSnapshotUpdateTest()
+    {
+        super( ALL_MAVEN_VERSIONS );
+    }
+
+    /**
+     * Verify that snapshot updates can be forced from the command line via "-U".
+     */
+    public void testit()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4361" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4361" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+
+        Properties filterProps = verifier.newDefaultFilterProperties();
+
+        filterProps.setProperty( "@repo@", "repo-1" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.setLogFileName( "log-force-1.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+
+        filterProps.setProperty( "@repo@", "repo-2" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.setLogFileName( "log-force-2.txt" );
+        verifier.deleteDirectory( "target" );
+        verifier.getCliOptions().add( "-U" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+
+        verifier.resetStreams();
+
+        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
+        assertChecksum( "2a22eeca91211193e927ea3b2ecdf56481585064", checksums );
+    }
+
+    private void assertChecksum( String checksum, Properties checksums )
+    {
+        assertEquals( checksum, checksums.getProperty( "a-0.1-SNAPSHOT.jar" ).toLowerCase( java.util.Locale.ENGLISH ) );
+    }
+
+}
