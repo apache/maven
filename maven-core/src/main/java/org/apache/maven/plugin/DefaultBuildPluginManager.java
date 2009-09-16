@@ -154,10 +154,11 @@ public class DefaultBuildPluginManager
 
         Plugin plugin = pluginDescriptor.getPlugin();
 
+        MavenProject project = session.getCurrentProject();
         ArtifactRepository localRepository = session.getLocalRepository();
-        List<ArtifactRepository> remoteRepositories = session.getCurrentProject().getPluginArtifactRepositories();
+        List<ArtifactRepository> remoteRepositories = project.getPluginArtifactRepositories();
 
-        PluginCache.CacheRecord cacheRecord = pluginCache.get( plugin, localRepository, remoteRepositories );
+        PluginCache.CacheRecord cacheRecord = pluginCache.get( plugin, project, localRepository, remoteRepositories );
 
         if ( cacheRecord != null )
         {
@@ -168,14 +169,14 @@ public class DefaultBuildPluginManager
         {
             try
             {
-                mavenPluginManager.setupPluginRealm( pluginDescriptor, session, null, null );
+                mavenPluginManager.setupPluginRealm( pluginDescriptor, session, project.getClassRealm(), null );
             }
             catch ( PluginResolutionException e )
             {
                 throw new PluginManagerException( plugin, e.getMessage(), e );
             }
 
-            pluginCache.put( plugin, localRepository, remoteRepositories, pluginDescriptor.getClassRealm(),
+            pluginCache.put( plugin, project, localRepository, remoteRepositories, pluginDescriptor.getClassRealm(),
                              pluginDescriptor.getArtifacts() );
         }
 

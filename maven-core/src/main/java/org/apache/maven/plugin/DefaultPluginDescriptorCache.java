@@ -116,11 +116,6 @@ public class DefaultPluginDescriptorCache
         return clones;
     }
 
-    private static <T> List<T> clone( List<T> original )
-    {
-        return ( original != null ) ? new ArrayList<T>( original ) : null;
-    }
-
     private static final class CacheKey
         implements Key
     {

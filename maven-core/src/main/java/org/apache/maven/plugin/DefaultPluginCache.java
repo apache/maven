@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -46,18 +47,23 @@ public class DefaultPluginCache
         private final Plugin plugin;
 
         private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
-        
+
+        private final ClassRealm projectRealm;
+
         private final int hashCode;
 
-        public CacheKey( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        public CacheKey( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
+                         List<ArtifactRepository> remoteRepositories )
         {
             this.plugin = plugin.clone();
             this.repositories.add( localRepository );
             this.repositories.addAll( remoteRepositories );
+            this.projectRealm = project.getClassRealm();
 
             int hash = 17;
             hash = hash * 31 + pluginHashCode( plugin );
             hash = hash * 31 + repositories.hashCode();
+            hash = hash * 31 + ( projectRealm != null ? projectRealm.hashCode() : 0 );
             this.hashCode = hash;
         }
 
@@ -82,27 +88,28 @@ public class DefaultPluginCache
 
             CacheKey other = (CacheKey) o;
 
-            return pluginEquals( plugin, other.plugin ) && eq(repositories, other.repositories);
+            return projectRealm == other.projectRealm && pluginEquals( plugin, other.plugin )
+                && eq( repositories, other.repositories );
         }
     }
 
     protected final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
-    public CacheRecord get( Plugin plugin, ArtifactRepository localRepository,
+    public CacheRecord get( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
                             List<ArtifactRepository> remoteRepositories )
     {
-        return cache.get( new CacheKey( plugin, localRepository, remoteRepositories ) );
+        return cache.get( new CacheKey( plugin, project, localRepository, remoteRepositories ) );
     }
 
-    public void put( Plugin plugin, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                     ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
+    public void put( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
+                     List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
         if ( pluginRealm == null || pluginArtifacts == null )
         {
             throw new NullPointerException();
         }
 
-        CacheKey key = new CacheKey( plugin, localRepository, remoteRepositories );
+        CacheKey key = new CacheKey( plugin, project, localRepository, remoteRepositories );
 
         if ( cache.containsKey( key ) )
         {
