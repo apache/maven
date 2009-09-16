@@ -62,7 +62,7 @@ public class ArtifactStub
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo( Object object )
+    public int compareTo( Artifact artifact )
     {
         return 0;
     }
