@@ -37,7 +37,7 @@ public class MavenITmng2749ExtensionAvailableToPluginTest
 
     public MavenITmng2749ExtensionAvailableToPluginTest()
     {
-        super( "(2.0.2,3.0-alpha-1)" ); // not supported in 3.0+
+        super( "(2.0.2,)" );
     }
 
     /**
