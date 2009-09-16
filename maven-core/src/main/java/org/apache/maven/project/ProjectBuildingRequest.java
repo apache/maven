@@ -38,6 +38,10 @@ public interface ProjectBuildingRequest
 
     boolean isOffline();
 
+    ProjectBuildingRequest setForceUpdate( boolean forceUpdate );
+
+    boolean isForceUpdate();
+
     ProjectBuildingRequest setRepositoryCache( RepositoryCache repositoryCache );
 
     RepositoryCache getRepositoryCache();

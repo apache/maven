@@ -39,6 +39,8 @@ public class DefaultProjectBuildingRequest
 
     private boolean offline;
 
+    private boolean forceUpdate;
+
     private RepositoryCache repositoryCache;
 
     private ArtifactRepository localRepository;
@@ -110,6 +112,18 @@ public class DefaultProjectBuildingRequest
     public boolean isOffline()
     {
         return offline;
+    }
+
+    public boolean isForceUpdate()
+    {
+        return forceUpdate;
+    }
+
+    public ProjectBuildingRequest setForceUpdate( boolean forceUpdate )
+    {
+        this.forceUpdate = forceUpdate;
+
+        return this;
     }
 
     public ProjectBuildingRequest setRepositoryCache( RepositoryCache repositoryCache )

@@ -131,4 +131,16 @@ public class DefaultPluginVersionRequest
         return this;
     }
 
+    public boolean isForceUpdate()
+    {
+        return repositoryRequest.isForceUpdate();
+    }
+
+    public DefaultPluginVersionRequest setForceUpdate( boolean forceUpdate )
+    {
+        repositoryRequest.setForceUpdate( forceUpdate );
+
+        return this;
+    }
+
 }

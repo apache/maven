@@ -117,7 +117,8 @@ public class DefaultRepositoryMetadataManager
                     new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata,
                                                                                                            repository ) );
 
-                if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+                if ( ( policy.isEnabled() && request.isForceUpdate() )
+                    || updateCheckManager.isUpdateRequired( metadata, repository, file ) )
                 {
                     getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
                     try

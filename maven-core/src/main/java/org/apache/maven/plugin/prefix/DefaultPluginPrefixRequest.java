@@ -164,4 +164,16 @@ public class DefaultPluginPrefixRequest
         return this;
     }
 
+    public boolean isForceUpdate()
+    {
+        return repositoryRequest.isForceUpdate();
+    }
+
+    public DefaultPluginPrefixRequest setForceUpdate( boolean forceUpdate )
+    {
+        repositoryRequest.setForceUpdate( forceUpdate );
+
+        return this;
+    }
+
 }

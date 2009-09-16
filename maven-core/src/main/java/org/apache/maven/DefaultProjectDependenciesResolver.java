@@ -133,6 +133,7 @@ public class DefaultProjectDependenciesResolver
             .setResolutionFilter( resolutionScopeFilter )
             .setLocalRepository( session.getLocalRepository() )
             .setOffline( session.isOffline() )
+            .setForceUpdate( session.getRequest().isUpdateSnapshots() )
             .setCache( session.getRepositoryCache() );
         // FIXME setTransferListener
 

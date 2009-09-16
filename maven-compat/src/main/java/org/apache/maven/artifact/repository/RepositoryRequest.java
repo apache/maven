@@ -45,6 +45,24 @@ public interface RepositoryRequest
     RepositoryRequest setOffline( boolean offline );
 
     /**
+     * Indicates whether remote repositories should be re-checked for updated artifacts/metadata regardless of their
+     * configured update policy.
+     * 
+     * @return {@code true} if remote repositories should be re-checked for updated artifacts/metadata, {@code false}
+     *         otherwise.
+     */
+    boolean isForceUpdate();
+
+    /**
+     * Enables/disabled forced checks for updated artifacts/metadata on remote repositories.
+     * 
+     * @param forceUpdate {@code true} to forcibly check the remote repositories for updated artifacts/metadata, {@code
+     *            false} to use the update policy configured on each repository.
+     * @return This request, never {@code null}.
+     */
+    RepositoryRequest setForceUpdate( boolean forceUpdate );
+
+    /**
      * Gets the local repository to use.
      * 
      * @return The local repository to use or {@code null} if not set.

@@ -72,6 +72,8 @@ public class ArtifactResolutionRequest
 
     private boolean offline;
 
+    private boolean forceUpdate;
+
     public ArtifactResolutionRequest()
     {
         // nothing here
@@ -83,6 +85,7 @@ public class ArtifactResolutionRequest
         setRemoteRepositories( request.getRemoteRepositories() );
         setCache( request.getCache() );
         setOffline( request.isOffline() );
+        setForceUpdate( request.isForceUpdate() );
     }
 
     public Artifact getArtifact()
@@ -268,6 +271,18 @@ public class ArtifactResolutionRequest
     public ArtifactResolutionRequest setOffline( boolean offline )
     {
         this.offline = offline;
+
+        return this;
+    }
+
+    public boolean isForceUpdate()
+    {
+        return forceUpdate;
+    }
+
+    public ArtifactResolutionRequest setForceUpdate( boolean forceUpdate )
+    {
+        this.forceUpdate = forceUpdate;
 
         return this;
     }

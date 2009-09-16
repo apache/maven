@@ -525,6 +525,7 @@ public class MavenMetadataSource
                     configuration.setLocalRepository( repositoryRequest.getLocalRepository() );
                     configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
                     configuration.setOffline( repositoryRequest.isOffline() );
+                    configuration.setForceUpdate( repositoryRequest.isForceUpdate() );
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( System.getProperties() );

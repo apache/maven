@@ -133,6 +133,7 @@ public class DefaultProjectBuilder
                     .setLocalRepository( configuration.getLocalRepository() )
                     .setRemoteRepositories( project.getRemoteArtifactRepositories() )
                     .setOffline( configuration.isOffline() )
+                    .setForceUpdate( configuration.isForceUpdate() )
                     .setManagedVersionMap( project.getManagedVersionMap() );
                 // FIXME setTransferListener
 
@@ -195,7 +196,8 @@ public class DefaultProjectBuilder
             .setCache( configuration.getRepositoryCache() )
             .setLocalRepository( configuration.getLocalRepository() )
             .setRemoteRepositories( configuration.getRemoteRepositories() )
-            .setOffline( configuration.isOffline() );
+            .setOffline( configuration.isOffline() )
+            .setForceUpdate( configuration.isForceUpdate() );
         // FIXME setTransferListener
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 

@@ -124,4 +124,16 @@ public class DefaultMetadataResolutionRequest
         return this;
     }
 
+    public boolean isForceUpdate()
+    {
+        return repositoryRequest.isForceUpdate();
+    }
+
+    public DefaultMetadataResolutionRequest setForceUpdate( boolean forceUpdate )
+    {
+        repositoryRequest.setForceUpdate( forceUpdate );
+
+        return this;
+    }
+
 }

@@ -33,6 +33,8 @@ public class DefaultRepositoryRequest
 
     private boolean offline;
 
+    private boolean forceUpdate;
+
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
@@ -58,6 +60,7 @@ public class DefaultRepositoryRequest
         setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
         setOffline( repositoryRequest.isOffline() );
         setCache( repositoryRequest.getCache() );
+        setForceUpdate( repositoryRequest.isForceUpdate() );
     }
 
     public boolean isOffline()
@@ -68,6 +71,18 @@ public class DefaultRepositoryRequest
     public DefaultRepositoryRequest setOffline( boolean offline )
     {
         this.offline = offline;
+
+        return this;
+    }
+
+    public boolean isForceUpdate()
+    {
+        return forceUpdate;
+    }
+
+    public DefaultRepositoryRequest setForceUpdate( boolean forceUpdate )
+    {
+        this.forceUpdate = forceUpdate;
 
         return this;
     }
