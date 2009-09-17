@@ -19,6 +19,12 @@ package org.apache.maven.repository;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -78,6 +84,26 @@ public class DelegatingLocalArtifactRepository
         }
 
         return artifact;
+    }
+
+    @Override
+    public List<String> findVersions( Artifact artifact )
+    {
+        Collection<String> versions = new LinkedHashSet<String>();
+
+        if ( buildReactor != null )
+        {
+            versions.addAll( buildReactor.findVersions( artifact ) );
+        }
+
+        if ( ideWorkspace != null )
+        {
+            versions.addAll( ideWorkspace.findVersions( artifact ) );
+        }
+
+        versions.addAll( userLocalArtifactRepository.findVersions( artifact ) );
+
+        return Collections.unmodifiableList( new ArrayList<String>( versions ) );
     }
 
     public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )

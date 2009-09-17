@@ -15,6 +15,8 @@ package org.apache.maven.artifact.repository;
  * the License.
  */
 
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
@@ -64,7 +66,15 @@ public interface ArtifactRepository
     // New interface methods for the repository system. 
     //
     Artifact find( Artifact artifact );
-    
+
+    /**
+     * Finds the versions of the specified artifact that are available in this repository.
+     * 
+     * @param artifact The artifact whose available versions should be determined, must not be {@code null}.
+     * @return The available versions of the artifact or an empty list if none, never {@code null}.
+     */
+    List<String> findVersions( Artifact artifact );
+
     void setAuthentication( Authentication authentication );    
     Authentication getAuthentication();
     

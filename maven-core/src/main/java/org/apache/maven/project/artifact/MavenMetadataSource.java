@@ -18,6 +18,7 @@ package org.apache.maven.project.artifact;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -401,13 +402,16 @@ public class MavenMetadataSource
             throw new ArtifactMetadataRetrievalException( e.getMessage(), e, request.getArtifact() );
         }
 
-        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
+        List<String> availableVersions = request.getLocalRepository().findVersions( request.getArtifact() );
+
+        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata(), availableVersions );
     }
 
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository deploymentRepository )
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
+
         try
         {
             repositoryMetadataManager.resolveAlways( metadata, localRepository, deploymentRepository );
@@ -417,30 +421,30 @@ public class MavenMetadataSource
             throw new ArtifactMetadataRetrievalException( e.getMessage(), e, artifact );
         }
 
-        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata() );
+        List<String> availableVersions = localRepository.findVersions( artifact );
+
+        return retrieveAvailableVersionsFromMetadata( metadata.getMetadata(), availableVersions );
     }
 
-    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata )
+    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata, List<String> availableVersions )
     {
-        List<ArtifactVersion> versions;
+        Collection<String> versions = new LinkedHashSet<String>();
 
         if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
         {
-            List<String> metadataVersions = repoMetadata.getVersioning().getVersions();
-
-            versions = new ArrayList<ArtifactVersion>( metadataVersions.size() );
-
-            for ( String version : metadataVersions )
-            {
-                versions.add( new DefaultArtifactVersion( version ) );
-            }
+            versions.addAll( repoMetadata.getVersioning().getVersions() );
         }
-        else
+
+        versions.addAll( availableVersions );
+
+        List<ArtifactVersion> artifactVersions = new ArrayList<ArtifactVersion>( versions.size() );
+
+        for ( String version : versions )
         {
-            versions = Collections.<ArtifactVersion> emptyList();
+            artifactVersions.add( new DefaultArtifactVersion( version ) );
         }
 
-        return versions;
+        return artifactVersions;
     }
 
     // USED BY MAVEN ASSEMBLY PLUGIN                                                                                                                                                                                                    

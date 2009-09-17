@@ -20,6 +20,8 @@ package org.apache.maven.artifact.repository;
  */
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -203,6 +205,11 @@ public class DefaultArtifactRepository
         }
                 
         return artifact;
+    }
+
+    public List<String> findVersions( Artifact artifact )
+    {
+        return Collections.emptyList();
     }
 
     //

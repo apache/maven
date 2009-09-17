@@ -1,7 +1,11 @@
 package org.apache.maven;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
@@ -24,6 +28,8 @@ public class ReactorArtifactRepository
 {
     private Map<String, MavenProject> reactorProjects;
 
+    private Map<String, List<String>> availableVersions;
+
     private MavenExecutionResult executionResult;
 
     private final int hashCode;
@@ -33,6 +39,22 @@ public class ReactorArtifactRepository
         this.reactorProjects = reactorProjects;
         this.executionResult = ( session != null ) ? session.getResult() : null;
         hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
+
+        availableVersions = new HashMap<String, List<String>>( reactorProjects.size() * 2 );
+        for ( MavenProject project : reactorProjects.values() )
+        {
+            String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
+
+            List<String> versions = availableVersions.get( key );
+
+            if ( versions == null )
+            {
+                versions = new ArrayList<String>( 1 );
+                availableVersions.put( key, versions );
+            }
+
+            versions.add( project.getVersion() );
+        }
     }
 
     @Override
@@ -93,6 +115,16 @@ public class ReactorArtifactRepository
         artifact.setResolved( true );
 
         artifact.setRepository( this );
+    }
+
+    @Override
+    public List<String> findVersions( Artifact artifact )
+    {
+        String key = ArtifactUtils.versionlessKey( artifact );
+
+        List<String> versions = availableVersions.get( key );
+
+        return ( versions != null ) ? Collections.unmodifiableList( versions ) : Collections.<String> emptyList();
     }
 
     @Override
