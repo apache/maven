@@ -36,7 +36,7 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
 
     public MavenITmng4048VersionRangeReactorResolutionTest()
     {
-        super( "[4.0,)" );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
@@ -50,6 +50,7 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-2/target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4048" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

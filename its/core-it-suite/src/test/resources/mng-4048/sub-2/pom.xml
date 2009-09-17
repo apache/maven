@@ -41,7 +41,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.its.mng4048</groupId>
       <artifactId>sub-1</artifactId>
-      <version>[1.0,)</version>
+      <version>[1.0,1.1-SNAPSHOT]</version>
     </dependency>
   </dependencies>
 
