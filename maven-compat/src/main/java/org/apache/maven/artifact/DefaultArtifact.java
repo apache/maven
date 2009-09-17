@@ -357,14 +357,11 @@ public class DefaultArtifact
 
     public String getBaseVersion()
     {
-        if ( baseVersion == null )
+        if ( baseVersion == null && version != null )
         {
-            if ( version == null )
-            {
-                throw new NullPointerException( "version was null for " + groupId + ":" + artifactId );
-            }
             setBaseVersionInternal( version );
         }
+
         return baseVersion;
     }
 

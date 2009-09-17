@@ -127,4 +127,14 @@ public class DefaultArtifactTest
         assertTrue( artifact.compareTo( artifact1 ) == 0 );
         assertTrue( artifact1.compareTo( artifact ) == 0 );
     }
+
+    public void testNonResolvedVersionRangeConsistentlyYieldsNullVersions()
+        throws Exception
+    {
+        VersionRange vr = VersionRange.createFromVersionSpec( "[1.0,2.0)" );
+        artifact = new DefaultArtifact( groupId, artifactId, vr, scope, type, null, artifactHandler );
+        assertEquals( null, artifact.getVersion() );
+        assertEquals( null, artifact.getBaseVersion() );
+    }
+
 }
