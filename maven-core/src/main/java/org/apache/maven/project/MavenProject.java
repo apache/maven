@@ -112,6 +112,8 @@ public class MavenProject
 
     private MavenProject executionProject;
 
+    private List<MavenProject> collectedProjects;
+
     private List<String> compileSourceRoots = new ArrayList<String>();
 
     private List<String> testCompileSourceRoots = new ArrayList<String>();
@@ -1475,6 +1477,16 @@ public class MavenProject
     public void setExecutionProject( MavenProject executionProject )
     {
         this.executionProject = executionProject;
+    }
+
+    public List<MavenProject> getCollectedProjects()
+    {
+        return collectedProjects;
+    }
+
+    public void setCollectedProjects( List<MavenProject> collectedProjects )
+    {
+        this.collectedProjects = collectedProjects;
     }
 
     /**

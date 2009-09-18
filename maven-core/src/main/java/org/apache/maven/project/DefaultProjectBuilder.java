@@ -18,6 +18,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.Maven;
@@ -265,45 +266,23 @@ public class DefaultProjectBuilder
 
         ReactorModelCache modelCache = new ReactorModelCache();
 
-        boolean errors =
+        boolean noErrors =
             build( results, interimResults, pomFiles, true, recursive, config, reactorModelPool, modelCache );
 
-        for ( InterimResult interimResult : interimResults )
-        {
-            Model model = interimResult.result.getEffectiveModel();
-            reactorModelPool.put( model.getGroupId(), model.getArtifactId(), model.getVersion(), model.getPomFile() );
-        }
+        populateReactorModelPool( reactorModelPool, interimResults );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
         {
-            for ( InterimResult interimResult : interimResults )
-            {
-                try
-                {
-                    ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
-
-                    MavenProject project = toProject( result, config, interimResult.listener );
-                    project.setExecutionRoot( interimResult.root );
-
-                    results.add( new DefaultProjectBuildingResult( project, result.getProblems(), null ) );
-                }
-                catch ( ModelBuildingException e )
-                {
-                    results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile,
-                                                                   e.getProblems() ) );
-
-                    errors = true;
-                }
-            }
+            noErrors = build( results, new ArrayList<MavenProject>(), interimResults, config ) && noErrors;
         }
         finally
         {
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
 
-        if ( errors )
+        if ( !noErrors )
         {
             throw new ProjectBuildingException( results );
         }
@@ -315,7 +294,7 @@ public class DefaultProjectBuilder
                            List<File> pomFiles, boolean isRoot, boolean recursive, ProjectBuildingRequest config,
                            ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
     {
-        boolean errors = false;
+        boolean noErrors = true;
 
         for ( File pomFile : pomFiles )
         {
@@ -334,7 +313,8 @@ public class DefaultProjectBuilder
 
                 Model model = result.getEffectiveModel();
 
-                interimResults.add( new InterimResult( pomFile, request, result, listener, isRoot ) );
+                InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
+                interimResults.add( interimResult );
 
                 if ( recursive && !model.getModules().isEmpty() )
                 {
@@ -363,7 +343,7 @@ public class DefaultProjectBuilder
                                     + " does not exist", ModelProblem.Severity.ERROR, model, -1, -1, null );
                             result.getProblems().add( problem );
 
-                            errors = true;
+                            noErrors = false;
 
                             continue;
                         }
@@ -388,10 +368,12 @@ public class DefaultProjectBuilder
                         moduleFiles.add( moduleFile );
                     }
 
-                    if ( build( results, interimResults, moduleFiles, false, recursive, config, reactorModelPool,
-                                 modelCache ) )
+                    interimResult.modules = new ArrayList<InterimResult>();
+
+                    if ( !build( results, interimResult.modules, moduleFiles, false, recursive, config,
+                                reactorModelPool, modelCache ) )
                     {
-                        errors = true;
+                        noErrors = false;
                     }
                 }
             }
@@ -399,11 +381,11 @@ public class DefaultProjectBuilder
             {
                 results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
 
-                errors = true;
+                noErrors = false;
             }
         }
 
-        return errors;
+        return noErrors;
     }
 
     static class InterimResult
@@ -419,6 +401,8 @@ public class DefaultProjectBuilder
 
         boolean root;
 
+        List<InterimResult> modules = Collections.emptyList();
+
         InterimResult( File pomFile, ModelBuildingRequest request, ModelBuildingResult result,
                        DefaultModelBuildingListener listener, boolean root )
         {
@@ -429,6 +413,54 @@ public class DefaultProjectBuilder
             this.root = root;
         }
 
+    }
+
+    private void populateReactorModelPool( ReactorModelPool reactorModelPool, List<InterimResult> interimResults )
+    {
+        for ( InterimResult interimResult : interimResults )
+        {
+            Model model = interimResult.result.getEffectiveModel();
+            reactorModelPool.put( model.getGroupId(), model.getArtifactId(), model.getVersion(), model.getPomFile() );
+
+            populateReactorModelPool( reactorModelPool, interimResult.modules );
+        }
+    }
+
+    private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
+                           List<InterimResult> interimResults, ProjectBuildingRequest config )
+    {
+        boolean noErrors = true;
+
+        for ( InterimResult interimResult : interimResults )
+        {
+            try
+            {
+                ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
+
+                MavenProject project = toProject( result, config, interimResult.listener );
+
+                projects.add( project );
+
+                results.add( new DefaultProjectBuildingResult( project, result.getProblems(), null ) );
+
+                project.setExecutionRoot( interimResult.root );
+
+                List<MavenProject> modules = new ArrayList<MavenProject>();
+                noErrors = build( results, modules, interimResult.modules, config ) && noErrors;
+
+                projects.addAll( modules );
+
+                project.setCollectedProjects( modules );
+            }
+            catch ( ModelBuildingException e )
+            {
+                results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() ) );
+
+                noErrors = false;
+            }
+        }
+
+        return noErrors;
     }
 
     private MavenProject toProject( ModelBuildingResult result, ProjectBuildingRequest configuration,
