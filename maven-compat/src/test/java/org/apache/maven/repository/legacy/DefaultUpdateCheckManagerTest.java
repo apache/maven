@@ -75,7 +75,8 @@ public class DefaultUpdateCheckManagerTest
 
         assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
-        assertNull( updateCheckManager.readLastUpdated( touchFile, remoteRepository.getId() ) );
+        assertNull( updateCheckManager.readLastUpdated( touchFile,
+                                                        updateCheckManager.getRepositoryKey( remoteRepository ) ) );
         
         assertFalse( updateCheckManager.getTouchfile( a ).exists() );
     }
@@ -103,7 +104,8 @@ public class DefaultUpdateCheckManagerTest
         assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
         assertFalse( file.exists() );
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile, remoteRepository.getId() ) );
+        assertNotNull( updateCheckManager.readLastUpdated( touchFile,
+                                                           updateCheckManager.getRepositoryKey( remoteRepository ) ) );
     }
 
     public void testPom() throws Exception
@@ -121,15 +123,16 @@ public class DefaultUpdateCheckManagerTest
         File touchFile = updateCheckManager.getTouchfile( a );
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isPomUpdateRequired( a, remoteRepository ) );
+        assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
         file.getParentFile().mkdirs();
         file.createNewFile();
         updateCheckManager.touch( a, remoteRepository );
 
-        assertFalse( updateCheckManager.isPomUpdateRequired( a, remoteRepository ) );
+        assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
-        assertNull( updateCheckManager.readLastUpdated( touchFile, remoteRepository.getId() ) );
+        assertNull( updateCheckManager.readLastUpdated( touchFile,
+                                                        updateCheckManager.getRepositoryKey( remoteRepository ) ) );
         
         assertFalse( updateCheckManager.getTouchfile( a ).exists() );
     }
@@ -150,14 +153,15 @@ public class DefaultUpdateCheckManagerTest
         File touchFile = updateCheckManager.getTouchfile( a );
         touchFile.delete();
 
-        assertTrue( updateCheckManager.isPomUpdateRequired( a, remoteRepository ) );
+        assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
         updateCheckManager.touch( a, remoteRepository );
 
-        assertFalse( updateCheckManager.isPomUpdateRequired( a, remoteRepository ) );
+        assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
         assertFalse( file.exists() );
-        assertNotNull( updateCheckManager.readLastUpdated( touchFile, remoteRepository.getId() ) );
+        assertNotNull( updateCheckManager.readLastUpdated( touchFile,
+                                                           updateCheckManager.getRepositoryKey( remoteRepository ) ) );
     }
 
     public void testMetadata() throws Exception

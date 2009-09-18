@@ -34,6 +34,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -60,37 +61,27 @@ public class DefaultUpdateCheckManager
 
     public boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository )
     {
-        // Update intervals are never used for release artifacts. These intervals
-        // only exist on the release section of the repository definition in the POM for one reason:
-        // to specify how often artifact METADATA is checked. Here, we simply shortcut for non-snapshot
-        // artifacts.
-        if ( !artifact.isSnapshot() )
+        File file = artifact.getFile();
+
+        ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+
+        if ( !policy.isEnabled() )
         {
-            getLogger().debug( "Skipping update check for non-snapshot artifact " + artifact );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                                   "Skipping update check for " + artifact + " (" + file + ") from "
+                                       + repository.getId() + " (" + repository.getUrl() + ")" );
+            }
+
             return false;
         }
-
-        // we can safely assume that we're calculating based on the snapshot policy here if we've made it past the
-        // release-artifact short circuit above.
-        ArtifactRepositoryPolicy policy = repository.getSnapshots();
-
-        return isUpdateRequired( artifact, repository, policy );
-    }
-
-    private boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository, ArtifactRepositoryPolicy policy )
-    {
-        File file = artifact.getFile();
 
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Determining update check for " + artifact + " (" + file + ") from " + repository
-                                   + " (enabled = " + policy.isEnabled() + ")" );
-        }
-
-        if ( !policy.isEnabled() )
-        {
-            return false;
+                               "Determining update check for " + artifact + " (" + file + ") from "
+                                   + repository.getId() + " (" + repository.getUrl() + ")" );
         }
 
         if ( file == null )
@@ -108,7 +99,7 @@ public class DefaultUpdateCheckManager
         else
         {
             File touchfile = getTouchfile( artifact );
-            lastCheckDate = readLastUpdated( touchfile, repository.getId() );
+            lastCheckDate = readLastUpdated( touchfile, getRepositoryKey( repository ) );
         }
 
         return ( lastCheckDate == null ) || policy.checkOutOfDate( lastCheckDate );
@@ -124,17 +115,23 @@ public class DefaultUpdateCheckManager
         // artifacts available.
         ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
+        if ( !policy.isEnabled() )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                                   "Skipping update check for " + metadata.getKey() + " (" + file + ") from "
+                                       + repository.getId() + " (" + repository.getUrl() + ")" );
+            }
+
+            return false;
+        }
+
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Determining update check for " + metadata + " (" + file + ") from " + repository
-                                   + " (snapshot = " + metadata.isSnapshot() + ", enabled = " + policy.isEnabled()
-                                   + ")" );
-        }
-
-        if ( !policy.isEnabled() )
-        {
-            return false;
+                               "Determining update check for " + metadata.getKey() + " (" + file + ") from "
+                                   + repository.getId() + " (" + repository.getUrl() + ")" );
         }
 
         if ( file == null )
@@ -148,7 +145,7 @@ public class DefaultUpdateCheckManager
         return ( lastCheckDate == null ) || policy.checkOutOfDate( lastCheckDate );
     }
 
-    public Date readLastUpdated( RepositoryMetadata metadata, ArtifactRepository repository, File file )
+    private Date readLastUpdated( RepositoryMetadata metadata, ArtifactRepository repository, File file )
     {
         File touchfile = getTouchfile( metadata, file );
 
@@ -169,9 +166,8 @@ public class DefaultUpdateCheckManager
         }
         else
         {
-            writeLastUpdated( touchfile, repository.getId() );
+            writeLastUpdated( touchfile, getRepositoryKey( repository ) );
         }
-
     }
 
     public void touch( RepositoryMetadata metadata, ArtifactRepository repository, File file )
@@ -183,9 +179,27 @@ public class DefaultUpdateCheckManager
         writeLastUpdated( touchfile, key );
     }
 
-    public String getMetadataKey( ArtifactRepository repository, File file )
+    String getMetadataKey( ArtifactRepository repository, File file )
     {
-        return repository.getId() + "." + file.getName() + LAST_UPDATE_TAG;
+        return repository.getId() + '.' + file.getName() + LAST_UPDATE_TAG;
+    }
+
+    String getRepositoryKey( ArtifactRepository repository )
+    {
+        StringBuilder buffer = new StringBuilder( 256 );
+
+        // consider the username&password because a repo manager might block artifacts depending on authorization
+        Authentication auth = repository.getAuthentication();
+        if ( auth != null )
+        {
+            int hash = ( auth.getUsername() + auth.getPassword() ).hashCode();
+            buffer.append( hash ).append( '@' );
+        }
+
+        // consider the URL (instead of the id) as this most closely relates to the contents in the repo
+        buffer.append( repository.getUrl() );
+
+        return buffer.toString();
     }
 
     private void writeLastUpdated( File touchfile, String key )
@@ -350,9 +364,9 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    public File getTouchfile( Artifact artifact )
+    File getTouchfile( Artifact artifact )
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 128 );
         sb.append( artifact.getArtifactId() );
         sb.append( '-' ).append( artifact.getBaseVersion() );
         if ( artifact.getClassifier() != null )
@@ -363,14 +377,9 @@ public class DefaultUpdateCheckManager
         return new File( artifact.getFile().getParentFile(), sb.toString() );
     }
 
-    public File getTouchfile( RepositoryMetadata metadata, File file )
+    File getTouchfile( RepositoryMetadata metadata, File file )
     {
         return new File( file.getParent(), TOUCHFILE_NAME );
-    }
-
-    public boolean isPomUpdateRequired( Artifact artifact, ArtifactRepository repository )
-    {
-        return isUpdateRequired( artifact, repository, repository.getReleases() );
     }
 
 }

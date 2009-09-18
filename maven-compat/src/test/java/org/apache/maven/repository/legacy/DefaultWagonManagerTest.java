@@ -108,31 +108,8 @@ public class DefaultWagonManagerTest
         }
 
         TransferListener listener = new TransferListener();
-        wagonManager.getArtifact( artifact, repos, listener );
+        wagonManager.getArtifact( artifact, repos, listener, false );
         assertEquals( 1, listener.events.size() );
-    }
-
-    public void testGetPomExistsLocallyForced()
-        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
-    {
-        Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
-        artifact.getFile().createNewFile();
-        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
-
-        ArtifactRepository repo = createStringRepo();
-
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
-        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
-
-        MockControl control = MockControl.createControl( UpdateCheckManager.class );
-        control.replay();
-
-        wagonManager.getArtifact( artifact, repo, null );
-
-        assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
-
-        control.verify();
     }
 
     public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException
@@ -143,7 +120,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
 
             fail();
         }
@@ -163,7 +140,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
 
             fail();
         }
@@ -189,30 +166,7 @@ public class DefaultWagonManagerTest
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         control.replay();
 
-        wagonManager.getArtifact( artifact, repo, null );
-
-        assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
-
-        control.verify();
-    }
-
-    public void testGetJarExistsLocallyForced()
-        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
-    {
-        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "jar" );
-        artifact.getFile().createNewFile();
-        artifact.getFile().setLastModified( System.currentTimeMillis() - 60 * 1000 );
-
-        ArtifactRepository repo = createStringRepo();
-
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
-        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
-
-        MockControl control = MockControl.createControl( UpdateCheckManager.class );
-        control.replay();
-
-        wagonManager.getArtifact( artifact, repo, null );
+        wagonManager.getArtifact( artifact, repo, null, false );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
@@ -318,7 +272,7 @@ public class DefaultWagonManagerTest
         /* getArtifact */
         assertFalse( "Transfer listener is registered before test",
                      wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
-        wagonManager.getArtifact( artifact, repo, transferListener );
+        wagonManager.getArtifact( artifact, repo, transferListener, false );
         assertFalse( "Transfer listener still registered after getArtifact",
                      wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
 
@@ -354,7 +308,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
         }
         catch ( ChecksumFailedException e )
         {
@@ -367,7 +321,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
         }
         catch ( ChecksumFailedException e )
         {
@@ -380,7 +334,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
             fail( "Checksum verification did not fail" );
         }
         catch ( ChecksumFailedException e )
@@ -394,7 +348,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
         }
         catch ( ChecksumFailedException e )
         {
@@ -407,7 +361,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
         }
         catch ( ChecksumFailedException e )
         {
@@ -420,7 +374,7 @@ public class DefaultWagonManagerTest
 
         try
         {
-            wagonManager.getArtifact( artifact, repo, null );
+            wagonManager.getArtifact( artifact, repo, null, false );
             fail( "Checksum verification did not fail" );
         }
         catch ( ChecksumFailedException e )

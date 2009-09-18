@@ -76,106 +76,57 @@ public class DefaultWagonManager
     //
     // Retriever
     //   
-    public void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor )
+    public void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
 
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-        boolean updateCheckIsRequired = updateCheckManager.isUpdateRequired( artifact, repository );
-
         if ( !policy.isEnabled() )
         {
             logger.debug( "Skipping disabled repository " + repository.getId() + " for resolution of "
                 + artifact.getId() );
         }
-
-        // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
-        // 1. If it's forced, then check
-        // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.        
-        else if ( artifact.isSnapshot() && updateCheckIsRequired )
+        else if ( artifact.isSnapshot() || !artifact.getFile().exists() )
         {
-            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
-                + " from " + remotePath );
-
-            try
-            {
-                getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
-            }
-            finally
-            {
-                updateCheckManager.touch( artifact, repository );
-            }
-
-            logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
-
-            artifact.setResolved( true );
-        }
-
-        // XXX: This is not really intended for the long term - unspecified POMs should be converted to failures
-        //      meaning caching would be unnecessary. The code for this is here instead of the MavenMetadataSource
-        //      to keep the logic related to update checks enclosed, and so to keep the rules reasonably consistent
-        //      with release metadata
-        else if ( "pom".equals( artifact.getType() ) && !artifact.getFile().exists() )
-        {
-            // if POM is not present locally, try and get it if it's forced, out of date, or has not been attempted yet  
-            if ( updateCheckManager.isPomUpdateRequired( artifact, repository ) )
+            if ( force || updateCheckManager.isUpdateRequired( artifact, repository ) )
             {
                 logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
                     + " from " + remotePath );
 
                 try
                 {
-                    getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
+                    getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor,
+                                   policy.getChecksumPolicy(), false );
                 }
-                catch ( ResourceDoesNotExistException e )
+                finally
                 {
-                    // cache the POM failure
                     updateCheckManager.touch( artifact, repository );
-
-                    throw e;
                 }
 
                 logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
 
                 artifact.setResolved( true );
             }
-            else
+            else if ( !artifact.getFile().exists() )
             {
-                // cached failure - pass on the failure
-                throw new ResourceDoesNotExistException( "Failure was cached in the local repository" );
+                throw new ResourceDoesNotExistException( "Failure to resolve " + remotePath + " from "
+                    + repository.getUrl() + " was cached in the local repository. "
+                    + "Resolution will not be reattempted until the update interval of " + repository.getId()
+                    + " has elapsed or updates are forced." );
             }
-        }
-
-        // If it's not a snapshot artifact, then we don't care what the force flag says. If it's on the local
-        // system, it's resolved. Releases are presumed to be immutable, so release artifacts are not ever updated.
-        // NOTE: This is NOT the case for metadata files on relese-only repositories. This metadata may contain information
-        // about successive releases, so it should be checked using the same updateInterval/force characteristics as snapshot
-        // artifacts, above.
-
-        // don't write touch-file for release artifacts.
-        else if ( !artifact.isSnapshot() )
-        {
-            logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
-                + " from " + remotePath );
-
-            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
-
-            logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
-
-            artifact.setResolved( true );
         }
     }
 
-    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor )
+    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         for ( ArtifactRepository repository : remoteRepositories )
         {
             try
             {
-                getArtifact( artifact, repository, downloadMonitor );
+                getArtifact( artifact, repository, downloadMonitor, force );
 
                 if ( artifact.isResolved() )
                 {

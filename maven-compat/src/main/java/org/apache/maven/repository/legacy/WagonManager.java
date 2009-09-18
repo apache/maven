@@ -41,10 +41,10 @@ public interface WagonManager
     //
     // Retriever
     //        
-    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener transferListener )
+    void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener transferListener, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener transferListener )
+    void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener transferListener, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getRemoteFile( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor, String checksumPolicy, boolean force )

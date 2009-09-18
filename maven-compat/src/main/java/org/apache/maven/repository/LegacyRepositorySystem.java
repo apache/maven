@@ -215,8 +215,10 @@ public class LegacyRepositorySystem
     public ArtifactRepository createDefaultRemoteRepository()
         throws InvalidRepositoryException
     {
-        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID, true, ArtifactRepositoryPolicy.UPDATE_POLICY_NEVER, false,
-                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+        return createRepository( RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
     }
 
     public ArtifactRepository createLocalRepository( String url, String repositoryId )

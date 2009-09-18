@@ -146,11 +146,6 @@ public class DefaultRepositoryMetadataManager
                         updateCheckManager.touch( metadata, repository, file );
                     }
                 }
-                else
-                {
-                    getLogger().debug( "Skipping metadata update of " + metadata.getKey() + " from "
-                                           + repository.getId() );
-                }
 
                 // TODO: should this be inside the above check?
                 // touch file so that this is not checked again until interval has passed
