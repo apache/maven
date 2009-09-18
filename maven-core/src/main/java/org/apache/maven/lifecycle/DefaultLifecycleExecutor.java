@@ -1287,40 +1287,23 @@ public class DefaultLifecycleExecutor
             plugin = findPlugin( g, a, project.getPluginManagement().getPlugins() );
         }
 
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-        if ( plugin != null && StringUtils.isNotEmpty( mojoExecution.getExecutionId() ) )
+        if ( plugin != null )
         {
-            for ( PluginExecution e : plugin.getExecutions() )
+            PluginExecution pluginExecution =
+                findPluginExecution( mojoExecution.getExecutionId(), plugin.getExecutions() );
+
+            Xpp3Dom pomConfiguration = null;
+
+            if ( pluginExecution != null )
             {
-                if ( mojoExecution.getExecutionId().equals( e.getId() ) )
-                {
-                    Xpp3Dom executionConfiguration = (Xpp3Dom) e.getConfiguration();
-
-                    Xpp3Dom mojoConfiguration =
-                        ( executionConfiguration != null ) ? new Xpp3Dom( executionConfiguration ) : null;
-
-                    mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
-
-                    mojoExecution.setConfiguration( mojoConfiguration );
-
-                    return;
-                }
+                pomConfiguration = (Xpp3Dom) pluginExecution.getConfiguration();
             }
-        }
-
-        if ( allowPluginLevelConfig )
-        {
-            Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
-
-            Xpp3Dom mojoConfiguration = defaultConfiguration;
-
-            if ( plugin != null && plugin.getConfiguration() != null )
+            else if ( allowPluginLevelConfig )
             {
-                Xpp3Dom pluginConfiguration = (Xpp3Dom) plugin.getConfiguration();
-                pluginConfiguration = new Xpp3Dom( pluginConfiguration );
-                mojoConfiguration = Xpp3Dom.mergeXpp3Dom( pluginConfiguration, defaultConfiguration, Boolean.TRUE );
+                pomConfiguration = (Xpp3Dom) plugin.getConfiguration();
             }
+
+            Xpp3Dom mojoConfiguration = ( pomConfiguration != null ) ? new Xpp3Dom( pomConfiguration ) : null;
 
             mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoExecution.getConfiguration(), mojoConfiguration );
 
@@ -1339,65 +1322,49 @@ public class DefaultLifecycleExecutor
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        Xpp3Dom mojoConfiguration = mojoExecution.getConfiguration();
+        Xpp3Dom executionConfiguration = mojoExecution.getConfiguration();
+        if ( executionConfiguration == null )
+        {
+            executionConfiguration = new Xpp3Dom( "configuration" );
+        }
 
         Xpp3Dom defaultConfiguration = getMojoConfiguration( mojoDescriptor );
 
-        mojoConfiguration = Xpp3Dom.mergeXpp3Dom( mojoConfiguration, defaultConfiguration, Boolean.TRUE );
+        Xpp3Dom finalConfiguration = new Xpp3Dom( "configuration" );
 
-        mojoConfiguration = extractMojoConfiguration( mojoConfiguration, mojoDescriptor );
-
-        mojoExecution.setConfiguration( mojoConfiguration );
-    }
-
-    /**
-     * Extracts the configuration for a single mojo from the specified execution configuration by discarding any
-     * non-applicable parameters. This is necessary because a plugin execution can have multiple goals with different
-     * parametes whose default configurations are all aggregated into the execution configuration. However, the
-     * underlying configurator will error out when trying to configure a mojo parameter that is specified in the
-     * configuration but not present in the mojo instance.
-     * 
-     * @param executionConfiguration The configuration from the plugin execution, may be {@code null}.
-     * @param mojoDescriptor The descriptor for the mojo being configured, must not be {@code null}.
-     * @return The configuration for the mojo, never {@code null}.
-     */
-    private Xpp3Dom extractMojoConfiguration( Xpp3Dom executionConfiguration, MojoDescriptor mojoDescriptor )
-    {
-        Xpp3Dom mojoConfiguration = null;
-
-        if ( executionConfiguration != null )
+        if ( mojoDescriptor.getParameters() != null )
         {
-            mojoConfiguration = new Xpp3Dom( executionConfiguration.getName() );
-
-            if ( mojoDescriptor.getParameters() != null )
+            for ( Parameter parameter : mojoDescriptor.getParameters() )
             {
-                for ( Parameter parameter : mojoDescriptor.getParameters() )
+                Xpp3Dom parameterConfiguration = executionConfiguration.getChild( parameter.getName() );
+
+                if ( parameterConfiguration == null )
                 {
-                    Xpp3Dom parameterConfiguration = executionConfiguration.getChild( parameter.getName() );
+                    parameterConfiguration = executionConfiguration.getChild( parameter.getAlias() );
+                }
 
-                    if ( parameterConfiguration == null )
+                Xpp3Dom parameterDefaults = defaultConfiguration.getChild( parameter.getName() );
+
+                parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults, Boolean.TRUE );
+
+                if ( parameterConfiguration != null )
+                {
+                    parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
+
+                    if ( StringUtils.isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
+                        && StringUtils.isNotEmpty( parameter.getImplementation() ) )
                     {
-                        parameterConfiguration = executionConfiguration.getChild( parameter.getAlias() );
+                        parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
                     }
 
-                    if ( parameterConfiguration != null )
-                    {
-                        parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
-
-                        if ( StringUtils.isNotEmpty( parameter.getImplementation() ) )
-                        {
-                            parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
-                        }
-
-                        mojoConfiguration.addChild( parameterConfiguration );
-                    }
+                    finalConfiguration.addChild( parameterConfiguration );
                 }
             }
         }
 
-        return mojoConfiguration;
+        mojoExecution.setConfiguration( finalConfiguration );
     }
-   
+
     // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project ) 
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException
@@ -1519,6 +1486,22 @@ public class DefaultLifecycleExecutor
             if ( artifactId.equals( plugin.getArtifactId() ) && groupId.equals( plugin.getGroupId() ) )
             {
                 return plugin;
+            }
+        }
+
+        return null;
+    }
+
+    private PluginExecution findPluginExecution( String executionId, Collection<PluginExecution> executions )
+    {
+        if ( StringUtils.isNotEmpty( executionId ) )
+        {
+            for ( PluginExecution execution : executions )
+            {
+                if ( executionId.equals( execution.getId() ) )
+                {
+                    return execution;
+                }
             }
         }
 
