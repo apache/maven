@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-674">MNG-674</a>.
@@ -33,15 +34,16 @@ import java.io.File;
 public class MavenITmng0674PluginParameterAliasTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng0674PluginParameterAliasTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test parameter alias usage.
+     * Test parameter alias usage for lifecycle-bound goal execution.
      */
-    public void testitMNG674()
+    public void testitLifecycle()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
@@ -49,11 +51,35 @@ public class MavenITmng0674PluginParameterAliasTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
+        verifier.setLogFileName( "log-lifecycle.txt" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertFilePresent( "target/touchFile.txt" );
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
+        assertEquals( "MNG-674-2", props.getProperty( "aliasDefaultExpressionParam" ) );
+    }
+
+    /**
+     * Test parameter alias usage for direct goal execution from CLI.
+     */
+    public void testitCli()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.setLogFileName( "log-cli.txt" );
+        verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:config" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
+        assertEquals( "MNG-674-2", props.getProperty( "aliasDefaultExpressionParam" ) );
     }
 
 }

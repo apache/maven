@@ -1,21 +1,36 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: it0049</name> 
-  <groupId>org.apache.maven.its.it0049</groupId>
-  <artifactId>maven-it-it0049</artifactId>
-  <description>Test parameter alias usage.</description>
+
+  <groupId>org.apache.maven.its.mng0674</groupId>
+  <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-674</name> 
+  <description>Test parameter alias usage.</description>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-touch</artifactId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
         <version>2.1-SNAPSHOT</version>
         <configuration>
-          <pluginFile>touchFile.txt</pluginFile>
+          <propertiesFile>target/config.properties</propertiesFile>
+          <!-- parameter that has no default value -->
+          <aliasParamLegacy>MNG-674-1</aliasParamLegacy>
+          <!-- parameter that has a default value -->
+          <fullyAnnotatedParam>MNG-674-2</fullyAnnotatedParam>
         </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>config</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-
 </project>
