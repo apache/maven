@@ -19,7 +19,14 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.component.annotations.Component;
 
 @Component(role=WagonManager.class) 
@@ -33,4 +40,22 @@ public class DefaultWagonManager
        // empty one to prevent NPE
        return new AuthenticationInfo();
     }
+
+    public ProxyInfo getProxy( String protocol )
+    {
+        return null;
+    }
+
+    public void getArtifact( Artifact artifact, ArtifactRepository repository )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        getArtifact( artifact, repository, null, false );
+    }
+
+    public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        getArtifact( artifact, remoteRepositories, null, false );
+    }
+
 }
