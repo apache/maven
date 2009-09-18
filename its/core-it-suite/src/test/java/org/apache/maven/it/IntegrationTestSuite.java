@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4363DynamicAdditionOfDependencyArtifactTest.class );
         suite.addTestSuite( MavenITmng4361ForceSnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng4360WebDavSupportTest.class );
         suite.addTestSuite( MavenITmng4359LocallyReachableParentOutsideOfReactorTest.class );
