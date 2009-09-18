@@ -97,6 +97,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4347ImportScopeWithSettingsProfilesTest.class );
         suite.addTestSuite( MavenITmng4345DefaultPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4344ManagedPluginExecutionOrderTest.class );
+        suite.addTestSuite( MavenITmng4343MissingReleaseUpdatePolicyTest.class );
         suite.addTestSuite( MavenITmng4342IndependentMojoParameterDefaultValuesTest.class );
         suite.addTestSuite( MavenITmng4341PluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4338OptionalMojosTest.class );
