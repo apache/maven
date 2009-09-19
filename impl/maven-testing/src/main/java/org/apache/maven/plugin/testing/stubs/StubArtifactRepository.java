@@ -19,6 +19,9 @@ package org.apache.maven.plugin.testing.stubs;
  * under the License.
  */
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -222,6 +225,11 @@ public class StubArtifactRepository
     public void setUrl( String url )
     {
         
+    }
+
+    public List<String> findVersions( Artifact artifact )
+    {
+        return Collections.emptyList();
     }
 
 }
