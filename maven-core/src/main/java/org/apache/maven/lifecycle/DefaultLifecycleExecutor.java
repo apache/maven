@@ -309,12 +309,17 @@ public class DefaultLifecycleExecutor
 
                 for ( MavenProject project : projectsToResolve )
                 {
-                    resolveProjectDependencies( project, executionPlan, session, projectBuild.taskSegment.aggregating );
+                    resolveProjectDependencies( project, executionPlan.getRequiredCollectionScopes(),
+                                                executionPlan.getRequiredResolutionScopes(), session,
+                                                projectBuild.taskSegment.aggregating );
                 }
+
+                DependencyContext dependencyContext =
+                    new DependencyContext( executionPlan, projectBuild.taskSegment.aggregating );
 
                 for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
                 {
-                    execute( session, mojoExecution, projectIndex );
+                    execute( session, mojoExecution, projectIndex, dependencyContext );
                 }
 
                 long buildEndTime = System.currentTimeMillis();
@@ -364,18 +369,15 @@ public class DefaultLifecycleExecutor
         fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
     }
 
-    private void resolveProjectDependencies( MavenProject project, MavenExecutionPlan executionPlan,
-                                             MavenSession session, boolean aggregating )
+    private void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
+                                             Collection<String> scopesToResolve, MavenSession session,
+                                             boolean aggregating )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         Set<Artifact> artifacts;
 
         try
         {
-            Collection<String> scopesToResolve = executionPlan.getRequiredResolutionScopes();
-
-            Collection<String> scopesToCollect = executionPlan.getRequiredCollectionScopes();
-
             artifacts = projectDependenciesResolver.resolve( project, scopesToCollect, scopesToResolve, session );
         }
         catch ( MultipleArtifactsNotFoundException e )
@@ -407,21 +409,24 @@ public class DefaultLifecycleExecutor
 
         project.setArtifacts( artifacts );
 
-        Set<String> directDependencies = new HashSet<String>( project.getDependencies().size() * 2 );
-        for ( Dependency dependency : project.getDependencies() )
+        if ( project.getDependencyArtifacts() == null )
         {
-            directDependencies.add( dependency.getManagementKey() );
-        }
-
-        Set<Artifact> dependencyArtifacts = new LinkedHashSet<Artifact>( project.getDependencies().size() * 2 );
-        for ( Artifact artifact : artifacts )
-        {
-            if ( directDependencies.contains( artifact.getDependencyConflictId() ) )
+            Set<String> directDependencies = new HashSet<String>( project.getDependencies().size() * 2 );
+            for ( Dependency dependency : project.getDependencies() )
             {
-                dependencyArtifacts.add( artifact );
+                directDependencies.add( dependency.getManagementKey() );
             }
+
+            Set<Artifact> dependencyArtifacts = new LinkedHashSet<Artifact>( project.getDependencies().size() * 2 );
+            for ( Artifact artifact : artifacts )
+            {
+                if ( directDependencies.contains( artifact.getDependencyConflictId() ) )
+                {
+                    dependencyArtifacts.add( artifact );
+                }
+            }
+            project.setDependencyArtifacts( dependencyArtifacts );
         }
-        project.setDependencyArtifacts( dependencyArtifacts );
     }
 
     private boolean areAllArtifactsInReactor( Collection<MavenProject> projects, Collection<Artifact> artifacts )
@@ -445,8 +450,72 @@ public class DefaultLifecycleExecutor
         return true;
     }
 
-    private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+    private class DependencyContext
+    {
+
+        private final Collection<String> scopesToCollect;
+
+        private final Collection<String> scopesToResolve;
+
+        private final boolean aggregating;
+
+        private MavenProject lastProject;
+
+        private Collection<?> lastDependencyArtifacts;
+
+        private int lastDependencyArtifactCount;
+
+        DependencyContext( Collection<String> scopesToCollect, Collection<String> scopesToResolve, boolean aggregating )
+        {
+            this.scopesToCollect = scopesToCollect;
+            this.scopesToResolve = scopesToResolve;
+            this.aggregating = aggregating;
+        }
+
+        DependencyContext( MavenExecutionPlan executionPlan, boolean aggregating )
+        {
+            this.scopesToCollect = executionPlan.getRequiredCollectionScopes();
+            this.scopesToResolve = executionPlan.getRequiredResolutionScopes();
+            this.aggregating = aggregating;
+        }
+
+        DependencyContext( MojoExecution mojoExecution )
+        {
+            this.scopesToCollect = new TreeSet<String>();
+            this.scopesToResolve = new TreeSet<String>();
+            collectDependencyRequirements( scopesToResolve, scopesToCollect, mojoExecution );
+            this.aggregating = mojoExecution.getMojoDescriptor().isAggregating();
+        }
+
+        public DependencyContext clone()
+        {
+            return new DependencyContext( scopesToCollect, scopesToResolve, aggregating );
+        }
+
+        void checkForUpdate( MavenSession session )
+            throws ArtifactResolutionException, ArtifactNotFoundException
+        {
+            if ( lastProject == session.getCurrentProject() )
+            {
+                if ( lastDependencyArtifacts != lastProject.getDependencyArtifacts()
+                    || ( lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size() ) )
+                {
+                    logger.debug( "Re-resolving dependencies for project " + lastProject.getId()
+                        + " to account for updates by previous goal execution" );
+                    resolveProjectDependencies( lastProject, scopesToCollect, scopesToResolve, session, aggregating );
+                }
+            }
+
+            lastProject = session.getCurrentProject();
+            lastDependencyArtifacts = lastProject.getDependencyArtifacts();
+            lastDependencyArtifactCount = ( lastDependencyArtifacts != null ) ? lastDependencyArtifacts.size() : 0;
+        }
+    }
+
+    private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
+                          DependencyContext dependencyContext )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
+        ArtifactResolutionException, ArtifactNotFoundException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
@@ -471,7 +540,10 @@ public class DefaultLifecycleExecutor
             }
         }
 
-        List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
+        dependencyContext.checkForUpdate( session );
+
+        List<MavenProject> forkedProjects =
+            executeForkedExecutions( mojoExecution, session, projectIndex, dependencyContext );
 
         fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_STARTED );
 
@@ -515,14 +587,17 @@ public class DefaultLifecycleExecutor
     }
 
     public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
+        ArtifactResolutionException, ArtifactNotFoundException
     {
-        return executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ) );
+        return executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ),
+                                        new DependencyContext( mojoExecution ) );
     }
 
     private List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session,
-                                                        ProjectIndex projectIndex )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
+                                                        ProjectIndex projectIndex, DependencyContext dependencyContext )
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
+        ArtifactResolutionException, ArtifactNotFoundException
     {
         List<MavenProject> forkedProjects = Collections.emptyList();
 
@@ -535,6 +610,8 @@ public class DefaultLifecycleExecutor
             MavenProject project = session.getCurrentProject();
 
             forkedProjects = new ArrayList<MavenProject>( forkedExecutions.size() );
+
+            dependencyContext = dependencyContext.clone();
 
             try
             {
@@ -558,7 +635,7 @@ public class DefaultLifecycleExecutor
 
                         for ( MojoExecution forkedExecution : fork.getValue() )
                         {
-                            execute( session, forkedExecution, projectIndex );
+                            execute( session, forkedExecution, projectIndex, dependencyContext );
                         }
                     }
                     finally

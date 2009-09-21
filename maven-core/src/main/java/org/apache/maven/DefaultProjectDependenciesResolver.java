@@ -142,6 +142,7 @@ public class DefaultProjectDependenciesResolver
         for ( MavenProject project : projects )
         {
             request.setArtifact( new ProjectArtifact( project ) );
+            request.setArtifactDependencies( project.getDependencyArtifacts() );
             request.setManagedVersionMap( project.getManagedVersionMap() );
             request.setRemoteRepositories( project.getRemoteArtifactRepositories() );
 

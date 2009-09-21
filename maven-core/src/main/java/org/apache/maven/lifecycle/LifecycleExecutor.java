@@ -22,6 +22,8 @@ package org.apache.maven.lifecycle;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -107,6 +109,7 @@ public interface LifecycleExecutor
      *         will never be {@code null}.
      */
     List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException;
+        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
+        ArtifactResolutionException, ArtifactNotFoundException;
 
 }
