@@ -26,4 +26,5 @@ under the License.
   <artifactId>standalone-pom</artifactId>
   <version>1</version>
   <packaging>pom</packaging>
+  <name>Maven Stub Project (No POM)</name>
 </project>
