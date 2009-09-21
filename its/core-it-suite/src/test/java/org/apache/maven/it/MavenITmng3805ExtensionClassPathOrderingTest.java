@@ -37,7 +37,7 @@ public class MavenITmng3805ExtensionClassPathOrderingTest
 
     public MavenITmng3805ExtensionClassPathOrderingTest()
     {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,3.0-alpha-1)" ); // extensions not supported in 3.0+
+        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" );
     }
 
     /**
