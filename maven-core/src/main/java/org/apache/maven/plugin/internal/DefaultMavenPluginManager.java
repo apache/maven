@@ -297,9 +297,11 @@ public class DefaultMavenPluginManager
     {
         Plugin plugin = pluginDescriptor.getPlugin();
 
+        MavenProject project = session.getCurrentProject();
+
         PluginRealmCache.CacheRecord cacheRecord =
             pluginRealmCache.get( plugin, parent, imports, session.getLocalRepository(),
-                                  session.getCurrentProject().getPluginArtifactRepositories() );
+                                  project.getPluginArtifactRepositories() );
 
         if ( cacheRecord != null )
         {
@@ -311,9 +313,11 @@ public class DefaultMavenPluginManager
             createPluginRealm( pluginDescriptor, session, parent, imports );
 
             pluginRealmCache.put( plugin, parent, imports, session.getLocalRepository(),
-                                  session.getCurrentProject().getPluginArtifactRepositories(),
-                                  pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
+                                  project.getPluginArtifactRepositories(), pluginDescriptor.getClassRealm(),
+                                  pluginDescriptor.getArtifacts() );
         }
+
+        pluginRealmCache.register( project, pluginDescriptor.getClassRealm() );
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,

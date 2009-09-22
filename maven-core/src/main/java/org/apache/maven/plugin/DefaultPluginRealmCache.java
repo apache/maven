@@ -31,6 +31,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -231,6 +232,11 @@ public class DefaultPluginRealmCache
     private static <T> boolean eq( T s1, T s2 )
     {
         return s1 != null ? s1.equals( s2 ) : s2 == null;
+    }
+
+    public void register( MavenProject project, ClassRealm pluginRealm )
+    {
+        // default cache does not track plugin usage
     }
 
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
@@ -56,5 +57,15 @@ public interface PluginRealmCache
               List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
 
     void flush();
+
+    /**
+     * Registers the specified plugin realm for usage with the given project. Integrators can use the information
+     * collected from this method in combination with a custom cache implementation to dispose unused plugin realms from
+     * the cache.
+     * 
+     * @param project The project that employs the plugin realm, must not be {@code null}.
+     * @param pluginRealm The plugin realm being used for the project, must not be {@code null}.
+     */
+    void register( MavenProject project, ClassRealm pluginRealm );
 
 }
