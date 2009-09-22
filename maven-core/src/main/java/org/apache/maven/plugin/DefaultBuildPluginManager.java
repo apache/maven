@@ -61,7 +61,7 @@ public class DefaultBuildPluginManager
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
      * @throws InvalidPluginDescriptorException 
      */
-    public synchronized PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
+    public PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
         return mavenPluginManager.getPluginDescriptor( plugin, repositoryRequest );
@@ -140,7 +140,7 @@ public class DefaultBuildPluginManager
      *      call, which is not nice.
      * @throws ArtifactResolutionException 
      */
-    public synchronized ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) 
+    public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) 
         throws PluginManagerException
     {
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();

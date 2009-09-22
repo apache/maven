@@ -291,8 +291,8 @@ public class DefaultMavenPluginManager
         return mojoDescriptor;
     }
 
-    public void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                                  List<String> imports )
+    public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
+                                               ClassLoader parent, List<String> imports )
         throws PluginResolutionException, PluginManagerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
