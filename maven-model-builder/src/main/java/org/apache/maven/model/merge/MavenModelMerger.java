@@ -20,7 +20,6 @@ package org.apache.maven.model.merge;
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -163,6 +162,12 @@ public class MavenModelMerger
                 mergeCiManagement( tgt, src, sourceDominant, context );
             }
         }
+    }
+
+    @Override
+    protected void mergeModel_ModelVersion( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        // neither inherited nor injected
     }
 
     @Override

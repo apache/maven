@@ -112,6 +112,17 @@ public class DefaultModelValidatorTest
         assertEquals( "'modelVersion' is missing.", result.getErrors().get( 0 ) );
     }
 
+    public void testBadModelVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result =
+            validateRaw( "bad-modelVersion.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
+
+        assertViolations( result, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).indexOf( "modelVersion" ) > -1 );
+    }
+
     public void testMissingArtifactId()
         throws Exception
     {

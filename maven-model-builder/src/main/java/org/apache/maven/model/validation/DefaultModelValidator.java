@@ -73,6 +73,7 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            validateEnum( "modelVersion", problems, false, model.getModelVersion(), null, "4.0.0" );
             validateStringNoExpression( "groupId", problems, true, model.getGroupId() );
             validateStringNoExpression( "artifactId", problems, true, model.getArtifactId() );
             validateStringNoExpression( "version", problems, true, model.getVersion() );
