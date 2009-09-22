@@ -20,6 +20,7 @@ under the License.
 -->
 
 <project>
+  <modelVersion>4.0.0</modelVersion>
   <groupId>maven-test</groupId>
   <artifactId>scope-compile</artifactId>
   <version>1.0</version>
