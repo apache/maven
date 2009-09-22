@@ -37,9 +37,9 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * Default PluginCache implementation. Assumes cached data does not change.
  */
-@Component( role = PluginCache.class )
-public class DefaultPluginCache
-    implements PluginCache
+@Component( role = PluginRealmCache.class )
+public class DefaultPluginRealmCache
+    implements PluginRealmCache
 {
 
     protected static class CacheKey

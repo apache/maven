@@ -47,7 +47,7 @@ public class DefaultBuildPluginManager
     private PlexusContainer container;
 
     @Requirement
-    private PluginCache pluginCache;
+    private PluginRealmCache pluginCache;
 
     @Requirement
     private MavenPluginManager mavenPluginManager;
@@ -158,7 +158,7 @@ public class DefaultBuildPluginManager
         ArtifactRepository localRepository = session.getLocalRepository();
         List<ArtifactRepository> remoteRepositories = project.getPluginArtifactRepositories();
 
-        PluginCache.CacheRecord cacheRecord = pluginCache.get( plugin, project, localRepository, remoteRepositories );
+        PluginRealmCache.CacheRecord cacheRecord = pluginCache.get( plugin, project, localRepository, remoteRepositories );
 
         if ( cacheRecord != null )
         {

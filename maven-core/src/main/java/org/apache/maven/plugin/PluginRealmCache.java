@@ -27,7 +27,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
-public interface PluginCache
+public interface PluginRealmCache
 {
     
     public static class CacheRecord
