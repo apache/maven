@@ -24,9 +24,16 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
+/**
+ * Caches plugin class realms. <strong>Warning:</strong> This is an internal utility interface that is only public for
+ * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
+ * prior notice.
+ * 
+ * @author Igor Fedorenko
+ * @author Benjamin Bentmann
+ */
 public interface PluginRealmCache
 {
     
@@ -42,11 +49,12 @@ public interface PluginRealmCache
         }
     }
 
-    CacheRecord get( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
-                     List<ArtifactRepository> remoteRepositories );
+    CacheRecord get( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories );
 
-    void put( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
+    void put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports, ArtifactRepository localRepository,
               List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
 
     void flush();
+
 }

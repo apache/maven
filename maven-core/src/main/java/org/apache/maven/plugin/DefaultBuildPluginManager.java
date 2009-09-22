@@ -47,9 +47,6 @@ public class DefaultBuildPluginManager
     private PlexusContainer container;
 
     @Requirement
-    private PluginRealmCache pluginCache;
-
-    @Requirement
     private MavenPluginManager mavenPluginManager;
 
     @Requirement
@@ -154,30 +151,14 @@ public class DefaultBuildPluginManager
 
         Plugin plugin = pluginDescriptor.getPlugin();
 
-        MavenProject project = session.getCurrentProject();
-        ArtifactRepository localRepository = session.getLocalRepository();
-        List<ArtifactRepository> remoteRepositories = project.getPluginArtifactRepositories();
-
-        PluginRealmCache.CacheRecord cacheRecord = pluginCache.get( plugin, project, localRepository, remoteRepositories );
-
-        if ( cacheRecord != null )
+        try
         {
-            pluginDescriptor.setClassRealm( cacheRecord.realm );
-            pluginDescriptor.setArtifacts( new ArrayList<Artifact>( cacheRecord.artifacts ) );
+            mavenPluginManager.setupPluginRealm( pluginDescriptor, session,
+                                                 session.getCurrentProject().getClassRealm(), null );
         }
-        else
+        catch ( PluginResolutionException e )
         {
-            try
-            {
-                mavenPluginManager.setupPluginRealm( pluginDescriptor, session, project.getClassRealm(), null );
-            }
-            catch ( PluginResolutionException e )
-            {
-                throw new PluginManagerException( plugin, e.getMessage(), e );
-            }
-
-            pluginCache.put( plugin, project, localRepository, remoteRepositories, pluginDescriptor.getClassRealm(),
-                             pluginDescriptor.getArtifacts() );
+            throw new PluginManagerException( plugin, e.getMessage(), e );
         }
 
         return pluginDescriptor.getClassRealm();

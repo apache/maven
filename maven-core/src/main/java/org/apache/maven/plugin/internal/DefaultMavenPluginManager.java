@@ -63,6 +63,7 @@ import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
+import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -124,6 +125,9 @@ public class DefaultMavenPluginManager
 
     @Requirement
     private PluginDescriptorCache pluginDescriptorCache;
+
+    @Requirement
+    private PluginRealmCache pluginRealmCache;
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
@@ -288,6 +292,31 @@ public class DefaultMavenPluginManager
     }
 
     public void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
+                                  List<String> imports )
+        throws PluginResolutionException, PluginManagerException
+    {
+        Plugin plugin = pluginDescriptor.getPlugin();
+
+        PluginRealmCache.CacheRecord cacheRecord =
+            pluginRealmCache.get( plugin, parent, imports, session.getLocalRepository(),
+                                  session.getCurrentProject().getPluginArtifactRepositories() );
+
+        if ( cacheRecord != null )
+        {
+            pluginDescriptor.setClassRealm( cacheRecord.realm );
+            pluginDescriptor.setArtifacts( new ArrayList<Artifact>( cacheRecord.artifacts ) );
+        }
+        else
+        {
+            createPluginRealm( pluginDescriptor, session, parent, imports );
+
+            pluginRealmCache.put( plugin, parent, imports, session.getLocalRepository(),
+                                  session.getCurrentProject().getPluginArtifactRepositories(),
+                                  pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
+        }
+    }
+
+    private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
                                   List<String> imports )
         throws PluginResolutionException, PluginManagerException
     {

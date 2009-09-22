@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +31,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 
@@ -48,22 +48,26 @@ public class DefaultPluginRealmCache
 
         private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
 
-        private final ClassRealm projectRealm;
+        private final ClassLoader parentRealm;
+
+        private final List<String> parentImports;
 
         private final int hashCode;
 
-        public CacheKey( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
+        public CacheKey( Plugin plugin, ClassLoader parentRealm, List<String> parentImports, ArtifactRepository localRepository,
                          List<ArtifactRepository> remoteRepositories )
         {
             this.plugin = plugin.clone();
             this.repositories.add( localRepository );
             this.repositories.addAll( remoteRepositories );
-            this.projectRealm = project.getClassRealm();
+            this.parentRealm = parentRealm;
+            this.parentImports = ( parentImports != null ) ? parentImports : Collections.<String> emptyList();
 
             int hash = 17;
             hash = hash * 31 + pluginHashCode( plugin );
             hash = hash * 31 + repositories.hashCode();
-            hash = hash * 31 + ( projectRealm != null ? projectRealm.hashCode() : 0 );
+            hash = hash * 31 + ( parentRealm != null ? parentRealm.hashCode() : 0 );
+            hash = hash * 31 + this.parentImports.hashCode();
             this.hashCode = hash;
         }
 
@@ -88,32 +92,33 @@ public class DefaultPluginRealmCache
 
             CacheKey other = (CacheKey) o;
 
-            return projectRealm == other.projectRealm && pluginEquals( plugin, other.plugin )
+            return parentRealm == other.parentRealm && pluginEquals( plugin, other.plugin )
                 && eq( repositories, other.repositories );
         }
     }
 
     protected final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
-    public CacheRecord get( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
-                            List<ArtifactRepository> remoteRepositories )
+    public CacheRecord get( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                            ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
     {
-        return cache.get( new CacheKey( plugin, project, localRepository, remoteRepositories ) );
+        return cache.get( new CacheKey( plugin, parentRealm, parentImports, localRepository, remoteRepositories ) );
     }
 
-    public void put( Plugin plugin, MavenProject project, ArtifactRepository localRepository,
-                     List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
+    public void put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                     ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
         if ( pluginRealm == null || pluginArtifacts == null )
         {
             throw new NullPointerException();
         }
 
-        CacheKey key = new CacheKey( plugin, project, localRepository, remoteRepositories );
+        CacheKey key = new CacheKey( plugin, parentRealm, parentImports, localRepository, remoteRepositories );
 
         if ( cache.containsKey( key ) )
         {
-            throw new IllegalStateException( "Duplicate plugin realm for plugin " + plugin );
+            throw new IllegalStateException( "Duplicate plugin realm for plugin " + plugin.getId() );
         }
 
         CacheRecord record = new CacheRecord( pluginRealm, pluginArtifacts );
