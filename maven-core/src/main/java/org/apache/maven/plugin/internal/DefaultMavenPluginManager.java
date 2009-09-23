@@ -228,7 +228,8 @@ public class DefaultMavenPluginManager
 
         if ( pluginDescriptor == null )
         {
-            throw new InvalidPluginDescriptorException( "Missing plugin descriptor for " + plugin.getId() );
+            throw new InvalidPluginDescriptorException( "Missing plugin descriptor for " + plugin.getId() + " ("
+                + pluginFile + ")" );
         }
 
         MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
@@ -237,8 +238,8 @@ public class DefaultMavenPluginManager
 
         if ( validator.hasErrors() )
         {
-            throw new InvalidPluginDescriptorException( "Invalid plugin descriptor for " + plugin.getId(),
-                                                        validator.getErrors() );
+            throw new InvalidPluginDescriptorException( "Invalid plugin descriptor for " + plugin.getId() + " ("
+                + pluginFile + ")", validator.getErrors() );
         }
 
         pluginDescriptor.setPluginArtifact( pluginArtifact );
