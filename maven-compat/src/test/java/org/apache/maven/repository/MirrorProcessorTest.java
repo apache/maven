@@ -180,6 +180,42 @@ public class MirrorProcessorTest
         assertTrue( DefaultMirrorSelector.matchPattern( getRepo( "c", "http://somehost" ), "!a,external:*" ) );
     }
 
+    public void testLayoutPattern()
+    {
+        assertTrue( DefaultMirrorSelector.matchesLayout( "default", null ) );
+        assertTrue( DefaultMirrorSelector.matchesLayout( "default", "" ) );
+        assertTrue( DefaultMirrorSelector.matchesLayout( "default", "*" ) );
+
+        assertTrue( DefaultMirrorSelector.matchesLayout( "default", "default" ) );
+        assertFalse( DefaultMirrorSelector.matchesLayout( "default", "legacy" ) );
+
+        assertTrue( DefaultMirrorSelector.matchesLayout( "default", "legacy,default" ) );
+        assertTrue( DefaultMirrorSelector.matchesLayout( "default", "default,legacy" ) );
+
+        assertFalse( DefaultMirrorSelector.matchesLayout( "default", "legacy,!default" ) );
+        assertFalse( DefaultMirrorSelector.matchesLayout( "default", "!default,legacy" ) );
+
+        assertFalse( DefaultMirrorSelector.matchesLayout( "default", "*,!default" ) );
+        assertFalse( DefaultMirrorSelector.matchesLayout( "default", "!default,*" ) );
+    }
+
+    public void testMirrorLayoutConsideredForMatching()
+    {
+        ArtifactRepository repo = getRepo( "a" );
+
+        Mirror mirrorA = newMirror( "a", "a", null, "http://a" );
+        Mirror mirrorB = newMirror( "b", "a", "p2", "http://b" );
+
+        Mirror mirrorC = newMirror( "c", "*", null, "http://c" );
+        Mirror mirrorD = newMirror( "d", "*", "p2", "http://d" );
+
+        assertSame( mirrorA, mirrorSelector.getMirror( repo, Arrays.asList( mirrorA ) ) );
+        assertNull( mirrorSelector.getMirror( repo, Arrays.asList( mirrorB ) ) );
+
+        assertSame( mirrorC, mirrorSelector.getMirror( repo, Arrays.asList( mirrorC ) ) );
+        assertNull( mirrorSelector.getMirror( repo, Arrays.asList( mirrorD ) ) );
+    }
+
     /**
      * Build an ArtifactRepository object.
      *
@@ -205,10 +241,16 @@ public class MirrorProcessorTest
 
     private Mirror newMirror( String id, String mirrorOf, String url )
     {
+        return newMirror( id, mirrorOf, null, url );
+    }
+
+    private Mirror newMirror( String id, String mirrorOf, String layouts, String url )
+    {
         Mirror mirror = new Mirror();
 
         mirror.setId( id );
         mirror.setMirrorOf( mirrorOf );
+        mirror.setMirrorOfLayouts( layouts );
         mirror.setUrl( url );
 
         return mirror;

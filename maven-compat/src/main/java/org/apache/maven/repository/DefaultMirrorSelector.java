@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 
 @Component( role = MirrorSelector.class )
 public class DefaultMirrorSelector
@@ -44,7 +45,7 @@ public class DefaultMirrorSelector
         {
             for ( Mirror mirror : mirrors )
             {
-                if ( repoId.equals( mirror.getMirrorOf() ) )
+                if ( repoId.equals( mirror.getMirrorOf() ) && matchesLayout( repository, mirror ) )
                 {
                     return mirror;
                 }
@@ -52,7 +53,7 @@ public class DefaultMirrorSelector
 
             for ( Mirror mirror : mirrors )
             {
-                if ( matchPattern( repository, mirror.getMirrorOf() ) )
+                if ( matchPattern( repository, mirror.getMirrorOf() ) && matchesLayout( repository, mirror ) )
                 {
                     return mirror;
                 }
@@ -137,6 +138,65 @@ public class DefaultMirrorSelector
             // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
             return false;
         }
+    }
+
+    static boolean matchesLayout( ArtifactRepository repository, Mirror mirror )
+    {
+        return matchesLayout( repository.getLayout().getId(), mirror.getMirrorOfLayouts() );
+    }
+
+    /**
+     * Checks whether the layouts configured for a mirror match with the layout of the repository.
+     * 
+     * @param repoLayout The layout of the repository, may be {@code null}.
+     * @param mirrorLayout The layouts supported by the mirror, may be {@code null}.
+     * @return {@code true} if the layouts associated with the mirror match the layout of the original repository,
+     *         {@code false} otherwise.
+     */
+    static boolean matchesLayout( String repoLayout, String mirrorLayout )
+    {
+        boolean result = false;
+
+        // simple checks first to short circuit processing below.
+        if ( StringUtils.isEmpty( mirrorLayout ) || WILDCARD.equals( mirrorLayout ) )
+        {
+            result = true;
+        }
+        else if ( mirrorLayout.equals( repoLayout ) )
+        {
+            result = true;
+        }
+        else
+        {
+            // process the list
+            String[] layouts = mirrorLayout.split( "," );
+            for ( String layout : layouts )
+            {
+                // see if this is a negative match
+                if ( layout.length() > 1 && layout.startsWith( "!" ) )
+                {
+                    if ( layout.substring( 1 ).equals( repoLayout ) )
+                    {
+                        // explicitly exclude. Set result and stop processing.
+                        result = false;
+                        break;
+                    }
+                }
+                // check for exact match
+                else if ( layout.equals( repoLayout ) )
+                {
+                    result = true;
+                    break;
+                }
+                else if ( WILDCARD.equals( layout ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+            }
+        }
+
+        return result;
     }
 
 }

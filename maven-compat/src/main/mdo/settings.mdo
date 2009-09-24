@@ -46,14 +46,14 @@
   <classes>
     <class java.clone="deep">
       <name>TrackableBase</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         common base class that contains code to track the source for
         this instance (USER|GLOBAL)
       </description>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <code>
             <![CDATA[
     public static final String USER_LEVEL = "user-level";
@@ -91,7 +91,7 @@
     <class>
       <name>IdentifiableBase</name>
       <superClass>TrackableBase</superClass>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         <![CDATA[
         Base class for <code>Mirror</code>, <code>Profile</code>, <code>Proxy</code> and <code>Server</code>.
@@ -99,7 +99,7 @@
       <fields>
         <field>
           <name>id</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
           <required>true</required>
@@ -108,7 +108,7 @@
     </class>
     <class rootElement="true" xml.tagName="settings">
       <name>Settings</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <superClass>TrackableBase</superClass>
       <description>
         Root element of the user configuration file.
@@ -116,7 +116,7 @@
       <fields>
         <field>
           <name>localRepository</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <required>true</required>
           <description>
             <![CDATA[
@@ -127,7 +127,7 @@
         </field>
         <field>
           <name>interactiveMode</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Whether Maven should attempt to interact with the user for input.
@@ -138,7 +138,7 @@
         </field>
         <field>
           <name>usePluginRegistry</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Whether Maven should use the plugin-registry.xml file to manage plugin versions.
@@ -150,14 +150,14 @@
         <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
         <!-- field>
           <name>passwordStore</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <required>false</required>
           <description><![CDATA[The keystore used to store passwords.]]></description>
           <type>String</type>
           </field -->
         <field>
           <name>offline</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <required>false</required>
           <description>
             <![CDATA[
@@ -170,7 +170,7 @@
         <!-- [JC] Not ready to use yet, so I'm making if unavailable for now. -->
         <!-- field>
           <name>jdks</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description><![CDATA[
           Configuration for different java environment profiles. One good use
           for this might be to configure both JDK 1.4 and JDK 1.5 to work with
@@ -185,7 +185,7 @@
           </field -->
         <field>
           <name>proxies</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Configuration for different proxy profiles. Multiple proxy profiles
@@ -202,7 +202,7 @@
         </field>
         <field>
           <name>servers</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Configuration of server-specific settings, mainly authentication
@@ -217,7 +217,7 @@
         </field>
         <field>
           <name>mirrors</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             Configuration of download mirrors for repositories.
           </description>
@@ -228,7 +228,7 @@
         </field>
         <field>
           <name>profiles</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Configuration of build profiles for adjusting the build
@@ -242,7 +242,7 @@
         </field>
         <field>
           <name>activeProfiles</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             List of manually-activated build profiles, specified in the order in which
@@ -256,7 +256,7 @@
         </field>
         <field>
           <name>pluginGroups</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             List of groupIds to search for a plugin when that plugin
             groupId is not explicitly provided.
@@ -269,7 +269,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <code>
             <![CDATA[
     public Boolean getInteractiveMode()
@@ -415,13 +415,13 @@
     <!-- [JC] Commenting out until we're ready to use it... -->
     <!-- class>
       <name>Jdk</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <superClass>TrackableBase</superClass>
       <description><![CDATA[Describes one Java environment]]></description>
       <fields>
       <field>
       <name>active</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <required>false</required>
       <defaultValue>false</defaultValue>
       <description><![CDATA[Whether this JDK is the active one.]]></description>
@@ -429,14 +429,14 @@
       </field>
       <field>
       <name>version</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <required>true</required>
       <description><![CDATA[The JDK major version (eg. '1.4').]]></description>
       <type>String</type>
       </field>
       <field>
       <name>javaHome</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <required>true</required>
       <description><![CDATA[The JDK home.]]></description>
       <type>String</type>
@@ -445,7 +445,7 @@
       </class -->
     <class>
       <name>Proxy</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
@@ -454,7 +454,7 @@
       <fields>
         <field>
           <name>active</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <required>false</required>
           <defaultValue>true</defaultValue>
           <description>
@@ -466,7 +466,7 @@
         </field>
         <field>
           <name>protocol</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The proxy protocol.
@@ -477,7 +477,7 @@
         </field>
         <field>
           <name>username</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The proxy user.
@@ -487,7 +487,7 @@
         </field>
         <field>
           <name>password</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The proxy password.
@@ -497,7 +497,7 @@
         </field>
         <field>
           <name>port</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The proxy port.
@@ -508,7 +508,7 @@
         </field>
         <field>
           <name>host</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The proxy host.
@@ -519,7 +519,7 @@
         </field>
         <field>
           <name>nonProxyHosts</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The list of non-proxied hosts (delimited by |).
@@ -531,7 +531,7 @@
     </class>
     <class>
       <name>Server</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
@@ -540,7 +540,7 @@
       <fields>
         <field>
           <name>username</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The username used to authenticate.
@@ -550,7 +550,7 @@
         </field>
         <field>
           <name>password</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The password used in conjunction with the username to authenticate.
@@ -560,7 +560,7 @@
         </field>
         <field>
           <name>privateKey</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The private key location used to authenticate.
@@ -570,7 +570,7 @@
         </field>
         <field>
           <name>passphrase</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The passphrase used in conjunction with the privateKey to authenticate.
@@ -580,7 +580,7 @@
         </field>
         <field>
           <name>filePermissions</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The permissions for files when they are created.
@@ -590,7 +590,7 @@
         </field>
         <field>
           <name>directoryPermissions</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The permissions for directories when they are created.
@@ -611,7 +611,7 @@
     </class>
     <class>
       <name>Mirror</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <superClass>IdentifiableBase</superClass>
       <description>
         A download mirror for a given repository.
@@ -620,7 +620,7 @@
         <field>
           <name>mirrorOf</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The server ID of the repository being mirrored, eg
@@ -630,7 +630,7 @@
         <field>
           <name>name</name>
           <required>false</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The optional name that describes the mirror.
@@ -639,25 +639,30 @@
         <field>
           <name>url</name>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The URL of the mirror repository.</description>
         </field>
-        <!--
-          <field>
-          <name>allowOriginal</name>
-          <version>1.0.0</version>
-          <type>boolean</type>
-          <defaultValue>true</defaultValue>
+        <field>
+          <name>layout</name>
+          <version>1.1.0+</version>
+          <type>String</type>
+          <description>The layout of the mirror repository. Since Maven 3.</description>
+        </field>
+        <field>
+          <name>mirrorOfLayouts</name>
+          <version>1.1.0+</version>
+          <type>String</type>
           <description>
-          Whether to allow the user of the original as a fallback if an artifact is not found on the mirror.
+            The layouts of repositories being mirrored. This value can be used to restrict the usage
+            of the mirror to repositories with a matching layout. If unspecified, the mirror can be used
+            for any repository regardless of its layout. Since Maven 3.
           </description>
-          </field>
-        -->
+        </field>
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <code>
             <![CDATA[
 
@@ -680,7 +685,7 @@
     <!-- Profile support -->
     <class>
       <name>Profile</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
@@ -691,7 +696,7 @@
       <fields>
         <field>
           <name>activation</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The conditional logic which will automatically
@@ -717,7 +722,7 @@
         </field>
         <field>
           <name>repositories</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The lists of the remote repositories.
@@ -730,7 +735,7 @@
         </field>
         <field>
           <name>pluginRepositories</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The lists of the remote repositories for discovering plugins.
@@ -752,7 +757,7 @@
     </class>
     <class java.clone="deep">
       <name>Activation</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         <![CDATA[
         The conditions within the build runtime environment which will trigger
@@ -762,7 +767,7 @@
       <fields>
         <field>
           <name>activeByDefault</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>boolean</type>
           <description>
             Flag specifying whether this profile is active as a default.
@@ -770,7 +775,7 @@
         </field>
         <field>
           <name>jdk</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -780,7 +785,7 @@
         </field>
         <field>
           <name>os</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Specifies that this profile will be activated when matching OS attributes are detected.
@@ -792,7 +797,7 @@
         </field>
         <field>
           <name>property</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Specifies that this profile will be activated when this System property is specified.
@@ -804,7 +809,7 @@
         </field>
         <field>
           <name>file</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Specifies that this profile will be activated based on existence of a file.
@@ -820,7 +825,7 @@
     <!-- TODO: reproduced from maven-model/maven.mdo, instead should inherit code and link to external docs -->
     <class java.clone="deep">
       <name>RepositoryBase</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         <![CDATA[
         Repository contains the information needed
@@ -830,7 +835,7 @@
       <fields>
         <field>
           <name>id</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             A unique identifier for a repository.
@@ -840,7 +845,7 @@
         </field>
         <field>
           <name>name</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             Human readable name of the repository.
@@ -850,7 +855,7 @@
         </field>
         <field>
           <name>url</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             <![CDATA[
             The url of the repository.
@@ -860,7 +865,7 @@
         </field>
         <field>
           <name>layout</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             The type of layout this repository uses for locating and
             storing artifacts - can be "legacy" or "default".
@@ -871,7 +876,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <code>
             <![CDATA[
     /**
@@ -899,7 +904,7 @@
     <class>
       <name>Repository</name>
       <superClass>RepositoryBase</superClass>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         Repository contains the information needed for establishing
         connections with remote repoistory
@@ -907,7 +912,7 @@
       <fields>
         <field>
           <name>releases</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             How to handle downloading of releases from this repository
           </description>
@@ -917,7 +922,7 @@
         </field>
         <field>
           <name>snapshots</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             How to handle downloading of snapshots from this repository
           </description>
@@ -929,7 +934,7 @@
       <!-- prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <code>
             <![CDATA[
     /**
@@ -947,12 +952,12 @@
 
     <class java.clone="deep">
       <name>RepositoryPolicy</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>Download policy</description>
       <fields>
         <field>
           <name>enabled</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             Whether to use this repository for downloading this type of
             artifact.
@@ -962,7 +967,7 @@
         </field>
         <field>
           <name>updatePolicy</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             The frequency for downloading updates - can be "always",
             "daily" (default), "interval:XXX" (in minutes) or "never"
@@ -972,7 +977,7 @@
         </field>
         <field>
           <name>checksumPolicy</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>
             What to do when verification of an artifact checksum fails -
             warn, fail, etc. Valid values are "fail" or "warn".
@@ -984,7 +989,7 @@
 
     <class java.clone="deep">
       <name>ActivationProperty</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         <![CDATA[
         This is the property specification used to activate a profile. If the value field is empty,
@@ -995,7 +1000,7 @@
       <fields>
         <field>
           <name>name</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>
@@ -1004,7 +1009,7 @@
         </field>
         <field>
           <name>value</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The value of the property to be used to activate a profile.
@@ -1014,7 +1019,7 @@
     </class>
     <class java.clone="deep">
       <name>ActivationOS</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         <![CDATA[
         This is an activator which will detect an operating system's attributes in order to activate
@@ -1024,7 +1029,7 @@
       <fields>
         <field>
           <name>name</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The name of the OS to be used to activate a profile.
@@ -1032,7 +1037,7 @@
         </field>
         <field>
           <name>family</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The general family of the OS to be used to activate a
@@ -1041,7 +1046,7 @@
         </field>
         <field>
           <name>arch</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The architecture of the OS to be used to activate a profile.
@@ -1049,7 +1054,7 @@
         </field>
         <field>
           <name>version</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The version of the OS to be used to activate a profile.
@@ -1059,7 +1064,7 @@
     </class>
     <class java.clone="deep">
       <name>ActivationFile</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>
         <![CDATA[
         This is the file specification used to activate a profile. The missing value will be a the location
@@ -1070,7 +1075,7 @@
       <fields>
         <field>
           <name>missing</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The name of the file that should be missing to activate a
@@ -1079,7 +1084,7 @@
         </field>
         <field>
           <name>exists</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>
             The name of the file that should exist to activate a profile.

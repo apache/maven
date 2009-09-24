@@ -474,6 +474,12 @@ public class LegacyRepositorySystem
                 {
                     repository.setId( mirror.getId() );
                     repository.setUrl( mirror.getUrl() );
+
+                    ArtifactRepositoryLayout layout = layouts.get( mirror.getLayout() );
+                    if ( layout != null )
+                    {
+                        repository.setLayout( layout );
+                    }
                 }
             }
         }
