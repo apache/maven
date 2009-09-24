@@ -85,6 +85,9 @@ public class LegacyRepositorySystem
     @Requirement
     private PlexusContainer plexus;
 
+    @Requirement
+    private MirrorSelector mirrorSelector;
+
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
         return artifactFactory.createArtifact( groupId, artifactId, version, scope, type );
@@ -456,28 +459,7 @@ public class LegacyRepositorySystem
 
     public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
     {
-        String repoId = repository.getId();
-
-        if ( repoId != null && mirrors != null )
-        {
-            for ( Mirror mirror : mirrors )
-            {
-                if ( repoId.equals( mirror.getMirrorOf() ) )
-                {
-                    return mirror;
-                }
-            }
-
-            for ( Mirror mirror : mirrors )
-            {
-                if ( DefaultMirrorBuilder.matchPattern( repository, mirror.getMirrorOf() ) )
-                {
-                    return mirror;
-                }
-            }
-        }
-
-        return null;
+        return mirrorSelector.getMirror( repository, mirrors );
     }
 
     public void injectMirror( List<ArtifactRepository> repositories, List<Mirror> mirrors )

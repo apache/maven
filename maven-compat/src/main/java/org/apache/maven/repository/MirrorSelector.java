@@ -22,15 +22,23 @@ package org.apache.maven.repository;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.Authentication;
+import org.apache.maven.settings.Mirror;
 
-public interface MirrorBuilder
+/**
+ * Handles the selection of mirrors for repositories.
+ * 
+ * @author Benjamin Bentmann
+ */
+public interface MirrorSelector
 {
-    ArtifactRepository getMirror( ArtifactRepository repository );
-    
-    List<ArtifactRepository> getMirrors( List<ArtifactRepository> repositories );
-    
-    void addMirror( String id, String mirrorOf, String url, Authentication auth );
-    
-    void clearMirrors();    
+
+    /**
+     * Determines the mirror for the specified repository.
+     * 
+     * @param repository The repository to determine the mirror for, must not be {@code null}.
+     * @param mirrors The available mirrors, may be {@code null}.
+     * @return The mirror specification for the repository or {@code null} if no mirror matched.
+     */
+    Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors );
+
 }
