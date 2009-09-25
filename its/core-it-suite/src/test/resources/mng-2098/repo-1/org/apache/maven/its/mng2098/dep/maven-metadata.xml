@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.mng2098</groupId>
+  <artifactId>dep</artifactId>
+  <version>0.1</version>
+  <versioning>
+    <release>0.1</release>
+    <versions>
+      <version>0.1</version>
+    </versions>
+    <!-- NOTE: It's essential that this metadata is considered older than the one from repo-2 -->
+    <lastUpdated>20090925110425</lastUpdated>
+  </versioning>
+</metadata>
