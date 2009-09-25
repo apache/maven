@@ -84,11 +84,16 @@ public class ArtifactRepositoryMetadata
 
     public ArtifactRepository getRepository()
     {
-        return artifact.getRepository();
+        return null;
     }
 
     public void setRepository( ArtifactRepository remoteRepository )
     {
-        artifact.setRepository( remoteRepository );
+        /*
+         * NOTE: Metadata at the g:a level contains a collection of available versions. After merging, we can't tell
+         * which repository provides which version so the metadata manager must not restrict the artifact resolution to
+         * the repository with the most recent updates.
+         */
     }
+
 }
