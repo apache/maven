@@ -442,6 +442,7 @@
                   <value>${maven.repo.local}</value>
                 </property>
               </systemProperties>
+              <argLine>-Xmx256m</argLine>              
             </configuration>
           </plugin>
         </plugins>
