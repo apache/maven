@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 /**
  * Test ComparableVersion.
- * 
+ *
  * @author <a href="mailto:hboutemy@apache.org">Herve Boutemy</a>
  * @version $Id$
  */
@@ -104,12 +104,19 @@ public class ComparableVersionTest
         checkVersionsEqual( "1", "1-0" );
         checkVersionsEqual( "1", "1.0-0" );
         checkVersionsEqual( "1.0", "1.0-0" );
+        // no separator between number and character
         checkVersionsEqual( "1a", "1.a" );
         checkVersionsEqual( "1a", "1-a" );
         checkVersionsEqual( "1a", "1.0-a" );
         checkVersionsEqual( "1a", "1.0.0-a" );
         checkVersionsEqual( "1.0a", "1.0.a" );
         checkVersionsEqual( "1.0.0a", "1.0.0.a" );
+        checkVersionsEqual( "1x", "1.x" );
+        checkVersionsEqual( "1x", "1-x" );
+        checkVersionsEqual( "1x", "1.0-x" );
+        checkVersionsEqual( "1x", "1.0.0-x" );
+        checkVersionsEqual( "1.0x", "1.0.x" );
+        checkVersionsEqual( "1.0.0x", "1.0.0.x" );
 
         // aliases
         checkVersionsEqual( "1ga", "1" );
@@ -120,6 +127,22 @@ public class ComparableVersionTest
         checkVersionsEqual( "1a1", "1alpha1" );
         checkVersionsEqual( "1b2", "1beta2" );
         checkVersionsEqual( "1m3", "1milestone3" );
+
+        // case insensitive
+        checkVersionsEqual( "1X", "1x" );
+        checkVersionsEqual( "1A", "1a" );
+        checkVersionsEqual( "1B", "1b" );
+        checkVersionsEqual( "1M", "1m" );
+        checkVersionsEqual( "1Ga", "1" );
+        checkVersionsEqual( "1GA", "1" );
+        checkVersionsEqual( "1Final", "1" );
+        checkVersionsEqual( "1FinaL", "1" );
+        checkVersionsEqual( "1FINAL", "1" );
+        checkVersionsEqual( "1Cr", "1Rc" );
+        checkVersionsEqual( "1cR", "1rC" );
+        checkVersionsEqual( "1m3", "1Milestone3" );
+        checkVersionsEqual( "1m3", "1MileStone3" );
+        checkVersionsEqual( "1m3", "1MILESTONE3" );
     }
 
     public void testVersionComparing()
