@@ -291,8 +291,8 @@
       <!--
       <dependency>
         <groupId>org.jsecurity</groupId>
-    	<artifactId>jsecurity</artifactId>
-    	<version>0.9.0-RC2</version>
+      <artifactId>jsecurity</artifactId>
+      <version>0.9.0-RC2</version>
       </dependency>
       -->
       <!--bootstrap-start-comment-->
@@ -347,6 +347,12 @@
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <tagBase>https://svn.apache.org/repos/asf/maven/components/tags</tagBase>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>-Xmx256m</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -442,7 +448,6 @@
                   <value>${maven.repo.local}</value>
                 </property>
               </systemProperties>
-              <argLine>-Xmx256m</argLine>              
             </configuration>
           </plugin>
         </plugins>
