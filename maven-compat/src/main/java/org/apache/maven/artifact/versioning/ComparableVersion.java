@@ -30,8 +30,28 @@ import java.util.Properties;
 import java.util.Stack;
 
 /**
- * Generic implementation of version comparison.
+ * Generic implementation of version comparison. Features:
+ * <ul>
+ * <li>mixing of '<code>-</code>' (dash) and '<code>.</code>' (dot) separators,</li>
+ * <li>transition between characters and digits also constitutes a separator:
+ *     <code>1.0alpha1 =&gt; [1, 0, alpha, 1]</code></li>
+ * <li>unlimited number of version components,</li>
+ * <li>version components in the text can be digits or strings</li>
+ * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
+ *     Well-known qualifiers (case insensitive):<ul>
+ *     <li><code>snapshot</code></li>
+ *     <li><code>alpha</code> or <code>a</code></li>
+ *     <li><code>beta</code> or <code>b</code></li>
+ *     <li><code>milestone</code> or <code>m</code></li>
+ *     <li><code>rc</code> or <code>cr</code></li>
+ *     <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
+ *     <li><code>sp</code></li>
+ *     </ul>
+ *   </li>
+ * <li>a dash usually precedes a qualifier, and is always less important than something preceded with a dot.</li>
+ * </ul>
  *
+ * @see <a href="http://docs.codehaus.org/display/MAVEN/Versioning">"Versioning" on Maven Wiki</a>
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  * @author <a href="mailto:hboutemy@apache.org">Herve Boutemy</a>
  * @version $Id$
@@ -279,21 +299,21 @@ public class ComparableVersion
                 case LIST_ITEM:
                     Iterator left = iterator();
                     Iterator right = ( (ListItem) item ).iterator();
-    
+
                     while ( left.hasNext() || right.hasNext() )
                     {
                         Item l = left.hasNext() ? (Item) left.next() : null;
                         Item r = right.hasNext() ? (Item) right.next() : null;
-    
+
                         // if this is shorter, then invert the compare and mul with -1
                         int result = l == null ? -1 * r.compareTo( l ) : l.compareTo( r );
-    
+
                         if ( result != 0 )
                         {
                             return result;
                         }
                     }
-    
+
                     return 0;
 
                 default:
@@ -370,7 +390,7 @@ public class ComparableVersion
                 if ( isDigit )
                 {
                     list.normalize(); // 1.0-* = 1-*
-                    
+
                     if ( ( i + 1 < version.length() ) && Character.isDigit( version.charAt( i + 1 ) ) )
                     {
                         // new ListItem only if previous were digits and new char is a digit,
