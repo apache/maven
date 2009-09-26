@@ -26,9 +26,10 @@ import junit.framework.TestCase;
 /**
  * Test ComparableVersion.
  *
- * @author <a href="mailto:hboutemy@apache.org">Herve Boutemy</a>
+ * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  * @version $Id$
  */
+@SuppressWarnings( "unchecked" )
 public class ComparableVersionTest
     extends TestCase
 {

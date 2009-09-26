@@ -53,11 +53,11 @@ import java.util.Stack;
  *
  * @see <a href="http://docs.codehaus.org/display/MAVEN/Versioning">"Versioning" on Maven Wiki</a>
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- * @author <a href="mailto:hboutemy@apache.org">Herve Boutemy</a>
+ * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
  * @version $Id$
  */
 public class ComparableVersion
-    implements Comparable
+    implements Comparable<ComparableVersion>
 {
     private String value;
 
@@ -147,7 +147,7 @@ public class ComparableVersion
     {
         private final static String[] QUALIFIERS = { "snapshot", "alpha", "beta", "milestone", "rc", "", "sp" };
 
-        private final static List _QUALIFIERS = Arrays.asList( QUALIFIERS );
+        private final static List<String> _QUALIFIERS = Arrays.asList( QUALIFIERS );
 
         private final static Properties ALIASES = new Properties();
         static {
@@ -156,10 +156,10 @@ public class ComparableVersion
             ALIASES.put( "cr", "rc" );
         }
         /**
-         * A comparable for the empty-string qualifier. This one is used to determine if a given qualifier makes the
+         * A comparable value for the empty-string qualifier. This one is used to determine if a given qualifier makes the
          * version older than one without a qualifier, or more recent.
          */
-        private static Comparable RELEASE_VERSION_INDEX = String.valueOf( _QUALIFIERS.indexOf( "" ) );
+        private static String RELEASE_VERSION_INDEX = String.valueOf( _QUALIFIERS.indexOf( "" ) );
 
         private String value;
 
@@ -195,7 +195,7 @@ public class ComparableVersion
         }
 
         /**
-         * Returns a comparable for a qualifier.
+         * Returns a comparable value for a qualifier.
          *
          * This method both takes into account the ordering of known qualifiers as well as lexical ordering for unknown
          * qualifiers.
@@ -205,9 +205,9 @@ public class ComparableVersion
          * so this is still fast. If more characters are needed then it requires a lexical sort anyway.
          *
          * @param qualifier
-         * @return
+         * @return an equivalent value that can be used with lexical comparison
          */
-        public static Comparable comparableQualifier( String qualifier )
+        public static String comparableQualifier( String qualifier )
         {
             int i = _QUALIFIERS.indexOf( qualifier );
 
@@ -248,7 +248,7 @@ public class ComparableVersion
      * with '-(number)' in the version specification).
      */
     private static class ListItem
-        extends ArrayList
+        extends ArrayList<Item>
         implements Item
     {
         public int getType()
@@ -263,9 +263,9 @@ public class ComparableVersion
 
         void normalize()
         {
-            for( ListIterator iterator = listIterator( size() ); iterator.hasPrevious(); )
+            for( ListIterator<Item> iterator = listIterator( size() ); iterator.hasPrevious(); )
             {
-                Item item = (Item) iterator.previous();
+                Item item = iterator.previous();
                 if ( item.isNull() )
                 {
                     iterator.remove(); // remove null trailing items: 0, "", empty list
@@ -297,8 +297,8 @@ public class ComparableVersion
                     return 1; // 1-1 > 1-sp
 
                 case LIST_ITEM:
-                    Iterator left = iterator();
-                    Iterator right = ( (ListItem) item ).iterator();
+                    Iterator<Item> left = iterator();
+                    Iterator<Item> right = ( (ListItem) item ).iterator();
 
                     while ( left.hasNext() || right.hasNext() )
                     {
@@ -324,7 +324,7 @@ public class ComparableVersion
         public String toString()
         {
             StringBuilder buffer = new StringBuilder( "(" );
-            for( Iterator iter = iterator(); iter.hasNext(); )
+            for( Iterator<Item> iter = iterator(); iter.hasNext(); )
             {
                 buffer.append( iter.next() );
                 if ( iter.hasNext() )
@@ -352,7 +352,7 @@ public class ComparableVersion
 
         ListItem list = items;
 
-        Stack stack = new Stack();
+        Stack<Item> stack = new Stack<Item>();
         stack.push( list );
 
         boolean isDigit = false;
@@ -442,9 +442,9 @@ public class ComparableVersion
         return isDigit ? new IntegerItem( buf ) : new StringItem( buf, false );
     }
 
-    public int compareTo( Object o )
+    public int compareTo( ComparableVersion o )
     {
-        return items.compareTo( ( (ComparableVersion) o ).items );
+        return items.compareTo( o.items );
     }
 
     public String toString()
