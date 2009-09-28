@@ -64,7 +64,7 @@ public class DefaultMavenExecutionResult
         return this;
     }
 
-    public List getTopologicallySortedProjects()
+    public List<MavenProject> getTopologicallySortedProjects()
     {
         return topologicallySortedProjects;
     }

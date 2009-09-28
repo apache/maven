@@ -31,14 +31,14 @@ public final class SettingsValidationResult
 {
     private final static String NEWLINE = System.getProperty( "line.separator" );
 
-    private List messages;
+    private List<String> messages;
 
     /**
      * Default constructor
      */
     public SettingsValidationResult()
     {
-        messages = new ArrayList();
+        messages = new ArrayList<String>();
     }
 
     /**
@@ -61,7 +61,7 @@ public final class SettingsValidationResult
     /**
      * @return
      */
-    public List getMessages()
+    public List<String> getMessages()
     {
         return Collections.unmodifiableList( messages );
     }

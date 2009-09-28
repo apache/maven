@@ -23,10 +23,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.maven.artifact.Artifact;
+
 public class ManagedVersionMap
-    extends HashMap
+    extends HashMap<String, Artifact>
 {
-    public ManagedVersionMap( Map map )
+    public ManagedVersionMap( Map<String, Artifact> map )
     {
         super();
         if ( map != null )
@@ -38,10 +40,10 @@ public class ManagedVersionMap
     public String toString()
     {
         StringBuilder buffer = new StringBuilder( "ManagedVersionMap (" + size() + " entries)\n" );
-        Iterator iter = keySet().iterator();
+        Iterator<String> iter = keySet().iterator();
         while ( iter.hasNext() )
         {
-            String key = (String) iter.next();
+            String key = iter.next();
             buffer.append( key ).append( "=" ).append( get( key ) );
             if ( iter.hasNext() )
             {
