@@ -54,6 +54,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Profile;
@@ -1416,6 +1417,43 @@ public class MavenProject
         return attachedArtifacts;
     }
 
+    public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
+                                         String goalId )
+    {
+        Xpp3Dom dom = null;
+
+        if ( getBuildPlugins() != null )
+        {
+            for ( Plugin plugin : getBuildPlugins() )
+            {
+                if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
+                {
+                    dom = (Xpp3Dom) plugin.getConfiguration();
+
+                    if ( executionId != null )
+                    {
+                        PluginExecution execution = plugin.getExecutionsAsMap().get( executionId );
+                        if ( execution != null )
+                        {
+                            // NOTE: The PluginConfigurationExpander already merged the plugin-level config in
+                            dom = (Xpp3Dom) execution.getConfiguration();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if ( dom != null )
+        {
+            // make a copy so the original in the POM doesn't get messed with
+            dom = new Xpp3Dom( dom );
+        }
+
+        return dom;
+    }
+
+    @Deprecated
     public Xpp3Dom getReportConfiguration( String pluginGroupId, String pluginArtifactId, String reportSetId )
     {
         Xpp3Dom dom = null;
