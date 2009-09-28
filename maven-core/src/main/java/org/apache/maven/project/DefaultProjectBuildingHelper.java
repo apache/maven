@@ -129,7 +129,7 @@ public class DefaultProjectBuildingHelper
         return artifactRepositories;
     }
 
-    public synchronized ProjectRealmCache.CacheRecord createProjectRealm( Model model,
+    public synchronized ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
                                                                           RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException, PluginVersionResolutionException
     {
@@ -260,6 +260,8 @@ public class DefaultProjectBuildingHelper
 
                 extensionRealmCache.put( plugin, repositoryRequest, extensionRealm, artifacts, extensionDescriptor );
             }
+
+            extensionRealmCache.register( project, extensionRealm );
 
             extensionRealms.add( extensionRealm );
             if ( extensionDescriptor != null )

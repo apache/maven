@@ -92,8 +92,11 @@ public class DefaultProjectBuilder
             if ( project == null )
             {
                 ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
-    
-                DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, configuration );
+
+                project = new MavenProject( repositorySystem, this, configuration );
+
+                DefaultModelBuildingListener listener =
+                    new DefaultModelBuildingListener( project, projectBuildingHelper, configuration );
                 request.setModelBuildingListener( listener );
     
                 if ( localProject )
@@ -117,7 +120,7 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                project = toProject( result, configuration, listener );
+                initProject( project, result );
             }
 
             ArtifactResolutionResult artifactResult = null;
@@ -228,7 +231,10 @@ public class DefaultProjectBuilder
     {
         ModelBuildingRequest request = getModelBuildingRequest( config, null );
 
-        DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
+        MavenProject standaloneProject = new MavenProject( repositorySystem, this, config );
+
+        DefaultModelBuildingListener listener =
+            new DefaultModelBuildingListener( standaloneProject, projectBuildingHelper, config );
         request.setModelBuildingListener( listener );
 
         request.setModelSource( new UrlModelSource( getClass().getResource( "standalone.xml" ) ) );
@@ -243,12 +249,11 @@ public class DefaultProjectBuilder
             throw new ProjectBuildingException( "[standalone]", "Failed to build standalone project", e );
         }
 
-        MavenProject standaloneProject = new MavenProject( result.getEffectiveModel(), repositorySystem, this, config );
+        standaloneProject.setModel( result.getEffectiveModel() );
+        standaloneProject.setOriginalModel( result.getRawModel() );
 
         standaloneProject.setActiveProfiles( result.getActiveExternalProfiles() );
         standaloneProject.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
-        standaloneProject.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
-        standaloneProject.setPluginArtifactRepositories( listener.getPluginRepositories() );
 
         standaloneProject.setExecutionRoot( true );
 
@@ -300,11 +305,14 @@ public class DefaultProjectBuilder
         {
             ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
 
+            MavenProject project = new MavenProject( repositorySystem, this, config );
+
             request.setPomFile( pomFile );
             request.setTwoPhaseBuilding( true );
             request.setModelCache( modelCache );
 
-            DefaultModelBuildingListener listener = new DefaultModelBuildingListener( projectBuildingHelper, config );
+            DefaultModelBuildingListener listener =
+                new DefaultModelBuildingListener( project, projectBuildingHelper, config );
             request.setModelBuildingListener( listener );
 
             try
@@ -437,7 +445,8 @@ public class DefaultProjectBuilder
             {
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
-                MavenProject project = toProject( result, config, interimResult.listener );
+                MavenProject project = interimResult.listener.getProject();
+                initProject( project, result );
 
                 projects.add( project );
 
@@ -463,12 +472,12 @@ public class DefaultProjectBuilder
         return noErrors;
     }
 
-    private MavenProject toProject( ModelBuildingResult result, ProjectBuildingRequest configuration,
-                                    DefaultModelBuildingListener listener )
+    private void initProject( MavenProject project, ModelBuildingResult result )
     {
         Model model = result.getEffectiveModel();
 
-        MavenProject project = new MavenProject( model, repositorySystem, this, configuration );
+        project.setModel( model );
+        project.setOriginalModel( result.getRawModel() );
 
         project.setFile( model.getPomFile() );
 
@@ -479,14 +488,6 @@ public class DefaultProjectBuilder
             repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
                                              project.getPackaging() );
         project.setArtifact( projectArtifact );
-
-        project.setOriginalModel( result.getRawModel() );
-
-        project.setRemoteArtifactRepositories( listener.getRemoteRepositories() );
-        project.setPluginArtifactRepositories( listener.getPluginRepositories() );
-
-        project.setClassRealm( listener.getProjectRealm() );
-        project.setExtensionArtifactFilter( listener.getExtentionArtifactFilter() );
 
         Build build = project.getBuild();
         project.addScriptSourceRoot( build.getScriptSourceDirectory() );
@@ -503,8 +504,6 @@ public class DefaultProjectBuilder
         {
             project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
         }
-
-        return project;
     }
 
 }

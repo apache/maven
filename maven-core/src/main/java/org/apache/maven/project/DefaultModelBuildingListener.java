@@ -25,12 +25,10 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * Processes events from the model builder while building the effective model for a {@link MavenProject} instance.
@@ -41,24 +39,28 @@ class DefaultModelBuildingListener
     extends AbstractModelBuildingListener
 {
 
+    private MavenProject project;
+
     private ProjectBuildingHelper projectBuildingHelper;
 
     private ProjectBuildingRequest projectBuildingRequest;
-
-    private ClassRealm projectRealm;
-
-    private ArtifactFilter extensionArtifactFilter;
 
     private List<ArtifactRepository> remoteRepositories;
 
     private List<ArtifactRepository> pluginRepositories;
 
-    public DefaultModelBuildingListener( ProjectBuildingHelper projectBuildingHelper,
+    public DefaultModelBuildingListener( MavenProject project, ProjectBuildingHelper projectBuildingHelper,
                                          ProjectBuildingRequest projectBuildingRequest )
     {
+        if ( project == null )
+        {
+            throw new IllegalArgumentException( "project missing" );
+        }
+        this.project = project;
+
         if ( projectBuildingHelper == null )
         {
-            throw new IllegalArgumentException( "project realm manager missing" );
+            throw new IllegalArgumentException( "project building helper missing" );
         }
         this.projectBuildingHelper = projectBuildingHelper;
 
@@ -72,51 +74,13 @@ class DefaultModelBuildingListener
     }
 
     /**
-     * Gets the project realm that hosts the build extensions.
+     * Gets the project whose model is being built.
      * 
-     * @return The project realm or {@code null} if the project requires no extensions.
+     * @return The project, never {@code null}.
      */
-    public ClassRealm getProjectRealm()
+    public MavenProject getProject()
     {
-        return projectRealm;
-    }
-
-    /**
-     * Gets the artifact filter to exclude extension artifacts from plugin realms.
-     * 
-     * @return The extension artifact filter or {@code null} if none.
-     */
-    public ArtifactFilter getExtentionArtifactFilter()
-    {
-        return extensionArtifactFilter;
-    }
-
-    /**
-     * Gets the effective remote artifact repositories for the project. The repository list is created from the
-     * repositories given by {@link ProjectBuildingRequest#getRemoteRepositories()} and the repositories given in the
-     * POM, i.e. {@link Model#getRepositories()}. The POM repositories themselves also contain any repositories
-     * contributed by external profiles as specified in {@link ProjectBuildingRequest#getProfiles()}. Furthermore, the
-     * repositories have already been mirrored.
-     * 
-     * @return The remote artifact repositories for the project.
-     */
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
-        return remoteRepositories;
-    }
-
-    /**
-     * Gets the effective remote plugin repositories for the project. The repository list is created from the
-     * repositories given by {@link ProjectBuildingRequest#getPluginArtifactRepositories()} and the repositories given
-     * in the POM, i.e. {@link Model#getPluginRepositories()}. The POM repositories themselves also contain any
-     * repositories contributed by external profiles as specified in {@link ProjectBuildingRequest#getProfiles()}.
-     * Furthermore, the repositories have already been mirrored.
-     * 
-     * @return The remote plugin repositories for the project.
-     */
-    public List<ArtifactRepository> getPluginRepositories()
-    {
-        return pluginRepositories;
+        return project;
     }
 
     @Override
@@ -134,6 +98,7 @@ class DefaultModelBuildingListener
         {
             event.getProblems().addError( "Invalid plugin repository: " + e.getMessage(), e );
         }
+        project.setPluginArtifactRepositories( pluginRepositories );
 
         if ( event.getRequest().isProcessPlugins() )
         {
@@ -146,10 +111,10 @@ class DefaultModelBuildingListener
                 repositoryRequest.setOffline( projectBuildingRequest.isOffline() );
 
                 ProjectRealmCache.CacheRecord record =
-                    projectBuildingHelper.createProjectRealm( model, repositoryRequest );
+                    projectBuildingHelper.createProjectRealm( project, model, repositoryRequest );
 
-                projectRealm = record.realm;
-                extensionArtifactFilter = record.extensionArtifactFilter;
+                project.setClassRealm( record.realm );
+                project.setExtensionArtifactFilter( record.extensionArtifactFilter );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -160,14 +125,14 @@ class DefaultModelBuildingListener
                 event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
             }
 
-            if ( projectRealm != null )
+            if ( project.getClassRealm() != null )
             {
                 /*
                  * Update the context class loader such that the container will search the project realm when the model
                  * builder injects the lifecycle bindings from the packaging in the next step. The context class loader
                  * will be reset by the project builder when the project is fully assembled.
                  */
-                Thread.currentThread().setContextClassLoader( projectRealm );
+                Thread.currentThread().setContextClassLoader( project.getClassRealm() );
             }
         }
 
@@ -182,6 +147,7 @@ class DefaultModelBuildingListener
         {
             event.getProblems().addError( "Invalid artifact repository: " + e.getMessage(), e );
         }
+        project.setRemoteArtifactRepositories( remoteRepositories );
     }
 
 }

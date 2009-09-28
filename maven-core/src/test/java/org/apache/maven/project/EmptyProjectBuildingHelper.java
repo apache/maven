@@ -55,7 +55,8 @@ public class EmptyProjectBuildingHelper
         }
     }
 
-    public ProjectRealmCache.CacheRecord createProjectRealm( Model model, RepositoryRequest repositoryRequest )
+    public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject proejct, Model model,
+                                                             RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException
     {
         return new ProjectRealmCache.CacheRecord( null, null );

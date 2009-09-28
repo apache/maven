@@ -216,30 +216,22 @@ public class MavenProject
     /**
      * Constructor
      * 
-     * @param model - may not be null
      * @param artifactFactory - may not be null
      * @param repositorySystem - may not be null
      * @param mavenProjectBuilder
      * @param projectBuilderConfiguration
      * @throws InvalidRepositoryException
      */
-    public MavenProject( Model model, RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder, ProjectBuildingRequest projectBuilderConfiguration )
+    MavenProject( RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder, ProjectBuildingRequest projectBuilderConfiguration )
     {
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model: null" );
-        }
-
         if ( repositorySystem == null )
         {
             throw new IllegalArgumentException( "mavenTools: null" );
         }
 
-        setModel( model );
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
         this.repositorySystem = repositorySystem;
-        originalModel = model;
     }
 
     //TODO: need to integrate the effective scope and refactor it out of the MMS
