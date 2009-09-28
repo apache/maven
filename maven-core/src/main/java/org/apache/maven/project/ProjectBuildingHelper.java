@@ -28,7 +28,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility interface that is only public for
@@ -61,10 +60,10 @@ public interface ProjectBuildingHelper
      * 
      * @param model The model to create the project realm for, must not be {@code null}
      * @param repositoryRequest The repository request to use for artifact resolution, must not be {@code null}.
-     * @return The project realm or {@code null} if the project uses no extensions.
+     * @return The record with the project realm and extension artifact filter, never {@code null}.
      * @throws ArtifactResolutionException If any build extension could not be resolved.
      */
-    ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
+    ProjectRealmCache.CacheRecord createProjectRealm( Model model, RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException, PluginVersionResolutionException;
 
 }

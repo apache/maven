@@ -486,6 +486,7 @@ public class DefaultProjectBuilder
         project.setPluginArtifactRepositories( listener.getPluginRepositories() );
 
         project.setClassRealm( listener.getProjectRealm() );
+        project.setExtensionArtifactFilter( listener.getExtentionArtifactFilter() );
 
         Build build = project.getBuild();
         project.addScriptSourceRoot( build.getScriptSourceDirectory() );

@@ -167,6 +167,8 @@ public class MavenProject
 
     private ClassRealm classRealm;
 
+    private ArtifactFilter extensionArtifactFilter;
+
     //
 
     public MavenProject()
@@ -1948,7 +1950,9 @@ public class MavenProject
     }
 
     /**
-     * Sets the project's class realm.
+     * Sets the project's class realm. <strong>Warning:</strong> This is an internal utility method that is only public
+     * for technical reasons, it is not part of the public API. In particular, this method can be changed or deleted
+     * without prior notice and must not be used by plugins.
      * 
      * @param classRealm The class realm hosting the build extensions of this project, may be {@code null}.
      */
@@ -1959,12 +1963,39 @@ public class MavenProject
 
     /**
      * Gets the project's class realm. This class realm hosts the build extensions of the project.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
      * 
      * @return The project's class realm or {@code null}.
      */
     public ClassRealm getClassRealm()
     {
         return classRealm;
+    }
+
+    /**
+     * Sets the artifact filter used to exclude shared extension artifacts from plugin realms. <strong>Warning:</strong>
+     * This is an internal utility method that is only public for technical reasons, it is not part of the public API.
+     * In particular, this method can be changed or deleted without prior notice and must not be used by plugins.
+     * 
+     * @param extensionArtifactFilter The artifact filter to apply to plugins, may be {@code null}.
+     */
+    public void setExtensionArtifactFilter( ArtifactFilter extensionArtifactFilter )
+    {
+        this.extensionArtifactFilter = extensionArtifactFilter;
+    }
+
+    /**
+     * Gets the artifact filter used to exclude shared extension artifacts from plugin realms. <strong>Warning:</strong>
+     * This is an internal utility method that is only public for technical reasons, it is not part of the public API.
+     * In particular, this method can be changed or deleted without prior notice and must not be used by plugins.
+     * 
+     * @return The artifact filter or {@code null}.
+     */
+    public ArtifactFilter getExtensionArtifactFilter()
+    {
+        return extensionArtifactFilter;
     }
 
 }

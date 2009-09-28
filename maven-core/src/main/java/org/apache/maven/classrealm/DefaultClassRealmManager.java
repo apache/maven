@@ -197,6 +197,16 @@ public class DefaultClassRealmManager
         return "project>" + model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
     }
 
+    public ClassRealm createExtensionRealm( Plugin plugin )
+    {
+        if ( plugin == null )
+        {
+            throw new IllegalArgumentException( "extension plugin missing" );
+        }
+
+        return createRealm( getKey( plugin, true ), null, null );
+    }
+
     public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports )
     {
         if ( plugin == null )
@@ -204,13 +214,14 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "plugin missing" );
         }
 
-        return createRealm( getKey( plugin ), parent, imports );
+        return createRealm( getKey( plugin, false ), parent, imports );
     }
 
-    private String getKey( Plugin plugin )
+    private String getKey( Plugin plugin, boolean extension )
     {
         String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
-        return "plugin>" + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + version;
+        return ( extension ? "extension>" : "plugin>" ) + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":"
+            + version;
     }
 
     private List<ClassRealmManagerDelegate> getDelegates()

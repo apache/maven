@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
@@ -339,13 +341,16 @@ public class DefaultMavenPluginManager
             throw new IllegalArgumentException( "incomplete plugin descriptor, plugin artifact missing" );
         }
 
+        MavenProject project = session.getCurrentProject();
+
         RepositoryRequest request = new DefaultRepositoryRequest();
         request.setLocalRepository( session.getLocalRepository() );
-        request.setRemoteRepositories( session.getCurrentProject().getPluginArtifactRepositories() );
+        request.setRemoteRepositories( project.getPluginArtifactRepositories() );
         request.setCache( session.getRepositoryCache() );
         request.setOffline( session.isOffline() );
 
-        List<Artifact> pluginArtifacts = resolvePluginArtifacts( plugin, pluginArtifact, request );
+        List<Artifact> pluginArtifacts =
+            resolvePluginArtifacts( plugin, pluginArtifact, request, project.getExtensionArtifactFilter() );
 
         ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports );
 
@@ -417,7 +422,8 @@ public class DefaultMavenPluginManager
      */
     // FIXME: only exposed to allow workaround for MNG-4194
     protected List<Artifact> resolvePluginArtifacts( Plugin plugin, Artifact pluginArtifact,
-                                                   RepositoryRequest repositoryRequest )
+                                                     RepositoryRequest repositoryRequest,
+                                                     ArtifactFilter extensionArtifactFilter )
         throws PluginResolutionException
     {
         Set<Artifact> overrideArtifacts = new LinkedHashSet<Artifact>();
@@ -429,6 +435,11 @@ public class DefaultMavenPluginManager
         ArtifactFilter collectionFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
 
         ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
+
+        if ( extensionArtifactFilter != null )
+        {
+            resolutionFilter = new AndArtifactFilter( Arrays.asList( resolutionFilter, extensionArtifactFilter ) );
+        }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
         request.setArtifact( pluginArtifact );

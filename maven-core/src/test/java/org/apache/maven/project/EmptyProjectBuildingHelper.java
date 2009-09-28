@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -56,10 +55,10 @@ public class EmptyProjectBuildingHelper
         }
     }
 
-    public ClassRealm createProjectRealm( Model model, RepositoryRequest repositoryRequest )
+    public ProjectRealmCache.CacheRecord createProjectRealm( Model model, RepositoryRequest repositoryRequest )
         throws ArtifactResolutionException
     {
-        return null;
+        return new ProjectRealmCache.CacheRecord( null, null );
     }
 
 }

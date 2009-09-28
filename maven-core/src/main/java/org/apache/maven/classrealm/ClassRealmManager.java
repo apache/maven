@@ -44,6 +44,14 @@ public interface ClassRealmManager
     ClassRealm createProjectRealm( Model model );
 
     /**
+     * Creates a new class realm for the specified build extension.
+     * 
+     * @param plugin The extension plugin for which to create a realm, must not be {@code null}.
+     * @return The new extension realm, never {@code null}.
+     */
+    ClassRealm createExtensionRealm( Plugin extension );
+
+    /**
      * Creates a new class realm for the specified plugin.
      * 
      * @param plugin The plugin for which to create a realm, must not be {@code null}.

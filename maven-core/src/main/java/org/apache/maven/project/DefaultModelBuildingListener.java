@@ -25,6 +25,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
@@ -45,6 +46,8 @@ class DefaultModelBuildingListener
     private ProjectBuildingRequest projectBuildingRequest;
 
     private ClassRealm projectRealm;
+
+    private ArtifactFilter extensionArtifactFilter;
 
     private List<ArtifactRepository> remoteRepositories;
 
@@ -76,6 +79,16 @@ class DefaultModelBuildingListener
     public ClassRealm getProjectRealm()
     {
         return projectRealm;
+    }
+
+    /**
+     * Gets the artifact filter to exclude extension artifacts from plugin realms.
+     * 
+     * @return The extension artifact filter or {@code null} if none.
+     */
+    public ArtifactFilter getExtentionArtifactFilter()
+    {
+        return extensionArtifactFilter;
     }
 
     /**
@@ -113,17 +126,6 @@ class DefaultModelBuildingListener
 
         try
         {
-            remoteRepositories =
-                projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories,
-                                                                  projectBuildingRequest );
-        }
-        catch ( Exception e )
-        {
-            event.getProblems().addError( "Invalid artifact repository: " + e.getMessage(), e );
-        }
-
-        try
-        {
             pluginRepositories =
                 projectBuildingHelper.createArtifactRepositories( model.getPluginRepositories(), pluginRepositories,
                                                                   projectBuildingRequest );
@@ -143,7 +145,11 @@ class DefaultModelBuildingListener
                 repositoryRequest.setRemoteRepositories( pluginRepositories );
                 repositoryRequest.setOffline( projectBuildingRequest.isOffline() );
 
-                projectRealm = projectBuildingHelper.createProjectRealm( model, repositoryRequest );
+                ProjectRealmCache.CacheRecord record =
+                    projectBuildingHelper.createProjectRealm( model, repositoryRequest );
+
+                projectRealm = record.realm;
+                extensionArtifactFilter = record.extensionArtifactFilter;
             }
             catch ( ArtifactResolutionException e )
             {
@@ -163,6 +169,18 @@ class DefaultModelBuildingListener
                  */
                 Thread.currentThread().setContextClassLoader( projectRealm );
             }
+        }
+
+        // build the regular repos after extensions are loaded to allow for custom layouts
+        try
+        {
+            remoteRepositories =
+                projectBuildingHelper.createArtifactRepositories( model.getRepositories(), remoteRepositories,
+                                                                  projectBuildingRequest );
+        }
+        catch ( Exception e )
+        {
+            event.getProblems().addError( "Invalid artifact repository: " + e.getMessage(), e );
         }
     }
 

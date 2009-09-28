@@ -38,11 +38,11 @@
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <classWorldsVersion>2.1.0</classWorldsVersion>
+    <classWorldsVersion>2.2.0-SNAPSHOT</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
-    <plexusVersion>1.2.1</plexusVersion>
+    <plexusVersion>1.3.0-SNAPSHOT</plexusVersion>
     <plexusInterpolationVersion>1.11</plexusInterpolationVersion>
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>2.0.0</plexusUtilsVersion>
@@ -157,6 +157,14 @@
       <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
     </site>
   </distributionManagement>
+
+  <!-- FIXME: Remove once snapshots have been released -->
+  <repositories>
+    <repository>
+      <id>sonatype.public</id>
+      <url>http://repository.sonatype.org/content/groups/public/</url>
+    </repository>
+  </repositories>
 
   <!--bootstrap-start-comment-->
   <dependencyManagement>
