@@ -42,6 +42,8 @@ under the License.
     <module>maven-it-plugin-dependency-resolution</module>
     <module>maven-it-plugin-expression</module>
     <module>maven-it-plugin-error</module>
+    <module>maven-it-plugin-extension-consumer</module>
+    <module>maven-it-plugin-extension-provider</module>
     <module>maven-it-plugin-fork</module>
     <module>maven-it-plugin-invalid-descriptor</module>
     <module>maven-it-plugin-log-file</module>
