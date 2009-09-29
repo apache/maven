@@ -170,10 +170,19 @@ public class DefaultReportingConverter
             configuration = new Xpp3Dom( configuration );
             dom.addChild( configuration );
         }
+        Xpp3Dom reports = new Xpp3Dom( "reports" );
 
-        // TODO: Clarifiy conversion
+        if (! plugin.getReportSets().isEmpty())
+        {
+            dom.addChild( reports );
+        }
+        // TODO: Clarifiy conversion f reporset.configuration
         for ( ReportSet reportSet : plugin.getReportSets() )
         {
+            for (String report : reportSet.getReports())
+            {
+                addDom( reports, "report", report );
+            }
         }
 
         return dom;
