@@ -32,6 +32,24 @@ under the License.
     project and in projects with the same extension.
   </description>
 
+  <!--
+  These repositories do not provide any artifacts and in particular do not affect the extension class path. They
+  are declared in this module only to check that the identity of extension realms is not affected by the sets of
+  repositories declared for a project.
+  -->
+  <repositories>
+    <repository>
+      <id>test</id>
+      <url>file://${basedir}/target/null</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>test</id>
+      <url>file://${basedir}/target/null</url>
+    </pluginRepository>
+  </pluginRepositories>
+
   <build>
     <plugins>
       <plugin>
