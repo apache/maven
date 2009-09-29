@@ -84,9 +84,6 @@ public class DefaultReportingConverter
             return;
         }
 
-        problems.addWarning( "The <reporting> section is deprecated"
-            + ", please move the reports to the <configuration> section of the new Maven Site Plugin." );
-
         if ( configuration.getChild( "outputDirectory" ) == null )
         {
             addDom( configuration, "outputDirectory", reporting.getOutputDirectory() );
@@ -96,6 +93,13 @@ public class DefaultReportingConverter
         configuration.addChild( reportPlugins );
 
         boolean hasMavenProjectInfoReportsPlugin = false;
+
+        if ( !reporting.getPlugins().isEmpty() )
+        {
+
+            problems.addWarning( "The <reporting> section is deprecated"
+                + ", please move the reports to the <configuration> section of the new Maven Site Plugin." );
+        }
 
         for ( ReportPlugin plugin : reporting.getPlugins() )
         {
