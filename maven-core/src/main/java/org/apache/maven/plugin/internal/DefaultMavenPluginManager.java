@@ -315,12 +315,13 @@ public class DefaultMavenPluginManager
         {
             createPluginRealm( pluginDescriptor, session, parent, imports );
 
-            pluginRealmCache.put( plugin, parent, imports, session.getLocalRepository(),
-                                  project.getPluginArtifactRepositories(), pluginDescriptor.getClassRealm(),
-                                  pluginDescriptor.getArtifacts() );
+            cacheRecord =
+                pluginRealmCache.put( plugin, parent, imports, session.getLocalRepository(),
+                                      project.getPluginArtifactRepositories(), pluginDescriptor.getClassRealm(),
+                                      pluginDescriptor.getArtifacts() );
         }
 
-        pluginRealmCache.register( project, pluginDescriptor.getClassRealm() );
+        pluginRealmCache.register( project, cacheRecord );
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,

@@ -83,8 +83,8 @@ public class DefaultProjectRealmCache
         return cache.get( new CacheKey( extensionRealms ) );
     }
 
-    public void put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
-                     ArtifactFilter extensionArtifactFilter )
+    public CacheRecord put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
+                            ArtifactFilter extensionArtifactFilter )
     {
         if ( projectRealm == null )
         {
@@ -99,12 +99,20 @@ public class DefaultProjectRealmCache
         }
 
         CacheRecord record = new CacheRecord( projectRealm, extensionArtifactFilter );
+
         cache.put( key, record );
+
+        return record;
     }
 
     public void flush()
     {
         cache.clear();
+    }
+
+    public void register( MavenProject project, CacheRecord record )
+    {
+        // default cache does not track record usage
     }
 
 }

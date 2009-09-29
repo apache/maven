@@ -53,19 +53,20 @@ public interface PluginRealmCache
     CacheRecord get( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories );
 
-    void put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports, ArtifactRepository localRepository,
-              List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
+    CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                     ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
 
     void flush();
 
     /**
-     * Registers the specified plugin realm for usage with the given project. Integrators can use the information
-     * collected from this method in combination with a custom cache implementation to dispose unused plugin realms from
-     * the cache.
+     * Registers the specified cache record for usage with the given project. Integrators can use the information
+     * collected from this method in combination with a custom cache implementation to dispose unused records from the
+     * cache.
      * 
      * @param project The project that employs the plugin realm, must not be {@code null}.
-     * @param pluginRealm The plugin realm being used for the project, must not be {@code null}.
+     * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, ClassRealm pluginRealm );
+    void register( MavenProject project, CacheRecord record );
 
 }

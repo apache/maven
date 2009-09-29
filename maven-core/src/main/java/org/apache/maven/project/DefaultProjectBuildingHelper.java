@@ -362,10 +362,10 @@ public class DefaultProjectBuildingHelper
                 extensionArtifactFilter = new ExclusionSetFilter( exclusions );
             }
 
-            projectRealmCache.put( extensionRealms, projectRealm, extensionArtifactFilter );
-
-            record = new ProjectRealmCache.CacheRecord( projectRealm, extensionArtifactFilter );
+            record = projectRealmCache.put( extensionRealms, projectRealm, extensionArtifactFilter );
         }
+
+        projectRealmCache.register( project, record );
 
         return record;
     }

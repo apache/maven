@@ -106,9 +106,9 @@ public class DefaultPluginRealmCache
         return cache.get( new CacheKey( plugin, parentRealm, parentImports, localRepository, remoteRepositories ) );
     }
 
-    public void put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
-                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                     ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
+    public CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                            ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                            ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
         if ( pluginRealm == null || pluginArtifacts == null )
         {
@@ -123,7 +123,10 @@ public class DefaultPluginRealmCache
         }
 
         CacheRecord record = new CacheRecord( pluginRealm, pluginArtifacts );
+
         cache.put( key, record );
+
+        return record;
     }
 
     public void flush()
@@ -234,7 +237,7 @@ public class DefaultPluginRealmCache
         return s1 != null ? s1.equals( s2 ) : s2 == null;
     }
 
-    public void register( MavenProject project, ClassRealm pluginRealm )
+    public void register( MavenProject project, CacheRecord record )
     {
         // default cache does not track plugin usage
     }

@@ -52,9 +52,19 @@ public interface ProjectRealmCache
 
     CacheRecord get( List<? extends ClassRealm> extensionRealms );
 
-    void put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
-              ArtifactFilter extensionArtifactFilter );
+    CacheRecord put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
+                     ArtifactFilter extensionArtifactFilter );
 
     void flush();
+
+    /**
+     * Registers the specified cache record for usage with the given project. Integrators can use the information
+     * collected from this method in combination with a custom cache implementation to dispose unused records from the
+     * cache.
+     * 
+     * @param project The project that employs the plugin realm, must not be {@code null}.
+     * @param record The cache record being used for the project, must not be {@code null}.
+     */
+    void register( MavenProject project, CacheRecord record );
 
 }
