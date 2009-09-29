@@ -19,18 +19,13 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Exclusion;
-import org.apache.maven.model.Plugin;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -47,22 +42,19 @@ public class DefaultExtensionRealmCache
     private static class CacheKey
     {
 
-        private final Plugin extension;
-
-        private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+        private final List<File> files;
 
         private final int hashCode;
 
-        public CacheKey( Plugin extension, RepositoryRequest repositoryRequest )
+        public CacheKey( List<? extends Artifact> extensionArtifacts )
         {
-            this.extension = extension.clone();
-            this.repositories.add( repositoryRequest.getLocalRepository() );
-            this.repositories.addAll( repositoryRequest.getRemoteRepositories() );
+            this.files = new ArrayList<File>( extensionArtifacts.size() );
+            for ( Artifact artifact : extensionArtifacts )
+            {
+                files.add( artifact.getFile() );
+            }
 
-            int hash = 17;
-            hash = hash * 31 + extensionHashCode( extension );
-            hash = hash * 31 + repositories.hashCode();
-            this.hashCode = hash;
+            this.hashCode = files.hashCode();
         }
 
         @Override
@@ -86,35 +78,38 @@ public class DefaultExtensionRealmCache
 
             CacheKey other = (CacheKey) o;
 
-            return extensionEquals( extension, other.extension ) && eq( repositories, other.repositories );
+            return files.equals( other.files );
         }
 
     }
 
     private final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
-    public CacheRecord get( Plugin extension, RepositoryRequest repositoryRequest )
+    public CacheRecord get( List<? extends Artifact> extensionArtifacts )
     {
-        return cache.get( new CacheKey( extension, repositoryRequest ) );
+        return cache.get( new CacheKey( extensionArtifacts ) );
     }
 
-    public void put( Plugin extension, RepositoryRequest repositoryRequest, ClassRealm extensionRealm,
-                     List<Artifact> extensionArtifacts, ExtensionDescriptor extensionDescriptor )
+    public CacheRecord put( List<? extends Artifact> extensionArtifacts, ClassRealm extensionRealm,
+                            ExtensionDescriptor extensionDescriptor )
     {
-        if ( extensionRealm == null || extensionArtifacts == null )
+        if ( extensionRealm == null )
         {
             throw new NullPointerException();
         }
 
-        CacheKey key = new CacheKey( extension, repositoryRequest );
+        CacheKey key = new CacheKey( extensionArtifacts );
 
         if ( cache.containsKey( key ) )
         {
-            throw new IllegalStateException( "Duplicate extension realm for extension " + extension.getId() );
+            throw new IllegalStateException( "Duplicate extension realm for extension " + extensionArtifacts );
         }
 
-        CacheRecord record = new CacheRecord( extensionRealm, extensionArtifacts, extensionDescriptor );
+        CacheRecord record = new CacheRecord( extensionRealm, extensionDescriptor );
+
         cache.put( key, record );
+
+        return record;
     }
 
     public void flush()
@@ -122,108 +117,7 @@ public class DefaultExtensionRealmCache
         cache.clear();
     }
 
-    protected static int extensionHashCode( Plugin extension )
-    {
-        int hash = 17;
-
-        hash = hash * 31 + extension.getGroupId().hashCode();
-        hash = hash * 31 + extension.getArtifactId().hashCode();
-        hash = hash * 31 + extension.getVersion().hashCode();
-
-        for ( Dependency dependency : extension.getDependencies() )
-        {
-            hash = hash * 31 + dependency.getGroupId().hashCode();
-            hash = hash * 31 + dependency.getArtifactId().hashCode();
-            hash = hash * 31 + dependency.getVersion().hashCode();
-            hash = hash * 31 + dependency.getType().hashCode();
-            hash = hash * 31 + ( dependency.getClassifier() != null ? dependency.getClassifier().hashCode() : 0 );
-            hash = hash * 31 + ( dependency.getScope() != null ? dependency.getScope().hashCode() : 0 );
-
-            for ( Exclusion exclusion : dependency.getExclusions() )
-            {
-                hash = hash * 31 + exclusion.getGroupId().hashCode();
-                hash = hash * 31 + exclusion.getArtifactId().hashCode();
-            }
-        }
-
-        return hash;
-    }
-
-    private static boolean extensionEquals( Plugin a, Plugin b )
-    {
-        return eq( a.getGroupId(), b.getGroupId() ) //
-            && eq( a.getArtifactId(), b.getArtifactId() ) //
-            && eq( a.getVersion(), b.getVersion() ) // 
-            && a.isExtensions() == b.isExtensions() //
-            && dependenciesEquals( a.getDependencies(), b.getDependencies() );
-    }
-
-    private static boolean dependenciesEquals( List<Dependency> a, List<Dependency> b )
-    {
-        if ( a.size() != b.size() )
-        {
-            return false;
-        }
-
-        Iterator<Dependency> aI = a.iterator();
-        Iterator<Dependency> bI = b.iterator();
-
-        while ( aI.hasNext() )
-        {
-            Dependency aD = aI.next();
-            Dependency bD = bI.next();
-
-            boolean r = eq( aD.getGroupId(), bD.getGroupId() ) //
-                && eq( aD.getArtifactId(), bD.getArtifactId() ) //
-                && eq( aD.getVersion(), bD.getVersion() ) // 
-                && eq( aD.getType(), bD.getType() ) //
-                && eq( aD.getClassifier(), bD.getClassifier() ) //
-                && eq( aD.getScope(), bD.getScope() );
-
-            r &= exclusionsEquals( aD.getExclusions(), bD.getExclusions() );
-
-            if ( !r )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean exclusionsEquals( List<Exclusion> a, List<Exclusion> b )
-    {
-        if ( a.size() != b.size() )
-        {
-            return false;
-        }
-
-        Iterator<Exclusion> aI = a.iterator();
-        Iterator<Exclusion> bI = b.iterator();
-
-        while ( aI.hasNext() )
-        {
-            Exclusion aD = aI.next();
-            Exclusion bD = bI.next();
-
-            boolean r = eq( aD.getGroupId(), bD.getGroupId() ) //
-                && eq( aD.getArtifactId(), bD.getArtifactId() );
-
-            if ( !r )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static <T> boolean eq( T s1, T s2 )
-    {
-        return s1 != null ? s1.equals( s2 ) : s2 == null;
-    }
-
-    public void register( MavenProject project, ClassRealm extensionRealm )
+    public void register( MavenProject project, CacheRecord record )
     {
         // default cache does not track extension usage
     }

@@ -22,40 +22,38 @@ package org.apache.maven.plugin;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.project.ExtensionDescriptor;
+import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
- * Caches extension class realms. <strong>Warning:</strong> This is an internal utility interface that is only public
- * for technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted
- * without prior notice.
+ * Caches plugin artifacts. <strong>Warning:</strong> This is an internal utility interface that is only public for
+ * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
+ * prior notice.
  * 
  * @author Igor Fedorenko
  * @author Benjamin Bentmann
  */
-public interface ExtensionRealmCache
+public interface PluginArtifactsCache
 {
 
     public static class CacheRecord
     {
 
-        public final ClassRealm realm;
+        public final List<Artifact> artifacts;
 
-        public final ExtensionDescriptor desciptor;
-
-        public CacheRecord( ClassRealm realm, ExtensionDescriptor descriptor )
+        public CacheRecord( List<Artifact> artifacts )
         {
-            this.realm = realm;
-            this.desciptor = descriptor;
+            this.artifacts = artifacts;
         }
 
     }
 
-    CacheRecord get( List<? extends Artifact> extensionArtifacts );
+    CacheRecord get( Plugin plugin, RepositoryRequest repositoryRequest, ArtifactFilter extensionArtifactFilter );
 
-    CacheRecord put( List<? extends Artifact> extensionArtifacts, ClassRealm extensionRealm,
-                     ExtensionDescriptor extensionDescriptor );
+    CacheRecord put( Plugin plugin, RepositoryRequest repositoryRequest, ArtifactFilter extensionArtifactFilter,
+                     List<Artifact> pluginArtifacts );
 
     void flush();
 

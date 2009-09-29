@@ -49,6 +49,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.ExtensionRealmCache;
+import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -80,6 +81,9 @@ public class DefaultProjectBuildingHelper
 
     @Requirement
     private ClassRealmManager classRealmManager;
+
+    @Requirement
+    private PluginArtifactsCache pluginArtifactsCache;
 
     @Requirement
     private ExtensionRealmCache extensionRealmCache;
@@ -180,22 +184,36 @@ public class DefaultProjectBuildingHelper
                 plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
             }
 
-            ClassRealm extensionRealm;
             List<Artifact> artifacts;
-            ExtensionDescriptor extensionDescriptor = null;
 
-            ExtensionRealmCache.CacheRecord record = extensionRealmCache.get( plugin, repositoryRequest );
+            PluginArtifactsCache.CacheRecord recordArtifacts =
+                pluginArtifactsCache.get( plugin, repositoryRequest, null );
 
-            if ( record != null )
+            if ( recordArtifacts != null )
             {
-                extensionRealm = record.realm;
-                artifacts = record.artifacts;
-                extensionDescriptor = record.desciptor;
+                artifacts = recordArtifacts.artifacts;
             }
             else
             {
                 artifacts = resolveExtensionArtifacts( plugin, repositoryRequest );
 
+                recordArtifacts = pluginArtifactsCache.put( plugin, repositoryRequest, null, artifacts );
+            }
+
+            pluginArtifactsCache.register( project, recordArtifacts );
+
+            ClassRealm extensionRealm;
+            ExtensionDescriptor extensionDescriptor = null;
+
+            ExtensionRealmCache.CacheRecord recordRealm = extensionRealmCache.get( artifacts );
+
+            if ( recordRealm != null )
+            {
+                extensionRealm = recordRealm.realm;
+                extensionDescriptor = recordRealm.desciptor;
+            }
+            else
+            {
                 extensionRealm = classRealmManager.createExtensionRealm( plugin );
 
                 if ( logger.isDebugEnabled() )
@@ -258,10 +276,10 @@ public class DefaultProjectBuildingHelper
                     }
                 }
 
-                extensionRealmCache.put( plugin, repositoryRequest, extensionRealm, artifacts, extensionDescriptor );
+                recordRealm = extensionRealmCache.put( artifacts, extensionRealm, extensionDescriptor );
             }
 
-            extensionRealmCache.register( project, extensionRealm );
+            extensionRealmCache.register( project, recordRealm );
 
             extensionRealms.add( extensionRealm );
             if ( extensionDescriptor != null )
