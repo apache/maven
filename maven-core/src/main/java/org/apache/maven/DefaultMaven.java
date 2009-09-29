@@ -313,6 +313,8 @@ public class DefaultMaven
 
         List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
 
+        boolean problems = false;
+
         for ( ProjectBuildingResult result : results )
         {
             projects.add( result.getProject() );
@@ -322,21 +324,25 @@ public class DefaultMaven
                 logger.warn( "" );
                 logger.warn( "Some problems were encountered while building the effective model for "
                     + result.getProject().getId() );
-                logger.warn( "" );
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
                     logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
                 }
 
-                logger.warn( "" );
-                logger.warn( "It is highly recommended to fix these problems"
-                    + " because they threaten the stability of your build." );
-                logger.warn( "" );
-                logger.warn( "For this reason, future Maven versions might no"
-                    + " longer support building such malformed projects." );
-                logger.warn( "" );
+                problems = true;
             }
+        }
+
+        if ( problems )
+        {
+            logger.warn( "" );
+            logger.warn( "It is highly recommended to fix these problems"
+                + " because they threaten the stability of your build." );
+            logger.warn( "" );
+            logger.warn( "For this reason, future Maven versions might no"
+                + " longer support building such malformed projects." );
+            logger.warn( "" );
         }
     }
 
