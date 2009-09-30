@@ -165,6 +165,11 @@ public class DefaultProjectBuildingHelper
 
         if ( extensionPlugins.isEmpty() )
         {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Extension realms for project " + model.getId() + ": (none)" );
+            }
+
             return new ProjectRealmCache.CacheRecord( null, null );
         }
 
@@ -297,6 +302,11 @@ public class DefaultProjectBuildingHelper
                  */
                 publicArtifacts.addAll( artifacts );
             }
+        }
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Extension realms for project " + model.getId() + ": " + extensionRealms );
         }
 
         ProjectRealmCache.CacheRecord record = projectRealmCache.get( extensionRealms );
