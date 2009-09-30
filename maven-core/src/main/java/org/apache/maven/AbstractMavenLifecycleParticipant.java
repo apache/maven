@@ -46,6 +46,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * activate profiles and perform similar tasks that affect MavenProject
      * instance construction.
      */
+    // TODO: This is too early for build extensions, so maybe just remove it?
     public void afterSessionStart( MavenSession session ) throws MavenExecutionException
     {
         // do nothing

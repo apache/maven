@@ -20,7 +20,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -108,7 +110,7 @@ public class DefaultMaven
         
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants() )
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject> emptyList() ) )
             {
                 listener.afterSessionStart( session );
             }
@@ -138,16 +140,23 @@ public class DefaultMaven
 
         session.setProjects( projects );
 
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants() )
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( projects ) )
             {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
                 listener.afterProjectsRead( session );
             }
         }
         catch ( MavenExecutionException e )
         {
             return processResult( result, e );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
         try
@@ -212,19 +221,51 @@ public class DefaultMaven
         return result;
     }
 
-    private List<AbstractMavenLifecycleParticipant> getLifecycleParticipants()
+    private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
     {
-        // TODO injection of component lists does not work
-        List<AbstractMavenLifecycleParticipant> lifecycleListeners;
+        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
+            new LinkedHashSet<AbstractMavenLifecycleParticipant>();
+
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            lifecycleListeners = container.lookupList( AbstractMavenLifecycleParticipant.class );
+            try
+            {
+                lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
+            }
+            catch ( ComponentLookupException e )
+            {
+                // this is just silly, lookupList should return an empty list!
+                logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
+            }
+
+            Collection<ClassLoader> scannedRealms = new HashSet<ClassLoader>();
+
+            for ( MavenProject project : projects )
+            {
+                ClassLoader projectRealm = project.getClassRealm();
+
+                if ( projectRealm != null && scannedRealms.add( projectRealm ) )
+                {
+                    Thread.currentThread().setContextClassLoader( projectRealm );
+
+                    try
+                    {
+                        lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
+                    }
+                    catch ( ComponentLookupException e )
+                    {
+                        // this is just silly, lookupList should return an empty list!
+                        logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
+                    }
+                }
+            }
         }
-        catch ( ComponentLookupException e1 )
+        finally
         {
-            // this is just silly, lookupList should return an empty list!
-            lifecycleListeners = new ArrayList<AbstractMavenLifecycleParticipant>();
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
+
         return lifecycleListeners;
     }
 
