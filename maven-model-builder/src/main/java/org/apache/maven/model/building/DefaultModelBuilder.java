@@ -103,7 +103,7 @@ public class DefaultModelBuilder
     @Requirement
     private DependencyManagementImporter dependencyManagementImporter;
 
-    @Requirement
+    @Requirement( optional = true )
     private LifecycleBindingsInjector lifecycleBindingsInjector;
 
     @Requirement
@@ -246,6 +246,11 @@ public class DefaultModelBuilder
 
         if ( request.isProcessPlugins() )
         {
+            if ( lifecycleBindingsInjector == null )
+            {
+                throw new IllegalStateException( "lifecycle bindings injector is missing" );
+            }
+
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
