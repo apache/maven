@@ -67,7 +67,7 @@ public class DefaultClassRealmManager
      * @param imports The packages/types to import from the parent realm, may be {@code null}.
      * @return The created class realm, never {@code null}.
      */
-    private ClassRealm createRealm( String baseRealmId, ClassLoader parent, List<String> imports )
+    private ClassRealm createRealm( String baseRealmId, ClassLoader parent, List<String> imports, boolean importXpp3Dom )
     {
         ClassWorld world = getClassWorld();
 
@@ -108,7 +108,10 @@ public class DefaultClassRealmManager
                 importMavenApi( classRealm );
             }
 
-            importXpp3Dom( classRealm );
+            if ( importXpp3Dom )
+            {
+                importXpp3Dom( classRealm );
+            }
 
             if ( imports != null && !imports.isEmpty() )
             {
@@ -189,7 +192,7 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "model missing" );
         }
 
-        return createRealm( getKey( model ), null, null );
+        return createRealm( getKey( model ), null, null, false );
     }
 
     private String getKey( Model model )
@@ -204,7 +207,7 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "extension plugin missing" );
         }
 
-        return createRealm( getKey( plugin, true ), null, null );
+        return createRealm( getKey( plugin, true ), null, null, true );
     }
 
     public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports )
@@ -214,7 +217,7 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "plugin missing" );
         }
 
-        return createRealm( getKey( plugin, false ), parent, imports );
+        return createRealm( getKey( plugin, false ), parent, imports, true );
     }
 
     private String getKey( Plugin plugin, boolean extension )
