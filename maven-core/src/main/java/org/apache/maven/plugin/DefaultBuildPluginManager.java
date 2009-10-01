@@ -116,6 +116,16 @@ public class DefaultBuildPluginManager
 
             throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
         }
+        catch ( ClassCastException e )
+        {
+            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+            PrintStream ps = new PrintStream( os );
+            ps.println( "A type incompatibility occured while executing " + mojoDescriptor.getId() );
+            ps.println( e );
+            pluginRealm.display( ps );
+
+            throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
+        }
         finally
         {
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
