@@ -134,6 +134,13 @@ class DefaultModelBuildingListener
                  */
                 Thread.currentThread().setContextClassLoader( project.getClassRealm() );
             }
+            else
+            {
+                /*
+                 * Reset context class loader to core realm.
+                 */
+                Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
+            }
         }
 
         // build the regular repos after extensions are loaded to allow for custom layouts
