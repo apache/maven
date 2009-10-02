@@ -258,6 +258,8 @@ public class MavenCli
 
         request.setExecutionListener( new ExecutionEventLogger( logger ) );
 
+        container.getLoggerManager().setThresholds( request.getLoggingLevel() );
+
         if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
             CLIReportingUtils.showVersion();
