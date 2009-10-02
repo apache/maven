@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4387QuietLoggingTest.class );
         suite.addTestSuite( MavenITmng4385LifecycleMappingFromExtensionInReactorTest.class );
         suite.addTestSuite( MavenITmng4381ExtensionSingletonComponentTest.class );
         suite.addTestSuite( MavenITmng4367LayoutAwareMirrorSelectionTest.class );
