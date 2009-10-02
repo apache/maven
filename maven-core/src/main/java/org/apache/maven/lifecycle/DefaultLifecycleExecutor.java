@@ -1768,7 +1768,7 @@ public class DefaultLifecycleExecutor
     {        
         // [prefix]:[goal]
         
-        PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest( session ).setPrefix( prefix );
+        PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest( prefix, session );
         PluginPrefixResult prefixResult = pluginPrefixResolver.resolve( prefixRequest );
         
         Plugin plugin = new Plugin();

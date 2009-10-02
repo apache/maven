@@ -173,8 +173,7 @@ public class DefaultPluginManager
 
     public Plugin getPluginDefinitionForPrefix( String prefix, MavenSession session, MavenProject project )
     {
-        PluginPrefixRequest request = new DefaultPluginPrefixRequest( session );
-        request.setPrefix( prefix );
+        PluginPrefixRequest request = new DefaultPluginPrefixRequest( prefix, session );
         request.setPom( project.getModel() );
 
         try
@@ -197,8 +196,7 @@ public class DefaultPluginManager
     {
         MavenSession session = legacySupport.getSession();
 
-        PluginPrefixRequest request = new DefaultPluginPrefixRequest( session );
-        request.setPrefix( prefix );
+        PluginPrefixRequest request = new DefaultPluginPrefixRequest( prefix, session );
 
         try
         {

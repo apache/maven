@@ -47,18 +47,36 @@ public class DefaultPluginPrefixRequest
 
     private RepositoryRequest repositoryRequest;
 
+    /**
+     * Creates an empty request.
+     */
     public DefaultPluginPrefixRequest()
     {
         repositoryRequest = new DefaultRepositoryRequest();
     }
 
+    /**
+     * Creates a request by copying settings from the specified repository request.
+     * 
+     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
+     */
     public DefaultPluginPrefixRequest( RepositoryRequest repositoryRequest )
     {
         this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
     }
 
-    public DefaultPluginPrefixRequest( MavenSession session )
+    /**
+     * Creates a request for the specified plugin prefix and build session. The provided build session will be used to
+     * configure repository settings. If the session has a current project, its plugin artifact repositories and model
+     * will be used as well.
+     * 
+     * @param prefix The plugin prefix to resolve, must not be {@code null}.
+     * @param session The build session from which to derive further settings, must not be {@code null}.
+     */
+    public DefaultPluginPrefixRequest( String prefix, MavenSession session )
     {
+        setPrefix( prefix );
+
         this.repositoryRequest = new DefaultRepositoryRequest();
 
         setCache( session.getRepositoryCache() );
