@@ -303,6 +303,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3220ImportScopeTest.class );
         suite.addTestSuite( MavenITmng3217InterPluginDependencyTest.class );
         suite.addTestSuite( MavenITmng3203DefaultLifecycleExecIdTest.class );
+        suite.addTestSuite( MavenITmng3183LoggingToFileTest.class );
         suite.addTestSuite( MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest.class );
         suite.addTestSuite( MavenITmng3118TestClassPathOrderTest.class );
         suite.addTestSuite( MavenITmng3106ProfileMultipleActivatorsTest.class );
