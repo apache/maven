@@ -153,10 +153,19 @@ public class MavenCli
                 .setName( "embedder" );
 
             container = new DefaultPlexusContainer( cc );
-            
+
             logger = container.getLogger();
+
+            if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
+            {
+                File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) ).getAbsoluteFile();
+
+                logger = new FileLogger( logFile );
+
+                container.setLoggerManager( new MavenLoggerManager( logger ) );
+            }
             
-            maven = container.lookup( Maven.class );            
+            maven = container.lookup( Maven.class );
         }
         catch ( PlexusContainerException e )
         {

@@ -22,6 +22,7 @@ package org.apache.maven.cli;
 import java.io.PrintStream;
 
 import org.apache.maven.Maven;
+import org.codehaus.plexus.logging.AbstractLogger;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -30,8 +31,9 @@ import org.codehaus.plexus.logging.Logger;
  * @author Benjamin Bentmann
  */
 public class PrintStreamLogger
-    implements Logger
+    extends AbstractLogger
 {
+
     private final PrintStream out;
 
     private static final String FATAL_ERROR = "[FATAL] ";
@@ -46,6 +48,8 @@ public class PrintStreamLogger
 
     public PrintStreamLogger( PrintStream out )
     {
+        super( Logger.LEVEL_INFO, Maven.class.getName() );
+
         if ( out == null )
         {
             throw new IllegalArgumentException( "output stream missing" );
@@ -54,11 +58,6 @@ public class PrintStreamLogger
         this.out = out;
     }
 
-    public void debug( String message )
-    {
-        debug( message, null );
-    }
-    
     public void debug( String message, Throwable throwable )
     {
         if ( isDebugEnabled() )
@@ -71,11 +70,6 @@ public class PrintStreamLogger
                 throwable.printStackTrace( out );
             }
         }
-    }
-
-    public void info( String message )
-    {
-        info( message, null );
     }
 
     public void info( String message, Throwable throwable )
@@ -92,11 +86,6 @@ public class PrintStreamLogger
         }
     }
 
-    public void warn( String message )
-    {
-        warn( message, null );
-    }
-    
     public void warn( String message, Throwable throwable )
     {
         if ( isWarnEnabled() )
@@ -111,11 +100,6 @@ public class PrintStreamLogger
         }
     }
 
-    public void error( String message )
-    {
-        error( message, null );
-    }
-    
     public void error( String message, Throwable throwable )
     {
         if ( isErrorEnabled() )
@@ -130,11 +114,6 @@ public class PrintStreamLogger
         }
     }
 
-    public void fatalError( String message )
-    {
-        fatalError( message, null );
-    }
-    
     public void fatalError( String message, Throwable throwable )
     {
         if ( isFatalErrorEnabled() )
@@ -166,42 +145,4 @@ public class PrintStreamLogger
         return this;
     }
 
-    public String getName()
-    {
-        return Maven.class.getName();
-    }
-
-    public int getThreshold()
-    {
-        return 0;
-    }
-
-    public boolean isDebugEnabled()
-    {
-        return false;
-    }
-
-    public boolean isErrorEnabled()
-    {
-        return false;
-    }
-
-    public boolean isFatalErrorEnabled()
-    {
-        return false;
-    }
-
-    public boolean isInfoEnabled()
-    {
-        return false;
-    }
-
-    public boolean isWarnEnabled()
-    {
-        return false;
-    }
-
-    public void setThreshold( int arg0 )
-    {
-    }
 }
