@@ -19,8 +19,10 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -71,6 +74,32 @@ public class MavenSession
     {
         this( container, request, result, Arrays.asList( new MavenProject[]{ project } ) );        
     }    
+
+    @Deprecated
+    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
+                         String executionRootDir, Properties executionProperties, Date startTime )
+    {
+        this( container, settings, localRepository, eventDispatcher, unused, goals, executionRootDir,
+              executionProperties, null, startTime );
+    }
+
+    @Deprecated
+    public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
+                         EventDispatcher eventDispatcher, ReactorManager unused, List<String> goals,
+                         String executionRootDir, Properties executionProperties, Properties userProperties,
+                         Date startTime )
+    {
+        this.container = container;
+        this.settings = settings;
+        this.executionProperties = executionProperties;
+        this.request = new DefaultMavenExecutionRequest();
+        this.request.setUserProperties( userProperties );
+        this.request.setLocalRepository( localRepository );
+        this.request.setGoals( goals );
+        this.request.setBaseDirectory( ( executionRootDir != null ) ? new File( executionRootDir ) : null );
+        this.request.setStartTime( startTime );
+    }
 
     @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, List<MavenProject> projects )
@@ -319,6 +348,17 @@ public class MavenSession
     private String getId( MavenProject project )
     {
         return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
+    }
+
+    @Deprecated
+    public EventDispatcher getEventDispatcher()
+    {
+        return null;
+    }
+
+    public Date getStartTime()
+    {
+        return request.getStartTime();
     }
 
 }
