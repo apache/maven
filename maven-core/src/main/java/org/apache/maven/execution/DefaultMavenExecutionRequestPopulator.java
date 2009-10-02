@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.execution;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,8 +28,6 @@ import java.util.Set;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.embedder.MavenEmbedderException;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -58,7 +56,7 @@ public class DefaultMavenExecutionRequestPopulator
     private SecDispatcher securityDispatcher;
 
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         if ( settings == null )
         {
@@ -197,7 +195,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     private void injectDefaultRepositories( MavenExecutionRequest request )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         Set<String> definedRepositories = getRepoIds( request.getRemoteRepositories() );
 
@@ -209,13 +207,13 @@ public class DefaultMavenExecutionRequestPopulator
             }
             catch ( InvalidRepositoryException e )
             {
-                throw new MavenEmbedderException( "Cannot create default remote repository.", e );
+                throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
             }
         }
     }
 
     private void injectDefaultPluginRepositories( MavenExecutionRequest request )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         Set<String> definedRepositories = getRepoIds( request.getPluginArtifactRepositories() );
 
@@ -227,7 +225,7 @@ public class DefaultMavenExecutionRequestPopulator
             }
             catch ( InvalidRepositoryException e )
             {
-                throw new MavenEmbedderException( "Cannot create default remote repository.", e );
+                throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
             }
         }
     }
@@ -248,7 +246,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     private void processRepositoriesInSettings( MavenExecutionRequest request )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         repositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
         repositorySystem.injectProxy( request.getRemoteRepositories(), request.getProxies() );
@@ -264,7 +262,7 @@ public class DefaultMavenExecutionRequestPopulator
     }
 
     private void localRepository( MavenExecutionRequest request )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         // ------------------------------------------------------------------------
         // Local Repository
@@ -290,7 +288,7 @@ public class DefaultMavenExecutionRequestPopulator
     // ------------------------------------------------------------------------
 
     public ArtifactRepository createLocalRepository( MavenExecutionRequest request )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         String localRepositoryPath = null;
 
@@ -310,12 +308,12 @@ public class DefaultMavenExecutionRequestPopulator
         }
         catch ( InvalidRepositoryException e )
         {
-            throw new MavenEmbedderException( "Cannot create local repository.", e );
+            throw new MavenExecutionRequestPopulationException( "Cannot create local repository.", e );
         }
     }
 
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
-        throws MavenEmbedderException
+        throws MavenExecutionRequestPopulationException
     {
         pom( request );
 

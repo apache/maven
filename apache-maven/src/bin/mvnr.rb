@@ -24,7 +24,7 @@ class Maven
 
   include_class 'java.io.File'
   include_class 'org.apache.maven.embedder.MavenEmbedder'
-  include_class 'org.apache.maven.embedder.DefaultConfiguration'
+  include_class 'org.apache.maven.cli.DefaultConfiguration'
   include_class 'org.apache.maven.execution.DefaultMavenExecutionRequest'
 
   def run        

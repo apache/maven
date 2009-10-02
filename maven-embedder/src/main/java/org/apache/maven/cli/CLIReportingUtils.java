@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.apache.maven.embedder.MavenEmbedderLogger;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
 
@@ -89,7 +89,7 @@ public final class CLIReportingUtils
     }
 
 
-    private static void stats( Date start, MavenEmbedderLogger logger )
+    private static void stats( Date start, Logger logger )
     {
         Date finish = new Date();
 
@@ -182,7 +182,7 @@ public final class CLIReportingUtils
         return properties;
     }
 
-    public static void showError( MavenEmbedderLogger logger, String message, Exception e, boolean showStackTrace )
+    public static void showError( Logger logger, String message, Exception e, boolean showStackTrace )
     {
         if ( showStackTrace )
         {

@@ -1,4 +1,4 @@
-package org.apache.maven.embedder;
+package org.apache.maven.cli;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,15 +21,17 @@ package org.apache.maven.embedder;
 
 import java.io.PrintStream;
 
+import org.apache.maven.Maven;
+import org.codehaus.plexus.logging.Logger;
+
 /**
  * Logs to a user-supplied {@link PrintStream}.
  * 
  * @author Benjamin Bentmann
  */
-public class MavenEmbedderPrintStreamLogger
-    extends AbstractMavenEmbedderLogger
+public class PrintStreamLogger
+    implements Logger
 {
-
     private final PrintStream out;
 
     private static final String FATAL_ERROR = "[FATAL] ";
@@ -42,7 +44,7 @@ public class MavenEmbedderPrintStreamLogger
 
     private static final String DEBUG = "[DEBUG] ";
 
-    public MavenEmbedderPrintStreamLogger( PrintStream out )
+    public PrintStreamLogger( PrintStream out )
     {
         if ( out == null )
         {
@@ -52,6 +54,11 @@ public class MavenEmbedderPrintStreamLogger
         this.out = out;
     }
 
+    public void debug( String message )
+    {
+        debug( message, null );
+    }
+    
     public void debug( String message, Throwable throwable )
     {
         if ( isDebugEnabled() )
@@ -64,6 +71,11 @@ public class MavenEmbedderPrintStreamLogger
                 throwable.printStackTrace( out );
             }
         }
+    }
+
+    public void info( String message )
+    {
+        info( message, null );
     }
 
     public void info( String message, Throwable throwable )
@@ -80,6 +92,11 @@ public class MavenEmbedderPrintStreamLogger
         }
     }
 
+    public void warn( String message )
+    {
+        warn( message, null );
+    }
+    
     public void warn( String message, Throwable throwable )
     {
         if ( isWarnEnabled() )
@@ -94,6 +111,11 @@ public class MavenEmbedderPrintStreamLogger
         }
     }
 
+    public void error( String message )
+    {
+        error( message, null );
+    }
+    
     public void error( String message, Throwable throwable )
     {
         if ( isErrorEnabled() )
@@ -108,6 +130,11 @@ public class MavenEmbedderPrintStreamLogger
         }
     }
 
+    public void fatalError( String message )
+    {
+        fatalError( message, null );
+    }
+    
     public void fatalError( String message, Throwable throwable )
     {
         if ( isFatalErrorEnabled() )
@@ -134,4 +161,47 @@ public class MavenEmbedderPrintStreamLogger
         }
     }
 
+    public Logger getChildLogger( String arg0 )
+    {
+        return this;
+    }
+
+    public String getName()
+    {
+        return Maven.class.getName();
+    }
+
+    public int getThreshold()
+    {
+        return 0;
+    }
+
+    public boolean isDebugEnabled()
+    {
+        return false;
+    }
+
+    public boolean isErrorEnabled()
+    {
+        return false;
+    }
+
+    public boolean isFatalErrorEnabled()
+    {
+        return false;
+    }
+
+    public boolean isInfoEnabled()
+    {
+        return false;
+    }
+
+    public boolean isWarnEnabled()
+    {
+        return false;
+    }
+
+    public void setThreshold( int arg0 )
+    {
+    }
 }

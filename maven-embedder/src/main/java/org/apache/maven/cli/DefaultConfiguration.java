@@ -1,4 +1,4 @@
-package org.apache.maven.embedder;
+package org.apache.maven.cli;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * Default implementation of Configuration intefrace.
@@ -43,13 +44,11 @@ public class DefaultConfiguration
 
     private File globalSettings;
 
-    private ContainerCustomizer customizer;
-
     private Properties systemProperties;
 
     private List<URL> extensions = new ArrayList<URL>();
 
-    private MavenEmbedderLogger logger;
+    private Logger logger;
 
     private ClassWorld classWorld;
 
@@ -128,17 +127,6 @@ public class DefaultConfiguration
         return globalSettings;
     }
 
-    public Configuration setConfigurationCustomizer( ContainerCustomizer customizer )
-    {
-        this.customizer = customizer;
-        return this;
-    }
-
-    public ContainerCustomizer getContainerCustomizer()
-    {
-        return customizer;
-    }
-
     public Configuration setSystemProperties( Properties properties )
     {
         systemProperties = properties;
@@ -160,13 +148,13 @@ public class DefaultConfiguration
         return extensions;
     }
 
-    public Configuration setMavenEmbedderLogger( MavenEmbedderLogger logger )
+    public Configuration setMavenEmbedderLogger( Logger logger )
     {
         this.logger = logger;
         return this;
     }
 
-    public MavenEmbedderLogger getMavenEmbedderLogger()
+    public Logger getMavenEmbedderLogger()
     {
         return logger;
     }

@@ -31,7 +31,6 @@ import java.util.Map.Entry;
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.Maven;
 import org.apache.maven.MavenTransferListener;
-import org.apache.maven.embedder.MavenEmbedder;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
@@ -224,7 +223,7 @@ final class CLIRequestUtils
         }
         else
         {
-            userToolchainsFile = MavenEmbedder.DEFAULT_USER_TOOLCHAINS_FILE;
+            userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
         request

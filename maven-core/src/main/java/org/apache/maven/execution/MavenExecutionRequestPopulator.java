@@ -1,4 +1,4 @@
-package org.apache.maven.embedder.execution;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,8 +19,6 @@ package org.apache.maven.embedder.execution;
  * under the License.
  */
 
-import org.apache.maven.embedder.MavenEmbedderException;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.settings.Settings;
 
 /**
@@ -39,19 +37,19 @@ public interface MavenExecutionRequestPopulator
      * @param request The execution request to populate, must not be {@code null}.
      * @param settings The settings to copy into the execution request, may be {@code null}.
      * @return The populated execution request, never {@code null}.
-     * @throws MavenEmbedderException If the execution request could not be populated.
+     * @throws MavenExecutionRequestPopulationException If the execution request could not be populated.
      */
     MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
-        throws MavenEmbedderException;
+        throws MavenExecutionRequestPopulationException;
 
     /**
      * Injects default values like plugin groups or repositories into the specified execution request.
      * 
      * @param request The execution request to populate, must not be {@code null}.
      * @return The populated execution request, never {@code null}.
-     * @throws MavenEmbedderException If the execution request could not be populated.
+     * @throws MavenExecutionRequestPopulationException If the execution request could not be populated.
      */
     MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
-        throws MavenEmbedderException;
+        throws MavenExecutionRequestPopulationException;
 
 }

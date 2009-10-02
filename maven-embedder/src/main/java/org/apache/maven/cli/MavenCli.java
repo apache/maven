@@ -17,27 +17,32 @@ package org.apache.maven.cli;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.embedder.Configuration;
-import org.apache.maven.embedder.ConfigurationValidationResult;
-import org.apache.maven.embedder.DefaultConfiguration;
-import org.apache.maven.embedder.MavenEmbedder;
-import org.apache.maven.embedder.MavenEmbedderConsoleLogger;
-import org.apache.maven.embedder.MavenEmbedderException;
-import org.apache.maven.embedder.MavenEmbedderFileLogger;
-import org.apache.maven.embedder.MavenEmbedderLogger;
-import org.apache.maven.embedder.execution.MavenExecutionRequestPopulator;
+import org.apache.maven.Maven;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
@@ -53,6 +58,17 @@ public class MavenCli
 {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
+    public static final String userHome = System.getProperty( "user.home" );
+
+    public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
+
+    public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
+
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
+        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+
+    public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
+    
     public static void main( String[] args )
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
@@ -122,23 +138,41 @@ public class MavenCli
             System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
         }
 
-        Configuration configuration = buildEmbedderConfiguration( commandLine, classWorld );
-
-        MavenEmbedderLogger logger = configuration.getMavenEmbedderLogger();
-
-        MavenEmbedder mavenEmbedder;
-
+        //
+        
+        Maven maven;
+        
+        DefaultPlexusContainer container;
+        
+        Logger logger;
+        
         try
         {
-            mavenEmbedder = new MavenEmbedder( configuration );
+            ContainerConfiguration cc = new DefaultContainerConfiguration()
+                .setClassWorld( classWorld )
+                .setName( "embedder" );
+
+            container = new DefaultPlexusContainer( cc );
+            
+            logger = container.getLogger();
+            
+            maven = container.lookup( Maven.class );            
         }
-        catch ( MavenEmbedderException e )
+        catch ( PlexusContainerException e )
         {
-            CLIReportingUtils.showError( logger, "Unable to start the embedder: ", e, showErrors );
+            CLIReportingUtils.showError( new ConsoleLogger( Logger.LEVEL_ERROR, Maven.class.getName() ), "Unable to start the embedder: ", e, showErrors );
 
             return 1;
         }
+        catch ( ComponentLookupException e )
+        {
+            CLIReportingUtils.showError( new ConsoleLogger( Logger.LEVEL_ERROR, Maven.class.getName() ), "Unable to start the embedder: ", e, showErrors );
 
+            return 1;
+        }
+                
+        Configuration configuration = buildEmbedderConfiguration( commandLine );        
+        
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
         request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
@@ -150,8 +184,7 @@ public class MavenCli
 
         try
         {
-            MavenSettingsBuilder settingsBuilder =
-                mavenEmbedder.getPlexusContainer().lookup( MavenSettingsBuilder.class );
+            MavenSettingsBuilder settingsBuilder = container.lookup( MavenSettingsBuilder.class );
 
             try
             {
@@ -161,7 +194,7 @@ public class MavenCli
             {
                 try
                 {
-                    mavenEmbedder.getPlexusContainer().release( settingsBuilder );
+                    container.release( settingsBuilder );
                 }
                 catch ( ComponentLifecycleException e )
                 {
@@ -190,8 +223,7 @@ public class MavenCli
 
         try
         {
-            MavenExecutionRequestPopulator requestPopulator =
-                mavenEmbedder.getPlexusContainer().lookup( MavenExecutionRequestPopulator.class );
+            MavenExecutionRequestPopulator requestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
 
             try
             {
@@ -201,7 +233,7 @@ public class MavenCli
             {
                 try
                 {
-                    mavenEmbedder.getPlexusContainer().release( requestPopulator );
+                    container.release( requestPopulator );
                 }
                 catch ( ComponentLifecycleException e )
                 {
@@ -215,7 +247,7 @@ public class MavenCli
 
             return 1;
         }
-        catch ( MavenEmbedderException e )
+        catch ( MavenExecutionRequestPopulationException e )
         {
             CLIReportingUtils.showError( logger, "Failed to process settings: ", e, showErrors );
 
@@ -245,20 +277,18 @@ public class MavenCli
             logger.info( "Enabling strict checksum verification on all artifact downloads." );
         }
 
-        ConfigurationValidationResult cvr = MavenEmbedder.validateConfiguration( configuration );
+        ConfigurationValidationResult cvr = validateConfiguration( configuration );
 
         if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
         {
-            CLIReportingUtils.showError( logger, "Error reading user settings: ", cvr.getUserSettingsException(),
-                                         showErrors );
+            CLIReportingUtils.showError( logger, "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
 
             return 1;
         }
 
         if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
         {
-            CLIReportingUtils.showError( logger, "Error reading global settings: ", cvr.getGlobalSettingsException(),
-                                         showErrors );
+            CLIReportingUtils.showError( logger, "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
 
             return 1;
         }
@@ -291,14 +321,14 @@ public class MavenCli
                 String passwd = commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
 
                 DefaultSecDispatcher dispatcher;
-                dispatcher = (DefaultSecDispatcher) mavenEmbedder.getPlexusContainer().lookup( SecDispatcher.class );
+                dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class );
                 String configurationFile = dispatcher.getConfigurationFile();
                 if ( configurationFile.startsWith( "~" ) )
                 {
                     configurationFile = System.getProperty( "user.home" ) + configurationFile.substring( 1 );
                 }
                 String file = System.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile );
-                mavenEmbedder.getPlexusContainer().release( dispatcher );
+                container.release( dispatcher );
 
                 String master = null;
 
@@ -316,8 +346,7 @@ public class MavenCli
                 }
 
                 DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-                String masterPasswd =
-                    cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+                String masterPasswd = cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
                 System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
 
                 return 0;
@@ -326,21 +355,28 @@ public class MavenCli
         catch ( Exception e )
         {
             System.err.println( "FATAL ERROR: " + "Error encrypting password: " + e.getMessage() );
-            e.printStackTrace();
 
             return 1;
         }
-
-        MavenExecutionResult result = mavenEmbedder.execute( request );
+        
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try
         {
-            mavenEmbedder.stop();
+            MavenExecutionRequestPopulator populator = container.lookup(  MavenExecutionRequestPopulator.class );            
+            
+            request = populator.populateDefaults( request );
         }
-        catch ( MavenEmbedderException e )
+        catch ( MavenExecutionRequestPopulationException e )
         {
             result.addException( e );
         }
+        catch ( ComponentLookupException e )
+        {
+            result.addException( e );
+        }
+
+        result = maven.execute( request );
 
         // The exception handling should be handled in Maven itself.
 
@@ -381,7 +417,7 @@ public class MavenCli
         }
     }
 
-    private Configuration buildEmbedderConfiguration( CommandLine commandLine, ClassWorld classWorld )
+    private Configuration buildEmbedderConfiguration( CommandLine commandLine )
     {
         File userSettingsFile;
 
@@ -391,7 +427,7 @@ public class MavenCli
         }
         else
         {
-            userSettingsFile = MavenEmbedder.DEFAULT_USER_SETTINGS_FILE;
+            userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
         File globalSettingsFile;
@@ -402,23 +438,92 @@ public class MavenCli
         }
         else
         {
-            globalSettingsFile = MavenEmbedder.DEFAULT_GLOBAL_SETTINGS_FILE;
+            globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
         }
 
-        Configuration configuration = new DefaultConfiguration().setUserSettingsFile( userSettingsFile ).setGlobalSettingsFile( globalSettingsFile ).setClassWorld( classWorld );
+        Configuration configuration = new DefaultConfiguration().setUserSettingsFile( userSettingsFile ).setGlobalSettingsFile( globalSettingsFile );
 
         if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) ).getAbsoluteFile();
 
-            configuration.setMavenEmbedderLogger( new MavenEmbedderFileLogger( logFile ) );
+            configuration.setMavenEmbedderLogger( new FileLogger( logFile ) );
         }
         else
         {
-            configuration.setMavenEmbedderLogger( new MavenEmbedderConsoleLogger() );
+            configuration.setMavenEmbedderLogger( new ConsoleLogger( Logger.LEVEL_ERROR, Maven.class.getName()) );
         }
 
         return configuration;
     }
 
+    // ----------------------------------------------------------------------------
+    // Options for settings
+    //
+    // 1. No settings
+    // 2. User settings only
+    // 3. Global settings only
+    // 4. Both Users settings and Global settings. In the case that both are present
+    //    the User settings take priority.
+    //
+    // What we would like to provide is a way that the client code does not have
+    // to deal with settings configuration at all.
+    // ----------------------------------------------------------------------------
+
+    public static ConfigurationValidationResult validateConfiguration( Configuration configuration )
+    {
+        DefaultConfigurationValidationResult result = new DefaultConfigurationValidationResult();
+
+        Reader fileReader = null;
+
+        // User settings
+
+        if ( configuration.getUserSettingsFile() != null )
+        {
+            try
+            {
+                fileReader = ReaderFactory.newXmlReader( configuration.getUserSettingsFile() );
+
+                result.setUserSettings( new SettingsXpp3Reader().read( fileReader ) );
+            }
+            catch ( IOException e )
+            {
+                result.setUserSettingsException( e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                result.setUserSettingsException( e );
+            }
+            finally
+            {
+                IOUtil.close( fileReader );
+            }
+        }
+
+        // Global settings
+
+        if ( configuration.getGlobalSettingsFile() != null )
+        {
+            try
+            {
+                fileReader = ReaderFactory.newXmlReader( configuration.getGlobalSettingsFile() );
+
+                result.setGlobalSettings( new SettingsXpp3Reader().read( fileReader ) );
+            }
+            catch ( IOException e )
+            {
+                result.setGlobalSettingsException( e );
+            }
+            catch ( XmlPullParserException e )
+            {
+                result.setGlobalSettingsException( e );
+            }
+            finally
+            {
+                IOUtil.close( fileReader );
+            }
+        }
+
+        return result;
+    }    
 }

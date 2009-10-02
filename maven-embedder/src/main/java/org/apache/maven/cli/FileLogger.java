@@ -1,4 +1,4 @@
-package org.apache.maven.embedder;
+package org.apache.maven.cli;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -27,11 +27,11 @@ import java.io.PrintStream;
  * @author Jason van Zyl
  * @todo document the need to call close() once successfully constructed, otherwise file handles can be leaked. Might be good to add a finalizer too, just in case.
  */
-public final class MavenEmbedderFileLogger
-    extends MavenEmbedderPrintStreamLogger
+public final class FileLogger
+    extends PrintStreamLogger
 {
 
-    public MavenEmbedderFileLogger( File logFile )
+    public FileLogger( File logFile )
     {
         super( openStream( logFile ) );
     }

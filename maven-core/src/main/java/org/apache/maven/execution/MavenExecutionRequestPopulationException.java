@@ -1,4 +1,4 @@
-package org.apache.maven.embedder;
+package org.apache.maven.execution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,15 +19,25 @@ package org.apache.maven.embedder;
  * under the License.
  */
 
-import org.apache.maven.artifact.factory.DefaultArtifactFactory;
-
 /**
- *
- * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
- *
+ * @author Jason van Zyl
  */
-public class CustomArtifactFactory
-    extends DefaultArtifactFactory
+public class MavenExecutionRequestPopulationException
+    extends Exception
 {
+    public MavenExecutionRequestPopulationException( String message )
+    {
+        super( message );
+    }
 
+    public MavenExecutionRequestPopulationException( Throwable cause )
+    {
+        super( cause );
+    }
+
+    public MavenExecutionRequestPopulationException( String message,
+                                   Throwable cause )
+    {
+        super( message, cause );
+    }
 }

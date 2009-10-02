@@ -1,4 +1,4 @@
-package org.apache.maven.embedder;
+package org.apache.maven.cli;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +25,7 @@ import java.util.Properties;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  * Configuration of embedder, used when starting up.
@@ -52,9 +53,9 @@ public interface Configuration
     // Logger
     // ----------------------------------------------------------------------------
 
-    Configuration setMavenEmbedderLogger( MavenEmbedderLogger logger );
+    Configuration setMavenEmbedderLogger( Logger logger );
 
-    MavenEmbedderLogger getMavenEmbedderLogger();
+    Logger getMavenEmbedderLogger();
 
     // ----------------------------------------------------------------------------
     // ClassWorld/ClassLoader
@@ -86,21 +87,12 @@ public interface Configuration
     /** Add a list of String instances with names of profiles to inactivate. */
     Configuration addInactiveProfiles( List<String> profiles );
 
-    /** Set a customizer callback implemetation that will be given a chance to modify the plexus container on startup. */
-    Configuration setConfigurationCustomizer( ContainerCustomizer customizer );
-
     /** set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used. */
     Configuration setSystemProperties( Properties properties );
 
     List<String> getActiveProfiles();
 
     List<String> getInactiveProfiles();
-
-    // ----------------------------------------------------------------------------
-    // Container Customizer
-    // ----------------------------------------------------------------------------
-
-    ContainerCustomizer getContainerCustomizer();
 
     // ----------------------------------------------------------------------------
     // System Properties
