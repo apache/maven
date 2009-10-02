@@ -25,7 +25,9 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 
 /**
  * Collects settings required to resolve the version for a plugin.
@@ -42,21 +44,59 @@ public class DefaultPluginVersionRequest
 
     private RepositoryRequest repositoryRequest;
 
+    /**
+     * Creates an empty request.
+     */
     public DefaultPluginVersionRequest()
     {
         repositoryRequest = new DefaultRepositoryRequest();
     }
 
+    /**
+     * Creates a request by copying settings from the specified repository request.
+     * 
+     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
+     */
     public DefaultPluginVersionRequest( RepositoryRequest repositoryRequest )
     {
         this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
     }
 
+    /**
+     * Creates a request for the specified plugin by copying settings from the specified repository request.
+     * 
+     * @param The plugin for which to resolve a version, must not be {@code null}.
+     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
+     */
     public DefaultPluginVersionRequest( Plugin plugin, RepositoryRequest repositoryRequest )
     {
         this.groupId = plugin.getGroupId();
         this.artifactId = plugin.getArtifactId();
         this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
+    }
+
+    /**
+     * Creates a request for the specified plugin by copying settings from the specified build session. If the session
+     * has a current project, its plugin artifact repositories will be used as well.
+     * 
+     * @param The plugin for which to resolve a version, must not be {@code null}.
+     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
+     */
+    public DefaultPluginVersionRequest( Plugin plugin, MavenSession session )
+    {
+        this.groupId = plugin.getGroupId();
+        this.artifactId = plugin.getArtifactId();
+        this.repositoryRequest = new DefaultRepositoryRequest();
+
+        setCache( session.getRepositoryCache() );
+        setLocalRepository( session.getLocalRepository() );
+        setOffline( session.isOffline() );
+
+        MavenProject project = session.getCurrentProject();
+        if ( project != null )
+        {
+            setRemoteRepositories( project.getPluginArtifactRepositories() );
+        }
     }
 
     public String getGroupId()

@@ -253,8 +253,6 @@ public class DefaultLifecycleExecutor
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        RepositoryRequest repositoryRequest = getRepositoryRequest( session, null );
-
         for ( ProjectBuild projectBuild : projectBuilds )
         {
             MavenProject currentProject = projectBuild.project;
@@ -273,9 +271,6 @@ public class DefaultLifecycleExecutor
                 }
 
                 fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
-
-                repositoryRequest.setRemoteRepositories( currentProject.getPluginArtifactRepositories() );
-                resolveMissingPluginVersions( currentProject.getBuildPlugins(), repositoryRequest );
 
                 ClassRealm projectRealm = currentProject.getClassRealm();
                 if ( projectRealm != null )
@@ -750,6 +745,8 @@ public class DefaultLifecycleExecutor
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
+        resolveMissingPluginVersions( project, session );
+
         List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
 
         Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
@@ -1705,22 +1702,15 @@ public class DefaultLifecycleExecutor
         }
     }
 
-    private void resolveMissingPluginVersions( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
-        throws LifecycleExecutionException
+    private void resolveMissingPluginVersions( MavenProject project, MavenSession session )
+        throws PluginVersionResolutionException
     {
-        for ( Plugin plugin : plugins )
+        for ( Plugin plugin : project.getBuildPlugins() )
         {
             if ( plugin.getVersion() == null )
             {
-                try
-                {
-                    resolvePluginVersion( plugin, repositoryRequest );
-                }
-                catch ( PluginVersionResolutionException e )
-                {
-                    throw new LifecycleExecutionException( "Error resolving version for plugin " + plugin.getKey()
-                        + ": " + e.getMessage(), e );
-                }
+                PluginVersionRequest request = new DefaultPluginVersionRequest( plugin, session );
+                plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
             }
         }
     }
