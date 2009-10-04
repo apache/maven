@@ -115,6 +115,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest.class );
         suite.addTestSuite( MavenITmng4321CliUsesPluginMgmtConfigTest.class );
         suite.addTestSuite( MavenITmng4320AggregatorAndDependenciesTest.class );
+        suite.addTestSuite( MavenITmng4319PluginExecutionGoalInterpolationTest.class );
         suite.addTestSuite( MavenITmng4318ProjectExecutionRootTest.class );
         suite.addTestSuite( MavenITmng4317PluginVersionResolutionFromMultiReposTest.class );
         suite.addTestSuite( MavenITmng4314DirectInvocationOfAggregatorTest.class );
