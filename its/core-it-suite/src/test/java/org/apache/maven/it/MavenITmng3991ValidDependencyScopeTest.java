@@ -38,7 +38,7 @@ public class MavenITmng3991ValidDependencyScopeTest
 
     public MavenITmng3991ValidDependencyScopeTest()
     {
-        super( "[3.0-alpha-3,)" );
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**
@@ -47,6 +47,9 @@ public class MavenITmng3991ValidDependencyScopeTest
     public void testitProjectBuild()
         throws Exception
     {
+        // TODO: One day, we should be able to error out but this requires to consider extensions and their use cases
+        requiresMavenVersion( "[4.0,)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3991/build" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
