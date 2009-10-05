@@ -334,4 +334,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getWarnings().get( 1 ).contains( "test:g" ) );
     }
 
+    public void testBadDependencyVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-dependency-version.xml" );
+
+        assertViolations( result, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
+    }
+
 }
