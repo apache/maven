@@ -88,6 +88,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4387QuietLoggingTest.class );
         suite.addTestSuite( MavenITmng4386DebugLoggingTest.class );
         suite.addTestSuite( MavenITmng4385LifecycleMappingFromExtensionInReactorTest.class );
+        suite.addTestSuite( MavenITmng4383ValidDependencyVersionTest.class );
         suite.addTestSuite( MavenITmng4381ExtensionSingletonComponentTest.class );
         suite.addTestSuite( MavenITmng4367LayoutAwareMirrorSelectionTest.class );
         suite.addTestSuite( MavenITmng4365XmlMarkupInAttributeValueTest.class );
