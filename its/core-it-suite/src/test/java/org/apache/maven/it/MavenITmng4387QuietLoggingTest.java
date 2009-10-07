@@ -63,7 +63,7 @@ public class MavenITmng4387QuietLoggingTest
         for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
             String line = it.next().toString();
-            if ( line.startsWith( "+" ) )
+            if ( line.startsWith( "+" ) || line.startsWith( "EMMA" ) )
             {
                 it.remove();
             }

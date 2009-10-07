@@ -66,7 +66,7 @@ public class MavenITmng3183LoggingToFileTest
         for ( Iterator it = stdout.iterator(); it.hasNext(); )
         {
             String line = it.next().toString();
-            if ( line.startsWith( "+" ) )
+            if ( line.startsWith( "+" ) || line.startsWith( "EMMA" ) )
             {
                 it.remove();
             }
