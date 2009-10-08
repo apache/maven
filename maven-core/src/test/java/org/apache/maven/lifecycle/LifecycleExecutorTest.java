@@ -11,7 +11,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -25,7 +24,6 @@ public class LifecycleExecutorTest
         throws Exception
     {
         super.setUp();
-        ( (DefaultPlexusContainer) getContainer() ).getLoggerManager().setThresholds( 0 );
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
         lookup( ExceptionHandler.class );
     }
