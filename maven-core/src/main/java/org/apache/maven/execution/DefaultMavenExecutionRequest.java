@@ -30,10 +30,10 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
@@ -112,7 +112,7 @@ public class DefaultMavenExecutionRequest
 
     private List<String> inactiveProfiles;
 
-    private TransferListener transferListener;
+    private ArtifactTransferListener transferListener;
 
     private int loggingLevel = LOGGING_LEVEL_INFO;
 
@@ -348,7 +348,7 @@ public class DefaultMavenExecutionRequest
         return inactiveProfiles;
     }
 
-    public TransferListener getTransferListener()
+    public ArtifactTransferListener getTransferListener()
     {
         return transferListener;
     }
@@ -585,7 +585,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest setTransferListener( TransferListener transferListener )
+    public MavenExecutionRequest setTransferListener( ArtifactTransferListener transferListener )
     {
         this.transferListener = transferListener;
 

@@ -288,22 +288,6 @@ public class MavenCli
             logger.info( "Enabling strict checksum verification on all artifact downloads." );
         }
 
-        ConfigurationValidationResult cvr = validateConfiguration( configuration );
-
-        if ( cvr.isUserSettingsFilePresent() && !cvr.isUserSettingsFileParses() )
-        {
-            CLIReportingUtils.showError( logger, "Error reading user settings: ", cvr.getUserSettingsException(), showErrors );
-
-            return 1;
-        }
-
-        if ( cvr.isGlobalSettingsFilePresent() && !cvr.isGlobalSettingsFileParses() )
-        {
-            CLIReportingUtils.showError( logger, "Error reading global settings: ", cvr.getGlobalSettingsException(), showErrors );
-
-            return 1;
-        }
-
         if ( configuration.getGlobalSettingsFile() != null )
         {
             request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
@@ -452,18 +436,9 @@ public class MavenCli
             globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
         }
 
-        Configuration configuration = new DefaultConfiguration().setUserSettingsFile( userSettingsFile ).setGlobalSettingsFile( globalSettingsFile );
-
-        if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
-        {
-            File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) ).getAbsoluteFile();
-
-            configuration.setMavenEmbedderLogger( new FileLogger( logFile ) );
-        }
-        else
-        {
-            configuration.setMavenEmbedderLogger( new ConsoleLogger( Logger.LEVEL_ERROR, Maven.class.getName()) );
-        }
+        Configuration configuration = new DefaultConfiguration()
+            .setUserSettingsFile( userSettingsFile )
+            .setGlobalSettingsFile( globalSettingsFile );
 
         return configuration;
     }

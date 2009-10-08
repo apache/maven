@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven.repository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,18 +19,9 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-/**
- * Test for {@link ConsoleDownloadMonitor}
- *
- * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @version $Id$
- */
-public class ConsoleDownloadMonitorTest
-    extends AbstractConsoleDownloadMonitorTest
+public interface ArtifactTransferListener
 {
-    protected void setUp()
-        throws Exception
-    {
-        monitor = new ConsoleDownloadMonitor();
-    }
+    public boolean isShowChecksumEvents();
+
+    public void setShowChecksumEvents( boolean showChecksumEvents );
 }

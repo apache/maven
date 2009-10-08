@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.Maven;
-import org.apache.maven.MavenTransferListener;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 
@@ -175,15 +175,15 @@ final class CLIRequestUtils
             }
         }
 
-        MavenTransferListener transferListener;
+        ArtifactTransferListener transferListener;
 
         if ( request.isInteractiveMode() )
         {
-            transferListener = new ConsoleDownloadMonitor();
+            transferListener = new ConsoleMavenTransferListener();
         }
         else
         {
-            transferListener = new BatchModeDownloadMonitor();
+            transferListener = new BatchModeMavenTransferListener();
         }
 
         transferListener.setShowChecksumEvents( false );

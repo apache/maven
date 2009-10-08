@@ -37,8 +37,8 @@ import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.repository.ArtifactDoesNotExistException;
+import org.apache.maven.repository.ArtifactTransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -173,7 +173,7 @@ public class DefaultPluginPrefixResolver
                     {
                         repositorySystem.retrieve( repository, destination, remotePath, null );
                     }
-                    catch ( TransferFailedException e )
+                    catch ( ArtifactTransferFailedException e )
                     {
                         if ( logger.isDebugEnabled() )
                         {
@@ -186,7 +186,7 @@ public class DefaultPluginPrefixResolver
 
                         continue;
                     }
-                    catch ( ResourceDoesNotExistException e )
+                    catch ( ArtifactDoesNotExistException e )
                     {
                         continue;
                     }

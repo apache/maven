@@ -27,84 +27,13 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.logging.Logger;
 
-/**
- * Configuration of embedder, used when starting up.
- *
- * @author mkleint
- * @author Jason van Zyl
- */
 public interface Configuration
 {
-    // ----------------------------------------------------------------------------
-    // Settings
-    // ----------------------------------------------------------------------------
-
-    /** Set location of the userSettingsFile settings file to use for the embedder. */
     Configuration setUserSettingsFile( File userSettingsFile );
 
     File getUserSettingsFile();
 
-    /** Set location of the globalSettingsFiles settings file to use for the embedder. */
     Configuration setGlobalSettingsFile( File globalSettingsFiles );
 
     File getGlobalSettingsFile();
-
-    // ----------------------------------------------------------------------------
-    // Logger
-    // ----------------------------------------------------------------------------
-
-    Configuration setMavenEmbedderLogger( Logger logger );
-
-    Logger getMavenEmbedderLogger();
-
-    // ----------------------------------------------------------------------------
-    // ClassWorld/ClassLoader
-    // ----------------------------------------------------------------------------
-
-    ClassWorld getClassWorld();
-
-    Configuration setClassWorld( ClassWorld classWorld );
-
-    Configuration setClassLoader( ClassLoader loader );
-
-    PlexusContainer getParentContainer();
-
-    Configuration setParentContainer( PlexusContainer parentContainer );
-
-    // ----------------------------------------------------------------------------
-    // Profiles
-    // ----------------------------------------------------------------------------
-
-    /** Add profile to activate. */
-    Configuration addActiveProfile( String profile );
-
-    /** Add profile to inactivate. */
-    Configuration addInactiveProfile( String profile );
-
-    /** Add a list of String instances with names of profiles to activate. */
-    Configuration addActiveProfiles( List<String> profiles );
-
-    /** Add a list of String instances with names of profiles to inactivate. */
-    Configuration addInactiveProfiles( List<String> profiles );
-
-    /** set the system properties to be used during the lifecycle of the embedder. Excluding the time when executing the project, then the properties from MavenExecutionRequestare used. */
-    Configuration setSystemProperties( Properties properties );
-
-    List<String> getActiveProfiles();
-
-    List<String> getInactiveProfiles();
-
-    // ----------------------------------------------------------------------------
-    // System Properties
-    // ----------------------------------------------------------------------------
-
-    Properties getSystemProperties();
-
-    // ----------------------------------------------------------------------------
-    // Extensions
-    // ----------------------------------------------------------------------------
-
-    void addExtension( URL url );
-
-    List<URL> getExtensions();
 }

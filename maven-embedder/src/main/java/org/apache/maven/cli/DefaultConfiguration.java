@@ -19,91 +19,13 @@ package org.apache.maven.cli;
  */
 
 import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.logging.Logger;
-
-/**
- * Default implementation of Configuration intefrace.
- *
- * @author mkleint
- */
 public class DefaultConfiguration
     implements Configuration
 {
-    private List<String> inactives;
-
-    private List<String> actives;
-
     private File userSettings;
 
     private File globalSettings;
-
-    private Properties systemProperties;
-
-    private List<URL> extensions = new ArrayList<URL>();
-
-    private Logger logger;
-
-    private ClassWorld classWorld;
-
-    private PlexusContainer parentContainer;
-
-    /** Creates a new instance of DefaultConfiguration */
-    public DefaultConfiguration()
-    {
-    }
-
-    public Configuration addActiveProfile( String profile )
-    {
-        getActiveProfiles().add( profile );
-
-        return this;
-    }
-
-    public Configuration addInactiveProfile( String profile )
-    {
-        getInactiveProfiles().add( profile );
-
-        return this;
-    }
-
-    public Configuration addActiveProfiles( List<String> profiles )
-    {
-        getActiveProfiles().addAll( profiles );
-
-        return this;
-    }
-
-    public Configuration addInactiveProfiles( List<String> profiles )
-    {
-        getInactiveProfiles().addAll( profiles );
-
-        return this;
-    }
-
-    public List<String> getActiveProfiles()
-    {
-        if ( actives == null )
-        {
-            actives = new ArrayList<String>();
-        }
-        return actives;
-    }
-
-    public List<String> getInactiveProfiles()
-    {
-        if ( inactives == null )
-        {
-            inactives = new ArrayList<String>();
-        }
-        return inactives;
-    }
 
     public Configuration setUserSettingsFile( File user )
     {
@@ -126,66 +48,4 @@ public class DefaultConfiguration
     {
         return globalSettings;
     }
-
-    public Configuration setSystemProperties( Properties properties )
-    {
-        systemProperties = properties;
-        return this;
-    }
-
-    public Properties getSystemProperties()
-    {
-        return systemProperties != null ? systemProperties : System.getProperties();
-    }
-
-    public void addExtension( URL url )
-    {
-        extensions.add( url );
-    }
-
-    public List<URL> getExtensions()
-    {
-        return extensions;
-    }
-
-    public Configuration setMavenEmbedderLogger( Logger logger )
-    {
-        this.logger = logger;
-        return this;
-    }
-
-    public Logger getMavenEmbedderLogger()
-    {
-        return logger;
-    }
-
-    public ClassWorld getClassWorld()
-    {
-        return classWorld;
-    }
-
-    public Configuration setClassWorld( ClassWorld classWorld )
-    {
-        this.classWorld = classWorld;
-        return this;
-    }
-
-    public Configuration setClassLoader( ClassLoader loader )
-    {
-        classWorld = new ClassWorld( "plexus.core", loader );
-
-        return this;
-    }
-
-    public PlexusContainer getParentContainer()
-    {
-        return parentContainer;
-    }
-
-    public Configuration setParentContainer( PlexusContainer parentContainer )
-    {
-        this.parentContainer = parentContainer;
-        return this;
-    }
-
 }

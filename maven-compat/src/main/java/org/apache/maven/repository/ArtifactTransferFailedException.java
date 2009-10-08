@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.repository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,16 +19,17 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.apache.maven.wagon.events.TransferListener;
-
-/**
- * @author Jason van Zyl
- * @version $Revision$
- */
-public interface MavenTransferListener
-    extends TransferListener
+public class ArtifactTransferFailedException
+    extends Exception
 {
-    public boolean isShowChecksumEvents();
+    public ArtifactTransferFailedException( final String message )
+    {
+        super( message );
+    }
 
-    public void setShowChecksumEvents( boolean showChecksumEvents );
+    public ArtifactTransferFailedException( final String message, final Throwable cause )
+    {
+        super( message, cause );
+    }
+
 }

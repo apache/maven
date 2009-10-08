@@ -19,30 +19,16 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.maven.wagon.events.TransferEvent;
+import org.apache.maven.repository.ArtifactTransferEvent;
 
-/**
- * Console download progress meter.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- */
-public class BatchModeDownloadMonitor
-    extends AbstractConsoleDownloadMonitor
+public class BatchModeMavenTransferListener
+    extends AbstractMavenTransferListener
 {
-    public void transferInitiated( TransferEvent transferEvent )
+    public void transferInitiated( ArtifactTransferEvent transferEvent )
     {
         if ( !showEvent( transferEvent ) )
         {
             return;
         }
-        
-        String message = transferEvent.getRequestType() == TransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
-
-        String url = transferEvent.getWagon().getRepository().getUrl();
-
-        System.out.println( "url = " + url );
-
-        // TODO: can't use getLogger() because this isn't currently instantiated as a component
-        System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
     }
 }

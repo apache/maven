@@ -53,49 +53,4 @@ public interface ConfigurationValidationResult
      * Any exception that happened during parsing global settings, or null if there were no errors.
      */
     Exception getGlobalSettingsException();
-
-    /**
-     * @deprecated
-     */
-    boolean isUserSettingsFilePresent();
-
-    /**
-     * @deprecated
-     */
-    void setUserSettingsFilePresent( boolean userSettingsFilePresent );
-
-    /**
-     * @deprecated
-     */
-    boolean isUserSettingsFileParses();
-
-    /**
-     * @deprecated
-     */
-    void setUserSettingsFileParses( boolean userSettingsFileParses );
-
-    /**
-     * @deprecated
-     */
-    boolean isGlobalSettingsFilePresent();
-
-    /**
-     * @deprecated
-     */
-    void setGlobalSettingsFilePresent( boolean globalSettingsFilePresent );
-
-    /**
-     * @deprecated
-     */
-    boolean isGlobalSettingsFileParses();
-
-    /**
-     * @deprecated
-     */
-    void setGlobalSettingsFileParses( boolean globalSettingsFileParses );
-
-    /**
-     * @deprecated
-     */
-    void display();
 }

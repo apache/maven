@@ -169,13 +169,11 @@ public class DefaultArtifactResolver
                     if ( artifact.getRepository() != null )
                     {
                         // the transformations discovered the artifact - so use it exclusively
-                        wagonManager.getArtifact( artifact, artifact.getRepository(), downloadMonitor,
-                                                  request.isForceUpdate() );
+                        wagonManager.getArtifact( artifact, artifact.getRepository(), downloadMonitor, request.isForceUpdate() );
                     }
                     else
                     {
-                        wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor,
-                                                  request.isForceUpdate() );
+                        wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor, request.isForceUpdate() );
                     }
                 }
                 catch ( ResourceDoesNotExistException e )

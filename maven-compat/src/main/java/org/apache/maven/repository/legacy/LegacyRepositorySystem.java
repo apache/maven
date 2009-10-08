@@ -1,4 +1,4 @@
-package org.apache.maven.repository;
+package org.apache.maven.repository.legacy;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -45,15 +45,16 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalArtifactRepository;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.repository.MetadataResolutionRequest;
 import org.apache.maven.repository.MetadataResolutionResult;
+import org.apache.maven.repository.MirrorSelector;
+import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.legacy.WagonManager;
+import org.apache.maven.repository.ArtifactDoesNotExistException;
+import org.apache.maven.repository.ArtifactTransferFailedException;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -577,21 +578,39 @@ public class LegacyRepositorySystem
         //      ArtifactFilter filter,
         //      List<ResolutionListener> listeners,
         //      List<ConflictResolver> conflictResolvers )
-
-        //        ArtifactResolutionResult result = artifactCollector.
+        //      ArtifactResolutionResult result = artifactCollector.
+        
         return null;
     }
 
-    public void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
-        throws TransferFailedException, ResourceDoesNotExistException
+    public void retrieve( ArtifactRepository repository, File destination, String remotePath, ArtifactTransferListener transferListener )
+        throws ArtifactTransferFailedException, ArtifactDoesNotExistException
     {
-        wagonManager.getRemoteFile( repository, destination, remotePath, downloadMonitor, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
+        try
+        {
+            wagonManager.getRemoteFile( repository, destination, remotePath, new TransferListenerAdapter( transferListener ), ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
+        }
+        catch ( org.apache.maven.wagon.TransferFailedException e )
+        {
+            throw new ArtifactTransferFailedException( "Error transferring artifact.", e );
+        }
+        catch ( org.apache.maven.wagon.ResourceDoesNotExistException e )
+        {
+            throw new ArtifactDoesNotExistException( "Requested artifact does not exist.", e );            
+        }
     }
 
-    public void publish( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
-        throws TransferFailedException
+    public void publish( ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener )
+        throws ArtifactTransferFailedException
     {
-        wagonManager.putRemoteFile( repository, source, remotePath, downloadMonitor );
+        try
+        {
+            wagonManager.putRemoteFile( repository, source, remotePath, new TransferListenerAdapter( transferListener ) );
+        }
+        catch ( org.apache.maven.wagon.TransferFailedException e )
+        {
+            throw new ArtifactTransferFailedException( "Error transferring artifact.", e );
+        }
     }
 
     //

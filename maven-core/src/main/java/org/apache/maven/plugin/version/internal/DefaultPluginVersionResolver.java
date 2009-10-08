@@ -32,8 +32,8 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.repository.ArtifactDoesNotExistException;
+import org.apache.maven.repository.ArtifactTransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -86,7 +86,7 @@ public class DefaultPluginVersionResolver
                 {
                     repositorySystem.retrieve( repository, artifactMetadataFile, remotePath, null );
                 }
-                catch ( TransferFailedException e )
+                catch ( ArtifactTransferFailedException e )
                 {
                     if ( logger.isDebugEnabled() )
                     {
@@ -99,7 +99,7 @@ public class DefaultPluginVersionResolver
 
                     continue;
                 }
-                catch ( ResourceDoesNotExistException e )
+                catch ( ArtifactDoesNotExistException e )
                 {
                     continue;
                 }

@@ -100,31 +100,6 @@ public class DefaultConfigurationValidationResult
         return isSettingsFilePresent( getUserSettings(), getUserSettingsException() );
     }
 
-    public void setGlobalSettingsFileParses( boolean globalSettingsFileParses )
-    {
-        // ignored
-    }
-
-    public void setGlobalSettingsFilePresent( boolean globalSettingsFilePresent )
-    {
-        // ignored
-    }
-
-    public void setUserSettingsFileParses( boolean userSettingsFileParses )
-    {
-        // ignored
-    }
-
-    public void setUserSettingsFilePresent( boolean userSettingsFilePresent )
-    {
-        // ignored
-    }
-
-    public void display()
-    {
-        // ignored
-    }
-
     private boolean isSettingsFilePresent( Settings settings, Throwable e )
     {
         return ( settings != null ) || ( ( e != null ) && !( e instanceof FileNotFoundException ) );

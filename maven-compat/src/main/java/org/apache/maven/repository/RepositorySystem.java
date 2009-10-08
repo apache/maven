@@ -34,9 +34,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * @author Jason van Zyl
@@ -147,10 +144,10 @@ public interface RepositorySystem
     //
     // Raw file transfers
     //
-    void publish( ArtifactRepository repository, File source, String remotePath, TransferListener downloadMonitor )
-        throws TransferFailedException;
+    void publish( ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener )
+        throws ArtifactTransferFailedException;
     
-    void retrieve( ArtifactRepository repository, File destination, String remotePath, TransferListener downloadMonitor )
-        throws TransferFailedException, ResourceDoesNotExistException; 
+    void retrieve( ArtifactRepository repository, File destination, String remotePath, ArtifactTransferListener transferListener )
+        throws ArtifactTransferFailedException, ArtifactDoesNotExistException; 
 
 }

@@ -19,27 +19,26 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.maven.wagon.WagonConstants;
-import org.apache.maven.wagon.events.TransferEvent;
+import org.apache.maven.repository.ArtifactTransferEvent;
 
 /**
  * Console download progress meter.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class ConsoleDownloadMonitor
-    extends AbstractConsoleDownloadMonitor
+public class ConsoleMavenTransferListener
+    extends AbstractMavenTransferListener
 {
     private long complete;
 
-    public void transferInitiated( TransferEvent transferEvent )
+    public void transferInitiated( ArtifactTransferEvent transferEvent )
     {
         super.transferInitiated( transferEvent );
 
         complete = 0;
     }
 
-    public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
+    public void transferProgress( ArtifactTransferEvent transferEvent, byte[] buffer, int length )
     {
         long total = transferEvent.getResource().getContentLength();
         complete += length;
@@ -53,12 +52,12 @@ public class ConsoleDownloadMonitor
         if ( total >= 1024 )
         {
             System.out.print(
-                ( complete / 1024 ) + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : ( total / 1024 ) + "K" )
+                ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + "K" )
                     + "\r" );
         }
         else
         {
-            System.out.print( complete + "/" + ( total == WagonConstants.UNKNOWN_LENGTH ? "?" : total + "b" ) + "\r" );
+            System.out.print( complete + "/" + ( total == -1 ? "?" : total + "b" ) + "\r" );
         }
     }
 }

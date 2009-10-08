@@ -29,10 +29,10 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -164,8 +164,8 @@ public interface MavenExecutionRequest
     boolean isShowErrors();
 
     // Transfer listeners
-    MavenExecutionRequest setTransferListener( TransferListener transferListener );
-    TransferListener getTransferListener();
+    MavenExecutionRequest setTransferListener( ArtifactTransferListener transferListener );
+    ArtifactTransferListener getTransferListener();
 
     // Logging
     MavenExecutionRequest setLoggingLevel( int loggingLevel );
