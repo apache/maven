@@ -34,7 +34,7 @@ public class UsesPropertiesMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression=${basedir}"
+     * @parameter expression="${basedir}"
      */
     private File basedir;
     
