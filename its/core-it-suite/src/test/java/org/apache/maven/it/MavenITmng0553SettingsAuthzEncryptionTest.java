@@ -114,15 +114,18 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     public void testitBasic()
         throws Exception
     {
+        testDir = new File( testDir, "test-1" );
+
         Properties filterProps = new Properties();
         filterProps.setProperty( "@port@", Integer.toString( port ) );
 
-        Verifier verifier = new Verifier( new File( testDir, "test-1" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getSystemProperties().setProperty( "settings.security", "settings-security.xml" );
+        verifier.getSystemProperties().setProperty( "settings.security", 
+            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
@@ -139,13 +142,15 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     public void testitRelocation()
         throws Exception
     {
+        testDir = new File( testDir, "test-2" );
+
         Properties filterProps = new Properties();
         filterProps.setProperty( "@port@", Integer.toString( port ) );
         // NOTE: The upper-case scheme name is essential part of the test
-        String secUrl = "FILE://" + new File( testDir, "test-2/relocated-settings-security.xml" ).toURI().getRawPath();
+        String secUrl = "FILE://" + new File( testDir, "relocated-settings-security.xml" ).toURI().getRawPath();
         filterProps.setProperty( "@relocation@", secUrl );
 
-        Verifier verifier = new Verifier( new File( testDir, "test-2" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
@@ -154,7 +159,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.filterFile( "security-template.xml", "settings~security.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
 
-        verifier.getSystemProperties().setProperty( "settings.security", "settings~security.xml" );
+        verifier.getSystemProperties().setProperty( "settings.security", 
+            new File( testDir, "settings~security.xml" ).getAbsolutePath() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
@@ -171,9 +177,12 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     public void testitEncryption()
         throws Exception
     {
-        Verifier verifier = new Verifier( new File( testDir, "test-3" ).getAbsolutePath() );
+        testDir = new File( testDir, "test-3" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.getSystemProperties().setProperty( "settings.security", "settings~security.xml" );
+        verifier.getSystemProperties().setProperty( "settings.security", 
+            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
         verifier.getCliOptions().add( "--encrypt-master-password" );
         verifier.getCliOptions().add( "test" );
         verifier.setLogFileName( "log-emp.txt" );
@@ -184,9 +193,10 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         List log = verifier.loadLines( verifier.getLogFileName(), null );
         assertNotNull( findPassword( log ) );
 
-        verifier = new Verifier( new File( testDir, "test-3" ).getAbsolutePath() );
+        verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.getSystemProperties().setProperty( "settings.security", "settings-security.xml" );
+        verifier.getSystemProperties().setProperty( "settings.security", 
+            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
         verifier.getCliOptions().add( "--encrypt-password" );
         verifier.getCliOptions().add( "testpass" );
         verifier.setLogFileName( "log-ep.txt" );

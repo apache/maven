@@ -37,7 +37,7 @@ under the License.
   <distributionManagement>
     <repository>
       <id>test</id>
-      <url>file:target/test-repo</url>
+      <url>file:///${basedir}/target/test-repo</url>
       <layout>legacy</layout>
     </repository>
   </distributionManagement>

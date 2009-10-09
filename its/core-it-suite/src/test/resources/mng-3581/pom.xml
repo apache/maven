@@ -7,7 +7,7 @@
   <distributionManagement>
     <repository>
       <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
+      <url>file:///${basedir}/target/null</url>
     </repository>
   </distributionManagement>
 

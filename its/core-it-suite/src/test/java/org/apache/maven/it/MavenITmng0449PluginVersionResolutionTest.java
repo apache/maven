@@ -52,7 +52,14 @@ public class MavenITmng0449PluginVersionResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
+        try
+        {
+            verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
+        }
+        catch ( Exception e )
+        {
+            // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
+        }
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
@@ -87,7 +94,14 @@ public class MavenITmng0449PluginVersionResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
+        try
+        {
+            verifier.deleteArtifacts( "org.apache.maven.its.mng0449" );
+        }
+        catch ( Exception e )
+        {
+            // when we run Maven embedded, the plugin class realm locks the artifacts so we can't delete them
+        }
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );

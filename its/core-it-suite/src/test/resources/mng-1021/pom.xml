@@ -36,7 +36,7 @@ under the License.
     <snapshotRepository>
       <id>test</id>
       <name>Test Repo</name>
-      <url>file:repo</url>
+      <url>file:///${basedir}/repo</url>
     </snapshotRepository>
   </distributionManagement>
 
