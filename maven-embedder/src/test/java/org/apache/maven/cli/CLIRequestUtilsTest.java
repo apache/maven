@@ -60,7 +60,7 @@ public class CLIRequestUtilsTest
         assertEquals( 1, commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY ).length );
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request = CLIRequestUtils.populateRequest( request, commandLine, false, false, false );
+        request = CLIRequestUtils.populateRequest( request, commandLine, null, false, false, false );
 
         Properties userProperties = request.getUserProperties();
 
@@ -108,7 +108,7 @@ public class CLIRequestUtilsTest
         String path = new File( "" ).getAbsolutePath();
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        CLIRequestUtils.populateRequest( request, parse( "-Dmaven.repo.local=" + path ), false, false, false );
+        CLIRequestUtils.populateRequest( request, parse( "-Dmaven.repo.local=" + path ), null, false, false, false );
 
         assertEquals( path, request.getLocalRepositoryPath().getAbsolutePath() );
     }

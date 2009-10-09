@@ -19,6 +19,7 @@ package org.apache.maven.project.artifact;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.codehaus.plexus.component.annotations.Component;
 
 @Component( role = MavenMetadataCache.class )
@@ -39,6 +41,7 @@ public class DefaultMavenMetadataCache
     public static class CacheKey 
     {
         private final Artifact artifact;
+        private final long pomHash;
         private final boolean resolveManagedVersions;
         private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
         private final int hashCode;
@@ -46,7 +49,16 @@ public class DefaultMavenMetadataCache
         public CacheKey( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                          List<ArtifactRepository> remoteRepositories )
         {
+            File file = artifact.getFile();
             this.artifact = ArtifactUtils.copyArtifact( artifact );
+            if ( "pom".equals( artifact.getType() ) && file != null )
+            {
+                pomHash = file.getPath().hashCode() + file.lastModified();
+            }
+            else
+            {
+                pomHash = 0;
+            }
             this.resolveManagedVersions = resolveManagedVersions;
             this.repositories.add( localRepository );
             this.repositories.addAll( remoteRepositories );
@@ -54,7 +66,7 @@ public class DefaultMavenMetadataCache
             int hash = 17;
             hash = hash * 31 + artifactHashCode( artifact );
             hash = hash * 31 + ( resolveManagedVersions ? 1 : 2 );
-            hash = hash * 31 + repositories.hashCode();
+            hash = hash * 31 + repositoriesHashCode( repositories );
             this.hashCode = hash;
         }
 
@@ -78,9 +90,10 @@ public class DefaultMavenMetadataCache
             }
             
             CacheKey other = (CacheKey) o;
-            
-            return artifactEquals( artifact, other.artifact ) && resolveManagedVersions == other.resolveManagedVersions
-                && repositories.equals( other.repositories );
+
+            return pomHash == other.pomHash && artifactEquals( artifact, other.artifact )
+                && resolveManagedVersions == other.resolveManagedVersions
+                && repositoriesEquals( repositories, other.repositories );
         }
     }
 
@@ -107,7 +120,7 @@ public class DefaultMavenMetadataCache
         {
             return true;
         }
-        
+
         return eq( a1.getGroupId(), a2.getGroupId() )
             && eq( a1.getArtifactId(), a2.getArtifactId() )
             && eq( a1.getType(), a2.getType() )
@@ -116,6 +129,63 @@ public class DefaultMavenMetadataCache
             && eq( a1.getScope(), a2.getScope() )
             && eq( a1.getDependencyFilter(), a2.getDependencyFilter() )
             && a1.isOptional() == a2.isOptional();
+    }
+
+    private static int repositoryHashCode( ArtifactRepository repository )
+    {
+        int result = 17;
+        result = 31 * result + ( repository.getId() != null ? repository.getId().hashCode() : 0 );
+        return result;
+    }
+
+    private static int repositoriesHashCode( List<ArtifactRepository> repositories )
+    {
+        int result = 17;
+        for ( ArtifactRepository repository : repositories )
+        {
+            result = 31 * result + repositoryHashCode( repository );
+        }
+        return result;
+    }
+
+    private static boolean repositoryEquals( ArtifactRepository r1, ArtifactRepository r2 )
+    {
+        if ( r1 == r2 )
+        {
+            return true;
+        }
+
+        return eq( r1.getId(), r2.getId() ) && eq( r1.getUrl(), r2.getUrl() )
+            && repositoryPolicyEquals( r1.getReleases(), r2.getReleases() )
+            && repositoryPolicyEquals( r1.getSnapshots(), r2.getSnapshots() );
+    }
+
+    private static boolean repositoryPolicyEquals( ArtifactRepositoryPolicy p1, ArtifactRepositoryPolicy p2 )
+    {
+        if ( p1 == p2 )
+        {
+            return true;
+        }
+
+        return p1.isEnabled() == p2.isEnabled() && eq( p1.getUpdatePolicy(), p2.getUpdatePolicy() );
+    }
+
+    private static boolean repositoriesEquals( List<ArtifactRepository> r1, List<ArtifactRepository> r2 )
+    {
+        if ( r1.size() != r2.size() )
+        {
+            return false;
+        }
+
+        for ( Iterator<ArtifactRepository> it1 = r1.iterator(), it2 = r2.iterator(); it1.hasNext(); )
+        {
+            if ( !repositoryEquals( it1.next(), it2.next() ) )
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static <T> boolean eq( T s1, T s2 )
@@ -190,9 +260,26 @@ public class DefaultMavenMetadataCache
         public boolean isStale()
         {
             File pomFile = pomArtifact.getFile();
-            if ( pomFile != null && pomFile.canRead() )
+            if ( pomFile != null )
             {
-                return length != pomFile.length() || timestamp != pomFile.lastModified();
+                if ( pomFile.canRead() )
+                {
+                    return length != pomFile.length() || timestamp != pomFile.lastModified();
+                }
+                else
+                {
+                    // if the POM didn't exist, retry if any repo is configured to always update
+                    boolean snapshot = pomArtifact.isSnapshot();
+                    for ( ArtifactRepository repository : remoteRepositories )
+                    {
+                        ArtifactRepositoryPolicy policy =
+                            snapshot ? repository.getSnapshots() : repository.getReleases();
+                        if ( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( policy.getUpdatePolicy() ) )
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
 
             return length != -1 || timestamp != -1;

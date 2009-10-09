@@ -34,7 +34,7 @@ public class PrintStreamLogger
     extends AbstractLogger
 {
 
-    private final PrintStream out;
+    private PrintStream out;
 
     private static final String FATAL_ERROR = "[FATAL] ";
 
@@ -50,6 +50,11 @@ public class PrintStreamLogger
     {
         super( Logger.LEVEL_INFO, Maven.class.getName() );
 
+        setStream( out );
+    }
+
+    public void setStream( PrintStream out )
+    {
         if ( out == null )
         {
             throw new IllegalArgumentException( "output stream missing" );

@@ -132,7 +132,11 @@ public class MavenMetadataSource
 
         if ( cached != null )
         {
-            return cached;
+            // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
+            if ( !request.isForceUpdate() || hasFile( cached.getPomArtifact() ) )
+            {
+                return cached;
+            }
         }
 
         List<Dependency> dependencies;
@@ -227,6 +231,11 @@ public class MavenMetadataSource
                    request.getRemoteRepositories(), result );
 
         return result;
+    }
+
+    private boolean hasFile( Artifact artifact )
+    {
+        return artifact != null && artifact.getFile() != null && artifact.getFile().exists();
     }
 
     private List<ArtifactRepository> aggregateRepositories( List<ArtifactRepository> requestRepositories,

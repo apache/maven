@@ -53,7 +53,8 @@ final class CLIRequestUtils
     }
 
     public static MavenExecutionRequest populateRequest( MavenExecutionRequest request, CommandLine commandLine,
-                                                         boolean debug, boolean quiet, boolean showErrors )
+                                                         String workingDirectory, boolean debug, boolean quiet,
+                                                         boolean showErrors )
     {
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
@@ -135,7 +136,7 @@ final class CLIRequestUtils
             globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
         }
 
-        File baseDirectory = new File( System.getProperty( "user.dir" ) );
+        File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
         // ----------------------------------------------------------------------
         // Profile Activation
@@ -220,6 +221,7 @@ final class CLIRequestUtils
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
         {
             userToolchainsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
+            userToolchainsFile = resolveFile( userToolchainsFile, workingDirectory );
         }
         else
         {
@@ -249,6 +251,7 @@ final class CLIRequestUtils
         if ( alternatePomFile != null )
         {
             pom = new File( alternatePomFile );
+            pom = resolveFile( pom, workingDirectory );
         }
         else
         {
@@ -300,6 +303,27 @@ final class CLIRequestUtils
         }
 
         return request;
+    }
+
+    static File resolveFile( File file, String workingDirectory )
+    {
+        if ( file == null )
+        {
+            return null;
+        }
+        else if ( file.isAbsolute() )
+        {
+            return file;
+        }
+        else if ( file.getPath().startsWith( File.separator ) )
+        {
+            // drive-relative Windows path
+            return file.getAbsoluteFile();
+        }
+        else
+        {
+            return new File( workingDirectory, file.getPath() );
+        }
     }
 
     // ----------------------------------------------------------------------

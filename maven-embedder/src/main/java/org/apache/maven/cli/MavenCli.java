@@ -16,7 +16,9 @@ package org.apache.maven.cli;
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.Reader;
 
 import org.apache.commons.cli.CommandLine;
@@ -68,12 +70,14 @@ public class MavenCli
         new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
-    
+
+    private DefaultPlexusContainer container;
+
+    private PrintStreamLogger logger;
+
     public static void main( String[] args )
     {
-        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
-
-        int result = main( args, classWorld );
+        int result = main( args, null );
 
         System.exit( result );
     }
@@ -81,13 +85,55 @@ public class MavenCli
     /** @noinspection ConfusingMainMethod */
     public static int main( String[] args, ClassWorld classWorld )
     {
-        MavenCli cli = new MavenCli();
+        MavenCli cli = new MavenCli( classWorld );
 
-        return cli.doMain( args, classWorld );
+        return cli.doMain( args, null, System.out, System.err );
     }
 
-    public int doMain( String[] args, ClassWorld classWorld )
+    public MavenCli()
     {
+        this( null );
+    }
+
+    public MavenCli( ClassWorld classWorld )
+    {
+        if ( classWorld == null )
+        {
+            classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
+        }
+
+        try
+        {
+            ContainerConfiguration cc =
+                new DefaultContainerConfiguration().setClassWorld( classWorld ).setName( "embedder" );
+
+            container = new DefaultPlexusContainer( cc );
+        }
+        catch ( PlexusContainerException e )
+        {
+            throw new IllegalStateException( "Could not start component container: " + e.getMessage(), e );
+        }
+
+        logger = new PrintStreamLogger( System.out );
+
+        container.setLoggerManager( new MavenLoggerManager( logger ) );
+    }
+
+    public int doMain( String[] args, String workingDirectory, PrintStream stdout, PrintStream stderr )
+    {
+        if ( stdout == null )
+        {
+            stdout = System.out;
+        }
+        if ( stderr == null )
+        {
+            stderr = System.err;
+        }
+        if ( workingDirectory == null )
+        {
+            workingDirectory = System.getProperty( "user.dir" );
+        }
+
         // ----------------------------------------------------------------------
         // Setup the command line parser
         // ----------------------------------------------------------------------
@@ -101,8 +147,8 @@ public class MavenCli
         }
         catch ( ParseException e )
         {
-            System.err.println( "Unable to parse command line options: " + e.getMessage() );
-            cliManager.displayHelp();
+            stderr.println( "Unable to parse command line options: " + e.getMessage() );
+            cliManager.displayHelp( stdout );
             return 1;
         }
 
@@ -118,14 +164,14 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.HELP ) )
         {
-            cliManager.displayHelp();
+            cliManager.displayHelp( stdout );
 
             return 0;
         }
 
         if ( commandLine.hasOption( CLIManager.VERSION ) )
         {
-            CLIReportingUtils.showVersion();
+            CLIReportingUtils.showVersion( stdout );
 
             return 0;
         }
@@ -138,40 +184,36 @@ public class MavenCli
             System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
         }
 
+        PrintStream fileStream = null;
+
+        if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) );
+            logFile = CLIRequestUtils.resolveFile( logFile, workingDirectory );
+
+            try
+            {
+                fileStream = new PrintStream( logFile );
+                logger.setStream( fileStream );
+            }
+            catch ( FileNotFoundException e )
+            {
+                stderr.println( e );
+                logger.setStream( stdout );
+            }
+        }
+        else
+        {
+            logger.setStream( stdout );
+        }
+
         //
         
         Maven maven;
         
-        DefaultPlexusContainer container;
-        
-        Logger logger;
-        
         try
         {
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld( classWorld )
-                .setName( "embedder" );
-
-            container = new DefaultPlexusContainer( cc );
-
-            logger = container.getLogger();
-
-            if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
-            {
-                File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) ).getAbsoluteFile();
-
-                logger = new FileLogger( logFile );
-
-                container.setLoggerManager( new MavenLoggerManager( logger ) );
-            }
-            
             maven = container.lookup( Maven.class );
-        }
-        catch ( PlexusContainerException e )
-        {
-            CLIReportingUtils.showError( new ConsoleLogger( Logger.LEVEL_ERROR, Maven.class.getName() ), "Unable to start the embedder: ", e, showErrors );
-
-            return 1;
         }
         catch ( ComponentLookupException e )
         {
@@ -180,7 +222,7 @@ public class MavenCli
             return 1;
         }
                 
-        Configuration configuration = buildEmbedderConfiguration( commandLine );        
+        Configuration configuration = buildEmbedderConfiguration( commandLine, workingDirectory );        
         
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
 
@@ -263,7 +305,7 @@ public class MavenCli
             return 1;
         }
 
-        CLIRequestUtils.populateRequest( request, commandLine, debug, quiet, showErrors );
+        CLIRequestUtils.populateRequest( request, commandLine, workingDirectory, debug, quiet, showErrors );
 
         request.setExecutionListener( new ExecutionEventLogger( logger ) );
 
@@ -271,7 +313,7 @@ public class MavenCli
 
         if ( debug || commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
-            CLIReportingUtils.showVersion();
+            CLIReportingUtils.showVersion( stdout );
         }
 
         if ( showErrors )
@@ -306,8 +348,7 @@ public class MavenCli
 
                 DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-                System.out.println( cipher.encryptAndDecorate( passwd,
-                                                               DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+                stdout.println( cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
 
                 return 0;
             }
@@ -335,21 +376,21 @@ public class MavenCli
 
                 if ( master == null )
                 {
-                    System.err.println( "Master password is not set in the setting security file" );
+                    stderr.println( "Master password is not set in the setting security file" );
 
                     return 1;
                 }
 
                 DefaultPlexusCipher cipher = new DefaultPlexusCipher();
                 String masterPasswd = cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
-                System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+                stdout.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
 
                 return 0;
             }
         }
         catch ( Exception e )
         {
-            System.err.println( "FATAL ERROR: " + "Error encrypting password: " + e.getMessage() );
+            stderr.println( "FATAL ERROR: " + "Error encrypting password: " + e.getMessage() );
 
             return 1;
         }
@@ -375,50 +416,61 @@ public class MavenCli
 
         // The exception handling should be handled in Maven itself.
 
-        if ( result.hasExceptions() )
+        try
         {
-            ExceptionSummary es = result.getExceptionSummary();
+            if ( result.hasExceptions() )
+            {
+                ExceptionSummary es = result.getExceptionSummary();
 
-            if ( es == null )
-            {
-                logger.error( "", result.getExceptions().get( 0 ) );
-            }
-            else
-            {
-                if ( showErrors )
+                if ( es == null )
                 {
-                    logger.error( es.getMessage(), es.getException() );
+                    logger.error( "", result.getExceptions().get( 0 ) );
                 }
                 else
                 {
-                    logger.error( es.getMessage() );
+                    if ( showErrors )
+                    {
+                        logger.error( es.getMessage(), es.getException() );
+                    }
+                    else
+                    {
+                        logger.error( es.getMessage() );
+                    }
                 }
-            }
 
-            if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
-            {
-                logger.info( "Build failures were ignored." );
+                if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
+                {
+                    logger.info( "Build failures were ignored." );
 
-                return 0;
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
             }
             else
             {
-                return 1;
+                return 0;
             }
         }
-        else
+        finally
         {
-            return 0;
+            if ( fileStream != null )
+            {
+                fileStream.close();
+            }
         }
     }
 
-    private Configuration buildEmbedderConfiguration( CommandLine commandLine )
+    private Configuration buildEmbedderConfiguration( CommandLine commandLine, String workingDirectory )
     {
         File userSettingsFile;
 
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
         {
             userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
+            userSettingsFile = CLIRequestUtils.resolveFile( userSettingsFile, workingDirectory );
         }
         else
         {
@@ -430,6 +482,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
         {
             globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
+            globalSettingsFile = CLIRequestUtils.resolveFile( globalSettingsFile, workingDirectory );
         }
         else
         {
@@ -512,4 +565,5 @@ public class MavenCli
 
         return result;
     }    
+
 }

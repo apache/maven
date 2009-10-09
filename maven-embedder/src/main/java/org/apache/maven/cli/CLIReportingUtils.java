@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,7 +48,7 @@ public final class CLIReportingUtils
 
     public static final int SEC_PER_MIN = 60;
 
-    public static void showVersion()
+    public static void showVersion( PrintStream stdout )
     {
         Properties properties = getBuildProperties();
 
@@ -70,17 +71,17 @@ public final class CLIReportingUtils
             msg += ")";
         }
 
-        System.out.println( msg );
+        stdout.println( msg );
 
-        System.out.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
+        stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
 
-        System.out.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
+        stdout.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
 
-        System.out.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
-                            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
+        stdout.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
+            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
 
-        System.out.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION
-                            + "\" arch: \"" + Os.OS_ARCH + "\" Family: \"" + Os.OS_FAMILY + "\"" );
+        stdout.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION + "\" arch: \"" + Os.OS_ARCH
+            + "\" Family: \"" + Os.OS_FAMILY + "\"" );
     }
 
     private static String reduce( String s )

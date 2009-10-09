@@ -15,6 +15,8 @@ package org.apache.maven.cli;
  * the License.
  */
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -247,12 +249,18 @@ public class CLIManager
         return cleanArgs;
     }
 
-    public void displayHelp()
+    public void displayHelp( PrintStream stdout )
     {
-        System.out.println();
+        stdout.println();
+
+        PrintWriter pw = new PrintWriter( stdout );
 
         HelpFormatter formatter = new HelpFormatter();
 
-        formatter.printHelp( "mvn [options] [<goal(s)>] [<phase(s)>]", "\nOptions:", options, "\n" );
+        formatter.printHelp( pw, HelpFormatter.DEFAULT_WIDTH, "mvn [options] [<goal(s)>] [<phase(s)>]", "\nOptions:",
+                             options, HelpFormatter.DEFAULT_LEFT_PAD, HelpFormatter.DEFAULT_DESC_PAD, "\n", false );
+
+        pw.flush();
     }
+
 }
