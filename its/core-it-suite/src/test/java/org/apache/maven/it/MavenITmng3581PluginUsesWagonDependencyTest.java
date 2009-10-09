@@ -27,6 +27,7 @@ import java.io.File;
 public class MavenITmng3581PluginUsesWagonDependencyTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3581PluginUsesWagonDependencyTest()
     {
         // Not 2.0.9
@@ -34,25 +35,18 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
     }
 
     /**
-     * Test that a plugin using a wagon directly works
+     * Test that a plugin using a specific wagon implementation directly works.
      */
-    public void testmng3581()
+    public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3581" );
-        File pluginDir = new File( testDir, "plugin" );
-        File projectDir = new File( testDir, "project" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
-        verifier.executeGoal( "install" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-
     }
-}
 
+}

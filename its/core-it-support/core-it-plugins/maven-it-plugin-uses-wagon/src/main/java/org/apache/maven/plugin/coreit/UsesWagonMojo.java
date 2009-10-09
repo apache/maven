@@ -23,6 +23,7 @@ import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.providers.ssh.jsch.ScpWagon;
 
 /**
@@ -32,6 +33,7 @@ import org.apache.maven.wagon.providers.ssh.jsch.ScpWagon;
 public class UsesWagonMojo
     extends AbstractMojo
 {
+
     /**
      * @component
      */
@@ -40,17 +42,51 @@ public class UsesWagonMojo
     public void execute()
         throws MojoExecutionException
     {
+        Wagon fileWagon;
         try
         {
-            getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol scp" );
-            Wagon wagon = wagonManager.getWagon( "scp" );
-
-            ScpWagon myWagon = (ScpWagon) wagon;
-            getLog().info( "[MAVEN-CORE-IT-LOG] Looked up and successfully casted scp wagon: " + myWagon );
+            getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol file" );
+            fileWagon = wagonManager.getWagon( "file" );
         }
         catch( Exception e )
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
+        try
+        {
+            FileWagon theWagon = (FileWagon) fileWagon;
+        }
+        catch( ClassCastException e )
+        {
+            getLog().error( "", e );
+            getLog().error( "Plugin Class Loaded by " + FileWagon.class.getClassLoader() );
+            getLog().error( "Wagon Class Loaded by " + fileWagon.getClass().getClassLoader() );
+
+            throw e;
+        }
+
+        Wagon scpWagon;
+        try
+        {
+            getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol scp" );
+            scpWagon = wagonManager.getWagon( "scp" );
+        }
+        catch( Exception e )
+        {
+            throw new MojoExecutionException( e.getMessage(), e );
+        }
+        try
+        {
+            ScpWagon theWagon = (ScpWagon) scpWagon;
+        }
+        catch( ClassCastException e )
+        {
+            getLog().error( "", e );
+            getLog().error( "Plugin Class Loaded by " + ScpWagon.class.getClassLoader() );
+            getLog().error( "Wagon Class Loaded by " + scpWagon.getClass().getClassLoader() );
+
+            throw e;
+        }
     }
+
 }
