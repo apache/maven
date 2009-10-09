@@ -76,6 +76,9 @@ public class MavenITmng2790LastUpdatedMetadataTest
         assertTrue( artifactLastUpdated1 + " ~ " + now,
             Math.abs( artifactLastUpdated1.getTime() - now.getTime() ) < 10 * 60 * 1000 );
 
+        // enforce some advance of time
+        Thread.sleep( 1000 );
+
         /*
          * Phase 2: Re-install snapshot and check for proper timestamp update in local metadata.
          */
