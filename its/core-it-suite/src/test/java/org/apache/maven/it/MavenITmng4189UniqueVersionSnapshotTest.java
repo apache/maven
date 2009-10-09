@@ -52,12 +52,14 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar 
         //      which contains add() method
+        verifier.setLogFileName( "log-1.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
        
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-f" );
         verifier.getCliOptions().add( "dependent-on-newer-timestamp-pom.xml" );
+        verifier.setLogFileName( "log-2.txt" );
         try
         {
          // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090532-2-1:jar 
@@ -77,6 +79,7 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         //      which contains the add() method
         verifier.getCliOptions().remove( "-f" );
         verifier.getCliOptions().remove( "dependent-on-newer-timestamp-pom.xml" );
+        verifier.setLogFileName( "log-3.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
