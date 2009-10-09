@@ -49,7 +49,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
         verifier.resetStreams();
 
         verifier = new Verifier( projectDir.getAbsolutePath() );
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

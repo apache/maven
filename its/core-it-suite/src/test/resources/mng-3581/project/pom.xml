@@ -3,21 +3,48 @@
   <groupId>org.apache.maven.its.mng3581</groupId>
   <artifactId>parent</artifactId>
   <version>1.0-SNAPSHOT</version>
+
+  <distributionManagement>
+    <repository>
+      <id>maven-core-it</id>
+      <url>file:///${basedir}/repo</url>
+    </repository>
+  </distributionManagement>
+
   <build>
     <plugins>
+      <plugin>
+        <!-- NOTE: This plugin will (indirectly) use the file wagon from the core which must have no impact on the test plugin below -->
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-artifact</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <mainFile>pom.xml</mainFile>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>set</goal>
+              <goal>deploy</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.its.mng3581</groupId>
         <artifactId>maven-mng3581-plugin</artifactId>
         <version>1</version>
         <executions>
           <execution>
-            <phase>validate</phase>
+            <phase>initialize</phase>
             <goals>
               <goal>use-wagon</goal>
             </goals>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
     </plugins>
   </build>
 </project>
