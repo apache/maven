@@ -33,6 +33,12 @@ under the License.
 
   <name>Maven Integration Tests</name>
 
+  <!--
+  To run the ITs using embedded Maven 3.x, add -D verifier.forkMode=auto. This will require more memory, something like
+    MAVEN_OPTS=-Xmx256m -XX:MaxPermSize=128m
+  seems to work.
+  -->
+
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-suite</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-suite</developerConnection>
@@ -70,7 +76,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-      <version>1.2</version>
+      <version>1.3-SNAPSHOT</version>
 <!-- TODO: not transitive in tests artifact, so must be left in main scope
       <scope>test</scope>
 -->
