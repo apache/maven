@@ -29,7 +29,6 @@ import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.maven.Maven;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.codehaus.plexus.util.StringUtils;
@@ -246,21 +245,9 @@ final class CLIRequestUtils
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setUserToolchainsFile( userToolchainsFile );
 
-        File pom;
-
         if ( alternatePomFile != null )
         {
-            pom = new File( alternatePomFile );
-            pom = resolveFile( pom, workingDirectory );
-        }
-        else
-        {
-            pom = new File( baseDirectory, Maven.POMv4 );
-        }
-
-        if ( pom.exists() )
-        {
-            request.setPom( pom );
+            request.setPom( resolveFile( new File( alternatePomFile ), workingDirectory ) );
         }
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )

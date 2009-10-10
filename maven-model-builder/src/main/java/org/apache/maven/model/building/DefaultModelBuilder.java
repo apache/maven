@@ -40,6 +40,7 @@ import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
+import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
@@ -66,6 +67,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
+
+    @Requirement
+    private ModelLocator modelLocator;
 
     @Requirement
     private ModelReader modelReader;
@@ -519,7 +523,7 @@ public class DefaultModelBuilder
 
         if ( pomFile.isDirectory() )
         {
-            pomFile = new File( pomFile, "pom.xml" );
+            pomFile = modelLocator.locatePom( pomFile );
         }
 
         return pomFile;

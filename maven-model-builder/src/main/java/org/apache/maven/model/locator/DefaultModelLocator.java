@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.model.locator;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,16 +19,23 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
+import java.io.File;
+
+import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * @author Jason van Zyl
+ * Locates a POM file within a project base directory.
+ * 
+ * @author Benjamin Bentmann
  */
-public interface Maven
+@Component( role = ModelLocator.class )
+public class DefaultModelLocator
+    implements ModelLocator
 {
-    @Deprecated
-    String POMv4 = "pom.xml";
 
-    MavenExecutionResult execute( MavenExecutionRequest request );    
+    public File locatePom( File projectDirectory )
+    {
+        return new File( projectDirectory, "pom.xml" );
+    }
+
 }

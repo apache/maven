@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.Maven;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -39,6 +38,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.UrlModelSource;
+import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
@@ -57,6 +57,9 @@ public class DefaultProjectBuilder
 
     @Requirement
     private ModelBuilder modelBuilder;
+
+    @Requirement
+    private ModelLocator modelLocator;
 
     @Requirement
     private ProjectBuildingHelper projectBuildingHelper;
@@ -341,7 +344,7 @@ public class DefaultProjectBuilder
 
                         if ( moduleFile.isDirectory() )
                         {
-                            moduleFile = new File( moduleFile, Maven.POMv4 );
+                            moduleFile = modelLocator.locatePom( moduleFile );
                         }
 
                         if ( !moduleFile.isFile() )
