@@ -121,22 +121,33 @@ public class DefaultSettingsBuilder
 
         try
         {
-            boolean strict = true;
+            Map<String, ?> options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.TRUE );
 
-            Map<String, ?> options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.valueOf( strict ) );
+            try
+            {
+                settings = settingsReader.read( settingsFile, options );
+            }
+            catch ( SettingsParseException e )
+            {
+                options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.FALSE );
 
-            settings = settingsReader.read( settingsFile, options );
+                settings = settingsReader.read( settingsFile, options );
+
+                problems.add( new DefaultSettingsProblem( e.getMessage(), SettingsProblem.Severity.WARNING,
+                                                          settingsFile.getAbsolutePath(), e.getLineNumber(),
+                                                          e.getColumnNumber(), e ) );
+            }
         }
         catch ( SettingsParseException e )
         {
-            problems.add( new DefaultSettingsProblem( "Non-parseable settings " + settingsFile,
+            problems.add( new DefaultSettingsProblem( "Non-parseable settings " + settingsFile + ": " + e.getMessage(),
                                                       SettingsProblem.Severity.FATAL, settingsFile.getAbsolutePath(),
                                                       e.getLineNumber(), e.getColumnNumber(), e ) );
             return new Settings();
         }
         catch ( IOException e )
         {
-            problems.add( new DefaultSettingsProblem( "Non-readable settings " + settingsFile,
+            problems.add( new DefaultSettingsProblem( "Non-readable settings " + settingsFile + ": " + e.getMessage(),
                                                       SettingsProblem.Severity.FATAL, settingsFile.getAbsolutePath(),
                                                       -1, -1, e ) );
             return new Settings();
