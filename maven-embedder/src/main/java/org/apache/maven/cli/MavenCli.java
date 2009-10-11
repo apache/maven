@@ -39,8 +39,13 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.repository.ArtifactTransferListener;
-import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuilder;
+import org.apache.maven.settings.building.SettingsBuildingException;
+import org.apache.maven.settings.building.SettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuildingResult;
+import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -249,11 +254,32 @@ public class MavenCli
 
         try
         {
-            MavenSettingsBuilder settingsBuilder = container.lookup( MavenSettingsBuilder.class );
+            SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
+            settingsRequest.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
+            settingsRequest.setUserSettingsFile( configuration.getUserSettingsFile() );
+            settingsRequest.setSystemProperties( request.getSystemProperties() );
+            settingsRequest.setUserProperties( request.getUserProperties() );
+
+            SettingsBuilder settingsBuilder = container.lookup( SettingsBuilder.class );
 
             try
             {
-                settings = settingsBuilder.buildSettings( request );
+                SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
+
+                settings = settingsResult.getEffectiveSettings();
+
+                if ( !settingsResult.getProblems().isEmpty() && logger.isWarnEnabled() )
+                {
+                    logger.warn( "" );
+                    logger.warn( "Some problems were encountered while building the effective settings" );
+
+                    for ( SettingsProblem problem : settingsResult.getProblems() )
+                    {
+                        logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                    }
+
+                    logger.warn( "" );
+                }
             }
             finally
             {
@@ -273,15 +299,9 @@ public class MavenCli
 
             return 1;
         }
-        catch ( IOException e )
+        catch ( SettingsBuildingException e )
         {
             CLIReportingUtils.showError( logger, "Failed to read settings: ", e, showErrors );
-
-            return 1;
-        }
-        catch ( XmlPullParserException e )
-        {
-            CLIReportingUtils.showError( logger, "Failed to parse settings: ", e, showErrors );
 
             return 1;
         }

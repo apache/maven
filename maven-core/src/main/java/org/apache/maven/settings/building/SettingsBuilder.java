@@ -1,4 +1,4 @@
-package org.apache.maven.settings;
+package org.apache.maven.settings.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,24 +19,22 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.settings.validation.SettingsValidationResult;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 /**
- * @author jdcasey
- * @author Jason van Zyl
+ * Builds the effective settings from a user settings file and/or a global settings file.
+ * 
+ * @author Benjamin Bentmann
  */
-@Deprecated
-public interface MavenSettingsBuilder
+public interface SettingsBuilder
 {
-    String ROLE = MavenSettingsBuilder.class.getName();
 
-    Settings buildSettings( MavenExecutionRequest request )
-        throws IOException, XmlPullParserException;
+    /**
+     * Builds the effective settings of the specified settings files.
+     * 
+     * @param request The settings building request that holds the parameters, must not be {@code null}.
+     * @return The result of the settings building, never {@code null}.
+     * @throws SettingsBuildingException If the effective settings could not be built.
+     */
+    SettingsBuildingResult build( SettingsBuildingRequest request )
+        throws SettingsBuildingException;
 
-    SettingsValidationResult validateSettings( File settingsFile );
 }

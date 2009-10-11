@@ -1,4 +1,4 @@
-package org.apache.maven.settings;
+package org.apache.maven.settings.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.settings;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,24 +19,37 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.settings.validation.SettingsValidationResult;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.apache.maven.settings.Settings;
 
 /**
- * @author jdcasey
- * @author Jason van Zyl
+ * Collects the output of the settings builder.
+ * 
+ * @author Benjamin Bentmann
  */
-@Deprecated
-public interface MavenSettingsBuilder
+class DefaultSettingsBuildingResult
+    implements SettingsBuildingResult
 {
-    String ROLE = MavenSettingsBuilder.class.getName();
 
-    Settings buildSettings( MavenExecutionRequest request )
-        throws IOException, XmlPullParserException;
+    private Settings effectiveSettings;
 
-    SettingsValidationResult validateSettings( File settingsFile );
+    private List<SettingsProblem> problems;
+
+    public DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
+    {
+        this.effectiveSettings = effectiveSettings;
+        this.problems = problems;
+    }
+
+    public Settings getEffectiveSettings()
+    {
+        return effectiveSettings;
+    }
+
+    public List<SettingsProblem> getProblems()
+    {
+        return problems;
+    }
+
 }

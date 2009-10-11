@@ -316,7 +316,7 @@ public class DefaultModelBuilder
         }
         catch ( IOException e )
         {
-            problems.addFatalError( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), -1, -1, e );
+            problems.addFatalError( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(), -1, -1, e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
