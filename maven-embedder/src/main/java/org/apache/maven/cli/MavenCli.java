@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +45,6 @@ import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -56,11 +54,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -530,77 +525,7 @@ public class MavenCli
         return configuration;
     }
 
-    // ----------------------------------------------------------------------------
-    // Options for settings
-    //
-    // 1. No settings
-    // 2. User settings only
-    // 3. Global settings only
-    // 4. Both Users settings and Global settings. In the case that both are present
-    //    the User settings take priority.
-    //
-    // What we would like to provide is a way that the client code does not have
-    // to deal with settings configuration at all.
-    // ----------------------------------------------------------------------------
-
-    public static ConfigurationValidationResult validateConfiguration( Configuration configuration )
-    {
-        DefaultConfigurationValidationResult result = new DefaultConfigurationValidationResult();
-
-        Reader fileReader = null;
-
-        // User settings
-
-        if ( configuration.getUserSettingsFile() != null )
-        {
-            try
-            {
-                fileReader = ReaderFactory.newXmlReader( configuration.getUserSettingsFile() );
-
-                result.setUserSettings( new SettingsXpp3Reader().read( fileReader ) );
-            }
-            catch ( IOException e )
-            {
-                result.setUserSettingsException( e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                result.setUserSettingsException( e );
-            }
-            finally
-            {
-                IOUtil.close( fileReader );
-            }
-        }
-
-        // Global settings
-
-        if ( configuration.getGlobalSettingsFile() != null )
-        {
-            try
-            {
-                fileReader = ReaderFactory.newXmlReader( configuration.getGlobalSettingsFile() );
-
-                result.setGlobalSettings( new SettingsXpp3Reader().read( fileReader ) );
-            }
-            catch ( IOException e )
-            {
-                result.setGlobalSettingsException( e );
-            }
-            catch ( XmlPullParserException e )
-            {
-                result.setGlobalSettingsException( e );
-            }
-            finally
-            {
-                IOUtil.close( fileReader );
-            }
-        }
-
-        return result;
-    }    
-
-    public void populateProperties( MavenExecutionRequest request, CommandLine commandLine )
+    private void populateProperties( MavenExecutionRequest request, CommandLine commandLine )
     {
         Properties systemProperties = new Properties();
         Properties userProperties = new Properties();
@@ -609,7 +534,7 @@ public class MavenCli
         request.setSystemProperties( systemProperties );
     }
     
-    public MavenExecutionRequest populateRequest( MavenExecutionRequest request, CommandLine commandLine,
+    private MavenExecutionRequest populateRequest( MavenExecutionRequest request, CommandLine commandLine,
                                                   String workingDirectory, boolean debug, boolean quiet, boolean showErrors )
     {
         // ----------------------------------------------------------------------
@@ -644,6 +569,7 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
+        @SuppressWarnings( "unchecked" )
         List<String> goals = commandLine.getArgList();
 
         boolean recursive = true;
