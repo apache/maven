@@ -34,7 +34,6 @@ import org.apache.maven.model.Model;
  */
 public interface ModelReader
 {
-
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
      * true}. If {@code false}, unknown elements will be ignored instead of causing a failure.

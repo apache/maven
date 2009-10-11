@@ -20,6 +20,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -31,6 +37,8 @@ import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.model.locator.ModelLocator;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.MavenSettingsBuilder;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
@@ -45,6 +53,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
@@ -75,6 +85,8 @@ public class MavenCli
 
     private PrintStreamLogger logger;
 
+    private ModelLocator modelLocator;
+    
     public static void main( String[] args )
     {
         int result = main( args, null );
@@ -189,7 +201,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( commandLine.getOptionValue( CLIManager.LOG_FILE ) );
-            logFile = CLIRequestUtils.resolveFile( logFile, workingDirectory );
+            logFile = resolveFile( logFile, workingDirectory );
 
             try
             {
@@ -214,6 +226,8 @@ public class MavenCli
         try
         {
             maven = container.lookup( Maven.class );
+            
+            modelLocator = container.lookup( ModelLocator.class );
         }
         catch ( ComponentLookupException e )
         {
@@ -229,7 +243,7 @@ public class MavenCli
         request.setGlobalSettingsFile( configuration.getGlobalSettingsFile() );
         request.setUserSettingsFile( configuration.getUserSettingsFile() );
 
-        CLIRequestUtils.populateProperties( request, commandLine );
+        populateProperties( request, commandLine );
 
         Settings settings;
 
@@ -305,7 +319,7 @@ public class MavenCli
             return 1;
         }
 
-        CLIRequestUtils.populateRequest( request, commandLine, workingDirectory, debug, quiet, showErrors );
+        populateRequest( request, commandLine, workingDirectory, debug, quiet, showErrors );
 
         request.setExecutionListener( new ExecutionEventLogger( logger ) );
 
@@ -470,7 +484,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
         {
             userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-            userSettingsFile = CLIRequestUtils.resolveFile( userSettingsFile, workingDirectory );
+            userSettingsFile = resolveFile( userSettingsFile, workingDirectory );
         }
         else
         {
@@ -482,7 +496,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
         {
             globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
-            globalSettingsFile = CLIRequestUtils.resolveFile( globalSettingsFile, workingDirectory );
+            globalSettingsFile = resolveFile( globalSettingsFile, workingDirectory );
         }
         else
         {
@@ -566,4 +580,367 @@ public class MavenCli
         return result;
     }    
 
+    public void populateProperties( MavenExecutionRequest request, CommandLine commandLine )
+    {
+        Properties systemProperties = new Properties();
+        Properties userProperties = new Properties();
+        populateProperties( commandLine, systemProperties, userProperties );
+        request.setUserProperties( userProperties );
+        request.setSystemProperties( systemProperties );
+    }
+    
+    public MavenExecutionRequest populateRequest( MavenExecutionRequest request, CommandLine commandLine,
+                                                  String workingDirectory, boolean debug, boolean quiet, boolean showErrors )
+    {
+        // ----------------------------------------------------------------------
+        // Now that we have everything that we need we will fire up plexus and
+        // bring the maven component to life for use.
+        // ----------------------------------------------------------------------
+
+        if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        {
+            request.setInteractiveMode( false );
+        }
+
+        boolean pluginUpdateOverride = false;
+
+        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES )
+            || commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
+        {
+            pluginUpdateOverride = true;
+        }
+        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_UPDATES ) )
+        {
+            pluginUpdateOverride = false;
+        }
+
+        boolean noSnapshotUpdates = false;
+        if ( commandLine.hasOption( CLIManager.SUPRESS_SNAPSHOT_UPDATES ) )
+        {
+            noSnapshotUpdates = true;
+        }
+
+        // ----------------------------------------------------------------------
+        //
+        // ----------------------------------------------------------------------
+
+        List<String> goals = commandLine.getArgList();
+
+        boolean recursive = true;
+
+        // this is the default behavior.
+        String reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
+
+        if ( commandLine.hasOption( CLIManager.NON_RECURSIVE ) )
+        {
+            recursive = false;
+        }
+
+        if ( commandLine.hasOption( CLIManager.FAIL_FAST ) )
+        {
+            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_FAST;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_AT_END ) )
+        {
+            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_AT_END;
+        }
+        else if ( commandLine.hasOption( CLIManager.FAIL_NEVER ) )
+        {
+            reactorFailureBehaviour = MavenExecutionRequest.REACTOR_FAIL_NEVER;
+        }
+
+        if ( commandLine.hasOption( CLIManager.OFFLINE ) )
+        {
+            request.setOffline( true );
+        }
+
+        boolean updateSnapshots = false;
+
+        if ( commandLine.hasOption( CLIManager.UPDATE_SNAPSHOTS ) )
+        {
+            updateSnapshots = true;
+        }
+
+        String globalChecksumPolicy = null;
+
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
+        {
+            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
+        }
+        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        {
+            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
+        }
+
+        File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
+
+        // ----------------------------------------------------------------------
+        // Profile Activation
+        // ----------------------------------------------------------------------
+
+        List<String> activeProfiles = new ArrayList<String>();
+
+        List<String> inactiveProfiles = new ArrayList<String>();
+
+        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
+        {
+            String [] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
+            if ( profileOptionValues != null )
+            {
+                for ( int i = 0; i < profileOptionValues.length; ++i )
+                {
+                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i] , "," );
+
+                    while ( profileTokens.hasMoreTokens() )
+                    {
+                        String profileAction = profileTokens.nextToken().trim();
+
+                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
+                        {
+                            inactiveProfiles.add( profileAction.substring( 1 ) );
+                        }
+                        else if ( profileAction.startsWith( "+" ) )
+                        {
+                            activeProfiles.add( profileAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            activeProfiles.add( profileAction );
+                        }
+                    }
+                }
+            }
+        }
+
+        ArtifactTransferListener transferListener;
+
+        if ( request.isInteractiveMode() )
+        {
+            transferListener = new ConsoleMavenTransferListener();
+        }
+        else
+        {
+            transferListener = new BatchModeMavenTransferListener();
+        }
+
+        transferListener.setShowChecksumEvents( false );
+
+        String alternatePomFile = null;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
+        {
+            alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
+        }
+
+        int loggingLevel;
+
+        if ( debug )
+        {
+            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
+        }
+        else if ( quiet )
+        {
+            // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+            // Ideally, we could use Warn across the board
+            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_ERROR;
+            // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+        }
+        else
+        {
+            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
+        }
+
+        Properties systemProperties = new Properties();
+        Properties userProperties = new Properties();
+        populateProperties( commandLine, systemProperties, userProperties );
+
+        File userToolchainsFile;
+        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
+        {
+            userToolchainsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
+            userToolchainsFile = resolveFile( userToolchainsFile, workingDirectory );
+        }
+        else
+        {
+            userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
+        }
+
+        request
+            .setBaseDirectory( baseDirectory )
+            .setGoals( goals )
+            .setSystemProperties( systemProperties )
+            .setUserProperties( userProperties )
+            .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
+            .setRecursive( recursive ) // default: true
+            .setShowErrors( showErrors ) // default: false
+            .setUsePluginUpdateOverride( pluginUpdateOverride )
+            .addActiveProfiles( activeProfiles ) // optional
+            .addInactiveProfiles( inactiveProfiles ) // optional
+            .setLoggingLevel( loggingLevel ) // default: info
+            .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
+            .setUpdateSnapshots( updateSnapshots ) // default: false
+            .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
+            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
+            .setUserToolchainsFile( userToolchainsFile );
+
+        if ( alternatePomFile != null )
+        {
+            request.setPom( resolveFile( new File( alternatePomFile ), workingDirectory ) );
+        }
+        else if ( request.getPom() != null && !request.getPom().isAbsolute() )
+        {
+            request.setPom( request.getPom().getAbsoluteFile() );
+        }
+
+        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
+        {
+            request.setBaseDirectory( request.getPom().getParentFile() );
+        }
+        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
+        {
+            File pom = modelLocator.locatePom( new File( request.getBaseDirectory() ) );
+
+            request.setPom( pom );
+        }
+        // TODO: Is this correct?
+        else if ( request.getBaseDirectory() == null )
+        {
+            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
+        }        
+        
+        if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
+        {
+            request.setResumeFrom( commandLine.getOptionValue( CLIManager.RESUME_FROM ) );
+        }
+
+        if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
+        {
+            String projectList = commandLine.getOptionValue( CLIManager.PROJECT_LIST );
+            String[] projects = StringUtils.split( projectList, "," );
+            request.setSelectedProjects( Arrays.asList( projects ) );
+        }
+
+        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM );
+        }
+        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE )
+            && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM );
+        }
+        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE )
+            && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        {
+            request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
+        }
+
+        String localRepoProperty = request.getUserProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+
+        if ( localRepoProperty == null )
+        {
+            localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
+        }
+
+        if ( localRepoProperty != null )
+        {
+            request.setLocalRepositoryPath( localRepoProperty );
+        }
+
+        return request;
+    }
+
+    static File resolveFile( File file, String workingDirectory )
+    {
+        if ( file == null )
+        {
+            return null;
+        }
+        else if ( file.isAbsolute() )
+        {
+            return file;
+        }
+        else if ( file.getPath().startsWith( File.separator ) )
+        {
+            // drive-relative Windows path
+            return file.getAbsoluteFile();
+        }
+        else
+        {
+            return new File( workingDirectory, file.getPath() );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // System properties handling
+    // ----------------------------------------------------------------------
+
+    static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
+    {
+        // add the env vars to the property set, with the "env." prefix
+        // XXX support for env vars should probably be removed from the ModelInterpolator
+        try
+        {
+            Properties envVars = CommandLineUtils.getSystemEnvVars();
+            for ( Entry<Object, Object> e : envVars.entrySet() )
+            {
+                systemProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+            }
+        }
+        catch ( IOException e )
+        {
+            System.err.println( "Error getting environment vars for profile activation: " + e );
+        }
+
+        // ----------------------------------------------------------------------
+        // Options that are set on the command line become system properties
+        // and therefore are set in the session properties. System properties
+        // are most dominant.
+        // ----------------------------------------------------------------------
+
+        if ( commandLine.hasOption( CLIManager.SET_SYSTEM_PROPERTY ) )
+        {
+            String[] defStrs = commandLine.getOptionValues( CLIManager.SET_SYSTEM_PROPERTY );
+
+            if ( defStrs != null )
+            {
+                for ( int i = 0; i < defStrs.length; ++i )
+                {
+                    setCliProperty( defStrs[i], userProperties );
+                }
+            }
+        }
+
+        systemProperties.putAll( System.getProperties() );
+    }
+
+    private static void setCliProperty( String property, Properties properties )
+    {
+        String name;
+
+        String value;
+
+        int i = property.indexOf( "=" );
+
+        if ( i <= 0 )
+        {
+            name = property.trim();
+
+            value = "true";
+        }
+        else
+        {
+            name = property.substring( 0, i ).trim();
+
+            value = property.substring( i + 1 ).trim();
+        }
+
+        properties.setProperty( name, value );
+
+        // ----------------------------------------------------------------------
+        // I'm leaving the setting of system properties here as not to break
+        // the SystemPropertyProfileActivator. This won't harm embedding. jvz.
+        // ----------------------------------------------------------------------
+
+        System.setProperty( name, value );
+    }    
 }

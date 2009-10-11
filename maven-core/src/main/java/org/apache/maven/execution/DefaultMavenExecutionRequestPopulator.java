@@ -167,30 +167,6 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
-    private void pom( MavenExecutionRequest request )
-    {
-        if ( request.getPom() != null && !request.getPom().isAbsolute() )
-        {
-            request.setPom( request.getPom().getAbsoluteFile() );
-        }
-
-        if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
-        {
-            request.setBaseDirectory( request.getPom().getParentFile() );
-        }
-        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
-        {
-            File pom = modelLocator.locatePom( new File( request.getBaseDirectory() ) );
-
-            request.setPom( pom );
-        }
-        // TODO: Is this correct?
-        else if ( request.getBaseDirectory() == null )
-        {
-            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
-        }
-    }
-
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );
@@ -318,8 +294,6 @@ public class DefaultMavenExecutionRequestPopulator
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenExecutionRequestPopulationException
     {
-        pom( request );
-
         localRepository( request );
 
         populateDefaultPluginGroups( request );
