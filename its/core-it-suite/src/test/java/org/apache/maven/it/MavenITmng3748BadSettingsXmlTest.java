@@ -20,7 +20,7 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.it.VerificationException;
@@ -39,38 +39,57 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3748BadSettingsXmlTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3748BadSettingsXmlTest()
     {
         super( "(2.0.8,)" ); // only test in 2.0.9+
     }
 
-    public void testitMNG3748 ()
+    public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3748" );
 
-        Verifier verifier;
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );     
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-s" );
-        cliOptions.add( "settings.xml" );
-        
-        verifier.setCliOptions( cliOptions );
-
-        try
+        // Maven 3.x will only print warnings (see MNG-4390)
+        if ( matchesVersionRange( "(,3.0-alpha-3)" ) )
+        {
+            try
+            {
+                verifier.executeGoal( "validate" );
+                verifier.verifyErrorFreeLog();
+                
+                fail( "build should fail if settings.xml contains unrecognized elements." );
+            }
+            catch ( VerificationException e )
+            {
+                // expected
+            }
+        }
+        else
         {
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
-            
-            fail( "build should fail if settings.xml doesn't contain valid xml." );
-        }
-        catch ( VerificationException e )
-        {
-            // expected
+
+            List lines = verifier.loadLines( verifier.getLogFileName(), null );
+            boolean foundWarning = false;
+            for ( Iterator it = lines.iterator(); it.hasNext(); )
+            {
+                String line = it.next().toString();
+                if ( line.matches( "(?i)\\[WARNING\\].*unrecognised tag.+repositories.+2.*" ) )
+                {
+                    foundWarning = true;
+                    break;
+                }
+            }
+            assertTrue( foundWarning );
         }
         
         verifier.resetStreams();
     }
+
 }
