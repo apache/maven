@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -54,9 +53,6 @@ public class DefaultMavenExecutionRequestPopulator
 
     @Requirement( hint = "maven" )
     private SecDispatcher securityDispatcher;
-
-    @Requirement
-    private ModelLocator modelLocator;
 
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException
