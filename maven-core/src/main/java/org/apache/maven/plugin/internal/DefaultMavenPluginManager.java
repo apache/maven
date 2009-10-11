@@ -20,11 +20,11 @@ package org.apache.maven.plugin.internal;
  */
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,10 +89,8 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
@@ -259,12 +257,9 @@ public class DefaultMavenPluginManager
     {
         try
         {
-            XmlStreamReader reader = ReaderFactory.newXmlReader( is );
+            Reader reader = ReaderFactory.newXmlReader( is );
 
-            InterpolationFilterReader interpolationFilterReader =
-                new InterpolationFilterReader( new BufferedReader( reader ), container.getContext().getContextData() );
-
-            PluginDescriptor pluginDescriptor = builder.build( interpolationFilterReader );
+            PluginDescriptor pluginDescriptor = builder.build( reader );
 
             return pluginDescriptor;
         }
