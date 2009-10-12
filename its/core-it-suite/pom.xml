@@ -37,6 +37,9 @@ under the License.
   To run the ITs using embedded Maven 3.x, add -D verifier.forkMode=auto. This will require more memory, something like
     MAVEN_OPTS=-Xmx256m -XX:MaxPermSize=128m
   seems to work.
+
+  ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
+  Maven dependencies are added to the test class path.
   -->
 
   <scm>
