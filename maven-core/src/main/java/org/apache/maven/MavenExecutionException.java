@@ -20,7 +20,6 @@ package org.apache.maven;
  */
 
 import java.io.File;
-import java.io.IOException;
 
 import org.apache.maven.project.ProjectBuildingException;
 
@@ -45,13 +44,7 @@ public class MavenExecutionException
         this.pomFile = pomFile;
     }
 
-    public MavenExecutionException( String message, IOException cause )
-    {
-        super( message, cause );
-    }
-
-    public MavenExecutionException( String message,
-                                    ProjectBuildingException cause )
+    public MavenExecutionException( String message, Throwable cause )
     {
         super( message, cause );
     }
