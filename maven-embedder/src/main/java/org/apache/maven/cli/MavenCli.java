@@ -52,8 +52,6 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
@@ -231,7 +229,7 @@ public class MavenCli
         }
         catch ( ComponentLookupException e )
         {
-            CLIReportingUtils.showError( new ConsoleLogger( Logger.LEVEL_ERROR, Maven.class.getName() ), "Unable to start the embedder: ", e, showErrors );
+            CLIReportingUtils.showError( logger, "Unable to start the embedder: ", e, showErrors );
 
             return 1;
         }
