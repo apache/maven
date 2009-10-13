@@ -1024,11 +1024,13 @@ public class MavenProject
         getBuild().addTestResource( testResource );
     }
 
+    @Deprecated
     public void setReporting( Reporting reporting )
     {
         getModel().setReporting( reporting );
     }
 
+    @Deprecated
     public Reporting getReporting()
     {
         return getModel().getReporting();
@@ -1125,6 +1127,7 @@ public class MavenProject
         return pluginArtifactMap;
     }
 
+    @Deprecated
     public void setReportArtifacts( Set<Artifact> reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
@@ -1132,6 +1135,7 @@ public class MavenProject
         reportArtifactMap = null;
     }
 
+    @Deprecated
     public Set<Artifact> getReportArtifacts()
     {
         if ( reportArtifacts != null )
@@ -1173,6 +1177,7 @@ public class MavenProject
         return reportArtifacts;
     }
 
+    @Deprecated
     public Map<String, Artifact> getReportArtifactMap()
     {
         if ( reportArtifactMap == null )
@@ -1260,6 +1265,7 @@ public class MavenProject
     // Plugins
     // ----------------------------------------------------------------------
 
+    @Deprecated
     public List<ReportPlugin> getReportPlugins()
     {
         if ( getModel().getReporting() == null )
