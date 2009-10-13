@@ -36,6 +36,7 @@ import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Settings;
@@ -48,6 +49,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -83,7 +85,7 @@ public class MavenCli
 
     private PrintStreamLogger logger;
 
-    private ModelLocator modelLocator;
+    private ModelProcessor modelProcessor;
     
     public static void main( String[] args )
     {
@@ -127,8 +129,14 @@ public class MavenCli
         logger = new PrintStreamLogger( System.out );
 
         container.setLoggerManager( new MavenLoggerManager( logger ) );
+        
+        customizeContainer( container );
     }
 
+    protected void customizeContainer( PlexusContainer container )
+    {        
+    }
+    
     public int doMain( String[] args, String workingDirectory, PrintStream stdout, PrintStream stderr )
     {
         if ( stdout == null )
@@ -225,7 +233,7 @@ public class MavenCli
         {
             maven = container.lookup( Maven.class );
             
-            modelLocator = container.lookup( ModelLocator.class );
+            modelProcessor = createModelProcessor( container );
         }
         catch ( ComponentLookupException e )
         {
@@ -490,6 +498,12 @@ public class MavenCli
         }
     }
 
+    protected ModelProcessor createModelProcessor( PlexusContainer container ) 
+        throws ComponentLookupException
+    {
+        return container.lookup( ModelProcessor.class );        
+    }
+
     private Configuration buildEmbedderConfiguration( CommandLine commandLine, String workingDirectory )
     {
         File userSettingsFile;
@@ -741,7 +755,7 @@ public class MavenCli
         }
         else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
         {
-            File pom = modelLocator.locatePom( new File( request.getBaseDirectory() ) );
+            File pom = modelProcessor.locatePom( new File( request.getBaseDirectory() ) );
 
             request.setPom( pom );
         }

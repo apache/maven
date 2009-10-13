@@ -21,8 +21,11 @@ package org.apache.maven.model.superpom;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.io.ModelReader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -43,7 +46,7 @@ public class DefaultSuperPomProvider
     private Model superModel;
 
     @Requirement
-    private ModelReader modelReader;
+    private ModelProcessor modelProcessor;
 
     public Model getSuperModel( String version )
     {
@@ -61,7 +64,9 @@ public class DefaultSuperPomProvider
 
             try
             {
-                superModel = modelReader.read( is, null );
+                Map<String,String> options = new HashMap<String,String>();
+                options.put( "xml:4.0.0", "xml:4.0.0" );
+                superModel = modelProcessor.read( is, options );
             }
             catch ( IOException e )
             {

@@ -37,8 +37,8 @@ import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.UrlModelSource;
-import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
@@ -59,7 +59,7 @@ public class DefaultProjectBuilder
     private ModelBuilder modelBuilder;
 
     @Requirement
-    private ModelLocator modelLocator;
+    private ModelProcessor modelProcessor;
 
     @Requirement
     private ProjectBuildingHelper projectBuildingHelper;
@@ -344,7 +344,7 @@ public class DefaultProjectBuilder
 
                         if ( moduleFile.isDirectory() )
                         {
-                            moduleFile = modelLocator.locatePom( moduleFile );
+                            moduleFile = modelProcessor.locatePom( moduleFile );
                         }
 
                         if ( !moduleFile.isFile() )
