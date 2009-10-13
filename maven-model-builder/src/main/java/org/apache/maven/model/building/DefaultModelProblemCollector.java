@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.io.ModelParseException;
 
 /**
  * Collects problems that are encountered during model building. The primary purpose of this component is to account for
@@ -106,8 +107,18 @@ class DefaultModelProblemCollector
         problems.addAll( problems );
     }
 
-    public void addFatalError( String message, int line, int column, Exception cause )
+    public void addFatalError( String message, Exception cause )
     {
+        int line = -1;
+        int column = -1;
+
+        if ( cause instanceof ModelParseException )
+        {
+            ModelParseException e = (ModelParseException) cause;
+            line = e.getLineNumber();
+            column = e.getColumnNumber();
+        }
+
         add( message, ModelProblem.Severity.FATAL, line, column, cause );
     }
 
@@ -118,7 +129,17 @@ class DefaultModelProblemCollector
 
     public void addError( String message, Exception cause )
     {
-        add( message, ModelProblem.Severity.ERROR, -1, -1, cause );
+        int line = -1;
+        int column = -1;
+
+        if ( cause instanceof ModelParseException )
+        {
+            ModelParseException e = (ModelParseException) cause;
+            line = e.getLineNumber();
+            column = e.getColumnNumber();
+        }
+
+        add( message, ModelProblem.Severity.ERROR, line, column, cause );
     }
 
     public void addWarning( String message )
@@ -128,7 +149,17 @@ class DefaultModelProblemCollector
 
     public void addWarning( String message, Exception cause )
     {
-        add( message, ModelProblem.Severity.WARNING, -1, -1, cause );
+        int line = -1;
+        int column = -1;
+
+        if ( cause instanceof ModelParseException )
+        {
+            ModelParseException e = (ModelParseException) cause;
+            line = e.getLineNumber();
+            column = e.getColumnNumber();
+        }
+
+        add( message, ModelProblem.Severity.WARNING, line, column, cause );
     }
 
     private void add( String message, ModelProblem.Severity severity, int line, int column, Exception cause )

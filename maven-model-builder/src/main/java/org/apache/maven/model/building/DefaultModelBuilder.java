@@ -300,17 +300,32 @@ public class DefaultModelBuilder
 
             Map<String, ?> options = Collections.singletonMap( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );
 
-            model = modelProcessor.read( modelSource.getInputStream(), options );
+            try
+            {
+                model = modelProcessor.read( modelSource.getInputStream(), options );
+            }
+            catch ( ModelParseException e )
+            {
+                if ( !strict || pomFile != null )
+                {
+                    throw e;
+                }
+
+                options = Collections.singletonMap( ModelProcessor.IS_STRICT, Boolean.FALSE );
+
+                model = modelProcessor.read( modelSource.getInputStream(), options );
+
+                problems.addWarning( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+            }
         }
         catch ( ModelParseException e )
         {
-            problems.addFatalError( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                    e.getLineNumber(), e.getColumnNumber(), e );
+            problems.addFatalError( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
         catch ( IOException e )
         {
-            problems.addFatalError( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(), -1, -1, e );
+            problems.addFatalError( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
@@ -552,7 +567,7 @@ public class DefaultModelBuilder
         catch ( UnresolvableModelException e )
         {
             problems.addFatalError( "Non-resolvable parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), -1, -1, e );
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
