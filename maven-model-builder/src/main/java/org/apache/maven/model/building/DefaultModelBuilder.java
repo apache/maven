@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -298,7 +299,10 @@ public class DefaultModelBuilder
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
 
-            Map<String, ?> options = Collections.singletonMap( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );
+            Map<String,Object> options = new HashMap<String,Object>();
+            options.put(ModelProcessor.IS_STRICT, Boolean.valueOf( strict ));
+            options.put(ModelProcessor.LOCATION, modelSource.getLocation());
+            options.put(ModelProcessor.SOURCE, modelSource);
 
             try
             {
@@ -311,7 +315,7 @@ public class DefaultModelBuilder
                     throw e;
                 }
 
-                options = Collections.singletonMap( ModelProcessor.IS_STRICT, Boolean.FALSE );
+                options = Collections.singletonMap( ModelProcessor.IS_STRICT, (Object)Boolean.FALSE );
 
                 model = modelProcessor.read( modelSource.getInputStream(), options );
 
