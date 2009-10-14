@@ -588,7 +588,9 @@ public class LegacyRepositorySystem
     {
         try
         {
-            wagonManager.getRemoteFile( repository, destination, remotePath, new TransferListenerAdapter( transferListener ), ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
+            wagonManager.getRemoteFile( repository, destination, remotePath,
+                                        TransferListenerAdapter.newAdapter( transferListener ),
+                                        ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, true );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
@@ -605,7 +607,8 @@ public class LegacyRepositorySystem
     {
         try
         {
-            wagonManager.putRemoteFile( repository, source, remotePath, new TransferListenerAdapter( transferListener ) );
+            wagonManager.putRemoteFile( repository, source, remotePath,
+                                        TransferListenerAdapter.newAdapter( transferListener ) );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
