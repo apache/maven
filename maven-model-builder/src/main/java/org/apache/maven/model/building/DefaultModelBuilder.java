@@ -299,10 +299,10 @@ public class DefaultModelBuilder
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
 
-            Map<String,Object> options = new HashMap<String,Object>();
-            options.put(ModelProcessor.IS_STRICT, Boolean.valueOf( strict ));
-            options.put(ModelProcessor.LOCATION, modelSource.getLocation());
-            options.put(ModelProcessor.SOURCE, modelSource);
+            Map<String, Object> options = new HashMap<String, Object>();
+            options.put( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );
+            options.put( ModelProcessor.LOCATION, modelSource.getLocation() );
+            options.put( ModelProcessor.SOURCE, modelSource );
 
             try
             {
@@ -315,7 +315,7 @@ public class DefaultModelBuilder
                     throw e;
                 }
 
-                options = Collections.singletonMap( ModelProcessor.IS_STRICT, (Object)Boolean.FALSE );
+                options.put( ModelProcessor.IS_STRICT, Boolean.FALSE );
 
                 model = modelProcessor.read( modelSource.getInputStream(), options );
 
