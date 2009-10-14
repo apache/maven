@@ -57,6 +57,11 @@ public abstract class AbstractMavenTransferListener
         }        
     }
 
+    public void transferProgress( ArtifactTransferEvent transferEvent, byte[] buffer, int length )
+    {
+
+    }
+
     public void transferCompleted( ArtifactTransferEvent transferEvent )
     {
         long contentLength = transferEvent.getResource().getContentLength();

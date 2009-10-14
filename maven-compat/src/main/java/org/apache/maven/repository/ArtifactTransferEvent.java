@@ -78,18 +78,20 @@ public class ArtifactTransferEvent
 
     private MavenArtifact artifact;
     
-    public ArtifactTransferEvent( String wagon, final int eventType, final int requestType )
+    public ArtifactTransferEvent( String wagon, final int eventType, final int requestType, MavenArtifact artifact )
     {
         super( wagon );
         
         setEventType( eventType );
 
         setRequestType( requestType );
+
+        this.artifact = artifact;
     }
 
-    public ArtifactTransferEvent( String wagon, final Exception exception, final int requestType )
+    public ArtifactTransferEvent( String wagon, final Exception exception, final int requestType, MavenArtifact artifact )
     {
-        this( wagon, TRANSFER_ERROR, requestType );
+        this( wagon, TRANSFER_ERROR, requestType, artifact );
 
         this.exception = exception;
     }

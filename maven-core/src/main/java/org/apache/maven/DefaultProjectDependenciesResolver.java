@@ -34,6 +34,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.TransferListenerAdapter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
@@ -135,7 +136,7 @@ public class DefaultProjectDependenciesResolver
             .setOffline( session.isOffline() )
             .setForceUpdate( session.getRequest().isUpdateSnapshots() )
             .setCache( session.getRepositoryCache() );
-        // FIXME setTransferListener
+        request.setTransferListener( TransferListenerAdapter.newAdapter( session.getRequest().getTransferListener() ) );
 
         Set<String> projectIds = null;
 

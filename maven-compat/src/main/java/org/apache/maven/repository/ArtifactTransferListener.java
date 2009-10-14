@@ -21,7 +21,14 @@ package org.apache.maven.repository;
 
 public interface ArtifactTransferListener
 {
-    public boolean isShowChecksumEvents();
+    boolean isShowChecksumEvents();
 
-    public void setShowChecksumEvents( boolean showChecksumEvents );
+    void setShowChecksumEvents( boolean showChecksumEvents );
+
+    void transferInitiated( ArtifactTransferEvent transferEvent );
+
+    void transferProgress( ArtifactTransferEvent transferEvent, byte[] buffer, int length );
+
+    void transferCompleted( ArtifactTransferEvent transferEvent );
+
 }

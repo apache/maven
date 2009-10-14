@@ -36,6 +36,18 @@ public class ConsoleMavenTransferListener
         super.transferInitiated( transferEvent );
 
         complete = 0;
+
+        if ( !showEvent( transferEvent ) )
+        {
+            return;
+        }
+
+        String message =
+            transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
+
+        String url = transferEvent.getSource().toString();
+
+        System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
     }
 
     public void transferProgress( ArtifactTransferEvent transferEvent, byte[] buffer, int length )
