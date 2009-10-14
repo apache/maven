@@ -399,7 +399,7 @@ public class PluginParameterExpressionEvaluatorTest
     private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "legacy" );
+        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "default" );
 
         ArtifactRepository repo = artifactRepositoryFactory.createArtifactRepository( "local", "target/repo", repoLayout, null, null );
 
