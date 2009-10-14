@@ -26,6 +26,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.TransferListenerAdapter;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -142,7 +143,7 @@ public class DefaultProjectBuilder
                     .setOffline( configuration.isOffline() )
                     .setForceUpdate( configuration.isForceUpdate() )
                     .setManagedVersionMap( project.getManagedVersionMap() );
-                // FIXME setTransferListener
+                artifactRequest.setTransferListener( TransferListenerAdapter.newAdapter( configuration.getTransferListener() ) );
 
                 artifactResult = repositorySystem.resolve( artifactRequest );
 
@@ -205,7 +206,8 @@ public class DefaultProjectBuilder
             .setRemoteRepositories( configuration.getRemoteRepositories() )
             .setOffline( configuration.isOffline() )
             .setForceUpdate( configuration.isForceUpdate() );
-        // FIXME setTransferListener
+        request.setTransferListener( TransferListenerAdapter.newAdapter( configuration.getTransferListener() ) );
+
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
         try

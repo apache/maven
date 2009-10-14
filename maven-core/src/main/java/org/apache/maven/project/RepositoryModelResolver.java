@@ -30,6 +30,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
+import org.apache.maven.artifact.resolver.TransferListenerAdapter;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -136,7 +137,8 @@ class RepositoryModelResolver
             request.setLocalRepository( projectBuildingRequest.getLocalRepository() );
             request.setOffline( projectBuildingRequest.isOffline() );
             request.setCache( projectBuildingRequest.getRepositoryCache() );
-            // FIXME setTransferListener
+            request.setTransferListener( TransferListenerAdapter.newAdapter( projectBuildingRequest.getTransferListener() ) );
+
             ArtifactResolutionResult result = repositorySystem.resolve( request );
 
             try

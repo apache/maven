@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelEventListener;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -76,6 +77,8 @@ public class DefaultProjectBuildingRequest
     private Date buildStartTime;
 
     private boolean resolveDependencies;
+
+    private ArtifactTransferListener transferListener;
 
     public DefaultProjectBuildingRequest()
     {
@@ -392,6 +395,16 @@ public class DefaultProjectBuildingRequest
     public void setBuildStartTime( Date buildStartTime )
     {
         this.buildStartTime = buildStartTime;
+    }
+
+    public ArtifactTransferListener getTransferListener()
+    {
+        return transferListener;
+    }
+
+    public void setTransferListener( ArtifactTransferListener transferListener )
+    {
+        this.transferListener = transferListener;
     }
 
 }

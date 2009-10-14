@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -173,9 +174,9 @@ public interface ProjectBuildingRequest
      * @return This request, never {@code null}.
      */
     void setBuildStartTime( Date buildStartTime );
-    
-    // TODO ? 
-    //TransferListener getTransferListener();
-    //void setTransferListener ( TransferListener transferListener );
+
+    ArtifactTransferListener getTransferListener();
+
+    void setTransferListener( ArtifactTransferListener transferListener );
 
 }
