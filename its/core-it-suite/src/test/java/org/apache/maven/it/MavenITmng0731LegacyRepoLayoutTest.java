@@ -33,9 +33,11 @@ import java.io.File;
 public class MavenITmng0731LegacyRepoLayoutTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng0731LegacyRepoLayoutTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        // legacy layout no longer supported in Maven 3.x (see MNG-4204)
+        super( "[2.0,3.0-alpha-3)" );
     }
 
     /**

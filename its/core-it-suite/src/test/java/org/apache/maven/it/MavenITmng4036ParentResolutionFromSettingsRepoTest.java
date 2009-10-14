@@ -65,6 +65,9 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
     public void testitLegacyLayout()
         throws Exception
     {
+        // legacy layout no longer supported in Maven 3.x (see MNG-4204)
+        requiresMavenVersion( "[2.0,3.0-alpha-3)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4036/legacy" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
