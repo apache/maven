@@ -81,16 +81,16 @@ public class DefaultMavenExecutionResult
         return this;
     }
 
-    public List getExceptions()
+    public List<Throwable> getExceptions()
     {
-        return exceptions == null ? Collections.EMPTY_LIST : exceptions;
+        return exceptions == null ? Collections.<Throwable> emptyList() : exceptions;
     }
 
     public MavenExecutionResult addException( Throwable t )
     {
         if ( exceptions == null )
         {
-            exceptions = new ArrayList();
+            exceptions = new ArrayList<Throwable>();
         }
 
         exceptions.add( t );

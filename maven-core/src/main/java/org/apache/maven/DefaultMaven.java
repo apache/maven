@@ -269,7 +269,7 @@ public class DefaultMaven
         return lifecycleListeners;
     }
 
-    private MavenExecutionResult processResult( MavenExecutionResult result, Exception e )
+    private MavenExecutionResult processResult( MavenExecutionResult result, Throwable e )
     {
         ExceptionHandler handler = new DefaultExceptionHandler();
         

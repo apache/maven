@@ -44,7 +44,7 @@ public interface MavenExecutionResult
     // - project building exception
     // - invalid project model exception: list of markers
     // - xmlpull parser exception
-    List<Exception> getExceptions();
+    List<Throwable> getExceptions();
 
     MavenExecutionResult addException( Throwable e );
 

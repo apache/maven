@@ -28,20 +28,20 @@ package org.apache.maven.exception;
 
 public class ExceptionSummary
 {
-    private Exception exception;
+    private Throwable exception;
     
     private String message;
     
     private String reference;
 
-    public ExceptionSummary( Exception exception, String message, String reference )
+    public ExceptionSummary( Throwable exception, String message, String reference )
     {
         this.exception = exception;
         this.message = message;
         this.reference = reference;
     }
 
-    public Exception getException()
+    public Throwable getException()
     {
         return exception;
     }

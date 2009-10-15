@@ -79,7 +79,7 @@ Plugins:
 public class DefaultExceptionHandler
     implements ExceptionHandler
 {
-    public ExceptionSummary handleException( Exception exception )
+    public ExceptionSummary handleException( Throwable exception )
     {
         String message;
         
