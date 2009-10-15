@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * Collects settings required to resolve a plugin prefix.
@@ -82,6 +83,7 @@ public class DefaultPluginPrefixRequest
         setCache( session.getRepositoryCache() );
         setLocalRepository( session.getLocalRepository() );
         setOffline( session.isOffline() );
+        setTransferListener( session.getRequest().getTransferListener() );
 
         MavenProject project = session.getCurrentProject();
         if ( project != null )
@@ -190,6 +192,18 @@ public class DefaultPluginPrefixRequest
     public DefaultPluginPrefixRequest setForceUpdate( boolean forceUpdate )
     {
         repositoryRequest.setForceUpdate( forceUpdate );
+
+        return this;
+    }
+
+    public ArtifactTransferListener getTransferListener()
+    {
+        return repositoryRequest.getTransferListener();
+    }
+
+    public DefaultPluginPrefixRequest setTransferListener( ArtifactTransferListener transferListener )
+    {
+        repositoryRequest.setTransferListener( transferListener );
 
         return this;
     }

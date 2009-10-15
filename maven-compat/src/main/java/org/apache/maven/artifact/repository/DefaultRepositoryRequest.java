@@ -22,6 +22,8 @@ package org.apache.maven.artifact.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.repository.ArtifactTransferListener;
+
 /**
  * Collects basic settings to access the repository system.
  * 
@@ -40,6 +42,8 @@ public class DefaultRepositoryRequest
     private List<ArtifactRepository> remoteRepositories;
 
     private RepositoryCache cache;
+
+    private ArtifactTransferListener transferListener;
 
     /**
      * Creates an empty repository request.
@@ -61,6 +65,7 @@ public class DefaultRepositoryRequest
         setOffline( repositoryRequest.isOffline() );
         setCache( repositoryRequest.getCache() );
         setForceUpdate( repositoryRequest.isForceUpdate() );
+        setTransferListener( repositoryRequest.getTransferListener() );
     }
 
     public boolean isOffline()
@@ -124,6 +129,18 @@ public class DefaultRepositoryRequest
     public DefaultRepositoryRequest setCache( RepositoryCache cache )
     {
         this.cache = cache;
+
+        return this;
+    }
+
+    public ArtifactTransferListener getTransferListener()
+    {
+        return transferListener;
+    }
+
+    public DefaultRepositoryRequest setTransferListener( ArtifactTransferListener transferListener )
+    {
+        this.transferListener = transferListener;
 
         return this;
     }

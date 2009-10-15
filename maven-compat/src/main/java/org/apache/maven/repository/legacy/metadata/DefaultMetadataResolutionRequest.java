@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * Forms a request to retrieve artifact metadata.
@@ -132,6 +133,18 @@ public class DefaultMetadataResolutionRequest
     public DefaultMetadataResolutionRequest setForceUpdate( boolean forceUpdate )
     {
         repositoryRequest.setForceUpdate( forceUpdate );
+
+        return this;
+    }
+
+    public ArtifactTransferListener getTransferListener()
+    {
+        return repositoryRequest.getTransferListener();
+    }
+
+    public DefaultMetadataResolutionRequest setTransferListener( ArtifactTransferListener transferListener )
+    {
+        repositoryRequest.setTransferListener( transferListener );
 
         return this;
     }

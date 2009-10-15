@@ -39,7 +39,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.legacy.TransferListenerAdapter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -136,7 +135,7 @@ public class DefaultProjectDependenciesResolver
             .setOffline( session.isOffline() )
             .setForceUpdate( session.getRequest().isUpdateSnapshots() )
             .setCache( session.getRepositoryCache() );
-        request.setTransferListener( TransferListenerAdapter.newAdapter( session.getRequest().getTransferListener() ) );
+        request.setTransferListener( session.getRequest().getTransferListener() );
 
         Set<String> projectIds = null;
 

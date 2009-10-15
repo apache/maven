@@ -42,7 +42,6 @@ import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.legacy.TransferListenerAdapter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.Os;
@@ -143,7 +142,7 @@ public class DefaultProjectBuilder
                     .setOffline( configuration.isOffline() )
                     .setForceUpdate( configuration.isForceUpdate() )
                     .setManagedVersionMap( project.getManagedVersionMap() );
-                artifactRequest.setTransferListener( TransferListenerAdapter.newAdapter( configuration.getTransferListener() ) );
+                artifactRequest.setTransferListener( configuration.getTransferListener() );
 
                 artifactResult = repositorySystem.resolve( artifactRequest );
 
@@ -206,7 +205,7 @@ public class DefaultProjectBuilder
             .setRemoteRepositories( configuration.getRemoteRepositories() )
             .setOffline( configuration.isOffline() )
             .setForceUpdate( configuration.isForceUpdate() );
-        request.setTransferListener( TransferListenerAdapter.newAdapter( configuration.getTransferListener() ) );
+        request.setTransferListener( configuration.getTransferListener() );
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 

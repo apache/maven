@@ -25,6 +25,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Model;
+import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * Collects settings required to resolve a plugin prefix.
@@ -142,5 +143,20 @@ public interface PluginPrefixRequest
      * @return This request, never {@code null}.
      */
     PluginPrefixRequest setCache( RepositoryCache cache );
+
+    /**
+     * Gets the listener to notify of transfer events.
+     * 
+     * @return The transfer listener or {@code null} if none.
+     */
+    ArtifactTransferListener getTransferListener();
+
+    /**
+     * Sets the listener to notify of transfer events.
+     * 
+     * @param transferListener The transfer listener to notify, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    PluginPrefixRequest setTransferListener( ArtifactTransferListener transferListener );
 
 }

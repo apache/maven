@@ -29,7 +29,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
@@ -64,7 +64,7 @@ public class ArtifactResolutionRequest
     // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
 
-    private TransferListener transferListener;
+    private ArtifactTransferListener transferListener;
     
     private boolean resolveRoot = true;
 
@@ -86,6 +86,7 @@ public class ArtifactResolutionRequest
         setCache( request.getCache() );
         setOffline( request.isOffline() );
         setForceUpdate( request.isForceUpdate() );
+        setTransferListener( request.getTransferListener() );
     }
 
     public Artifact getArtifact()
@@ -228,12 +229,12 @@ public class ArtifactResolutionRequest
         return resolveTransitively;
     }        
     
-    public TransferListener getTransferListener()
+    public ArtifactTransferListener getTransferListener()
     {
         return transferListener;
     }
 
-    public ArtifactResolutionRequest setTransferListener( TransferListener transferListener )
+    public ArtifactResolutionRequest setTransferListener( ArtifactTransferListener transferListener )
     {
         this.transferListener = transferListener;
         return this;

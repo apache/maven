@@ -542,6 +542,7 @@ public class MavenMetadataSource
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( System.getProperties() );
+                    configuration.setTransferListener( repositoryRequest.getTransferListener() );
 
                     project = getProjectBuilder().build( pomArtifact, configuration ).getProject();
                 }

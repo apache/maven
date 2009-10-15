@@ -38,6 +38,7 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.repository.legacy.TransferListenerAdapter;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadata;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
@@ -370,7 +371,8 @@ public class DefaultArtifactResolver
         Map managedVersions = request.getManagedVersionMap();
         List<ResolutionListener> listeners = request.getListeners();
         ArtifactFilter collectionFilter = request.getCollectionFilter();                       
-        ArtifactFilter resolutionFilter = request.getResolutionFilter();                       
+        ArtifactFilter resolutionFilter = request.getResolutionFilter();
+        TransferListener transferListener = TransferListenerAdapter.newAdapter( request.getTransferListener() );
         
         //TODO: hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the workspace
         if ( source == null )
@@ -408,7 +410,7 @@ public class DefaultArtifactResolver
         {            
             try
             {
-                resolve( rootArtifact, request, request.getTransferListener(), false );
+                resolve( rootArtifact, request, transferListener, false );
             }
             catch ( ArtifactResolutionException e )
             {
@@ -512,7 +514,7 @@ public class DefaultArtifactResolver
                     {
                         childRequest.setRemoteRepositories( node.getRemoteRepositories() );
 
-                        resolve( artifact, childRequest, request.getTransferListener(), false );
+                        resolve( artifact, childRequest, transferListener, false );
                     }
                 }
                 catch ( ArtifactNotFoundException anfe )

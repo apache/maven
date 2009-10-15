@@ -171,7 +171,7 @@ public class DefaultPluginPrefixResolver
 
                     try
                     {
-                        repositorySystem.retrieve( repository, destination, remotePath, null );
+                        repositorySystem.retrieve( repository, destination, remotePath, request.getTransferListener() );
                     }
                     catch ( ArtifactTransferFailedException e )
                     {

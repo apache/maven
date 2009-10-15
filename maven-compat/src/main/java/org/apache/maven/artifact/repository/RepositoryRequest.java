@@ -21,6 +21,8 @@ package org.apache.maven.artifact.repository;
 
 import java.util.List;
 
+import org.apache.maven.repository.ArtifactTransferListener;
+
 /**
  * Collects basic settings to access the repository system.
  * 
@@ -106,5 +108,20 @@ public interface RepositoryRequest
      * @return This request, never {@code null}.
      */
     RepositoryRequest setCache( RepositoryCache cache );
+
+    /**
+     * Gets the listener to notify of transfer events.
+     * 
+     * @return The transfer listener or {@code null} if none.
+     */
+    ArtifactTransferListener getTransferListener();
+
+    /**
+     * Sets the listener to notify of transfer events.
+     * 
+     * @param transferListener The transfer listener to notify, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    RepositoryRequest setTransferListener( ArtifactTransferListener transferListener );
 
 }

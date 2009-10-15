@@ -37,7 +37,6 @@ import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.legacy.TransferListenerAdapter;
 
 /**
  * Implements a model resolver backed by the Maven Repository API and the reactor.
@@ -137,7 +136,7 @@ class RepositoryModelResolver
             request.setLocalRepository( projectBuildingRequest.getLocalRepository() );
             request.setOffline( projectBuildingRequest.isOffline() );
             request.setCache( projectBuildingRequest.getRepositoryCache() );
-            request.setTransferListener( TransferListenerAdapter.newAdapter( projectBuildingRequest.getTransferListener() ) );
+            request.setTransferListener( projectBuildingRequest.getTransferListener() );
 
             ArtifactResolutionResult result = repositorySystem.resolve( request );
 

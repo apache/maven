@@ -84,7 +84,8 @@ public class DefaultPluginVersionResolver
 
                 try
                 {
-                    repositorySystem.retrieve( repository, artifactMetadataFile, remotePath, null );
+                    repositorySystem.retrieve( repository, artifactMetadataFile, remotePath,
+                                               request.getTransferListener() );
                 }
                 catch ( ArtifactTransferFailedException e )
                 {

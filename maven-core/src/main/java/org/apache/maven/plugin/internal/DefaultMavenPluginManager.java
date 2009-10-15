@@ -344,6 +344,7 @@ public class DefaultMavenPluginManager
         request.setRemoteRepositories( project.getPluginArtifactRepositories() );
         request.setCache( session.getRepositoryCache() );
         request.setOffline( session.isOffline() );
+        request.setTransferListener( session.getRequest().getTransferListener() );
 
         List<Artifact> pluginArtifacts =
             resolvePluginArtifacts( plugin, pluginArtifact, request, project.getExtensionArtifactFilter() );

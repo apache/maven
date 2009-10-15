@@ -28,6 +28,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * Collects settings required to resolve the version for a plugin.
@@ -91,6 +92,7 @@ public class DefaultPluginVersionRequest
         setCache( session.getRepositoryCache() );
         setLocalRepository( session.getLocalRepository() );
         setOffline( session.isOffline() );
+        setTransferListener( session.getRequest().getTransferListener() );
 
         MavenProject project = session.getCurrentProject();
         if ( project != null )
@@ -179,6 +181,18 @@ public class DefaultPluginVersionRequest
     public DefaultPluginVersionRequest setForceUpdate( boolean forceUpdate )
     {
         repositoryRequest.setForceUpdate( forceUpdate );
+
+        return this;
+    }
+
+    public ArtifactTransferListener getTransferListener()
+    {
+        return repositoryRequest.getTransferListener();
+    }
+
+    public DefaultPluginVersionRequest setTransferListener( ArtifactTransferListener transferListener )
+    {
+        repositoryRequest.setTransferListener( transferListener );
 
         return this;
     }
