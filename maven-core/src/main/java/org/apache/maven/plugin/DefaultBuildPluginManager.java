@@ -24,7 +24,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.DuplicateArtifactAttachmentException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -97,7 +96,12 @@ public class DefaultBuildPluginManager
             {
                 mojo.execute();
             }
-            catch ( DuplicateArtifactAttachmentException e )
+            catch ( ClassCastException e )
+            {
+                // to be processed in the outer catch block
+                throw e;
+            }
+            catch ( RuntimeException e )
             {
                 throw new PluginExecutionException( mojoExecution, project, e );
             }
