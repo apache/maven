@@ -344,11 +344,11 @@ public class PluginDescriptorBuilder
         }
         catch ( IOException e )
         {
-            throw new PlexusConfigurationException( "Error creating configuration", e );
+            throw new PlexusConfigurationException( e.getMessage(), e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new PlexusConfigurationException( "Error creating configuration", e );
+            throw new PlexusConfigurationException( e.getMessage(), e );
         }
     }
 }

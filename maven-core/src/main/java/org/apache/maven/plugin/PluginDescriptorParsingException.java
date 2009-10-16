@@ -27,11 +27,35 @@ import org.apache.maven.model.Plugin;
 public class PluginDescriptorParsingException
     extends Exception
 {
+
     private Plugin plugin;
 
-    public PluginDescriptorParsingException( Plugin plugin, Exception e )
+    public PluginDescriptorParsingException( Plugin plugin, String descriptorLocation, Throwable e )
     {
-        super( e );
+        super( createMessage( plugin, descriptorLocation, e ), e );
         this.plugin = plugin;
     }
+
+    private static String createMessage( Plugin plugin, String descriptorLocation, Throwable e )
+    {
+        String message = "Failed to parse plugin descriptor";
+
+        if ( plugin != null )
+        {
+            message += " for " + plugin.getId();
+        }
+
+        if ( descriptorLocation != null )
+        {
+            message += " (" + descriptorLocation + ")";
+        }
+
+        if ( e != null )
+        {
+            message += ": " + e.getMessage();
+        }
+
+        return message;
+    }
+
 }

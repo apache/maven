@@ -32,11 +32,6 @@ public class InvalidPluginDescriptorException
         this.errors = errors;
     }
 
-    public InvalidPluginDescriptorException( String message )
-    {
-        super( message );
-    }
-
     private static String toMessage( String message, List<String> errors )
     {
         StringBuilder buffer = new StringBuilder( 256 );

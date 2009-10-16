@@ -1281,11 +1281,11 @@ public class DefaultLifecycleExecutor
         }
         catch ( IOException e )
         {
-            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), e );
+            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), e );
+            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e );
         }
 
         if ( lifecycleOverlay == null )

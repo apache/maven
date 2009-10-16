@@ -195,7 +195,7 @@ public class DefaultMavenPluginManager
                     {
                         InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
 
-                        pluginDescriptor = parsePluginDescriptor( is, plugin );
+                        pluginDescriptor = parsePluginDescriptor( is, plugin, pluginFile.getAbsolutePath() );
                     }
                 }
                 finally
@@ -207,12 +207,12 @@ public class DefaultMavenPluginManager
             {
                 File pluginXml = new File( pluginFile, getPluginDescriptorLocation() );
 
-                if ( pluginXml.canRead() )
+                if ( pluginXml.isFile() )
                 {
                     InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) );
                     try
                     {
-                        pluginDescriptor = parsePluginDescriptor( is, plugin );
+                        pluginDescriptor = parsePluginDescriptor( is, plugin, pluginXml.getAbsolutePath() );
                     }
                     finally
                     {
@@ -220,16 +220,15 @@ public class DefaultMavenPluginManager
                     }
                 }
             }
+
+            if ( pluginDescriptor == null )
+            {
+                throw new IOException( "No plugin descriptor found at " + getPluginDescriptorLocation() );
+            }
         }
         catch ( IOException e )
         {
-            throw new PluginDescriptorParsingException( plugin, e );
-        }
-
-        if ( pluginDescriptor == null )
-        {
-            throw new InvalidPluginDescriptorException( "Missing plugin descriptor for " + plugin.getId() + " ("
-                + pluginFile + ")" );
+            throw new PluginDescriptorParsingException( plugin, pluginFile.getAbsolutePath(), e );
         }
 
         MavenPluginValidator validator = new MavenPluginValidator( pluginArtifact );
@@ -252,24 +251,24 @@ public class DefaultMavenPluginManager
         return "META-INF/maven/plugin.xml";
     }
 
-    private PluginDescriptor parsePluginDescriptor( InputStream is, Plugin plugin )
+    private PluginDescriptor parsePluginDescriptor( InputStream is, Plugin plugin, String descriptorLocation )
         throws PluginDescriptorParsingException
     {
         try
         {
             Reader reader = ReaderFactory.newXmlReader( is );
 
-            PluginDescriptor pluginDescriptor = builder.build( reader );
+            PluginDescriptor pluginDescriptor = builder.build( reader, descriptorLocation );
 
             return pluginDescriptor;
         }
         catch ( IOException e )
         {
-            throw new PluginDescriptorParsingException( plugin, e );
+            throw new PluginDescriptorParsingException( plugin, descriptorLocation, e );
         }
         catch ( PlexusConfigurationException e )
         {
-            throw new PluginDescriptorParsingException( plugin, e );
+            throw new PluginDescriptorParsingException( plugin, descriptorLocation, e );
         }
     }
 
