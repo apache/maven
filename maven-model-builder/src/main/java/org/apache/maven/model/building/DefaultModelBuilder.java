@@ -310,7 +310,7 @@ public class DefaultModelBuilder
             }
             catch ( ModelParseException e )
             {
-                if ( !strict || pomFile != null )
+                if ( !strict )
                 {
                     throw e;
                 }
@@ -319,7 +319,14 @@ public class DefaultModelBuilder
 
                 model = modelProcessor.read( modelSource.getInputStream(), options );
 
-                problems.addWarning( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+                if ( pomFile != null )
+                {
+                    problems.addError( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+                }
+                else
+                {
+                    problems.addWarning( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+                }
             }
         }
         catch ( ModelParseException e )
