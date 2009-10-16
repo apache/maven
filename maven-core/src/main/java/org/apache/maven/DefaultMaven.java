@@ -92,6 +92,18 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
+        try
+        {
+            return doExecute( request );
+        }
+        catch ( OutOfMemoryError e )
+        {
+            return processResult( new DefaultMavenExecutionResult(), e );
+        }
+    }
+
+    private MavenExecutionResult doExecute( MavenExecutionRequest request )
+    {
         //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
@@ -130,10 +142,6 @@ public class DefaultMaven
             projects = getProjectsForMavenReactor( request );                                                
         }
         catch ( ProjectBuildingException e )
-        {
-            return processResult( result, e );
-        }
-        catch ( MavenExecutionException e )
         {
             return processResult( result, e );
         }
@@ -286,7 +294,7 @@ public class DefaultMaven
     }
     
     private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
-        throws MavenExecutionException, ProjectBuildingException
+        throws ProjectBuildingException
     {
         List<MavenProject> projects =  new ArrayList<MavenProject>();
 
@@ -348,7 +356,7 @@ public class DefaultMaven
     }
 
     private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
-        throws MavenExecutionException, ProjectBuildingException
+        throws ProjectBuildingException
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 

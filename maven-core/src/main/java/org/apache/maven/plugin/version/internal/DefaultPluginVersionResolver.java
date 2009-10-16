@@ -149,7 +149,8 @@ public class DefaultPluginVersionResolver
         if ( StringUtils.isEmpty( result.getVersion() ) )
         {
             throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
-                                                        "Plugin not found in any repository" );
+                                                        request.getLocalRepository(), request.getRemoteRepositories(),
+                                                        "Plugin not found in any plugin repository" );
         }
 
         return result;

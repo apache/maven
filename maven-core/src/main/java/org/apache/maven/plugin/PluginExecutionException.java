@@ -42,13 +42,13 @@ public class PluginExecutionException
 
     public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, Exception cause )
     {
-        super( mojoExecution.getMojoDescriptor(), project, constructMessage( cause ), cause );
+        super( mojoExecution.getMojoDescriptor(), project, constructMessage( mojoExecution, cause ), cause );
         this.mojoExecution = mojoExecution;
     }
 
     public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, DuplicateArtifactAttachmentException cause )
     {
-        super( mojoExecution.getMojoDescriptor(), project, constructMessage( cause ), cause );
+        super( mojoExecution.getMojoDescriptor(), project, constructMessage( mojoExecution, cause ), cause );
         this.mojoExecution = mojoExecution;
     }
 
@@ -57,16 +57,31 @@ public class PluginExecutionException
         return mojoExecution;
     }
 
-    private static String constructMessage( Throwable cause )
+    private static String constructMessage( MojoExecution mojoExecution, Throwable cause )
     {
-        if ( cause != null )
+        String message;
+
+        if ( mojoExecution != null )
         {
-            return "Mojo execution failed: " + cause.getMessage();
+            message =
+                "Execution " + mojoExecution.getExecutionId() + " of goal " + mojoExecution.getMojoDescriptor().getId()
+                    + " failed";
         }
         else
         {
-            return "Mojo execution failed.";
+            message = "Mojo execution failed";
         }
+
+        if ( cause != null )
+        {
+            message = ": " + cause.getMessage();
+        }
+        else
+        {
+            message += ".";
+        }
+
+        return message;
     }
 
 }

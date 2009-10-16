@@ -19,8 +19,9 @@ package org.apache.maven.plugin.version;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
+import java.util.List;
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 public class PluginVersionResolutionException
     extends Exception
@@ -33,25 +34,7 @@ public class PluginVersionResolutionException
 
     public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, Throwable cause )
     {
-        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
-
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.baseMessage = baseMessage;
-    }
-
-    public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, ArtifactMetadataRetrievalException cause )
-    {
-        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
-
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.baseMessage = baseMessage;
-    }
-
-    public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage, InvalidVersionSpecificationException cause )
-    {
-        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
+        super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\': " + baseMessage, cause );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -60,7 +43,18 @@ public class PluginVersionResolutionException
 
     public PluginVersionResolutionException( String groupId, String artifactId, String baseMessage )
     {
-        super( "Error resolving version for \'" + groupId + ":" + artifactId + "\': " + baseMessage );
+        super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\': " + baseMessage );
+
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.baseMessage = baseMessage;
+    }
+
+    public PluginVersionResolutionException( String groupId, String artifactId, ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories, String baseMessage )
+    {
+        super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\' from the repositories "
+            + format( localRepository, remoteRepositories ) + ": " + baseMessage );
 
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -80,6 +74,33 @@ public class PluginVersionResolutionException
     public String getBaseMessage()
     {
         return baseMessage;
+    }
+
+    private static String format( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    {
+        String repos = "[";
+
+        if ( localRepository != null )
+        {
+            repos += localRepository.getId() + " (" + localRepository.getBasedir() + ")";
+        }
+
+        if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
+        {
+            repos += ", ";
+
+            for ( ArtifactRepository repository : remoteRepositories )
+            {
+                if ( repository != null )
+                {
+                    repos += repository.getId() + " (" + repository.getUrl() + ")";
+                }
+            }
+        }
+
+        repos += "]";
+
+        return repos;
     }
 
 }

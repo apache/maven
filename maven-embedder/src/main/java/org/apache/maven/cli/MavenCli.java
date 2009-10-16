@@ -470,6 +470,17 @@ public class MavenCli
                     else
                     {
                         logger.error( es.getMessage() );
+                        logger.error( "To see the full stack trace of the error, re-run Maven with the -e switch." );
+                    }
+
+                    logger.error( "Re-run Maven using the -X switch to enable full debug logging." );
+
+                    if ( StringUtils.isNotEmpty( es.getReference() ) )
+                    {
+                        logger.error( "" );
+                        logger.error( "For more information about the error and possible solutions"
+                            + ", please try the following article:" );
+                        logger.error( "  " + es.getReference() );
                     }
                 }
 

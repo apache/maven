@@ -76,7 +76,8 @@ public class DefaultPluginPrefixResolver
 
             if ( result == null )
             {
-                throw new NoPluginFoundForPrefixException( request.getPrefix(), request.getLocalRepository(),
+                throw new NoPluginFoundForPrefixException( request.getPrefix(), request.getPluginGroups(),
+                                                           request.getLocalRepository(),
                                                            request.getRemoteRepositories() );
             }
         }

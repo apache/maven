@@ -32,11 +32,42 @@ public class NoPluginFoundForPrefixException
     
     private List<ArtifactRepository> remoteRepositories;
     
-    public NoPluginFoundForPrefixException( String prefix, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public NoPluginFoundForPrefixException( String prefix, List<String> pluginGroups,
+                                            ArtifactRepository localRepository,
+                                            List<ArtifactRepository> remoteRepositories )
     {
-        super( "No plugin found for prefix '" + prefix + "'" );
+        super( "No plugin found for prefix '" + prefix + "' in the current project and in the plugin groups "
+            + pluginGroups + " available from the repositories " + format( localRepository, remoteRepositories ) );
         this.prefix = prefix;
         this.localRepository = localRepository;
-        this.remoteRepositories = remoteRepositories;        
+        this.remoteRepositories = remoteRepositories;
     }
+
+    private static String format( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    {
+        String repos = "[";
+
+        if ( localRepository != null )
+        {
+            repos += localRepository.getId() + " (" + localRepository.getBasedir() + ")";
+        }
+
+        if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
+        {
+            repos += ", ";
+
+            for ( ArtifactRepository repository : remoteRepositories )
+            {
+                if ( repository != null )
+                {
+                    repos += repository.getId() + " (" + repository.getUrl() + ")";
+                }
+            }
+        }
+
+        repos += "]";
+
+        return repos;
+    }
+
 }
