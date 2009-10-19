@@ -21,7 +21,7 @@ under the License.
   <id>bin</id>
   <formats>
     <format>zip</format>
-	<format>tar.gz</format>
+    <format>tar.gz</format>
   </formats>
   <dependencySets>
     <dependencySet>
@@ -33,13 +33,13 @@ under the License.
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-	    <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+      <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
         <exclude>junit:junit</exclude>
         <exclude>org.apache.maven:apache-maven</exclude>
         <exclude>log4j:log4j</exclude>
         <exclude>commons-logging:commons-logging-api</exclude>
       
-   	    <!--exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <!--exclude>org.codehaus.plexus:plexus-classworlds</exclude>
         <exclude>org.codehaus.plexus:plexus-component-api</exclude>
         <exclude>classworlds:classworlds</exclude>
         <exclude>junit:junit</exclude>
