@@ -88,14 +88,19 @@ public class TransferListenerAdapter
 
             MavenArtifact artifact = wrap( event.getResource() );
 
+            ArtifactTransferEvent evt;
             if ( event.getException() != null )
             {
-                return new ArtifactTransferEvent( wagon, event.getException(), event.getRequestType(), artifact );
+                evt = new ArtifactTransferEvent( wagon, event.getException(), event.getRequestType(), artifact );
             }
             else
             {
-                return new ArtifactTransferEvent( wagon, event.getEventType(), event.getRequestType(), artifact );
+                evt = new ArtifactTransferEvent( wagon, event.getEventType(), event.getRequestType(), artifact );
             }
+
+            evt.setLocalFile( event.getLocalFile() );
+
+            return evt;
         }
     }
 
