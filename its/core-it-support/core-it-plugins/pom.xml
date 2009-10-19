@@ -33,6 +33,7 @@ under the License.
 
   <modules>
     <module>maven-it-plugin-active-collection</module>
+    <module>maven-it-plugin-ant-based</module>
     <module>maven-it-plugin-artifact</module>
     <module>maven-it-plugin-class-loader</module>
     <module>maven-it-plugin-configuration</module>
