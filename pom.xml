@@ -162,13 +162,19 @@
   <repositories>
     <repository>
       <id>sonatype.public</id>
-      <url>http://repository.sonatype.org/content/groups/public/</url>
+      <url>http://repository.sonatype.org/content/repositories/plexus-oss-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
       <id>sonatype.public</id>
-      <url>http://repository.sonatype.org/content/groups/public/</url>
+      <url>http://repository.sonatype.org/content/repositories/plexus-oss-snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </pluginRepository>
   </pluginRepositories>
 

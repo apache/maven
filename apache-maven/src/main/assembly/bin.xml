@@ -21,6 +21,7 @@ under the License.
   <id>bin</id>
   <formats>
     <format>zip</format>
+	<format>tar.gz</format>
   </formats>
   <dependencySets>
     <dependencySet>
@@ -32,7 +33,13 @@ under the License.
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-        <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+	    <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <exclude>junit:junit</exclude>
+        <exclude>org.apache.maven:apache-maven</exclude>
+        <exclude>log4j:log4j</exclude>
+        <exclude>commons-logging:commons-logging-api</exclude>
+      
+   	    <!--exclude>org.codehaus.plexus:plexus-classworlds</exclude>
         <exclude>org.codehaus.plexus:plexus-component-api</exclude>
         <exclude>classworlds:classworlds</exclude>
         <exclude>junit:junit</exclude>
@@ -41,11 +48,7 @@ under the License.
         <exclude>org.apache.maven:maven-artifact</exclude>
         <exclude>org.apache.maven:maven-monitor</exclude>
         <exclude>org.apache.maven:maven-plugin-descriptor</exclude>
-        <!-- NOTE: Excluding to avoid maven-model and maven-profile inclusions,
-             since we're not using the jdom modello stuff here.
-        -->
         <exclude>jdom:jdom</exclude>
-        <!-- Stuff which will be culled or optional as we move toward 3.0 -->
         <exclude>org.apache.maven:apache-maven</exclude>
         <exclude>bouncycastle:bcprov-jdk15</exclude>
         <exclude>bouncycastle:bcpg-jdk15</exclude>
@@ -55,7 +58,7 @@ under the License.
         <exclude>org.slf4j:slf4j-api</exclude>
         <exclude>org.slf4j:slf4j-jdk14</exclude>
         <exclude>org.apache.maven.mercury:mercury-crypto-api</exclude>
-        <exclude>org.apache.maven.mercury:mercury-crypto-basic</exclude>        
+        <exclude>org.apache.maven.mercury:mercury-crypto-basic</exclude-->        
       </excludes>
     </dependencySet>
   </dependencySets>
