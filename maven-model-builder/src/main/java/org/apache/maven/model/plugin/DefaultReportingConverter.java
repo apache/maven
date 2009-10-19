@@ -94,7 +94,8 @@ public class DefaultReportingConverter
 
         boolean hasMavenProjectInfoReportsPlugin = false;
 
-        if ( !reporting.getPlugins().isEmpty() )
+        if ( !reporting.getPlugins().isEmpty()
+            && request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
         {
 
             problems.addWarning( "The <reporting> section is deprecated"
