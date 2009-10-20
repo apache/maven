@@ -24,10 +24,10 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
 /**
@@ -116,7 +116,7 @@ class DefaultModelBuildingListener
                 project.setClassRealm( record.realm );
                 project.setExtensionArtifactFilter( record.extensionArtifactFilter );
             }
-            catch ( ArtifactResolutionException e )
+            catch ( PluginResolutionException e )
             {
                 event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
             }

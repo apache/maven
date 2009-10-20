@@ -22,10 +22,8 @@ package org.apache.maven.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.codehaus.plexus.component.annotations.Component;
@@ -43,7 +41,6 @@ public class EmptyProjectBuildingHelper
     public List<ArtifactRepository> createArtifactRepositories( List<Repository> pomRepositories,
                                                                 List<ArtifactRepository> externalRepositories,
                                                                 ProjectBuildingRequest request )
-        throws InvalidRepositoryException
     {
         if ( externalRepositories != null )
         {
@@ -57,7 +54,6 @@ public class EmptyProjectBuildingHelper
 
     public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject proejct, Model model,
                                                              RepositoryRequest repositoryRequest )
-        throws ArtifactResolutionException
     {
         return new ProjectRealmCache.CacheRecord( null, null );
     }

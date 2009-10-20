@@ -50,6 +50,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.PluginArtifactsCache;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -135,7 +136,7 @@ public class DefaultProjectBuildingHelper
 
     public synchronized ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
                                                                           RepositoryRequest repositoryRequest )
-        throws ArtifactResolutionException, PluginVersionResolutionException
+        throws PluginResolutionException, PluginVersionResolutionException
     {
         ClassRealm projectRealm = null;
 
@@ -381,7 +382,7 @@ public class DefaultProjectBuildingHelper
     }
 
     private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, RepositoryRequest repositoryRequest )
-        throws ArtifactResolutionException
+        throws PluginResolutionException
     {
         Artifact extensionArtifact = repositorySystem.createPluginArtifact( extensionPlugin );
 
@@ -405,7 +406,14 @@ public class DefaultProjectBuildingHelper
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
-        resolutionErrorHandler.throwErrors( request, result );
+        try
+        {
+            resolutionErrorHandler.throwErrors( request, result );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new PluginResolutionException( extensionPlugin, e );
+        }
 
         List<Artifact> extensionArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
 

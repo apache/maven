@@ -24,9 +24,9 @@ import java.util.List;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
 /**
@@ -62,10 +62,10 @@ public interface ProjectBuildingHelper
      * @param model The model to create the project realm for, must not be {@code null}
      * @param repositoryRequest The repository request to use for artifact resolution, must not be {@code null}.
      * @return The record with the project realm and extension artifact filter, never {@code null}.
-     * @throws ArtifactResolutionException If any build extension could not be resolved.
+     * @throws PluginResolutionException If any build extension could not be resolved.
      */
     ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
                                                       RepositoryRequest repositoryRequest )
-        throws ArtifactResolutionException, PluginVersionResolutionException;
+        throws PluginResolutionException, PluginVersionResolutionException;
 
 }
