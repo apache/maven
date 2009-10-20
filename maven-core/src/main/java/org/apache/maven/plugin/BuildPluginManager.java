@@ -36,7 +36,7 @@ public interface BuildPluginManager
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException;
 
     ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )
-        throws PluginManagerException;
+        throws PluginResolutionException, PluginManagerException;
 
     void executeMojo( MavenSession session, MojoExecution execution )
         throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException;

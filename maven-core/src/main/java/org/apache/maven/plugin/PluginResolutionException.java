@@ -36,8 +36,9 @@ public class PluginResolutionException
 
     public PluginResolutionException( Plugin plugin, ArtifactResolutionException e )
     {
-        super( "Plugin or one of its dependencies could not be resolved: " + e.getMessage(), e.getGroupId(),
-               e.getArtifactId(), e.getVersion(), e.getType(), null, e.getRemoteRepositories(), null, e.getCause() );
+        super( "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved: " + e.getMessage(),
+               e.getGroupId(), e.getArtifactId(), e.getVersion(), e.getType(), null, e.getRemoteRepositories(), null,
+               e );
         this.plugin = plugin;
     }
 

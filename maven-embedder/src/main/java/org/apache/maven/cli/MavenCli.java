@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
@@ -29,6 +31,8 @@ import java.util.Map.Entry;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
+import org.apache.maven.exception.DefaultExceptionHandler;
+import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -37,7 +41,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.model.locator.ModelLocator;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
@@ -453,52 +456,7 @@ public class MavenCli
 
         try
         {
-            if ( result.hasExceptions() )
-            {
-                ExceptionSummary es = result.getExceptionSummary();
-
-                if ( es == null )
-                {
-                    logger.error( "", result.getExceptions().get( 0 ) );
-                }
-                else
-                {
-                    if ( showErrors )
-                    {
-                        logger.error( es.getMessage(), es.getException() );
-                    }
-                    else
-                    {
-                        logger.error( es.getMessage() );
-                        logger.error( "To see the full stack trace of the error, re-run Maven with the -e switch." );
-                    }
-
-                    logger.error( "Re-run Maven using the -X switch to enable full debug logging." );
-
-                    if ( StringUtils.isNotEmpty( es.getReference() ) )
-                    {
-                        logger.error( "" );
-                        logger.error( "For more information about the error and possible solutions"
-                            + ", please try the following article:" );
-                        logger.error( "  " + es.getReference() );
-                    }
-                }
-
-                if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
-                {
-                    logger.info( "Build failures were ignored." );
-
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
-            else
-            {
-                return 0;
-            }
+            return processResult( request, result, showErrors );
         }
         finally
         {
@@ -506,6 +464,92 @@ public class MavenCli
             {
                 fileStream.close();
             }
+        }
+    }
+
+    private int processResult( MavenExecutionRequest request, MavenExecutionResult result, boolean showErrors )
+    {
+        if ( result.hasExceptions() )
+        {
+            ExceptionHandler handler = new DefaultExceptionHandler();
+
+            Map<String, String> references = new LinkedHashMap<String, String>();
+
+            for ( Throwable exception : result.getExceptions() )
+            {
+                ExceptionSummary summary = handler.handleException( exception );
+
+                logSummary( summary, references, "", showErrors );
+            }
+
+            logger.error( "" );
+
+            if ( !showErrors )
+            {
+                logger.error( "To see the full stack trace of the errors, re-run Maven with the -e switch." );
+            }
+            if ( !logger.isDebugEnabled() )
+            {
+                logger.error( "Re-run Maven using the -X switch to enable full debug logging." );
+            }
+
+            if ( !references.isEmpty() )
+            {
+                logger.error( "" );
+                logger.error( "For more information about the errors and possible solutions"
+                    + ", please read the following articles:" );
+
+                for ( Map.Entry<String, String> entry : references.entrySet() )
+                {
+                    logger.error( entry.getValue() + " " + entry.getKey() );
+                }
+            }
+
+            if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( request.getReactorFailureBehavior() ) )
+            {
+                logger.info( "Build failures were ignored." );
+
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent, boolean showErrors )
+    {
+        String referenceKey = "";
+
+        if ( StringUtils.isNotEmpty( summary.getReference() ) )
+        {
+            referenceKey = references.get( summary.getReference() );
+            if ( referenceKey == null )
+            {
+                referenceKey = "[" + references.size() + "]";
+                references.put( summary.getReference(), referenceKey );
+            }
+        }
+
+        if ( showErrors )
+        {
+            logger.error( indent + referenceKey, summary.getException() );
+        }
+        else
+        {
+            logger.error( indent + summary.getMessage() + " " + referenceKey );
+        }
+
+        indent += "  ";
+
+        for ( ExceptionSummary child : summary.getChildren() )
+        {
+            logSummary( child, references, indent, showErrors );
         }
     }
 

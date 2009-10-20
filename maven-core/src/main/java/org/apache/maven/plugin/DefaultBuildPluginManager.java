@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -75,7 +74,16 @@ public class DefaultBuildPluginManager
 
         Mojo mojo = null;
 
-        ClassRealm pluginRealm = getPluginRealm( session, mojoDescriptor.getPluginDescriptor() );            
+        ClassRealm pluginRealm;
+        try
+        {
+            pluginRealm = getPluginRealm( session, mojoDescriptor.getPluginDescriptor() );
+        }
+        catch ( PluginResolutionException e )
+        {
+            throw new PluginExecutionException( mojoExecution, project, e );
+        }
+
         ClassRealm oldLookupRealm = container.getLookupRealm();
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
@@ -110,22 +118,36 @@ public class DefaultBuildPluginManager
         {
             throw new PluginExecutionException( mojoExecution, project, e );
         }
+        catch ( NoClassDefFoundError e )
+        {
+            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+            PrintStream ps = new PrintStream( os );
+            ps.println( "A required class was missing while executing " + mojoDescriptor.getId() + ": "
+                + e.getMessage() );
+            pluginRealm.display( ps );
+
+            Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
+
+            throw new PluginExecutionException( mojoExecution, project, wrapper );
+        }
         catch ( LinkageError e )
         {
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
-            ps.println( "A linkage error occured while executing " + mojoDescriptor.getId() );
-            ps.println( e );
+            ps.println( "An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
+                + e.getClass().getName() + ": " + e.getMessage() );
             pluginRealm.display( ps );
 
-            throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
+            Exception wrapper = new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), e );
+
+            throw new PluginExecutionException( mojoExecution, project, wrapper );
         }
         catch ( ClassCastException e )
         {
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
-            ps.println( "A type incompatibility occured while executing " + mojoDescriptor.getId() );
-            ps.println( e );
+            ps.println( "A type incompatibility occured while executing " + mojoDescriptor.getId() + ": "
+                + e.getMessage() );
             pluginRealm.display( ps );
 
             throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
@@ -148,10 +170,10 @@ public class DefaultBuildPluginManager
     /**
      * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this
      *      call, which is not nice.
-     * @throws ArtifactResolutionException 
+     * @throws PluginResolutionException 
      */
     public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) 
-        throws PluginManagerException
+        throws PluginResolutionException, PluginManagerException
     {
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
         if ( pluginRealm != null )
@@ -159,17 +181,8 @@ public class DefaultBuildPluginManager
             return pluginRealm;
         }
 
-        Plugin plugin = pluginDescriptor.getPlugin();
-
-        try
-        {
-            mavenPluginManager.setupPluginRealm( pluginDescriptor, session,
-                                                 session.getCurrentProject().getClassRealm(), null );
-        }
-        catch ( PluginResolutionException e )
-        {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
-        }
+        mavenPluginManager.setupPluginRealm( pluginDescriptor, session, session.getCurrentProject().getClassRealm(),
+                                             null );
 
         return pluginDescriptor.getClassRealm();
     }

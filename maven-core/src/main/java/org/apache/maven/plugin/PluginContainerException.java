@@ -42,9 +42,23 @@ public class PluginContainerException
 
     private ClassRealm pluginRealm;
 
+    public PluginContainerException( MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message, Throwable e )
+    {
+        super( mojoDescriptor, message, e );
+
+        this.pluginRealm = pluginRealm;
+    }
+
     public PluginContainerException( MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message, ComponentLookupException e )
     {
         super( mojoDescriptor, message, e );
+
+        this.pluginRealm = pluginRealm;
+    }
+
+    public PluginContainerException( Plugin plugin, ClassRealm pluginRealm, String message, Throwable e )
+    {
+        super( plugin, message, e );
 
         this.pluginRealm = pluginRealm;
     }

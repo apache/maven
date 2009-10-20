@@ -74,7 +74,7 @@ public interface MavenPluginManager
      */
     void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
                            List<String> imports )
-        throws PluginResolutionException, PluginManagerException;
+        throws PluginResolutionException, PluginContainerException;
 
     /**
      * Looks up the mojo for the specified mojo execution and populates its parameters from the configuration given by

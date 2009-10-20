@@ -122,6 +122,8 @@ public class DefaultWagonManager
     public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
+        TransferFailedException tfe = null;
+
         for ( ArtifactRepository repository : remoteRepositories )
         {
             try
@@ -139,18 +141,29 @@ public class DefaultWagonManager
                 // This one we will eat when looking through remote repositories
                 // because we want to cycle through them all before squawking.
 
-                logger.debug( "Unable to find resource '" + artifact.getId() + "' in repository " + repository.getId() + " (" + repository.getUrl() + ")", e );
+                logger.debug( "Unable to find resource '" + artifact.getId() + "' in repository " + repository.getId()
+                    + " (" + repository.getUrl() + ")", e );
             }
             catch ( TransferFailedException e )
             {
-                logger.debug( "Unable to get resource '" + artifact.getId() + "' from repository " + repository.getId() + " (" + repository.getUrl() + ")", e );
+                tfe = e;
+
+                logger.debug( "Unable to get resource '" + artifact.getId() + "' from repository " + repository.getId()
+                    + " (" + repository.getUrl() + ")", e );
             }
         }
 
         // if it already exists locally we were just trying to force it - ignore the update
         if ( !artifact.getFile().exists() )
         {
-            throw new ResourceDoesNotExistException( "Unable to download the artifact from any repository" );
+            if ( tfe != null )
+            {
+                throw tfe;
+            }
+            else
+            {
+                throw new ResourceDoesNotExistException( "Unable to download the artifact from any repository" );
+            }
         }
     }
 

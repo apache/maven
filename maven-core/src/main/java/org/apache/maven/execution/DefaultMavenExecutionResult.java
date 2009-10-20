@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.project.MavenProject;
 
 /** @author Jason van Zyl */
@@ -40,8 +39,6 @@ public class DefaultMavenExecutionResult
     private ArtifactResolutionResult artifactResolutionResult;
 
     private List<Throwable> exceptions;
-
-    private ExceptionSummary exceptionSummary;
 
     private Map<MavenProject, BuildSummary> buildSummaries;
 
@@ -101,18 +98,6 @@ public class DefaultMavenExecutionResult
     public boolean hasExceptions()
     {
         return !getExceptions().isEmpty();
-    }
-
-    public MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary )
-    {
-        this.exceptionSummary = exceptionSummary;
-
-        return this;
-    }
-    
-    public ExceptionSummary getExceptionSummary()
-    {
-        return exceptionSummary;
     }
 
     public BuildSummary getBuildSummary( MavenProject project )

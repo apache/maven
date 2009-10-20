@@ -19,16 +19,17 @@ package org.apache.maven.exception;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.plugin.CycleDetectedInPluginGraphException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.MojoNotFoundException;
-import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.PluginExecutionException;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -79,73 +80,162 @@ Plugins:
 public class DefaultExceptionHandler
     implements ExceptionHandler
 {
+
     public ExceptionSummary handleException( Throwable exception )
     {
-        String message;
-        
-        String reference = "http://";
-        
-        // Plugin problems
-        if ( exception instanceof PluginNotFoundException )
-        {
-            message = exception.getMessage();
-        }
-        else if ( exception instanceof PluginResolutionException )
-        {
-            message = exception.getMessage();           
-        }
-        else if ( exception instanceof PluginDescriptorParsingException )
-        {
-            message = exception.getMessage();           
-        }
-        else if ( exception instanceof CycleDetectedInPluginGraphException )
-        {
-            message = exception.getMessage();           
-        }        
-        else if ( exception instanceof NoPluginFoundForPrefixException )
-        {
-            message = exception.getMessage();                       
-        }
-        
-        // Project dependency downloading problems.
-        else if ( exception instanceof ArtifactNotFoundException )
-        {
-            message = exception.getMessage();
-        }
-        else if ( exception instanceof ArtifactResolutionException )
-        {
-            message = exception.getMessage();
-        }        
-        
-        // Mojo problems
-        else if ( exception instanceof MojoNotFoundException )
-        {
-            message = exception.getMessage();            
-        }        
-        else if ( exception instanceof MojoFailureException )
-        {
-            message = ((MojoFailureException)exception).getLongMessage();
+        return handle( "", exception );
+    }
 
-            if ( StringUtils.isEmpty( message ) )
-            {
-                message = exception.getMessage();
-            }
-        }
-        else if ( exception instanceof MojoExecutionException )
-        {
-            message = ((MojoExecutionException)exception).getLongMessage();
+    private ExceptionSummary handle( String message, Throwable exception )
+    {
+        String reference = getReference( exception );
 
-            if ( StringUtils.isEmpty( message ) )
+        List<ExceptionSummary> children = null;
+
+        if ( exception instanceof ProjectBuildingException )
+        {
+            List<ProjectBuildingResult> results = ( (ProjectBuildingException) exception ).getResults();
+
+            children = new ArrayList<ExceptionSummary>();
+
+            for ( ProjectBuildingResult result : results )
             {
-                message = exception.getMessage();
+                ExceptionSummary child = handle( result );
+                if ( child != null )
+                {
+                    children.add( child );
+                }
             }
+
+            message = "The build could not read " + children.size() + " project" + ( children.size() == 1 ? "" : "s" );
         }
-        
         else
         {
-            message = exception.getMessage();
-        }        
-        
-        return new ExceptionSummary( exception, message, reference );
+            message = getMessage( message, exception );
+        }
+
+        return new ExceptionSummary( exception, message, reference, children );
     }
+
+    private ExceptionSummary handle( ProjectBuildingResult result )
+    {
+        List<ExceptionSummary> children = new ArrayList<ExceptionSummary>();
+
+        for ( ModelProblem problem : result.getProblems() )
+        {
+            ExceptionSummary child = handle( problem );
+            if ( child != null )
+            {
+                children.add( child );
+            }
+        }
+
+        if ( children.isEmpty() )
+        {
+            return null;
+        }
+
+        String message =
+            "The project " + result.getProjectId() + " (" + result.getPomFile() + ") has " + children.size() + " error"
+                + ( children.size() == 1 ? "" : "s" );
+
+        return new ExceptionSummary( null, message, null, children );
+    }
+
+    private ExceptionSummary handle( ModelProblem problem )
+    {
+        if ( ModelProblem.Severity.ERROR.compareTo( problem.getSeverity() ) >= 0 )
+        {
+            return handle( problem.getMessage(), problem.getException() );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private String getReference( Throwable exception )
+    {
+        String reference = "";
+
+        if ( exception != null )
+        {
+            if ( exception instanceof MojoExecutionException )
+            {
+                reference = MojoExecutionException.class.getSimpleName();
+            }
+            else if ( exception instanceof MojoFailureException )
+            {
+                reference = MojoFailureException.class.getSimpleName();
+            }
+            else if ( exception instanceof LinkageError )
+            {
+                reference = LinkageError.class.getSimpleName();
+            }
+            else if ( exception instanceof PluginExecutionException )
+            {
+                reference = getReference( exception.getCause() );
+
+                if ( StringUtils.isEmpty( reference ) )
+                {
+                    reference = exception.getClass().getSimpleName();
+                }
+            }
+            else if ( !( exception instanceof RuntimeException ) )
+            {
+                reference = exception.getClass().getSimpleName();
+            }
+        }
+
+        if ( StringUtils.isNotEmpty( reference ) && !reference.startsWith( "http:" ) )
+        {
+            reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
+        }
+
+        return reference;
+    }
+
+    private String getMessage( String message, Throwable exception )
+    {
+        String fullMessage = ( message != null ) ? message : "";
+
+        for ( Throwable t = exception; t != null; t = t.getCause() )
+        {
+            String exceptionMessage = t.getMessage();
+
+            if ( t instanceof AbstractMojoExecutionException )
+            {
+                String longMessage = ( (AbstractMojoExecutionException) t ).getLongMessage();
+                if ( StringUtils.isNotEmpty( longMessage ) )
+                {
+                    exceptionMessage = longMessage;
+                }
+            }
+
+            if ( t instanceof UnknownHostException && !fullMessage.contains( "host" ) )
+            {
+                if ( fullMessage.length() > 0 )
+                {
+                    fullMessage += ": ";
+                }
+                fullMessage += "Unknown host " + exceptionMessage;
+            }
+            else if ( !fullMessage.contains( exceptionMessage ) )
+            {
+                if ( fullMessage.length() > 0 )
+                {
+                    fullMessage += ": ";
+                }
+                fullMessage += exceptionMessage;
+            }
+        }
+
+        if ( StringUtils.isEmpty( fullMessage ) && exception != null )
+        {
+            fullMessage = exception.toString();
+        }
+
+        return fullMessage.trim();
+    }
+
 }

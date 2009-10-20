@@ -78,7 +78,7 @@ public class AbstractArtifactResolutionException
                                                    Throwable t )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ), t );
-        
+
         this.originalMessage = message;
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -196,50 +196,55 @@ public class AbstractArtifactResolutionException
         StringBuilder sb = new StringBuilder();
 
         sb.append( message );
-        sb.append( LS );
-        sb.append( "  " + groupId + ":" + artifactId + ":" + type + ":" + version );
-        sb.append( LS );
-        if ( remoteRepositories != null )
+
+        if ( message == null || !message.contains( "from the specified remote repositories:" ) )
         {
             sb.append( LS );
-            sb.append( "from the specified remote repositories:" );
-            sb.append( LS + "  " );
-
-            if ( remoteRepositories.isEmpty() )
+            sb.append( "  " + groupId + ":" + artifactId + ":" + type + ":" + version );
+            sb.append( LS );
+            if ( remoteRepositories != null )
             {
-                sb.append( "(none)" );
+                sb.append( LS );
+                sb.append( "from the specified remote repositories:" );
+                sb.append( LS + "  " );
+
+                if ( remoteRepositories.isEmpty() )
+                {
+                    sb.append( "(none)" );
+                }
+
+                for ( Iterator<ArtifactRepository> i = remoteRepositories.iterator(); i.hasNext(); )
+                {
+                    ArtifactRepository remoteRepository = i.next();
+
+                    sb.append( remoteRepository.getId() );
+                    sb.append( " (" );
+                    sb.append( remoteRepository.getUrl() );
+
+                    ArtifactRepositoryPolicy releases = remoteRepository.getReleases();
+                    if ( releases != null )
+                    {
+                        sb.append( ", releases=" ).append( releases.isEnabled() );
+                    }
+
+                    ArtifactRepositoryPolicy snapshots = remoteRepository.getSnapshots();
+                    if ( snapshots != null )
+                    {
+                        sb.append( ", snapshots=" ).append( snapshots.isEnabled() );
+                    }
+
+                    sb.append( ")" );
+                    if ( i.hasNext() )
+                    {
+                        sb.append( "," ).append( LS ).append( "  " );
+                    }
+                }
             }
 
-            for ( Iterator<ArtifactRepository> i = remoteRepositories.iterator(); i.hasNext(); )
-            {
-                ArtifactRepository remoteRepository = i.next();
-
-                sb.append( remoteRepository.getId() );
-                sb.append( " (" );
-                sb.append( remoteRepository.getUrl() );
-
-                ArtifactRepositoryPolicy releases = remoteRepository.getReleases();
-                if ( releases != null )
-                {
-                    sb.append( ", releases=" ).append( releases.isEnabled() );
-                }
-
-                ArtifactRepositoryPolicy snapshots = remoteRepository.getSnapshots();
-                if ( snapshots != null )
-                {
-                    sb.append( ", snapshots=" ).append( snapshots.isEnabled() );
-                }
-
-                sb.append( ")" );
-                if ( i.hasNext() )
-                {
-                    sb.append( "," ).append( LS ).append( "  " );
-                }
-            }
+            sb.append( constructArtifactPath( path, "" ) );
+            sb.append( LS );
         }
 
-        sb.append( constructArtifactPath( path, "" ) );
-        sb.append( LS );
         return sb.toString();
     }
 

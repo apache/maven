@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.exception.DefaultExceptionHandler;
-import org.apache.maven.exception.ExceptionHandler;
-import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultLifecycleEvent;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.DuplicateProjectException;
@@ -50,6 +47,7 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
+import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -92,14 +90,18 @@ public class DefaultMaven
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
+        MavenExecutionResult result;
+
         try
         {
-            return doExecute( request );
+            result = doExecute( request );
         }
         catch ( OutOfMemoryError e )
         {
-            return processResult( new DefaultMavenExecutionResult(), e );
+            result = processResult( new DefaultMavenExecutionResult(), e );
         }
+
+        return result;
     }
 
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
@@ -113,8 +115,18 @@ public class DefaultMaven
         request.setStartTime( new Date() );
         
         MavenExecutionResult result = new DefaultMavenExecutionResult();
-        
-        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository = new DelegatingLocalArtifactRepository( request.getLocalRepository() );
+
+        try
+        {
+            validateLocalRepository( request );
+        }
+        catch ( LocalRepositoryNotAccessibleException e )
+        {
+            return processResult( result, e );
+        }
+
+        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
+            new DelegatingLocalArtifactRepository( request.getLocalRepository() );
         
         request.setLocalRepository( delegatingLocalArtifactRepository );        
 
@@ -229,6 +241,18 @@ public class DefaultMaven
         return result;
     }
 
+    private void validateLocalRepository( MavenExecutionRequest request )
+        throws LocalRepositoryNotAccessibleException
+    {
+        File localRepoDir = request.getLocalRepositoryPath();
+        localRepoDir.mkdirs();
+
+        if ( !localRepoDir.isDirectory() )
+        {
+            throw new LocalRepositoryNotAccessibleException( "Could not create local repository at " + localRepoDir );
+        }
+    }
+
     private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
     {
         Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
@@ -279,17 +303,11 @@ public class DefaultMaven
 
     private MavenExecutionResult processResult( MavenExecutionResult result, Throwable e )
     {
-        ExceptionHandler handler = new DefaultExceptionHandler();
-        
-        ExceptionSummary es = handler.handleException( e );                        
-
         if ( !result.getExceptions().contains( e ) )
         {
             result.addException( e );
         }
-        
-        result.setExceptionSummary( es );    
-        
+
         return result;
     }
     

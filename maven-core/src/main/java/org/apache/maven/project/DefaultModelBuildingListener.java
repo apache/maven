@@ -118,11 +118,11 @@ class DefaultModelBuildingListener
             }
             catch ( PluginResolutionException e )
             {
-                event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
+                event.getProblems().addError( "Unresolveable build extension: " + e.getMessage(), e );
             }
             catch ( PluginVersionResolutionException e )
             {
-                event.getProblems().addError( "Unresolveable build extensions: " + e.getMessage(), e );
+                event.getProblems().addError( "Unresolveable build extension: " + e.getMessage(), e );
             }
 
             if ( project.getClassRealm() != null )

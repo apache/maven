@@ -20,10 +20,12 @@ package org.apache.maven.plugin.internal;
  */
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -63,7 +65,6 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -290,7 +291,7 @@ public class DefaultMavenPluginManager
 
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
                                                ClassLoader parent, List<String> imports )
-        throws PluginResolutionException, PluginManagerException
+        throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
 
@@ -319,8 +320,8 @@ public class DefaultMavenPluginManager
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                                  List<String> imports )
-        throws PluginResolutionException, PluginManagerException
+                                    List<String> imports )
+        throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
 
@@ -401,13 +402,13 @@ public class DefaultMavenPluginManager
         }
         catch ( PlexusConfigurationException e )
         {
-            throw new PluginManagerException( plugin, "Error in component graph of plugin " + plugin.getId() + ": "
-                + e.getMessage(), e );
+            throw new PluginContainerException( plugin, pluginRealm, "Error in component graph of plugin "
+                + plugin.getId() + ": " + e.getMessage(), e );
         }
         catch ( CycleDetectedInComponentGraphException e )
         {
-            throw new PluginManagerException( plugin, "Error in component graph of plugin " + plugin.getId() + ": "
-                + e.getMessage(), e );
+            throw new PluginContainerException( plugin, pluginRealm, "Error in component graph of plugin "
+                + plugin.getId() + ": " + e.getMessage(), e );
         }
     }
 
@@ -497,13 +498,28 @@ public class DefaultMavenPluginManager
 
                 if ( ( cause instanceof NoClassDefFoundError ) || ( cause instanceof ClassNotFoundException ) )
                 {
-                    throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to load the mojo '"
-                        + mojoDescriptor.getGoal() + "' in the plugin '" + pluginDescriptor.getId()
-                        + "'. A required class is missing: " + cause.getMessage(), e );
+                    ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+                    PrintStream ps = new PrintStream( os );
+                    ps.println( "Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
+                        + pluginDescriptor.getId() + "'. A required class is missing: " + cause.getMessage() );
+                    pluginRealm.display( ps );
+
+                    throw new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), cause );
+                }
+                else if ( cause instanceof LinkageError )
+                {
+                    ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+                    PrintStream ps = new PrintStream( os );
+                    ps.println( "Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
+                        + pluginDescriptor.getId() + "' due to an API incompatibility: " + e.getClass().getName()
+                        + ": " + cause.getMessage() );
+                    pluginRealm.display( ps );
+
+                    throw new PluginContainerException( mojoDescriptor, pluginRealm, os.toString(), cause );
                 }
 
-                throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to find the mojo '"
-                    + mojoDescriptor.getGoal() + "' (or one of its required components) in the plugin '"
+                throw new PluginContainerException( mojoDescriptor, pluginRealm, "Unable to load the mojo '"
+                    + mojoDescriptor.getGoal() + "' (or one of its required components) from the plugin '"
                     + pluginDescriptor.getId() + "'", e );
             }
 
@@ -596,46 +612,23 @@ public class DefaultMavenPluginManager
         }
         catch ( NoClassDefFoundError e )
         {
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "A required class was missing during configuration of mojo "
-                                                        + mojoDescriptor.getId() + ": " + e.getMessage(), e );
+            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+            PrintStream ps = new PrintStream( os );
+            ps.println( "A required class was missing during configuration of mojo " + mojoDescriptor.getId() + ": "
+                + e.getMessage() );
+            pluginRealm.display( ps );
+
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), os.toString(), e );
         }
         catch ( LinkageError e )
         {
-            if ( logger.isFatalErrorEnabled() )
-            {
-                logger.fatalError( configurator.getClass().getName()
-                    + "#configureComponent(...) caused a linkage error (" + e.getClass().getName()
-                    + ") and may be out-of-date. Check the realms:" );
+            ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
+            PrintStream ps = new PrintStream( os );
+            ps.println( "An API incompatibility was encountered during configuration of mojo " + mojoDescriptor.getId()
+                + ": " + e.getClass().getName() + ": " + e.getMessage() );
+            pluginRealm.display( ps );
 
-                StringBuilder sb = new StringBuilder();
-                sb.append( "Plugin realm = " + pluginRealm.getId() ).append( '\n' );
-                for ( int i = 0; i < pluginRealm.getURLs().length; i++ )
-                {
-                    sb.append( "urls[" + i + "] = " + pluginRealm.getURLs()[i] );
-                    if ( i != ( pluginRealm.getURLs().length - 1 ) )
-                    {
-                        sb.append( '\n' );
-                    }
-                }
-                logger.fatalError( sb.toString() );
-
-                ClassRealm containerRealm = container.getContainerRealm();
-                sb = new StringBuilder();
-                sb.append( "Container realm = " + containerRealm.getId() ).append( '\n' );
-                for ( int i = 0; i < containerRealm.getURLs().length; i++ )
-                {
-                    sb.append( "urls[" + i + "] = " + containerRealm.getURLs()[i] );
-                    if ( i != ( containerRealm.getURLs().length - 1 ) )
-                    {
-                        sb.append( '\n' );
-                    }
-                }
-                logger.fatalError( sb.toString() );
-            }
-
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), e.getClass().getName() + ": "
-                + e.getMessage(), new ComponentConfigurationException( e ) );
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), os.toString(), e );
         }
         finally
         {

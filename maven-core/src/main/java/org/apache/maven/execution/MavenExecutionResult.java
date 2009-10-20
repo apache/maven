@@ -49,9 +49,6 @@ public interface MavenExecutionResult
     MavenExecutionResult addException( Throwable e );
 
     boolean hasExceptions();
-        
-    MavenExecutionResult setExceptionSummary( ExceptionSummary exceptionSummary );
-    ExceptionSummary getExceptionSummary();
 
     /**
      * Gets the build summary for the specified project.
