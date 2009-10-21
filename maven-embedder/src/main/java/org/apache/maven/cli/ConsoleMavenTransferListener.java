@@ -29,48 +29,23 @@ import org.apache.maven.repository.ArtifactTransferEvent;
 public class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
-    private long complete;
 
-    public void transferInitiated( ArtifactTransferEvent transferEvent )
-    {
-        super.transferInitiated( transferEvent );
-
-        complete = 0;
-
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
-
-        String message =
-            transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
-
-        String url = transferEvent.getSource().toString();
-
-        System.out.println( message + ": " + url + "/" + transferEvent.getResource().getName() );
-    }
-
-    public void transferProgress( ArtifactTransferEvent transferEvent, byte[] buffer, int length )
+    @Override
+    protected void doProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset,
+                               int length )
     {
         long total = transferEvent.getResource().getContentLength();
-        complete += length;
-
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
+        long complete = transferred;
 
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )
         {
-            System.out.print(
-                ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + "K" )
-                    + "\r" );
+            System.out.print( ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + "K" ) + "\r" );
         }
         else
         {
             System.out.print( complete + "/" + ( total == -1 ? "?" : total + "b" ) + "\r" );
         }
     }
-}
 
+}

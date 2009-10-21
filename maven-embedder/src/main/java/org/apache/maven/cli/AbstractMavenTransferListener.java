@@ -25,8 +25,9 @@ import org.apache.maven.repository.ArtifactTransferListener;
 public abstract class AbstractMavenTransferListener
     implements ArtifactTransferListener
 {
-    private boolean showChecksumEvents = false;
-    
+
+    private boolean showChecksumEvents;
+
     protected boolean showEvent( ArtifactTransferEvent event )
     {
         if ( event.getResource() == null )
@@ -54,20 +55,68 @@ public abstract class AbstractMavenTransferListener
         if ( !showEvent( transferEvent ) )
         {
             return;
-        }        
+        }
+
+        doInitiated( transferEvent );
     }
 
-    public void transferProgress( ArtifactTransferEvent transferEvent, byte[] buffer, int length )
+    protected void doInitiated( ArtifactTransferEvent transferEvent )
     {
+        String message =
+            transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
 
+        System.out.println( message + ": " + transferEvent.getResource().getUrl() );
+    }
+
+    public void transferStarted( ArtifactTransferEvent transferEvent )
+    {
+        if ( !showEvent( transferEvent ) )
+        {
+            return;
+        }
+
+        doStarted( transferEvent );
+    }
+
+    protected void doStarted( ArtifactTransferEvent transferEvent )
+    {
+        // to be overriden by sub classes
+    }
+
+    public void transferProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset,
+                                  int length )
+    {
+        if ( !showEvent( transferEvent ) )
+        {
+            return;
+        }
+
+        doProgress( transferEvent, transferred, buffer, offset, length );
+    }
+
+    protected void doProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset,
+                               int length )
+    {
+        // to be overriden by sub classes
     }
 
     public void transferCompleted( ArtifactTransferEvent transferEvent )
     {
-        long contentLength = transferEvent.getResource().getContentLength();
-        if ( contentLength != -1 )
+        if ( !showEvent( transferEvent ) )
         {
-            String type = ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "uploaded" : "downloaded" );
+            return;
+        }
+
+        doCompleted( transferEvent );
+    }
+
+    protected void doCompleted( ArtifactTransferEvent transferEvent )
+    {
+        long contentLength = transferEvent.getResource().getContentLength();
+        if ( contentLength >= 0 )
+        {
+            String type =
+                ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "uploaded" : "downloaded" );
             String l = contentLength >= 1024 ? ( contentLength / 1024 ) + "K" : contentLength + "b";
             System.out.println( l + " " + type );
         }
@@ -82,4 +131,5 @@ public abstract class AbstractMavenTransferListener
     {
         this.showChecksumEvents = showChecksumEvents;
     }
+
 }

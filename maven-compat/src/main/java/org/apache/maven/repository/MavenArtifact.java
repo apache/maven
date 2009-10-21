@@ -22,24 +22,88 @@ package org.apache.maven.repository;
 public class MavenArtifact
 {
 
+    private String repositoryUrl;
+
     private String name;
 
     private long contentLength;
 
-    public MavenArtifact( String name, long contentLength )
+    public MavenArtifact( String repositoryUrl, String name, long contentLength )
     {
-        this.name = name;
+        if ( repositoryUrl == null )
+        {
+            this.repositoryUrl = "";
+        }
+        else if ( !repositoryUrl.endsWith( "/" ) && repositoryUrl.length() > 0 )
+        {
+            this.repositoryUrl = repositoryUrl + '/';
+        }
+        else
+        {
+            this.repositoryUrl = repositoryUrl;
+        }
+
+        if ( name == null )
+        {
+            this.name = "";
+        }
+        else if ( name.startsWith( "/" ) )
+        {
+            this.name = name.substring( 1 );
+        }
+        else
+        {
+            this.name = name;
+        }
+
         this.contentLength = contentLength;
     }
 
+    /**
+     * The base URL of the repository, e.g. "http://repo1.maven.org/maven2/". Unless the URL is unknown, it will be
+     * terminated by a trailing slash.
+     * 
+     * @return The base URL of the repository or an empty string if unknown, never {@code null}.
+     */
+    public String getRepositoryUrl()
+    {
+        return repositoryUrl;
+    }
+
+    /**
+     * The path of the artifact relative to the repository's base URL.
+     * 
+     * @return The path of the artifact, never {@code null}.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Gets the full URL of the artifact.
+     * 
+     * @return The full URL of the artifact, never {@code null}.
+     */
+    public String getUrl()
+    {
+        return getRepositoryUrl() + getName();
+    }
+
+    /**
+     * The size of the artifact in bytes.
+     * 
+     * @return The of the artifact in bytes or a negative value if unknown.
+     */
     public long getContentLength()
     {
         return contentLength;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getUrl();
     }
 
 }

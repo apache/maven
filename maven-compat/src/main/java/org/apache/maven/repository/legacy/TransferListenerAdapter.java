@@ -19,11 +19,15 @@ package org.apache.maven.repository.legacy;
  * under the License.
  */
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import org.apache.maven.repository.ArtifactTransferEvent;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.repository.MavenArtifact;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.resource.Resource;
 
 public class TransferListenerAdapter
@@ -31,6 +35,8 @@ public class TransferListenerAdapter
 {
 
     private ArtifactTransferListener listener;
+
+    private Map<Resource, Long> transfers;
 
     public static TransferListener newAdapter( ArtifactTransferListener listener )
     {
@@ -47,6 +53,7 @@ public class TransferListenerAdapter
     private TransferListenerAdapter( ArtifactTransferListener listener )
     {
         this.listener = listener;
+        this.transfers = new IdentityHashMap<Resource, Long>();
     }
 
     public void debug( String message )
@@ -55,6 +62,8 @@ public class TransferListenerAdapter
 
     public void transferCompleted( TransferEvent transferEvent )
     {
+        transfers.remove( transferEvent.getResource() );
+
         listener.transferCompleted( wrap( transferEvent ) );
     }
 
@@ -69,11 +78,23 @@ public class TransferListenerAdapter
 
     public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
     {
-        listener.transferProgress( wrap( transferEvent ), buffer, length );
+        Long transferred = transfers.get( transferEvent.getResource() );
+        if ( transferred == null )
+        {
+            transferred = Long.valueOf( length );
+        }
+        else
+        {
+            transferred = Long.valueOf( transferred.longValue() + length );
+        }
+        transfers.put( transferEvent.getResource(), transferred );
+
+        listener.transferProgress( wrap( transferEvent ), transferred.longValue(), buffer, 0, length );
     }
 
     public void transferStarted( TransferEvent transferEvent )
     {
+        listener.transferStarted( wrap( transferEvent ) );
     }
 
     private ArtifactTransferEvent wrap( TransferEvent event )
@@ -84,9 +105,9 @@ public class TransferListenerAdapter
         }
         else
         {
-            String wagon = event.getWagon().getRepository().getUrl();
+            String wagon = event.getWagon().getClass().getName();
 
-            MavenArtifact artifact = wrap( event.getResource() );
+            MavenArtifact artifact = wrap( event.getWagon().getRepository(), event.getResource() );
 
             ArtifactTransferEvent evt;
             if ( event.getException() != null )
@@ -104,7 +125,7 @@ public class TransferListenerAdapter
         }
     }
 
-    private MavenArtifact wrap( Resource resource )
+    private MavenArtifact wrap( Repository repository, Resource resource )
     {
         if ( resource == null )
         {
@@ -112,7 +133,7 @@ public class TransferListenerAdapter
         }
         else
         {
-            return new MavenArtifact( resource.getName(), resource.getContentLength() );
+            return new MavenArtifact( repository.getUrl(), resource.getName(), resource.getContentLength() );
         }
     }
 

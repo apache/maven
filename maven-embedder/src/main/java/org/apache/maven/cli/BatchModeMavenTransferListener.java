@@ -19,16 +19,8 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.apache.maven.repository.ArtifactTransferEvent;
-
 public class BatchModeMavenTransferListener
     extends AbstractMavenTransferListener
 {
-    public void transferInitiated( ArtifactTransferEvent transferEvent )
-    {
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
-    }
+
 }
