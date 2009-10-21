@@ -27,6 +27,9 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataInstallationException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.repository.DefaultLocalRepositoryMaintainerEvent;
+import org.apache.maven.repository.LocalRepositoryMaintainer;
+import org.apache.maven.repository.LocalRepositoryMaintainerEvent;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -46,6 +49,9 @@ public class DefaultArtifactInstaller
 
     @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
+
+    @Requirement( optional = true )
+    private LocalRepositoryMaintainer localRepositoryMaintainer;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
@@ -87,6 +93,13 @@ public class DefaultArtifactInstaller
             // transformation
             // This would avoid the need to merge and clear out the state during deployment
             // artifact.getMetadataList().clear();
+
+            if ( localRepositoryMaintainer != null )
+            {
+                LocalRepositoryMaintainerEvent event =
+                    new DefaultLocalRepositoryMaintainerEvent( artifact, destination );
+                localRepositoryMaintainer.artifactInstalled( event );
+            }
         }
         catch ( IOException e )
         {
