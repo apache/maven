@@ -37,8 +37,7 @@ public class MavenITmng3819PluginDepPlexusUtilsTest
 
     public MavenITmng3819PluginDepPlexusUtilsTest()
     {
-        // This hacky support for bad plugins is dropped in 3.x (MNG-3819)
-        super( "(2.0.1,3.0-alpha-1)" );
+        super( "(2.0.1,)" );
     }
 
     /**
