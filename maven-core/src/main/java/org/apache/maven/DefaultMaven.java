@@ -179,8 +179,11 @@ public class DefaultMaven
             Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
+        Map<String, MavenProject> projectMap;
         try
         {
+            projectMap = getProjectMap( session.getProjects() );
+
             ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
 
             ProjectDependencyGraph projectDependencyGraph = createDependencyGraph( projectSorter, request );
@@ -211,14 +214,7 @@ public class DefaultMaven
         // Reactor
         // Workspace
         // User Local Repository
-        try
-        {
-            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( getProjectMap( session.getProjects() ), session ) );
-        }
-        catch ( MavenExecutionException e )
-        {
-            return processResult( result, e );
-        }
+        delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap, session ) );
         
         if ( result.hasExceptions() )
         {
