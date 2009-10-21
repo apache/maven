@@ -76,12 +76,13 @@ public class ArtifactTransferEvent
 
     private File localFile;
 
-    private MavenArtifact artifact;
-    
-    public ArtifactTransferEvent( String wagon, final int eventType, final int requestType, MavenArtifact artifact )
+    private ArtifactTransferResource artifact;
+
+    public ArtifactTransferEvent( String wagon, final int eventType, final int requestType,
+                                  ArtifactTransferResource artifact )
     {
         super( wagon );
-        
+
         setEventType( eventType );
 
         setRequestType( requestType );
@@ -89,18 +90,19 @@ public class ArtifactTransferEvent
         this.artifact = artifact;
     }
 
-    public ArtifactTransferEvent( String wagon, final Exception exception, final int requestType, MavenArtifact artifact )
+    public ArtifactTransferEvent( String wagon, final Exception exception, final int requestType,
+                                  ArtifactTransferResource artifact )
     {
         this( wagon, TRANSFER_ERROR, requestType, artifact );
 
         this.exception = exception;
     }
 
-    public MavenArtifact getResource()
+    public ArtifactTransferResource getResource()
     {
         return artifact;
     }
-    
+
     /**
      * @return Returns the exception.
      */

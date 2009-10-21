@@ -1,4 +1,4 @@
-package org.apache.maven.repository;
+package org.apache.maven.repository.legacy;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,16 +19,20 @@ package org.apache.maven.repository;
  * under the License.
  */
 
-public class MavenArtifact
+import org.apache.maven.repository.ArtifactTransferResource;
+import org.apache.maven.wagon.resource.Resource;
+
+class MavenArtifact
+    implements ArtifactTransferResource
 {
 
     private String repositoryUrl;
 
-    private String name;
+    private Resource resource;
 
-    private long contentLength;
+    private long transferStartTime;
 
-    public MavenArtifact( String repositoryUrl, String name, long contentLength )
+    public MavenArtifact( String repositoryUrl, Resource resource )
     {
         if ( repositoryUrl == null )
         {
@@ -42,62 +46,45 @@ public class MavenArtifact
         {
             this.repositoryUrl = repositoryUrl;
         }
+        this.resource = resource;
 
-        if ( name == null )
-        {
-            this.name = "";
-        }
-        else if ( name.startsWith( "/" ) )
-        {
-            this.name = name.substring( 1 );
-        }
-        else
-        {
-            this.name = name;
-        }
-
-        this.contentLength = contentLength;
+        this.transferStartTime = System.currentTimeMillis();
     }
 
-    /**
-     * The base URL of the repository, e.g. "http://repo1.maven.org/maven2/". Unless the URL is unknown, it will be
-     * terminated by a trailing slash.
-     * 
-     * @return The base URL of the repository or an empty string if unknown, never {@code null}.
-     */
     public String getRepositoryUrl()
     {
         return repositoryUrl;
     }
 
-    /**
-     * The path of the artifact relative to the repository's base URL.
-     * 
-     * @return The path of the artifact, never {@code null}.
-     */
     public String getName()
     {
+        String name = resource.getName();
+
+        if ( name == null )
+        {
+            name = "";
+        }
+        else if ( name.startsWith( "/" ) )
+        {
+            name = name.substring( 1 );
+        }
+
         return name;
     }
 
-    /**
-     * Gets the full URL of the artifact.
-     * 
-     * @return The full URL of the artifact, never {@code null}.
-     */
     public String getUrl()
     {
         return getRepositoryUrl() + getName();
     }
 
-    /**
-     * The size of the artifact in bytes.
-     * 
-     * @return The of the artifact in bytes or a negative value if unknown.
-     */
     public long getContentLength()
     {
-        return contentLength;
+        return resource.getContentLength();
+    }
+
+    public long getTransferStartTime()
+    {
+        return transferStartTime;
     }
 
     @Override

@@ -40,11 +40,11 @@ public class ConsoleMavenTransferListener
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )
         {
-            System.out.print( ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + "K" ) + "\r" );
+            System.out.print( ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + " KB" ) + "\r" );
         }
         else
         {
-            System.out.print( complete + "/" + ( total == -1 ? "?" : total + "b" ) + "\r" );
+            System.out.print( complete + "/" + ( total == -1 ? "?" : total + " B" ) + "\r" );
         }
     }
 

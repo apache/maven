@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.maven.repository.ArtifactTransferEvent;
 import org.apache.maven.repository.ArtifactTransferListener;
-import org.apache.maven.repository.MavenArtifact;
+import org.apache.maven.repository.ArtifactTransferResource;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.repository.Repository;
@@ -35,6 +35,8 @@ public class TransferListenerAdapter
 {
 
     private ArtifactTransferListener listener;
+
+    private Map<Resource, ArtifactTransferResource> artifacts;
 
     private Map<Resource, Long> transfers;
 
@@ -53,6 +55,7 @@ public class TransferListenerAdapter
     private TransferListenerAdapter( ArtifactTransferListener listener )
     {
         this.listener = listener;
+        this.artifacts = new IdentityHashMap<Resource, ArtifactTransferResource>();
         this.transfers = new IdentityHashMap<Resource, Long>();
     }
 
@@ -62,13 +65,16 @@ public class TransferListenerAdapter
 
     public void transferCompleted( TransferEvent transferEvent )
     {
-        transfers.remove( transferEvent.getResource() );
-
         listener.transferCompleted( wrap( transferEvent ) );
+
+        artifacts.remove( transferEvent.getResource() );
+        transfers.remove( transferEvent.getResource() );
     }
 
     public void transferError( TransferEvent transferEvent )
     {
+        artifacts.remove( transferEvent.getResource() );
+        transfers.remove( transferEvent.getResource() );
     }
 
     public void transferInitiated( TransferEvent transferEvent )
@@ -107,7 +113,7 @@ public class TransferListenerAdapter
         {
             String wagon = event.getWagon().getClass().getName();
 
-            MavenArtifact artifact = wrap( event.getWagon().getRepository(), event.getResource() );
+            ArtifactTransferResource artifact = wrap( event.getWagon().getRepository(), event.getResource() );
 
             ArtifactTransferEvent evt;
             if ( event.getException() != null )
@@ -125,7 +131,7 @@ public class TransferListenerAdapter
         }
     }
 
-    private MavenArtifact wrap( Repository repository, Resource resource )
+    private ArtifactTransferResource wrap( Repository repository, Resource resource )
     {
         if ( resource == null )
         {
@@ -133,7 +139,15 @@ public class TransferListenerAdapter
         }
         else
         {
-            return new MavenArtifact( repository.getUrl(), resource.getName(), resource.getContentLength() );
+            ArtifactTransferResource artifact = artifacts.get( resource );
+
+            if ( artifact == null )
+            {
+                artifact = new MavenArtifact( repository.getUrl(), resource );
+                artifacts.put( resource, artifact );
+            }
+
+            return artifact;
         }
     }
 

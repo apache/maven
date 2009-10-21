@@ -19,8 +19,13 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 import org.apache.maven.repository.ArtifactTransferEvent;
 import org.apache.maven.repository.ArtifactTransferListener;
+import org.apache.maven.repository.ArtifactTransferResource;
 
 public abstract class AbstractMavenTransferListener
     implements ArtifactTransferListener
@@ -112,13 +117,24 @@ public abstract class AbstractMavenTransferListener
 
     protected void doCompleted( ArtifactTransferEvent transferEvent )
     {
-        long contentLength = transferEvent.getResource().getContentLength();
+        ArtifactTransferResource artifact = transferEvent.getResource();
+        long contentLength = artifact.getContentLength();
         if ( contentLength >= 0 )
         {
             String type =
                 ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "uploaded" : "downloaded" );
-            String l = contentLength >= 1024 ? ( contentLength / 1024 ) + "K" : contentLength + "b";
-            System.out.println( l + " " + type );
+            String l = contentLength >= 1024 ? ( ( contentLength + 1023 ) / 1024 ) + " KB" : contentLength + " B";
+
+            String throughput = "";
+            long duration = System.currentTimeMillis() - artifact.getTransferStartTime();
+            if ( duration > 0 )
+            {
+                DecimalFormat format = new DecimalFormat( "0.0", new DecimalFormatSymbols( Locale.ENGLISH ) );
+                double kbPerSec = ( contentLength / 1024.0 ) / ( duration / 1000.0 );
+                throughput = " at " + format.format( kbPerSec ) + " KB/sec";
+            }
+
+            System.out.println( l + " " + type + throughput );
         }
     }
 
