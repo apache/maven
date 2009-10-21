@@ -203,12 +203,24 @@ public class DefaultExceptionHandler
         {
             String exceptionMessage = t.getMessage();
 
+            if ( exceptionMessage == null )
+            {
+                exceptionMessage = "";
+            }
+
             if ( t instanceof AbstractMojoExecutionException )
             {
                 String longMessage = ( (AbstractMojoExecutionException) t ).getLongMessage();
                 if ( StringUtils.isNotEmpty( longMessage ) )
                 {
-                    exceptionMessage = longMessage;
+                    if ( StringUtils.isEmpty( exceptionMessage ) || longMessage.contains( exceptionMessage ) )
+                    {
+                        exceptionMessage = longMessage;
+                    }
+                    else
+                    {
+                        exceptionMessage += ": " + longMessage;
+                    }
                 }
             }
 

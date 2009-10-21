@@ -1800,8 +1800,8 @@ public class MavenProject
 
     protected ArtifactRepository getReleaseArtifactRepository()
     {
-        if ( getDistributionManagement().getRepository() != null )
-        {           
+        if ( getDistributionManagement() != null && getDistributionManagement().getRepository() != null )
+        {
             try
             {
                 ArtifactRepository repo =
@@ -1819,8 +1819,8 @@ public class MavenProject
 
     protected ArtifactRepository getSnapshotArtifactRepository()
     {
-        if ( getDistributionManagement().getSnapshotRepository() != null )
-        {           
+        if ( getDistributionManagement() != null && getDistributionManagement().getSnapshotRepository() != null )
+        {
             try
             {
                 ArtifactRepository repo =
