@@ -458,7 +458,43 @@ public class DefaultMavenPluginManager
 
         List<Artifact> pluginArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
 
+        addPlexusUtils( pluginArtifacts, plugin, repositoryRequest );
+
         return pluginArtifacts;
+    }
+
+    // backward-compatibility with Maven 2.x
+    private void addPlexusUtils( List<Artifact> pluginArtifacts, Plugin plugin, RepositoryRequest repositoryRequest )
+        throws PluginResolutionException
+    {
+        for ( Artifact artifact : pluginArtifacts )
+        {
+            if ( "org.codehaus.plexus:plexus-utils:jar".equals( artifact.getDependencyConflictId() ) )
+            {
+                return;
+            }
+        }
+
+        Artifact plexusUtils =
+            repositorySystem.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.1", Artifact.SCOPE_RUNTIME,
+                                             "jar" );
+
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
+        request.setArtifact( plexusUtils );
+        request.setResolveRoot( true );
+        request.setResolveTransitively( false );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        try
+        {
+            resolutionErrorHandler.throwErrors( request, result );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new PluginResolutionException( plugin, e );
+        }
+
+        pluginArtifacts.add( plexusUtils );
     }
 
     public <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )
