@@ -25,8 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
-import org.apache.maven.execution.ProjectSorter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectSorter;
 
 /**
  * Describes the inter-dependencies between projects in the reactor.

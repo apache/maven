@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.project;
 
 import java.io.File;
 

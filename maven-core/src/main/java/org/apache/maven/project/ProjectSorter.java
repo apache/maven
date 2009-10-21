@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,7 +20,6 @@ package org.apache.maven.execution;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +31,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.dag.DAG;
@@ -70,7 +68,7 @@ public class ProjectSorter
     // In this case, both the verify and the report goals are called
     // in a different lifecycle. Though the compiler-plugin has a valid usecase, although
     // that seems to work fine. We need to take versions and lifecycle into account.
-    public ProjectSorter( Collection<MavenProject> projects )
+    public ProjectSorter( List<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException
     {
         dag = new DAG();
