@@ -636,9 +636,14 @@ public class DefaultMavenPluginManager
         }
         catch ( ComponentConfigurationException e )
         {
-            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(),
-                                                    "Unable to parse configuration of mojo " + mojoDescriptor.getId()
-                                                        + ": " + e.getMessage(), e );
+            String message = "Unable to parse configuration of mojo " + mojoDescriptor.getId();
+            if ( e.getFailedConfiguration() != null )
+            {
+                message += " for parameter " + e.getFailedConfiguration().getName();
+            }
+            message += ": " + e.getMessage();
+
+            throw new PluginConfigurationException( mojoDescriptor.getPluginDescriptor(), message, e );
         }
         catch ( ComponentLookupException e )
         {
