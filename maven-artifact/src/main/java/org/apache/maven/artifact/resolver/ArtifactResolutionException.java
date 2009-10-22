@@ -15,14 +15,10 @@ package org.apache.maven.artifact.resolver;
  * the License.
  */
 
-import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
-import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.wagon.TransferFailedException;
 
 /**
  * @author Jason van Zyl
@@ -53,40 +49,14 @@ public class ArtifactResolutionException
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, ArtifactMetadataRetrievalException cause )
-    {
-        super( message, artifact, null, cause );
-    }
-
-    @Deprecated
     public ArtifactResolutionException( String message, Artifact artifact, Throwable cause )
     {
         super( message, artifact, null, cause );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactMetadataRetrievalException cause )
+    public ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories, Throwable cause )
     {
         super( message, artifact, remoteRepositories, cause );
     }
 
-    @Deprecated
-    protected ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories, Throwable cause )
-    {
-        super( message, artifact, remoteRepositories, cause );
-    }
-
-    protected ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories, TransferFailedException cause )
-    {
-        super( message, artifact, remoteRepositories, cause );
-    }
-
-    protected ArtifactResolutionException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories, IOException cause )
-    {
-        super( message, artifact, remoteRepositories, cause );
-    }
-
-    public ArtifactResolutionException( String message, Artifact artifact, RepositoryMetadataResolutionException cause )
-    {
-        super( message, artifact, null, cause );
-    }
 }

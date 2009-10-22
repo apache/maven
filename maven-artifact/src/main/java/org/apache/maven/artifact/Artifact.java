@@ -46,19 +46,19 @@ public interface Artifact
 
     // TODO: into artifactScope handler
 
-    String SCOPE_COMPILE = ArtifactScopeEnum.compile.toString();
+    String SCOPE_COMPILE = "compile";
 
     String SCOPE_COMPILE_PLUS_RUNTIME = "compile+runtime";
 
-    String SCOPE_TEST = ArtifactScopeEnum.test.toString();
+    String SCOPE_TEST = "test";
 
-    String SCOPE_RUNTIME = ArtifactScopeEnum.runtime.toString();
+    String SCOPE_RUNTIME = "runtime";
 
-    String SCOPE_RUNTIME_PLUS_SYSTEM = ArtifactScopeEnum.runtime_plus_system.toString();
+    String SCOPE_RUNTIME_PLUS_SYSTEM = "runtime+system";
 
-    String SCOPE_PROVIDED = ArtifactScopeEnum.provided.toString();
+    String SCOPE_PROVIDED = "provided";
 
-    String SCOPE_SYSTEM = ArtifactScopeEnum.system.toString();
+    String SCOPE_SYSTEM = "system";
 
     String SCOPE_IMPORT = "import";   // Used to import dependencyManagement dependencies
 

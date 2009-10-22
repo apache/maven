@@ -19,8 +19,8 @@
     <version>3.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-compat</artifactId>
-  <name>Maven Compat</name>
+  <artifactId>maven-artifact</artifactId>
+  <name>Maven Artifact</name>
 
   <dependencies>
     <dependency>
@@ -30,10 +30,6 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model-builder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -70,34 +66,6 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.modello</groupId>
-        <artifactId>modello-maven-plugin</artifactId>
-        <configuration>
-          <version>1.0.0</version>
-          <models>
-            <model>src/main/mdo/metadata.mdo</model>
-            <model>src/main/mdo/profiles.mdo</model>
-            <model>src/main/mdo/paramdoc.mdo</model>
-          </models>
-        </configuration>
-        <executions>
-          <execution>
-            <id>settings</id>
-            <goals>
-              <goal>java</goal>
-              <goal>xpp3-reader</goal>
-              <goal>xpp3-writer</goal>
-            </goals>
-            <configuration>
-              <version>1.1.0</version>
-              <models>
-                <model>src/main/mdo/settings.mdo</model>
-              </models>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
