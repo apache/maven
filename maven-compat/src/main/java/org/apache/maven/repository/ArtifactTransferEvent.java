@@ -78,6 +78,14 @@ public class ArtifactTransferEvent
 
     private ArtifactTransferResource artifact;
 
+    private long transferredBytes;
+
+    private byte[] dataBuffer;
+
+    private int dataOffset;
+
+    private int dataLength;
+
     public ArtifactTransferEvent( String wagon, final int eventType, final int requestType,
                                   ArtifactTransferResource artifact )
     {
@@ -194,6 +202,46 @@ public class ArtifactTransferEvent
     public void setLocalFile( File localFile )
     {
         this.localFile = localFile;
+    }
+
+    public long getTransferredBytes()
+    {
+        return transferredBytes;
+    }
+
+    public void setTransferredBytes( long transferredBytes )
+    {
+        this.transferredBytes = transferredBytes;
+    }
+
+    public byte[] getDataBuffer()
+    {
+        return dataBuffer;
+    }
+
+    public void setDataBuffer( byte[] dataBuffer )
+    {
+        this.dataBuffer = dataBuffer;
+    }
+
+    public int getDataOffset()
+    {
+        return dataOffset;
+    }
+
+    public void setDataOffset( int dataOffset )
+    {
+        this.dataOffset = dataOffset;
+    }
+
+    public int getDataLength()
+    {
+        return dataLength;
+    }
+
+    public void setDataLength( int dataLength )
+    {
+        this.dataLength = dataLength;
     }
 
     public String toString()

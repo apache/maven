@@ -31,11 +31,10 @@ public class ConsoleMavenTransferListener
 {
 
     @Override
-    protected void doProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset,
-                               int length )
+    protected void doProgress( ArtifactTransferEvent transferEvent )
     {
         long total = transferEvent.getResource().getContentLength();
-        long complete = transferred;
+        long complete = transferEvent.getTransferredBytes();
 
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )

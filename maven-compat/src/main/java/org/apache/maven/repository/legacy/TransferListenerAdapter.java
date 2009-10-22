@@ -65,7 +65,15 @@ public class TransferListenerAdapter
 
     public void transferCompleted( TransferEvent transferEvent )
     {
-        listener.transferCompleted( wrap( transferEvent ) );
+        ArtifactTransferEvent event = wrap( transferEvent );
+
+        Long transferred = transfers.get( transferEvent.getResource() );
+        if ( transferred != null )
+        {
+            event.setTransferredBytes( transferred.longValue() );
+        }
+
+        listener.transferCompleted( event );
 
         artifacts.remove( transferEvent.getResource() );
         transfers.remove( transferEvent.getResource() );
@@ -95,7 +103,13 @@ public class TransferListenerAdapter
         }
         transfers.put( transferEvent.getResource(), transferred );
 
-        listener.transferProgress( wrap( transferEvent ), transferred.longValue(), buffer, 0, length );
+        ArtifactTransferEvent event = wrap( transferEvent );
+        event.setDataBuffer( buffer );
+        event.setDataOffset( 0 );
+        event.setDataLength( length );
+        event.setTransferredBytes( transferred.longValue() );
+
+        listener.transferProgress( event );
     }
 
     public void transferStarted( TransferEvent transferEvent )

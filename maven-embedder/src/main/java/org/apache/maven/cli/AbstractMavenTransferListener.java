@@ -88,19 +88,17 @@ public abstract class AbstractMavenTransferListener
         // to be overriden by sub classes
     }
 
-    public void transferProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset,
-                                  int length )
+    public void transferProgress( ArtifactTransferEvent transferEvent )
     {
         if ( !showEvent( transferEvent ) )
         {
             return;
         }
 
-        doProgress( transferEvent, transferred, buffer, offset, length );
+        doProgress( transferEvent );
     }
 
-    protected void doProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset,
-                               int length )
+    protected void doProgress( ArtifactTransferEvent transferEvent )
     {
         // to be overriden by sub classes
     }
@@ -118,7 +116,7 @@ public abstract class AbstractMavenTransferListener
     protected void doCompleted( ArtifactTransferEvent transferEvent )
     {
         ArtifactTransferResource artifact = transferEvent.getResource();
-        long contentLength = artifact.getContentLength();
+        long contentLength = transferEvent.getTransferredBytes();
         if ( contentLength >= 0 )
         {
             String type =

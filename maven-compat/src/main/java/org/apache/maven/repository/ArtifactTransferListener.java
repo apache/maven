@@ -29,7 +29,7 @@ public interface ArtifactTransferListener
 
     void transferStarted( ArtifactTransferEvent transferEvent );
 
-    void transferProgress( ArtifactTransferEvent transferEvent, long transferred, byte[] buffer, int offset, int length );
+    void transferProgress( ArtifactTransferEvent transferEvent );
 
     void transferCompleted( ArtifactTransferEvent transferEvent );
 
