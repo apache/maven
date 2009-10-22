@@ -392,11 +392,13 @@
 
     private RuntimeInfo runtimeInfo;
 
+    @Deprecated
     public void setRuntimeInfo( RuntimeInfo runtimeInfo )
     {
         this.runtimeInfo = runtimeInfo;
     }
 
+    @Deprecated
     public RuntimeInfo getRuntimeInfo()
     {
         if ( runtimeInfo == null )
@@ -405,7 +407,6 @@
         }
         return runtimeInfo;
     }
-
             ]]>
           </code>
         </codeSegment>
