@@ -55,6 +55,8 @@ class RepositoryModelResolver
 
     private ProjectBuildingRequest projectBuildingRequest;
 
+    private List<ArtifactRepository> pomRepositories;
+
     private List<ArtifactRepository> remoteRepositories;
 
     private ReactorModelPool reactorModelPool;
@@ -88,6 +90,8 @@ class RepositoryModelResolver
             this.remoteRepositories.addAll( projectBuildingRequest.getRemoteRepositories() );
         }
 
+        this.pomRepositories = new ArrayList<ArtifactRepository>();
+
         this.repositoryIds = new HashSet<String>();
 
         this.reactorModelPool = reactorModelPool;
@@ -101,6 +105,7 @@ class RepositoryModelResolver
         this.reactorModelPool = original.reactorModelPool;
         this.remoteRepositories = new ArrayList<ArtifactRepository>( original.remoteRepositories );
         this.repositoryIds = new HashSet<String>( original.repositoryIds );
+        this.pomRepositories = new ArrayList<ArtifactRepository>( original.pomRepositories );
     }
 
     public ModelResolver newCopy()
@@ -126,7 +131,11 @@ class RepositoryModelResolver
 
             repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuildingRequest.getServers() );
 
-            remoteRepositories.add( repo );
+            pomRepositories.add( repo );
+
+            remoteRepositories = new ArrayList<ArtifactRepository>();
+            remoteRepositories.addAll( pomRepositories );
+            remoteRepositories.addAll( projectBuildingRequest.getRemoteRepositories() );
 
             remoteRepositories = repositorySystem.getEffectiveRepositories( remoteRepositories );
         }
