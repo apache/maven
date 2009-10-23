@@ -129,7 +129,7 @@ public abstract class AbstractMavenTransferListener
         {
             String type =
                 ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "uploaded" : "downloaded" );
-            String l = contentLength >= 1024 ? ( ( contentLength + 1023 ) / 1024 ) + " KB" : contentLength + " B";
+            String l = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
 
             String throughput = "";
             long duration = System.currentTimeMillis() - artifact.getTransferStartTime();
@@ -142,6 +142,11 @@ public abstract class AbstractMavenTransferListener
 
             out.println( l + " " + type + throughput );
         }
+    }
+
+    protected long toKB( long bytes )
+    {
+        return ( bytes + 1023 ) / 1024;
     }
 
     public boolean isShowChecksumEvents()
