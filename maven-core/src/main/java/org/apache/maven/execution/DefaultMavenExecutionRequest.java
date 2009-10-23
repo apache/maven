@@ -973,6 +973,7 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setProfiles( getProfiles() );
             projectBuildingRequest.setProcessPlugins( true );
             projectBuildingRequest.setBuildStartTime( getStartTime() );
+            projectBuildingRequest.setTransferListener( getTransferListener() );
         }
 
         return projectBuildingRequest;
