@@ -82,7 +82,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http-lightweight</artifactId>
+      <artifactId>wagon-file</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

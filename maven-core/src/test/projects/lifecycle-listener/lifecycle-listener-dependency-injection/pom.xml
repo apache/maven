@@ -9,4 +9,22 @@
     <foo>${injected}</foo>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin</artifactId>
+        <version>0.1</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>it</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

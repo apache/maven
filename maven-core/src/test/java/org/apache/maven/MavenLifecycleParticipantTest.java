@@ -19,6 +19,7 @@ package org.apache.maven;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -95,6 +96,7 @@ public class MavenLifecycleParticipantTest
         Maven maven = container.lookup( Maven.class );
         File pom = getProject( "lifecycle-listener-dependency-injection" );
         MavenExecutionRequest request = createMavenExecutionRequest( pom );
+        request.setGoals( Arrays.asList( "validate" ) );
         MavenExecutionResult result = maven.execute( request );
 
         assertFalse( result.hasExceptions() );

@@ -45,11 +45,11 @@ public class ProjectDependenciesResolverTest
         MavenProject project = session.getCurrentProject();
 
         Exclusion exclusion = new Exclusion();
-        exclusion.setGroupId( "commons-lang" );
-        exclusion.setArtifactId( "commons-lang" );        
+        exclusion.setGroupId( "org.apache.maven.its" );
+        exclusion.setArtifactId( "a" );
 
-        new ProjectBuilder( project ).addDependency( "org.apache.maven.its", "maven-core-it-support", "1.3",
-                                                     Artifact.SCOPE_RUNTIME, exclusion );
+        new ProjectBuilder( project ).addDependency( "org.apache.maven.its", "b", "0.1", Artifact.SCOPE_RUNTIME,
+                                                     exclusion );
         
         Set<Artifact> artifactDependencies =
             resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session );
@@ -57,7 +57,7 @@ public class ProjectDependenciesResolverTest
 
         artifactDependencies = resolver.resolve( project, Collections.singleton( Artifact.SCOPE_RUNTIME ), session );
         assertEquals( 1, artifactDependencies.size() );
-        assertEquals( "maven-core-it-support", artifactDependencies.iterator().next().getArtifactId() );
+        assertEquals( "b", artifactDependencies.iterator().next().getArtifactId() );
     }
     
     public void testSystemScopeDependencies()

@@ -18,6 +18,7 @@ import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -59,10 +60,7 @@ public abstract class AbstractCoreMavenComponentTestCase
     {
         File source = new File( new File( getBasedir(), getProjectsDirectory() ), name );
         File target = new File( new File( getBasedir(), "target" ), name );
-        if ( !target.exists() )
-        {
-            FileUtils.copyDirectoryStructure( source, target );
-        }
+        FileUtils.copyDirectoryStructureIfModified( source, target );
         return new File( target, "pom.xml" );
     }
 
@@ -147,22 +145,34 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected List<ArtifactRepository> getRemoteRepositories()
         throws InvalidRepositoryException
     {
-        return Arrays.asList( repositorySystem.createDefaultRemoteRepository() );
+        File repoDir = new File( getBasedir(), "src/test/remote-repo" ).getAbsoluteFile();
+
+        RepositoryPolicy policy = new RepositoryPolicy();
+        policy.setEnabled( true );
+        policy.setChecksumPolicy( "ignore" );
+        policy.setUpdatePolicy( "always" );
+
+        Repository repository = new Repository();
+        repository.setId( RepositorySystem.DEFAULT_REMOTE_REPO_ID );
+        repository.setUrl( "file://" + repoDir.toURI().getPath() );
+        repository.setReleases( policy );
+        repository.setSnapshots( policy );
+
+        return Arrays.asList( repositorySystem.buildArtifactRepository( repository ) );
     }
 
     protected List<ArtifactRepository> getPluginArtifactRepositories()
         throws InvalidRepositoryException
     {
-        Repository itRepo = new Repository();
-        itRepo.setId( "maven.it" );
-        itRepo.setUrl( "http://repository.sonatype.org/content/repositories/maven.snapshots" );
-        return Arrays.asList(  repositorySystem.createDefaultRemoteRepository(), repositorySystem.buildArtifactRepository( itRepo ) );
+        return getRemoteRepositories();
     }
-        
-    protected ArtifactRepository getLocalRepository() 
+
+    protected ArtifactRepository getLocalRepository()
         throws InvalidRepositoryException
-    {        
-        return repositorySystem.createDefaultLocalRepository();        
+    {
+        File repoDir = new File( getBasedir(), "target/local-repo" ).getAbsoluteFile();
+
+        return repositorySystem.createLocalRepository( repoDir );
     }
     
     protected class ProjectBuilder

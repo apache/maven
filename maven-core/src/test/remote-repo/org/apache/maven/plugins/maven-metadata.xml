@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>clean</prefix>
+      <artifactId>maven-clean-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>deploy</prefix>
+      <artifactId>maven-deploy-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>install</prefix>
+      <artifactId>maven-install-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>jar</prefix>
+      <artifactId>maven-jar-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>surefire</prefix>
+      <artifactId>maven-surefire-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>compiler</prefix>
+      <artifactId>maven-compiler-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>resources</prefix>
+      <artifactId>maven-resources-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin</name>
+      <prefix>plugin</prefix>
+      <artifactId>maven-plugin-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

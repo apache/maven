@@ -50,9 +50,9 @@ public class LifecycleExecutorTest
     {
         // We are doing something like "mvn resources:resources" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
-        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
-        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
+        assertEquals( "project-basic", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
         List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "resources:resources" ).getExecutions();
         assertEquals( 1, executionPlan.size() );
@@ -60,7 +60,7 @@ public class LifecycleExecutorTest
         assertNotNull( mojoExecution );
         assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
         assertEquals( "maven-resources-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
-        assertEquals( "2.3", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
+        assertEquals( "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
 
     public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanLifecycle()
@@ -68,9 +68,9 @@ public class LifecycleExecutorTest
     {
         // We are doing something like "mvn clean:clean" where no version is specified but this
         // project we are working on has the version specified in the POM so the version should come from there.
-        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
-        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
+        assertEquals( "project-basic", session.getCurrentProject().getArtifactId() );
         assertEquals( "1.0", session.getCurrentProject().getVersion() );
         List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "clean" ).getExecutions();
         assertEquals( 1, executionPlan.size() );
@@ -78,7 +78,25 @@ public class LifecycleExecutorTest
         assertNotNull( mojoExecution );
         assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
         assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
-        assertEquals( "2.3", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
+        assertEquals( "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
+    }
+    
+    public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
+        throws Exception
+    {
+        // We are doing something like "mvn clean:clean" where no version is specified but this
+        // project we are working on has the version specified in the POM so the version should come from there.
+        File pom = getProject( "project-basic" );
+        MavenSession session = createMavenSession( pom );
+        assertEquals( "project-basic", session.getCurrentProject().getArtifactId() );
+        assertEquals( "1.0", session.getCurrentProject().getVersion() );
+        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "clean:clean" ).getExecutions();
+        assertEquals( 1, executionPlan.size() );
+        MojoExecution mojoExecution = executionPlan.get( 0 );
+        assertNotNull( mojoExecution );
+        assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
+        assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
+        assertEquals( "0.1", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
     }
 
     // We need to take in multiple lifecycles
@@ -94,10 +112,10 @@ public class LifecycleExecutorTest
         //[01] clean:clean
         //[02] resources:resources
         //[03] compiler:compile
-        //[04] plexus-component-metadata:generate-metadata
+        //[04] it:generate-metadata
         //[05] resources:testResources
         //[06] compiler:testCompile
-        //[07] plexus-component-metadata:generate-test-metadata
+        //[07] it:generate-test-metadata
         //[08] surefire:test
         //[09] jar:jar
         //[10] install:install
@@ -107,10 +125,10 @@ public class LifecycleExecutorTest
         assertEquals( "clean:clean", executionPlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "resources:resources", executionPlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:compile", executionPlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-metadata", executionPlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:generate-metadata", executionPlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "resources:testResources", executionPlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:testCompile", executionPlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-test-metadata", executionPlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:generate-test-metadata", executionPlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "surefire:test", executionPlan.get( 7 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "jar:jar", executionPlan.get( 8 ).getMojoDescriptor().getFullGoalName() );                
         assertEquals( "install:install", executionPlan.get( 9 ).getMojoDescriptor().getFullGoalName() );                
@@ -154,12 +172,12 @@ public class LifecycleExecutorTest
         assertEquals( 16, executions.size() );        
                 
         assertEquals( "clean:clean", executions.get( 0 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-writer", executions.get( 1 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:java", executions.get( 2 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-reader", executions.get( 3 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-writer", executions.get( 4 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:java", executions.get( 5 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "modello:xpp3-reader", executions.get( 6 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:xpp3-writer", executions.get( 1 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:java", executions.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:xpp3-reader", executions.get( 3 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:xpp3-writer", executions.get( 4 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:java", executions.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:xpp3-reader", executions.get( 6 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "plugin:descriptor", executions.get( 7 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "resources:resources", executions.get( 8 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:compile", executions.get( 9 ).getMojoDescriptor().getFullGoalName() );
@@ -174,24 +192,6 @@ public class LifecycleExecutorTest
         assertEquals( "src/main/mdo/supplemental-model.mdo", new MojoExecutionXPathContainer( executions.get( 4 ) ).getValue( "configuration/models[1]/model" ) );
     }        
     
-    public void testCalculationOfBuildPlanWithIndividualTaskOfTheCleanCleanGoal()
-        throws Exception
-    {
-        // We are doing something like "mvn clean:clean" where no version is specified but this
-        // project we are working on has the version specified in the POM so the version should come from there.
-        File pom = getProject( "project-with-additional-lifecycle-elements" );
-        MavenSession session = createMavenSession( pom );
-        assertEquals( "project-with-additional-lifecycle-elements", session.getCurrentProject().getArtifactId() );
-        assertEquals( "1.0", session.getCurrentProject().getVersion() );
-        List<MojoExecution> executionPlan = lifecycleExecutor.calculateExecutionPlan( session, "clean:clean" ).getExecutions();
-        assertEquals( 1, executionPlan.size() );
-        MojoExecution mojoExecution = executionPlan.get( 0 );
-        assertNotNull( mojoExecution );
-        assertEquals( "org.apache.maven.plugins", mojoExecution.getMojoDescriptor().getPluginDescriptor().getGroupId() );
-        assertEquals( "maven-clean-plugin", mojoExecution.getMojoDescriptor().getPluginDescriptor().getArtifactId() );
-        assertEquals( "2.3", mojoExecution.getMojoDescriptor().getPluginDescriptor().getVersion() );
-    }
-    
     public void testLifecycleQueryingUsingADefaultLifecyclePhase()
         throws Exception
     {   
@@ -203,7 +203,7 @@ public class LifecycleExecutorTest
         
         //[01] resources:resources
         //[02] compiler:compile
-        //[03] plexus-component-metadata:generate-metadata
+        //[03] it:generate-metadata
         //[04] resources:testResources
         //[05] compiler:testCompile
         //[06] plexus-component-metadata:generate-test-metadata
@@ -214,10 +214,10 @@ public class LifecycleExecutorTest
                 
         assertEquals( "resources:resources", executionPlan.get( 0 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:compile", executionPlan.get( 1 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-metadata", executionPlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:generate-metadata", executionPlan.get( 2 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "resources:testResources", executionPlan.get( 3 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:testCompile", executionPlan.get( 4 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plexus-component-metadata:generate-test-metadata", executionPlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "it:generate-test-metadata", executionPlan.get( 5 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "surefire:test", executionPlan.get( 6 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "jar:jar", executionPlan.get( 7 ).getMojoDescriptor().getFullGoalName() );        
     }    
@@ -236,7 +236,7 @@ public class LifecycleExecutorTest
         File pom = getProject( "project-with-additional-lifecycle-elements" );
         MavenSession session = createMavenSession( pom );
         MojoDescriptor mojoDescriptor =
-            lifecycleExecutor.getMojoDescriptor( "org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process",
+            lifecycleExecutor.getMojoDescriptor( "org.apache.maven.its.plugins:maven-it-plugin:0.1:java",
                                                  session, session.getCurrentProject() );
         Xpp3Dom dom = lifecycleExecutor.convert( mojoDescriptor );
         System.out.println( dom );
@@ -245,7 +245,7 @@ public class LifecycleExecutorTest
     public void testPluginPrefixRetrieval()
         throws Exception
     {
-        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
         Plugin plugin = lifecycleExecutor.findPluginForPrefix( "resources", session );
         assertEquals( "org.apache.maven.plugins", plugin.getGroupId() );
@@ -257,7 +257,7 @@ public class LifecycleExecutorTest
     public void testFindingPluginPrefixforCleanClean()
         throws Exception
     {
-        File pom = getProject( "project-with-additional-lifecycle-elements" );
+        File pom = getProject( "project-basic" );
         MavenSession session = createMavenSession( pom );
         Plugin plugin = lifecycleExecutor.findPluginForPrefix( "clean", session );
         assertNotNull( plugin );

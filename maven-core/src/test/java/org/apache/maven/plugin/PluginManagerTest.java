@@ -18,9 +18,7 @@ public class PluginManagerTest
 {
     @Requirement
     private DefaultBuildPluginManager pluginManager;
-    
-    private String plexusVersion = "1.0-beta-3.0.7";
-    
+
     protected void setUp()
         throws Exception
     {
@@ -54,11 +52,11 @@ public class PluginManagerTest
     public void testPluginLoading()
         throws Exception
     {
-        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
+        MavenSession session = createMavenSession( null );       
         Plugin plugin = new Plugin();
-        plugin.setGroupId( "org.codehaus.plexus" );
-        plugin.setArtifactId( "plexus-component-metadata" );
-        plugin.setVersion( plexusVersion );
+        plugin.setGroupId( "org.apache.maven.its.plugins" );
+        plugin.setArtifactId( "maven-it-plugin" );
+        plugin.setVersion( "0.1" );
         PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, getRepositoryRequest( session ) );
         assertNotNull( pluginDescriptor );
     }
@@ -66,24 +64,24 @@ public class PluginManagerTest
     public void testMojoDescriptorRetrieval()
         throws Exception
     {
-        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
-        String goal = "generate-metadata";
+        MavenSession session = createMavenSession( null );       
+        String goal = "it";
         Plugin plugin = new Plugin();
-        plugin.setGroupId( "org.codehaus.plexus" );
-        plugin.setArtifactId( "plexus-component-metadata" );
-        plugin.setVersion( plexusVersion );
+        plugin.setGroupId( "org.apache.maven.its.plugins" );
+        plugin.setArtifactId( "maven-it-plugin" );
+        plugin.setVersion( "0.1" );
         
         MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, getRepositoryRequest( session ) );        
         assertNotNull( mojoDescriptor );
-        assertEquals( "generate-metadata", mojoDescriptor.getGoal() );
+        assertEquals( goal, mojoDescriptor.getGoal() );
         // igorf: plugin realm comes later
         // assertNotNull( mojoDescriptor.getRealm() );
         
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         assertNotNull( pluginDescriptor );
-        assertEquals( "org.codehaus.plexus", pluginDescriptor.getGroupId() );
-        assertEquals( "plexus-component-metadata", pluginDescriptor.getArtifactId() );
-        assertEquals( plexusVersion, pluginDescriptor.getVersion() );
+        assertEquals( "org.apache.maven.its.plugins", pluginDescriptor.getGroupId() );
+        assertEquals( "maven-it-plugin", pluginDescriptor.getArtifactId() );
+        assertEquals( "0.1", pluginDescriptor.getVersion() );
     }
     
     // -----------------------------------------------------------------------------------------------
@@ -225,17 +223,7 @@ public class PluginManagerTest
         
         MavenSession session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
         MavenProject project = session.getCurrentProject();
-        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin-class-loader" );                
-        Artifact pluginArtifact = project.getPluginArtifactMap().get( "org.apache.maven.its.plugins:maven-it-plugin-class-loader" ); 
-        
-        /*
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( pluginArtifact )
-            .setLocalRepository( getLocalRepository() )
-            .setRemoteRepostories( getPluginArtifactRepositories() );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-        */
+        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );                
         
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository( getLocalRepository() );
