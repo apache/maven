@@ -343,7 +343,7 @@ public class MavenCli
             return 1;
         }
 
-        populateRequest( request, commandLine, workingDirectory, debug, quiet, showErrors );
+        populateRequest( request, commandLine, workingDirectory, debug, quiet, showErrors, stdout );
 
         request.setExecutionListener( new ExecutionEventLogger( logger ) );
 
@@ -602,7 +602,8 @@ public class MavenCli
     }
     
     private MavenExecutionRequest populateRequest( MavenExecutionRequest request, CommandLine commandLine,
-                                                  String workingDirectory, boolean debug, boolean quiet, boolean showErrors )
+                                                   String workingDirectory, boolean debug, boolean quiet,
+                                                   boolean showErrors, PrintStream stdout )
     {
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
@@ -729,11 +730,11 @@ public class MavenCli
 
         if ( request.isInteractiveMode() )
         {
-            transferListener = new ConsoleMavenTransferListener();
+            transferListener = new ConsoleMavenTransferListener( stdout );
         }
         else
         {
-            transferListener = new BatchModeMavenTransferListener();
+            transferListener = new BatchModeMavenTransferListener( stdout );
         }
 
         transferListener.setShowChecksumEvents( false );

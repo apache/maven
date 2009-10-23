@@ -19,6 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -31,7 +32,14 @@ public abstract class AbstractMavenTransferListener
     implements ArtifactTransferListener
 {
 
+    protected PrintStream out;
+
     private boolean showChecksumEvents;
+
+    protected AbstractMavenTransferListener( PrintStream out )
+    {
+        this.out = ( out != null ) ? out : System.out;
+    }
 
     protected boolean showEvent( ArtifactTransferEvent event )
     {
@@ -70,7 +78,7 @@ public abstract class AbstractMavenTransferListener
         String message =
             transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
 
-        System.out.println( message + ": " + transferEvent.getResource().getUrl() );
+        out.println( message + ": " + transferEvent.getResource().getUrl() );
     }
 
     public void transferStarted( ArtifactTransferEvent transferEvent )
@@ -132,7 +140,7 @@ public abstract class AbstractMavenTransferListener
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            System.out.println( l + " " + type + throughput );
+            out.println( l + " " + type + throughput );
         }
     }
 

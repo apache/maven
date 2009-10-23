@@ -19,6 +19,8 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.PrintStream;
+
 import org.apache.maven.repository.ArtifactTransferEvent;
 
 /**
@@ -26,9 +28,14 @@ import org.apache.maven.repository.ArtifactTransferEvent;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-public class ConsoleMavenTransferListener
+class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
+
+    public ConsoleMavenTransferListener( PrintStream out )
+    {
+        super( out );
+    }
 
     @Override
     protected void doProgress( ArtifactTransferEvent transferEvent )
@@ -39,11 +46,11 @@ public class ConsoleMavenTransferListener
         // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
         if ( total >= 1024 )
         {
-            System.out.print( ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + " KB" ) + "\r" );
+            out.print( ( complete / 1024 ) + "/" + ( total == -1 ? "?" : ( total / 1024 ) + " KB" ) + "\r" );
         }
         else
         {
-            System.out.print( complete + "/" + ( total == -1 ? "?" : total + " B" ) + "\r" );
+            out.print( complete + "/" + ( total == -1 ? "?" : total + " B" ) + "\r" );
         }
     }
 
