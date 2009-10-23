@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -387,7 +386,6 @@ public class DefaultModelBuilder
         problems.setSource( model );
 
         List<Repository> repositories = model.getRepositories();
-        Collections.reverse( repositories );
 
         for ( Repository repository : repositories )
         {

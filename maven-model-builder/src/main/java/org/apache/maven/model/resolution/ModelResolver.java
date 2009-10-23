@@ -46,8 +46,9 @@ public interface ModelResolver
         throws UnresolvableModelException;
 
     /**
-     * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters.
-     * When multiple repositories with the same identifier are added, only the last repository being added will be used.
+     * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
+     * repositories that were added first should also be searched first. When multiple repositories with the same
+     * identifier are added, only the first repository being added will be used.
      * 
      * @param repository The repository to add to the internal search chain, must not be {@code null}.
      * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).

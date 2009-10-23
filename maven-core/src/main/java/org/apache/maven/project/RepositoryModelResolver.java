@@ -22,7 +22,9 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -57,6 +59,8 @@ class RepositoryModelResolver
 
     private ReactorModelPool reactorModelPool;
 
+    private Set<String> repositoryIds;
+
     public RepositoryModelResolver( RepositorySystem repositorySystem, ResolutionErrorHandler resolutionErrorHandler,
                                     ProjectBuildingRequest projectBuildingRequest, ReactorModelPool reactorModelPool )
     {
@@ -78,24 +82,40 @@ class RepositoryModelResolver
         }
         this.projectBuildingRequest = projectBuildingRequest;
 
-        if ( projectBuildingRequest.getRemoteRepositories() == null )
+        this.remoteRepositories = new ArrayList<ArtifactRepository>();
+        if ( projectBuildingRequest.getRemoteRepositories() != null )
         {
-            throw new IllegalArgumentException( "no remote repositories specified" );
+            this.remoteRepositories.addAll( projectBuildingRequest.getRemoteRepositories() );
         }
-        this.remoteRepositories = new ArrayList<ArtifactRepository>( projectBuildingRequest.getRemoteRepositories() );
+
+        this.repositoryIds = new HashSet<String>();
 
         this.reactorModelPool = reactorModelPool;
     }
 
+    private RepositoryModelResolver( RepositoryModelResolver original )
+    {
+        this.repositorySystem = original.repositorySystem;
+        this.resolutionErrorHandler = original.resolutionErrorHandler;
+        this.projectBuildingRequest = original.projectBuildingRequest;
+        this.reactorModelPool = original.reactorModelPool;
+        this.remoteRepositories = new ArrayList<ArtifactRepository>( original.remoteRepositories );
+        this.repositoryIds = new HashSet<String>( original.repositoryIds );
+    }
+
     public ModelResolver newCopy()
     {
-        return new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, projectBuildingRequest,
-                                            reactorModelPool );
+        return new RepositoryModelResolver( this );
     }
 
     public void addRepository( Repository repository )
         throws InvalidRepositoryException
     {
+        if ( !repositoryIds.add( repository.getId() ) )
+        {
+            return;
+        }
+
         try
         {
             ArtifactRepository repo = repositorySystem.buildArtifactRepository( repository );
@@ -106,7 +126,7 @@ class RepositoryModelResolver
 
             repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuildingRequest.getServers() );
 
-            remoteRepositories.add( 0, repo );
+            remoteRepositories.add( repo );
 
             remoteRepositories = repositorySystem.getEffectiveRepositories( remoteRepositories );
         }
