@@ -203,11 +203,6 @@ public class DefaultExceptionHandler
         {
             String exceptionMessage = t.getMessage();
 
-            if ( exceptionMessage == null )
-            {
-                exceptionMessage = "";
-            }
-
             if ( t instanceof AbstractMojoExecutionException )
             {
                 String longMessage = ( (AbstractMojoExecutionException) t ).getLongMessage();
@@ -219,35 +214,56 @@ public class DefaultExceptionHandler
                     }
                     else
                     {
-                        exceptionMessage += ": " + longMessage;
+                        exceptionMessage = join( exceptionMessage, longMessage );
                     }
                 }
             }
 
+            if ( StringUtils.isEmpty( exceptionMessage ) )
+            {
+                exceptionMessage = t.getClass().getSimpleName();
+            }
+
             if ( t instanceof UnknownHostException && !fullMessage.contains( "host" ) )
             {
-                if ( fullMessage.length() > 0 )
-                {
-                    fullMessage += ": ";
-                }
-                fullMessage += "Unknown host " + exceptionMessage;
+                fullMessage = join( fullMessage, "Unknown host " + exceptionMessage );
             }
             else if ( !fullMessage.contains( exceptionMessage ) )
             {
-                if ( fullMessage.length() > 0 )
-                {
-                    fullMessage += ": ";
-                }
-                fullMessage += exceptionMessage;
+                fullMessage = join( fullMessage, exceptionMessage );
             }
         }
 
-        if ( StringUtils.isEmpty( fullMessage ) && exception != null )
+        return fullMessage.trim();
+    }
+
+    private String join( String message1, String message2 )
+    {
+        String message = "";
+
+        if ( StringUtils.isNotEmpty( message1 ) )
         {
-            fullMessage = exception.toString();
+            message = message1.trim();
         }
 
-        return fullMessage.trim();
+        if ( StringUtils.isNotEmpty( message2 ) )
+        {
+            if ( StringUtils.isNotEmpty( message ) )
+            {
+                if ( message.endsWith( "." ) || message.endsWith( "!" ) || message.endsWith( ":" ) )
+                {
+                    message += " ";
+                }
+                else
+                {
+                    message += ": ";
+                }
+            }
+
+            message += message2;
+        }
+
+        return message;
     }
 
 }
