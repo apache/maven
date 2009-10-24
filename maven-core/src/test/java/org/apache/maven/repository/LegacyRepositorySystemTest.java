@@ -16,17 +16,17 @@ package org.apache.maven.repository;
  */
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
@@ -60,6 +60,33 @@ public class LegacyRepositorySystemTest
         resolutionErrorHandler = null;
         super.tearDown();
     }
+    
+    protected List<ArtifactRepository> getRemoteRepositories()
+        throws Exception
+    {
+        File repoDir = new File( getBasedir(), "src/test/remote-repo" ).getAbsoluteFile();
+
+        RepositoryPolicy policy = new RepositoryPolicy();
+        policy.setEnabled( true );
+        policy.setChecksumPolicy( "ignore" );
+        policy.setUpdatePolicy( "always" );
+
+        Repository repository = new Repository();
+        repository.setId( RepositorySystem.DEFAULT_REMOTE_REPO_ID );
+        repository.setUrl( "file://" + repoDir.toURI().getPath() );
+        repository.setReleases( policy );
+        repository.setSnapshots( policy );
+
+        return Arrays.asList( repositorySystem.buildArtifactRepository( repository ) );
+    }
+
+    protected ArtifactRepository getLocalRepository()
+        throws Exception
+    {
+        File repoDir = new File( getBasedir(), "target/local-repo" ).getAbsoluteFile();
+
+        return repositorySystem.createLocalRepository( repoDir );
+    }
 
     public void testThatASystemScopedDependencyIsNotResolvedFromRepositories()
         throws Exception
@@ -68,9 +95,9 @@ public class LegacyRepositorySystemTest
         // We should get a whole slew of dependencies resolving this artifact transitively
         //
         Dependency d = new Dependency();
-        d.setGroupId( "org.apache.maven" );
-        d.setArtifactId( "maven-core" );
-        d.setVersion( "2.1.0" );
+        d.setGroupId( "org.apache.maven.its" );
+        d.setArtifactId( "b" );
+        d.setVersion( "0.1" );
         d.setScope( Artifact.SCOPE_COMPILE );
         Artifact artifact = repositorySystem.createDependencyArtifact( d );
         
@@ -78,12 +105,12 @@ public class LegacyRepositorySystemTest
             .setArtifact( artifact )
             .setResolveRoot( true )
             .setResolveTransitively( true )
-            .setRemoteRepositories( Arrays.asList( new ArtifactRepository[]{ repositorySystem.createDefaultRemoteRepository() } ) )
-            .setLocalRepository( repositorySystem.createDefaultLocalRepository() );            
+            .setRemoteRepositories( getRemoteRepositories() )
+            .setLocalRepository( getLocalRepository() );            
                             
         ArtifactResolutionResult result = repositorySystem.resolve( request );
         resolutionErrorHandler.throwErrors( request, result );        
-        assertEquals( 45, result.getArtifacts().size() );
+        assertEquals( 2, result.getArtifacts().size() );
         
         //
         // System scoped version which should 
