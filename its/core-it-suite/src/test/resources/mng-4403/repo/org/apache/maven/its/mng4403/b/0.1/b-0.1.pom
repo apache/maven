@@ -96,6 +96,17 @@ under the License.
     </pluginRepository>
   </pluginRepositories>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.mng4405</groupId>
+        <artifactId>a</artifactId>
+        <!-- unresolvable property in plugin version (MNG-4405) -->
+        <version>${missing.property}</version>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
       <id>non-unique-id</id>
