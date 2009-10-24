@@ -28,44 +28,47 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4193">MNG-4193</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4403">MNG-4403</a>.
  * 
  * @author Benjamin Bentmann
  */
-public class MavenITmng4193UniqueRepoIdTest
+public class MavenITmng4403LenientDependencyPomParsingTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4193UniqueRepoIdTest()
+    public MavenITmng4403LenientDependencyPomParsingTest()
     {
-        super( "[3.0-alpha-3,)" );
+        super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Test that duplicate repository id cause a validation error during building.
+     * Test that dependency POMs are only subject to minimal validation during metadata retrieval, i.e. Maven should
+     * ignore most kinds of badness and make a best effort at getting the metadata.
      */
     public void testit()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4193" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4403" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        try
-        {
-            verifier.executeGoal( "validate" );
-            verifier.verifyErrorFreeLog();
-            fail( "Duplicate repository ids did not cause validation error" );
-        }
-        catch ( VerificationException e )
-        {
-            // expected
-        }
-        finally
-        {
-            verifier.resetStreams();
-        }
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4403" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        Collections.sort( artifacts );
+
+        List expected = new ArrayList();
+        expected.add( "org.apache.maven.its.mng4403:a:jar:0.1" );
+        expected.add( "org.apache.maven.its.mng4403:b:jar:0.1" );
+
+        assertEquals( expected, artifacts );
     }
 
 }

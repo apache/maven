@@ -38,19 +38,17 @@ public class MavenITmng3991ValidDependencyScopeTest
 
     public MavenITmng3991ValidDependencyScopeTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        // TODO: One day, we should be able to error out but this requires to consider extensions and their use cases
+        super( "[4.0,)" );
     }
 
     /**
      * Test that invalid dependency scopes cause a validation error during building.
      */
-    public void testitProjectBuild()
+    public void testit()
         throws Exception
     {
-        // TODO: One day, we should be able to error out but this requires to consider extensions and their use cases
-        requiresMavenVersion( "[4.0,)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3991/build" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3991" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -69,33 +67,6 @@ public class MavenITmng3991ValidDependencyScopeTest
         {
             verifier.resetStreams();
         }
-    }
-
-    /**
-     * Test that invalid dependency scopes in dependency POMs are gracefully ignored.
-     */
-    public void testitMetadataRetrieval()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3991/metadata" );
-
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3991" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        List classpath = verifier.loadLines( "target/test.txt", "UTF-8" );
-
-        assertTrue( classpath.toString(), classpath.contains( "b-0.2.jar" ) );
-
-        // In Maven 2.x, any dependency with an invalid/unrecognized scope ends up on the test class path...
-        assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );
     }
 
 }

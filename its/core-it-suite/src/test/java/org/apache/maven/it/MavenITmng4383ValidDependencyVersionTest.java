@@ -36,18 +36,16 @@ public class MavenITmng4383ValidDependencyVersionTest
 
     public MavenITmng4383ValidDependencyVersionTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
      * Test that non-interpolated dependency versions cause a validation error during building.
      */
-    public void testitProjectBuild()
+    public void testit()
         throws Exception
     {
-        requiresMavenVersion( "[3.0-alpha-3,)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4383/build" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4383" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -66,32 +64,6 @@ public class MavenITmng4383ValidDependencyVersionTest
         {
             verifier.resetStreams();
         }
-    }
-
-    /**
-     * Test that non-interpolated dependency versions in dependency POMs are gracefully ignored (as long as those
-     * dependencies are not actually resolved).
-     */
-    public void testitMetadataRetrieval()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4383/metadata" );
-
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4383" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        List classpath = verifier.loadLines( "target/test.txt", "UTF-8" );
-
-        assertTrue( classpath.toString(), classpath.contains( "b-0.2.jar" ) );
-        assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );
     }
 
 }

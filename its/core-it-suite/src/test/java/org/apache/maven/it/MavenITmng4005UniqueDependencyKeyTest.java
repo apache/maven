@@ -44,10 +44,10 @@ public class MavenITmng4005UniqueDependencyKeyTest
     /**
      * Test that duplicate dependencies cause a validation error during building.
      */
-    public void testitProjectBuild()
+    public void testit()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/build" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -66,35 +66,6 @@ public class MavenITmng4005UniqueDependencyKeyTest
         {
             verifier.resetStreams();
         }
-    }
-
-    /**
-     * Test that duplicate dependencies don't cause a validation error during metadata retrieval.
-     */
-    public void testitMetadataRetrieval()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/metadata" );
-
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4005" );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        Collections.sort( artifacts );
-
-        List expected = new ArrayList();
-        expected.add( "org.apache.maven.its.mng4005:a:jar:0.2" );
-        expected.add( "org.apache.maven.its.mng4005:b:jar:0.1" );
-
-        assertEquals( expected, artifacts );
     }
 
 }
