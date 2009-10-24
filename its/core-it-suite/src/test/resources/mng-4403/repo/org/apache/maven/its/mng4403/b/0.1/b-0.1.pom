@@ -98,7 +98,7 @@ under the License.
 
   <profiles>
     <profile>
-      <id>test</id>
+      <id>non-unique-id</id>
       <repositories>
         <!-- duplicate repository id's (MNG-4193) -->
         <repository>
@@ -120,6 +120,10 @@ under the License.
           <url>http://repo2.maven.org</url>
         </pluginRepository>
       </pluginRepositories>
+    </profile>
+    <profile>
+      <!-- non-unique profile id (MNG-4404) -->
+      <id>non-unique-id</id>
     </profile>
   </profiles>
 </project>
