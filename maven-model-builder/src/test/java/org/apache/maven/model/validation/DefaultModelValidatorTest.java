@@ -54,6 +54,12 @@ public class DefaultModelValidatorTest
         return validateEffective( pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
     }
 
+    private SimpleProblemCollector validateRaw( String pom )
+        throws Exception
+    {
+        return validateRaw( pom, ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
+    }
+
     private SimpleProblemCollector validateEffective( String pom, int level )
         throws Exception
     {
@@ -352,6 +358,16 @@ public class DefaultModelValidatorTest
         assertViolations( result, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "child" ) );
+    }
+
+    public void testDuplicateProfileId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "duplicate-profile-id.xml" );
+
+        assertViolations( result, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "non-unique-id" ) );
     }
 
 }

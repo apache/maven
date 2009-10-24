@@ -92,8 +92,16 @@ public class DefaultModelValidator
 
             validateRepositories( problems, model.getPluginRepositories(), "pluginRepositories.pluginRepository", request );
 
+            Set<String> profileIds = new HashSet<String>();
+
             for ( Profile profile : model.getProfiles() )
             {
+                if ( !profileIds.add( profile.getId() ) )
+                {
+                    addViolation( problems, false, "profiles.profile.id must be unique"
+                        + " but found duplicate profile with id " + profile.getId() );
+                }
+
                 validateDependencies( problems, profile.getDependencies(), "profiles.profile[" + profile.getId()
                     + "].dependencies.dependency", request );
 
