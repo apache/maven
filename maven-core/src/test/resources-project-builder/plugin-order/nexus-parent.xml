@@ -11,7 +11,7 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexus.version}</version>
+          <version>1.4.0</version>
         </plugin>
         </plugins>
     </pluginManagement>

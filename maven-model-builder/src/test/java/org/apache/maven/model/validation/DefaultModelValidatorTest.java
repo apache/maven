@@ -370,4 +370,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getErrors().get( 0 ).contains( "non-unique-id" ) );
     }
 
+    public void testBadPluginVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-plugin-version.xml" );
+
+        assertViolations( result, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:mip" ) );
+    }
+
 }

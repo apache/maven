@@ -271,6 +271,8 @@ public class DefaultModelValidator
                     validateStringNotEmpty( "build.plugins.plugin.version", problems, warnOnMissingPluginVersion,
                                             p.getVersion(), p.getKey() );
 
+                    validateVersion( "build.plugins.plugin.version", problems, warnOnly, p.getVersion(), p.getKey() );
+
                     validateBoolean( "build.plugins.plugin.inherited", problems, warnOnly, p.getInherited(),
                                      p.getKey() );
 
