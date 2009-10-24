@@ -344,4 +344,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
     }
 
+    public void testDuplicateModule()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "duplicate-module.xml" );
+
+        assertViolations( result, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "child" ) );
+    }
+
 }

@@ -22,8 +22,10 @@ package org.apache.maven.model.validation;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -237,6 +239,15 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            Set<String> modules = new HashSet<String>();
+            for ( String module : model.getModules() )
+            {
+                if ( !modules.add( module ) )
+                {
+                    addViolation( problems, false, "Duplicate child module: " + module );
+                }
+            }
+
             boolean warnOnMissingPluginVersion =
                 request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1;
 
