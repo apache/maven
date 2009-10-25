@@ -602,6 +602,9 @@ under the License.
                 <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                 <link>http://jakarta.apache.org/regexp/apidocs/</link>
                 <link>http://velocity.apache.org/engine/releases/velocity-1.5/apidocs/</link>
+                <link>http://plexus.codehaus.org/plexus-utils/apidocs/</link>
+                <link>http://plexus.codehaus.org/plexus-classworlds/apidocs/</link>
+                <link>http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/</link>
               </links>
               <aggregate>true</aggregate>
             </configuration>
