@@ -198,7 +198,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing." ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing" ) > -1 );
     }
 
     public void testMissingDependencyGroupId()
@@ -208,7 +208,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.groupId' is missing." ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.groupId' is missing" ) > -1 );
     }
 
     public void testMissingDependencyVersion()
@@ -229,7 +229,7 @@ public class DefaultModelValidatorTest
         assertViolations( result, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf(
-                                                         "'dependencyManagement.dependencies.dependency.artifactId' is missing." ) > -1 );
+                                                         "'dependencyManagement.dependencies.dependency.artifactId' is missing" ) > -1 );
     }
 
     public void testMissingDependencyManagementGroupId()
@@ -240,7 +240,7 @@ public class DefaultModelValidatorTest
         assertViolations( result, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf(
-                                                         "'dependencyManagement.dependencies.dependency.groupId' is missing." ) > -1 );
+                                                         "'dependencyManagement.dependencies.dependency.groupId' is missing" ) > -1 );
     }
 
     public void testMissingAll()

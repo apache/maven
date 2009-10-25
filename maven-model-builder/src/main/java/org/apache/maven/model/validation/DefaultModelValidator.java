@@ -153,9 +153,9 @@ public class DefaultModelValidator
 
         for ( Dependency d : model.getDependencies() )
         {
-            validateId( "dependencies.dependency.artifactId", problems, d.getArtifactId() );
+            validateId( "dependencies.dependency.artifactId", problems, d.getArtifactId(), d.getManagementKey() );
 
-            validateId( "dependencies.dependency.groupId", problems, d.getGroupId() );
+            validateId( "dependencies.dependency.groupId", problems, d.getGroupId(), d.getManagementKey() );
 
             validateStringNotEmpty( "dependencies.dependency.type", problems, false, d.getType(), d.getManagementKey() );
 
@@ -168,21 +168,22 @@ public class DefaultModelValidator
 
                 if ( StringUtils.isEmpty( systemPath ) )
                 {
-                    addViolation( problems, false, "For dependency " + d + ": system-scoped dependency must specify systemPath." );
+                    addViolation( problems, false, "For dependency " + d.getManagementKey()
+                        + ": system-scoped dependency must specify systemPath." );
                 }
                 else
                 {
                     if ( !new File( systemPath ).isAbsolute() )
                     {
-                        addViolation( problems, false, "For dependency " + d + ": system-scoped dependency must "
-                            + "specify an absolute path systemPath." );
+                        addViolation( problems, false, "For dependency " + d.getManagementKey()
+                            + ": system-scoped dependency must specify an absolute systemPath but is " + systemPath );
                     }
                 }
             }
             else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
             {
-                addViolation( problems, false,
-                    "For dependency " + d + ": only dependency with system scope can specify systemPath." );
+                addViolation( problems, false, "For dependency " + d.getManagementKey()
+                    + ": only dependency with system scope can specify systemPath." );
             }
 
             if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
@@ -207,11 +208,11 @@ public class DefaultModelValidator
         {
             for ( Dependency d : mgmt.getDependencies() )
             {
-                validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.artifactId", problems,
-                                                  d.getArtifactId() );
+                validateStringNotEmpty( "dependencyManagement.dependencies.dependency.artifactId", problems, false,
+                                        d.getArtifactId(), d.getManagementKey() );
 
-                validateSubElementStringNotEmpty( d, "dependencyManagement.dependencies.dependency.groupId", problems,
-                                                  d.getGroupId() );
+                validateStringNotEmpty( "dependencyManagement.dependencies.dependency.groupId", problems, false,
+                                        d.getGroupId(), d.getManagementKey() );
 
                 if ( "system".equals( d.getScope() ) )
                 {
@@ -219,22 +220,23 @@ public class DefaultModelValidator
 
                     if ( StringUtils.isEmpty( systemPath ) )
                     {
-                        addViolation( problems, false,
-                            "For managed dependency " + d + ": system-scoped dependency must specify systemPath." );
+                        addViolation( problems, false, "For managed dependency " + d.getManagementKey()
+                            + ": system-scoped dependency must specify systemPath." );
                     }
                     else
                     {
                         if ( !new File( systemPath ).isAbsolute() )
                         {
-                            addViolation( problems, false, "For managed dependency " + d + ": system-scoped dependency must "
-                                + "specify an absolute path systemPath." );
+                            addViolation( problems, false, "For managed dependency " + d.getManagementKey()
+                                + ": system-scoped dependency must specify an absolute systemPath but is "
+                                + systemPath );
                         }
                     }
                 }
                 else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
                 {
-                    addViolation( problems, false,
-                        "For managed dependency " + d + ": only dependency with system scope can specify systemPath." );
+                    addViolation( problems, false, "For managed dependency " + d.getManagementKey()
+                        + ": only dependency with system scope can specify systemPath." );
                 }
 
                 if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
@@ -331,7 +333,12 @@ public class DefaultModelValidator
 
     private boolean validateId( String fieldName, ModelProblemCollector problems, String id )
     {
-        if ( !validateStringNotEmpty( fieldName, problems, false, id ) )
+        return validateId( fieldName, problems, id, null );
+    }
+
+    private boolean validateId( String fieldName, ModelProblemCollector problems, String id, String sourceHint )
+    {
+        if ( !validateStringNotEmpty( fieldName, problems, false, id, sourceHint ) )
         {
             return false;
         }
@@ -340,7 +347,9 @@ public class DefaultModelValidator
             boolean match = id.matches( ID_REGEX );
             if ( !match )
             {
-                addViolation( problems, false, "'" + fieldName + "' with value '" + id + "' does not match a valid id pattern." );
+                addViolation( problems, false, "'" + fieldName + "'"
+                    + ( sourceHint != null ? " for " + sourceHint : "" ) + " with value '" + id
+                    + "' does not match a valid id pattern." );
             }
             return match;
         }
@@ -519,32 +528,6 @@ public class DefaultModelValidator
      * <p/>
      * <ul>
      * <li><code>string != null</code>
-     * <li><code>string.length > 0</code>
-     * </ul>
-     */
-    private boolean validateSubElementStringNotEmpty( Object subElementInstance, String fieldName,
-                                                      ModelProblemCollector problems, String string )
-    {
-        if ( !validateSubElementNotNull( subElementInstance, fieldName, problems, string ) )
-        {
-            return false;
-        }
-
-        if ( string.length() > 0 )
-        {
-            return true;
-        }
-
-        addViolation( problems, false, "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
-
-        return false;
-    }
-
-    /**
-     * Asserts:
-     * <p/>
-     * <ul>
-     * <li><code>string != null</code>
      * </ul>
      */
     private boolean validateNotNull( String fieldName, ModelProblemCollector problems, boolean warning, Object object, String sourceHint )
@@ -562,26 +545,6 @@ public class DefaultModelValidator
         {
             addViolation( problems, warning, "'" + fieldName + "' is missing." );
         }
-
-        return false;
-    }
-
-    /**
-     * Asserts:
-     * <p/>
-     * <ul>
-     * <li><code>string != null</code>
-     * </ul>
-     */
-    private boolean validateSubElementNotNull( Object subElementInstance, String fieldName,
-                                               ModelProblemCollector problems, Object object )
-    {
-        if ( object != null )
-        {
-            return true;
-        }
-
-        addViolation( problems, false, "In " + subElementInstance + ":\n\n       -> '" + fieldName + "' is missing." );
 
         return false;
     }
