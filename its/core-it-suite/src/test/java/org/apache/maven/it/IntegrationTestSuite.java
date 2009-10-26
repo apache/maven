@@ -245,6 +245,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3811ReportingPluginConfigurationInheritanceTest.class );
         suite.addTestSuite( MavenITmng3810BadProfileActivationTest.class );
         suite.addTestSuite( MavenITmng3808ReportInheritenceOrderingTest.class );
+        suite.addTestSuite( MavenITmng3807PluginConfigExpressionEvaluationTest.class );
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
         suite.addTestSuite( MavenITmng3769ExclusionRelocatedTransdepsTest.class );
