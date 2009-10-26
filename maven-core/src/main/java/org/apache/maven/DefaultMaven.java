@@ -34,6 +34,8 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
@@ -76,6 +78,9 @@ public class DefaultMaven
     @Requirement
     protected PlexusContainer container;
 
+    @Requirement
+    MavenExecutionRequestPopulator populator;
+    
     private void fireEvent( MavenSession session, ExecutionEventCatapult catapult )
     {
         ExecutionListener listener = session.getRequest().getExecutionListener();
@@ -94,9 +99,13 @@ public class DefaultMaven
 
         try
         {
-            result = doExecute( request );
+            result = doExecute( populator.populateDefaults( request ) );
         }
         catch ( OutOfMemoryError e )
+        {
+            result = processResult( new DefaultMavenExecutionResult(), e );
+        }
+        catch ( MavenExecutionRequestPopulationException e )
         {
             result = processResult( new DefaultMavenExecutionResult(), e );
         }
