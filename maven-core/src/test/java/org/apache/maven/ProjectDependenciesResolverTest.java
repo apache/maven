@@ -38,6 +38,7 @@ public class ProjectDependenciesResolverTest
         return "src/test/projects/project-dependencies-resolver";
     }
 
+    /*
     public void testExclusionsInDependencies()
         throws Exception
     {
@@ -59,6 +60,7 @@ public class ProjectDependenciesResolverTest
         assertEquals( 1, artifactDependencies.size() );
         assertEquals( "b", artifactDependencies.iterator().next().getArtifactId() );
     }
+    */
     
     public void testSystemScopeDependencies()
         throws Exception

@@ -24,7 +24,6 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector;
 
 /**
  * Specific problems during resolution that we want to account for:

@@ -38,7 +38,6 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
@@ -1583,7 +1582,7 @@ public class MavenProject
             DependencyManagement dependencyManagement = getDependencyManagement();
             if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) && ( deps.size() > 0 ) )
             {
-                map = new ManagedVersionMap( map );
+                map = new HashMap<String, Artifact>();
                 for ( Iterator<Dependency> i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
                 {
                     Dependency d = i.next();
@@ -1928,7 +1927,7 @@ public class MavenProject
 
         if ( project.getManagedVersionMap() != null )
         {
-            setManagedVersionMap( new ManagedVersionMap( project.getManagedVersionMap() ) );
+            setManagedVersionMap( new HashMap<String, Artifact>( project.getManagedVersionMap() ) );
         }
     }
 

@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -121,7 +120,6 @@ public class MavenProjectTest
         Map clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
         assertTrue( "ManagedVersionMap is empty", !clonedMap.isEmpty() );
-        assertTrue( "Not a ManagedVersionMap", clonedMap instanceof ManagedVersionMap );
         assertTrue( "ManagedVersionMap does not contain test key",
                     clonedMap.containsKey( "maven-test:maven-test-b:jar" ) );
     }

@@ -40,6 +40,18 @@
       <artifactId>maven-artifact</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>
@@ -54,11 +66,6 @@
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http-lightweight</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -81,7 +88,6 @@
         <configuration>
           <version>1.0.0</version>
           <models>
-            <model>src/main/mdo/metadata.mdo</model>
             <model>src/main/mdo/profiles.mdo</model>
             <model>src/main/mdo/paramdoc.mdo</model>
           </models>

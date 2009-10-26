@@ -133,8 +133,6 @@ public interface RepositorySystem
 
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
-    MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request );
-    
     // Install
     
     // Deploy

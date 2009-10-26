@@ -28,13 +28,12 @@
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-compat</artifactId>
+      <artifactId>maven-settings</artifactId>
     </dependency>
-    <!--
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-repository</artifactId>
-    </dependency>         -->
+      <artifactId>maven-artifact</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
@@ -43,13 +42,6 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model-builder</artifactId>
     </dependency>
-    <!--
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-toolchain</artifactId>
-      <scope>test</scope>
-    </dependency>
-    -->
     <!-- Plexus -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -80,11 +72,6 @@
       <artifactId>commons-jxpath</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-file</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <resources>
@@ -105,6 +92,7 @@
           <version>1.0.0</version>
           <models>
             <model>src/main/mdo/toolchains.mdo</model>
+            <model>src/main/mdo/metadata.mdo</model>
           </models>
         </configuration>
       </plugin>

@@ -21,9 +21,7 @@ package org.apache.maven.project;
 
 import java.io.File;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.project.validation.ModelValidationResult;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 @Deprecated
 public class InvalidProjectModelException
@@ -66,42 +64,6 @@ public class InvalidProjectModelException
     public InvalidProjectModelException( String projectId, String pomLocation, String message )
     {
         this( projectId, message, new File( pomLocation ) );
-    }
-
-
-    /**
-     * @deprecated use {@link File} constructor for pomLocation
-     */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message,
-                                         InvalidRepositoryException cause )
-    {
-        this( projectId, message, new File( pomLocation ), cause );
-    }
-
-    public InvalidProjectModelException( String projectId, String message, File pomLocation,
-                                         InvalidRepositoryException cause )
-    {
-        super( projectId, message, pomLocation, cause );
-    }
-
-    /**
-     * @deprecated use {@link File} constructor for pomLocation
-     */
-    public InvalidProjectModelException( String projectId, String pomLocation, String message,
-                                         XmlPullParserException cause )
-    {
-        this( projectId, message, new File( pomLocation ), cause );
-    }
-
-    public InvalidProjectModelException( String projectId, String message, File pomFile, XmlPullParserException cause )
-    {
-        super( projectId, message, pomFile, cause );
-    }
-
-    // for super-POM building.
-    public InvalidProjectModelException( String projectId, String message, XmlPullParserException cause )
-    {
-        super( projectId, message, cause );
     }
 
     public final ModelValidationResult getValidationResult()

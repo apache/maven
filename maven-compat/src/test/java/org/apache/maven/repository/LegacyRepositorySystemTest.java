@@ -28,7 +28,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.legacy.LegacyRepositorySystem;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**

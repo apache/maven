@@ -31,7 +31,7 @@ import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = ArtifactMetadataSource.class)
+@Component(role = ArtifactMetadataSource.class, hint="test")
 public class TestMetadataSource
     implements ArtifactMetadataSource
 {

@@ -31,19 +31,18 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
@@ -60,15 +59,13 @@ public class PluginParameterExpressionEvaluatorTest
 {
     private static final String FS = System.getProperty( "file.separator" );
 
-    private ArtifactFactory factory;
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
+    private RepositorySystem factory;
 
     public void setUp()
         throws Exception
     {
         super.setUp();
-        factory = lookup( ArtifactFactory.class );
-        artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
+        factory = lookup( RepositorySystem.class );
     }
 
     @Override
@@ -100,12 +97,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         MojoExecution exec = newMojoExecution();
 
-        Artifact depArtifact = factory.createDependencyArtifact( "group",
-                                                                 "artifact",
-                                                                 VersionRange.createFromVersion( "1" ),
-                                                                 "jar",
-                                                                 null,
-                                                                 Artifact.SCOPE_COMPILE );
+        Artifact depArtifact = createArtifact( "group", "artifact", "1" );
 
         List<Artifact> deps = new ArrayList<Artifact>();
         deps.add( depArtifact );
@@ -128,12 +120,7 @@ public class PluginParameterExpressionEvaluatorTest
     {
         MojoExecution exec = newMojoExecution();
 
-        Artifact depArtifact = factory.createDependencyArtifact( "group",
-                                                                 "artifact",
-                                                                 VersionRange.createFromVersion( "1" ),
-                                                                 "jar",
-                                                                 null,
-                                                                 Artifact.SCOPE_COMPILE );
+        Artifact depArtifact = createArtifact( "group", "artifact", "1" );
 
         List<Artifact> deps = new ArrayList<Artifact>();
         deps.add( depArtifact );
@@ -399,9 +386,7 @@ public class PluginParameterExpressionEvaluatorTest
     private ExpressionEvaluator createExpressionEvaluator( MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties )
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "default" );
-
-        ArtifactRepository repo = artifactRepositoryFactory.createArtifactRepository( "local", "target/repo", repoLayout, null, null );
+        ArtifactRepository repo = factory.createDefaultLocalRepository();
 
         MutablePlexusContainer container = (MutablePlexusContainer) getContainer();
         MavenSession session = createSession( container, repo, executionProperties );
@@ -416,15 +401,17 @@ public class PluginParameterExpressionEvaluatorTest
         return new PluginParameterExpressionEvaluator( session, mojoExecution );
     }
 
-    protected Artifact createArtifact( String groupId,
-                                       String artifactId,
-                                       String version )
+    protected Artifact createArtifact( String groupId, String artifactId, String version )
         throws Exception
     {
-        ArtifactFactory artifactFactory = lookup( ArtifactFactory.class );
+        Dependency dependency = new Dependency();
+        dependency.setGroupId( groupId );
+        dependency.setArtifactId( artifactId );
+        dependency.setVersion( version );
+        dependency.setType( "jar" );
+        dependency.setScope( "compile" );
 
-        // TODO: used to be SCOPE_COMPILE, check
-        return artifactFactory.createBuildArtifact( groupId, artifactId, version, "jar" );
+        return factory.createDependencyArtifact( dependency );
     }
 
     private MojoExecution newMojoExecution()
@@ -454,4 +441,5 @@ public class PluginParameterExpressionEvaluatorTest
         // TODO Auto-generated method stub
         return null;
     }
+
 }
