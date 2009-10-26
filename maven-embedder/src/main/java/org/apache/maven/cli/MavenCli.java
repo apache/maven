@@ -36,6 +36,7 @@ import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.repository.ArtifactTransferListener;
@@ -83,12 +84,14 @@ public class MavenCli
     private ModelProcessor modelProcessor;
 
     private Maven maven;
-    
+
+    private MavenExecutionRequestPopulator executionRequestPopulator;
+
     private SettingsBuilder settingsBuilder;            
     
     private DefaultSecDispatcher dispatcher;
 
-    private enum Exit { EXIT_WITH_ERROR, EXIT_WITHOUT_ERROR }
+    private enum Exit { EXIT_WITHOUT_ERROR, EXIT_WITH_ERROR }
     
     public static void main( String[] args )
     {
@@ -144,6 +147,17 @@ public class MavenCli
 
     private void initialize( CliRequest cliRequest )
     {
+        if ( cliRequest.stdout == null )
+        {
+            cliRequest.stdout = System.out;
+        }
+        if ( cliRequest.stderr == null )
+        {
+            cliRequest.stderr = System.err;
+        }       
+        
+        logger = new PrintStreamLogger( cliRequest.stdout );
+
         if ( cliRequest.workingDirectory == null )
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
@@ -166,17 +180,28 @@ public class MavenCli
     //
     private void logging( CliRequest cliRequest )
     {   
-        if ( cliRequest.stdout == null )
+        cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
+        cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
+        cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
+
+        if ( cliRequest.debug )
         {
-            cliRequest.stdout = System.out;
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
         }
-        if ( cliRequest.stderr == null )
+        else if ( cliRequest.quiet )
         {
-            cliRequest.stderr = System.err;
-        }       
-        
-        logger = new PrintStreamLogger( System.out );
-                
+            // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
+            // Ideally, we could use Warn across the board
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
+            // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+        }
+        else
+        {
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
+        }
+
+        logger.setThreshold( cliRequest.request.getLoggingLevel() );
+
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
@@ -204,37 +229,33 @@ public class MavenCli
     //
     // Every bit of information taken from the CLI should be processed here.
     //
-    private void cli( CliRequest request )
+    private void cli( CliRequest cliRequest )
     {
         CLIManager cliManager = new CLIManager();
 
         try
         {
-            request.commandLine = cliManager.parse( request.args );
+            cliRequest.commandLine = cliManager.parse( cliRequest.args );
         }
         catch ( ParseException e )
         {
-            request.stderr.println( "Unable to parse command line options: " + e.getMessage() );
-            cliManager.displayHelp( request.stdout );
-            request.exit = Exit.EXIT_WITH_ERROR;
+            cliRequest.stderr.println( "Unable to parse command line options: " + e.getMessage() );
+            cliManager.displayHelp( cliRequest.stdout );
+            cliRequest.exit = Exit.EXIT_WITH_ERROR;
         }
-
-        request.debug = request.commandLine.hasOption( CLIManager.DEBUG );
-        request.quiet = !request.debug && request.commandLine.hasOption( CLIManager.QUIET );
-        request.showErrors = request.debug || request.commandLine.hasOption( CLIManager.ERRORS );
 
         // TODO: these should be moved out of here. Wrong place.
         //
-        if ( request.commandLine.hasOption( CLIManager.HELP ) )
+        if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
-            cliManager.displayHelp( request.stdout );
-            request.exit = Exit.EXIT_WITHOUT_ERROR;
+            cliManager.displayHelp( cliRequest.stdout );
+            cliRequest.exit = Exit.EXIT_WITHOUT_ERROR;
         }
 
-        if ( request.commandLine.hasOption( CLIManager.VERSION ) )
+        if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            CLIReportingUtils.showVersion( request.stdout );
-            request.exit = Exit.EXIT_WITHOUT_ERROR;
+            CLIReportingUtils.showVersion( cliRequest.stdout );
+            cliRequest.exit = Exit.EXIT_WITHOUT_ERROR;
         }        
     }    
         
@@ -277,13 +298,15 @@ public class MavenCli
 
         DefaultPlexusContainer container = new DefaultPlexusContainer( cc );
 
-        container.setLoggerManager( new MavenLoggerManager( new PrintStreamLogger( System.out ) ) );
+        container.setLoggerManager( new MavenLoggerManager( logger ) );
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
         
         customizeContainer( container );
 
         maven = container.lookup( Maven.class );
+
+        executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
 
         modelProcessor = createModelProcessor( container );
 
@@ -474,6 +497,8 @@ public class MavenCli
         settingsRequest.setUserProperties( cliRequest.request.getUserProperties() );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
+
+        executionRequestPopulator.populateFromSettings( cliRequest.request, settingsResult.getEffectiveSettings() );
 
         if ( !settingsResult.getProblems().isEmpty() && logger.isWarnEnabled() )
         {

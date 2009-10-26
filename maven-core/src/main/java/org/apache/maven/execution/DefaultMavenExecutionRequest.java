@@ -116,7 +116,7 @@ public class DefaultMavenExecutionRequest
 
     private int loggingLevel = LOGGING_LEVEL_INFO;
 
-    private String globalChecksumPolicy = CHECKSUM_POLICY_WARN;
+    private String globalChecksumPolicy;
 
     private boolean updateSnapshots = false;
 
