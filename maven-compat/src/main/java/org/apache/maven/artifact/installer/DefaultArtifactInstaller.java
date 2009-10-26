@@ -97,7 +97,7 @@ public class DefaultArtifactInstaller
             if ( localRepositoryMaintainer != null )
             {
                 LocalRepositoryMaintainerEvent event =
-                    new DefaultLocalRepositoryMaintainerEvent( artifact, destination );
+                    new DefaultLocalRepositoryMaintainerEvent( localRepository, artifact, destination );
                 localRepositoryMaintainer.artifactInstalled( event );
             }
         }

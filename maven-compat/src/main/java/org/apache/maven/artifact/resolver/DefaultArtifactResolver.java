@@ -38,6 +38,9 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.repository.DefaultLocalRepositoryMaintainerEvent;
+import org.apache.maven.repository.LocalRepositoryMaintainer;
+import org.apache.maven.repository.LocalRepositoryMaintainerEvent;
 import org.apache.maven.repository.legacy.TransferListenerAdapter;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadata;
@@ -85,6 +88,9 @@ public class DefaultArtifactResolver
     
     @Requirement
     private PlexusContainer container;
+
+    @Requirement( optional = true )
+    private LocalRepositoryMaintainer localRepositoryMaintainer;
     
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
@@ -176,6 +182,14 @@ public class DefaultArtifactResolver
                     {
                         wagonManager.getArtifact( artifact, remoteRepositories, downloadMonitor, request.isForceUpdate() );
                     }
+
+                    if ( localRepositoryMaintainer != null )
+                    {
+                        LocalRepositoryMaintainerEvent event =
+                            new DefaultLocalRepositoryMaintainerEvent( localRepository, artifact, null );
+                        localRepositoryMaintainer.artifactDownloaded( event );
+                    }
+
                 }
                 catch ( ResourceDoesNotExistException e )
                 {

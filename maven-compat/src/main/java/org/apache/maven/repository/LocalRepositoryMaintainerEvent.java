@@ -21,6 +21,8 @@ package org.apache.maven.repository;
 
 import java.io.File;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
 /**
  * Describes an event to be consumed by {@link LocalRepositoryMaintainer}.
  * 
@@ -28,6 +30,13 @@ import java.io.File;
  */
 public interface LocalRepositoryMaintainerEvent
 {
+
+    /**
+     * The local ArtifactRepository instance that generated the event.
+     * 
+     * @return Source artifact repository, never {@code null}.
+     */
+    ArtifactRepository getLocalRepository();
 
     /**
      * The group id of the artifact.

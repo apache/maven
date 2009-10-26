@@ -30,9 +30,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.repository.DefaultLocalRepositoryMaintainerEvent;
-import org.apache.maven.repository.LocalRepositoryMaintainer;
-import org.apache.maven.repository.LocalRepositoryMaintainerEvent;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -76,9 +73,6 @@ public class DefaultWagonManager
     @Requirement
     private UpdateCheckManager updateCheckManager;
 
-    @Requirement( optional = true )
-    private LocalRepositoryMaintainer localRepositoryMaintainer;
-
     //
     // Retriever
     //   
@@ -105,13 +99,6 @@ public class DefaultWagonManager
                 {
                     getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor,
                                    policy.getChecksumPolicy(), false );
-
-                    if ( localRepositoryMaintainer != null )
-                    {
-                        LocalRepositoryMaintainerEvent event =
-                            new DefaultLocalRepositoryMaintainerEvent( artifact, null );
-                        localRepositoryMaintainer.artifactDownloaded( event );
-                    }
                 }
                 finally
                 {

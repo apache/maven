@@ -22,6 +22,7 @@ package org.apache.maven.repository;
 import java.io.File;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Describes an event to be consumed by {@link LocalRepositoryMaintainer}.
@@ -31,15 +32,22 @@ import org.apache.maven.artifact.Artifact;
 public class DefaultLocalRepositoryMaintainerEvent
     implements LocalRepositoryMaintainerEvent
 {
+    private ArtifactRepository localRepository;
 
     private Artifact artifact;
 
     private File file;
 
-    public DefaultLocalRepositoryMaintainerEvent( Artifact artifact, File file )
+    public DefaultLocalRepositoryMaintainerEvent( ArtifactRepository localRepository, Artifact artifact, File file )
     {
+        this.localRepository = localRepository;
         this.artifact = artifact;
         this.file = ( file != null ) ? file : artifact.getFile();
+    }
+
+    public ArtifactRepository getLocalRepository()
+    {
+        return localRepository;
     }
 
     public String getGroupId()
