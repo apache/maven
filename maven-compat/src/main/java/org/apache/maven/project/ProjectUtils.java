@@ -20,13 +20,16 @@ package org.apache.maven.project;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -53,28 +56,31 @@ public final class ProjectUtils
             remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, c ) );
         }
 
-        /*
-         * FIXME: The bad dependency relation between maven-core and maven-compat prevents access to LegacySupport here
-         * which is required to get the mirror&authentication settings from the session/request.
-         */
-
         return remoteRepositories;
     }
 
     public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
-        /*
-         * FIXME: The bad dependency relation between maven-core and maven-compat prevents access to LegacySupport here
-         * which is required to get the authentication settings from the session/request.
-         */
-        return rs( c ).buildArtifactRepository( repo );
+        return buildArtifactRepository( repo, artifactRepositoryFactory, c );
     }
 
     public static ArtifactRepository buildArtifactRepository( Repository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
-        return rs( c  ).buildArtifactRepository( repo );        
+        RepositorySystem repositorySystem = rs( c );
+        MavenExecutionRequest executionRequest = er( c );
+
+        ArtifactRepository repository = repositorySystem.buildArtifactRepository( repo );
+
+        if ( executionRequest != null )
+        {
+            repositorySystem.injectMirror( Arrays.asList( repository ), executionRequest.getMirrors() );
+            repositorySystem.injectProxy( Arrays.asList( repository ), executionRequest.getProxies() );
+            repositorySystem.injectAuthentication( Arrays.asList( repository ), executionRequest.getServers() );
+        }
+
+        return repository;
     }
 
     private static RepositorySystem rs( PlexusContainer c )
@@ -82,6 +88,27 @@ public final class ProjectUtils
         try
         {
             return c.lookup( RepositorySystem.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new IllegalStateException( e );
+        }
+    }
+
+    private static MavenExecutionRequest er( PlexusContainer c )
+    {
+        try
+        {
+            LegacySupport legacySupport = c.lookup( LegacySupport.class );
+
+            if ( legacySupport.getSession() != null )
+            {
+                return legacySupport.getSession().getRequest();
+            }
+            else
+            {
+                return null;
+            }
         }
         catch ( ComponentLookupException e )
         {
