@@ -34,7 +34,8 @@ public class MavenITmng4148DepPomInterpWithSettingsProfilesTest
 
     public MavenITmng4148DepPomInterpWithSettingsProfilesTest()
     {
-        super( "(2.2.1,]" );
+        // TODO: Disabled for 3.x due to its controversial effects, see also http://www.mail-archive.com/dev@maven.apache.org/msg82166.html
+        super( "(2.2.1,3.0-alpha-1)" );
     }
 
     /**
