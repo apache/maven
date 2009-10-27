@@ -79,6 +79,11 @@ public class MavenCli
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
+    private ClassWorld classWorld;
+
+    // Per-instance container supports fast embedded execution of core ITs
+    private DefaultPlexusContainer container;
+
     private PrintStreamLogger logger;
 
     private ModelProcessor modelProcessor;
@@ -90,6 +95,17 @@ public class MavenCli
     private SettingsBuilder settingsBuilder;            
     
     private DefaultSecDispatcher dispatcher;
+
+    public MavenCli()
+    {
+        this( null );
+    }
+
+    // This supports painless invocation by the Verifier during embedded execution of the core ITs
+    public MavenCli( ClassWorld classWorld )
+    {
+        this.classWorld = classWorld;
+    }
 
     public static void main( String[] args )
     {
@@ -110,6 +126,17 @@ public class MavenCli
     {
         MavenCli cli = new MavenCli();
         return cli.doMain( new CliRequest( args, classWorld ) );
+    }
+
+    // This supports painless invocation by the Verifier during embedded execution of the core ITs
+    public int doMain( String[] args, String workingDirectory, PrintStream stdout, PrintStream stderr )
+    {
+        CliRequest cliRequest = new CliRequest( args, classWorld );
+        cliRequest.workingDirectory = workingDirectory;
+        cliRequest.stdout = stdout;
+        cliRequest.stderr = stderr;
+
+        return doMain( cliRequest );
     }
 
     // TODO: need to externalize CliRequest
@@ -157,8 +184,15 @@ public class MavenCli
         {
             cliRequest.stderr = System.err;
         }
-        
-        logger = new PrintStreamLogger( cliRequest.stdout );
+
+        if ( logger == null )
+        {
+            logger = new PrintStreamLogger( cliRequest.stdout );
+        }
+        else
+        {
+            logger.setStream( cliRequest.stdout );
+        }
 
         if ( cliRequest.workingDirectory == null )
         {
@@ -295,17 +329,27 @@ public class MavenCli
             cliRequest.classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
         }
 
-        ContainerConfiguration cc = new DefaultContainerConfiguration()
-            .setClassWorld( cliRequest.classWorld )
-            .setName( "maven" );
+        DefaultPlexusContainer container = this.container;
 
-        DefaultPlexusContainer container = new DefaultPlexusContainer( cc );
+        if ( container == null )
+        {
+            ContainerConfiguration cc = new DefaultContainerConfiguration()
+                .setClassWorld( cliRequest.classWorld )
+                .setName( "maven" );
 
-        container.setLoggerManager( new MavenLoggerManager( logger ) );
+            container = new DefaultPlexusContainer( cc );
 
-        container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
-        
-        customizeContainer( container );
+            container.setLoggerManager( new MavenLoggerManager( logger ) );
+
+            container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+
+            customizeContainer( container );
+
+            if ( cliRequest.classWorld == classWorld )
+            {
+                this.container = container;
+            }
+        }
 
         maven = container.lookup( Maven.class );
 
