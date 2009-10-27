@@ -18,6 +18,7 @@ package org.apache.maven.artifact.factory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.VersionRange;
 
+@Deprecated
 public interface ArtifactFactory
 {
     @Deprecated
