@@ -114,7 +114,7 @@ public class ResolveMojo
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "Failed to resolve artifacts", e );
+            throw new MojoExecutionException( "Failed to resolve artifacts: " + e.getMessage(), e );
         }
     }
 

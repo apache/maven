@@ -89,7 +89,7 @@ public class DeployMojo
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "Failed to deploy artifacts", e );
+            throw new MojoExecutionException( "Failed to deploy artifacts: " + e.getMessage(), e );
         }
     }
 
