@@ -71,6 +71,11 @@ under the License.
           <field-name>localRepositoryMaintainer</field-name>
           <optional>true</optional>
         </requirement>
+        <requirement>
+          <role>org.apache.maven.plugin.LegacySupport</role>
+          <role-hint>default</role-hint>
+          <field-name>legacySupport</field-name>
+        </requirement>
       </requirements>
     </component>
   </components>

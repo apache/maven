@@ -38,6 +38,8 @@ import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.DefaultLocalRepositoryMaintainerEvent;
 import org.apache.maven.repository.LocalRepositoryMaintainer;
 import org.apache.maven.repository.LocalRepositoryMaintainerEvent;
@@ -91,11 +93,25 @@ public class DefaultArtifactResolver
 
     @Requirement( optional = true )
     private LocalRepositoryMaintainer localRepositoryMaintainer;
-    
+
+    @Requirement
+    private LegacySupport legacySupport;
+
+    private void injectSession( RepositoryRequest request )
+    {
+        MavenSession session = legacySupport.getSession();
+
+        if ( session != null )
+        {
+            request.setOffline( session.isOffline() );
+        }
+    }
+
     public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener resolutionListener )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
+        injectSession( request );
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         resolve( artifact, request, resolutionListener, false );
@@ -105,6 +121,7 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
+        injectSession( request );
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         resolve( artifact, request, null, true );
@@ -356,6 +373,8 @@ public class DefaultArtifactResolver
             .setRemoteRepositories( remoteRepositories )
             .setCollectionFilter( filter )
             .setListeners( listeners );
+
+        injectSession( request );
 
         return resolveWithExceptions( request );
     }
