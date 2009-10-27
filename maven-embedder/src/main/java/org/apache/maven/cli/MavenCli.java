@@ -91,8 +91,6 @@ public class MavenCli
     
     private DefaultSecDispatcher dispatcher;
 
-    private enum Exit { EXIT_WITHOUT_ERROR, EXIT_WITH_ERROR }
-    
     public static void main( String[] args )
     {
         int result = main( args, null );
@@ -113,7 +111,7 @@ public class MavenCli
         MavenCli cli = new MavenCli();
         return cli.doMain( new CliRequest( args, classWorld ) );
     }
-        
+
     // TODO: need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
@@ -130,8 +128,12 @@ public class MavenCli
             encryption( cliRequest );                                    
             return execute( cliRequest );
         }
+        catch( ExitException e )
+        {
+            return e.exitCode;
+        }
         catch( Exception e )
-        {            
+        {
             CLIReportingUtils.showError( logger, "Error executing Maven.", e, cliRequest.showErrors );
             
             return 1;
@@ -154,14 +156,14 @@ public class MavenCli
         if ( cliRequest.stderr == null )
         {
             cliRequest.stderr = System.err;
-        }       
+        }
         
         logger = new PrintStreamLogger( cliRequest.stdout );
 
         if ( cliRequest.workingDirectory == null )
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
-        }                               
+        }
         
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
@@ -172,14 +174,14 @@ public class MavenCli
         if ( mavenHome != null )
         {
             System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
-        }        
+        }
     }
     
     //
     // Logging needs to be handled in a standard way at the container level.
     //
     private void logging( CliRequest cliRequest )
-    {   
+    {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
         cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
         cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
@@ -230,6 +232,7 @@ public class MavenCli
     // Every bit of information taken from the CLI should be processed here.
     //
     private void cli( CliRequest cliRequest )
+        throws Exception
     {
         CLIManager cliManager = new CLIManager();
 
@@ -241,7 +244,7 @@ public class MavenCli
         {
             cliRequest.stderr.println( "Unable to parse command line options: " + e.getMessage() );
             cliManager.displayHelp( cliRequest.stdout );
-            cliRequest.exit = Exit.EXIT_WITH_ERROR;
+            throw e;
         }
 
         // TODO: these should be moved out of here. Wrong place.
@@ -249,15 +252,15 @@ public class MavenCli
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
             cliManager.displayHelp( cliRequest.stdout );
-            cliRequest.exit = Exit.EXIT_WITHOUT_ERROR;
+            throw new ExitException( 0 );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
             CLIReportingUtils.showVersion( cliRequest.stdout );
-            cliRequest.exit = Exit.EXIT_WITHOUT_ERROR;
-        }        
-    }    
+            throw new ExitException( 0 );
+        }
+    }
         
     private void commands( CliRequest cliRequest )
     {
@@ -282,7 +285,7 @@ public class MavenCli
         {
             logger.info( "Enabling strict checksum verification on all artifact downloads." );
         }
-    }   
+    }
     
     private void container( CliRequest cliRequest )
         throws Exception
@@ -317,7 +320,7 @@ public class MavenCli
     
     protected void customizeContainer( PlexusContainer container )
     {
-    }    
+    }
     
     //
     // This should probably be a separate tool and not be baked into Maven.
@@ -332,6 +335,8 @@ public class MavenCli
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
             cliRequest.stdout.println( cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+
+            throw new ExitException( 0 );
         }
         else if ( cliRequest.commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
         {
@@ -356,12 +361,14 @@ public class MavenCli
 
             if ( master == null )
             {
-                cliRequest.stderr.println( "Master password is not set in the setting security file." );
+                throw new IllegalStateException( "Master password is not set in the setting security file: " + file );
             }
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
             String masterPasswd = cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
             cliRequest.stdout.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+
+            throw new ExitException( 0 );
         }
     }
     
@@ -877,7 +884,7 @@ public class MavenCli
     }
     
     static class CliRequest
-    {    
+    {
         String[] args;
         CommandLine commandLine;
         PrintStream stdout;
@@ -889,13 +896,26 @@ public class MavenCli
         boolean showErrors; 
         PrintStream fileStream;
         MavenExecutionRequest request;
-        Exit exit;
         
         CliRequest( String[] args, ClassWorld classWorld )
         {
             this.args = args;
             this.classWorld = classWorld;
             this.request = new DefaultMavenExecutionRequest();
-        }        
-    }    
+        }
+    }
+
+    static class ExitException
+        extends Exception
+    {
+
+        public int exitCode;
+
+        public ExitException( int exitCode )
+        {
+            this.exitCode = exitCode;
+        }
+
+    }
+
 }
