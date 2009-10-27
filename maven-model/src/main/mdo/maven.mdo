@@ -589,7 +589,7 @@
 
     public void setPomFile( java.io.File pomFile )
     {
-        this.pomFile = pomFile;
+        this.pomFile = ( pomFile != null ) ? pomFile.getAbsoluteFile() : null;
     }
 
     /**

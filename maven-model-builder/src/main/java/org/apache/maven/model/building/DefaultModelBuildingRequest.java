@@ -72,7 +72,7 @@ public class DefaultModelBuildingRequest
 
     public DefaultModelBuildingRequest setPomFile( File pomFile )
     {
-        this.pomFile = pomFile;
+        this.pomFile = ( pomFile != null ) ? pomFile.getAbsoluteFile() : null;
 
         return this;
     }

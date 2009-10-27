@@ -46,7 +46,7 @@ public class FileModelSource
         {
             throw new IllegalArgumentException( "no POM file specified" );
         }
-        this.pomFile = pomFile;
+        this.pomFile = pomFile.getAbsoluteFile();
     }
 
     public InputStream getInputStream()
