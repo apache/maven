@@ -250,6 +250,9 @@ public class DefaultMaven
         throws LocalRepositoryNotAccessibleException
     {
         File localRepoDir = request.getLocalRepositoryPath();
+
+        logger.debug( "Using local repository at " + localRepoDir );
+
         localRepoDir.mkdirs();
 
         if ( !localRepoDir.isDirectory() )

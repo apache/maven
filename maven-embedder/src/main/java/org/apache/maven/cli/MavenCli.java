@@ -524,6 +524,8 @@ public class MavenCli
             userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
+        logger.debug( "Reading user settings from " + userSettingsFile );
+
         File globalSettingsFile;
 
         if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
@@ -535,6 +537,8 @@ public class MavenCli
         {
             globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
         }
+
+        logger.debug( "Reading global settings from " + globalSettingsFile );
 
         cliRequest.request.setGlobalSettingsFile( globalSettingsFile );
         cliRequest.request.setUserSettingsFile( userSettingsFile );
