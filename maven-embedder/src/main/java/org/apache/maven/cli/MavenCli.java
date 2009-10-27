@@ -518,6 +518,12 @@ public class MavenCli
         {
             userSettingsFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
             userSettingsFile = resolveFile( userSettingsFile, cliRequest.workingDirectory );
+
+            if ( !userSettingsFile.isFile() )
+            {
+                throw new FileNotFoundException( "The specified user settings file does not exist: "
+                    + userSettingsFile );
+            }
         }
         else
         {
@@ -532,6 +538,12 @@ public class MavenCli
         {
             globalSettingsFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
             globalSettingsFile = resolveFile( globalSettingsFile, cliRequest.workingDirectory );
+
+            if ( !globalSettingsFile.isFile() )
+            {
+                throw new FileNotFoundException( "The specified global settings file does not exist: "
+                    + globalSettingsFile );
+            }
         }
         else
         {
