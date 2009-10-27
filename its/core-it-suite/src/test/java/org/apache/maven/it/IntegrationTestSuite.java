@@ -87,6 +87,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng4411VersionInfoTest.class );
         suite.addTestSuite( MavenITmng4410UsageHelpTest.class );
+        suite.addTestSuite( MavenITmng4408NonExistentSettingsFileTest.class );
         suite.addTestSuite( MavenITmng4405ValidPluginVersionTest.class );
         suite.addTestSuite( MavenITmng4404UniqueProfileIdTest.class );
         suite.addTestSuite( MavenITmng4403LenientDependencyPomParsingTest.class );
