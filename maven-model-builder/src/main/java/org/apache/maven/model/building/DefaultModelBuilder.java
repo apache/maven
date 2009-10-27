@@ -576,7 +576,8 @@ public class DefaultModelBuilder
         catch ( UnresolvableModelException e )
         {
             problems.addFatalError( "Non-resolvable parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
+                + ModelProblemUtils.toId( groupId, artifactId, version ) + " for "
+                + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
