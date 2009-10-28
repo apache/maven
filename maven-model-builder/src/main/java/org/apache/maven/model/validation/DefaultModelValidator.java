@@ -376,8 +376,18 @@ public class DefaultModelValidator
             {
                 boolean warning = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
 
-                addViolation( problems, warning, "'" + prefix + ".(groupId:artifactId:type:classifier)' must be unique: "
-                    + key + " -> " + existing.getVersion() + " vs " + dependency.getVersion() );
+                String msg;
+                if ( String.valueOf( existing.getVersion() ).equals( dependency.getVersion() ) )
+                {
+                    msg = "duplicate declaration of " + dependency.getVersion();
+                }
+                else
+                {
+                    msg = existing.getVersion() + " vs " + dependency.getVersion();
+                }
+
+                addViolation( problems, warning, "'" + prefix
+                    + ".(groupId:artifactId:type:classifier)' must be unique: " + key + " -> " + msg );
             }
             else
             {
