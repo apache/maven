@@ -23,8 +23,12 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.profiles.ProfileManager;
@@ -125,18 +129,13 @@ public class DefaultMavenProjectBuilder
         return build( project, configuration );
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                                             ArtifactRepository localRepository, boolean allowStubModel )
         throws ProjectBuildingException
     {
-        return buildFromRepository( artifact, remoteRepositories, localRepository );        
-    }
-
-    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
-        throws ProjectBuildingException
-    {
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
-            .setLocalRepository( localRepository )
-            .setRemoteRepositories( remoteRepositories );
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+        configuration.setLocalRepository( localRepository );
+        configuration.setRemoteRepositories( remoteRepositories );
         configuration.setProcessPlugins( false );
         configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
 
@@ -151,7 +150,57 @@ public class DefaultMavenProjectBuilder
             configuration.setSystemProperties( System.getProperties() );
         }
 
-        return buildFromRepository( artifact, configuration );
+        try
+        {
+            return buildFromRepository( artifact, configuration );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            if ( e.getCause() instanceof ModelBuildingException )
+            {
+                throw new InvalidProjectModelException( e.getProjectId(), e.getMessage(), e.getPomFile() );
+            }
+            else if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
+            {
+                if ( allowStubModel )
+                {
+                    MavenProject stubProject = new MavenProject( createStubModel( artifact ) );
+                    stubProject.setParent( buildStandaloneSuperProject( configuration ) );
+                    return stubProject;
+                }
+            }
+
+            throw e;
+        }
+    }
+
+    private Model createStubModel( Artifact projectArtifact )
+    {
+        Model model = new Model();
+
+        model.setModelVersion( "4.0.0" );
+
+        model.setArtifactId( projectArtifact.getArtifactId() );
+
+        model.setGroupId( projectArtifact.getGroupId() );
+
+        model.setVersion( projectArtifact.getVersion() );
+
+        // TODO: not correct in some instances
+        model.setPackaging( projectArtifact.getType() );
+
+        model.setDistributionManagement( new DistributionManagement() );
+
+        model.getDistributionManagement().setStatus( "generated" );
+
+        return model;
+    }
+
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                                             ArtifactRepository localRepository )
+        throws ProjectBuildingException
+    {
+        return buildFromRepository( artifact, remoteRepositories, localRepository, true );
     }
 
     /**
