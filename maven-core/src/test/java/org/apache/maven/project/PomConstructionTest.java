@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -1698,6 +1699,33 @@ public class PomConstructionTest
             }
         }
         assertTrue( plugins.toString(), customPlugin == resourcesPlugin - 1 );
+    }
+
+    /** MNG-4415 */
+    public void testPluginOrderAfterMergingWithInheritedPlugins()
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "plugin-inheritance-merge-order/sub" );
+
+        List<String> expected = new ArrayList<String>();
+        expected.add( "maven-it-plugin-error" );
+        expected.add( "maven-it-plugin-configuration" );
+        expected.add( "maven-it-plugin-dependency-resolution" );
+        expected.add( "maven-it-plugin-packaging" );
+        expected.add( "maven-it-plugin-log-file" );
+        expected.add( "maven-it-plugin-expression" );
+        expected.add( "maven-it-plugin-fork" );
+        expected.add( "maven-it-plugin-touch" );
+
+        List<String> actual = new ArrayList<String>();
+        for ( Plugin plugin : (List<Plugin>) pom.getValue( "build/plugins" ) )
+        {
+            actual.add( plugin.getArtifactId() );
+        }
+
+        actual.retainAll( expected );
+
+        assertEquals( actual, expected );
     }
 
     private void assertPathSuffixEquals( String expected, Object actual )
