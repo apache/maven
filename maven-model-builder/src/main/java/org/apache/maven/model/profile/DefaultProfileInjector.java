@@ -91,29 +91,49 @@ public class DefaultProfileInjector
             if ( !src.isEmpty() )
             {
                 List<Plugin> tgt = target.getPlugins();
-                Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, Plugin> master = new LinkedHashMap<Object, Plugin>( tgt.size() * 2 );
 
                 for ( Plugin element : tgt )
                 {
                     Object key = getPluginKey( element );
-                    merged.put( key, element );
+                    master.put( key, element );
                 }
 
+                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<Object, List<Plugin>>();
+                List<Plugin> pending = new ArrayList<Plugin>();
                 for ( Plugin element : src )
                 {
                     Object key = getPluginKey( element );
-                    Plugin existing = merged.get( key );
-                    if ( existing == null )
+                    Plugin existing = master.get( key );
+                    if ( existing != null )
                     {
-                        merged.put( key, element );
+                        mergePlugin( existing, element, sourceDominant, context );
+
+                        if ( !pending.isEmpty() )
+                        {
+                            predecessors.put( key, pending );
+                            pending = new ArrayList<Plugin>();
+                        }
                     }
                     else
                     {
-                        mergePlugin( existing, element, sourceDominant, context );
+                        pending.add( element );
                     }
                 }
 
-                target.setPlugins( new ArrayList<Plugin>( merged.values() ) );
+                List<Plugin> result = new ArrayList<Plugin>( src.size() + tgt.size() );
+                for ( Map.Entry<Object, Plugin> entry : master.entrySet() )
+                {
+                    List<Plugin> pre = predecessors.get( entry.getKey() );
+                    if ( pre != null )
+                    {
+                        result.addAll( pre );
+                    }
+                    result.add( entry.getValue() );
+                }
+                result.addAll( pending );
+
+                target.setPlugins( result );
             }
         }
 
