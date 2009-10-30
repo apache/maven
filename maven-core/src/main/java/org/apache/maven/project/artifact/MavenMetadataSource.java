@@ -48,12 +48,14 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -93,6 +95,23 @@ public class MavenMetadataSource
     @Requirement
     private MavenMetadataCache cache;    
 
+    @Requirement
+    private LegacySupport legacySupport;
+
+    private void injectSession( MetadataResolutionRequest request )
+    {
+        MavenSession session = legacySupport.getSession();
+
+        if ( session != null )
+        {
+            request.setOffline( session.isOffline() );
+            request.setServers( session.getRequest().getServers() );
+            request.setMirrors( session.getRequest().getMirrors() );
+            request.setProxies( session.getRequest().getProxies() );
+            request.setTransferListener( session.getRequest().getTransferListener() );
+        }
+    }
+
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
                                      List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
@@ -105,6 +124,7 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
+        injectSession( request );
         request.setArtifact( artifact );
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
@@ -391,6 +411,7 @@ public class MavenMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
+        injectSession( request );
         request.setArtifact( artifact );
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
@@ -503,7 +524,7 @@ public class MavenMetadataSource
         return projectBuilder;
     }
 
-    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, RepositoryRequest repositoryRequest )
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, MetadataResolutionRequest repositoryRequest )
         throws ArtifactMetadataRetrievalException
     {
         MavenProject project;
@@ -543,6 +564,9 @@ public class MavenMetadataSource
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( System.getProperties() );
                     configuration.setTransferListener( repositoryRequest.getTransferListener() );
+                    configuration.setServers( repositoryRequest.getServers() );
+                    configuration.setMirrors( repositoryRequest.getMirrors() );
+                    configuration.setProxies( repositoryRequest.getProxies() );
 
                     project = getProjectBuilder().build( pomArtifact, configuration ).getProject();
                 }

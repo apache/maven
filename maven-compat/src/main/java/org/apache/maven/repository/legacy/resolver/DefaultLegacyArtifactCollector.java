@@ -35,6 +35,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
 import org.apache.maven.artifact.resolver.ResolutionListener;
@@ -78,7 +79,7 @@ public class DefaultLegacyArtifactCollector
                                              List<ResolutionListener> listeners,
                                              List<ConflictResolver> conflictResolvers )
     {
-        RepositoryRequest request = new DefaultRepositoryRequest();
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         return collect( artifacts, originatingArtifact, managedVersions, request, source, filter, listeners,
@@ -88,7 +89,7 @@ public class DefaultLegacyArtifactCollector
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, 
                                              Artifact originatingArtifact,
                                              Map managedVersions, 
-                                             RepositoryRequest repositoryRequest,
+                                             ArtifactResolutionRequest repositoryRequest,
                                              ArtifactMetadataSource source, 
                                              ArtifactFilter filter,
                                              List<ResolutionListener> listeners,
@@ -226,7 +227,7 @@ public class DefaultLegacyArtifactCollector
                           ResolutionNode node,
                           Map<Object, List<ResolutionNode>> resolvedArtifacts, 
                           ManagedVersionMap managedVersions,
-                          RepositoryRequest request,
+                          ArtifactResolutionRequest request,
                           ArtifactMetadataSource source, 
                           ArtifactFilter filter, 
                           List<ResolutionListener> listeners,
@@ -568,7 +569,11 @@ public class DefaultLegacyArtifactCollector
                                 + e.getMessage(), artifact, childRemoteRepositories, e );
                         }
 
-                        recurse( result, child, resolvedArtifacts, managedVersions, metadataRequest, source, filter,
+                        ArtifactResolutionRequest subRequest = new ArtifactResolutionRequest( metadataRequest );
+                        subRequest.setServers( request.getServers() );
+                        subRequest.setMirrors( request.getMirrors() );
+                        subRequest.setProxies( request.getProxies() );
+                        recurse( result, child, resolvedArtifacts, managedVersions, subRequest, source, filter,
                                  listeners, conflictResolvers );
                     }
                 }

@@ -136,6 +136,9 @@ public class DefaultProjectDependenciesResolver
             .setForceUpdate( session.getRequest().isUpdateSnapshots() )
             .setCache( session.getRepositoryCache() );
         request.setTransferListener( session.getRequest().getTransferListener() );
+        request.setServers( session.getRequest().getServers() );
+        request.setMirrors( session.getRequest().getMirrors() );
+        request.setProxies( session.getRequest().getProxies() );
 
         Set<String> projectIds = null;
 

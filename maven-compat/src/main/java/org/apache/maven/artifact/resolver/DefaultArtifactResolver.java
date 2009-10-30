@@ -104,6 +104,21 @@ public class DefaultArtifactResolver
         if ( session != null )
         {
             request.setOffline( session.isOffline() );
+            request.setTransferListener( session.getRequest().getTransferListener() );
+        }
+    }
+
+    private void injectSession( ArtifactResolutionRequest request )
+    {
+        MavenSession session = legacySupport.getSession();
+
+        if ( session != null )
+        {
+            request.setOffline( session.isOffline() );
+            request.setServers( session.getRequest().getServers() );
+            request.setMirrors( session.getRequest().getMirrors() );
+            request.setProxies( session.getRequest().getProxies() );
+            request.setTransferListener( session.getRequest().getTransferListener() );
         }
     }
 
@@ -457,7 +472,7 @@ public class DefaultArtifactResolver
             }
         }
 
-        RepositoryRequest collectionRequest = request;
+        ArtifactResolutionRequest collectionRequest = request;
 
         if ( request.isResolveTransitively() )
         {
@@ -500,7 +515,10 @@ public class DefaultArtifactResolver
                     artifacts = new LinkedHashSet<Artifact>( mergedArtifacts.values() );
                 }
 
-                collectionRequest = new DefaultRepositoryRequest( request );
+                collectionRequest = new ArtifactResolutionRequest( request );
+                collectionRequest.setServers( request.getServers() );
+                collectionRequest.setMirrors( request.getMirrors() );
+                collectionRequest.setProxies( request.getProxies() );
                 collectionRequest.setRemoteRepositories( resolutionGroup.getResolutionRepositories() );
             }
             catch ( ArtifactMetadataRetrievalException e )

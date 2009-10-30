@@ -30,6 +30,9 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.repository.ArtifactTransferListener;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 
 /**
  * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
@@ -73,6 +76,12 @@ public class ArtifactResolutionRequest
     private boolean offline;
 
     private boolean forceUpdate;
+
+    private List<Server> servers;
+
+    private List<Mirror> mirrors;
+
+    private List<Proxy> proxies;
 
     public ArtifactResolutionRequest()
     {
@@ -286,6 +295,57 @@ public class ArtifactResolutionRequest
         this.forceUpdate = forceUpdate;
 
         return this;
+    }
+
+    public ArtifactResolutionRequest setServers( List<Server> servers )
+    {
+        this.servers = servers;
+
+        return this;
+    }
+
+    public List<Server> getServers()
+    {
+        if ( servers == null )
+        {
+            servers = new ArrayList<Server>();
+        }
+
+        return servers;
+    }
+
+    public ArtifactResolutionRequest setMirrors( List<Mirror> mirrors )
+    {
+        this.mirrors = mirrors;
+
+        return this;
+    }
+
+    public List<Mirror> getMirrors()
+    {
+        if ( mirrors == null )
+        {
+            mirrors = new ArrayList<Mirror>();
+        }
+
+        return mirrors;
+    }
+
+    public ArtifactResolutionRequest setProxies( List<Proxy> proxies )
+    {
+        this.proxies = proxies;
+
+        return this;
+    }
+
+    public List<Proxy> getProxies()
+    {
+        if ( proxies == null )
+        {
+            proxies = new ArrayList<Proxy>();
+        }
+
+        return proxies;
     }
 
 }
