@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -64,6 +63,8 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
+import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.StringUtils;
@@ -237,22 +238,9 @@ public class MavenProject
     //TODO: need to integrate the effective scope and refactor it out of the MMS
     @Deprecated
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter )
+        throws InvalidDependencyVersionException
     {
-        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
-
-        for ( Dependency d : getDependencies() )
-        {
-            Artifact dependencyArtifact =
-                repositorySystem.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(),
-                                                 d.getType() );
-
-            if ( filter == null || filter.include( dependencyArtifact ) )
-            {
-                artifacts.add( dependencyArtifact );
-            }
-        }
-
-        return artifacts;        
+        return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, filter, this );
     }
 
     // TODO: Find a way to use <relativePath/> here...it's tricky, because the moduleProject
