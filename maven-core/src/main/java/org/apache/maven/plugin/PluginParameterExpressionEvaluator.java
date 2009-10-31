@@ -163,13 +163,37 @@ public class PluginParameterExpressionEvaluator
         {
             value = session;
         }
+        else if ( expression.startsWith( "session" ) )
+        {
+            try
+            {
+                int pathSeparator = expression.indexOf( "/" );
+
+                if ( pathSeparator > 0 )
+                {
+                    String pathExpression = expression.substring( 1, pathSeparator );
+                    value = ReflectionValueExtractor.evaluate( pathExpression, session );
+                    value = value + expression.substring( pathSeparator );
+                }
+                else
+                {
+                    value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), session );
+                }
+            }
+            catch ( Exception e )
+            {
+                // TODO: don't catch exception
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
+                                                         e );
+            }
+        }
         else if ( "reactorProjects".equals( expression ) )
         {
             value = session.getProjects();
         }
-        else if ("mojoExecution".equals(expression))
+        else if ( "mojoExecution".equals( expression ) )
         {
-        	value = mojoExecution;
+            value = mojoExecution;
         }
         else if ( "project".equals( expression ) )
         {
@@ -180,7 +204,7 @@ public class PluginParameterExpressionEvaluator
             value = project.getExecutionProject();
         }
         else if ( expression.startsWith( "project" ) || expression.startsWith( "pom" ) )
-        {            
+        {
             try
             {
                 int pathSeparator = expression.indexOf( "/" );
