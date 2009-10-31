@@ -87,6 +87,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng4423SessionDataFromPluginParameterExpressionTest.class );
         suite.addTestSuite( MavenITmng4422PluginExecutionPhaseInterpolationTest.class );
+        suite.addTestSuite( MavenITmng4421DeprecatedPomInterpolationExpressionsTest.class );
         suite.addTestSuite( MavenITmng4416PluginOrderAfterProfileInjectionTest.class );
         suite.addTestSuite( MavenITmng4415InheritedPluginOrderTest.class );
         suite.addTestSuite( MavenITmng4413MirroringOfDependencyRepoTest.class );
