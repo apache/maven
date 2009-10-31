@@ -1146,6 +1146,8 @@ public class DefaultMavenProjectBuilder
                         PluginExecution iExec = (PluginExecution) iExecutions.get( j );
 
                         dExec.setId( iExec.getId() );
+                        dExec.setPhase( iExec.getPhase() );
+                        dExec.setGoals( iExec.getGoals() );
                     }
                 }
             }
