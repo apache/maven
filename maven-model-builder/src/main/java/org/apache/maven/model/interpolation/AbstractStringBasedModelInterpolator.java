@@ -104,12 +104,23 @@ public abstract class AbstractStringBasedModelInterpolator
         recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
     }
 
-    protected List<ValueSource> createValueSources( final Model model, final File projectDir, final ModelBuildingRequest config )
+    protected List<ValueSource> createValueSources( final Model model, final File projectDir,
+                                                    final ModelBuildingRequest config,
+                                                    final ModelProblemCollector problems )
     {
         Properties modelProperties = model.getProperties();
 
         ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
+        if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            modelValueSource1 = new ProblemDetectingValueSource( modelValueSource1, "pom.", "project.", problems );
+        }
+
         ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
+        if ( config.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            modelValueSource2 = new ProblemDetectingValueSource( modelValueSource2, "", "project.", problems );
+        }
 
         // NOTE: Order counts here!
         List<ValueSource> valueSources = new ArrayList<ValueSource>( 9 );

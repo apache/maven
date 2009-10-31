@@ -60,7 +60,7 @@ public class StringSearchModelInterpolator
     {
         try
         {
-            List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config );
+            List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
             List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
 
             InterpolateObjectAction action =
