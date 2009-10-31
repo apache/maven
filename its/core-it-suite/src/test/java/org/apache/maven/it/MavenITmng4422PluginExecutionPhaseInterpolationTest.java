@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4422">MNG-4422</a>.
@@ -37,7 +35,7 @@ public class MavenITmng4422PluginExecutionPhaseInterpolationTest
 
     public MavenITmng4422PluginExecutionPhaseInterpolationTest()
     {
-        super( "[2.0,2.0.99),[3.0-alpha-1,)" );
+        super( "[2.0,2.0.99),[2.2.2,)" );
     }
 
     /**
