@@ -52,7 +52,8 @@ under the License.
       <!-- duplicate dependency with different version (MNG-4005), last declaration wins -->
       <groupId>org.apache.maven.its.mng4403</groupId>
       <artifactId>a</artifactId>
-      <version>0.1</version>
+      <!-- deprecated expression prefix (MNG-4421) -->
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng4403</groupId>
