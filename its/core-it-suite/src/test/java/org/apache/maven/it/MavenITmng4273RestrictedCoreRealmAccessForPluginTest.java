@@ -57,8 +57,19 @@ public class MavenITmng4273RestrictedCoreRealmAccessForPluginTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/class.properties" );
+
         assertNull( props.getProperty( "org.codehaus.plexus.util.FileUtils$FilterWrapper" ) );
-        assertNull( props.getProperty( "org.apache.xerces.util.ParserConfigurationSettings" ) );
+
+        try
+        {
+            // some IBM JRE's ship with Xerces (xml.jar) so a plugin can load this class from the bootstrap loader
+            ClassLoader.getSystemClassLoader().loadClass( "org.apache.xerces.util.ParserConfigurationSettings" );
+        }
+        catch ( ClassNotFoundException e )
+        {
+            // not provided by JRE, and must not be provided by Maven's core realm either
+            assertNull( props.getProperty( "org.apache.xerces.util.ParserConfigurationSettings" ) );
+        }
     }
 
 }
