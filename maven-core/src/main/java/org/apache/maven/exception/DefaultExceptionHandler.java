@@ -212,9 +212,9 @@ public class DefaultExceptionHandler
                     {
                         exceptionMessage = longMessage;
                     }
-                    else
+                    else if ( !exceptionMessage.contains( longMessage ) )
                     {
-                        exceptionMessage = join( exceptionMessage, longMessage );
+                        exceptionMessage = join( exceptionMessage, '\n' + longMessage );
                     }
                 }
             }

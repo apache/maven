@@ -235,7 +235,6 @@ public class MavenProject
         this.repositorySystem = repositorySystem;
     }
 
-    //TODO: need to integrate the effective scope and refactor it out of the MMS
     @Deprecated
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter )
         throws InvalidDependencyVersionException

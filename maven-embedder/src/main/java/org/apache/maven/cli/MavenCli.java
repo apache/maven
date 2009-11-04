@@ -481,18 +481,32 @@ public class MavenCli
             referenceKey = references.get( summary.getReference() );
             if ( referenceKey == null )
             {
-                referenceKey = "[" + references.size() + "]";
+                referenceKey = "[Help " + ( references.size() + 1 ) + "]";
                 references.put( summary.getReference(), referenceKey );
+            }
+        }
+
+        String msg = indent + summary.getMessage();
+
+        if ( StringUtils.isNotEmpty( referenceKey ) )
+        {
+            if ( msg.indexOf( '\n' ) < 0 )
+            {
+                msg += " -> " + referenceKey;
+            }
+            else
+            {
+                msg += '\n' + indent + "-> " + referenceKey;
             }
         }
 
         if ( showErrors )
         {
-            logger.error( indent + referenceKey, summary.getException() );
+            logger.error( msg, summary.getException() );
         }
         else
         {
-            logger.error( indent + summary.getMessage() + " " + referenceKey );
+            logger.error( msg );
         }
 
         indent += "  ";
