@@ -44,10 +44,43 @@ public class MavenITmng4005UniqueDependencyKeyTest
     /**
      * Test that duplicate dependencies cause a validation error during building.
      */
-    public void testit()
+    public void testitDependency()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005" );
+        test( "dep" );
+    }
+
+    /**
+     * Test that duplicate managed dependencies cause a validation error during building.
+     */
+    public void testitManagedDependency()
+        throws Exception
+    {
+        test( "man-dep" );
+    }
+
+    /**
+     * Test that duplicate dependencies in profiles cause a validation error during building.
+     */
+    public void testitProfileDependency()
+        throws Exception
+    {
+        test( "profile-dep" );
+    }
+
+    /**
+     * Test that duplicate managed dependencies in profiles cause a validation error during building.
+     */
+    public void testitProfileManagedDependency()
+        throws Exception
+    {
+        test( "profile-man-dep" );
+    }
+
+    private void test( String project )
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/" + project );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
