@@ -69,20 +69,19 @@ public class DefaultModelNormalizer
             build.setPlugins( new ArrayList<Plugin>( normalized.values() ) );
         }
 
-        if ( request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 )
+        /*
+         * NOTE: This is primarily to keep backward-compat with Maven 2.x which did not validate that dependencies are
+         * unique within a single POM. Upon multiple declarations, 2.x just kept the last one but retained the order of
+         * the first occurrence. So when we're in lenient/compat mode, we have to deal with such broken POMs and mimic
+         * the way 2.x works. When we're in strict mode, the removal of duplicates just saves other merging steps from
+         * aftereffects and bogus error messages.
+         */
+        Map<String, Dependency> dependencies = new LinkedHashMap<String, Dependency>();
+        for ( Dependency dependency : model.getDependencies() )
         {
-            /*
-             * NOTE: This is to keep backward-compat with Maven 2.x which did not validate that dependencies are unique
-             * within a single POM. Upon multiple declarations, 2.x just kept the last one. So when we're in
-             * lenient/compat mode, we have to deal with such broken POMs and mimic the way 2.x works.
-             */
-            Map<String, Dependency> dependencies = new LinkedHashMap<String, Dependency>();
-            for ( Dependency dependency : model.getDependencies() )
-            {
-                dependencies.put( dependency.getManagementKey(), dependency );
-            }
-            model.setDependencies( new ArrayList<Dependency>( dependencies.values() ) );
+            dependencies.put( dependency.getManagementKey(), dependency );
         }
+        model.setDependencies( new ArrayList<Dependency>( dependencies.values() ) );
     }
 
     private static class DuplicateMerger
