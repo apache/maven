@@ -42,6 +42,31 @@ under the License.
   </distributionManagement>
 
   <!-- if the model builder rejected this POM, the test will miss its (compile-time) dependencies -->
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- duplicate managed dependencies (MNG-4005), both declarations apply in POM order, i.e. their effects get merged, using first-wins for values -->
+      <dependency>
+        <groupId>org.apache.maven.its.mng4403</groupId>
+        <artifactId>c</artifactId>
+        <version>0.1</version>
+        <scope>compile</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.its.mng4403</groupId>
+        <artifactId>c</artifactId>
+        <version>0.2</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.maven.its.mng4403</groupId>
+            <artifactId>cc</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng4403</groupId>
@@ -54,6 +79,11 @@ under the License.
       <artifactId>a</artifactId>
       <!-- deprecated expression prefix (MNG-4421) -->
       <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <!-- dependency managed by duplicate declarations -->
+      <groupId>org.apache.maven.its.mng4403</groupId>
+      <artifactId>c</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng4403</groupId>

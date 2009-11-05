@@ -43,7 +43,8 @@ public class MavenITmng4403LenientDependencyPomParsingTest
 
     /**
      * Test that dependency POMs are only subject to minimal validation during metadata retrieval, i.e. Maven should
-     * ignore most kinds of badness and make a best effort at getting the metadata.
+     * ignore most kinds of badness and make a best effort at getting the metadata. Of particular interest is also,
+     * how Maven deals with duplicate dependency declarations.
      */
     public void testit()
         throws Exception
@@ -67,6 +68,7 @@ public class MavenITmng4403LenientDependencyPomParsingTest
         List expected = new ArrayList();
         expected.add( "org.apache.maven.its.mng4403:a:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4403:b:jar:0.1" );
+        expected.add( "org.apache.maven.its.mng4403:c:jar:0.1" );
 
         assertEquals( expected, artifacts );
     }
