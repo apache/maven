@@ -52,10 +52,10 @@ public class DefaultModelNormalizer
         Build build = model.getBuild();
         if ( build != null )
         {
-            List<Plugin> original = build.getPlugins();
-            Map<Object, Plugin> normalized = new LinkedHashMap<Object, Plugin>();
+            List<Plugin> plugins = build.getPlugins();
+            Map<Object, Plugin> normalized = new LinkedHashMap<Object, Plugin>( plugins.size() * 2 );
 
-            for ( Plugin plugin : original )
+            for ( Plugin plugin : plugins )
             {
                 Object key = plugin.getKey();
                 Plugin first = normalized.get( key );
@@ -66,7 +66,10 @@ public class DefaultModelNormalizer
                 normalized.put( key, plugin );
             }
 
-            build.setPlugins( new ArrayList<Plugin>( normalized.values() ) );
+            if ( plugins.size() != normalized.size() )
+            {
+                build.setPlugins( new ArrayList<Plugin>( normalized.values() ) );
+            }
         }
 
         /*
@@ -76,12 +79,18 @@ public class DefaultModelNormalizer
          * the way 2.x works. When we're in strict mode, the removal of duplicates just saves other merging steps from
          * aftereffects and bogus error messages.
          */
-        Map<String, Dependency> dependencies = new LinkedHashMap<String, Dependency>();
-        for ( Dependency dependency : model.getDependencies() )
+        List<Dependency> dependencies = model.getDependencies();
+        Map<String, Dependency> normalized = new LinkedHashMap<String, Dependency>( dependencies.size() * 2 );
+
+        for ( Dependency dependency : dependencies )
         {
-            dependencies.put( dependency.getManagementKey(), dependency );
+            normalized.put( dependency.getManagementKey(), dependency );
         }
-        model.setDependencies( new ArrayList<Dependency>( dependencies.values() ) );
+
+        if ( dependencies.size() != normalized.size() )
+        {
+            model.setDependencies( new ArrayList<Dependency>( normalized.values() ) );
+        }
     }
 
     private static class DuplicateMerger
