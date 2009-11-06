@@ -323,6 +323,11 @@ public class DefaultModelValidator
             DistributionManagement distMgmt = model.getDistributionManagement();
             if ( distMgmt != null )
             {
+                if ( distMgmt.getStatus() != null )
+                {
+                    addViolation( problems, false, "'distributionManagement.status' must not be specified" );
+                }
+
                 validateRepositoryLayout( problems, distMgmt.getRepository(), "distributionManagement.repository",
                                           request );
                 validateRepositoryLayout( problems, distMgmt.getSnapshotRepository(),

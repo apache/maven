@@ -380,4 +380,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getErrors().get( 0 ).contains( "test:mip" ) );
     }
 
+    public void testDistributionManagementStatus()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "distribution-management-status.xml" );
+
+        assertViolations( result, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "distributionManagement.status" ) );
+    }
+
 }
