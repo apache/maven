@@ -42,6 +42,8 @@ public class ProjectSorter
     private DAG dag;
 
     private List<MavenProject> sortedProjects;
+    
+    private Map<String, MavenProject> projectMap;
 
     private MavenProject topLevelProject;
 
@@ -74,7 +76,7 @@ public class ProjectSorter
         dag = new DAG();
 
         // groupId:artifactId:version -> project
-        Map<String, MavenProject> projectMap = new HashMap<String, MavenProject>( projects.size() * 2 );
+        projectMap = new HashMap<String, MavenProject>( projects.size() * 2 );
 
         // groupId:artifactId -> (version -> vertex)
         Map<String, Map<String, Vertex>> vertexMap = new HashMap<String, Map<String, Vertex>>( projects.size() * 2 );
@@ -271,5 +273,15 @@ public class ProjectSorter
     {
         return ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
     }
-
+    
+    public DAG getDAG()
+    {
+        return dag;
+    }
+    
+    public Map<String, MavenProject> getProjectMap()
+    {
+        return projectMap;
+    }
+    
 }
