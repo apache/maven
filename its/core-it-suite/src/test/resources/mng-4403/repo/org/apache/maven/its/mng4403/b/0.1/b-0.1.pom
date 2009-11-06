@@ -39,6 +39,8 @@ under the License.
       <id>maven-core-it</id>
       <url>file:///${basedir}/repo</url>
     </repository>
+    <!-- remote-only field (MNG-4430) -->
+    <status>deployed</status>
   </distributionManagement>
 
   <!-- if the model builder rejected this POM, the test will miss its (compile-time) dependencies -->
