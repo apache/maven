@@ -109,6 +109,12 @@ public class DefaultMaven
         {
             result = processResult( new DefaultMavenExecutionResult(), e );
         }
+        catch ( RuntimeException e )
+        {
+            result =
+                processResult( new DefaultMavenExecutionResult(),
+                               new InternalErrorException( "Internal error: " + e, e ) );
+        }
 
         return result;
     }
