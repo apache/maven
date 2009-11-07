@@ -31,12 +31,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
@@ -54,12 +48,10 @@ import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -67,6 +59,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -259,242 +252,116 @@ public class DefaultLifecycleExecutor
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
-        
-        HashMap<MavenProject, ProjectBuild> projectBuildMap = new HashMap<MavenProject, ProjectBuild>();
-        for (ProjectBuild projectBuild : projectBuilds ) {
-            projectBuildMap.put( projectBuild.project, projectBuild );
-        }
 
-        ProjectDependencyGraph pdg = session.getProjectDependencyGraph();
-        
-        int threadCount = 1;
-        String threadCountProperty = (String) session.getUserProperties().get( "maven.threads.experimental" );
-        if (threadCountProperty != null) {
-            try {
-                threadCount = Integer.parseInt( threadCountProperty );
-            } catch (NumberFormatException e) {
-                logger.warn( "Couldn't parse thread count, will default to 1: " + threadCountProperty );
-            }
-        }
-        if ( logger.isDebugEnabled() )
+        for ( ProjectBuild projectBuild : projectBuilds )
         {
-            logger.debug( "Thread pool: " + threadCount );
-        }
-        Executor executor = Executors.newFixedThreadPool( threadCount );
-        CompletionService<IndividualProjectBuildResult> service = new ExecutorCompletionService<IndividualProjectBuildResult>( executor );
-        HashSet<Future<IndividualProjectBuildResult>> futures = new HashSet<Future<IndividualProjectBuildResult>>();
-        
-        // schedule independent projects
-        for (ProjectBuild projectBuild : projectBuilds) {
-            if ( pdg.getUpstreamProjects( projectBuild.project, false ).size() == 0 ) {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Scheduling: " + projectBuild.project );
-                }
-                CallableBuilder cb = new CallableBuilder( result, projectBuild, projectIndex, oldContextClassLoader, session );
-                futures.add( service.submit( cb ) );
-            }
-        }
-        
-        HashSet<MavenProject> finishedProjects = new HashSet<MavenProject>();
-        
-        // for each finished project
-        for (int i = 0; i < projectBuilds.size(); i++) {
-            IndividualProjectBuildResult ipbr;
+            MavenProject currentProject = projectBuild.project;
+
+            long buildStartTime = System.currentTimeMillis();
+
             try
             {
-                ipbr = service.take().get();
+                session.setCurrentProject( currentProject );
+
+                if ( session.isBlackListed( currentProject ) )
+                {
+                    fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
+
+                    continue;
+                }
+
+                fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
+
+                ClassRealm projectRealm = currentProject.getClassRealm();
+                if ( projectRealm != null )
+                {
+                    Thread.currentThread().setContextClassLoader( projectRealm );
+                }
+
+                MavenExecutionPlan executionPlan =
+                    calculateExecutionPlan( session, currentProject, projectBuild.taskSegment );
+
+                if ( logger.isDebugEnabled() )
+                {
+                    debugProjectPlan( currentProject, executionPlan );
+                }
+
+                // TODO: once we have calculated the build plan then we should accurately be able to download
+                // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
+                // this later by looking at the build plan. Would be better to just batch download everything required
+                // by the reactor.
+
+                List<MavenProject> projectsToResolve;
+
+                if ( projectBuild.taskSegment.aggregating )
+                {
+                    projectsToResolve = session.getProjects();
+                }
+                else
+                {
+                    projectsToResolve = Collections.singletonList( currentProject );
+                }
+
+                for ( MavenProject project : projectsToResolve )
+                {
+                    resolveProjectDependencies( project, executionPlan.getRequiredCollectionScopes(),
+                                                executionPlan.getRequiredResolutionScopes(), session,
+                                                projectBuild.taskSegment.aggregating );
+                }
+
+                DependencyContext dependencyContext =
+                    new DependencyContext( executionPlan, projectBuild.taskSegment.aggregating );
+
+                for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
+                {
+                    execute( session, mojoExecution, projectIndex, dependencyContext );
+                }
+
+                long buildEndTime = System.currentTimeMillis();
+
+                result.addBuildSummary( new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
+
+                fireEvent( session, null, LifecycleEventCatapult.PROJECT_SUCCEEDED );
             }
             catch ( Exception e )
             {
-                break;
+                result.addException( e );
+
+                long buildEndTime = System.currentTimeMillis();
+
+                result.addBuildSummary( new BuildFailure( currentProject, buildEndTime - buildStartTime, e ) );
+
+                fireEvent( session, null, LifecycleEventCatapult.PROJECT_FAILED );
+
+                if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( session.getReactorFailureBehavior() ) )
+                {
+                    // continue the build
+                }
+                else if ( MavenExecutionRequest.REACTOR_FAIL_AT_END.equals( session.getReactorFailureBehavior() ) )
+                {
+                    // continue the build but ban all projects that depend on the failed one
+                    session.blackList( currentProject );
+                }
+                else if ( MavenExecutionRequest.REACTOR_FAIL_FAST.equals( session.getReactorFailureBehavior() ) )
+                {
+                    // abort the build
+                    break;
+                }
+                else
+                {
+                    throw new IllegalArgumentException( "invalid reactor failure behavior "
+                        + session.getReactorFailureBehavior() );
+                }
             }
-            if (ipbr.shouldHaltBuild) break;
-            ProjectBuild projectBuild = ipbr.projectBuild;
-            MavenProject finishedProject = projectBuild.project;
-            finishedProjects.add( finishedProject );
-            // schedule dependent projects, if all of their requirements are met
-            for ( MavenProject dependentProject : pdg.getDownstreamProjects( finishedProject, false ) )  {
-                boolean allRequirementsMet = true;
-                for ( MavenProject requirement : pdg.getUpstreamProjects( dependentProject, false ) ) {
-                    if (!finishedProjects.contains( requirement ) ) {
-                        if ( logger.isDebugEnabled() )
-                        {
-                            logger.debug( "Not scheduling " + dependentProject + " because requirement not met: " + requirement);
-                        }
-                        allRequirementsMet = false;
-                        break;
-                    }
-                }
-                if (allRequirementsMet) {
-                    ProjectBuild scheduledDependent = projectBuildMap.get( dependentProject );
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.debug( "Scheduling: " + dependentProject );
-                    }
-                    CallableBuilder cb = new CallableBuilder( result, scheduledDependent, projectIndex, oldContextClassLoader, session );
-                    futures.add( service.submit( cb ) );
-                }
-            }   
+            finally
+            {
+                session.setCurrentProject( null );
+
+                Thread.currentThread().setContextClassLoader( oldContextClassLoader );
+            }
         }
-        
-        // cancel outstanding builds (if any)
-        for (Future<IndividualProjectBuildResult> future : futures) {
-            future.cancel( true /* mayInterruptIfRunning */ );
-        }
-        
 
         fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
-    }
-
-    private class CallableBuilder implements Callable<IndividualProjectBuildResult> {
-
-        final MavenExecutionResult result;
-        final ProjectBuild projectBuild;
-        final ProjectIndex projectIndex;
-        final ClassLoader oldContextClassLoader;
-        final MavenSession originalSession;
-        
-        public CallableBuilder( MavenExecutionResult result, ProjectBuild projectBuild, ProjectIndex projectIndex,
-                                ClassLoader oldContextClassLoader, MavenSession originalSession )
-        {
-            this.result = result;
-            this.projectBuild = projectBuild;
-            this.projectIndex = projectIndex;
-            this.oldContextClassLoader = oldContextClassLoader;
-            this.originalSession = originalSession;
-        }
-        
-        public IndividualProjectBuildResult call()
-            throws Exception
-        {
-            boolean shouldHaltBuild = buildProject( result, projectBuild, projectIndex, oldContextClassLoader, originalSession );
-            return new IndividualProjectBuildResult( shouldHaltBuild, projectBuild );
-        }
-    }
-    
-    private class IndividualProjectBuildResult {
-        public IndividualProjectBuildResult( boolean shouldHaltBuild, ProjectBuild projectBuild )
-        {
-            this.shouldHaltBuild = shouldHaltBuild;
-            this.projectBuild = projectBuild;
-        }
-        final boolean shouldHaltBuild;
-        final ProjectBuild projectBuild;
-        
-    }
-    
-    private boolean buildProject( MavenExecutionResult result,
-                                       ProjectBuild projectBuild, ProjectIndex projectIndex,
-                                       ClassLoader oldContextClassLoader, MavenSession originalSession )
-    {
-        MavenSession session = originalSession.clone();
-        MavenProject currentProject = projectBuild.project;
-
-        long buildStartTime = System.currentTimeMillis();
-
-        try
-        {
-            session.setCurrentProject( currentProject );
-
-            if ( session.isBlackListed( currentProject ) )
-            {
-                fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
-
-                return false;
-            }
-
-            fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
-
-            ClassRealm projectRealm = currentProject.getClassRealm();
-            if ( projectRealm != null )
-            {
-                Thread.currentThread().setContextClassLoader( projectRealm );
-            }
-
-            MavenExecutionPlan executionPlan =
-                calculateExecutionPlan( session, currentProject, projectBuild.taskSegment );
-
-            if ( logger.isDebugEnabled() )
-            {
-                debugProjectPlan( currentProject, executionPlan );
-            }
-
-            // TODO: once we have calculated the build plan then we should accurately be able to download
-            // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
-            // this later by looking at the build plan. Would be better to just batch download everything required
-            // by the reactor.
-
-            List<MavenProject> projectsToResolve;
-
-            if ( projectBuild.taskSegment.aggregating )
-            {
-                projectsToResolve = session.getProjects();
-            }
-            else
-            {
-                projectsToResolve = Collections.singletonList( currentProject );
-            }
-
-            for ( MavenProject project : projectsToResolve )
-            {
-                resolveProjectDependencies( project, executionPlan.getRequiredCollectionScopes(),
-                                            executionPlan.getRequiredResolutionScopes(), session,
-                                            projectBuild.taskSegment.aggregating );
-            }
-
-            DependencyContext dependencyContext =
-                new DependencyContext( executionPlan, projectBuild.taskSegment.aggregating );
-
-            for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
-            {
-                execute( session, mojoExecution, projectIndex, dependencyContext );
-            }
-
-            long buildEndTime = System.currentTimeMillis();
-
-            result.addBuildSummary( new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
-
-            fireEvent( session, null, LifecycleEventCatapult.PROJECT_SUCCEEDED );
-        }
-        catch ( Exception e )
-        {
-            result.addException( e );
-
-            long buildEndTime = System.currentTimeMillis();
-
-            result.addBuildSummary( new BuildFailure( currentProject, buildEndTime - buildStartTime, e ) );
-
-            fireEvent( session, null, LifecycleEventCatapult.PROJECT_FAILED );
-
-            if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( session.getReactorFailureBehavior() ) )
-            {
-                // continue the build
-            }
-            else if ( MavenExecutionRequest.REACTOR_FAIL_AT_END.equals( session.getReactorFailureBehavior() ) )
-            {
-                // continue the build but ban all projects that depend on the failed one
-                session.blackList( currentProject );
-            }
-            else if ( MavenExecutionRequest.REACTOR_FAIL_FAST.equals( session.getReactorFailureBehavior() ) )
-            {
-                // abort the build
-                return true;
-            }
-            else
-            {
-                throw new IllegalArgumentException( "invalid reactor failure behavior "
-                    + session.getReactorFailureBehavior() );
-            }
-        }
-        finally
-        {
-            session.setCurrentProject( null );
-            originalSession.merge( session );
-
-            Thread.currentThread().setContextClassLoader( oldContextClassLoader );
-        }
-        return false;
     }
 
     private void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,

@@ -43,7 +43,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @author Jason van Zyl
  * @version $Id$
  */
-public class MavenSession implements Cloneable
+public class MavenSession
 {
     private PlexusContainer container;
     
@@ -318,11 +318,6 @@ public class MavenSession implements Cloneable
     {
         this.projectDependencyGraph = projectDependencyGraph;
     }
-    
-    public ProjectDependencyGraph getProjectDependencyGraph()
-    {
-        return projectDependencyGraph;
-    }
 
     public String getReactorFailureBehavior()
     {
@@ -366,27 +361,4 @@ public class MavenSession implements Cloneable
         return request.getStartTime();
     }
 
-    @Override
-    public MavenSession clone()
-    {
-        try
-        {
-            return (MavenSession) super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new RuntimeException("Bug", e);
-        }
-    }
-    
-    public void merge( MavenSession session )
-    {
-        if ( session.blackListedProjects != null )
-        {
-            for ( String projectId : session.blackListedProjects )
-            {
-                blackListedProjects.add( projectId );
-            }
-        }
-    }
 }
