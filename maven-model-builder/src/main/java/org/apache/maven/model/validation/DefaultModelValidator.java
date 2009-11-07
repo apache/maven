@@ -382,17 +382,17 @@ public class DefaultModelValidator
                 boolean warning = request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0;
 
                 String msg;
-                if ( StringUtils.isEmpty( existing.getVersion() ) && StringUtils.isEmpty( dependency.getVersion() ) )
+                if ( StringUtils.clean( existing.getVersion() ).equals( StringUtils.clean( dependency.getVersion() ) ) )
                 {
-                    msg = "duplicate declaration";
-                }
-                else if ( existing.getVersion().equals( dependency.getVersion() ) )
-                {
-                    msg = "duplicate declaration of version " + dependency.getVersion();
+                    msg =
+                        "duplicate declaration of version "
+                            + StringUtils.defaultString( dependency.getVersion(), "(?)" );
                 }
                 else
                 {
-                    msg = "version " + existing.getVersion() + " vs " + dependency.getVersion();
+                    msg =
+                        "version " + StringUtils.defaultString( existing.getVersion(), "(?)" ) + " vs "
+                            + StringUtils.defaultString( dependency.getVersion(), "(?)" );
                 }
 
                 addViolation( problems, warning, "'" + prefix
