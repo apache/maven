@@ -203,7 +203,6 @@ under the License.
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skip>false</skip>
-              <testFailureIgnore>true</testFailureIgnore>
             </configuration>
           </plugin>
           <plugin>
