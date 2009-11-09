@@ -22,19 +22,31 @@ under the License.
   <formats>
     <format>zip</format>
     <format>tar.gz</format>
-    <format>tar.bz2</format>
   </formats>
   <fileSets>
     <fileSet>
-      <directory>.</directory>
+      <directory>${project.basedir}/..</directory>
       <outputDirectory>/</outputDirectory>
       <excludes>
-        <exclude>**/target/**</exclude>
+        <exclude>%regex[(?!.*src/).*target.*]</exclude>
+        <exclude>**/*.log</exclude>
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>target/maven-shared-archive-resources/META-INF</directory>
+      <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
       <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>DEPENDENCIES</include>
+        <!-- exclude the license and notice as they are not as accurate as the ones below -->
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>LICENSE.txt</include>
+        <include>NOTICE.txt</include>
+      </includes>
     </fileSet>
   </fileSets>
 </assembly>
