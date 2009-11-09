@@ -161,26 +161,6 @@
     </site>
   </distributionManagement>
 
-  <!-- FIXME: Remove once snapshots have been released -->
-  <repositories>
-    <repository>
-      <id>sonatype.public</id>
-      <url>http://repository.sonatype.org/content/repositories/plexus-oss-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype.public</id>
-      <url>http://repository.sonatype.org/content/repositories/plexus-oss-snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
   <!--bootstrap-start-comment-->
   <dependencyManagement>
     <!--bootstrap-end-comment-->
