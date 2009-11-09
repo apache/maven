@@ -20,7 +20,6 @@
   </parent>
 
   <artifactId>maven-model-builder</artifactId>
-  <version>3.0-SNAPSHOT</version>
 
   <name>Maven Model Builder</name>
 
