@@ -259,20 +259,25 @@ public class DefaultLifecycleExecutor
         }
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
-        
+
         HashMap<MavenProject, ProjectBuild> projectBuildMap = new HashMap<MavenProject, ProjectBuild>();
-        for (ProjectBuild projectBuild : projectBuilds ) {
+        for ( ProjectBuild projectBuild : projectBuilds )
+        {
             projectBuildMap.put( projectBuild.project, projectBuild );
         }
 
         ProjectDependencyGraph pdg = session.getProjectDependencyGraph();
-        
+
         int threadCount = 1;
         String threadCountProperty = (String) session.getUserProperties().get( "maven.threads.experimental" );
-        if (threadCountProperty != null) {
-            try {
+        if ( threadCountProperty != null )
+        {
+            try
+            {
                 threadCount = Integer.parseInt( threadCountProperty );
-            } catch (NumberFormatException e) {
+            }
+            catch ( NumberFormatException e )
+            {
                 logger.warn( "Couldn't parse thread count, will default to 1: " + threadCountProperty );
             }
         }
@@ -281,25 +286,30 @@ public class DefaultLifecycleExecutor
             logger.debug( "Thread pool: " + threadCount );
         }
         Executor executor = Executors.newFixedThreadPool( threadCount );
-        CompletionService<IndividualProjectBuildResult> service = new ExecutorCompletionService<IndividualProjectBuildResult>( executor );
+        CompletionService<IndividualProjectBuildResult> service =
+            new ExecutorCompletionService<IndividualProjectBuildResult>( executor );
         HashSet<Future<IndividualProjectBuildResult>> futures = new HashSet<Future<IndividualProjectBuildResult>>();
-        
+
         // schedule independent projects
-        for (ProjectBuild projectBuild : projectBuilds) {
-            if ( pdg.getUpstreamProjects( projectBuild.project, false ).size() == 0 ) {
+        for ( ProjectBuild projectBuild : projectBuilds )
+        {
+            if ( pdg.getUpstreamProjects( projectBuild.project, false ).size() == 0 )
+            {
                 if ( logger.isDebugEnabled() )
                 {
                     logger.debug( "Scheduling: " + projectBuild.project );
                 }
-                CallableBuilder cb = new CallableBuilder( result, projectBuild, projectIndex, oldContextClassLoader, session );
+                CallableBuilder cb =
+                    new CallableBuilder( result, projectBuild, projectIndex, oldContextClassLoader, session );
                 futures.add( service.submit( cb ) );
             }
         }
-        
+
         HashSet<MavenProject> finishedProjects = new HashSet<MavenProject>();
-        
+
         // for each finished project
-        for (int i = 0; i < projectBuilds.size(); i++) {
+        for ( int i = 0; i < projectBuilds.size(); i++ )
+        {
             IndividualProjectBuildResult ipbr;
             try
             {
@@ -309,52 +319,65 @@ public class DefaultLifecycleExecutor
             {
                 break;
             }
-            if (ipbr.shouldHaltBuild) break;
+            if ( ipbr.shouldHaltBuild )
+                break;
             ProjectBuild projectBuild = ipbr.projectBuild;
             MavenProject finishedProject = projectBuild.project;
             finishedProjects.add( finishedProject );
             // schedule dependent projects, if all of their requirements are met
-            for ( MavenProject dependentProject : pdg.getDownstreamProjects( finishedProject, false ) )  {
+            for ( MavenProject dependentProject : pdg.getDownstreamProjects( finishedProject, false ) )
+            {
                 boolean allRequirementsMet = true;
-                for ( MavenProject requirement : pdg.getUpstreamProjects( dependentProject, false ) ) {
-                    if (!finishedProjects.contains( requirement ) ) {
+                for ( MavenProject requirement : pdg.getUpstreamProjects( dependentProject, false ) )
+                {
+                    if ( !finishedProjects.contains( requirement ) )
+                    {
                         if ( logger.isDebugEnabled() )
                         {
-                            logger.debug( "Not scheduling " + dependentProject + " because requirement not met: " + requirement);
+                            logger.debug( "Not scheduling " + dependentProject + " because requirement not met: "
+                                + requirement );
                         }
                         allRequirementsMet = false;
                         break;
                     }
                 }
-                if (allRequirementsMet) {
+                if ( allRequirementsMet )
+                {
                     ProjectBuild scheduledDependent = projectBuildMap.get( dependentProject );
                     if ( logger.isDebugEnabled() )
                     {
                         logger.debug( "Scheduling: " + dependentProject );
                     }
-                    CallableBuilder cb = new CallableBuilder( result, scheduledDependent, projectIndex, oldContextClassLoader, session );
+                    CallableBuilder cb =
+                        new CallableBuilder( result, scheduledDependent, projectIndex, oldContextClassLoader, session );
                     futures.add( service.submit( cb ) );
                 }
-            }   
+            }
         }
-        
+
         // cancel outstanding builds (if any)
-        for (Future<IndividualProjectBuildResult> future : futures) {
-            future.cancel( true /* mayInterruptIfRunning */ );
+        for ( Future<IndividualProjectBuildResult> future : futures )
+        {
+            future.cancel( true /* mayInterruptIfRunning */);
         }
-        
 
         fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
     }
 
-    private class CallableBuilder implements Callable<IndividualProjectBuildResult> {
+    private class CallableBuilder
+        implements Callable<IndividualProjectBuildResult>
+    {
 
         final MavenExecutionResult result;
+
         final ProjectBuild projectBuild;
+
         final ProjectIndex projectIndex;
+
         final ClassLoader oldContextClassLoader;
+
         final MavenSession originalSession;
-        
+
         public CallableBuilder( MavenExecutionResult result, ProjectBuild projectBuild, ProjectIndex projectIndex,
                                 ClassLoader oldContextClassLoader, MavenSession originalSession )
         {
@@ -364,29 +387,32 @@ public class DefaultLifecycleExecutor
             this.oldContextClassLoader = oldContextClassLoader;
             this.originalSession = originalSession;
         }
-        
+
         public IndividualProjectBuildResult call()
             throws Exception
         {
-            boolean shouldHaltBuild = buildProject( result, projectBuild, projectIndex, oldContextClassLoader, originalSession );
+            boolean shouldHaltBuild =
+                buildProject( result, projectBuild, projectIndex, oldContextClassLoader, originalSession );
             return new IndividualProjectBuildResult( shouldHaltBuild, projectBuild );
         }
     }
-    
-    private class IndividualProjectBuildResult {
+
+    private class IndividualProjectBuildResult
+    {
         public IndividualProjectBuildResult( boolean shouldHaltBuild, ProjectBuild projectBuild )
         {
             this.shouldHaltBuild = shouldHaltBuild;
             this.projectBuild = projectBuild;
         }
+
         final boolean shouldHaltBuild;
+
         final ProjectBuild projectBuild;
-        
+
     }
-    
-    private boolean buildProject( MavenExecutionResult result,
-                                       ProjectBuild projectBuild, ProjectIndex projectIndex,
-                                       ClassLoader oldContextClassLoader, MavenSession originalSession )
+
+    private boolean buildProject( MavenExecutionResult result, ProjectBuild projectBuild, ProjectIndex projectIndex,
+                                  ClassLoader oldContextClassLoader, MavenSession originalSession )
     {
         MavenSession session = originalSession.clone();
         MavenProject currentProject = projectBuild.project;

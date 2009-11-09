@@ -375,10 +375,10 @@ public class MavenSession implements Cloneable
         }
         catch ( CloneNotSupportedException e )
         {
-            throw new RuntimeException("Bug", e);
+            throw new RuntimeException( "Bug", e );
         }
     }
-    
+
     public void merge( MavenSession session )
     {
         if ( session.blackListedProjects != null )
