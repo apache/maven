@@ -23,7 +23,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng4231</groupId>
-  <artifactId>a</artifactId>
+  <artifactId>b</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
@@ -33,12 +33,4 @@ under the License.
       <url>file:///${basedir}/repo</url>
     </repository>
   </distributionManagement>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.its.mng4231</groupId>
-      <artifactId>b</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 </project>

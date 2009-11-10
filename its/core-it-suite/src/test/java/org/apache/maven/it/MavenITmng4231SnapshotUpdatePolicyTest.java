@@ -72,7 +72,8 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "db3f17644e813af768ae6e82a6d0a2f29aef8988", checksums );
+        assertChecksum( "db3f17644e813af768ae6e82a6d0a2f29aef8988", "a-0.1-SNAPSHOT.jar", checksums );
+        assertChecksum( "5e3265f3ed55e8b217ff9db444fd8d888962a990", "b-0.1-SNAPSHOT.jar", checksums );
     }
 
     /**
@@ -108,12 +109,13 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "97c4e1a857d8957594ccbd2ac19d51885478ec80", checksums );
+        assertChecksum( "97c4e1a857d8957594ccbd2ac19d51885478ec80", "a-0.1-SNAPSHOT.jar", checksums );
+        assertChecksum( "", "b-0.1-SNAPSHOT.jar", checksums );
     }
 
-    private void assertChecksum( String checksum, Properties checksums )
+    private void assertChecksum( String checksum, String jar, Properties checksums )
     {
-        assertEquals( checksum, checksums.getProperty( "a-0.1-SNAPSHOT.jar" ).toLowerCase( java.util.Locale.ENGLISH ) );
+        assertEquals( checksum, checksums.getProperty( jar, "" ).toLowerCase( java.util.Locale.ENGLISH ) );
     }
 
 }
