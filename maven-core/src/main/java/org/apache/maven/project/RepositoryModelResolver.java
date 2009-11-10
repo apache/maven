@@ -166,6 +166,7 @@ class RepositoryModelResolver
             request.setOffline( projectBuildingRequest.isOffline() );
             request.setCache( projectBuildingRequest.getRepositoryCache() );
             request.setTransferListener( projectBuildingRequest.getTransferListener() );
+            request.setForceUpdate( projectBuildingRequest.isForceUpdate() );
 
             ArtifactResolutionResult result = repositorySystem.resolve( request );
 
