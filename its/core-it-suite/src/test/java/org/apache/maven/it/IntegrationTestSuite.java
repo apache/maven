@@ -338,6 +338,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3043BestEffortReactorResolutionTest.class );
         suite.addTestSuite( MavenITmng3023ReactorDependencyResolutionTest.class );
         suite.addTestSuite( MavenITmng3012CoreClassImportTest.class );
+        suite.addTestSuite( MavenITmng3004ReactorFailureBehaviorMultithreadedTest.class );
         suite.addTestSuite( MavenITmng2972OverridePluginDependencyTest.class );
         suite.addTestSuite( MavenITmng2926PluginPrefixOrderTest.class );
         suite.addTestSuite( MavenITmng2921ActiveAttachedArtifactsTest.class );
