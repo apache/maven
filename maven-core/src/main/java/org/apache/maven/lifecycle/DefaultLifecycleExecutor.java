@@ -262,7 +262,7 @@ public class DefaultLifecycleExecutor
 
 
 
-        int threadCount = 1;
+        int threadCount = 0;
         String threadCountProperty = (String) session.getUserProperties().get( "maven.threads.experimental" );
         if ( threadCountProperty != null )
         {
@@ -272,7 +272,7 @@ public class DefaultLifecycleExecutor
             }
             catch ( NumberFormatException e )
             {
-                logger.warn( "Couldn't parse thread count, will default to 1: " + threadCountProperty );
+                logger.warn( "Couldn't parse thread count, will default to " + threadCount + ": " + threadCountProperty );
             }
         }
         if ( logger.isDebugEnabled() )
