@@ -33,13 +33,11 @@ public interface CollectRequest
     // 3. children-only, e.g. the (managed) dependencies of a project, don't resolve root but only its transitive
     // closure
 
-    Artifact getRoot();
+    Dependency getRoot();
 
     List<? extends Dependency> getDependencies();
 
     List<? extends Dependency> getManagedDependencies();
-
-    LocalRepository getLocalRepository();
 
     List<? extends RemoteRepository> getRemoteRepositories();
 

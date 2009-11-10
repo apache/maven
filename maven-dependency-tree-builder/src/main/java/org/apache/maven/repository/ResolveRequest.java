@@ -29,8 +29,6 @@ public interface ResolveRequest
 
     List<? extends Artifact> getArtifacts();
 
-    LocalRepository getLocalRepository();
-
     List<? extends RemoteRepository> getRemoteRepositories( Artifact artifact );
 
     RepositoryContext getContext();

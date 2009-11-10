@@ -19,34 +19,17 @@ package org.apache.maven.repository;
  * under the License.
  */
 
-import java.util.Properties;
+import java.io.File;
+import java.util.List;
 
 /**
  * @author Benjamin Bentmann
  */
-public interface RepositoryContext
+public interface WorkspaceReader
 {
 
-    boolean isOffline();
+    File findArtifact( Artifact artifact );
 
-    String getChecksumPolicy();
-
-    String getUpdatePolicy();
-
-    LocalRepository getLocalRepository();
-
-    WorkspaceReader getWorkspaceReader();
-
-    TransferListener getTransferListener();
-
-    Properties getSystemProperties();
-
-    MirrorSelector getMirrorSelector();
-
-    ProxySelector getProxySelector();
-
-    AuthenticationSelector getAuthenticationSelector();
-
-    // TODO: cache?
+    List<String> findVersions( Artifact artifact );
 
 }

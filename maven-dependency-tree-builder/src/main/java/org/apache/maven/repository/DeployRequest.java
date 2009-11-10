@@ -30,8 +30,6 @@ public interface DeployRequest
 
     List<? extends Artifact> getArtifacts();
 
-    LocalRepository getLocalRepository();
-
     RemoteRepository getRemoteRepository();
 
     RepositoryContext getContext();

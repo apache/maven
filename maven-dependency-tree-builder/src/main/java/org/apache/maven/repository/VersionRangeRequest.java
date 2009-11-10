@@ -29,8 +29,6 @@ public interface VersionRangeRequest
 
     Artifact getArtifact();
 
-    LocalRepository getLocalRepository();
-
     List<? extends RemoteRepository> getRemoteRepositories();
 
     RepositoryContext getContext();
