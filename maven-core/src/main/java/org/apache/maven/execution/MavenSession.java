@@ -68,6 +68,8 @@ public class MavenSession implements Cloneable
     private ProjectDependencyGraph projectDependencyGraph;
 
     private Collection<String> blackListedProjects;
+    
+    private volatile boolean halted = false;
 
     @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
@@ -378,15 +380,33 @@ public class MavenSession implements Cloneable
             throw new RuntimeException( "Bug", e );
         }
     }
+    
+    public void halt()
+    {
+        halted = true;
+    }
+    
+    public boolean isHalted()
+    {
+        return halted;
+    }
 
     public void merge( MavenSession session )
     {
         if ( session.blackListedProjects != null )
         {
+            if ( blackListedProjects == null )
+            {
+                blackListedProjects = new HashSet<String>();
+            }
             for ( String projectId : session.blackListedProjects )
             {
                 blackListedProjects.add( projectId );
             }
+        }
+        if ( session.halted )
+        {
+            halted = true;
         }
     }
 }

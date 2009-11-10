@@ -260,13 +260,7 @@ public class DefaultLifecycleExecutor
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
-        HashMap<MavenProject, ProjectBuild> projectBuildMap = new HashMap<MavenProject, ProjectBuild>();
-        for ( ProjectBuild projectBuild : projectBuilds )
-        {
-            projectBuildMap.put( projectBuild.project, projectBuild );
-        }
 
-        ProjectDependencyGraph pdg = session.getProjectDependencyGraph();
 
         int threadCount = 1;
         String threadCountProperty = (String) session.getUserProperties().get( "maven.threads.experimental" );
@@ -285,10 +279,51 @@ public class DefaultLifecycleExecutor
         {
             logger.debug( "Thread pool: " + threadCount );
         }
+        
+        if ( threadCount > 0 )
+        {
+            multithreadedBuild( session, result, projectBuilds, projectIndex, 
+                                oldContextClassLoader, threadCount );
+        }
+        else
+        {
+            for ( ProjectBuild projectBuild : projectBuilds )
+            {
+                CallableBuilder cb = new CallableBuilder( result, projectBuild, projectIndex, 
+                                         oldContextClassLoader, session );
+                try
+                {
+                    cb.call();
+                    if ( session.isHalted() ) break;
+                }
+                catch ( Exception e )
+                {
+                    break;
+                }
+            }
+        }
+
+        fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
+    }
+
+    private void multithreadedBuild( MavenSession session, MavenExecutionResult result,
+                                     List<ProjectBuild> projectBuilds, ProjectIndex projectIndex,
+                                     ClassLoader oldContextClassLoader,
+                                     int threadCount )
+    {
+        
+        HashMap<MavenProject, ProjectBuild> projectBuildMap = new HashMap<MavenProject, ProjectBuild>();
+        
+        for ( ProjectBuild projectBuild : projectBuilds )
+        {
+            projectBuildMap.put( projectBuild.project, projectBuild );
+        }
+
+        ProjectDependencyGraph pdg = session.getProjectDependencyGraph();
         Executor executor = Executors.newFixedThreadPool( threadCount );
-        CompletionService<IndividualProjectBuildResult> service =
-            new ExecutorCompletionService<IndividualProjectBuildResult>( executor );
-        HashSet<Future<IndividualProjectBuildResult>> futures = new HashSet<Future<IndividualProjectBuildResult>>();
+        CompletionService<ProjectBuild> service =
+            new ExecutorCompletionService<ProjectBuild>( executor );
+        HashSet<Future<ProjectBuild>> futures = new HashSet<Future<ProjectBuild>>();
 
         // schedule independent projects
         for ( ProjectBuild projectBuild : projectBuilds )
@@ -310,18 +345,17 @@ public class DefaultLifecycleExecutor
         // for each finished project
         for ( int i = 0; i < projectBuilds.size(); i++ )
         {
-            IndividualProjectBuildResult ipbr;
+            ProjectBuild projectBuild;
             try
             {
-                ipbr = service.take().get();
+                projectBuild = service.take().get();
             }
             catch ( Exception e )
             {
                 break;
             }
-            if ( ipbr.shouldHaltBuild )
+            if ( session.isHalted() )
                 break;
-            ProjectBuild projectBuild = ipbr.projectBuild;
             MavenProject finishedProject = projectBuild.project;
             finishedProjects.add( finishedProject );
             // schedule dependent projects, if all of their requirements are met
@@ -356,16 +390,14 @@ public class DefaultLifecycleExecutor
         }
 
         // cancel outstanding builds (if any)
-        for ( Future<IndividualProjectBuildResult> future : futures )
+        for ( Future<ProjectBuild> future : futures )
         {
             future.cancel( true /* mayInterruptIfRunning */);
         }
-
-        fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
     }
 
     private class CallableBuilder
-        implements Callable<IndividualProjectBuildResult>
+        implements Callable<ProjectBuild>
     {
 
         final MavenExecutionResult result;
@@ -388,30 +420,15 @@ public class DefaultLifecycleExecutor
             this.originalSession = originalSession;
         }
 
-        public IndividualProjectBuildResult call()
+        public ProjectBuild call()
             throws Exception
         {
-            boolean shouldHaltBuild =
-                buildProject( result, projectBuild, projectIndex, oldContextClassLoader, originalSession );
-            return new IndividualProjectBuildResult( shouldHaltBuild, projectBuild );
+            buildProject( result, projectBuild, projectIndex, oldContextClassLoader, originalSession );
+            return projectBuild;
         }
     }
 
-    private class IndividualProjectBuildResult
-    {
-        public IndividualProjectBuildResult( boolean shouldHaltBuild, ProjectBuild projectBuild )
-        {
-            this.shouldHaltBuild = shouldHaltBuild;
-            this.projectBuild = projectBuild;
-        }
-
-        final boolean shouldHaltBuild;
-
-        final ProjectBuild projectBuild;
-
-    }
-
-    private boolean buildProject( MavenExecutionResult result, ProjectBuild projectBuild, ProjectIndex projectIndex,
+    private void buildProject( MavenExecutionResult result, ProjectBuild projectBuild, ProjectIndex projectIndex,
                                   ClassLoader oldContextClassLoader, MavenSession originalSession )
     {
         MavenSession session = originalSession.clone();
@@ -423,11 +440,11 @@ public class DefaultLifecycleExecutor
         {
             session.setCurrentProject( currentProject );
 
-            if ( session.isBlackListed( currentProject ) )
+            if ( session.isBlackListed( currentProject ) || session.isHalted() )
             {
                 fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
 
-                return false;
+                return;
             }
 
             fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
@@ -505,7 +522,8 @@ public class DefaultLifecycleExecutor
             else if ( MavenExecutionRequest.REACTOR_FAIL_FAST.equals( session.getReactorFailureBehavior() ) )
             {
                 // abort the build
-                return true;
+                originalSession.halt();
+                return;
             }
             else
             {
@@ -520,7 +538,6 @@ public class DefaultLifecycleExecutor
 
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
-        return false;
     }
 
     private void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
