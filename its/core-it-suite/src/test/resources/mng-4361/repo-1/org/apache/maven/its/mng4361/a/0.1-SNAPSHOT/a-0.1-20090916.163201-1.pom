@@ -22,6 +22,12 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.apache.maven.its.mng4361</groupId>
+    <artifactId>p</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.apache.maven.its.mng4361</groupId>
   <artifactId>a</artifactId>
   <version>0.1-SNAPSHOT</version>

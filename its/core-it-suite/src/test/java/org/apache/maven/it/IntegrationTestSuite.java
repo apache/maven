@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4433ForceParentSnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng4430DistributionManagementStatusTest.class );
         suite.addTestSuite( MavenITmng4429CompRequirementOnNonDefaultImplTest.class );
         suite.addTestSuite( MavenITmng4423SessionDataFromPluginParameterExpressionTest.class );
@@ -113,7 +114,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4367LayoutAwareMirrorSelectionTest.class );
         suite.addTestSuite( MavenITmng4365XmlMarkupInAttributeValueTest.class );
         suite.addTestSuite( MavenITmng4363DynamicAdditionOfDependencyArtifactTest.class );
-        suite.addTestSuite( MavenITmng4361ForceSnapshotUpdateTest.class );
+        suite.addTestSuite( MavenITmng4361ForceDependencySnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng4360WebDavSupportTest.class );
         suite.addTestSuite( MavenITmng4359LocallyReachableParentOutsideOfReactorTest.class );
         suite.addTestSuite( MavenITmng4357LifecycleMappingDiscoveryInReactorTest.class );

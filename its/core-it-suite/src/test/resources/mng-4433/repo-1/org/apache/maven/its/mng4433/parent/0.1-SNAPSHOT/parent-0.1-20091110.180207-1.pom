@@ -22,16 +22,10 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache.maven.its.mng4361</groupId>
-    <artifactId>p</artifactId>
-    <version>0.1-SNAPSHOT</version>
-  </parent>
-
-  <groupId>org.apache.maven.its.mng4361</groupId>
-  <artifactId>a</artifactId>
+  <groupId>org.apache.maven.its.mng4433</groupId>
+  <artifactId>parent</artifactId>
   <version>0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <distributionManagement>
     <repository>
@@ -40,12 +34,25 @@ under the License.
     </repository>
   </distributionManagement>
 
-  <!-- if this POM isn't updated, the dependency below will be missing from the second test run -->
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.its.mng4361</groupId>
-      <artifactId>b</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-log-file</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>reset</goal>
+            </goals>
+            <configuration>
+              <logFile>target/old.txt</logFile>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

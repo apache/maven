@@ -22,14 +22,8 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.apache.maven.its.mng4361</groupId>
-    <artifactId>p</artifactId>
-    <version>0.1-SNAPSHOT</version>
-  </parent>
-
   <groupId>org.apache.maven.its.mng4361</groupId>
-  <artifactId>a</artifactId>
+  <artifactId>b</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
@@ -39,13 +33,4 @@ under the License.
       <url>file:///${basedir}/repo</url>
     </repository>
   </distributionManagement>
-
-  <!-- if this POM isn't updated, the dependency below will be missing from the second test run -->
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.its.mng4361</groupId>
-      <artifactId>b</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
 </project>

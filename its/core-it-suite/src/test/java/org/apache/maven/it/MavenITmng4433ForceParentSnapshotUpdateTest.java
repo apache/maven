@@ -26,30 +26,30 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4361">MNG-4361</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4433">MNG-4433</a>.
  * 
  * @author Benjamin Bentmann
  */
-public class MavenITmng4361ForceSnapshotUpdateTest
+public class MavenITmng4433ForceParentSnapshotUpdateTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4361ForceSnapshotUpdateTest()
+    public MavenITmng4433ForceParentSnapshotUpdateTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Verify that snapshot updates can be forced from the command line via "-U".
+     * Verify that snapshot updates of parent POMs can be forced from the command line via "-U".
      */
     public void testit()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4361" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4433" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4361" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4433" );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
 
@@ -58,8 +58,12 @@ public class MavenITmng4361ForceSnapshotUpdateTest
         filterProps.setProperty( "@repo@", "repo-1" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-1.txt" );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
+
+        verifier.assertFilePresent( "target/old.txt" );
+        verifier.assertFileNotPresent( "target/new.txt" );
 
         filterProps.setProperty( "@repo@", "repo-2" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
@@ -71,13 +75,8 @@ public class MavenITmng4361ForceSnapshotUpdateTest
 
         verifier.resetStreams();
 
-        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "2a22eeca91211193e927ea3b2ecdf56481585064", checksums );
-    }
-
-    private void assertChecksum( String checksum, Properties checksums )
-    {
-        assertEquals( checksum, checksums.getProperty( "a-0.1-SNAPSHOT.jar" ).toLowerCase( java.util.Locale.ENGLISH ) );
+        verifier.assertFileNotPresent( "target/old.txt" );
+        verifier.assertFilePresent( "target/new.txt" );
     }
 
 }
