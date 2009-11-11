@@ -45,6 +45,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
@@ -67,6 +69,23 @@ public class DefaultLegacyArtifactCollector
 	@Requirement
     private Logger logger;
 
+    @Requirement
+    private LegacySupport legacySupport;
+
+    private void injectSession( ArtifactResolutionRequest request )
+    {
+        MavenSession session = legacySupport.getSession();
+
+        if ( session != null )
+        {
+            request.setOffline( session.isOffline() );
+            request.setServers( session.getRequest().getServers() );
+            request.setMirrors( session.getRequest().getMirrors() );
+            request.setProxies( session.getRequest().getProxies() );
+            request.setTransferListener( session.getRequest().getTransferListener() );
+        }
+    }
+
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, 
                                              Artifact originatingArtifact,
                                              Map managedVersions, 
@@ -80,6 +99,7 @@ public class DefaultLegacyArtifactCollector
         ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
+        injectSession( request );
         return collect( artifacts, originatingArtifact, managedVersions, request, source, filter, listeners,
                         conflictResolvers );
     }
