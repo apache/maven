@@ -28,6 +28,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactCollector;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionListener;
@@ -73,6 +74,16 @@ public class StubArtifactCollector
                                              List<ArtifactRepository> remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              List<ResolutionListener> listeners )
+    {
+        return new ArtifactResolutionResult();
+    }
+
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners )
+        throws ArtifactResolutionException
     {
         return new ArtifactResolutionResult();
     }
