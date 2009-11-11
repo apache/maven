@@ -41,7 +41,7 @@
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
-    <plexusVersion>1.5.0</plexusVersion>
+    <plexusVersion>1.5.1</plexusVersion>
     <plexusInterpolationVersion>1.11</plexusInterpolationVersion>
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>2.0.1</plexusUtilsVersion>
