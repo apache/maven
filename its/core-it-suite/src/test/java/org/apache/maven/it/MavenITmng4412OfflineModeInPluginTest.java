@@ -42,7 +42,7 @@ public class MavenITmng4412OfflineModeInPluginTest
      * Verify that plugins using the 2.x style artifact resolver directly are subject to the offline mode of the
      * current Maven session.
      */
-    public void testit()
+    public void testitResolver()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4412" );
@@ -52,9 +52,11 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "-Presolver" );
         verifier.getCliOptions().add( "--offline" );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
+        verifier.setLogFileName( "log-resolver.txt" );
         try
         {
             verifier.executeGoal( "validate" );
@@ -69,6 +71,32 @@ public class MavenITmng4412OfflineModeInPluginTest
         {
             verifier.resetStreams();
         }
+    }
+
+    /**
+     * Verify that plugins using the 2.x style artifact collector directly are subject to the offline mode of the
+     * current Maven session.
+     */
+    public void testitCollector()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4412" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "-Pcollector" );
+        verifier.getCliOptions().add( "--offline" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.setLogFileName( "log-collector.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4412", "dep", "0.1", "pom" );
     }
 
 }
