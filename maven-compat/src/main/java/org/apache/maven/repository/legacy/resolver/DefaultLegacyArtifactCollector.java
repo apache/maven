@@ -32,8 +32,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
@@ -771,6 +769,16 @@ public class DefaultLegacyArtifactCollector
     {
         return collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source,
                         filter, listeners, null );
+    }
+
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners )
+    {
+        return collect( artifacts, originatingArtifact, null, localRepository, remoteRepositories, source, filter,
+                        listeners );
     }
 
 }
