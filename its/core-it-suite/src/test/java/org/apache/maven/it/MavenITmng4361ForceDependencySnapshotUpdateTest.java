@@ -82,7 +82,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
 
     private void assertChecksum( String checksum, String jar, Properties checksums )
     {
-        assertEquals( checksum, checksums.getProperty( jar ).toLowerCase( java.util.Locale.ENGLISH ) );
+        assertEquals( checksum, checksums.getProperty( jar, "" ).toLowerCase( java.util.Locale.ENGLISH ) );
     }
 
 }
