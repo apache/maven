@@ -33,9 +33,8 @@ under the License.
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-      <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
         <exclude>junit:junit</exclude>
-        <exclude>org.apache.maven:apache-maven</exclude>
         <exclude>log4j:log4j</exclude>
         <exclude>commons-logging:commons-logging-api</exclude>
       
@@ -45,6 +44,7 @@ under the License.
         <exclude>junit:junit</exclude>
         <exclude>jmock:jmock</exclude>
         <exclude>xml-apis:xml-apis</exclude>
+        <exclude>org.apache.maven:apache-maven</exclude>
         <exclude>org.apache.maven:maven-artifact</exclude>
         <exclude>org.apache.maven:maven-monitor</exclude>
         <exclude>org.apache.maven:maven-plugin-descriptor</exclude>
