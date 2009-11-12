@@ -41,7 +41,7 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest
 
     public MavenITmng4293RequiresCompilePlusRuntimeScopeTest()
     {
-        super( "[3.0-alpha3,)" );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
