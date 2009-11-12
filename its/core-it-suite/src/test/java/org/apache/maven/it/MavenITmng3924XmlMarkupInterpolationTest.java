@@ -38,7 +38,7 @@ public class MavenITmng3924XmlMarkupInterpolationTest
 
     public MavenITmng3924XmlMarkupInterpolationTest()
     {
-        super( "(2.0.99,)" );
+        super( "[2.1.0-M1,)" );
     }
 
     /**

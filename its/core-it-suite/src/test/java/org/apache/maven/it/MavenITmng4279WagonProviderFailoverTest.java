@@ -34,7 +34,7 @@ public class MavenITmng4279WagonProviderFailoverTest
 
     public MavenITmng4279WagonProviderFailoverTest()
     {
-        super( "(2.2.0,2.99.99]" );
+        super( "[2.2.1,3.0-alpha-1)" );
     }
 
     public void testit()

@@ -35,7 +35,7 @@ public class MavenITmng4422PluginExecutionPhaseInterpolationTest
 
     public MavenITmng4422PluginExecutionPhaseInterpolationTest()
     {
-        super( "[2.0,2.0.99),[2.2.2,)" );
+        super( "[2.0,2.1.0),[2.2.2,)" );
     }
 
     /**

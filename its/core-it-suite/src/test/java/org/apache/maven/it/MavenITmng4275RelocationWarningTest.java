@@ -36,7 +36,7 @@ public class MavenITmng4275RelocationWarningTest
 
     public MavenITmng4275RelocationWarningTest()
     {
-        super( "[2.0,2.0.9)(2.2.0,)" );
+        super( "[2.0,2.0.9),[2.2.1,)" );
     }
 
     public void testit()

@@ -35,7 +35,7 @@ public class MavenITmng4319PluginExecutionGoalInterpolationTest
 
     public MavenITmng4319PluginExecutionGoalInterpolationTest()
     {
-        super( "[2.0,2.0.99),[2.2.2,)" );
+        super( "[2.0,2.1.0),[2.2.2,)" );
     }
 
     /**

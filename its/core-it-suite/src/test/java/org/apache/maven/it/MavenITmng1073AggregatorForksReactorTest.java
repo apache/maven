@@ -45,7 +45,7 @@ public class MavenITmng1073AggregatorForksReactorTest
         throws Exception
     {
         // excluded 2.1.x and 2.2.x due to MNG-4325
-        requiresMavenVersion( "[2.0,2.0.99),[3.0-alpha-3,)" );
+        requiresMavenVersion( "[2.0,2.1.0),[3.0-alpha-3,)" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1073" );
 
