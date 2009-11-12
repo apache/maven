@@ -35,7 +35,7 @@ public class MavenITmng4412OfflineModeInPluginTest
 
     public MavenITmng4412OfflineModeInPluginTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0,3.0-alpha-1),[3.0-alpha-4,)" );
     }
 
     /**
