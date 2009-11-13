@@ -25,12 +25,14 @@ under the License.
   </formats>
   <dependencySets>
     <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>boot</outputDirectory>
       <includes>
         <include>org.codehaus.plexus:plexus-classworlds</include>
       </includes>
     </dependencySet>
     <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
