@@ -19,16 +19,12 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -47,7 +43,6 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * A stub implementation that assumes an empty lifecycle to bypass interaction with the plugin manager and to avoid
@@ -68,18 +63,6 @@ public class EmptyLifecycleExecutor
 
     public void execute( MavenSession session )
     {
-    }
-
-    public Xpp3Dom getDefaultPluginConfiguration( String groupId, String artifactId, String version, String goal,
-                                                  MavenProject project, ArtifactRepository localRepository )
-        throws LifecycleExecutionException
-    {
-        return null;
-    }
-
-    public List<String> getLifecyclePhases()
-    {
-        return Collections.emptyList();
     }
 
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
@@ -122,21 +105,6 @@ public class EmptyLifecycleExecutor
         }
 
         return plugin;
-    }
-
-    public void populateDefaultConfigurationForPlugins( Collection<Plugin> plugins, RepositoryRequest repositoryRequest )
-        throws LifecycleExecutionException
-    {
-    }
-
-    public void populateDefaultConfigurationForPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws LifecycleExecutionException
-    {
-    }
-
-    public void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException
-    {
     }
 
     public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
