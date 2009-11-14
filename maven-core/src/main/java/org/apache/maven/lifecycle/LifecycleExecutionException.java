@@ -1,7 +1,5 @@
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.project.MavenProject;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +18,9 @@ import org.apache.maven.project.MavenProject;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -50,9 +51,62 @@ public class LifecycleExecutionException
         super( message );
         this.project = project;
     }
-    
+
+    LifecycleExecutionException( String message, MojoExecution execution, MavenProject project )
+    {
+        super( message );
+        this.project = project;
+    }
+
+    LifecycleExecutionException( String message, MojoExecution execution, MavenProject project, Throwable cause )
+    {
+        super( message, cause );
+        this.project = project;
+    }
+
+    LifecycleExecutionException( MojoExecution execution, MavenProject project, Throwable cause )
+    {
+        this( createMessage( execution, project, cause ), execution, project, cause );
+    }
+
     public MavenProject getProject()
     {
         return project;
     }
+
+    private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
+    {
+        StringBuilder buffer = new StringBuilder( 256 );
+
+        buffer.append( "Failed to execute goal" );
+
+        if ( execution != null )
+        {
+            buffer.append( ' ' );
+            buffer.append( execution.getGroupId() );
+            buffer.append( ':' );
+            buffer.append( execution.getArtifactId() );
+            buffer.append( ':' );
+            buffer.append( execution.getVersion() );
+            buffer.append( ':' );
+            buffer.append( execution.getGoal() );
+            buffer.append( " (" );
+            buffer.append( execution.getExecutionId() );
+            buffer.append( ")" );
+        }
+
+        if ( project != null )
+        {
+            buffer.append( " on project " );
+            buffer.append( project.getArtifactId() );
+        }
+
+        if ( cause != null )
+        {
+            buffer.append( ": " ).append( cause.getMessage() );
+        }
+
+        return buffer.toString();
+    }
+
 }

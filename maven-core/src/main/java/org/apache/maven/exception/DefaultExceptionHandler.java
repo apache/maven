@@ -23,6 +23,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -180,6 +181,10 @@ public class DefaultExceptionHandler
                 {
                     reference = exception.getClass().getSimpleName();
                 }
+            }
+            else if ( exception instanceof LifecycleExecutionException )
+            {
+                reference = getReference( exception.getCause() );
             }
             else if ( !( exception instanceof RuntimeException ) )
             {

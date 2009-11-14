@@ -367,39 +367,50 @@ public class DefaultLifecycleExecutor
     private void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
                                              Collection<String> scopesToResolve, MavenSession session,
                                              boolean aggregating )
-        throws ArtifactResolutionException, ArtifactNotFoundException
+        throws LifecycleExecutionException
     {
         Set<Artifact> artifacts;
 
         try
         {
-            artifacts = projectDependenciesResolver.resolve( project, scopesToCollect, scopesToResolve, session );
-        }
-        catch ( MultipleArtifactsNotFoundException e )
-        {
-            /*
-             * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
-             * plugins that require dependency resolution although they usually run in phases of the build where project
-             * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
-             */
-            if ( aggregating && areAllArtifactsInReactor( session.getProjects(), e.getMissingArtifacts() ) )
+            try
             {
-                logger.warn( "The following artifacts could not be resolved at this point of the build"
-                    + " but seem to be part of the reactor:" );
-
-                for ( Artifact artifact : e.getMissingArtifacts() )
+                artifacts = projectDependenciesResolver.resolve( project, scopesToCollect, scopesToResolve, session );
+            }
+            catch ( MultipleArtifactsNotFoundException e )
+            {
+                /*
+                 * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
+                 * plugins that require dependency resolution although they usually run in phases of the build where project
+                 * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
+                 */
+                if ( aggregating && areAllArtifactsInReactor( session.getProjects(), e.getMissingArtifacts() ) )
                 {
-                    logger.warn( "o " + artifact.getId() );
+                    logger.warn( "The following artifacts could not be resolved at this point of the build"
+                        + " but seem to be part of the reactor:" );
+
+                    for ( Artifact artifact : e.getMissingArtifacts() )
+                    {
+                        logger.warn( "o " + artifact.getId() );
+                    }
+
+                    logger.warn( "Try running the build up to the lifecycle phase \"package\"" );
+
+                    artifacts = new LinkedHashSet<Artifact>( e.getResolvedArtifacts() );
                 }
-
-                logger.warn( "Try running the build up to the lifecycle phase \"package\"" );
-
-                artifacts = new LinkedHashSet<Artifact>( e.getResolvedArtifacts() );
+                else
+                {
+                    throw e;
+                }
             }
-            else
-            {
-                throw e;
-            }
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new LifecycleExecutionException( null, project, e );
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            throw new LifecycleExecutionException( null, project, e );
         }
 
         project.setArtifacts( artifacts );
@@ -488,7 +499,7 @@ public class DefaultLifecycleExecutor
         }
 
         void checkForUpdate( MavenSession session )
-            throws ArtifactResolutionException, ArtifactNotFoundException
+            throws LifecycleExecutionException
         {
             if ( lastProject == session.getCurrentProject() )
             {
@@ -509,23 +520,25 @@ public class DefaultLifecycleExecutor
 
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                           DependencyContext dependencyContext )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
-        ArtifactResolutionException, ArtifactNotFoundException
+        throws LifecycleExecutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            throw new MojoExecutionException( "Goal " + mojoDescriptor.getId()
-                + " requires a project to execute but there is no POM in this build." );
+            Throwable cause =
+                new IllegalStateException( "Goal requires a project to execute but there is no POM in this build." );
+            throw new LifecycleExecutionException( mojoExecution, null, cause );
         }
 
         if ( mojoDescriptor.isOnlineRequired() && session.isOffline() )
         {
             if ( MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) )
             {
-                throw new MojoExecutionException( "Goal " + mojoDescriptor.getId()
-                    + " requires online mode for execution but Maven is currently offline." );
+                Throwable cause =
+                    new IllegalStateException( "Goal requires online mode for execution"
+                        + " but Maven is currently offline." );
+                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), cause );
             }
             else
             {
@@ -544,29 +557,30 @@ public class DefaultLifecycleExecutor
 
         try
         {
-            pluginManager.executeMojo( session, mojoExecution );
+            try
+            {
+                pluginManager.executeMojo( session, mojoExecution );
+            }
+            catch ( MojoFailureException e )
+            {
+                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+            }
+            catch ( MojoExecutionException e )
+            {
+                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+            }
+            catch ( PluginConfigurationException e )
+            {
+                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+            }
+            catch ( PluginManagerException e )
+            {
+                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+            }
 
             fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
         }
-        catch ( MojoFailureException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        catch ( MojoExecutionException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        catch ( PluginConfigurationException e )
-        {
-            fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
-
-            throw e;
-        }
-        catch ( PluginManagerException e )
+        catch ( LifecycleExecutionException e )
         {
             fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
 
@@ -582,8 +596,7 @@ public class DefaultLifecycleExecutor
     }
 
     public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
-        ArtifactResolutionException, ArtifactNotFoundException
+        throws LifecycleExecutionException
     {
         return executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ),
                                         new DependencyContext( mojoExecution ) );
@@ -591,8 +604,7 @@ public class DefaultLifecycleExecutor
 
     private List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session,
                                                         ProjectIndex projectIndex, DependencyContext dependencyContext )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException,
-        ArtifactResolutionException, ArtifactNotFoundException
+        throws LifecycleExecutionException
     {
         List<MavenProject> forkedProjects = Collections.emptyList();
 
@@ -643,25 +655,7 @@ public class DefaultLifecycleExecutor
 
                 fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_SUCCEEDED );
             }
-            catch ( MojoFailureException e )
-            {
-                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
-
-                throw e;
-            }
-            catch ( MojoExecutionException e )
-            {
-                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
-
-                throw e;
-            }
-            catch ( PluginConfigurationException e )
-            {
-                fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
-
-                throw e;
-            }
-            catch ( PluginManagerException e )
+            catch ( LifecycleExecutionException e )
             {
                 fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
 

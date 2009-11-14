@@ -38,7 +38,9 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
@@ -426,11 +428,18 @@ public class MavenCli
 
             Map<String, String> references = new LinkedHashMap<String, String>();
 
+            MavenProject project = null;
+
             for ( Throwable exception : result.getExceptions() )
             {
                 ExceptionSummary summary = handler.handleException( exception );
 
                 logSummary( summary, references, "", cliRequest.showErrors );
+
+                if ( project == null && exception instanceof LifecycleExecutionException )
+                {
+                    project = ( (LifecycleExecutionException) exception ).getProject();
+                }
             }
 
             logger.error( "" );
@@ -453,6 +462,13 @@ public class MavenCli
                 {
                     logger.error( entry.getValue() + " " + entry.getKey() );
                 }
+            }
+
+            if ( project != null && !project.equals( result.getTopologicallySortedProjects().get( 0 ) ) )
+            {
+                logger.error( "" );
+                logger.error( "After correcting the problems, you can resume the build with the command" );
+                logger.error( "  mvn <goals> -rf :" + project.getArtifactId() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )

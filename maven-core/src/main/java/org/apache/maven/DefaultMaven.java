@@ -175,6 +175,10 @@ public class DefaultMaven
 
         session.setProjects( projects );
 
+        result.setTopologicallySortedProjects( session.getProjects() );
+        
+        result.setProject( session.getTopLevelProject() );
+
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
@@ -224,6 +228,8 @@ public class DefaultMaven
             return processResult( result, e );
         }
 
+        result.setTopologicallySortedProjects( session.getProjects() );
+
         // Desired order of precedence for local artifact repositories
         //
         // Reactor
@@ -244,10 +250,6 @@ public class DefaultMaven
         {        
             return processResult( result, session.getResult().getExceptions().get( 0 ) );
         }
-
-        result.setTopologicallySortedProjects( session.getProjects() );
-        
-        result.setProject( session.getTopLevelProject() );
 
         return result;
     }
