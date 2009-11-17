@@ -114,7 +114,7 @@ public class DefaultBuildPluginManager
                 throw new PluginExecutionException( mojoExecution, project, e );
             }
         }
-        catch ( PluginManagerException e )
+        catch ( PluginContainerException e )
         {
             throw new PluginExecutionException( mojoExecution, project, e );
         }
