@@ -23,10 +23,7 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -64,12 +61,12 @@ public class DefaultMavenProjectBuilder
         return projectBuilder.build( pomFile, configuration ).getProject();
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration )
+    public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration, boolean allowStubModel )
         throws ProjectBuildingException
     {
         normalizeToArtifactRepositories( configuration );
 
-        return projectBuilder.build( artifact, configuration ).getProject();
+        return projectBuilder.build( artifact, allowStubModel, configuration ).getProject();
     }
 
     private void normalizeToArtifactRepositories( ProjectBuilderConfiguration configuration )
@@ -152,7 +149,7 @@ public class DefaultMavenProjectBuilder
 
         try
         {
-            return buildFromRepository( artifact, configuration );
+            return buildFromRepository( artifact, configuration, allowStubModel );
         }
         catch ( ProjectBuildingException e )
         {
@@ -160,40 +157,9 @@ public class DefaultMavenProjectBuilder
             {
                 throw new InvalidProjectModelException( e.getProjectId(), e.getMessage(), e.getPomFile() );
             }
-            else if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
-            {
-                if ( allowStubModel )
-                {
-                    MavenProject stubProject = new MavenProject( createStubModel( artifact ) );
-                    stubProject.setParent( buildStandaloneSuperProject( configuration ) );
-                    return stubProject;
-                }
-            }
 
             throw e;
         }
-    }
-
-    private Model createStubModel( Artifact projectArtifact )
-    {
-        Model model = new Model();
-
-        model.setModelVersion( "4.0.0" );
-
-        model.setArtifactId( projectArtifact.getArtifactId() );
-
-        model.setGroupId( projectArtifact.getGroupId() );
-
-        model.setVersion( projectArtifact.getVersion() );
-
-        // TODO: not correct in some instances
-        model.setPackaging( projectArtifact.getType() );
-
-        model.setDistributionManagement( new DistributionManagement() );
-
-        model.getDistributionManagement().setStatus( "generated" );
-
-        return model;
     }
 
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories,

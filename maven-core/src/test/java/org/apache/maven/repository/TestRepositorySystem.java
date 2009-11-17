@@ -269,6 +269,11 @@ public class TestRepositorySystem
 
         if ( !localFile.exists() )
         {
+            if ( request.getRemoteRepositories().isEmpty() )
+            {
+                throw new IOException( localFile + " does not exist and no remote repositories are configured" );
+            }
+
             ArtifactRepository remoteRepo = request.getRemoteRepositories().get( 0 );
 
             File remoteFile = new File( remoteRepo.getBasedir(), remoteRepo.pathOf( artifact ) );

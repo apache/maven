@@ -26,14 +26,12 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * A stub implementation to bypass artifact resolution from repositories.
  * 
  * @author Benjamin Bentmann
  */
-@Component( role = ProjectBuildingHelper.class )
 public class EmptyProjectBuildingHelper
     implements ProjectBuildingHelper
 {

@@ -38,7 +38,7 @@ public interface MavenProjectBuilder
         throws ProjectBuildingException;
 
     //TODO remote-resources-plugin
-    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean force )
+    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, boolean allowStubModel )
         throws ProjectBuildingException;
 
     // TODO: this is only to provide a project for plugins that don't need a project to execute but need some

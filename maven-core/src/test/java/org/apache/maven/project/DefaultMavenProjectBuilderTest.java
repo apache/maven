@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.util.FileUtils;
@@ -77,6 +78,15 @@ public class DefaultMavenProjectBuilderTest
         }
     }
 
+    protected MavenProject getProject( Artifact pom, boolean allowStub )
+        throws Exception
+    {
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setLocalRepository( getLocalRepository() );
+
+        return projectBuilder.build( pom, allowStub, configuration ).getProject();
+    }
+
     /**
      * Check that we can build ok from the middle pom of a (parent,child,grandchild) heirarchy
      * @throws Exception
@@ -104,6 +114,25 @@ public class DefaultMavenProjectBuilderTest
         assertEquals( "first", project.getBuildPlugins().get( 0 ).getExecutions().get( 0 ).getId() );
     }
 
+    public void testBuildStubModelForMissingRemotePom()
+        throws Exception
+    {
+        Artifact pom = repositorySystem.createProjectArtifact( "org.apache.maven.its", "missing", "0.1" );
+        MavenProject project = getProject( pom, true );
+
+        assertNotNull( project.getArtifactId() );
+
+        assertNotNull( project.getRemoteArtifactRepositories() );
+        assertFalse( project.getRemoteArtifactRepositories().isEmpty() );
+
+        assertNotNull( project.getPluginArtifactRepositories() );
+        assertFalse( project.getPluginArtifactRepositories().isEmpty() );
+
+        assertNull( project.getParent() );
+        assertNull( project.getParentArtifact() );
+
+        assertFalse( project.isExecutionRoot() );
+    }
 
     @Override
     protected ArtifactRepository getLocalRepository()

@@ -29,6 +29,9 @@ public interface ProjectBuilder
     ProjectBuildingResult build( Artifact projectArtifact, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
+    ProjectBuildingResult build( Artifact projectArtifact, boolean allowStubModel, ProjectBuildingRequest request )
+        throws ProjectBuildingException;
+
     // TODO: this is only to provide a project for plugins that don't need a project to execute but need some
     // of the values from a MavenProject. Ideally this should be something internal and nothing outside Maven
     // would ever need this so it should not be exposed in a public API

@@ -38,6 +38,8 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingResult;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -77,13 +79,12 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        return build( pomFile, true, configuration );
+        return build( pomFile, new FileModelSource( pomFile ), configuration );
     }
 
-    private ProjectBuildingResult build( File pomFile, boolean localProject, ProjectBuildingRequest configuration )
+    private ProjectBuildingResult build( File pomFile, ModelSource modelSource, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
@@ -102,14 +103,8 @@ public class DefaultProjectBuilder
                     new DefaultModelBuildingListener( project, projectBuildingHelper, configuration );
                 request.setModelBuildingListener( listener );
     
-                if ( localProject )
-                {
-                    request.setPomFile( pomFile );
-                }
-                else
-                {
-                    request.setModelSource( new FileModelSource( pomFile ) );
-                }
+                request.setPomFile( pomFile );
+                request.setModelSource( modelSource );
     
                 ModelBuildingResult result;
                 try
@@ -193,6 +188,12 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
+        return build( artifact, false, configuration );
+    }
+
+    public ProjectBuildingResult build( Artifact artifact, boolean allowStubModel, ProjectBuildingRequest configuration )
+        throws ProjectBuildingException
+    {
         if ( !artifact.getType().equals( "pom" ) )
         {
             artifact = repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
@@ -209,6 +210,11 @@ public class DefaultProjectBuilder
 
         ArtifactResolutionResult result = repositorySystem.resolve( request );
 
+        if ( result.hasMissingArtifacts() && allowStubModel )
+        {
+            return build( null, createStubModelSource( artifact ), configuration );
+        }
+
         try
         {
             resolutionErrorHandler.throwErrors( request, result );
@@ -221,7 +227,25 @@ public class DefaultProjectBuilder
 
         boolean localProject = artifact.getRepository() != null && "reactor".equals( artifact.getRepository().getId() );
 
-        return build( artifact.getFile(), localProject, configuration );
+        File pomFile = artifact.getFile();
+
+        return build( localProject ? pomFile : null, new FileModelSource( pomFile ), configuration );
+    }
+
+    private ModelSource createStubModelSource( Artifact artifact )
+    {
+        StringBuilder buffer = new StringBuilder( 1024 );
+
+        buffer.append( "<?xml version='1.0'?>" );
+        buffer.append( "<project>" );
+        buffer.append( "<modelVersion>4.0.0</modelVersion>" );
+        buffer.append( "<groupId>" ).append( artifact.getGroupId() ).append( "</groupId>" );
+        buffer.append( "<artifactId>" ).append( artifact.getArtifactId() ).append( "</artifactId>" );
+        buffer.append( "<version>" ).append( artifact.getBaseVersion() ).append( "</version>" );
+        buffer.append( "<packaging>" ).append( artifact.getType() ).append( "</packaging>" );
+        buffer.append( "</project>" );
+
+        return new StringModelSource( buffer, artifact.getId() );
     }
 
     /**
@@ -233,35 +257,10 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult buildStandaloneSuperProject( ProjectBuildingRequest config )
         throws ProjectBuildingException
     {
-        ModelBuildingRequest request = getModelBuildingRequest( config, null );
-
-        MavenProject standaloneProject = new MavenProject( repositorySystem, this, config );
-
-        DefaultModelBuildingListener listener =
-            new DefaultModelBuildingListener( standaloneProject, projectBuildingHelper, config );
-        request.setModelBuildingListener( listener );
-
-        request.setModelSource( new UrlModelSource( getClass().getResource( "standalone.xml" ) ) );
-
-        ModelBuildingResult result;
-        try
-        {
-            result = modelBuilder.build( request );
-        }
-        catch ( ModelBuildingException e )
-        {
-            throw new ProjectBuildingException( "[standalone]", "Failed to build standalone project", e );
-        }
-
-        standaloneProject.setModel( result.getEffectiveModel() );
-        standaloneProject.setOriginalModel( result.getRawModel() );
-
-        standaloneProject.setActiveProfiles( result.getActiveExternalProfiles() );
-        standaloneProject.setInjectedProfileIds( "external", getProfileIds( result.getActiveExternalProfiles() ) );
-
-        standaloneProject.setExecutionRoot( true );
-
-        return new DefaultProjectBuildingResult( standaloneProject, result.getProblems(), null );
+        ProjectBuildingResult result =
+            build( null, new UrlModelSource( getClass().getResource( "standalone.xml" ) ), config );
+        result.getProject().setExecutionRoot( true );
+        return result;
     }
 
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest config )
@@ -493,10 +492,13 @@ public class DefaultProjectBuilder
                                              project.getPackaging() );
         project.setArtifact( projectArtifact );
 
-        Build build = project.getBuild();
-        project.addScriptSourceRoot( build.getScriptSourceDirectory() );
-        project.addCompileSourceRoot( build.getSourceDirectory() );
-        project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
+        if ( project.getFile() != null )
+        {
+            Build build = project.getBuild();
+            project.addScriptSourceRoot( build.getScriptSourceDirectory() );
+            project.addCompileSourceRoot( build.getSourceDirectory() );
+            project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
+        }
 
         List<Profile> activeProfiles = new ArrayList<Profile>();
         activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
