@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4453PluginVersionFromLifecycleMappingTest.class );
         suite.addTestSuite( MavenITmng4450StubModelForMissingDependencyPomTest.class );
         suite.addTestSuite( MavenITmng4448FollowHttpRedirectTest.class );
         suite.addTestSuite( MavenITmng4436SingletonComponentLookupTest.class );
