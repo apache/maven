@@ -36,6 +36,7 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -63,7 +64,7 @@ public class DefaultLifecycleBindingsInjector
 
         if ( defaultPlugins == null )
         {
-            problems.addError( "Unknown packaging: " + packaging );
+            problems.add( Severity.ERROR, "Unknown packaging: " + packaging, null );
         }
         else if ( !defaultPlugins.isEmpty() )
         {

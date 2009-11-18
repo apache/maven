@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.profile.activation.ProfileActivator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -103,7 +104,7 @@ public class DefaultProfileSelector
             }
             catch ( RuntimeException e )
             {
-                problems.addError( "Failed to determine activation for profile " + profile.getId(), e );
+                problems.add( Severity.ERROR, "Failed to determine activation for profile " + profile.getId(), e );
                 return false;
             }
         }

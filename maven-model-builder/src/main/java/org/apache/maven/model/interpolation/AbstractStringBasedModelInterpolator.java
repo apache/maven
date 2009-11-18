@@ -22,6 +22,7 @@ package org.apache.maven.model.interpolation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.path.PathTranslator;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
@@ -229,7 +230,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 }
                 catch ( InterpolationException e )
                 {
-                    problems.addError( e.getMessage(), e );
+                    problems.add( Severity.ERROR, e.getMessage(), e );
                 }
 
                 interpolator.clearFeedback();

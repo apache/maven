@@ -22,6 +22,7 @@ package org.apache.maven.model.interpolation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -285,13 +286,13 @@ public class StringSearchModelInterpolator
                             }
                             catch ( IllegalArgumentException e )
                             {
-                                problems.addError( "Failed to interpolate field: " + fields[i] + " on class: "
-                                    + cls.getName(), e );
+                                problems.add( Severity.ERROR, "Failed to interpolate field: " + fields[i]
+                                    + " on class: " + cls.getName(), e );
                             }
                             catch ( IllegalAccessException e )
                             {
-                                problems.addError( "Failed to interpolate field: " + fields[i] + " on class: "
-                                    + cls.getName(), e );
+                                problems.add( Severity.ERROR, "Failed to interpolate field: " + fields[i]
+                                    + " on class: " + cls.getName(), e );
                             }
                         }
                         finally

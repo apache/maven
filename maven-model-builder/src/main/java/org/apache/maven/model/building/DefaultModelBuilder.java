@@ -35,6 +35,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -267,7 +268,7 @@ public class DefaultModelBuilder
 
         modelValidator.validateEffectiveModel( resultModel, request, problems );
 
-        if ( hasErrors( problems.getProblems() ) )
+        if ( problems.hasErrors() )
         {
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
@@ -320,22 +321,24 @@ public class DefaultModelBuilder
 
                 if ( pomFile != null )
                 {
-                    problems.addError( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+                    problems.add( Severity.ERROR, "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                                  e );
                 }
                 else
                 {
-                    problems.addWarning( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+                    problems.add( Severity.WARNING, "Malformed POM " + modelSource.getLocation() + ": "
+                        + e.getMessage(), e );
                 }
             }
         }
         catch ( ModelParseException e )
         {
-            problems.addFatalError( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+            problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
         catch ( IOException e )
         {
-            problems.addFatalError( "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+            problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
@@ -344,23 +347,12 @@ public class DefaultModelBuilder
         problems.setSource( model );
         modelValidator.validateRawModel( model, request, problems );
 
-        return model;
-    }
-
-    private boolean hasErrors( List<ModelProblem> problems )
-    {
-        if ( problems != null )
+        if ( problems.hasFatalErrors() )
         {
-            for ( ModelProblem problem : problems )
-            {
-                if ( ModelProblem.Severity.ERROR.compareTo( problem.getSeverity() ) >= 0 )
-                {
-                    return true;
-                }
-            }
+            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
-        return false;
+        return model;
     }
 
     private ProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
@@ -395,7 +387,7 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                problems.addError( "Invalid repository " + repository.getId() + ": " + e.getMessage(), e );
+                problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(), e );
             }
         }
     }
@@ -469,8 +461,9 @@ public class DefaultModelBuilder
 
             if ( !"pom".equals( parentModel.getPackaging() ) )
             {
-                problems.addError( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
-                    + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" );
+                problems.add( Severity.ERROR, "Invalid packaging for parent POM "
+                    + ModelProblemUtils.toSourceHint( parentModel ) + ", must be \"pom\" but is \""
+                    + parentModel.getPackaging() + "\"", null );
             }
         }
         else
@@ -575,7 +568,7 @@ public class DefaultModelBuilder
         }
         catch ( UnresolvableModelException e )
         {
-            problems.addFatalError( "Non-resolvable parent POM "
+            problems.add( Severity.FATAL, "Non-resolvable parent POM "
                 + ModelProblemUtils.toId( groupId, artifactId, version ) + " for "
                 + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
@@ -639,7 +632,7 @@ public class DefaultModelBuilder
                     message += modelId + " -> ";
                 }
                 message += imported;
-                problems.addError( message );
+                problems.add( Severity.ERROR, message, null );
 
                 continue;
             }
@@ -663,7 +656,7 @@ public class DefaultModelBuilder
                 }
                 catch ( UnresolvableModelException e )
                 {
-                    problems.addError( "Non-resolvable import POM "
+                    problems.add( Severity.ERROR, "Non-resolvable import POM "
                         + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
                     continue;
                 }

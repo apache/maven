@@ -23,6 +23,7 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,7 +61,8 @@ public class PropertyProfileActivator
 
                 if ( name == null || name.length() <= 0 )
                 {
-                    problems.addError( "The property name is required to activate the profile " + profile.getId() );
+                    problems.add( Severity.ERROR, "The property name is required to activate the profile "
+                        + profile.getId(), null );
                     return false;
                 }
 

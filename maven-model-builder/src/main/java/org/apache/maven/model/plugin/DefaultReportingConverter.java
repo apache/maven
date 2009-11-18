@@ -28,6 +28,7 @@ import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -98,8 +99,8 @@ public class DefaultReportingConverter
             && request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
         {
 
-            problems.addWarning( "The <reporting> section is deprecated"
-                + ", please move the reports to the <configuration> section of the new Maven Site Plugin." );
+            problems.add( Severity.WARNING, "The <reporting> section is deprecated"
+                + ", please move the reports to the <configuration> section of the new Maven Site Plugin.", null );
         }
 
         for ( ReportPlugin plugin : reporting.getPlugins() )

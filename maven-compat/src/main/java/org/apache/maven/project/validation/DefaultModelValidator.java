@@ -22,7 +22,9 @@ package org.apache.maven.project.validation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -64,24 +66,12 @@ public class DefaultModelValidator
             this.result = result;
         }
 
-        public void addError( String message )
+        public void add( Severity severity, String message, Exception cause )
         {
-            result.addMessage( message );
-        }
-
-        public void addError( String message, Exception cause )
-        {
-            result.addMessage( message );
-        }
-
-        public void addWarning( String message )
-        {
-            // not supported
-        }
-
-        public void addWarning( String message, Exception cause )
-        {
-            // not supported
+            if ( !ModelProblem.Severity.WARNING.equals( severity ) )
+            {
+                result.addMessage( message );
+            }
         }
 
     }

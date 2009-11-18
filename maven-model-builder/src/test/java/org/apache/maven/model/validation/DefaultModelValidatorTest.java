@@ -102,8 +102,9 @@ public class DefaultModelValidatorTest
         super.tearDown();
     }
 
-    private void assertViolations( SimpleProblemCollector result, int errors, int warnings )
+    private void assertViolations( SimpleProblemCollector result, int fatals, int errors, int warnings )
     {
+        assertEquals( fatals, result.getFatals().size() );
         assertEquals( errors, result.getErrors().size() );
         assertEquals( warnings, result.getWarnings().size() );
     }
@@ -113,7 +114,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-modelVersion-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'modelVersion' is missing.", result.getErrors().get( 0 ) );
     }
@@ -124,7 +125,7 @@ public class DefaultModelValidatorTest
         SimpleProblemCollector result =
             validateRaw( "bad-modelVersion.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf( "modelVersion" ) > -1 );
     }
@@ -134,7 +135,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-artifactId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'artifactId' is missing.", result.getErrors().get( 0 ) );
     }
@@ -144,7 +145,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-groupId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'groupId' is missing.", result.getErrors().get( 0 ) );
     }
@@ -154,7 +155,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "invalid-ids-pom.xml" );
 
-        assertViolations( result, 2, 0 );
+        assertViolations( result, 0, 2, 0 );
 
         assertEquals( "'groupId' with value 'o/a/m' does not match a valid id pattern.", result.getErrors().get( 0 ) );
 
@@ -166,7 +167,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-type-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'packaging' is missing.", result.getErrors().get( 0 ) );
     }
@@ -176,7 +177,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-version-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'version' is missing.", result.getErrors().get( 0 ) );
     }
@@ -186,7 +187,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "invalid-aggregator-packaging-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf( "Aggregator projects require 'pom' as packaging." ) > -1 );
     }
@@ -196,7 +197,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-dependency-artifactId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing" ) > -1 );
     }
@@ -206,7 +207,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-dependency-groupId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.groupId' is missing" ) > -1 );
     }
@@ -216,7 +217,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-dependency-version-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.version' is missing" ) > -1 );
     }
@@ -226,7 +227,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-dependency-mgmt-artifactId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf(
                                                          "'dependencyManagement.dependencies.dependency.artifactId' is missing" ) > -1 );
@@ -237,7 +238,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-dependency-mgmt-groupId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf(
                                                          "'dependencyManagement.dependencies.dependency.groupId' is missing" ) > -1 );
@@ -248,7 +249,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-1-pom.xml" );
 
-        assertViolations( result, 4, 0 );
+        assertViolations( result, 0, 4, 0 );
 
         List<String> messages = result.getErrors();
 
@@ -264,7 +265,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-plugin-artifactId-pom.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'build.plugins.plugin.artifactId' is missing.", result.getErrors().get( 0 ) );
     }
@@ -275,14 +276,14 @@ public class DefaultModelValidatorTest
         SimpleProblemCollector result =
             validateEffective( "missing-plugin-version-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertEquals( "'build.plugins.plugin.version' is missing for org.apache.maven.plugins:maven-it-plugin",
                       result.getErrors().get( 0 ) );
 
         result = validateEffective( "missing-plugin-version-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
-        assertViolations( result, 0, 1 );
+        assertViolations( result, 0, 0, 1 );
     }
 
     public void testMissingRepositoryId()
@@ -291,7 +292,7 @@ public class DefaultModelValidatorTest
         SimpleProblemCollector result =
             validateRaw( "missing-repository-id-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
 
-        assertViolations( result, 4, 0 );
+        assertViolations( result, 0, 4, 0 );
 
         assertEquals( "'repositories.repository.id' is missing.", result.getErrors().get( 0 ) );
 
@@ -307,7 +308,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-resource-directory-pom.xml" );
 
-        assertViolations( result, 2, 0 );
+        assertViolations( result, 0, 2, 0 );
 
         assertEquals( "'build.resources.resource.directory' is missing.", result.getErrors().get( 0 ) );
 
@@ -319,7 +320,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-plugin-dependency-scope.xml" );
 
-        assertViolations( result, 3, 0 );
+        assertViolations( result, 0, 3, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "test:d" ) );
 
@@ -333,7 +334,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-dependency-scope.xml" );
 
-        assertViolations( result, 0, 2 );
+        assertViolations( result, 0, 0, 2 );
 
         assertTrue( result.getWarnings().get( 0 ).contains( "test:f" ) );
 
@@ -345,7 +346,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-dependency-version.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
     }
@@ -355,7 +356,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "duplicate-module.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "child" ) );
     }
@@ -365,7 +366,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "duplicate-profile-id.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "non-unique-id" ) );
     }
@@ -375,7 +376,7 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-plugin-version.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "test:mip" ) );
     }
@@ -385,9 +386,21 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "distribution-management-status.xml" );
 
-        assertViolations( result, 1, 0 );
+        assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "distributionManagement.status" ) );
+    }
+
+    public void testIncompleteParent()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "incomplete-parent.xml" );
+
+        assertViolations( result, 3, 0, 0 );
+
+        assertTrue( result.getFatals().get( 0 ).contains( "parent.groupId" ) );
+        assertTrue( result.getFatals().get( 1 ).contains( "parent.artifactId" ) );
+        assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );
     }
 
 }

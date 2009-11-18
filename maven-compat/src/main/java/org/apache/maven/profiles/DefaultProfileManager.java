@@ -21,7 +21,9 @@ package org.apache.maven.profiles;
 
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileSelector;
@@ -192,25 +194,14 @@ public class DefaultProfileManager
             profileSelector.getActiveProfiles( profilesById.values(), context, new ModelProblemCollector()
             {
 
-                public void addWarning( String message, Exception cause )
+                public void add( Severity severity, String message, Exception cause )
                 {
-                    // ignored
+                    if ( !ModelProblem.Severity.WARNING.equals( severity ) )
+                    {
+                        errors.add( new ProfileActivationException( message, cause ) );
+                    }
                 }
 
-                public void addWarning( String message )
-                {
-                    // ignored
-                }
-
-                public void addError( String message, Exception cause )
-                {
-                    errors.add( new ProfileActivationException( message, cause ) );
-                }
-
-                public void addError( String message )
-                {
-                    errors.add( new ProfileActivationException( message ) );
-                }
             } );
 
         if ( !errors.isEmpty() )

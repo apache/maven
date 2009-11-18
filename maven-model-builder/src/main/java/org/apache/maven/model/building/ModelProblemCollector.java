@@ -32,33 +32,12 @@ public interface ModelProblemCollector
 {
 
     /**
-     * Adds the specified error.
+     * Adds the specified problem.
      * 
-     * @param message The detail message of the error, may be {@code null}.
+     * @param severity The severity of the problem, must not be {@code null}.
+     * @param message The detail message of the problem, may be {@code null}.
+     * @param cause The cause of the problem, may be {@code null}.
      */
-    void addError( String message );
-
-    /**
-     * Adds the specified error.
-     * 
-     * @param message The detail message of the error, may be {@code null}.
-     * @param cause The cause of the error, may be {@code null}.
-     */
-    void addError( String message, Exception cause );
-
-    /**
-     * Adds the specified warning.
-     * 
-     * @param message The detail message of the warning, may be {@code null}.
-     */
-    void addWarning( String message );
-
-    /**
-     * Adds the specified warning.
-     * 
-     * @param message The detail message of the warning, may be {@code null}.
-     * @param cause The cause of the warning, may be {@code null}.
-     */
-    void addWarning( String message, Exception cause );
+    void add( ModelProblem.Severity severity, String message, Exception cause );
 
 }

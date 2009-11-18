@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
@@ -96,7 +97,7 @@ class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().addError( "Invalid plugin repository: " + e.getMessage(), e );
+            event.getProblems().add( Severity.ERROR, "Invalid plugin repository: " + e.getMessage(), e );
         }
         project.setPluginArtifactRepositories( pluginRepositories );
 
@@ -118,11 +119,11 @@ class DefaultModelBuildingListener
             }
             catch ( PluginResolutionException e )
             {
-                event.getProblems().addError( "Unresolveable build extension: " + e.getMessage(), e );
+                event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), e );
             }
             catch ( PluginVersionResolutionException e )
             {
-                event.getProblems().addError( "Unresolveable build extension: " + e.getMessage(), e );
+                event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), e );
             }
 
             if ( project.getClassRealm() != null )
@@ -152,7 +153,7 @@ class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().addError( "Invalid artifact repository: " + e.getMessage(), e );
+            event.getProblems().add( Severity.ERROR, "Invalid artifact repository: " + e.getMessage(), e );
         }
         project.setRemoteArtifactRepositories( remoteRepositories );
     }

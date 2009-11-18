@@ -22,6 +22,7 @@ package org.apache.maven.model.interpolation;
 import java.util.List;
 
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.codehaus.plexus.interpolation.ValueSource;
 
 /**
@@ -61,7 +62,7 @@ class ProblemDetectingValueSource
             {
                 msg += " Please use ${" + newPrefix + expression.substring( bannedPrefix.length() ) + "} instead.";
             }
-            problems.addWarning( msg );
+            problems.add( Severity.WARNING, msg, null );
         }
 
         return value;

@@ -20,9 +20,12 @@ package org.apache.maven.model.building;
  */
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.io.ModelParseException;
 
 /**
@@ -46,9 +49,26 @@ class DefaultModelProblemCollector
 
     private Model rootModel;
 
+    private Set<ModelProblem.Severity> severities = EnumSet.noneOf( ModelProblem.Severity.class );
+
     public DefaultModelProblemCollector( List<ModelProblem> problems )
     {
         this.problems = ( problems != null ) ? problems : new ArrayList<ModelProblem>();
+
+        for ( ModelProblem problem : this.problems )
+        {
+            severities.add( problem.getSeverity() );
+        }
+    }
+
+    public boolean hasFatalErrors()
+    {
+        return severities.contains( ModelProblem.Severity.FATAL );
+    }
+
+    public boolean hasErrors()
+    {
+        return severities.contains( ModelProblem.Severity.ERROR ) || severities.contains( ModelProblem.Severity.FATAL );
     }
 
     public List<ModelProblem> getProblems()
@@ -100,14 +120,21 @@ class DefaultModelProblemCollector
     public void add( ModelProblem problem )
     {
         problems.add( problem );
+
+        severities.add( problem.getSeverity() );
     }
 
     public void addAll( List<ModelProblem> problems )
     {
-        problems.addAll( problems );
+        this.problems.addAll( problems );
+
+        for ( ModelProblem problem : problems )
+        {
+            severities.add( problem.getSeverity() );
+        }
     }
 
-    public void addFatalError( String message, Exception cause )
+    public void add( Severity severity, String message, Exception cause )
     {
         int line = -1;
         int column = -1;
@@ -119,52 +146,15 @@ class DefaultModelProblemCollector
             column = e.getColumnNumber();
         }
 
-        add( message, ModelProblem.Severity.FATAL, line, column, cause );
+        add( severity, message, line, column, cause );
     }
 
-    public void addError( String message )
+    private void add( ModelProblem.Severity severity, String message, int line, int column, Exception cause )
     {
-        addError( message, null );
-    }
+        ModelProblem problem =
+            new DefaultModelProblem( message, severity, getSource(), line, column, getModelId(), cause );
 
-    public void addError( String message, Exception cause )
-    {
-        int line = -1;
-        int column = -1;
-
-        if ( cause instanceof ModelParseException )
-        {
-            ModelParseException e = (ModelParseException) cause;
-            line = e.getLineNumber();
-            column = e.getColumnNumber();
-        }
-
-        add( message, ModelProblem.Severity.ERROR, line, column, cause );
-    }
-
-    public void addWarning( String message )
-    {
-        addWarning( message, null );
-    }
-
-    public void addWarning( String message, Exception cause )
-    {
-        int line = -1;
-        int column = -1;
-
-        if ( cause instanceof ModelParseException )
-        {
-            ModelParseException e = (ModelParseException) cause;
-            line = e.getLineNumber();
-            column = e.getColumnNumber();
-        }
-
-        add( message, ModelProblem.Severity.WARNING, line, column, cause );
-    }
-
-    private void add( String message, ModelProblem.Severity severity, int line, int column, Exception cause )
-    {
-        problems.add( new DefaultModelProblem( message, severity, getSource(), line, column, getModelId(), cause ) );
+        add( problem );
     }
 
 }

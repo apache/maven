@@ -22,6 +22,8 @@ package org.apache.maven.model.building;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.building.ModelProblem.Severity;
+
 /**
  * A simple model problem collector for testing the model building components.
  * 
@@ -35,25 +37,7 @@ public class SimpleProblemCollector
 
     private List<String> errors = new ArrayList<String>();
 
-    public void addError( String message )
-    {
-        errors.add( message );
-    }
-
-    public void addError( String message, Exception cause )
-    {
-        addError( message );
-    }
-
-    public void addWarning( String message )
-    {
-        warnings.add( message );
-    }
-
-    public void addWarning( String message, Exception cause )
-    {
-        addWarning( message );
-    }
+    private List<String> fatals = new ArrayList<String>();
 
     public List<String> getWarnings()
     {
@@ -63,6 +47,28 @@ public class SimpleProblemCollector
     public List<String> getErrors()
     {
         return errors;
+    }
+
+    public List<String> getFatals()
+    {
+        return fatals;
+    }
+
+    public void add( Severity severity, String message, Exception cause )
+    {
+        switch ( severity )
+        {
+            case FATAL:
+                fatals.add( message );
+                break;
+            case ERROR:
+                errors.add( message );
+                break;
+            case WARNING:
+                warnings.add( message );
+                break;
+        }
+
     }
 
 }
