@@ -182,7 +182,7 @@ public class DefaultBuildPluginManager
         }
 
         mavenPluginManager.setupPluginRealm( pluginDescriptor, session, session.getCurrentProject().getClassRealm(),
-                                             null );
+                                             null, null );
 
         return pluginDescriptor.getClassRealm();
     }

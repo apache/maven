@@ -119,7 +119,7 @@ public class DefaultPluginManager
 
             pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
 
-            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null );
+            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
         }
         catch ( Exception e )
         {
@@ -151,7 +151,7 @@ public class DefaultPluginManager
 
             pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
 
-            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null );
+            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
         }
         catch ( Exception e )
         {
@@ -231,7 +231,7 @@ public class DefaultPluginManager
 
         try
         {
-            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null );
+            pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
         }
         catch ( PluginResolutionException e )
         {

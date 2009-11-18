@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Plugin;
@@ -53,9 +54,12 @@ public class DefaultPluginRealmCache
 
         private final List<String> parentImports;
 
+        private final ArtifactFilter filter;
+
         private final int hashCode;
 
-        public CacheKey( Plugin plugin, ClassLoader parentRealm, List<String> parentImports, ArtifactRepository localRepository,
+        public CacheKey( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                         ArtifactFilter dependencyFilter, ArtifactRepository localRepository,
                          List<ArtifactRepository> remoteRepositories )
         {
             this.plugin = plugin.clone();
@@ -63,12 +67,14 @@ public class DefaultPluginRealmCache
             this.repositories.addAll( remoteRepositories );
             this.parentRealm = parentRealm;
             this.parentImports = ( parentImports != null ) ? parentImports : Collections.<String> emptyList();
+            this.filter = dependencyFilter;
 
             int hash = 17;
             hash = hash * 31 + pluginHashCode( plugin );
             hash = hash * 31 + repositories.hashCode();
             hash = hash * 31 + ( parentRealm != null ? parentRealm.hashCode() : 0 );
             hash = hash * 31 + this.parentImports.hashCode();
+            hash = hash * 31 + ( dependencyFilter != null ? dependencyFilter.hashCode() : 0 );
             this.hashCode = hash;
         }
 
@@ -94,19 +100,22 @@ public class DefaultPluginRealmCache
             CacheKey other = (CacheKey) o;
 
             return parentRealm == other.parentRealm && pluginEquals( plugin, other.plugin )
-                && eq( repositories, other.repositories );
+                && eq( repositories, other.repositories ) && eq( filter, other.filter )
+                && eq( parentImports, other.parentImports );
         }
     }
 
     protected final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
     public CacheRecord get( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
-                            ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+                            ArtifactFilter dependencyFilter, ArtifactRepository localRepository,
+                            List<ArtifactRepository> remoteRepositories )
     {
-        return cache.get( new CacheKey( plugin, parentRealm, parentImports, localRepository, remoteRepositories ) );
+        return cache.get( new CacheKey( plugin, parentRealm, parentImports, dependencyFilter, localRepository,
+                                        remoteRepositories ) );
     }
 
-    public CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+    public CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,ArtifactFilter dependencyFilter,
                             ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                             ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
     {
@@ -115,7 +124,8 @@ public class DefaultPluginRealmCache
             throw new NullPointerException();
         }
 
-        CacheKey key = new CacheKey( plugin, parentRealm, parentImports, localRepository, remoteRepositories );
+        CacheKey key =
+            new CacheKey( plugin, parentRealm, parentImports, dependencyFilter, localRepository, remoteRepositories );
 
         if ( cache.containsKey( key ) )
         {

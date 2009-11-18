@@ -22,6 +22,7 @@ package org.apache.maven.plugin;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -71,9 +72,10 @@ public interface MavenPluginManager
      *            {@code null}.
      * @param parent The parent class realm for the plugin, may be {@code null} to use the Maven core realm.
      * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     * @param filter The filter used to exclude certain plugin dependencies, may be {@code null}.
      */
     void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                           List<String> imports )
+                           List<String> imports, ArtifactFilter filter )
         throws PluginResolutionException, PluginContainerException;
 
     /**

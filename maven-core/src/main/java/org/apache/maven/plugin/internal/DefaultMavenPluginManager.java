@@ -290,7 +290,7 @@ public class DefaultMavenPluginManager
     }
 
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
-                                               ClassLoader parent, List<String> imports )
+                                               ClassLoader parent, List<String> imports, ArtifactFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
@@ -298,7 +298,7 @@ public class DefaultMavenPluginManager
         MavenProject project = session.getCurrentProject();
 
         PluginRealmCache.CacheRecord cacheRecord =
-            pluginRealmCache.get( plugin, parent, imports, session.getLocalRepository(),
+            pluginRealmCache.get( plugin, parent, imports, filter, session.getLocalRepository(),
                                   project.getPluginArtifactRepositories() );
 
         if ( cacheRecord != null )
@@ -308,10 +308,10 @@ public class DefaultMavenPluginManager
         }
         else
         {
-            createPluginRealm( pluginDescriptor, session, parent, imports );
+            createPluginRealm( pluginDescriptor, session, parent, imports, filter );
 
             cacheRecord =
-                pluginRealmCache.put( plugin, parent, imports, session.getLocalRepository(),
+                pluginRealmCache.put( plugin, parent, imports, filter, session.getLocalRepository(),
                                       project.getPluginArtifactRepositories(), pluginDescriptor.getClassRealm(),
                                       pluginDescriptor.getArtifacts() );
         }
@@ -320,7 +320,7 @@ public class DefaultMavenPluginManager
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                                    List<String> imports )
+                                    List<String> imports, ArtifactFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
@@ -346,8 +346,17 @@ public class DefaultMavenPluginManager
         request.setOffline( session.isOffline() );
         request.setTransferListener( session.getRequest().getTransferListener() );
 
-        List<Artifact> pluginArtifacts =
-            resolvePluginArtifacts( plugin, pluginArtifact, request, project.getExtensionArtifactFilter() );
+        ArtifactFilter dependencyFilter = project.getExtensionArtifactFilter();
+        if ( dependencyFilter == null )
+        {
+            dependencyFilter = filter;
+        }
+        else if ( filter != null )
+        {
+            dependencyFilter = new AndArtifactFilter( Arrays.asList( dependencyFilter, filter ) );
+        }
+
+        List<Artifact> pluginArtifacts = resolvePluginArtifacts( plugin, pluginArtifact, request, dependencyFilter );
 
         ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports );
 
@@ -420,7 +429,7 @@ public class DefaultMavenPluginManager
     // FIXME: only exposed to allow workaround for MNG-4194
     protected List<Artifact> resolvePluginArtifacts( Plugin plugin, Artifact pluginArtifact,
                                                      RepositoryRequest repositoryRequest,
-                                                     ArtifactFilter extensionArtifactFilter )
+                                                     ArtifactFilter dependencyFilter )
         throws PluginResolutionException
     {
         Set<Artifact> overrideArtifacts = new LinkedHashSet<Artifact>();
@@ -433,9 +442,9 @@ public class DefaultMavenPluginManager
 
         ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
 
-        if ( extensionArtifactFilter != null )
+        if ( dependencyFilter != null )
         {
-            resolutionFilter = new AndArtifactFilter( Arrays.asList( resolutionFilter, extensionArtifactFilter ) );
+            resolutionFilter = new AndArtifactFilter( Arrays.asList( resolutionFilter, dependencyFilter ) );
         }
 
         ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );

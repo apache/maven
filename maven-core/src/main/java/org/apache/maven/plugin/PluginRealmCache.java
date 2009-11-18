@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -51,11 +52,12 @@ public interface PluginRealmCache
     }
 
     CacheRecord get( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
-                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories );
+                     ArtifactFilter dependencyFilter, ArtifactRepository localRepository,
+                     List<ArtifactRepository> remoteRepositories );
 
     CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
-                     ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                     ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
+                     ArtifactFilter dependencyFilter, ArtifactRepository localRepository,
+                     List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm, List<Artifact> pluginArtifacts );
 
     void flush();
 
