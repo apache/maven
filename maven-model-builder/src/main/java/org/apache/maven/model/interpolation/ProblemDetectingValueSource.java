@@ -68,6 +68,7 @@ class ProblemDetectingValueSource
         return value;
     }
 
+    @SuppressWarnings( "unchecked" )
     public List getFeedback()
     {
         return valueSource.getFeedback();

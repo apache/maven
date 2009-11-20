@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.model.io.ModelReader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
