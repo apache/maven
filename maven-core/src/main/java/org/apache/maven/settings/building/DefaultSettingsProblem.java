@@ -26,7 +26,7 @@ package org.apache.maven.settings.building;
  * 
  * @author Benjamin Bentmann
  */
-class DefaultSettingsProblem
+public class DefaultSettingsProblem
     implements SettingsProblem
 {
 

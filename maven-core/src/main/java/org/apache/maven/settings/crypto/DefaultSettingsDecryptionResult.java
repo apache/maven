@@ -1,4 +1,4 @@
-package org.apache.maven.settings.building;
+package org.apache.maven.settings.crypto;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -22,30 +22,50 @@ package org.apache.maven.settings.building;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.building.SettingsProblem;
 
 /**
- * Collects the output of the settings builder.
+ * Collects the output of the settings decrypter.
  * 
  * @author Benjamin Bentmann
  */
-class DefaultSettingsBuildingResult
-    implements SettingsBuildingResult
+class DefaultSettingsDecryptionResult
+    implements SettingsDecryptionResult
 {
 
-    private Settings effectiveSettings;
+    private List<Server> servers;
+
+    private List<Proxy> proxies;
 
     private List<SettingsProblem> problems;
 
-    public DefaultSettingsBuildingResult( Settings effectiveSettings, List<SettingsProblem> problems )
+    public DefaultSettingsDecryptionResult( List<Server> servers, List<Proxy> proxies, List<SettingsProblem> problems )
     {
-        this.effectiveSettings = effectiveSettings;
+        this.servers = ( servers != null ) ? servers : new ArrayList<Server>();
+        this.proxies = ( proxies != null ) ? proxies : new ArrayList<Proxy>();
         this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
     }
 
-    public Settings getEffectiveSettings()
+    public Server getServer()
     {
-        return effectiveSettings;
+        return servers.isEmpty() ? null : servers.get( 0 );
+    }
+
+    public List<Server> getServers()
+    {
+        return servers;
+    }
+
+    public Proxy getProxy()
+    {
+        return proxies.isEmpty() ? null : proxies.get( 0 );
+    }
+
+    public List<Proxy> getProxies()
+    {
+        return proxies;
     }
 
     public List<SettingsProblem> getProblems()

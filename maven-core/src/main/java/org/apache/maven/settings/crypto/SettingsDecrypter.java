@@ -1,4 +1,4 @@
-package org.apache.maven.settings.building;
+package org.apache.maven.settings.crypto;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,32 +19,20 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
-import java.util.List;
-
-import org.apache.maven.settings.Settings;
-
 /**
- * Collects the output of the settings builder.
+ * Decrypts passwords in the settings.
  * 
  * @author Benjamin Bentmann
  */
-public interface SettingsBuildingResult
+public interface SettingsDecrypter
 {
 
     /**
-     * Gets the assembled settings.
+     * Decrypts passwords in the settings.
      * 
-     * @return The assembled settings, never {@code null}.
+     * @param request The settings decryption request that holds the parameters, must not be {@code null}.
+     * @return The result of the settings decryption, never {@code null}.
      */
-    Settings getEffectiveSettings();
-
-    /**
-     * Gets the problems that were encountered during the settings building. Note that only problems of severity
-     * {@link SettingsProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
-     * the settings builder to fail with a {@link SettingsBuildingException}.
-     * 
-     * @return The problems that were encountered during the settings building, can be empty but never {@code null}.
-     */
-    List<SettingsProblem> getProblems();
+    SettingsDecryptionResult decrypt( SettingsDecryptionRequest request );
 
 }
