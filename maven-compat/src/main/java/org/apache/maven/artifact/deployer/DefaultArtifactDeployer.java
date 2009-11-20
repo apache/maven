@@ -23,9 +23,13 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.repository.legacy.TransferListenerAdapter;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
 import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -44,6 +48,9 @@ public class DefaultArtifactDeployer
 
     @Requirement
     private RepositoryMetadataManager repositoryMetadataManager;
+
+    @Requirement
+    private LegacySupport legacySupport;
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set
@@ -72,7 +79,7 @@ public class DefaultArtifactDeployer
                 FileUtils.copyFile( source, artifactFile );
             }
 
-            wagonManager.putArtifact( source, artifact, deploymentRepository, null );
+            wagonManager.putArtifact( source, artifact, deploymentRepository, getTransferListener() );
 
             // must be after the artifact is installed
             for ( ArtifactMetadata metadata : artifact.getMetadataList() )
@@ -93,4 +100,17 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "Error installing artifact's metadata: " + e.getMessage(), e );
         }
     }
+
+    private TransferListener getTransferListener()
+    {
+        MavenSession session = legacySupport.getSession();
+
+        if ( session == null )
+        {
+            return null;
+        }
+
+        return TransferListenerAdapter.newAdapter( session.getRequest().getTransferListener() );
+    }
+
 }
