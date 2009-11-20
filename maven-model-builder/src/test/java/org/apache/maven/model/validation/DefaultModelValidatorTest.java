@@ -403,4 +403,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getFatals().get( 2 ).contains( "parent.version" ) );
     }
 
+    public void testHardCodedSystemPath()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "hard-coded-system-path.xml" );
+
+        assertViolations( result, 0, 0, 1 );
+
+        assertTrue( result.getWarnings().get( 0 ).contains( "test:a:jar" ) );
+    }
+
 }

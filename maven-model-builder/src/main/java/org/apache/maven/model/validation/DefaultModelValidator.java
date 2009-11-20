@@ -367,6 +367,15 @@ public class DefaultModelValidator
             {
                 addViolation( problems, Severity.ERROR, "'" + prefix + ".classifier' must be empty for imported POM: " + key );
             }
+            else if ( "system".equals( dependency.getScope() ) )
+            {
+                String sysPath = dependency.getSystemPath();
+                if ( StringUtils.isNotEmpty( sysPath ) && !hasExpression( sysPath ) )
+                {
+                    addViolation( problems, Severity.WARNING, "'" + prefix
+                        + ".systemPath' should use a variable instead of a hard-coded path: " + key + " -> " + sysPath );
+                }
+            }
 
             Dependency existing = index.get( key );
 
