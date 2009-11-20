@@ -55,10 +55,16 @@ import org.apache.maven.repository.ArtifactDoesNotExistException;
 import org.apache.maven.repository.ArtifactTransferFailedException;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
+import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
+import org.apache.maven.settings.crypto.SettingsDecryptionRequest;
+import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -68,6 +74,10 @@ import org.codehaus.plexus.util.StringUtils;
 public class LegacyRepositorySystem
     implements RepositorySystem
 {
+
+    @Requirement
+    private Logger logger;
+
     @Requirement
     private ArtifactFactory artifactFactory;
 
@@ -88,6 +98,9 @@ public class LegacyRepositorySystem
 
     @Requirement
     private MirrorSelector mirrorSelector;
+
+    @Requirement
+    private SettingsDecrypter settingsDecrypter;
 
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
@@ -509,6 +522,18 @@ public class LegacyRepositorySystem
 
                 if ( server != null )
                 {
+                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( server );
+                    SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
+                    server = result.getServer();
+
+                    if ( logger.isDebugEnabled() )
+                    {
+                        for ( SettingsProblem problem : result.getProblems() )
+                        {
+                            logger.debug( problem.getMessage(), problem.getException() );
+                        }
+                    }
+
                     Authentication authentication = new Authentication( server.getUsername(), server.getPassword() );
 
                     repository.setAuthentication( authentication );
@@ -548,6 +573,18 @@ public class LegacyRepositorySystem
 
                 if ( proxy != null )
                 {
+                    SettingsDecryptionRequest request = new DefaultSettingsDecryptionRequest( proxy );
+                    SettingsDecryptionResult result = settingsDecrypter.decrypt( request );
+                    proxy = result.getProxy();
+
+                    if ( logger.isDebugEnabled() )
+                    {
+                        for ( SettingsProblem problem : result.getProblems() )
+                        {
+                            logger.debug( problem.getMessage(), problem.getException() );
+                        }
+                    }
+
                     Proxy p = new Proxy();
                     p.setHost( proxy.getHost() );
                     p.setProtocol( proxy.getProtocol() );

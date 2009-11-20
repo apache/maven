@@ -20,7 +20,6 @@ package org.apache.maven.execution;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,10 +34,7 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 @Component(role = MavenExecutionRequestPopulator.class)
 public class DefaultMavenExecutionRequestPopulator
@@ -46,13 +42,7 @@ public class DefaultMavenExecutionRequestPopulator
 {
 
     @Requirement
-    private Logger logger;
-
-    @Requirement
     private RepositorySystem repositorySystem;
-
-    @Requirement( hint = "maven" )
-    private SecDispatcher securityDispatcher;
 
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException
@@ -73,10 +63,6 @@ public class DefaultMavenExecutionRequestPopulator
         for ( Server server : settings.getServers() )
         {
             server = server.clone();
-
-            String password = decrypt( server.getPassword(), "password for server " + server.getId() );
-
-            server.setPassword( password );
 
             request.addServer( server );
         }
@@ -101,10 +87,6 @@ public class DefaultMavenExecutionRequestPopulator
             }
 
             proxy = proxy.clone();
-
-            String password = decrypt( proxy.getPassword(), "password for proxy " + proxy.getId() );
-
-            proxy.setPassword( password );
 
             request.addProxy( proxy );
         }
@@ -132,35 +114,6 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         return request;
-    }
-
-    private String decrypt( String encrypted, String source )
-    {
-        try
-        {
-            return securityDispatcher.decrypt( encrypted );
-        }
-        catch ( SecDispatcherException e )
-        {
-            logger.warn( "Not decrypting " + source + " due to exception in security handler: " + e.getMessage() );
-
-            Throwable cause = e;
-
-            while ( cause.getCause() != null )
-            {
-                cause = cause.getCause();
-            }
-
-            if ( cause instanceof FileNotFoundException )
-            {
-                logger.warn( "Ensure that you have configured your master password file (and relocation if appropriate)." );
-                logger.warn( "See the installation instructions for details." );
-            }
-
-            logger.debug( "Full stack trace follows", e );
-
-            return encrypted;
-        }
     }
 
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
