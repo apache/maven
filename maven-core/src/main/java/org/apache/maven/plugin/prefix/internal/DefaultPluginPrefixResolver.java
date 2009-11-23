@@ -184,8 +184,6 @@ public class DefaultPluginPrefixResolver
                         {
                             logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage() );
                         }
-
-                        continue;
                     }
                     catch ( ArtifactDoesNotExistException e )
                     {
