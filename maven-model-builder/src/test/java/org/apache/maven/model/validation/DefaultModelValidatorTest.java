@@ -376,9 +376,11 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-plugin-version.xml" );
 
-        assertViolations( result, 0, 1, 0 );
+        assertViolations( result, 0, 3, 0 );
 
         assertTrue( result.getErrors().get( 0 ).contains( "test:mip" ) );
+        assertTrue( result.getErrors().get( 1 ).contains( "test:rmv" ) );
+        assertTrue( result.getErrors().get( 2 ).contains( "test:lmv" ) );
     }
 
     public void testDistributionManagementStatus()

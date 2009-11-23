@@ -27,8 +27,23 @@ under the License.
     <plugins>
       <plugin>
         <groupId>test</groupId>
+        <artifactId>good</artifactId>
+        <version>1.0</version>
+      </plugin>
+      <plugin>
+        <groupId>test</groupId>
         <artifactId>mip</artifactId>
         <version>${missing.property}</version>
+      </plugin>
+      <plugin>
+        <groupId>test</groupId>
+        <artifactId>rmv</artifactId>
+        <version>RELEASE</version>
+      </plugin>
+      <plugin>
+        <groupId>test</groupId>
+        <artifactId>lmv</artifactId>
+        <version>LATEST</version>
       </plugin>
     </plugins>
   </build>

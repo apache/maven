@@ -264,7 +264,7 @@ public class DefaultModelValidator
                     validateStringNotEmpty( "build.plugins.plugin.version", problems, errOn31, p.getVersion(),
                                             p.getKey() );
 
-                    validateVersion( "build.plugins.plugin.version", problems, errOn30, p.getVersion(), p.getKey() );
+                    validatePluginVersion( "build.plugins.plugin.version", problems, errOn30, p.getVersion(), p.getKey() );
 
                     validateBoolean( "build.plugins.plugin.inherited", problems, errOn30, p.getInherited(),
                                      p.getKey() );
@@ -638,6 +638,32 @@ public class DefaultModelValidator
         }
 
         if ( !hasExpression( string ) )
+        {
+            return true;
+        }
+
+        if ( sourceHint != null )
+        {
+            addViolation( problems, severity, "'" + fieldName + "' must be a valid version for " + sourceHint
+                + " but is '" + string + "'." );
+        }
+        else
+        {
+            addViolation( problems, severity, "'" + fieldName + "' must be a valid version but is '" + string + "'." );
+        }
+
+        return false;
+    }
+
+    private boolean validatePluginVersion( String fieldName, ModelProblemCollector problems, Severity severity, String string,
+                                     String sourceHint )
+    {
+        if ( string == null || string.length() <= 0 )
+        {
+            return true;
+        }
+
+        if ( !hasExpression( string ) && !"RELEASE".equals( string ) && !"LATEST".equals( string ) )
         {
             return true;
         }
