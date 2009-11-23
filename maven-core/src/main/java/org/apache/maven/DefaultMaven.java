@@ -41,6 +41,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -80,7 +82,7 @@ public class DefaultMaven
 
     @Requirement
     MavenExecutionRequestPopulator populator;
-    
+
     private void fireEvent( MavenSession session, ExecutionEventCatapult catapult )
     {
         ExecutionListener listener = session.getRequest().getExecutionListener();
@@ -336,7 +338,10 @@ public class DefaultMaven
         //
         if ( request.getPom() == null || !request.getPom().exists() )
         {
-            MavenProject project = projectBuilder.buildStandaloneSuperProject( request.getProjectBuildingRequest() ).getProject(); 
+            ModelSource modelSource = new UrlModelSource( getClass().getResource( "project/standalone.xml" ) );
+            MavenProject project =
+                projectBuilder.build( modelSource, request.getProjectBuildingRequest() ).getProject();
+            project.setExecutionRoot( true );
             projects.add( project );
             request.setProjectPresent( false );
             return projects;

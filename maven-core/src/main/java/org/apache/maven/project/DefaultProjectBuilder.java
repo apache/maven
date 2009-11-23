@@ -40,7 +40,6 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
-import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
@@ -80,6 +79,12 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         return build( pomFile, new FileModelSource( pomFile ), configuration );
+    }
+
+    public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest configuration )
+        throws ProjectBuildingException
+    {
+        return build( null, modelSource, configuration );
     }
 
     private ProjectBuildingResult build( File pomFile, ModelSource modelSource, ProjectBuildingRequest configuration )
@@ -246,21 +251,6 @@ public class DefaultProjectBuilder
         buffer.append( "</project>" );
 
         return new StringModelSource( buffer, artifact.getId() );
-    }
-
-    /**
-     * This is used for pom-less execution like running archetype:generate.
-     * 
-     * I am taking out the profile handling and the interpolation of the base directory until we
-     * spec this out properly.
-     */
-    public ProjectBuildingResult buildStandaloneSuperProject( ProjectBuildingRequest config )
-        throws ProjectBuildingException
-    {
-        ProjectBuildingResult result =
-            build( null, new UrlModelSource( getClass().getResource( "standalone.xml" ) ), config );
-        result.getProject().setExecutionRoot( true );
-        return result;
     }
 
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest config )

@@ -27,6 +27,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.repository.RepositorySystem;
@@ -178,7 +180,10 @@ public class DefaultMavenProjectBuilder
     public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
         throws ProjectBuildingException
     {
-        return projectBuilder.buildStandaloneSuperProject( config ).getProject();
+        ModelSource modelSource = new UrlModelSource( getClass().getResource( "standalone.xml" ) );
+        MavenProject project = projectBuilder.build( modelSource, config ).getProject();
+        project.setExecutionRoot( true );
+        return project;
     }
 
     public MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository )

@@ -19,23 +19,59 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.building.ModelSource;
 
+/**
+ * Builds in-memory descriptions of projects.
+ */
 public interface ProjectBuilder
 {
 
+    /**
+     * Builds a project descriptor from the specified POM file.
+     * 
+     * @param projectFile The POM file to build the project from, must not be {@code null}.
+     * @param request The project building request that holds further parameters, must not be {@code null}.
+     * @return The result of the project building, never {@code null}.
+     * @throws ProjectBuildingException If the project descriptor could not be successfully built.
+     */
     ProjectBuildingResult build( File projectFile, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
+    /**
+     * Builds a project descriptor for the specified artifact.
+     * 
+     * @param projectArtifact The POM artifact to build the project from, must not be {@code null}.
+     * @param request The project building request that holds further parameters, must not be {@code null}.
+     * @return The result of the project building, never {@code null}.
+     * @throws ProjectBuildingException If the project descriptor could not be successfully built.
+     */
     ProjectBuildingResult build( Artifact projectArtifact, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
+    /**
+     * Builds a project descriptor for the specified artifact.
+     * 
+     * @param projectArtifact The POM artifact to build the project from, must not be {@code null}.
+     * @param allowStubModel A flag controlling the case of a missing POM artifact. If {@code true} and the specified
+     *            POM artifact does not exist, a simple stub model will be returned. If {@code false}, an exception will
+     *            be thrown.
+     * @param request The project building request that holds further parameters, must not be {@code null}.
+     * @return The result of the project building, never {@code null}.
+     * @throws ProjectBuildingException If the project descriptor could not be successfully built.
+     */
     ProjectBuildingResult build( Artifact projectArtifact, boolean allowStubModel, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
-    // TODO: this is only to provide a project for plugins that don't need a project to execute but need some
-    // of the values from a MavenProject. Ideally this should be something internal and nothing outside Maven
-    // would ever need this so it should not be exposed in a public API
-    ProjectBuildingResult buildStandaloneSuperProject( ProjectBuildingRequest request )
+    /**
+     * Builds a project descriptor for the specified model source.
+     * 
+     * @param modelSource The source of the model to built the project descriptor from, must not be {@code null}.
+     * @param request The project building request that holds further parameters, must not be {@code null}.
+     * @return The result of the project building, never {@code null}.
+     * @throws ProjectBuildingException If the project descriptor could not be successfully built.
+     */
+    ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException;
 
     /**
