@@ -286,6 +286,17 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 0, 1 );
     }
 
+    public void testEmptyPluginVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "empty-plugin-version.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertEquals( "'build.plugins.plugin.version' must be a valid version "
+            + "for org.apache.maven.plugins:maven-it-plugin but is ''.", result.getErrors().get( 0 ) );
+    }
+
     public void testMissingRepositoryId()
         throws Exception
     {

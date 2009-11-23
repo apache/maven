@@ -261,10 +261,8 @@ public class DefaultModelValidator
 
                     validateStringNotEmpty( "build.plugins.plugin.groupId", problems, Severity.ERROR, p.getGroupId() );
 
-                    validateStringNotEmpty( "build.plugins.plugin.version", problems, errOn31, p.getVersion(),
-                                            p.getKey() );
-
-                    validatePluginVersion( "build.plugins.plugin.version", problems, errOn30, p.getVersion(), p.getKey() );
+                    validatePluginVersion( "build.plugins.plugin.version", problems, p.getVersion(), p.getKey(),
+                                           request );
 
                     validateBoolean( "build.plugins.plugin.inherited", problems, errOn30, p.getInherited(),
                                      p.getKey() );
@@ -655,27 +653,31 @@ public class DefaultModelValidator
         return false;
     }
 
-    private boolean validatePluginVersion( String fieldName, ModelProblemCollector problems, Severity severity, String string,
-                                     String sourceHint )
+    private boolean validatePluginVersion( String fieldName, ModelProblemCollector problems, String string,
+                                           String sourceHint, ModelBuildingRequest request )
     {
-        if ( string == null || string.length() <= 0 )
+        Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
+        Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+
+        if ( !validateNotNull( fieldName, problems, errOn31, string, sourceHint ) )
         {
-            return true;
+            return false;
         }
 
-        if ( !hasExpression( string ) && !"RELEASE".equals( string ) && !"LATEST".equals( string ) )
+        if ( string.length() > 0 && !hasExpression( string ) && !"RELEASE".equals( string )
+            && !"LATEST".equals( string ) )
         {
             return true;
         }
 
         if ( sourceHint != null )
         {
-            addViolation( problems, severity, "'" + fieldName + "' must be a valid version for " + sourceHint
+            addViolation( problems, errOn30, "'" + fieldName + "' must be a valid version for " + sourceHint
                 + " but is '" + string + "'." );
         }
         else
         {
-            addViolation( problems, severity, "'" + fieldName + "' must be a valid version but is '" + string + "'." );
+            addViolation( problems, errOn30, "'" + fieldName + "' must be a valid version but is '" + string + "'." );
         }
 
         return false;
@@ -693,7 +695,12 @@ public class DefaultModelValidator
 
     private static Severity getSeverity( ModelBuildingRequest request, int errorThreshold )
     {
-        if ( request.getValidationLevel() < errorThreshold )
+        return getSeverity( request.getValidationLevel(), errorThreshold );
+    }
+
+    private static Severity getSeverity( int validationLevel, int errorThreshold )
+    {
+        if ( validationLevel < errorThreshold )
         {
             return Severity.WARNING;
         }
