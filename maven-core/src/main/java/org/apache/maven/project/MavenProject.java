@@ -1792,6 +1792,7 @@ public class MavenProject
             {
                 ArtifactRepository repo =
                     repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
+                repositorySystem.injectProxy( Arrays.asList( repo ), projectBuilderConfiguration.getProxies() );
                 repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuilderConfiguration.getServers() );
                 setReleaseArtifactRepository( repo );
             }
@@ -1811,6 +1812,7 @@ public class MavenProject
             {
                 ArtifactRepository repo =
                     repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
+                repositorySystem.injectProxy( Arrays.asList( repo ), projectBuilderConfiguration.getProxies() );
                 repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuilderConfiguration.getServers() );
                 setSnapshotArtifactRepository( repo );
             }

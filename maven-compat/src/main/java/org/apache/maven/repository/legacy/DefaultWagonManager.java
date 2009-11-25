@@ -194,21 +194,22 @@ public class DefaultWagonManager
     private void connectWagon( Wagon wagon, ArtifactRepository repository ) 
         throws ConnectionException, AuthenticationException
     {
-        if ( repository.getAuthentication() != null )
+        if ( repository.getAuthentication() != null && repository.getProxy() != null )
         {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ) );                    
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ),
+                           proxyInfo( repository ) );
+        }
+        else if ( repository.getAuthentication() != null )
+        {
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ) );
         }
         else if ( repository.getProxy() != null )
         {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), proxyInfo( repository ) );                    
-        }
-        else if ( repository.getAuthentication() != null && repository.getProxy() != null )
-        {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ), proxyInfo( repository ) );                                
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ), proxyInfo( repository ) );
         }
         else
         {
-            wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );                    
+            wagon.connect( new Repository( repository.getId(), repository.getUrl() ) );
         }
     }    
     
