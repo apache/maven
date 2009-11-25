@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4470AuthenticatedDeploymentToProxyTest.class );
         suite.addTestSuite( MavenITmng4469AuthenticatedDeploymentToCustomRepoTest.class );
         suite.addTestSuite( MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest.class );
         suite.addTestSuite( MavenITmng4461ArtifactUploadMonitorTest.class );
