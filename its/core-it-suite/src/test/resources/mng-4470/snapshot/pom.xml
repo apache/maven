@@ -35,7 +35,7 @@ under the License.
   <distributionManagement>
     <snapshotRepository>
       <id>maven-core-it</id>
-      <url>http://bad.host/repo</url>
+      <url>http://bad2.host/repo</url>
     </snapshotRepository>
   </distributionManagement>
 
