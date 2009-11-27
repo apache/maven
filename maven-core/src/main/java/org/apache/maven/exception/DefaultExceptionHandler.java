@@ -124,7 +124,7 @@ public class DefaultExceptionHandler
 
         for ( ModelProblem problem : result.getProblems() )
         {
-            ExceptionSummary child = handle( problem );
+            ExceptionSummary child = handle( problem, result.getProjectId() );
             if ( child != null )
             {
                 children.add( child );
@@ -143,11 +143,30 @@ public class DefaultExceptionHandler
         return new ExceptionSummary( null, message, null, children );
     }
 
-    private ExceptionSummary handle( ModelProblem problem )
+    private ExceptionSummary handle( ModelProblem problem, String projectId )
     {
         if ( ModelProblem.Severity.ERROR.compareTo( problem.getSeverity() ) >= 0 )
         {
-            return handle( problem.getMessage(), problem.getException() );
+            String message = problem.getMessage();
+
+            String location = "";
+
+            if ( !problem.getModelId().equals( projectId ) )
+            {
+                location += problem.getModelId();
+
+                if ( StringUtils.isNotEmpty( problem.getSource() ) )
+                {
+                    location += " (" + problem.getSource() + ")";
+                }
+            }
+
+            if ( StringUtils.isNotEmpty( location ) )
+            {
+                message += " @ " + location;
+            }
+
+            return handle( message, problem.getException() );
         }
         else
         {
