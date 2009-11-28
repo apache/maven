@@ -117,7 +117,7 @@ public class DefaultModelBuilder
         return build( request, new LinkedHashSet<String>() );
     }
 
-    private ModelBuildingResult build( ModelBuildingRequest request, Collection<String> imports )
+    private ModelBuildingResult build( ModelBuildingRequest request, Collection<String> importIds )
         throws ModelBuildingException
     {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
@@ -136,6 +136,9 @@ public class DefaultModelBuilder
 
         ModelData resultData = new ModelData( inputModel );
         ModelData superData = new ModelData( getSuperModel() );
+
+        Collection<String> parentIds = new LinkedHashSet<String>();
+        parentIds.add( ModelProblemUtils.toId( inputModel ) );
 
         List<ModelData> lineage = new ArrayList<ModelData>();
 
@@ -181,6 +184,18 @@ public class DefaultModelBuilder
             if ( currentData == null )
             {
                 currentData = superData;
+            }
+            else if ( !parentIds.add( currentData.getId() ) )
+            {
+                String message = "The parents form a cycle: ";
+                for ( String modelId : parentIds )
+                {
+                    message += modelId + " -> ";
+                }
+                message += currentData.getId();
+
+                problems.add( ModelProblem.Severity.FATAL, message, null );
+                throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
             }
         }
 
@@ -588,7 +603,7 @@ public class DefaultModelBuilder
     }
 
     private void importDependencyManagement( Model model, ModelBuildingRequest request,
-                                             DefaultModelProblemCollector problems, Collection<String> imports )
+                                             DefaultModelProblemCollector problems, Collection<String> importIds )
     {
         DependencyManagement depMngt = model.getDependencyManagement();
 
@@ -599,7 +614,7 @@ public class DefaultModelBuilder
 
         String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
 
-        imports.add( importing );
+        importIds.add( importing );
 
         ModelResolver modelResolver = request.getModelResolver();
 
@@ -624,10 +639,10 @@ public class DefaultModelBuilder
 
             String imported = groupId + ':' + artifactId + ':' + version;
 
-            if ( imports.contains( imported ) )
+            if ( importIds.contains( imported ) )
             {
                 String message = "The dependencies of type=pom and with scope=import form a cycle: ";
-                for ( String modelId : imports )
+                for ( String modelId : importIds )
                 {
                     message += modelId + " -> ";
                 }
@@ -673,7 +688,7 @@ public class DefaultModelBuilder
                 ModelBuildingResult importResult;
                 try
                 {
-                    importResult = build( importRequest, imports );
+                    importResult = build( importRequest, importIds );
                 }
                 catch ( ModelBuildingException e )
                 {
@@ -703,7 +718,7 @@ public class DefaultModelBuilder
             importMngts.add( importMngt );
         }
 
-        imports.remove( importing );
+        importIds.remove( importing );
 
         dependencyManagementImporter.importManagement( model, importMngts, request, problems );
     }

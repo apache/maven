@@ -86,6 +86,11 @@ class DefaultModelProblemCollector
     {
         this.sourceModel = source;
         this.source = null;
+
+        if ( rootModel == null )
+        {
+            rootModel = source;
+        }
     }
 
     private String getSource()
