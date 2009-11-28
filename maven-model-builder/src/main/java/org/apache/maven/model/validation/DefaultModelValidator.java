@@ -70,7 +70,7 @@ public class DefaultModelValidator
             if ( equals( parent.getGroupId(), model.getGroupId() )
                 && equals( parent.getArtifactId(), model.getArtifactId() ) )
             {
-                addViolation( problems, Severity.ERROR, "The parent element cannot have the same ID as the project." );
+                addViolation( problems, Severity.FATAL, "The parent element cannot have the same ID as the project." );
             }
         }
 
