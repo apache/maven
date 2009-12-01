@@ -46,6 +46,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 
@@ -66,9 +67,6 @@ public class DefaultWagonManager
 
     @Requirement
     private PlexusContainer container;
-
-    @Requirement(role = Wagon.class)
-    private Map<String, Wagon> wagons;
 
     @Requirement
     private UpdateCheckManager updateCheckManager;
@@ -686,11 +684,16 @@ public class DefaultWagonManager
         }
 
         String hint = protocol.toLowerCase( java.util.Locale.ENGLISH );
-        Wagon wagon = (Wagon) wagons.get( hint );
 
-        if ( wagon == null )
+        Wagon wagon;
+        try
         {
-            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: " + protocol );
+            wagon = container.lookup( Wagon.class, hint );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: "
+                + protocol, e );
         }
 
         return wagon;
