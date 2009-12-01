@@ -581,7 +581,10 @@ public class MavenMetadataSource
                     }
                     else
                     {
-                        message = "Invalid artifact metadata for " + relocatedArtifact.getId();
+                        message =
+                            "Invalid artifact metadata for " + relocatedArtifact.getId()
+                                + ", transitive dependencies (if any) will not be available"
+                                + ", enable debug logging for more details";
                     }
 
                     if ( logger.isDebugEnabled() )
