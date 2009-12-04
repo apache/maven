@@ -1824,6 +1824,12 @@ public class MavenProject
         return snapshotArtifactRepository;
     }
 
+    @Deprecated
+    public Artifact replaceWithActiveArtifact( Artifact pluginArtifact )
+    {
+        return pluginArtifact;
+    }
+
     private void deepCopy( MavenProject project )
     {
         // disown the parent
