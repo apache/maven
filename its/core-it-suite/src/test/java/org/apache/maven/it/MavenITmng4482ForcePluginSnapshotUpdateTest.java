@@ -1,0 +1,84 @@
+package org.apache.maven.it;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
+import java.util.Properties;
+
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4482">MNG-4482</a>.
+ * 
+ * @author Benjamin Bentmann
+ */
+public class MavenITmng4482ForcePluginSnapshotUpdateTest
+    extends AbstractMavenIntegrationTestCase
+{
+
+    public MavenITmng4482ForcePluginSnapshotUpdateTest()
+    {
+        super( "[2.0.3,3.0-alpha-1),[3.0-alpha-6,)" );
+    }
+
+    /**
+     * Verify that snapshot updates of plugins/extensions can be forced from the command line via "-U".
+     */
+    public void testit()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4482" );
+
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4482" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+
+        Properties filterProps = verifier.newDefaultFilterProperties();
+
+        filterProps.setProperty( "@repo@", "repo-1" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.setLogFileName( "log-force-1.txt" );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+
+        Properties props1 = verifier.loadProperties( "target/touch.properties" );
+        assertEquals( "old", props1.getProperty( "one" ) );
+        assertSame( null, props1.getProperty( "two" ) );
+
+        filterProps.setProperty( "@repo@", "repo-2" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.setLogFileName( "log-force-2.txt" );
+        verifier.deleteDirectory( "target" );
+        verifier.getCliOptions().add( "-U" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+
+        verifier.resetStreams();
+
+        Properties props2 = verifier.loadProperties( "target/touch.properties" );
+        assertEquals( "new", props2.getProperty( "two" ) );
+        assertSame( null, props2.getProperty( "one" ) );
+    }
+
+}

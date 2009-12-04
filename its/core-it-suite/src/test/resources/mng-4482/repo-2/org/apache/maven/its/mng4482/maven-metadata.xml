@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test Plugin :: Touch</name>
+      <prefix>mng4482</prefix>
+      <artifactId>maven-mng4482-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
