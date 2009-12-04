@@ -110,6 +110,8 @@ class DefaultModelBuildingListener
                 repositoryRequest.setLocalRepository( projectBuildingRequest.getLocalRepository() );
                 repositoryRequest.setRemoteRepositories( pluginRepositories );
                 repositoryRequest.setOffline( projectBuildingRequest.isOffline() );
+                repositoryRequest.setForceUpdate( projectBuildingRequest.isForceUpdate() );
+                repositoryRequest.setTransferListener( projectBuildingRequest.getTransferListener() );
 
                 ProjectRealmCache.CacheRecord record =
                     projectBuildingHelper.createProjectRealm( project, model, repositoryRequest );

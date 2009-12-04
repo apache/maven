@@ -21,11 +21,13 @@ package org.apache.maven.plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -144,7 +146,7 @@ public class DefaultPluginDescriptorCache
             hash = hash * 31 + groupId.hashCode();
             hash = hash * 31 + artifactId.hashCode();
             hash = hash * 31 + version.hashCode();
-            hash = hash * 31 + repositories.hashCode();
+            hash = hash * 31 + repositoriesHashCode( repositories );
             this.hashCode = hash;
         }
 
@@ -170,13 +172,75 @@ public class DefaultPluginDescriptorCache
             CacheKey that = (CacheKey) obj;
 
             return this.artifactId.equals( that.artifactId ) && this.groupId.equals( that.groupId )
-                && this.version.equals( that.version ) && this.repositories.equals( that.repositories );
+                && this.version.equals( that.version ) && repositoriesEquals( this.repositories, that.repositories );
         }
 
         @Override
         public String toString()
         {
             return groupId + ':' + artifactId + ':' + version;
+        }
+
+        private static int repositoryHashCode( ArtifactRepository repository )
+        {
+            int result = 17;
+            result = 31 * result + ( repository.getId() != null ? repository.getId().hashCode() : 0 );
+            return result;
+        }
+
+        private static int repositoriesHashCode( List<ArtifactRepository> repositories )
+        {
+            int result = 17;
+            for ( ArtifactRepository repository : repositories )
+            {
+                result = 31 * result + repositoryHashCode( repository );
+            }
+            return result;
+        }
+
+        private static boolean repositoryEquals( ArtifactRepository r1, ArtifactRepository r2 )
+        {
+            if ( r1 == r2 )
+            {
+                return true;
+            }
+
+            return eq( r1.getId(), r2.getId() ) && eq( r1.getUrl(), r2.getUrl() )
+                && repositoryPolicyEquals( r1.getReleases(), r2.getReleases() )
+                && repositoryPolicyEquals( r1.getSnapshots(), r2.getSnapshots() );
+        }
+
+        private static boolean repositoryPolicyEquals( ArtifactRepositoryPolicy p1, ArtifactRepositoryPolicy p2 )
+        {
+            if ( p1 == p2 )
+            {
+                return true;
+            }
+
+            return p1.isEnabled() == p2.isEnabled() && eq( p1.getUpdatePolicy(), p2.getUpdatePolicy() );
+        }
+
+        private static boolean repositoriesEquals( List<ArtifactRepository> r1, List<ArtifactRepository> r2 )
+        {
+            if ( r1.size() != r2.size() )
+            {
+                return false;
+            }
+
+            for ( Iterator<ArtifactRepository> it1 = r1.iterator(), it2 = r2.iterator(); it1.hasNext(); )
+            {
+                if ( !repositoryEquals( it1.next(), it2.next() ) )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static <T> boolean eq( T s1, T s2 )
+        {
+            return s1 != null ? s1.equals( s2 ) : s2 == null;
         }
 
     }

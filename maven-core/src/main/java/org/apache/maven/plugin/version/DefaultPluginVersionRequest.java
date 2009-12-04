@@ -92,6 +92,7 @@ public class DefaultPluginVersionRequest
         setCache( session.getRepositoryCache() );
         setLocalRepository( session.getLocalRepository() );
         setOffline( session.isOffline() );
+        setForceUpdate( session.getRequest().isUpdateSnapshots() );
         setTransferListener( session.getRequest().getTransferListener() );
 
         MavenProject project = session.getCurrentProject();

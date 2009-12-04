@@ -44,17 +44,22 @@ public class DefaultExtensionRealmCache
 
         private final List<File> files;
 
+        private final List<String> ids;
+
         private final int hashCode;
 
         public CacheKey( List<? extends Artifact> extensionArtifacts )
         {
             this.files = new ArrayList<File>( extensionArtifacts.size() );
+            this.ids = new ArrayList<String>( extensionArtifacts.size() );
+
             for ( Artifact artifact : extensionArtifacts )
             {
                 files.add( artifact.getFile() );
+                ids.add( artifact.getVersion() );
             }
 
-            this.hashCode = files.hashCode();
+            this.hashCode = files.hashCode() * 31 + ids.hashCode();
         }
 
         @Override
@@ -78,7 +83,7 @@ public class DefaultExtensionRealmCache
 
             CacheKey other = (CacheKey) o;
 
-            return files.equals( other.files );
+            return files.equals( other.files ) && ids.equals( other.ids );
         }
 
     }

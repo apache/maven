@@ -960,6 +960,7 @@ public class DefaultLifecycleExecutor
             request.setRemoteRepositories( project.getPluginArtifactRepositories() );
         }
         request.setOffline( session.isOffline() );
+        request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
         request.setTransferListener( session.getRequest().getTransferListener() );
 
         return request;
