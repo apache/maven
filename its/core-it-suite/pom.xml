@@ -34,6 +34,13 @@ under the License.
   <name>Maven Integration Tests</name>
 
   <!--
+  By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
+    mvn clean test -Prun-its
+  
+  This will subject the Maven version running the build to the integration tests. If you would like to test a different
+  Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
+    mvn clean test -Prun-its -DmavenHome=<maven-under-test>
+  
   To run the ITs using embedded Maven 3.x, add -D verifier.forkMode=auto. This will require more memory, something like
     MAVEN_OPTS=-Xmx256m -XX:MaxPermSize=128m
   seems to work.
