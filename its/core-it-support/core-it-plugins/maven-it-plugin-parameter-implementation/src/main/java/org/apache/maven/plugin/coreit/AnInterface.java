@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.coreit.sub;
+package org.apache.maven.plugin.coreit;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,27 +19,8 @@ package org.apache.maven.plugin.coreit.sub;
  * under the License.
  */
 
-import org.apache.maven.plugin.coreit.Bla;
-
 /**
  */
-public class MyBla
-    implements Bla
+public interface AnInterface
 {
-    private String field;
-
-    public String getField()
-    {
-        return field; 
-    }
-
-    public void setField( String field )
-    {
-        this.field = field; 
-    }
-
-    public String toString()
-    {
-        return getClass() + "-" + field;
-    }
 }

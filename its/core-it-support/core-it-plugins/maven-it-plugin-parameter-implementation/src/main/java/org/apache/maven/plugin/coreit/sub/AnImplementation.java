@@ -1,4 +1,4 @@
-package org.apache.maven.plugin.coreit;
+package org.apache.maven.plugin.coreit.sub;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,8 +19,27 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugin.coreit.AnInterface;
+
 /**
  */
-public interface Bla
+public class AnImplementation
+    implements AnInterface
 {
+    private String field;
+
+    public String getField()
+    {
+        return field; 
+    }
+
+    public void setField( String field )
+    {
+        this.field = field; 
+    }
+
+    public String toString()
+    {
+        return getClass().getName() + "-" + field;
+    }
 }

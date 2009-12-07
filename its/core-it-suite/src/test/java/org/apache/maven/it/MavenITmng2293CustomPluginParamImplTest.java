@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2293">MNG-2293</a>.
@@ -48,9 +49,14 @@ public class MavenITmng2293CustomPluginParamImplTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/param.properties" );
+        assertEquals( "org.apache.maven.plugin.coreit.sub.AnImplementation-foobar", props.getProperty( "theParameter.string" ) );
+        assertEquals( "org.apache.maven.plugin.coreit.sub.AnImplementation", props.getProperty( "theParameter.class" ) );
     }
 
 }

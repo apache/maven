@@ -19,43 +19,72 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * Check that we correctly use the implementation parameter. See MNG-2293
+ * Check that we correctly use the implementation parameter.
  *
  * @goal param-implementation
- * @description Prints out the name of the implementation of the bla field.
  */
 public class ParameterImplementationMojo
     extends AbstractMojo
 {
 
     /**
-     * @parameter implementation="org.apache.maven.plugin.coreit.sub.MyBla"
-     * @required
+     * The path to the properties file for the parameter information.
+     * 
+     * @parameter
      */
-    private Bla bla;
+    private File outputFile;
 
     /**
-     * The expected value of bla.toString().
-     *
-     * @parameter
-     * @required
+     * A parameter whose type is an interface but with a default implementation class.
+     * 
+     * @parameter implementation="org.apache.maven.plugin.coreit.sub.AnImplementation"
      */
-    private String expected;
+    private AnInterface theParameter;
 
     public void execute()
         throws MojoExecutionException
     {
+        Properties props = new Properties();
 
-        getLog().info( "bla: " + bla );
-
-        if ( ! expected.equals( bla.toString() ) )
+        if ( theParameter != null )
         {
-            throw new MojoExecutionException( "Expected '" + expected + "'; found '" + bla + "'" );
+            getLog().info( "[MAVEN-CORE-IT-LOG] theParameter = " + theParameter );
+
+            props.setProperty( "theParameter.class", theParameter.getClass().getName() );
+            props.setProperty( "theParameter.string", theParameter.toString() );
         }
+
+        getLog().info( "[MAVEN-CORE-IT-LOG] Creating output file " + outputFile );
+
+        try
+        {
+            outputFile.getParentFile().mkdirs();
+
+            FileOutputStream os = new FileOutputStream( outputFile );
+            try
+            {
+                props.store( os, "[MAVEN-CORE-IT-LOG]" );
+            }
+            finally
+            {
+                os.close();
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Failed to create output file " + outputFile + ": " + e.getMessage(), e );
+        }
+
+        getLog().info( "[MAVEN-CORE-IT-LOG] Created output file " + outputFile );
     }
 
 }

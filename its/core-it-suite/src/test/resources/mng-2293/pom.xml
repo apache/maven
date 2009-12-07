@@ -8,7 +8,7 @@
 
   <name>Maven Integration Test :: MNG-2293</name> 
   <description>
-  	Verify that default implementation of an implementation for a complex object works as expected.
+    Verify that default implementation of an implementation for a complex object works as expected.
   </description>
 
   <build>
@@ -24,8 +24,10 @@
               <goal>param-implementation</goal>
             </goals>
             <configuration>
-              <bla><field>foobar</field></bla>
-              <expected>class org.apache.maven.plugin.coreit.sub.MyBla-foobar</expected>
+              <outputFile>target/param.properties</outputFile>
+              <theParameter>
+                <field>foobar</field>
+              </theParameter>
             </configuration>
           </execution>
         </executions>
