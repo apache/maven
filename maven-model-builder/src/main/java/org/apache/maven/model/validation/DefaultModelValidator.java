@@ -76,6 +76,8 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
+            Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
+
             validateEnum( "modelVersion", problems, Severity.ERROR, model.getModelVersion(), null, "4.0.0" );
             validateStringNoExpression( "groupId", problems, Severity.WARNING, model.getGroupId() );
             validateStringNoExpression( "artifactId", problems, Severity.WARNING, model.getArtifactId() );
@@ -99,7 +101,7 @@ public class DefaultModelValidator
             {
                 if ( !profileIds.add( profile.getId() ) )
                 {
-                    addViolation( problems, Severity.ERROR, "profiles.profile.id must be unique"
+                    addViolation( problems, errOn30, "profiles.profile.id must be unique"
                         + " but found duplicate profile with id " + profile.getId() );
                 }
 
@@ -354,6 +356,8 @@ public class DefaultModelValidator
     private void validateDependencies( ModelProblemCollector problems, List<Dependency> dependencies, String prefix,
                                        ModelBuildingRequest request )
     {
+        Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
+
         Map<String, Dependency> index = new HashMap<String, Dependency>();
 
         for ( Dependency dependency : dependencies )
@@ -363,7 +367,7 @@ public class DefaultModelValidator
             if ( "pom".equals( dependency.getType() ) && "import".equals( dependency.getScope() )
                 && StringUtils.isNotEmpty( dependency.getClassifier() ) )
             {
-                addViolation( problems, Severity.ERROR, "'" + prefix + ".classifier' must be empty for imported POM: " + key );
+                addViolation( problems, errOn30, "'" + prefix + ".classifier' must be empty for imported POM: " + key );
             }
             else if ( "system".equals( dependency.getScope() ) )
             {
@@ -379,8 +383,6 @@ public class DefaultModelValidator
 
             if ( existing != null )
             {
-                Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
-
                 String msg;
                 if ( equals( existing.getVersion(), dependency.getVersion() ) )
                 {

@@ -589,7 +589,20 @@ public class DefaultModelBuilder
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
-        Model parentModel = readModel( modelSource, null, request, problems );
+        ModelBuildingRequest lenientRequest = request;
+        if ( request.getValidationLevel() > ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            lenientRequest = new FilterModelBuildingRequest( request )
+            {
+                @Override
+                public int getValidationLevel()
+                {
+                    return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+                }
+            };
+        }
+
+        Model parentModel = readModel( modelSource, null, lenientRequest, problems );
 
         ModelData parentData =
             new ModelData( parentModel, parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
