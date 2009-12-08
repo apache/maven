@@ -312,18 +312,6 @@
         <artifactId>plexus-cipher</artifactId>
         <version>${cipherVersion}</version>
       </dependency>
-      <dependency>
-        <groupId>org.sonatype.plexus</groupId>
-        <artifactId>plexus-plugin-manager</artifactId>
-        <version>${plexusPluginManagerVersion}</version>
-      </dependency>
-      <!--
-      <dependency>
-        <groupId>org.jsecurity</groupId>
-      <artifactId>jsecurity</artifactId>
-      <version>0.9.0-RC2</version>
-      </dependency>
-      -->
       <!--bootstrap-start-comment-->
       <dependency>
         <groupId>easymock</groupId>

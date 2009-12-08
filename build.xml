@@ -36,9 +36,6 @@ END SNIPPET: ant-bootstrap -->
   <target name="initTaskDefs">
     <xmlproperty file="pom.xml" prefix="pom.xml" />
     <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.1.0.jar" />    
-    <!--    
-    <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.0.10.jar" />
-    -->
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath" />
   </target>
 
@@ -83,26 +80,25 @@ END SNIPPET: ant-bootstrap -->
   </target>
 
   <target name="pull" depends="init" unless="skip.pull">
-    <property name="verbose" value="false" />
     <!-- Pull the dependencies that Maven needs to build -->
     <copy file="pom.xml" tofile="dependencies.xml" />
     <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--" />
     <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;" />
     <artifact:pom file="${basedir}/dependencies.xml" id="pom" />
-    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
+    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" useScope="compile">
       <localRepository path="${maven.repo.local}" />
       <pom refid="pom" />
     </artifact:dependencies>
     <delete file="${basedir}/dependencies.xml" />
 
     <!-- Pull the dependencies for Modello -->
-    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
+    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset">
       <localRepository path="${maven.repo.local}" />
       <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="${pom.properties.modelloVersion}" />
     </artifact:dependencies>
 
     <!-- Pull the dependencies for the MetadataGenerator CLI -->
-    <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset" verbose="${verbose}">
+    <artifact:dependencies pathId="pmdg.pathid" filesetId="pmdg.fileset">
       <localRepository path="${maven.repo.local}" />
       <dependency groupId="org.codehaus.plexus" artifactId="plexus-component-metadata" version="${pom.properties.plexusVersion}" />
     </artifact:dependencies>
@@ -113,16 +109,14 @@ END SNIPPET: ant-bootstrap -->
     <mkdir dir="${basedir}/bootstrap/target" />
     <mkdir dir="${basedir}/bootstrap/target/classes" />
 
-    <path id="maven.classpath">
-      <pathelement location="bootstrap/target/classes" />
-      <path refid="sources" />
-      <path refid="pom.pathid" />
+    <path id="pmdg.classpath">
+      <path refid="maven.classpath" />
       <path refid="pmdg.pathid" />
     </path>
 
     <echo>Using plexus version ${pom.properties.plexusVersion}</echo>
     <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
-      <classpath refid="maven.classpath" />
+      <classpath refid="pmdg.classpath" />
       <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
       <arg value="--source" />
       <arg value="${basedir}/maven-compat/src/main/java" />
@@ -192,7 +186,7 @@ END SNIPPET: ant-bootstrap -->
     <path id="sources">
       <dirset dir=".">
         <include name="bootstrap/target/generated-sources" />
-        <include name="*/src/main/*" />
+        <include name="*/src/main/java" />
       </dirset>
     </path>
 
@@ -204,14 +198,16 @@ END SNIPPET: ant-bootstrap -->
 
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes" />
-      <pathelement location="maven-compat/src/main/resources" />
-      <path refid="sources" />
+      <dirset dir=".">
+        <include name="*/src/main/resources" />
+      </dirset>
       <path refid="pom.pathid" />
     </path>
   </target>
 
   <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
     <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
+      <!--jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/-->
       <classpath refid="maven.classpath" />
       <arg value="${maven.debug}" />
       <arg value="-B" />
