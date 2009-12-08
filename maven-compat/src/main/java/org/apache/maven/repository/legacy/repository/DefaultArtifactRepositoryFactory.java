@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository;
+package org.apache.maven.repository.legacy.repository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,15 +19,13 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -38,20 +36,18 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
-    
-    @Requirement
-    private org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory factory;
+    // TODO: use settings?
+    private String globalUpdatePolicy;
 
-    @Requirement
-    private LegacySupport legacySupport;
+    private String globalChecksumPolicy;
 
-    @Requirement
-    private RepositorySystem repositorySystem;
+    @Requirement(role=ArtifactRepositoryLayout.class)
+    private Map<String,ArtifactRepositoryLayout> repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )
         throws UnknownRepositoryLayoutException
     {
-        return factory.getLayout( layoutId );
+        return repositoryLayouts.get( layoutId );
     }
 
     public ArtifactRepository createDeploymentArtifactRepository( String id,
@@ -60,7 +56,22 @@ public class DefaultArtifactRepositoryFactory
                                                                   boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
-        return injectSession( factory.createDeploymentArtifactRepository( id, url, layoutId, uniqueVersion ), false );
+        ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
+
+        checkLayout( id, layoutId, layout );
+
+        return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
+    }
+
+    private void checkLayout( String repositoryId,
+                              String layoutId,
+                              ArtifactRepositoryLayout layout )
+        throws UnknownRepositoryLayoutException
+    {
+        if ( layout == null )
+        {
+            throw new UnknownRepositoryLayoutException( repositoryId, layoutId );
+        }
     }
 
     public ArtifactRepository createDeploymentArtifactRepository( String id,
@@ -68,7 +79,7 @@ public class DefaultArtifactRepositoryFactory
                                                                   ArtifactRepositoryLayout repositoryLayout,
                                                                   boolean uniqueVersion )
     {
-        return injectSession( factory.createDeploymentArtifactRepository( id, url, repositoryLayout, uniqueVersion ), false);
+        return createArtifactRepository( id, url, repositoryLayout, null, null );
     }
 
     public ArtifactRepository createArtifactRepository( String id,
@@ -78,7 +89,11 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
     {
-        return injectSession( factory.createArtifactRepository( layoutId, url, layoutId, snapshots, releases ), true );
+        ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
+
+        checkLayout( id, layoutId, layout );
+
+        return createArtifactRepository( id, url, layout, snapshots, releases );
     }
 
     public ArtifactRepository createArtifactRepository( String id,
@@ -87,42 +102,40 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
     {
-        return injectSession( factory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases ), true );
-    }
-
-    public void setGlobalUpdatePolicy( String updatePolicy )
-    {
-        factory.setGlobalUpdatePolicy( updatePolicy );
-    }
-
-    public void setGlobalChecksumPolicy( String checksumPolicy )
-    {
-        factory.setGlobalChecksumPolicy( checksumPolicy );
-    }
-
-    private ArtifactRepository injectSession( ArtifactRepository repository, boolean mirrors )
-    {
-        MavenSession session = legacySupport.getSession();
-
-        if ( session != null && repository != null )
+        if ( snapshots == null )
         {
-            MavenExecutionRequest request = session.getRequest();
-            if ( request != null )
-            {
-                List<ArtifactRepository> repositories = Arrays.asList( repository );
-
-                if ( mirrors )
-                {
-                    repositorySystem.injectMirror( repositories, request.getMirrors() );
-                }
-
-                repositorySystem.injectProxy( repositories, request.getProxies() );
-
-                repositorySystem.injectAuthentication( repositories, request.getServers() );
-            }
+            snapshots = new ArtifactRepositoryPolicy();
         }
+
+        if ( releases == null )
+        {
+            releases = new ArtifactRepositoryPolicy();
+        }
+
+        if ( globalUpdatePolicy != null )
+        {
+            snapshots.setUpdatePolicy( globalUpdatePolicy );
+            releases.setUpdatePolicy( globalUpdatePolicy );
+        }
+
+        if ( globalChecksumPolicy != null )
+        {
+            snapshots.setChecksumPolicy( globalChecksumPolicy );
+            releases.setChecksumPolicy( globalChecksumPolicy );
+        }
+
+        ArtifactRepository repository = new MavenArtifactRepository( id, url, repositoryLayout, snapshots, releases );
 
         return repository;
     }
 
-}
+    public void setGlobalUpdatePolicy( String updatePolicy )
+    {
+        globalUpdatePolicy = updatePolicy;
+    }
+
+    public void setGlobalChecksumPolicy( String checksumPolicy )
+    {
+        globalChecksumPolicy = checksumPolicy;
+    }
+ }
