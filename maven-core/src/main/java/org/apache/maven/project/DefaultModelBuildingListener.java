@@ -118,22 +118,7 @@ class DefaultModelBuildingListener
                 event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), e );
             }
 
-            if ( project.getClassRealm() != null )
-            {
-                /*
-                 * Update the context class loader such that the container will search the project realm when the model
-                 * builder injects the lifecycle bindings from the packaging in the next step. The context class loader
-                 * will be reset by the project builder when the project is fully assembled.
-                 */
-                Thread.currentThread().setContextClassLoader( project.getClassRealm() );
-            }
-            else
-            {
-                /*
-                 * Reset context class loader to core realm.
-                 */
-                Thread.currentThread().setContextClassLoader( getClass().getClassLoader() );
-            }
+            projectBuildingHelper.selectProjectRealm( project );
         }
 
         // build the regular repos after extensions are loaded to allow for custom layouts

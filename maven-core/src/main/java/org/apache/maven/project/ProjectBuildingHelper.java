@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -67,5 +66,14 @@ public interface ProjectBuildingHelper
      */
     ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model, ProjectBuildingRequest request )
         throws PluginResolutionException, PluginVersionResolutionException;
+
+    /**
+     * Updates the context class loader such that the container will search the project realm when the model builder
+     * injects the lifecycle bindings from the packaging in the next step. The context class loader is to be reset by
+     * the project builder when the project is fully assembled.
+     * 
+     * @param project The project whose class realm should be selected, must not be {@code null}.
+     */
+    void selectProjectRealm( MavenProject project );
 
 }

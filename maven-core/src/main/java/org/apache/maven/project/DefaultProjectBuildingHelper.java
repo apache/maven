@@ -433,4 +433,16 @@ public class DefaultProjectBuildingHelper
         return extensionArtifacts;
     }
 
+    public void selectProjectRealm( MavenProject project )
+    {
+        ClassLoader projectRealm = project.getClassRealm();
+
+        if ( projectRealm == null )
+        {
+            projectRealm = container.getContainerRealm();
+        }
+
+        Thread.currentThread().setContextClassLoader( projectRealm );
+    }
+
 }
