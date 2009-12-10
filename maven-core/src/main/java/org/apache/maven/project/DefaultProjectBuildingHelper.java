@@ -33,6 +33,7 @@ import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -135,7 +136,7 @@ public class DefaultProjectBuildingHelper
     }
 
     public synchronized ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
-                                                                          RepositoryRequest repositoryRequest )
+                                                                          ProjectBuildingRequest request )
         throws PluginResolutionException, PluginVersionResolutionException
     {
         ClassRealm projectRealm = null;
@@ -182,6 +183,14 @@ public class DefaultProjectBuildingHelper
 
         List<Artifact> publicArtifacts = new ArrayList<Artifact>();
 
+        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+        repositoryRequest.setCache( request.getRepositoryCache() );
+        repositoryRequest.setLocalRepository( request.getLocalRepository() );
+        repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
+        repositoryRequest.setOffline( request.isOffline() );
+        repositoryRequest.setForceUpdate( request.isForceUpdate() );
+        repositoryRequest.setTransferListener( request.getTransferListener() );
+
         for ( Plugin plugin : extensionPlugins )
         {
             if ( plugin.getVersion() == null )
@@ -201,7 +210,7 @@ public class DefaultProjectBuildingHelper
             }
             else
             {
-                artifacts = resolveExtensionArtifacts( plugin, repositoryRequest );
+                artifacts = resolveExtensionArtifacts( plugin, repositoryRequest, request );
 
                 recordArtifacts = pluginArtifactsCache.put( plugin, repositoryRequest, null, artifacts );
             }
@@ -381,7 +390,8 @@ public class DefaultProjectBuildingHelper
         return record;
     }
 
-    private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, RepositoryRequest repositoryRequest )
+    private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, RepositoryRequest repositoryRequest,
+                                                      ProjectBuildingRequest request )
         throws PluginResolutionException
     {
         Artifact extensionArtifact = repositorySystem.createPluginArtifact( extensionPlugin );
@@ -396,19 +406,22 @@ public class DefaultProjectBuildingHelper
 
         ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
-        request.setArtifact( extensionArtifact );
-        request.setArtifactDependencies( overrideArtifacts );
-        request.setCollectionFilter( collectionFilter );
-        request.setResolutionFilter( resolutionFilter );
-        request.setResolveRoot( true );
-        request.setResolveTransitively( true );
+        ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest( repositoryRequest );
+        artifactRequest.setArtifact( extensionArtifact );
+        artifactRequest.setArtifactDependencies( overrideArtifacts );
+        artifactRequest.setCollectionFilter( collectionFilter );
+        artifactRequest.setResolutionFilter( resolutionFilter );
+        artifactRequest.setResolveRoot( true );
+        artifactRequest.setResolveTransitively( true );
+        artifactRequest.setServers( request.getServers() );
+        artifactRequest.setMirrors( request.getMirrors() );
+        artifactRequest.setProxies( request.getProxies() );
 
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        ArtifactResolutionResult result = repositorySystem.resolve( artifactRequest );
 
         try
         {
-            resolutionErrorHandler.throwErrors( request, result );
+            resolutionErrorHandler.throwErrors( artifactRequest, result );
         }
         catch ( ArtifactResolutionException e )
         {

@@ -22,8 +22,6 @@ package org.apache.maven.project;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.AbstractModelBuildingListener;
 import org.apache.maven.model.building.ModelBuildingEvent;
@@ -105,16 +103,8 @@ class DefaultModelBuildingListener
         {
             try
             {
-                RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-                repositoryRequest.setCache( projectBuildingRequest.getRepositoryCache() );
-                repositoryRequest.setLocalRepository( projectBuildingRequest.getLocalRepository() );
-                repositoryRequest.setRemoteRepositories( pluginRepositories );
-                repositoryRequest.setOffline( projectBuildingRequest.isOffline() );
-                repositoryRequest.setForceUpdate( projectBuildingRequest.isForceUpdate() );
-                repositoryRequest.setTransferListener( projectBuildingRequest.getTransferListener() );
-
                 ProjectRealmCache.CacheRecord record =
-                    projectBuildingHelper.createProjectRealm( project, model, repositoryRequest );
+                    projectBuildingHelper.createProjectRealm( project, model, projectBuildingRequest );
 
                 project.setClassRealm( record.realm );
                 project.setExtensionArtifactFilter( record.extensionArtifactFilter );

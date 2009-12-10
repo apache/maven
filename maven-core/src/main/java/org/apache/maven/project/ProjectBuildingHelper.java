@@ -60,12 +60,12 @@ public interface ProjectBuildingHelper
      * 
      * @param project The project to create the project realm for, must not be {@code null}
      * @param model The model to create the project realm for, must not be {@code null}
-     * @param repositoryRequest The repository request to use for artifact resolution, must not be {@code null}.
+     * @param request The project building request holding further settings like repository settings, must not be
+     *            {@code null}.
      * @return The record with the project realm and extension artifact filter, never {@code null}.
      * @throws PluginResolutionException If any build extension could not be resolved.
      */
-    ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
-                                                      RepositoryRequest repositoryRequest )
+    ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model, ProjectBuildingRequest request )
         throws PluginResolutionException, PluginVersionResolutionException;
 
 }
