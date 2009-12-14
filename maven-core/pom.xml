@@ -128,5 +128,39 @@
         </plugins>
       </build>
     </profile>
-  </profiles>  
+    <profile>
+      <id>non-canonical-buildnumber</id>
+      <activation>
+        <file>
+          <missing>.svn</missing>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.0-beta-1</version>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>create</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <doCheck>false</doCheck>
+              <doUpdate>false</doUpdate>
+              <format>NON-CANONICAL_{0,date,yyyy-MM-dd_HH-mm}_{1}</format>
+              <items>
+                <item>timestamp</item>
+                <item>${user.name}</item>
+              </items>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
