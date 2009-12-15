@@ -90,8 +90,6 @@ under the License.
         <include>mvnDebug</include>
         <!-- This is so that CI systems can periodically run the profiler -->
         <include>mvnyjp</include>
-        <!-- This is self-update CLI -->
-        <include>mvnUpdate</include>
       </includes>
       <lineEnding>unix</lineEnding>
       <fileMode>0755</fileMode>
@@ -99,10 +97,6 @@ under the License.
     <fileSet>
       <directory>src/conf</directory>
       <outputDirectory>conf</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>src/.cd</directory>
-      <outputDirectory>bin/.cd</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
