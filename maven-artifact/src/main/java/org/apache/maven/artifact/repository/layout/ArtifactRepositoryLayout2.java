@@ -1,5 +1,8 @@
 package org.apache.maven.artifact.repository.layout;
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,21 +22,10 @@ package org.apache.maven.artifact.repository.layout;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-
-/** @author jdcasey */
-public interface ArtifactRepositoryLayout
+public interface ArtifactRepositoryLayout2
+    extends ArtifactRepositoryLayout
 {
-    String ROLE = ArtifactRepositoryLayout.class.getName();
 
-    String getId();
-    
-    String pathOf( Artifact artifact );
-
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
-
-    String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata );
+    ArtifactRepository newMavenArtifactRepository( String id, String url, ArtifactRepositoryPolicy snapshots,
+                                                   ArtifactRepositoryPolicy releases );
 }

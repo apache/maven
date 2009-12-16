@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -124,7 +125,17 @@ public class DefaultArtifactRepositoryFactory
             releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        ArtifactRepository repository = new MavenArtifactRepository( id, url, repositoryLayout, snapshots, releases );
+        ArtifactRepository repository;
+        if ( repositoryLayout instanceof ArtifactRepositoryLayout2 )
+        {
+            repository =
+                ( (ArtifactRepositoryLayout2) repositoryLayout ).newMavenArtifactRepository( id, url, snapshots,
+                                                                                             releases );
+        }
+        else
+        {
+            repository = new MavenArtifactRepository( id, url, repositoryLayout, snapshots, releases );
+        }
 
         return repository;
     }
