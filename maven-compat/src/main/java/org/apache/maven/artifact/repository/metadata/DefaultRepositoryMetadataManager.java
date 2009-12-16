@@ -164,10 +164,6 @@ public class DefaultRepositoryMetadataManager
         {
             throw new RepositoryMetadataResolutionException( "Unable to store local copy of metadata: " + e.getMessage(), e );
         }
-        catch ( RepositoryMetadataReadException e )
-        {
-            throw new RepositoryMetadataResolutionException( "Unable to read local copy of metadata: " + e.getMessage(), e );
-        }
 
         if ( cache != null )
         {
@@ -298,7 +294,7 @@ public class DefaultRepositoryMetadataManager
     }
 
     private void mergeMetadata( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
-        throws RepositoryMetadataStoreException, RepositoryMetadataReadException
+        throws RepositoryMetadataStoreException
     {
         // TODO: currently this is first wins, but really we should take the latest by comparing either the
         // snapshot timestamp, or some other timestamp later encoded into the metadata.
@@ -365,7 +361,6 @@ public class DefaultRepositoryMetadataManager
     }
 
     private boolean loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository, ArtifactRepository localRepository, Map<ArtifactRepository, Metadata> previousMetadata )
-        throws RepositoryMetadataReadException
     {
         boolean setRepository = false;
 
@@ -373,7 +368,24 @@ public class DefaultRepositoryMetadataManager
 
         if ( metadataFile.exists() )
         {
-            Metadata metadata = readMetadata( metadataFile );
+            Metadata metadata;
+
+            try
+            {
+                metadata = readMetadata( metadataFile );
+            }
+            catch ( RepositoryMetadataReadException e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().warn( e.getMessage(), e );
+                }
+                else
+                {
+                    getLogger().warn( e.getMessage() );
+                }
+                return setRepository;
+            }
 
             if ( repoMetadata.isSnapshot() && ( previousMetadata != null ) )
             {
