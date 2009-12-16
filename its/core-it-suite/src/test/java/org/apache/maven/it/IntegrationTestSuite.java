@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4498IgnoreBrokenMetadataTest.class );
         suite.addTestSuite( MavenITmng4489MirroringOfExtensionRepoTest.class );
         suite.addTestSuite( MavenITmng4488ValidateExternalParenPomLenientTest.class );
         suite.addTestSuite( MavenITmng4482ForcePluginSnapshotUpdateTest.class );
