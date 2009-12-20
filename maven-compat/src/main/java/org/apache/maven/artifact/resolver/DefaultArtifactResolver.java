@@ -197,11 +197,9 @@ public class DefaultArtifactResolver
 
             transformationManager.transformForResolve( artifact, request );
 
-            boolean localCopy = isLocalCopy( artifact );
-
             destination = artifact.getFile();
 
-            if ( ( force || !destination.exists() || ( artifact.isSnapshot() && !localCopy ) ) && !request.isOffline() )
+            if ( !request.isOffline() && ( force || !destination.exists() || isMutable( artifact ) ) )
             {
                 try
                 {
@@ -258,7 +256,7 @@ public class DefaultArtifactResolver
             // 1)         pom = 1.0-SNAPSHOT
             // 2)         pom = 1.0-yyyymmdd.hhmmss
             // 3) baseVersion = 1.0-SNAPSHOT
-            if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
+            if ( artifact.isSnapshot() && isTimestamped( artifact ) )
             {
                 String version = artifact.getVersion();
 
@@ -295,7 +293,17 @@ public class DefaultArtifactResolver
             }
         }
     }
-        
+
+    private boolean isMutable( Artifact artifact )
+    {
+        return artifact.isSnapshot() && !isTimestamped( artifact ) && !isLocalCopy( artifact );
+    }
+
+    private boolean isTimestamped( Artifact artifact )
+    {
+        return !artifact.getBaseVersion().equals( artifact.getVersion() );
+    }
+
     private boolean isLocalCopy( Artifact artifact )
     {
         boolean localCopy = false;
