@@ -82,7 +82,19 @@ public class DefaultArtifactInstaller
 
             getLogger().info( "Installing " + source.getPath() + " to " + destination );
 
-            FileUtils.copyFileIfModified( source, destination );
+            boolean copy =
+                !destination.exists() || "pom".equals( artifact.getType() )
+                    || source.lastModified() != destination.lastModified() || source.length() != destination.length();
+
+            if ( copy )
+            {
+                FileUtils.copyFile( source, destination );
+                destination.setLastModified( source.lastModified() );
+            }
+            else
+            {
+                getLogger().debug( "Skipped re-installation of " + destination + ", seems unchanged" );
+            }
 
             // must be after the artifact is installed
             for ( ArtifactMetadata metadata : artifact.getMetadataList() )
