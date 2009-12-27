@@ -316,15 +316,6 @@
           </association>
         </field>
         <field xdoc.separator="blank">
-          <name>mailingLists</name>
-          <version>3.0.0+</version>
-          <description>Contains information about a project's mailing lists.</description>
-          <association>
-            <type>MailingList</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field xdoc.separator="blank">
           <name>developers</name>
           <version>3.0.0+</version>
           <description>Describes the committers of a project.</description>
@@ -342,23 +333,26 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-
-        <!-- ====================================================================== -->
-        <!-- Issue Tracking                                                         -->
-        <!-- ====================================================================== -->
-
         <field xdoc.separator="blank">
-          <name>issueTrackingUrl</name>
-          <version>3.0.0</version>
-          <description>The URL of the project's issue tracking system.</description>
-          <type>String</type>
-        </field>
-        <field xdoc.separator="blank">
-          <name>issueManagement</name>
-          <version>4.0.0</version>
-          <description>The project's issue management system information.</description>
+          <name>mailingLists</name>
+          <version>3.0.0+</version>
+          <description>Contains information about a project's mailing lists.</description>
           <association>
-            <type>IssueManagement</type>
+            <type>MailingList</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Build prerequisites                                                    -->
+        <!-- ====================================================================== -->
+
+        <field xdoc.separator="blank">
+          <name>prerequisites</name>
+          <version>4.0.0</version>
+          <description>Describes the prerequisites in the build environment for this project.</description>
+          <association>
+            <type>Prerequisites</type>
           </association>
         </field>
 
@@ -387,12 +381,31 @@
             <type>Repository</type>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>scm</name>
           <version>4.0.0</version>
           <description>Specification for the SCM used by the project, such as CVS, Subversion, etc.</description>
           <association>
             <type>Scm</type>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
+        <!-- Issue Tracking                                                         -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>issueTrackingUrl</name>
+          <version>3.0.0</version>
+          <description>The URL of the project's issue tracking system.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>issueManagement</name>
+          <version>4.0.0</version>
+          <description>The project's issue management system information.</description>
+          <association>
+            <type>IssueManagement</type>
           </association>
         </field>
 
@@ -490,19 +503,6 @@
           <type>String</type>
           <description>The Java package name of the project. This value is used when generating
             JavaDoc.</description>
-        </field>
-
-        <!-- ====================================================================== -->
-        <!-- Build prerequisites                                                    -->
-        <!-- ====================================================================== -->
-
-        <field xdoc.separator="blank">
-          <name>prerequisites</name>
-          <version>4.0.0</version>
-          <description>Describes the prerequisites in the build environment for this project.</description>
-          <association>
-            <type>Prerequisites</type>
-          </association>
         </field>
 
         <!-- ====================================================================== -->
@@ -640,7 +640,17 @@
         ]]>
       </description>
       <fields>
-        <field>
+        <field xdoc.separator="blank">
+          <name>modules</name>
+          <version>4.0.0</version>
+          <description>The modules (sometimes called subprojects) to build as a part of this
+            project. Each module listed is a relative path to the directory containing the module.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank">
           <name>distributionManagement</name>
           <version>4.0.0</version>
           <description>Distribution information for a project that enables deployment of the site
@@ -650,12 +660,50 @@
           </association>
         </field>
         <field xdoc.separator="blank">
-          <name>modules</name>
+          <name>properties</name>
           <version>4.0.0</version>
-          <description>The modules (sometimes called subprojects) to build as a part of this
-            project. Each module listed is a relative path to the directory containing the module.</description>
-          <association>
+          <description>
+            <![CDATA[
+            Properties that can be used throughout the POM as a substitution, and
+            are used as filters in resources if enabled.
+            The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
+            ]]>
+          </description>
+          <type>Properties</type>
+          <association xml.mapStyle="inline">
             <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank">
+          <name>dependencyManagement</name>
+          <version>4.0.0</version>
+          <required>false</required>
+          <description>Default dependency information for projects that inherit from this one. The
+            dependencies in this section are not immediately resolved. Instead, when a POM derived
+            from this one declares a dependency described by a matching groupId and artifactId, the
+            version and other values from this section are used for that dependency if they were not
+            already specified.</description>
+          <association>
+            <type>DependencyManagement</type>
+          </association>
+        </field>
+        <field>
+          <name>dependencies</name>
+          <version>3.0.0+</version>
+          <description>
+            <![CDATA[
+            This element describes all of the dependencies associated with a
+            project.
+            These dependencies are used to construct a classpath for your
+            project during the build process. They are automatically downloaded from the
+            repositories defined in this project.
+            See <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
+            dependency mechanism</a> for more information.
+            ]]>
+          </description>
+          <association>
+            <type>Dependency</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -676,25 +724,6 @@
             reports.</description>
           <association>
             <type>Repository</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field xdoc.separator="blank">
-          <name>dependencies</name>
-          <version>3.0.0+</version>
-          <description>
-            <![CDATA[
-            This element describes all of the dependencies associated with a
-            project.
-            These dependencies are used to construct a classpath for your
-            project during the build process. They are automatically downloaded from the
-            repositories defined in this project.
-            See <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
-            dependency mechanism</a> for more information.
-            ]]>
-          </description>
-          <association>
-            <type>Dependency</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -721,35 +750,6 @@
           </description>
           <association>
             <type>Reporting</type>
-          </association>
-        </field>
-        <field xdoc.separator="blank">
-          <name>dependencyManagement</name>
-          <version>4.0.0</version>
-          <required>false</required>
-          <description>Default dependency information for projects that inherit from this one. The
-            dependencies in this section are not immediately resolved. Instead, when a POM derived
-            from this one declares a dependency described by a matching groupId and artifactId, the
-            version and other values from this section are used for that dependency if they were not
-            already specified.</description>
-          <association>
-            <type>DependencyManagement</type>
-          </association>
-        </field>
-        <field xdoc.separator="blank">
-          <name>properties</name>
-          <version>4.0.0</version>
-          <description>
-            <![CDATA[
-            Properties that can be used throughout the POM as a substitution, and
-            are used as filters in resources if enabled.
-            The format is <code>&lt;name&gt;value&lt;/name&gt;</code>.
-            ]]>
-          </description>
-          <type>Properties</type>
-          <association xml.mapStyle="inline">
-            <type>String</type>
-            <multiplicity>*</multiplicity>
           </association>
         </field>
       </fields>
