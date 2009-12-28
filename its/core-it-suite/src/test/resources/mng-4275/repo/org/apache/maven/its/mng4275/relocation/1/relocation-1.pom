@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4275</groupId>
+  <artifactId>relocation</artifactId>
+  <version>1</version>
+
+  <distributionManagement>
+    <relocation>
+      <groupId>org.apache.maven.its.mng4275</groupId>
+      <artifactId>relocated</artifactId>
+      <version>1</version>
+      <message>Relocation Test!</message>
+    </relocation>
+  </distributionManagement>
+</project>

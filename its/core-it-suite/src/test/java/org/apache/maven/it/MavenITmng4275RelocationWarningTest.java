@@ -36,34 +36,29 @@ public class MavenITmng4275RelocationWarningTest
 
     public MavenITmng4275RelocationWarningTest()
     {
-        super( "[2.0,2.0.9),[2.2.1,)" );
+        super( "[2.0,2.0.9),[2.2.1,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
+    /**
+     * Verify that relocations are logged (at warning level).
+     */
     public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4275" );
-        File depsDir = new File( testDir, "dependencies" );
-        File projectDir = new File( testDir, "project" );
 
-        Verifier verifier = new Verifier( depsDir.getAbsolutePath() );
-        
-        verifier.deleteArtifacts( "org.apache.maven.it.mng4275" );
-        
-        verifier.executeGoal( "install" );
-        
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4275" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        // now, build the project that depends on the above.
-        verifier = new Verifier( projectDir.getAbsolutePath() );
-        
-        verifier.executeGoal( "install" );
-        
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-        
-        List lines = verifier.loadFile( new File( projectDir, verifier.getLogFileName() ), false );
+        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
         boolean foundWarning = false;
         for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
@@ -73,10 +68,10 @@ public class MavenITmng4275RelocationWarningTest
             {
                 assertTrue(
                             "Relocation target should have been logged right after warning.",
-                            line.indexOf( "This artifact has been relocated to org.apache.maven.it.mng4275:relocated:1" ) > -1 );
+                            line.indexOf( "This artifact has been relocated to org.apache.maven.its.mng4275:relocated:1" ) > -1 );
                 break;
             }
-            else if ( line.startsWith( "[WARNING] While downloading org.apache.maven.it.mng4275:relocation:1" ) )
+            else if ( line.startsWith( "[WARNING] While downloading org.apache.maven.its.mng4275:relocation:1" ) )
             {
                 foundWarning = true;
             }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.mng4275</groupId>
+  <artifactId>relocated</artifactId>
+  <version>1</version>
+  <versioning>
+    <versions>
+      <version>1</version>
+    </versions>
+    <lastUpdated>20091228142805</lastUpdated>
+  </versioning>
+</metadata>
