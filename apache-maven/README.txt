@@ -11,8 +11,6 @@
   Documentation
   -------------
 
-  The documentation available as of the date of this release is included in
-  HTML format in the docs/ directory.
   The most up-to-date documentation can be found at http://maven.apache.org/.
 
   Release Notes
@@ -24,7 +22,7 @@
   -------------------
 
   JDK:
-    1.4 or above (this is to execute Maven - it still allows you to build against 1.3
+    1.5 or above (this is to execute Maven - it still allows you to build against 1.3
     and prior JDK's).
   Memory:
     No minimum requirement.
@@ -42,18 +40,18 @@
   1) Unpack the archive where you would like to store the binaries, eg:
 
     Unix-based Operating Systems (Linux, Solaris and Mac OS X)
-      tar zxvf apache-maven-2.1.x.tar.gz
+      tar zxvf apache-maven-3.0.x.tar.gz
     Windows 2000/XP
-      unzip apache-maven-2.1.x.zip
+      unzip apache-maven-3.0.x.zip
 
-  2) A directory called "apache-maven-2.1.x" will be created.
+  2) A directory called "apache-maven-3.0.x" will be created.
 
   3) Add the bin directory to your PATH, eg:
 
     Unix-based Operating Systems (Linux, Solaris and Mac OS X)
-      export PATH=/usr/local/apache-maven-2.1.x/bin:$PATH
+      export PATH=/usr/local/apache-maven-3.0.x/bin:$PATH
     Windows 2000/XP
-      set PATH="c:\program files\apache-maven-2.1.x\bin";%PATH%
+      set PATH="c:\program files\apache-maven-3.0.x\bin";%PATH%
 
   4) Make sure JAVA_HOME is set to the location of your JDK
 
@@ -70,7 +68,7 @@
   ----------
 
   Home Page:          http://maven.apache.org/
-  Downloads:          http://maven.apache.org/downloads.html
+  Downloads:          http://maven.apache.org/download.html
   Release Notes:      http://maven.apache.org/release-notes.html
   Mailing Lists:      http://maven.apache.org/mail-lists.html
   Source Code:        http://svn.apache.org/repos/asf/maven/
