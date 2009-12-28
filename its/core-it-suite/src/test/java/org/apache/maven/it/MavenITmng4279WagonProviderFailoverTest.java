@@ -37,20 +37,26 @@ public class MavenITmng4279WagonProviderFailoverTest
         super( "[2.2.1,3.0-alpha-1)" );
     }
 
+    /**
+     * Test that wagon provider selection fails gracefully and uses protocol for roleHint if protocol-provider roleHint
+     * isn't available.
+     */
     public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4279" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
-        
-        verifier.executeGoal( "deploy" );
+        verifier.executeGoal( "validate" );
         
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/wagon.properties" );
     }
 
 }
