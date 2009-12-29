@@ -93,7 +93,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
     public void testitJarPackaging()
         throws Exception
     {
-        requiresMavenVersion( "[3.0-alpha-6,)" );
+        requiresMavenVersion( "[2.2.2,3.0-alpha-1),[3.0-alpha-6,)" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4368/jar" );
 
