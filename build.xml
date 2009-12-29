@@ -245,6 +245,7 @@ TODO:
         <os family="windows"/>
       </not>
     </condition>
+    <property name="maven.opts.its" value="-Xmx128m -XX:MaxPermSize=128m"/>
   </target>
 
   <target name="its-win32" if="its.win32">
@@ -272,6 +273,7 @@ TODO:
     <echo>Running integration tests</echo>
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="cmd">
       <env key="M2_HOME" value="${maven.home}"/>
+      <env key="MAVEN_OPTS" value="${maven.opts.its}"/>
       <arg value="/c"/>
       <arg value="${maven.home}\bin\mvn.bat"/>
       <arg value="-Prun-its"/>
@@ -304,6 +306,7 @@ TODO:
     <echo>Running integration tests</echo>
     <exec failonerror="true" dir="${java.io.tmpdir}/${itPom.artifactId}-${itPom.version}" executable="${maven.home}/bin/mvn">
       <env key="M2_HOME" value="${maven.home}"/>
+      <env key="MAVEN_OPTS" value="${maven.opts.its}"/>
       <arg value="-Prun-its"/>
       <arg value="-e"/>
       <arg value="-B"/>
