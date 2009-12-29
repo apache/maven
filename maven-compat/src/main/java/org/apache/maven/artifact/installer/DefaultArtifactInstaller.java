@@ -80,20 +80,20 @@ public class DefaultArtifactInstaller
                 destination.getParentFile().mkdirs();
             }
 
-            getLogger().info( "Installing " + source.getPath() + " to " + destination );
-
             boolean copy =
                 !destination.exists() || "pom".equals( artifact.getType() )
                     || source.lastModified() != destination.lastModified() || source.length() != destination.length();
 
             if ( copy )
             {
+                getLogger().info( "Installing " + source + " to " + destination );
+
                 FileUtils.copyFile( source, destination );
                 destination.setLastModified( source.lastModified() );
             }
             else
             {
-                getLogger().debug( "Skipped re-installation of " + destination + ", seems unchanged" );
+                getLogger().info( "Skipped re-installing " + source + " to " + destination + ", seems unchanged" );
             }
 
             // must be after the artifact is installed
