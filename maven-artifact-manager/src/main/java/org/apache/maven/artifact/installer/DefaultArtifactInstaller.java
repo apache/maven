@@ -93,10 +93,22 @@ public class DefaultArtifactInstaller
                 destination.getParentFile().mkdirs();
             }
 
-            getLogger().info( "Installing " + source.getPath() + " to " + destination );
+            boolean copy =
+                !destination.exists() || "pom".equals( artifact.getType() )
+                    || source.lastModified() != destination.lastModified() || source.length() != destination.length();
 
-            FileUtils.copyFileIfModified( source, destination );
-            
+            if ( copy )
+            {
+                getLogger().info( "Installing " + source + " to " + destination );
+
+                FileUtils.copyFile( source, destination );
+                destination.setLastModified( source.lastModified() );
+            }
+            else
+            {
+                getLogger().info( "Skipped re-installing " + source + " to " + destination + ", seems unchanged" );
+            }
+
             // Now, we'll set the artifact's file to the one installed in the local repository,
             // to help avoid duplicate copy operations in the deployment step.
             if ( useArtifactFile )
