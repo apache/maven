@@ -70,6 +70,18 @@ under the License.
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <!-- NOTE: Ensure Ant scripts get copied to JAR regardless of MPLUGIN-136/MNG-3741 -->
+        <directory>src/main/scripts</directory>
+        <includes>
+          <include>**/*.build.xml</include>
+        </includes>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
