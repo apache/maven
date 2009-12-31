@@ -90,6 +90,10 @@ under the License.
             <version>2.4.2</version>
           </dependency>
         </dependencies>
+        <configuration>
+          <!-- NOTE: We use a hand-written descriptor to decouple from MPLUGIN-136/MNG-3741 so dump the generated one -->
+          <outputDirectory>${project.build.directory}</outputDirectory>
+        </configuration>
       </plugin>
     </plugins>
   </build>
