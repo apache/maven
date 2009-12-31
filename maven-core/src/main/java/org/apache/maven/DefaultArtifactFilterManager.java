@@ -63,6 +63,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "maven-error-diagnostics" );
         artifacts.add( "maven-lifecycle" );
         artifacts.add( "maven-model" );
+        artifacts.add( "maven-model-builder" );
         artifacts.add( "maven-monitor" );
         artifacts.add( "maven-plugin-api" );
         artifacts.add( "maven-plugin-descriptor" );
