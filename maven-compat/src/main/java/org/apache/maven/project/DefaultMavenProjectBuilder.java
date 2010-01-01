@@ -23,6 +23,8 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -32,6 +34,7 @@ import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -207,6 +210,32 @@ public class DefaultMavenProjectBuilder
         }
 
         return buildStandaloneSuperProject( configuration );
+    }
+
+    public MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+                                               ProfileManager profileManager, TransferListener transferListener )
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
+    {
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+
+        configuration.setLocalRepository( localRepository );
+
+        if ( profileManager != null )
+        {
+            configuration.setActiveProfileIds( profileManager.getExplicitlyActivatedIds() );
+            configuration.setInactiveProfileIds( profileManager.getExplicitlyDeactivatedIds() );
+        }
+
+        configuration.setResolveDependencies( true );
+
+        return build( project, configuration );
+    }
+
+    public MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+                                               ProfileManager profileManager )
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
+    {
+        return buildWithDependencies( project, localRepository, profileManager, null );
     }
 
 }

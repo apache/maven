@@ -20,7 +20,10 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.wagon.events.TransferListener;
 
 @Deprecated
 public interface MavenProjectBuilder
@@ -52,5 +55,13 @@ public interface MavenProjectBuilder
 
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
+
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager, TransferListener transferListener )
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
+
+    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+                                        ProfileManager globalProfileManager )
+        throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
 
 }
