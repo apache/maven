@@ -57,6 +57,7 @@ under the License.
 
   <profiles>
     <profile>
+      <!-- lower-bound only, matching -->
       <id>test-1</id>
       <activation>
         <jdk>[1.4,)</jdk>
@@ -66,6 +67,7 @@ under the License.
       </properties>
     </profile>
     <profile>
+      <!-- upper-bound only, matching -->
       <id>test-2</id>
       <activation>
         <jdk>(,100)</jdk>
@@ -75,6 +77,7 @@ under the License.
       </properties>
     </profile>
     <profile>
+      <!-- lower-bound and upper-bound, matching -->
       <id>test-3</id>
       <activation>
         <jdk>(1.3,100)</jdk>
@@ -84,6 +87,7 @@ under the License.
       </properties>
     </profile>
     <profile>
+      <!-- lower-bound only, not matching -->
       <id>test-4</id>
       <activation>
         <jdk>(100,)</jdk>
@@ -93,12 +97,53 @@ under the License.
       </properties>
     </profile>
     <profile>
+      <!-- upper-bound only, not matching -->
       <id>test-5</id>
       <activation>
         <jdk>(,1.4)</jdk>
       </activation>
       <properties>
         <jdkProperty5>FAILED</jdkProperty5>
+      </properties>
+    </profile>
+    <profile>
+      <!-- bounds close to current Java version (MNG-4512) -->
+      <id>test-6a</id>
+      <activation>
+        <jdk>[1.4,1.5)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
+      </properties>
+    </profile>
+    <profile>
+      <!-- bounds close to current Java version (MNG-4512) -->
+      <id>test-6b</id>
+      <activation>
+        <jdk>[1.5,1.6)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
+      </properties>
+    </profile>
+    <profile>
+      <!-- bounds close to current Java version (MNG-4512) -->
+      <id>test-6c</id>
+      <activation>
+        <jdk>[1.6,1.7)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
+      </properties>
+    </profile>
+    <profile>
+      <!-- bounds close to current Java version (MNG-4512) -->
+      <id>test-6d</id>
+      <activation>
+        <jdk>[1.7,1.8)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
       </properties>
     </profile>
   </profiles>

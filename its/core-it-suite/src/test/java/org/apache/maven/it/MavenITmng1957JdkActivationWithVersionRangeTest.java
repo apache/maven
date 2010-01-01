@@ -37,7 +37,7 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest
 
     public MavenITmng1957JdkActivationWithVersionRangeTest()
     {
-        super( "[2.1.0-M2,)" );
+        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-6,)" );
     }
 
     /**
@@ -61,6 +61,7 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest
         assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty3" ) );
         assertEquals( null, props.getProperty( "project.properties.jdkProperty4" ) );
         assertEquals( null, props.getProperty( "project.properties.jdkProperty5" ) );
+        assertEquals( "PASSED", props.getProperty( "project.properties.jdkProperty6" ) );
     }
 
 }
