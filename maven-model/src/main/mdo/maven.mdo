@@ -2357,6 +2357,7 @@
           <name>id</name>
           <version>4.0.0</version>
           <required>true</required>
+          <identifier>true</identifier>
           <description>
             <![CDATA[
             A unique identifier for a repository. This is used to match the repository
@@ -2396,40 +2397,6 @@
           <defaultValue>default</defaultValue>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>4.0.0</version>
-          <code>
-            <![CDATA[
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals( Object obj )
-    {
-        if ( obj instanceof RepositoryBase )
-        {
-
-            final RepositoryBase other =  (RepositoryBase) obj;
-
-            if ( id != null )
-            {
-                return id.equals( other.id );
-            }
-            return super.equals(obj);
-        }
-
-        return false;
-    }
-
-    @Override
-    public String toString()
-    {
-        return ( getId() != null ) ? getId() : "[null]";
-    }
-            ]]>
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
 
     <class>
@@ -2456,23 +2423,6 @@
           </association>
         </field>
       </fields>
-      <!-- TODO:prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
-      <codeSegments>
-        <codeSegment>
-          <version>4.0.0</version>
-          <code>
-            <![CDATA[
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals( Object obj )
-    {
-        return super.equals( obj );
-    }
-            ]]>
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
 
     <class>
@@ -2491,23 +2441,6 @@
           <version>4.0.0</version>
         </field>
       </fields>
-      <!-- TODO:prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
-      <codeSegments>
-        <codeSegment>
-          <version>4.0.0</version>
-          <code>
-            <![CDATA[
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    public boolean equals( Object obj )
-    {
-        return super.equals( obj );
-    }
-            ]]>
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
 
     <class java.clone="deep">
