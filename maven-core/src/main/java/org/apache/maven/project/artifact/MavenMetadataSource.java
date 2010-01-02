@@ -16,7 +16,6 @@ package org.apache.maven.project.artifact;
  */
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,10 +24,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -70,7 +69,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
+import org.codehaus.plexus.util.Os;
 
 /**
  * @author Jason van Zyl
@@ -704,17 +703,11 @@ public class MavenMetadataSource
         if ( envVars == null )
         {
             Properties tmp = new Properties();
-            try
+            boolean caseSensitive = !Os.isFamily( Os.FAMILY_WINDOWS );
+            for ( Map.Entry<String, String> entry : System.getenv().entrySet() )
             {
-                Properties env = CommandLineUtils.getSystemEnvVars();
-                for ( Entry<Object, Object> e : env.entrySet() )
-                {
-                    tmp.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
-                }
-            }
-            catch ( IOException e )
-            {
-                logger.debug( "Error getting environment variables: " + e );
+                String key = "env." + ( caseSensitive ? entry.getKey() : entry.getKey().toUpperCase( Locale.ENGLISH ) );
+                tmp.setProperty( key, entry.getValue() );
             }
             envVars = tmp;
         }

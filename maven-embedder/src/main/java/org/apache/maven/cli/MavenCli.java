@@ -17,16 +17,15 @@ package org.apache.maven.cli;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -53,8 +52,8 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -907,17 +906,11 @@ public class MavenCli
     {
         // add the env vars to the property set, with the "env." prefix
         // XXX support for env vars should probably be removed from the ModelInterpolator
-        try
+        boolean caseSensitive = !Os.isFamily( Os.FAMILY_WINDOWS );
+        for ( Map.Entry<String, String> entry : System.getenv().entrySet() )
         {
-            Properties envVars = CommandLineUtils.getSystemEnvVars();
-            for ( Entry<Object, Object> e : envVars.entrySet() )
-            {
-                systemProperties.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
-            }
-        }
-        catch ( IOException e )
-        {
-            System.err.println( "Error getting environment vars for profile activation: " + e );
+            String key = "env." + ( caseSensitive ? entry.getKey() : entry.getKey().toUpperCase( Locale.ENGLISH ) );
+            systemProperties.setProperty( key, entry.getValue() );
         }
 
         // ----------------------------------------------------------------------
