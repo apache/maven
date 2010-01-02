@@ -240,9 +240,22 @@ public class DefaultMavenExecutionRequestPopulator
         }
     }
 
+    private void baseDirectory( MavenExecutionRequest request )
+    {
+        if ( request.getBaseDirectory() == null )
+        {
+            if ( request.getPom() != null )
+            {
+                request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
+            }
+        }
+    }
+
     public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
         throws MavenExecutionRequestPopulationException
     {
+        baseDirectory( request );
+
         localRepository( request );
 
         populateDefaultPluginGroups( request );

@@ -465,7 +465,15 @@ public class DefaultMaven
 
         Collection<MavenProject> activeProjects = sorter.getSortedProjects();
 
-        File reactorDirectory = request.getPom().getAbsoluteFile().getParentFile();
+        File reactorDirectory;
+        if ( request.getBaseDirectory() != null )
+        {
+            reactorDirectory = new File( request.getBaseDirectory() );
+        }
+        else
+        {
+            reactorDirectory = null;
+        }
 
         if ( !request.getSelectedProjects().isEmpty() )
         {
@@ -596,7 +604,7 @@ public class DefaultMaven
         }
 
         // relative path, e.g. "sub", "../sub" or "."
-        else
+        else if ( reactorDirectory != null )
         {
             File selectedProject = new File( new File( reactorDirectory, selector ).toURI().normalize() );
 
