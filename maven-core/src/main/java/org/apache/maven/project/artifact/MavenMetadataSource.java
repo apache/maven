@@ -101,6 +101,8 @@ public class MavenMetadataSource
     @Requirement
     private LegacySupport legacySupport;
 
+    private static Properties envVars;
+
     private void injectSession( MetadataResolutionRequest request )
     {
         MavenSession session = legacySupport.getSession();
@@ -699,18 +701,25 @@ public class MavenMetadataSource
     {
         Properties props = new Properties();
 
-        try
+        if ( envVars == null )
         {
-            Properties envVars = CommandLineUtils.getSystemEnvVars();
-            for ( Entry<Object, Object> e : envVars.entrySet() )
+            Properties tmp = new Properties();
+            try
             {
-                props.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+                Properties env = CommandLineUtils.getSystemEnvVars();
+                for ( Entry<Object, Object> e : env.entrySet() )
+                {
+                    tmp.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+                }
             }
+            catch ( IOException e )
+            {
+                logger.debug( "Error getting environment variables: " + e );
+            }
+            envVars = tmp;
         }
-        catch ( IOException e )
-        {
-            logger.debug( "Error getting environment variables: " + e );
-        }
+
+        props.putAll( envVars );
 
         props.putAll( System.getProperties() );
 
