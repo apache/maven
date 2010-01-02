@@ -16,6 +16,7 @@ package org.apache.maven.project.artifact;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,7 +26,9 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -34,7 +37,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -68,6 +70,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.cli.CommandLineUtils;
 
 /**
  * @author Jason van Zyl
@@ -562,7 +565,7 @@ public class MavenMetadataSource
                     configuration.setForceUpdate( repositoryRequest.isForceUpdate() );
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
-                    configuration.setSystemProperties( System.getProperties() );
+                    configuration.setSystemProperties( getSystemProperties() );
                     configuration.setTransferListener( repositoryRequest.getTransferListener() );
                     configuration.setServers( repositoryRequest.getServers() );
                     configuration.setMirrors( repositoryRequest.getMirrors() );
@@ -690,6 +693,28 @@ public class MavenMetadataSource
         rel.relocatedArtifact = ( relocatedArtifact == artifact ) ? null : relocatedArtifact;
 
         return rel;
+    }
+
+    private Properties getSystemProperties()
+    {
+        Properties props = new Properties();
+
+        try
+        {
+            Properties envVars = CommandLineUtils.getSystemEnvVars();
+            for ( Entry<Object, Object> e : envVars.entrySet() )
+            {
+                props.setProperty( "env." + e.getKey().toString(), e.getValue().toString() );
+            }
+        }
+        catch ( IOException e )
+        {
+            logger.debug( "Error getting environment variables: " + e );
+        }
+
+        props.putAll( System.getProperties() );
+
+        return props;
     }
 
     private static final class ProjectRelocation
