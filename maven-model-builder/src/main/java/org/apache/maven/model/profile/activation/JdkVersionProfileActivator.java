@@ -108,20 +108,10 @@ public class JdkVersionProfileActivator
         List<String> valueTokens = new ArrayList<String>( Arrays.asList( value.split( "[\\.\\-\\_]" ) ) );
         List<String> rangeValueTokens = new ArrayList<String>( Arrays.asList( rangeValue.value.split( "\\." ) ) );
 
-        int max = Math.max( valueTokens.size(), rangeValueTokens.size() );
-        addZeroTokens( valueTokens, max );
-        addZeroTokens( rangeValueTokens, max );
+        addZeroTokens( valueTokens, 3 );
+        addZeroTokens( rangeValueTokens, 3 );
 
-        if ( value.equals( rangeValue.getValue() ) )
-        {
-            if ( !rangeValue.isClosed() )
-            {
-                return isLeft ? -1 : 1;
-            }
-            return 0;
-        }
-
-        for ( int i = 0; i < valueTokens.size() && i < rangeValueTokens.size(); i++ )
+        for ( int i = 0; i < 3; i++ )
         {
             int x = Integer.parseInt( valueTokens.get( i ) );
             int y = Integer.parseInt( rangeValueTokens.get( i ) );
@@ -143,12 +133,9 @@ public class JdkVersionProfileActivator
 
     private static void addZeroTokens( List<String> tokens, int max )
     {
-        if ( tokens.size() < max )
+        while ( tokens.size() < max )
         {
-            for ( int i = 0; i < ( max - tokens.size() ); i++ )
-            {
-                tokens.add( "0" );
-            }
+            tokens.add( "0" );
         }
     }
 
