@@ -400,6 +400,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2174PluginDepsManagedByParentProfileTest.class );
         suite.addTestSuite( MavenITmng2140ReactorAwareDepResolutionWhenForkTest.class );
         suite.addTestSuite( MavenITmng2136ActiveByDefaultProfileTest.class );
+        suite.addTestSuite( MavenITmng2135PluginBuildInReactorTest.class );
         suite.addTestSuite( MavenITmng2130ParentLookupFromReactorCacheTest.class );
         suite.addTestSuite( MavenITmng2124PomInterpolationWithParentValuesTest.class );
         suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
