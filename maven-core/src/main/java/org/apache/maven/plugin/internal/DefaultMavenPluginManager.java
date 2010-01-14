@@ -47,6 +47,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
@@ -440,6 +441,19 @@ public class DefaultMavenPluginManager
         }
 
         ArtifactFilter collectionFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
+
+        /*
+         * NOTE: This is a hack to support maven-deploy-plugin:[2.2.1,2.4] which has dependencies on old/buggy wagons.
+         * Under our class loader hierarchy those would take precedence over the wagons from the distro, causing grief
+         * due to their bugs (e.g. MNG-4528).
+         */
+        if ( "maven-deploy-plugin".equals( plugin.getArtifactId() )
+            && "org.apache.maven.plugins".equals( plugin.getGroupId() ) )
+        {
+            collectionFilter =
+                new AndArtifactFilter( Arrays.asList( collectionFilter,
+                                                      new ExclusionSetFilter( new String[] { "maven-core" } ) ) );
+        }
 
         ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
 
