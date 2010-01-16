@@ -32,6 +32,7 @@ import org.codehaus.plexus.interpolation.ValueSource;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -325,6 +326,11 @@ public class StringSearchModelInterpolator
             }
 
             if ( "parent".equals( field.getName() ) )
+            {
+                return false;
+            }
+
+            if ( Modifier.isFinal( field.getModifiers() ) )
             {
                 return false;
             }
