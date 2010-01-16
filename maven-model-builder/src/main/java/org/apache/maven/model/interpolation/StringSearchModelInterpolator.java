@@ -308,25 +308,21 @@ public class StringSearchModelInterpolator
 
         private boolean isQualifiedForInterpolation( Class<?> cls )
         {
-            return !cls.getPackage().getName().startsWith( "java" );
+            return !cls.getName().startsWith( "java" );
         }
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
         {
-            if ( !fieldIsPrimitiveByClass.containsKey( fieldType ) )
+            Boolean primitive = fieldIsPrimitiveByClass.get( fieldType );
+            if ( primitive == null )
             {
-                fieldIsPrimitiveByClass.put( fieldType, Boolean.valueOf( fieldType.isPrimitive() ) );
+                primitive = Boolean.valueOf( fieldType.isPrimitive() );
+                fieldIsPrimitiveByClass.put( fieldType, primitive );
             }
-
-            if ( fieldIsPrimitiveByClass.get( fieldType ).booleanValue() )
+            if ( primitive.booleanValue() )
             {
                 return false;
             }
-
-//            if ( fieldType.isPrimitive() )
-//            {
-//                return false;
-//            }
 
             if ( "parent".equals( field.getName() ) )
             {
