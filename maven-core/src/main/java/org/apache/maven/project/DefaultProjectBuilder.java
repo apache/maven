@@ -125,6 +125,10 @@ public class DefaultProjectBuilder
 
                 initProject( project, result );
             }
+            else if ( configuration.isResolveDependencies() )
+            {
+                projectBuildingHelper.selectProjectRealm( project );
+            }
 
             ArtifactResolutionResult artifactResult = null;
 
