@@ -124,7 +124,7 @@ public class JdkVersionProfileActivator
                 return 1;
             }
         }
-        if ( !rangeValue.isClosed() )
+        if ( !rangeValue.closed )
         {
             return isLeft ? -1 : 1;
         }
@@ -182,22 +182,12 @@ public class JdkVersionProfileActivator
     {
         private String value;
 
-        private boolean isClosed;
+        private boolean closed;
 
-        RangeValue( String value, boolean isClosed )
+        RangeValue( String value, boolean closed )
         {
             this.value = value.trim();
-            this.isClosed = isClosed;
-        }
-
-        public String getValue()
-        {
-            return value;
-        }
-
-        public boolean isClosed()
-        {
-            return isClosed;
+            this.closed = closed;
         }
 
         public String toString()
