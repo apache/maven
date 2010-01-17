@@ -103,7 +103,7 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.0-alpha-2", "1.0-alpha-15" );
         assertVersionOlder( "1.0-alpha-1", "1.0-beta-1" );
 
-        assertVersionOlder( "1.0-SNAPSHOT", "1.0-beta-1" );
+        assertVersionOlder( "1.0-beta-1", "1.0-SNAPSHOT" );
         assertVersionOlder( "1.0-SNAPSHOT", "1.0" );
         assertVersionOlder( "1.0-alpha-1-SNAPSHOT", "1.0-alpha-1" );
 
@@ -144,7 +144,7 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.0-alpha-1-SNAPSHOT", "1.0-alpha-2-SNAPSHOT" );
         assertVersionOlder( "1.0-alpha-1-SNAPSHOT", "1.0-beta-1-SNAPSHOT" );
 
-        assertVersionOlder( "1.0-SNAPSHOT-SNAPSHOT", "1.0-beta-1-SNAPSHOT" );
+        assertVersionOlder( "1.0-beta-1-SNAPSHOT", "1.0-SNAPSHOT-SNAPSHOT" );
         assertVersionOlder( "1.0-SNAPSHOT-SNAPSHOT", "1.0-SNAPSHOT" );
         assertVersionOlder( "1.0-alpha-1-SNAPSHOT-SNAPSHOT", "1.0-alpha-1-SNAPSHOT" );
 
@@ -163,10 +163,9 @@ public class DefaultArtifactVersionTest
 
     public void testSnapshotVsReleases()
     {
-        //assertVersionOlder( "1.0-RC1", "1.0-SNAPSHOT" ); not feasible if "1.0-SNAPSHOT" < "1.0-beta-1" too
-        assertVersionOlder( "1.0-SNAPSHOT", "1.0-RC1" );
-        assertVersionOlder( "1.0-SNAPSHOT", "1.0-rc1" );
-        assertVersionOlder( "1.0-SNAPSHOT", "1.0-rc-1" );
+        assertVersionOlder( "1.0-RC1", "1.0-SNAPSHOT" );
+        assertVersionOlder( "1.0-rc1", "1.0-SNAPSHOT" );
+        assertVersionOlder( "1.0-rc-1", "1.0-SNAPSHOT" );
     }
 
     public void testHashCode()
