@@ -43,8 +43,8 @@
   |   definition of these types
   |
 -->
-<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd"
+<model xmlns="http://modello.codehaus.org/MODELLO/1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.2.0 http://modello.codehaus.org/xsd/modello-1.2.0.xsd"
   xml.namespace="http://maven.apache.org/POM/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/maven-${version}.xsd">
   <id>maven</id>
@@ -381,7 +381,7 @@
             <type>Repository</type>
           </association>
         </field>
-        <field xdoc.separator="blank">
+        <field xdoc.separator="blank" xml.insertParentFieldsUpTo="modules">
           <name>scm</name>
           <version>4.0.0</version>
           <description>Specification for the SCM used by the project, such as CVS, Subversion, etc.</description>
@@ -394,7 +394,7 @@
         <!-- Issue Tracking                                                         -->
         <!-- ====================================================================== -->
 
-        <field>
+        <field xdoc.separator="blank">
           <name>issueTrackingUrl</name>
           <version>3.0.0</version>
           <description>The URL of the project's issue tracking system.</description>
@@ -509,7 +509,7 @@
         <!-- Build                                                                  -->
         <!-- ====================================================================== -->
 
-        <field xdoc.separator="blank">
+        <field xdoc.separator="blank" xml.insertParentFieldsUpTo="pluginRepositories">
           <name>build</name>
           <version>3.0.0+</version>
           <required>true</required>
@@ -523,7 +523,7 @@
         <!-- Profiles                                                               -->
         <!-- ====================================================================== -->
 
-        <field xdoc.separator="blank">
+        <field xdoc.separator="blank" xml.insertParentFieldsUpTo="reporting">
           <name>profiles</name>
           <version>4.0.0</version>
           <description>A listing of project-local build profiles which will modify the build process
