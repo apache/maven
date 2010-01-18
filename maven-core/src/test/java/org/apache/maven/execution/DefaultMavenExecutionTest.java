@@ -24,13 +24,16 @@ import junit.framework.TestCase;
 /**
  * @author Benjamin Bentmann
  */
-public class DefaultMavenExecutionTestCase
+public class DefaultMavenExecutionTest
     extends TestCase
 {
 
     public void testCopyDefault()
     {
-        assertNotNull( DefaultMavenExecutionRequest.copy( new DefaultMavenExecutionRequest() ) );
+        MavenExecutionRequest original = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy( original );
+        assertNotNull( copy );
+        assertNotSame( copy, original );
     }
 
 }

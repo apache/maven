@@ -172,7 +172,7 @@ public class DefaultMavenExecutionRequest
         copy.setRepositoryCache( original.getRepositoryCache() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
-        return original;
+        return copy;
     }
 
     public String getBaseDirectory()
