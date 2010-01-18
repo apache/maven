@@ -154,7 +154,7 @@ public class DefaultMavenExecutionRequest
         copy.setUserSettingsFile( original.getUserSettingsFile() );
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
         copy.setUserToolchainsFile( original.getUserToolchainsFile() );
-        copy.setBaseDirectory( new File( original.getBaseDirectory() ) );
+        copy.setBaseDirectory( ( original.getBaseDirectory() != null ) ? new File( original.getBaseDirectory() ) : null );
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
         copy.setPom( original.getPom() );
