@@ -156,7 +156,7 @@ public class StringSearchModelInterpolator
                                 if ( String.class == type )
                                 {
                                     String value = (String) fields[i].get( target );
-                                    if ( value != null )
+                                    if ( value != null && !Modifier.isFinal( fields[i].getModifiers() ) )
                                     {
                                         String interpolated =
                                             modelInterpolator.interpolateInternal( value, valueSources, postProcessors,
@@ -326,11 +326,6 @@ public class StringSearchModelInterpolator
             }
 
             if ( "parent".equals( field.getName() ) )
-            {
-                return false;
-            }
-
-            if ( Modifier.isFinal( field.getModifiers() ) )
             {
                 return false;
             }
