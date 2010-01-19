@@ -147,13 +147,14 @@ public class MavenCli
         {
             initialize( cliRequest );
             // Need to process cli options first to get possible logging options
-            cli( cliRequest );                        
-            logging( cliRequest );     
+            cli( cliRequest );
+            logging( cliRequest );
             commands( cliRequest );
+            properties( cliRequest );
             container( cliRequest );
             settings( cliRequest );
             populateRequest( cliRequest );
-            encryption( cliRequest );                                    
+            encryption( cliRequest );
             return execute( cliRequest );
         }
         catch( ExitException e )
@@ -321,7 +322,12 @@ public class MavenCli
             logger.info( "Enabling strict checksum verification on all artifact downloads." );
         }
     }
-    
+
+    private void properties( CliRequest cliRequest )
+    {
+        populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
+    }
+
     private void container( CliRequest cliRequest )
         throws Exception
     {
@@ -584,13 +590,11 @@ public class MavenCli
         cliRequest.request.setGlobalSettingsFile( globalSettingsFile );
         cliRequest.request.setUserSettingsFile( userSettingsFile );
 
-        populateProperties( cliRequest.request, cliRequest.commandLine );
-
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setGlobalSettingsFile( globalSettingsFile );
         settingsRequest.setUserSettingsFile( userSettingsFile );
-        settingsRequest.setSystemProperties( cliRequest.request.getSystemProperties() );
-        settingsRequest.setUserProperties( cliRequest.request.getUserProperties() );
+        settingsRequest.setSystemProperties( cliRequest.systemProperties );
+        settingsRequest.setUserProperties( cliRequest.userProperties );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -608,15 +612,6 @@ public class MavenCli
 
             logger.warn( "" );
         }
-    }
-
-    private void populateProperties( MavenExecutionRequest request, CommandLine commandLine )
-    {
-        Properties systemProperties = new Properties();
-        Properties userProperties = new Properties();
-        populateProperties( commandLine, systemProperties, userProperties );
-        request.setUserProperties( userProperties );
-        request.setSystemProperties( systemProperties );
     }
 
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
@@ -785,10 +780,6 @@ public class MavenCli
             loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
         }
 
-        Properties systemProperties = new Properties();
-        Properties userProperties = new Properties();
-        populateProperties( commandLine, systemProperties, userProperties );
-
         File userToolchainsFile;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
         {
@@ -800,7 +791,10 @@ public class MavenCli
             userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        request.setBaseDirectory( baseDirectory ).setGoals( goals ).setSystemProperties( systemProperties ).setUserProperties( userProperties ).setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
+        request.setBaseDirectory( baseDirectory ).setGoals( goals )
+            .setSystemProperties( cliRequest.systemProperties )
+            .setUserProperties( cliRequest.userProperties )
+            .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false
             .setUsePluginUpdateOverride( pluginUpdateOverride ).addActiveProfiles( activeProfiles ) // optional
@@ -978,6 +972,8 @@ public class MavenCli
         boolean quiet;
         boolean showErrors; 
         PrintStream fileStream;
+        Properties userProperties = new Properties();
+        Properties systemProperties = new Properties();
         MavenExecutionRequest request;
         
         CliRequest( String[] args, ClassWorld classWorld )
