@@ -143,6 +143,9 @@ public class DefaultProjectBuilder
                     .setCache( configuration.getRepositoryCache() )
                     .setLocalRepository( configuration.getLocalRepository() )
                     .setRemoteRepositories( project.getRemoteArtifactRepositories() )
+                    .setServers( configuration.getServers() )
+                    .setMirrors( configuration.getMirrors() )
+                    .setProxies( configuration.getProxies() )
                     .setOffline( configuration.isOffline() )
                     .setForceUpdate( configuration.isForceUpdate() )
                     .setManagedVersionMap( project.getManagedVersionMap() );
