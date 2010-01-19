@@ -20,6 +20,11 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -36,7 +41,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
 
     public MavenITmng3379ParallelArtifactDownloadsTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.5,3.0-alpha-1),[3.0-alpha-2,)" );
     }
 
     /**
@@ -53,7 +58,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.a" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.b" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.c" );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng3379.c" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3379.d" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
@@ -61,32 +66,93 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.a", "x", "0.1", "", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.a", "x", "0.1", "", "pom" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.a", "x", "0.1", "tests", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.a", "x", "0.1", "sources", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.a", "x", "0.1", "test-javadoc", "jar" );
+        String gid = "org.apache.maven.its.mng3379.";
+        assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "jar",
+            "69c041c12f35894230c7c23c49cd245886c6fb6f" );
+        assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "", "pom",
+            "10235b64a161e86e91cc6ff7245a4b9c6fdc7d5d" );
+        assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "tests", "jar",
+            "69c041c12f35894230c7c23c49cd245886c6fb6f" );
+        assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "sources", "jar",
+            "166f8bef02b9e92f99ec3b163d8321dd1d087e34" );
+        assertArtifact( verifier, gid + "a", "x", "0.2-SNAPSHOT", "javadoc", "jar",
+            "4d96e09f7e93870685a317c574f851b407224415" );
+        assertMetadata( verifier, gid + "a", "x", "0.2-SNAPSHOT",
+            "e1cfc3a77657fc46bb624dee25c61b290e5b4dd7" );
+        
+        assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "jar",
+            "efb7c4046565774cd7e44645e02f06ecdf91098d" );
+        assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "", "pom",
+            "1c816cc9eaaca1272f24887c461aa359503394f5" );
+        assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "tests", "jar",
+            "efb7c4046565774cd7e44645e02f06ecdf91098d" );
+        assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "sources", "jar",
+            "9ad231fc04ea1114987c377cc5cbccfbf83e3dbf" );
+        assertArtifact( verifier, gid + "b", "x", "0.2-SNAPSHOT", "javadoc", "jar",
+            "7807daefd3af3be73d3b92f9c5ab1b52510c0767" );
+        assertMetadata( verifier, gid + "b", "x", "0.2-SNAPSHOT",
+            "5ccc4edfb503f9a5ccadedf102dff8943250d830" );
+        assertMetadata( verifier, gid + "b", "x",
+            "8f38b1041871f22dcb031544d8a3436c335bfcdb" );
 
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.b", "x", "0.1", "", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.b", "x", "0.1", "", "pom" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.b", "x", "0.1", "tests", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.b", "x", "0.1", "sources", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.b", "x", "0.1", "test-javadoc", "jar" );
+        assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "jar",
+            "1eb0d5a421b3074e8a69b0dcca7e325c0636a932" );
+        assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "", "pom",
+            "bd9a24117d3ce4f8ef3b8fcfe79a08e5ea141a9b" );
+        assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "tests", "jar",
+            "1eb0d5a421b3074e8a69b0dcca7e325c0636a932" );
+        assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "sources", "jar",
+            "82f9664b3a910fb861fc4ed2b79e39d8f95e3675" );
+        assertArtifact( verifier, gid + "c", "x", "0.2-SNAPSHOT", "javadoc", "jar",
+            "64a3bfe19b294f67b1c52a2514c58922b88e5f97" );
+        assertMetadata( verifier, gid + "c", "x", "0.2-SNAPSHOT",
+            "b31ef40a51bdab4e6e44bfe3f2d1da42e5e42e46" );
+        assertMetadata( verifier, gid + "c", "x",
+            "c4848e60d226ec6304df3abd9eba8fdb301b3660" );
 
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.c", "x", "0.1", "", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.c", "x", "0.1", "", "pom" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.c", "x", "0.1", "tests", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.c", "x", "0.1", "sources", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.c", "x", "0.1", "test-javadoc", "jar" );
-
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.d", "x", "0.1", "", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.d", "x", "0.1", "", "pom" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.d", "x", "0.1", "tests", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.d", "x", "0.1", "sources", "jar" );
-        assertArtifactPresent( verifier, "org.apache.maven.its.mng3379.d", "x", "0.1", "test-javadoc", "jar" );
+        assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "jar",
+            "3d606c564625a594165bcbbe4a24c8f11b18b5a0" );
+        assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "", "pom",
+            "70a3c9795b2871fdd8a66e8fe312359f08d77c7d" );
+        assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "tests", "jar",
+            "3d606c564625a594165bcbbe4a24c8f11b18b5a0" );
+        assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "sources", "jar",
+            "35a7e140307f4bb67984dc72aa551f0faabacd36" );
+        assertArtifact( verifier, gid + "d", "x", "0.2-SNAPSHOT", "javadoc", "jar",
+            "2fe3487f496fe66f23772b1bada066ec6bd9222f" );
+        assertMetadata( verifier, gid + "d", "x", "0.2-SNAPSHOT",
+            "a0d0b5efd5d6f6a921a3f7c1a6a503359fccef04" );
+        assertMetadata( verifier, gid + "d", "x",
+            "1d2bf926862f2131f1229328e588b906b087bdb3" );
     }
 
-    private void assertArtifactPresent( Verifier verifier, String gid, String aid, String ver, String cls, String ext )
+    private void assertArtifact( Verifier verifier, String gid, String aid, String ver, String cls, String ext, String sha1 )
+        throws Exception
+    {
+        File file = getFile( verifier, gid, aid, ver, cls, ext );
+        assertTrue( file.getAbsolutePath(), file.isFile() );
+        assertEquals( sha1, calcHash( file, "SHA-1" ) );
+    }
+
+    private void assertMetadata( Verifier verifier, String gid, String aid, String ver, String sha1 )
+        throws Exception
+    {
+        File file = getFile( verifier, gid, aid, ver, "", "pom" );
+        file = new File( file.getParent(), "maven-metadata-maven-core-it.xml" );
+        assertTrue( file.getAbsolutePath(), file.isFile() );
+        assertEquals( sha1, calcHash( file, "SHA-1" ) );
+    }
+
+    private void assertMetadata( Verifier verifier, String gid, String aid, String sha1 )
+        throws Exception
+    {
+        File file = getFile( verifier, gid, aid, "0.2", "", "pom" );
+        file = new File( file.getParentFile().getParent(), "maven-metadata-maven-core-it.xml" );
+        assertTrue( file.getAbsolutePath(), file.isFile() );
+        assertEquals( sha1, calcHash( file, "SHA-1" ) );
+    }
+
+    private File getFile( Verifier verifier, String gid, String aid, String ver, String cls, String ext )
     {
         StringBuffer buffer = new StringBuffer( 256 );
         buffer.append( verifier.localRepo );
@@ -99,8 +165,46 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
             buffer.append( '-' ).append( cls );
         }
         buffer.append( '.' ).append( ext );
-        File file = new File( buffer.toString() );
-        assertTrue( file.getAbsolutePath(), file.isFile() );
+        return new File( buffer.toString() );
+    }
+
+    private String calcHash( File file, String algo )
+        throws IOException, NoSuchAlgorithmException
+    {
+        MessageDigest digester = MessageDigest.getInstance( algo );
+
+        FileInputStream is = new FileInputStream( file );
+        try
+        {
+            DigestInputStream dis = new DigestInputStream( is, digester );
+
+            for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
+            {
+                // just read it
+            }
+        }
+        finally
+        {
+            is.close();
+        }
+
+        byte[] digest = digester.digest();
+
+        StringBuffer hash = new StringBuffer( digest.length * 2 );
+
+        for ( int i = 0; i < digest.length; i++ )
+        {
+            int b = digest[i] & 0xFF;
+
+            if ( b < 0x10 )
+            {
+                hash.append( '0' );
+            }
+
+            hash.append( Integer.toHexString( b ) );
+        }
+
+        return hash.toString();
     }
 
 }

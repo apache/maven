@@ -38,97 +38,97 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.its.mng3379.a</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.a</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>tests</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.a</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.a</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
-      <classifier>test-javadoc</classifier>
+      <version>[0.2-SNAPSHOT,)</version>
+      <classifier>javadoc</classifier>
     </dependency>
     <!-- group B -->
     <dependency>
       <groupId>org.apache.maven.its.mng3379.b</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.b</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>tests</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.b</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.b</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
-      <classifier>test-javadoc</classifier>
+      <version>[0.2-SNAPSHOT,)</version>
+      <classifier>javadoc</classifier>
     </dependency>
     <!-- group C -->
     <dependency>
       <groupId>org.apache.maven.its.mng3379.c</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.c</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>tests</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.c</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.c</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
-      <classifier>test-javadoc</classifier>
+      <version>[0.2-SNAPSHOT,)</version>
+      <classifier>javadoc</classifier>
     </dependency>
     <!-- group D -->
     <dependency>
       <groupId>org.apache.maven.its.mng3379.d</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.d</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>tests</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.d</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
+      <version>[0.2-SNAPSHOT,)</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.mng3379.d</groupId>
       <artifactId>x</artifactId>
-      <version>0.1</version>
-      <classifier>test-javadoc</classifier>
+      <version>[0.2-SNAPSHOT,)</version>
+      <classifier>javadoc</classifier>
     </dependency>
   </dependencies>
 

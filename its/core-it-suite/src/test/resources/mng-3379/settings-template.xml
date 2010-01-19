@@ -28,8 +28,7 @@ under the License.
           <id>maven-core-it</id>
           <url>@baseurl@/repo</url>
           <releases>
-            <!-- NOTE: Be sure the verify the integrity -->
-            <checksumPolicy>fail</checksumPolicy>
+            <checksumPolicy>ignore</checksumPolicy>
           </releases>
           <snapshots>
             <checksumPolicy>ignore</checksumPolicy>
