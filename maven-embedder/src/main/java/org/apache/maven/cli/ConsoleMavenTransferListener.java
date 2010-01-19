@@ -20,17 +20,26 @@ package org.apache.maven.cli;
  */
 
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.maven.repository.ArtifactTransferEvent;
+import org.apache.maven.repository.ArtifactTransferResource;
 
 /**
  * Console download progress meter.
- *
+ * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
+
+    private Map<ArtifactTransferResource, Long> downloads =
+        Collections.synchronizedMap( new LinkedHashMap<ArtifactTransferResource, Long>() );
+
+    private int lastLength;
 
     public ConsoleMavenTransferListener( PrintStream out )
     {
@@ -40,26 +49,69 @@ class ConsoleMavenTransferListener
     @Override
     protected void doProgress( ArtifactTransferEvent transferEvent )
     {
-        long total = transferEvent.getResource().getContentLength();
-        long complete = transferEvent.getTransferredBytes();
+        ArtifactTransferResource resource = transferEvent.getResource();
+        downloads.put( resource, Long.valueOf( transferEvent.getTransferredBytes() ) );
 
-        // TODO [BP]: Sys.out may no longer be appropriate, but will \r work with getLogger()?
+        StringBuilder buffer = new StringBuilder( 64 );
+
+        for ( Map.Entry<ArtifactTransferResource, Long> entry : downloads.entrySet() )
+        {
+            long total = entry.getKey().getContentLength();
+            long complete = entry.getValue().longValue();
+
+            buffer.append( getStatus( complete, total ) ).append( "  " );
+        }
+
+        int pad = lastLength - buffer.length();
+        lastLength = buffer.length();
+        pad( buffer, pad );
+        buffer.append( '\r' );
+
+        out.print( buffer );
+    }
+
+    private String getStatus( long complete, long total )
+    {
         if ( total >= 1024 )
         {
-            out.print( toKB( complete ) + "/" + toKB( total ) + " KB " + "\r" );
+            return toKB( complete ) + "/" + toKB( total ) + " KB ";
         }
         else if ( total >= 0 )
         {
-            out.print( complete + "/" + total + " B " + "\r" );
+            return complete + "/" + total + " B ";
         }
         else if ( complete >= 1024 )
         {
-            out.print( toKB( complete ) + " KB " + "\r" );
+            return toKB( complete ) + " KB ";
         }
         else
         {
-            out.print( complete + " B " + "\r" );
+            return complete + " B ";
         }
+    }
+
+    private void pad( StringBuilder buffer, int spaces )
+    {
+        String block = "                                        ";
+        while ( spaces > 0 )
+        {
+            int n = Math.min( spaces, block.length() );
+            buffer.append( block, 0, n );
+            spaces -= n;
+        }
+    }
+
+    @Override
+    public void transferCompleted( ArtifactTransferEvent transferEvent )
+    {
+        downloads.remove( transferEvent.getResource() );
+
+        StringBuilder buffer = new StringBuilder( 64 );
+        pad( buffer, lastLength );
+        buffer.append( '\r' );
+        out.print( buffer );
+
+        super.transferCompleted( transferEvent );
     }
 
 }

@@ -34,11 +34,11 @@ public class TransferListenerAdapter
     implements TransferListener
 {
 
-    private ArtifactTransferListener listener;
+    private final ArtifactTransferListener listener;
 
-    private Map<Resource, ArtifactTransferResource> artifacts;
+    private final Map<Resource, ArtifactTransferResource> artifacts;
 
-    private Map<Resource, Long> transfers;
+    private final Map<Resource, Long> transfers;
 
     public static TransferListener newAdapter( ArtifactTransferListener listener )
     {
@@ -67,22 +67,34 @@ public class TransferListenerAdapter
     {
         ArtifactTransferEvent event = wrap( transferEvent );
 
-        Long transferred = transfers.get( transferEvent.getResource() );
+        Long transferred = null;
+        synchronized ( transfers )
+        {
+            transferred = transfers.remove( transferEvent.getResource() );
+        }
         if ( transferred != null )
         {
             event.setTransferredBytes( transferred.longValue() );
         }
 
-        listener.transferCompleted( event );
+        synchronized ( artifacts )
+        {
+            artifacts.remove( transferEvent.getResource() );
+        }
 
-        artifacts.remove( transferEvent.getResource() );
-        transfers.remove( transferEvent.getResource() );
+        listener.transferCompleted( event );
     }
 
     public void transferError( TransferEvent transferEvent )
     {
-        artifacts.remove( transferEvent.getResource() );
-        transfers.remove( transferEvent.getResource() );
+        synchronized ( transfers )
+        {
+            transfers.remove( transferEvent.getResource() );
+        }
+        synchronized ( artifacts )
+        {
+            artifacts.remove( transferEvent.getResource() );
+        }
     }
 
     public void transferInitiated( TransferEvent transferEvent )
@@ -92,16 +104,20 @@ public class TransferListenerAdapter
 
     public void transferProgress( TransferEvent transferEvent, byte[] buffer, int length )
     {
-        Long transferred = transfers.get( transferEvent.getResource() );
-        if ( transferred == null )
+        Long transferred;
+        synchronized ( transfers )
         {
-            transferred = Long.valueOf( length );
+            transferred = transfers.get( transferEvent.getResource() );
+            if ( transferred == null )
+            {
+                transferred = Long.valueOf( length );
+            }
+            else
+            {
+                transferred = Long.valueOf( transferred.longValue() + length );
+            }
+            transfers.put( transferEvent.getResource(), transferred );
         }
-        else
-        {
-            transferred = Long.valueOf( transferred.longValue() + length );
-        }
-        transfers.put( transferEvent.getResource(), transferred );
 
         ArtifactTransferEvent event = wrap( transferEvent );
         event.setDataBuffer( buffer );
@@ -153,15 +169,18 @@ public class TransferListenerAdapter
         }
         else
         {
-            ArtifactTransferResource artifact = artifacts.get( resource );
-
-            if ( artifact == null )
+            synchronized ( artifacts )
             {
-                artifact = new MavenArtifact( repository.getUrl(), resource );
-                artifacts.put( resource, artifact );
-            }
+                ArtifactTransferResource artifact = artifacts.get( resource );
 
-            return artifact;
+                if ( artifact == null )
+                {
+                    artifact = new MavenArtifact( repository.getUrl(), resource );
+                    artifacts.put( resource, artifact );
+                }
+
+                return artifact;
+            }
         }
     }
 

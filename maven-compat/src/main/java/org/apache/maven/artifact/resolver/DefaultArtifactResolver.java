@@ -24,6 +24,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -96,6 +102,38 @@ public class DefaultArtifactResolver
 
     @Requirement
     private LegacySupport legacySupport;
+
+    private final Executor executor;
+
+    public DefaultArtifactResolver()
+    {
+        int threads = Integer.getInteger( "maven.artifact.threads", 5 ).intValue();
+        if ( threads <= 1 )
+        {
+            executor = new Executor()
+            {
+                public void execute( Runnable command )
+                {
+                    command.run();
+                }
+            };
+        }
+        else
+        {
+            executor =
+                new ThreadPoolExecutor( threads, threads, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() );
+        }
+    }
+
+    @Override
+    protected void finalize()
+        throws Throwable
+    {
+        if ( executor instanceof ExecutorService )
+        {
+            ( (ExecutorService) executor ).shutdown();
+        }
+    }
 
     private void injectSession( RepositoryRequest request )
     {
@@ -558,41 +596,41 @@ public class DefaultArtifactResolver
         {
             return result;
         }
-                
+
         if ( result.getArtifactResolutionNodes() != null )
         {
-            ArtifactResolutionRequest childRequest = new ArtifactResolutionRequest( request );
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+            CountDownLatch latch = new CountDownLatch( result.getArtifactResolutionNodes().size() );
 
             for ( ResolutionNode node : result.getArtifactResolutionNodes() )
             {
                 Artifact artifact = node.getArtifact();
 
-                try
+                if ( resolutionFilter == null || resolutionFilter.include( artifact ) )
                 {
-                    if ( resolutionFilter == null || resolutionFilter.include( artifact ) )
-                    {
-                        childRequest.setRemoteRepositories( node.getRemoteRepositories() );
+                    ArtifactResolutionRequest childRequest = new ArtifactResolutionRequest( request );
+                    childRequest.setRemoteRepositories( node.getRemoteRepositories() );
 
-                        resolve( artifact, childRequest, transferListener, false );
-                    }
+                    executor.execute( new ResolveTask( classLoader, latch, artifact, transferListener, childRequest,
+                                                       result ) );
                 }
-                catch ( ArtifactNotFoundException anfe )
+                else
                 {
-                    // These are cases where the artifact just isn't present in any of the remote repositories
-                    // because it wasn't deployed, or it was deployed in the wrong place.
-
-                    result.addMissingArtifact( artifact );
-                }
-                catch ( ArtifactResolutionException e )
-                {
-                    // This is really a wagon TransferFailedException so something went wrong after we successfully
-                    // retrieved the metadata.
-
-                    result.addErrorArtifactException( e );
+                    latch.countDown();
                 }
             }
+            try
+            {
+                latch.await();
+            }
+            catch ( InterruptedException e )
+            {
+                result.addErrorArtifactException( new ArtifactResolutionException( "Resolution interrupted",
+                                                                                   rootArtifact, e ) );
+            }
         }
-                
+
         // We want to send the root artifact back in the result but we need to do this after the other dependencies
         // have been resolved.
         if ( request.isResolveRoot() )
@@ -612,4 +650,67 @@ public class DefaultArtifactResolver
     {
         resolve( artifact, remoteRepositories, localRepository, null );
     }
+
+    private class ResolveTask
+        implements Runnable
+    {
+
+        private final ClassLoader classLoader;
+
+        private final CountDownLatch latch;
+
+        private final Artifact artifact;
+
+        private final TransferListener transferListener;
+
+        private final ArtifactResolutionRequest request;
+
+        private final ArtifactResolutionResult result;
+
+        public ResolveTask( ClassLoader classLoader, CountDownLatch latch, Artifact artifact, TransferListener transferListener,
+                            ArtifactResolutionRequest request, ArtifactResolutionResult result )
+        {
+            this.classLoader = classLoader;
+            this.latch = latch;
+            this.artifact = artifact;
+            this.transferListener = transferListener;
+            this.request = request;
+            this.result = result;
+        }
+
+        public void run()
+        {
+            try
+            {
+                Thread.currentThread().setContextClassLoader( classLoader );
+                resolve( artifact, request, transferListener, false );
+            }
+            catch ( ArtifactNotFoundException anfe )
+            {
+                // These are cases where the artifact just isn't present in any of the remote repositories
+                // because it wasn't deployed, or it was deployed in the wrong place.
+
+                synchronized ( result )
+                {
+                    result.addMissingArtifact( artifact );
+                }
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                // This is really a wagon TransferFailedException so something went wrong after we successfully
+                // retrieved the metadata.
+
+                synchronized ( result )
+                {
+                    result.addErrorArtifactException( e );
+                }
+            }
+            finally
+            {
+                latch.countDown();
+            }
+        }
+
+    }
+
 }
