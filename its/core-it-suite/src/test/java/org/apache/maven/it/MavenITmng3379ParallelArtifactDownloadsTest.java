@@ -62,6 +62,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
+        verifier.setSystemProperty( "maven.artifact.threads", "16" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
