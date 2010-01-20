@@ -20,9 +20,8 @@ package org.apache.maven.cli;
  */
 
 import java.io.PrintStream;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.repository.ArtifactTransferEvent;
 import org.apache.maven.repository.ArtifactTransferResource;
@@ -36,8 +35,7 @@ class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
 
-    private Map<ArtifactTransferResource, Long> downloads =
-        Collections.synchronizedMap( new LinkedHashMap<ArtifactTransferResource, Long>() );
+    private Map<ArtifactTransferResource, Long> downloads = new ConcurrentHashMap<ArtifactTransferResource, Long>();
 
     private int lastLength;
 
