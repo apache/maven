@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -62,6 +61,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.PlexusContainer;
@@ -69,7 +69,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.Os;
 
 /**
  * @author Jason van Zyl
@@ -99,8 +98,6 @@ public class MavenMetadataSource
 
     @Requirement
     private LegacySupport legacySupport;
-
-    private static Properties envVars;
 
     private void injectSession( MetadataResolutionRequest request )
     {
@@ -700,19 +697,7 @@ public class MavenMetadataSource
     {
         Properties props = new Properties();
 
-        if ( envVars == null )
-        {
-            Properties tmp = new Properties();
-            boolean caseSensitive = !Os.isFamily( Os.FAMILY_WINDOWS );
-            for ( Map.Entry<String, String> entry : System.getenv().entrySet() )
-            {
-                String key = "env." + ( caseSensitive ? entry.getKey() : entry.getKey().toUpperCase( Locale.ENGLISH ) );
-                tmp.setProperty( key, entry.getValue() );
-            }
-            envVars = tmp;
-        }
-
-        props.putAll( envVars );
+        EnvironmentUtils.addEnvVars( props );
 
         props.putAll( System.getProperties() );
 

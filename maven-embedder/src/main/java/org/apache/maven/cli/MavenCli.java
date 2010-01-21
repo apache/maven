@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -40,6 +39,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
@@ -52,7 +52,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
@@ -898,14 +897,7 @@ public class MavenCli
 
     static void populateProperties( CommandLine commandLine, Properties systemProperties, Properties userProperties )
     {
-        // add the env vars to the property set, with the "env." prefix
-        // XXX support for env vars should probably be removed from the ModelInterpolator
-        boolean caseSensitive = !Os.isFamily( Os.FAMILY_WINDOWS );
-        for ( Map.Entry<String, String> entry : System.getenv().entrySet() )
-        {
-            String key = "env." + ( caseSensitive ? entry.getKey() : entry.getKey().toUpperCase( Locale.ENGLISH ) );
-            systemProperties.setProperty( key, entry.getValue() );
-        }
+        EnvironmentUtils.addEnvVars( systemProperties );
 
         // ----------------------------------------------------------------------
         // Options that are set on the command line become system properties
