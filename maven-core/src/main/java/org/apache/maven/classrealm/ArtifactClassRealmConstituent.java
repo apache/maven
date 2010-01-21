@@ -67,4 +67,10 @@ class ArtifactClassRealmConstituent
         return artifact.getFile();
     }
 
+    @Override
+    public String toString()
+    {
+        return artifact.getId();
+    }
+
 }
