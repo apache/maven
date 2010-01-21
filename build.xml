@@ -211,6 +211,7 @@ END SNIPPET: ant-bootstrap -->
       <classpath refid="maven.classpath" />
       <arg value="${maven.debug}" />
       <arg value="-B" />
+      <arg value="-V" />
       <arg value="clean" />
       <arg value="install" />
       <arg value="-Dmaven.test.skip=${maven.test.skip}" />
