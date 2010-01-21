@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -360,12 +359,7 @@ public class DefaultMavenPluginManager
 
         List<Artifact> pluginArtifacts = resolvePluginArtifacts( plugin, pluginArtifact, request, dependencyFilter );
 
-        ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports );
-
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Populating plugin realm for " + plugin.getId() );
-        }
+        ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports, pluginArtifacts );
 
         List<Artifact> exposedPluginArtifacts = new ArrayList<Artifact>();
 
@@ -373,28 +367,7 @@ public class DefaultMavenPluginManager
         {
             if ( artifact.getFile() != null )
             {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "  Included: " + artifact.getId() );
-                }
-
                 exposedPluginArtifacts.add( artifact );
-
-                try
-                {
-                    pluginRealm.addURL( artifact.getFile().toURI().toURL() );
-                }
-                catch ( MalformedURLException e )
-                {
-                    // Not going to happen
-                }
-            }
-            else
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "  Excluded: " + artifact.getId() );
-                }
             }
         }
 

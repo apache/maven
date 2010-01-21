@@ -19,11 +19,18 @@ package org.apache.maven.classrealm;
  * under the License.
  */
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.MutablePlexusContainer;
@@ -35,6 +42,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
@@ -63,21 +71,52 @@ public class DefaultClassRealmManager
      * Creates a new class realm with the specified parent and imports.
      * 
      * @param baseRealmId The base id to use for the new realm, must not be {@code null}.
+     * @param type The type of the class realm, must not be {@code null}.
      * @param parent The parent realm for the new realm, may be {@code null} to use the Maven core realm.
      * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     * @param artifacts The artifacts to add to the realm, may be {@code null}. Unresolved artifacts (i.e. with a
+     *            missing file) will automatically be excluded from the realm.
      * @return The created class realm, never {@code null}.
      */
-    private ClassRealm createRealm( String baseRealmId, ClassLoader parent, List<String> imports, boolean importXpp3Dom )
+    private ClassRealm createRealm( String baseRealmId, RealmType type, ClassLoader parent, List<String> imports,
+                                    boolean importXpp3Dom, List<Artifact> artifacts )
     {
+        Set<String> artifactIds = new HashSet<String>();
+
+        List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
+
+        if ( artifacts != null )
+        {
+            for ( Artifact artifact : artifacts )
+            {
+                artifactIds.add( artifact.getId() );
+                if ( artifact.getFile() != null )
+                {
+                    constituents.add( new ArtifactClassRealmConstituent( artifact ) );
+                }
+            }
+        }
+
+        if ( imports != null )
+        {
+            imports = new ArrayList<String>( imports );
+        }
+        else
+        {
+            imports = new ArrayList<String>();
+        }
+
+        ClassRealmRequest request = new DefaultClassRealmRequest( type, parent, imports, constituents );
+
+        ClassRealm classRealm;
+
         ClassWorld world = getClassWorld();
-
-        String realmId = baseRealmId;
-
-        Random random = new Random();
 
         synchronized ( world )
         {
-            ClassRealm classRealm;
+            String realmId = baseRealmId;
+
+            Random random = new Random();
 
             while ( true )
             {
@@ -97,39 +136,84 @@ public class DefaultClassRealmManager
                     realmId = baseRealmId + '-' + random.nextInt();
                 }
             }
-
-            if ( parent != null )
-            {
-                classRealm.setParentClassLoader( parent );
-            }
-            else
-            {
-                classRealm.setParentRealm( getCoreRealm() );
-                importMavenApi( classRealm );
-            }
-
-            if ( importXpp3Dom )
-            {
-                importXpp3Dom( classRealm );
-            }
-
-            if ( imports != null && !imports.isEmpty() )
-            {
-                ClassLoader importedRealm = classRealm.getParentClassLoader();
-
-                for ( String imp : imports )
-                {
-                    classRealm.importFrom( importedRealm, imp );
-                }
-            }
-
-            for ( ClassRealmManagerDelegate delegate : getDelegates() )
-            {
-                delegate.setupRealm( classRealm );
-            }
-
-            return classRealm;
         }
+
+        if ( parent != null )
+        {
+            classRealm.setParentClassLoader( parent );
+        }
+        else
+        {
+            classRealm.setParentRealm( getCoreRealm() );
+            importMavenApi( classRealm );
+        }
+
+        for ( ClassRealmManagerDelegate delegate : getDelegates() )
+        {
+            delegate.setupRealm( classRealm, request );
+        }
+
+        if ( importXpp3Dom )
+        {
+            importXpp3Dom( classRealm );
+        }
+
+        if ( !imports.isEmpty() )
+        {
+            ClassLoader importedRealm = classRealm.getParentClassLoader();
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Importing packages into class realm " + classRealm.getId() );
+            }
+
+            for ( String imp : imports )
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Imported: " + imp );
+                }
+
+                classRealm.importFrom( importedRealm, imp );
+            }
+        }
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Populating class realm " + classRealm.getId() );
+        }
+
+        for ( ClassRealmConstituent constituent : constituents )
+        {
+            File file = constituent.getFile();
+
+            String id = getId( constituent );
+            artifactIds.remove( id );
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "  Included: " + id );
+            }
+
+            try
+            {
+                classRealm.addURL( file.toURI().toURL() );
+            }
+            catch ( MalformedURLException e )
+            {
+                // Not going to happen
+            }
+        }
+
+        if ( logger.isDebugEnabled() )
+        {
+            for ( String id : artifactIds )
+            {
+                logger.debug( "  Excluded: " + id );
+            }
+        }
+
+        return classRealm;
     }
 
     /**
@@ -190,46 +274,54 @@ public class DefaultClassRealmManager
         return container.getContainerRealm();
     }
 
-    public ClassRealm createProjectRealm( Model model )
+    public ClassRealm createProjectRealm( Model model, List<Artifact> artifacts )
     {
         if ( model == null )
         {
             throw new IllegalArgumentException( "model missing" );
         }
 
-        return createRealm( getKey( model ), null, null, false );
+        return createRealm( getKey( model ), RealmType.Project, null, null, false, artifacts );
     }
 
-    private String getKey( Model model )
+    private static String getKey( Model model )
     {
         return "project>" + model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
     }
 
-    public ClassRealm createExtensionRealm( Plugin plugin )
+    public ClassRealm createExtensionRealm( Plugin plugin, List<Artifact> artifacts )
     {
         if ( plugin == null )
         {
             throw new IllegalArgumentException( "extension plugin missing" );
         }
 
-        return createRealm( getKey( plugin, true ), null, null, true );
+        return createRealm( getKey( plugin, true ), RealmType.Extension, null, null, true, artifacts );
     }
 
-    public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports )
+    public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports,
+                                         List<Artifact> artifacts )
     {
         if ( plugin == null )
         {
             throw new IllegalArgumentException( "plugin missing" );
         }
 
-        return createRealm( getKey( plugin, false ), parent, imports, true );
+        return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, imports, true, artifacts );
     }
 
-    private String getKey( Plugin plugin, boolean extension )
+    private static String getKey( Plugin plugin, boolean extension )
     {
         String version = ArtifactUtils.toSnapshotVersion( plugin.getVersion() );
         return ( extension ? "extension>" : "plugin>" ) + plugin.getGroupId() + ":" + plugin.getArtifactId() + ":"
             + version;
+    }
+
+    private static String getId( ClassRealmConstituent constituent )
+    {
+        return constituent.getGroupId() + ':' + constituent.getArtifactId() + ':' + constituent.getType()
+            + ( StringUtils.isNotEmpty( constituent.getClassifier() ) ? ':' + constituent.getClassifier() : "" ) + ':'
+            + constituent.getVersion();
     }
 
     private List<ClassRealmManagerDelegate> getDelegates()

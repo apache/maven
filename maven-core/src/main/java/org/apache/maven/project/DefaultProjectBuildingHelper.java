@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -229,39 +228,7 @@ public class DefaultProjectBuildingHelper
             }
             else
             {
-                extensionRealm = classRealmManager.createExtensionRealm( plugin );
-
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "Populating extension realm for " + plugin.getId() );
-                }
-
-                for ( Artifact artifact : artifacts )
-                {
-                    if ( artifact.getFile() != null )
-                    {
-                        if ( logger.isDebugEnabled() )
-                        {
-                            logger.debug( "  Included: " + artifact.getId() );
-                        }
-
-                        try
-                        {
-                            extensionRealm.addURL( artifact.getFile().toURI().toURL() );
-                        }
-                        catch ( MalformedURLException e )
-                        {
-                            // Not going to happen
-                        }
-                    }
-                    else
-                    {
-                        if ( logger.isDebugEnabled() )
-                        {
-                            logger.debug( "  Excluded: " + artifact.getId() );
-                        }
-                    }
-                }
+                extensionRealm = classRealmManager.createExtensionRealm( plugin, artifacts );
 
                 try
                 {
@@ -323,29 +290,7 @@ public class DefaultProjectBuildingHelper
 
         if ( record == null )
         {
-            projectRealm = classRealmManager.createProjectRealm( model );
-
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Populating project realm for " + model.getId() );
-            }
-
-            for ( Artifact publicArtifact : publicArtifacts )
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "  Included: " + publicArtifact.getId() );
-                }
-
-                try
-                {
-                    projectRealm.addURL( publicArtifact.getFile().toURI().toURL() );
-                }
-                catch ( MalformedURLException e )
-                {
-                    // can't happen
-                }
-            }
+            projectRealm = classRealmManager.createProjectRealm( model, publicArtifacts );
 
             Set<String> exclusions = new LinkedHashSet<String>();
 

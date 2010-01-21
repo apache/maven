@@ -19,18 +19,52 @@ package org.apache.maven.classrealm;
  * under the License.
  */
 
+import java.io.File;
 
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.apache.maven.artifact.Artifact;
 
 /**
- * ClassRealmManagerDelegate is used to perform addition configuration of
- * class realms created by ClassRealmManager.
- * 
- * @author igor
+ * @author Benjamin Bentmann
  */
-public interface ClassRealmManagerDelegate
+class ArtifactClassRealmConstituent
+    implements ClassRealmConstituent
 {
 
-    void setupRealm( ClassRealm classRealm, ClassRealmRequest request );
+    private final Artifact artifact;
+
+    public ArtifactClassRealmConstituent( Artifact artifact )
+    {
+        this.artifact = artifact;
+    }
+
+    public String getGroupId()
+    {
+        return artifact.getGroupId();
+    }
+
+    public String getArtifactId()
+    {
+        return artifact.getArtifactId();
+    }
+
+    public String getType()
+    {
+        return artifact.getType();
+    }
+
+    public String getClassifier()
+    {
+        return artifact.hasClassifier() ? artifact.getClassifier() : "";
+    }
+
+    public String getVersion()
+    {
+        return artifact.getBaseVersion();
+    }
+
+    public File getFile()
+    {
+        return artifact.getFile();
+    }
 
 }
