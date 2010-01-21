@@ -104,7 +104,7 @@ public class DefaultClassRealmManager
             }
             else
             {
-                classRealm.setParentRealm( container.getContainerRealm() );
+                classRealm.setParentRealm( getCoreRealm() );
                 importMavenApi( classRealm );
             }
 
@@ -141,7 +141,7 @@ public class DefaultClassRealmManager
      */
     private void importXpp3Dom( ClassRealm importingRealm )
     {
-        ClassRealm coreRealm = container.getContainerRealm();
+        ClassRealm coreRealm = getCoreRealm();
 
         importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.Xpp3Dom" );
         importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
@@ -183,6 +183,11 @@ public class DefaultClassRealmManager
         importingRealm.importFromParent( "org.codehaus.plexus.PlexusConstants" );
         importingRealm.importFromParent( "org.codehaus.plexus.PlexusContainer" );
         importingRealm.importFromParent( "org.codehaus.plexus.PlexusContainerException" );
+    }
+
+    public ClassRealm getCoreRealm()
+    {
+        return container.getContainerRealm();
     }
 
     public ClassRealm createProjectRealm( Model model )

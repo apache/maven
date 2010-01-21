@@ -36,6 +36,13 @@ public interface ClassRealmManager
 {
 
     /**
+     * Gets the class realm hosting the Maven core.
+     * 
+     * @return The class realm hosting the Maven core, never {@code null}.
+     */
+    ClassRealm getCoreRealm();
+
+    /**
      * Creates a new class realm for the specified project and its build extensions.
      * 
      * @param model The model of the project for which to create a realm, must not be {@code null}.

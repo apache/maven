@@ -439,7 +439,7 @@ public class DefaultProjectBuildingHelper
 
         if ( projectRealm == null )
         {
-            projectRealm = container.getContainerRealm();
+            projectRealm = classRealmManager.getCoreRealm();
         }
 
         Thread.currentThread().setContextClassLoader( projectRealm );
