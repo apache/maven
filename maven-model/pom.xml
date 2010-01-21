@@ -45,6 +45,7 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <version>1.2</version><!-- to be removed when upgrading parent -->
         <configuration>
           <version>4.0.0</version>
           <models>
