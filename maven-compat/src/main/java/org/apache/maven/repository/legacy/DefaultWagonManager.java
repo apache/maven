@@ -22,6 +22,7 @@ package org.apache.maven.repository.legacy;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -485,6 +486,8 @@ public class DefaultWagonManager
         {
             checksums.put( CHECKSUM_IDS[i], addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i] ) );
         }
+        
+        List<File> temporaryFiles = new ArrayList<File>();
 
         try
         {
@@ -517,6 +520,7 @@ public class DefaultWagonManager
                 temp.deleteOnExit();
                 FileUtils.fileWrite( temp.getAbsolutePath(), "UTF-8", sums.get( extension ) );
 
+                temporaryFiles.add( temp );
                 wagon.put( temp, remotePath + "." + extension );
             }
         }
@@ -542,6 +546,9 @@ public class DefaultWagonManager
         }
         finally
         {
+            // MNG-4543
+            cleanupTemporaryFiles( temporaryFiles );
+            
             // Remove every checksum listener
             for ( String aCHECKSUM_IDS : CHECKSUM_IDS )
             {
@@ -558,6 +565,24 @@ public class DefaultWagonManager
         }
     }
 
+    private void cleanupTemporaryFiles(List<File> files)
+    {
+        for ( File file : files )
+        {
+            // really don't care if it failed here only log warning
+            try
+            {
+                file.delete();
+            }
+            catch ( Exception e )
+            {
+                logger.warn( "skip failed to delete temporary file : " + file.getAbsolutePath() + " , message "
+                    + e.getMessage() );
+            }
+        }
+       
+    }
+    
     private ChecksumObserver addChecksumObserver( Wagon wagon, String algorithm )
         throws TransferFailedException
     {
