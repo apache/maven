@@ -58,12 +58,14 @@ public class StringSearchModelInterpolator
         return model;
     }
 
-    protected void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config, ModelProblemCollector problems )
+    protected void interpolateObject( Object obj, Model model, File projectDir, ModelBuildingRequest config,
+                                      ModelProblemCollector problems )
     {
         try
         {
             List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
-            List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
+            List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir,
+                                                                                              config );
 
             InterpolateObjectAction action =
                 new InterpolateObjectAction( obj, valueSources, postProcessors, this, problems );
@@ -95,7 +97,7 @@ public class StringSearchModelInterpolator
 
         public InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
                                         List<? extends InterpolationPostProcessor> postProcessors,
-                                        StringSearchModelInterpolator modelInterpolator, ModelProblemCollector problems )
+                                        StringSearchModelInterpolator modelInterpolator, ModelProblemCollector problems)
         {
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
@@ -135,28 +137,21 @@ public class StringSearchModelInterpolator
             }
             else if ( isQualifiedForInterpolation( cls ) )
             {
-                Field[] fields = fieldsByClass.get( cls );
-                if ( fields == null )
+                Field[] fields = getFields(cls);
+                for (Field currentField : fields)
                 {
-                    fields = cls.getDeclaredFields();
-                    fieldsByClass.put( cls, fields );
-                }
-
-                for ( int i = 0; i < fields.length; i++ )
-                {
-                    Class<?> type = fields[i].getType();
-                    if ( isQualifiedForInterpolation( fields[i], type ) )
+                    Class<?> type = currentField.getType();
+                    if ( isQualifiedForInterpolation( currentField, type ) )
                     {
-                        boolean isAccessible = fields[i].isAccessible();
-                        fields[i].setAccessible( true );
-                        try
-                        {
+                        synchronized ( currentField){
+                            boolean isAccessible = currentField.isAccessible();
+                            currentField.setAccessible( true );
                             try
                             {
                                 if ( String.class == type )
                                 {
-                                    String value = (String) fields[i].get( target );
-                                    if ( value != null && !Modifier.isFinal( fields[i].getModifiers() ) )
+                                    String value = (String) currentField.get( target );
+                                    if ( value != null && !Modifier.isFinal( currentField.getModifiers() ) )
                                     {
                                         String interpolated =
                                             modelInterpolator.interpolateInternal( value, valueSources, postProcessors,
@@ -164,13 +159,13 @@ public class StringSearchModelInterpolator
 
                                         if ( !interpolated.equals( value ) )
                                         {
-                                            fields[i].set( target, interpolated );
+                                            currentField.set( target, interpolated );
                                         }
                                     }
                                 }
                                 else if ( Collection.class.isAssignableFrom( type ) )
                                 {
-                                    Collection<Object> c = (Collection<Object>) fields[i].get( target );
+                                    Collection<Object> c = (Collection<Object>) currentField.get( target );
                                     if ( c != null && !c.isEmpty() )
                                     {
                                         List<Object> originalValues = new ArrayList<Object>( c );
@@ -192,7 +187,8 @@ public class StringSearchModelInterpolator
                                                     String interpolated =
                                                         modelInterpolator.interpolateInternal( (String) value,
                                                                                                valueSources,
-                                                                                               postProcessors, problems );
+                                                                                               postProcessors,
+                                                                                               problems );
 
                                                     if ( !interpolated.equals( value ) )
                                                     {
@@ -226,7 +222,7 @@ public class StringSearchModelInterpolator
                                 }
                                 else if ( Map.class.isAssignableFrom( type ) )
                                 {
-                                    Map<Object, Object> m = (Map<Object, Object>) fields[i].get( target );
+                                    Map<Object, Object> m = (Map<Object, Object>) currentField.get( target );
                                     if ( m != null && !m.isEmpty() )
                                     {
                                         for ( Map.Entry<Object, Object> entry : m.entrySet() )
@@ -240,7 +236,8 @@ public class StringSearchModelInterpolator
                                                     String interpolated =
                                                         modelInterpolator.interpolateInternal( (String) value,
                                                                                                valueSources,
-                                                                                               postProcessors, problems );
+                                                                                               postProcessors,
+                                                                                               problems );
 
                                                     if ( !interpolated.equals( value ) )
                                                     {
@@ -271,10 +268,10 @@ public class StringSearchModelInterpolator
                                 }
                                 else
                                 {
-                                    Object value = fields[i].get( target );
+                                    Object value = currentField.get( target );
                                     if ( value != null )
                                     {
-                                        if ( fields[i].getType().isArray() )
+                                        if ( currentField.getType().isArray() )
                                         {
                                             evaluateArray( value );
                                         }
@@ -287,24 +284,41 @@ public class StringSearchModelInterpolator
                             }
                             catch ( IllegalArgumentException e )
                             {
-                                problems.add( Severity.ERROR, "Failed to interpolate field: " + fields[i]
-                                    + " on class: " + cls.getName(), e );
+                                e.printStackTrace(System.err);
+
+                                problems.add( Severity.ERROR, "Failed to interpolate field3: " + currentField +
+                                    " on class: " + cls.getName(), e );
                             }
                             catch ( IllegalAccessException e )
                             {
-                                problems.add( Severity.ERROR, "Failed to interpolate field: " + fields[i]
-                                    + " on class: " + cls.getName(), e );
+                                e.printStackTrace(System.err);
+                                problems.add( Severity.ERROR, "Failed to interpolate field4: " + currentField +
+                                    " on class: " + cls.getName(), e );
                             }
-                        }
-                        finally
-                        {
-                            fields[i].setAccessible( isAccessible );
+                            finally
+                            {
+                                currentField.setAccessible( isAccessible );
+                            }
                         }
                     }
                 }
 
                 traverseObjectWithParents( cls.getSuperclass(), target );
             }
+        }
+
+        private Field[] getFields(Class<?> cls) {
+            Field[] fields;
+            synchronized(fieldsByClass)
+            {
+                fields = fieldsByClass.get( cls );
+                if ( fields == null )
+                {
+                    fields = cls.getDeclaredFields();
+                    fieldsByClass.put( cls, fields );
+                }
+            }
+            return fields;
         }
 
         private boolean isQualifiedForInterpolation( Class<?> cls )
@@ -314,23 +328,23 @@ public class StringSearchModelInterpolator
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
         {
-            Boolean primitive = fieldIsPrimitiveByClass.get( fieldType );
-            if ( primitive == null )
+            Boolean primitive;
+            synchronized ( fieldIsPrimitiveByClass)
             {
-                primitive = Boolean.valueOf( fieldType.isPrimitive() );
-                fieldIsPrimitiveByClass.put( fieldType, primitive );
+                primitive = fieldIsPrimitiveByClass.get( fieldType );
+                if ( primitive == null )
+                {
+                    primitive = fieldType.isPrimitive();
+                    fieldIsPrimitiveByClass.put( fieldType, primitive );
+                }
             }
-            if ( primitive.booleanValue() )
+            if ( primitive )
             {
                 return false;
             }
 
-            if ( "parent".equals( field.getName() ) )
-            {
-                return false;
-            }
+            return !"parent".equals(field.getName());
 
-            return true;
         }
 
         private void evaluateArray( Object target )

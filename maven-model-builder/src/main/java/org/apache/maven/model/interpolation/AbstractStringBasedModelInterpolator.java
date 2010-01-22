@@ -60,7 +60,7 @@ public abstract class AbstractStringBasedModelInterpolator
     /**
      * The default format used for build timestamps.
      */
-    private static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
+    static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
 
     /**
      * The name of a property that if present in the model's {@code <properties>} section specifies a custom format for
