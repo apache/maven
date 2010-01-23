@@ -21,8 +21,8 @@ package org.apache.maven.model.interpolation;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -35,20 +35,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component( role = ModelInterpolator.class )
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
 
-    private static final Map<Class<?>, Field[]> fieldsByClass = new WeakHashMap<Class<?>, Field[]>();
-    private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass = new WeakHashMap<Class<?>, Boolean>();
+    private static final Map<Class<?>, Field[]> fieldsByClass =
+            new ConcurrentHashMap<Class<?>, Field[]>(80, 0.75f, 2);  // Empirical data from 3.x, actual =40
+    private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass =
+            new ConcurrentHashMap<Class<?>, Boolean>(62, 0.75f, 2); // Empirical data from 3.x, actual 31
 
     public Model interpolateModel( Model model, File projectDir, ModelBuildingRequest config,
                                    ModelProblemCollector problems )
@@ -305,15 +303,11 @@ public class StringSearchModelInterpolator
         }
 
         private Field[] getFields(Class<?> cls) {
-            Field[] fields;
-            synchronized(fieldsByClass)
+            Field[] fields = fieldsByClass.get(cls);
+            if ( fields == null )
             {
-                fields = fieldsByClass.get( cls );
-                if ( fields == null )
-                {
-                    fields = cls.getDeclaredFields();
-                    fieldsByClass.put( cls, fields );
-                }
+                fields = cls.getDeclaredFields();
+                fieldsByClass.put( cls, fields );
             }
             return fields;
         }
@@ -325,16 +319,13 @@ public class StringSearchModelInterpolator
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
         {
-            Boolean primitive;
-            synchronized ( fieldIsPrimitiveByClass)
+            Boolean primitive = fieldIsPrimitiveByClass.get(fieldType);
+            if ( primitive == null )
             {
-                primitive = fieldIsPrimitiveByClass.get( fieldType );
-                if ( primitive == null )
-                {
-                    primitive = fieldType.isPrimitive();
-                    fieldIsPrimitiveByClass.put( fieldType, primitive );
-                }
+                primitive = fieldType.isPrimitive();
+                fieldIsPrimitiveByClass.put( fieldType, primitive );
             }
+
             if ( primitive )
             {
                 return false;
