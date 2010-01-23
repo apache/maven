@@ -86,6 +86,9 @@ public class CheckThreadSafetyMojo
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Testing concurrent component access" );
 
+        ClassLoader pluginRealm = getClass().getClassLoader();
+        ClassLoader coreRealm = MojoExecutionException.class.getClassLoader();
+
         final Map map = componentMap;
         final List list = componentList;
         final List go = new Vector();
@@ -95,8 +98,7 @@ public class CheckThreadSafetyMojo
         for ( int i = 0; i < threads.length; i++ )
         {
             // NOTE: The threads need to use different realms to trigger changes of the collections
-            final ClassLoader cl =
-                ( i % 2 ) == 0 ? getClass().getClassLoader() : MojoExecutionException.class.getClassLoader();
+            final ClassLoader cl = ( i % 2 ) == 0 ? pluginRealm : coreRealm;
             threads[i] = new Thread()
             {
                 private final ClassLoader tccl = cl;
