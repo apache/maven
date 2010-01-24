@@ -205,7 +205,7 @@ public class DefaultExceptionHandler
             {
                 reference = getReference( exception.getCause() );
             }
-            else if ( !( exception instanceof RuntimeException ) )
+            else if ( isNoteworthyException( exception ) )
             {
                 reference = exception.getClass().getSimpleName();
             }
@@ -217,6 +217,27 @@ public class DefaultExceptionHandler
         }
 
         return reference;
+    }
+
+    private boolean isNoteworthyException( Throwable exception )
+    {
+        if ( exception == null )
+        {
+            return false;
+        }
+        else if ( exception instanceof Error )
+        {
+            return true;
+        }
+        else if ( exception instanceof RuntimeException )
+        {
+            return false;
+        }
+        else if ( exception.getClass().getName().startsWith( "java" ) )
+        {
+            return false;
+        }
+        return true;
     }
 
     private String getMessage( String message, Throwable exception )
