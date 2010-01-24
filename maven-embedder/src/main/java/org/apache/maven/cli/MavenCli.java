@@ -807,27 +807,23 @@ public class MavenCli
 
         if ( alternatePomFile != null )
         {
-            request.setPom( resolveFile( new File( alternatePomFile ), workingDirectory ) );
+            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
+
+            request.setPom( pom );
         }
-        else if ( request.getPom() != null && !request.getPom().isAbsolute() )
+        else
         {
-            request.setPom( request.getPom().getAbsoluteFile() );
+            File pom = modelProcessor.locatePom( baseDirectory );
+
+            if ( pom.isFile() )
+            {
+                request.setPom( pom );
+            }
         }
 
         if ( ( request.getPom() != null ) && ( request.getPom().getParentFile() != null ) )
         {
             request.setBaseDirectory( request.getPom().getParentFile() );
-        }
-        else if ( ( request.getPom() == null ) && ( request.getBaseDirectory() != null ) )
-        {
-            File pom = modelProcessor.locatePom( new File( request.getBaseDirectory() ) );
-
-            request.setPom( pom );
-        }
-        // TODO: Is this correct?
-        else if ( request.getBaseDirectory() == null )
-        {
-            request.setBaseDirectory( new File( System.getProperty( "user.dir" ) ) );
         }
 
         if ( commandLine.hasOption( CLIManager.RESUME_FROM ) )
@@ -887,7 +883,7 @@ public class MavenCli
         }
         else
         {
-            return new File( workingDirectory, file.getPath() );
+            return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
         }
     }
 

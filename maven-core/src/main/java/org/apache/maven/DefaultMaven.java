@@ -336,7 +336,7 @@ public class DefaultMaven
 
         // We have no POM file.
         //
-        if ( request.getPom() == null || !request.getPom().exists() )
+        if ( request.getPom() == null )
         {
             ModelSource modelSource = new UrlModelSource( getClass().getResource( "project/standalone.xml" ) );
             MavenProject project =
