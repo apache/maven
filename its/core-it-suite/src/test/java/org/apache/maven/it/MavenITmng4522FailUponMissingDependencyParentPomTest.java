@@ -39,7 +39,7 @@ public class MavenITmng4522FailUponMissingDependencyParentPomTest
     }
 
     /**
-     * Test that unreadable metadata from one repository does not fail the entire dependency resolution.
+     * Test that dependency resolution fails/aborts in case a dependency has a POM that inherits from a missing parent.
      */
     public void testit()
         throws Exception
