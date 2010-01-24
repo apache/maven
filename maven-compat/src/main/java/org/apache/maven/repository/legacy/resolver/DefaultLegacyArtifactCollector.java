@@ -583,8 +583,8 @@ public class DefaultLegacyArtifactCollector
                         {
                             artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                            throw new ArtifactResolutionException( "Unable to get dependency information: "
-                                + e.getMessage(), artifact, childRemoteRepositories, e );
+                            throw new ArtifactResolutionException( "Unable to get dependency information for "
+                                + artifact.getId() + ": " + e.getMessage(), artifact, childRemoteRepositories, e );
                         }
 
                         ArtifactResolutionRequest subRequest = new ArtifactResolutionRequest( metadataRequest );

@@ -54,7 +54,10 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Relocation;
+import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
@@ -573,17 +576,26 @@ public class MavenMetadataSource
                 }
                 catch ( ProjectBuildingException e )
                 {
+                    ModelProblem missingParentPom = hasMissingParentPom( e );
+                    if ( missingParentPom != null )
+                    {
+                        throw new ArtifactMetadataRetrievalException( "Failed to process POM for "
+                            + relocatedArtifact.getId() + ": " + missingParentPom.getMessage(),
+                                                                      missingParentPom.getException(),
+                                                                      relocatedArtifact );
+                    }
+
                     String message;
 
                     // missing/incompatible POM (e.g. a Maven 1 POM)
-                    if ( e.getCause() instanceof ArtifactResolutionException )
+                    if ( isMissingPom( e ) )
                     {
-                        message = "Missing artifact metadata for " + relocatedArtifact.getId();
+                        message = "Missing POM for " + relocatedArtifact.getId();
                     }
                     else
                     {
                         message =
-                            "Invalid artifact metadata for " + relocatedArtifact.getId()
+                            "Invalid POM for " + relocatedArtifact.getId()
                                 + ", transitive dependencies (if any) will not be available"
                                 + ", enable debug logging for more details";
                     }
@@ -691,6 +703,28 @@ public class MavenMetadataSource
         rel.relocatedArtifact = ( relocatedArtifact == artifact ) ? null : relocatedArtifact;
 
         return rel;
+    }
+
+    private boolean isMissingPom( ProjectBuildingException e )
+    {
+        return e.getCause() instanceof ArtifactResolutionException;
+    }
+
+    private ModelProblem hasMissingParentPom( ProjectBuildingException e )
+    {
+        if ( e.getCause() instanceof ModelBuildingException )
+        {
+            ModelBuildingException mbe = (ModelBuildingException) e.getCause();
+            for ( ModelProblem problem : mbe.getProblems() )
+            {
+                if ( problem.getException() instanceof UnresolvableModelException )
+                {
+                    return problem;
+                }
+            }
+
+        }
+        return null;
     }
 
     private Properties getSystemProperties()

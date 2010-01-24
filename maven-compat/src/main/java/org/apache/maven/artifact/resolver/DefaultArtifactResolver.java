@@ -569,7 +569,10 @@ public class DefaultArtifactResolver
             }
             catch ( ArtifactMetadataRetrievalException e )
             {
-                // need to add metadata resolution exception
+                ArtifactResolutionException are =
+                    new ArtifactResolutionException( "Unable to get dependency information for " + rootArtifact.getId()
+                        + ": " + e.getMessage(), rootArtifact, metadataRequest.getRemoteRepositories(), e );
+                result.addMetadataResolutionException( are );
                 return result;
             }
         }
