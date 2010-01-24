@@ -19,6 +19,7 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -55,9 +56,27 @@ public class MavenITmng0836PluginParentResolutionTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
+        // Maven 3.x aims to separate plugins and project dependencies (MNG-4191)
+        if ( matchesVersionRange( "(,3.0-alpha-1),(3.0-alpha-1,3.0-alpha-7)" ) )
+        {
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            verifier.resetStreams();
+        }
+        else
+        {
+            try
+            {
+                verifier.executeGoal( "validate" );
+                verifier.verifyErrorFreeLog();
+                fail( "Plugin parent POM was erroneously resolved from non-plugin repository." );
+            }
+            catch ( VerificationException e )
+            {
+                // expected
+                verifier.resetStreams();
+            }
+        }
     }
 
 }
