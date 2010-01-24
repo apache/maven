@@ -109,7 +109,7 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         verifier.resetStreams();
 
         Properties checksums = verifier.loadProperties( "target/checksum.properties" );
-        assertChecksum( "97c4e1a857d8957594ccbd2ac19d51885478ec80", "a-0.1-SNAPSHOT.jar", checksums );
+        assertChecksum( "ec6c9ea65766cc272df0ee26076240d6a93047d5", "a-0.1-SNAPSHOT.jar", checksums );
         assertChecksum( "", "b-0.1-SNAPSHOT.jar", checksums );
     }
 

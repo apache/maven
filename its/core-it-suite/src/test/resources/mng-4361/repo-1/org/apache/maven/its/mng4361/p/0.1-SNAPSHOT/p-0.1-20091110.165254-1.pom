@@ -27,10 +27,5 @@ under the License.
   <version>0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <distributionManagement>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-    </repository>
-  </distributionManagement>
+  <!-- NOTE: Needs to have different size than other snapshot to avoid optimization pitfall -->
 </project>

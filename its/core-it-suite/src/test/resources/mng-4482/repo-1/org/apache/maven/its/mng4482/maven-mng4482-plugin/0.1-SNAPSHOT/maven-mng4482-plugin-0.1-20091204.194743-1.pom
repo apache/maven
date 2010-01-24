@@ -33,12 +33,7 @@ under the License.
   </description>
   <inceptionYear>2009</inceptionYear>
 
-  <distributionManagement>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-    </repository>
-  </distributionManagement>
+  <!-- NOTE: Needs to have different size than other snapshot to avoid optimization pitfall -->
 
   <properties>
     <maven.test.skip>true</maven.test.skip>

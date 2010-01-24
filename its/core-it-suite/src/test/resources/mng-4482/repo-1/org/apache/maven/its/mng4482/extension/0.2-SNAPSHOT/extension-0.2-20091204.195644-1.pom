@@ -27,12 +27,7 @@ under the License.
   <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <distributionManagement>
-    <repository>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-    </repository>
-  </distributionManagement>
+  <!-- NOTE: Needs to have different size than other snapshot to avoid optimization pitfall -->
 
   <properties>
     <maven.test.skip>true</maven.test.skip>
