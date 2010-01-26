@@ -70,6 +70,7 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-2.txt" );
         verifier.deleteDirectory( "target" );
+        verifier.getCliOptions().add( "-X" );
         verifier.getCliOptions().add( "-U" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
