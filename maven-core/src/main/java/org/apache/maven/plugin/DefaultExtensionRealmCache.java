@@ -44,6 +44,10 @@ public class DefaultExtensionRealmCache
 
         private final List<File> files;
 
+        private final List<Long> timestamps;
+
+        private final List<Long> sizes;
+
         private final List<String> ids;
 
         private final int hashCode;
@@ -51,15 +55,21 @@ public class DefaultExtensionRealmCache
         public CacheKey( List<? extends Artifact> extensionArtifacts )
         {
             this.files = new ArrayList<File>( extensionArtifacts.size() );
+            this.timestamps = new ArrayList<Long>( extensionArtifacts.size() );
+            this.sizes = new ArrayList<Long>( extensionArtifacts.size() );
             this.ids = new ArrayList<String>( extensionArtifacts.size() );
 
             for ( Artifact artifact : extensionArtifacts )
             {
-                files.add( artifact.getFile() );
+                File file = artifact.getFile();
+                files.add( file );
+                timestamps.add( ( file != null ) ? Long.valueOf( file.lastModified() ) : Long.valueOf( 0 ) );
+                sizes.add( ( file != null ) ? Long.valueOf( file.length() ) : Long.valueOf( 0 ) );
                 ids.add( artifact.getVersion() );
             }
 
-            this.hashCode = files.hashCode() * 31 + ids.hashCode();
+            this.hashCode =
+                31 * files.hashCode() + 31 * ids.hashCode() + 31 * timestamps.hashCode() + 31 * sizes.hashCode();
         }
 
         @Override
@@ -83,7 +93,8 @@ public class DefaultExtensionRealmCache
 
             CacheKey other = (CacheKey) o;
 
-            return files.equals( other.files ) && ids.equals( other.ids );
+            return ids.equals( other.ids ) && files.equals( other.files ) && timestamps.equals( other.timestamps )
+                && sizes.equals( other.sizes );
         }
 
     }
