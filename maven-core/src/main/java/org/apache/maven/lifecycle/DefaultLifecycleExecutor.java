@@ -40,6 +40,9 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
+import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultLifecycleEvent;
@@ -221,6 +224,18 @@ public class DefaultLifecycleExecutor
         logger.debug( "Configuration: " + mojoExecution.getConfiguration() );
     }
 
+    private List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )
+    {
+        if ( aggregator )
+        {
+            return session.getProjects();
+        }
+        else
+        {
+            return Collections.singletonList( project );
+        }
+    }
+
     public void execute( MavenSession session )
     {
         fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
@@ -291,16 +306,8 @@ public class DefaultLifecycleExecutor
                 // this later by looking at the build plan. Would be better to just batch download everything required
                 // by the reactor.
 
-                List<MavenProject> projectsToResolve;
-
-                if ( projectBuild.taskSegment.aggregating )
-                {
-                    projectsToResolve = session.getProjects();
-                }
-                else
-                {
-                    projectsToResolve = Collections.singletonList( currentProject );
-                }
+                List<MavenProject> projectsToResolve =
+                    getProjects( currentProject, session, projectBuild.taskSegment.aggregating );
 
                 for ( MavenProject project : projectsToResolve )
                 {
@@ -413,7 +420,7 @@ public class DefaultLifecycleExecutor
             throw new LifecycleExecutionException( null, project, e );
         }
 
-        project.setArtifacts( artifacts );
+        project.setResolvedArtifacts( artifacts );
 
         if ( project.getDependencyArtifacts() == null )
         {
@@ -555,6 +562,14 @@ public class DefaultLifecycleExecutor
 
         fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_STARTED );
 
+        ArtifactFilter artifactFilter = getArtifactFilter( mojoDescriptor );
+        List<MavenProject> resolvedProjects =
+            getProjects( session.getCurrentProject(), session, mojoDescriptor.isAggregator() );
+        for ( MavenProject project : resolvedProjects )
+        {
+            project.setArtifactFilter( artifactFilter );
+        }
+
         try
         {
             try
@@ -592,6 +607,31 @@ public class DefaultLifecycleExecutor
             {
                 forkedProject.setExecutionProject( null );
             }
+        }
+    }
+
+    private ArtifactFilter getArtifactFilter( MojoDescriptor mojoDescriptor )
+    {
+        String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
+        String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
+
+        List<String> scopes = new ArrayList<String>( 2 );
+        if ( StringUtils.isNotEmpty( scopeToCollect ) )
+        {
+            scopes.add( scopeToCollect );
+        }
+        if ( StringUtils.isNotEmpty( scopeToResolve ) )
+        {
+            scopes.add( scopeToResolve );
+        }
+
+        if ( scopes.isEmpty() )
+        {
+            return null;
+        }
+        else
+        {
+            return new CumulativeScopeArtifactFilter( scopes );
         }
     }
 
@@ -1133,16 +1173,7 @@ public class DefaultLifecycleExecutor
             return;
         }
 
-        List<MavenProject> forkedProjects;
-
-        if ( mojoDescriptor.isAggregator() )
-        {
-            forkedProjects = session.getProjects();
-        }
-        else
-        {
-            forkedProjects = Collections.singletonList( project );
-        }
+        List<MavenProject> forkedProjects = getProjects( project, session, mojoDescriptor.isAggregator() );
 
         for ( MavenProject forkedProject : forkedProjects )
         {

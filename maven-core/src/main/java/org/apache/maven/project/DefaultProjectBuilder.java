@@ -153,6 +153,7 @@ public class DefaultProjectBuilder
 
                 artifactResult = repositorySystem.resolve( artifactRequest );
 
+                project.setResolvedArtifacts( artifactResult.getArtifacts() );
                 project.setArtifacts( artifactResult.getArtifacts() );
             }
 

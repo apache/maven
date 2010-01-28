@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -98,6 +99,10 @@ public class MavenProject
     private MavenProject parent;
 
     private File file;
+
+    private Set<Artifact> resolvedArtifacts;
+
+    private ArtifactFilter artifactFilter;
 
     private Set<Artifact> artifacts;
 
@@ -1055,7 +1060,25 @@ public class MavenProject
      */
     public Set<Artifact> getArtifacts()
     {
-        return artifacts == null ? Collections.<Artifact> emptySet() : artifacts;
+        if ( artifacts == null )
+        {
+            if ( artifactFilter == null )
+            {
+                artifacts = new LinkedHashSet<Artifact>();
+            }
+            else
+            {
+                artifacts = new LinkedHashSet<Artifact>( resolvedArtifacts.size() * 2 );
+                for ( Artifact artifact : resolvedArtifacts )
+                {
+                    if ( artifactFilter.include( artifact ) )
+                    {
+                        artifacts.add( artifact );
+                    }
+                }
+            }
+        }
+        return artifacts;
     }
 
     public Map<String, Artifact> getArtifactMap()
@@ -2026,6 +2049,36 @@ public class MavenProject
     public ArtifactFilter getExtensionArtifactFilter()
     {
         return extensionArtifactFilter;
+    }
+
+    /**
+     * Sets the transitive dependency artifacts that have been resolved/collected for this project.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     * 
+     * @param artifacts The set of artifacts, may be {@code null}.
+     */
+    public void setResolvedArtifacts( Set<Artifact> artifacts )
+    {
+        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact> emptySet();
+        this.artifacts = null;
+        this.artifactMap = null;
+    }
+
+    /**
+     * Sets the scope filter to select the artifacts being exposed to the currently executed mojo.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     * 
+     * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
+     */
+    public void setArtifactFilter( ArtifactFilter artifactFilter )
+    {
+        this.artifactFilter = artifactFilter;
+        this.artifacts = null;
+        this.artifactMap = null;
     }
 
 }
