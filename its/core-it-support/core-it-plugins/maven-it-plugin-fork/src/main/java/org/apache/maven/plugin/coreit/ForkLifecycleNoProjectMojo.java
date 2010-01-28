@@ -21,48 +21,39 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 
 /**
- * @goal fork
- *
+ * @goal fork-lifecycle-no-project
+ * @requiresProject false
+ * 
  * @execute phase="generate-sources" lifecycle="foo"
  */
-public class ForkLifecycleMojo
+public class ForkLifecycleNoProjectMojo
     extends AbstractMojo
 {
-    /**
-     * @parameter expression="${project}"
-     */
-    private MavenProject project;
 
     /**
-     * @parameter expression="${executedProject}"
+     * @parameter default-value="${project.build.finalName}"
      */
-    private MavenProject executedProject;
+    private String finalName;
 
     /**
-     * @parameter default-value="${project.build.directory}"
+     * @parameter default-value="target"
      */
     private File touchDirectory;
 
     public void execute()
         throws MojoExecutionException
     {
-        TouchMojo.touch( touchDirectory, "fork-lifecycle.txt" );
+        TouchMojo.touch( touchDirectory, "fork-lifecycle-no-project.txt" );
 
-        if ( !executedProject.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
-        {
-            throw new MojoExecutionException( "Unexpected result, final name of executed project is "
-                + executedProject.getBuild().getFinalName() + " (should be \'" + TouchMojo.FINAL_NAME + "\')." );
-        }
-
-        if ( project.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
+        if ( TouchMojo.FINAL_NAME.equals( finalName ) )
         {
             throw new MojoExecutionException( "forked project was polluted. (should NOT be \'" + TouchMojo.FINAL_NAME
                 + "\')." );
         }
     }
+
 }

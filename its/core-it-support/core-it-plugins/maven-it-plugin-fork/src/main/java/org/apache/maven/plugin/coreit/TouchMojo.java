@@ -19,7 +19,6 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -28,14 +27,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @goal touch
  * 
  * @phase process-sources
- *
- * @description Goal which cleans the build
  */
 public class TouchMojo
     extends AbstractMojo
@@ -54,93 +50,21 @@ public class TouchMojo
      */
     private File outputDirectory;
 
-    /** Test setting of plugin-artifacts on the PluginDescriptor instance.
-     * @parameter expression="${plugin.artifactMap}"
-     * @required
-     */
-    private Map pluginArtifacts;
-
-    /**
-     * @parameter expression="target/test-basedir-alignment"
-     */
-    private File basedirAlignmentDirectory;
-
-    /**
-     * @parameter alias="pluginFile"
-     */
-    private String pluginItem = "foo";
-
-    /**
-     * @parameter
-     */
-    private String goalItem = "bar";
-    
-    /**
-     * @parameter expression="${artifactToFile}"
-     */
-    private String artifactToFile;
-    
-    /**
-     * @parameter expression="${fail}"
-     */
-    private boolean fail = false;
-
     public void execute()
         throws MojoExecutionException
     {
-        if ( fail )
-        {
-            throw new MojoExecutionException( "Failing per \'fail\' parameter (specified in pom or system properties)" );
-        }
-
         getLog().info( "[MAVEN-CORE-IT-LOG] Project build directory " + project.getBuild().getDirectory() );
+
+        touch( new File( project.getBuild().getDirectory() ), "touch.log" );
 
         getLog().info( "[MAVEN-CORE-IT-LOG] Using output directory " + outputDirectory );
 
         touch( outputDirectory, "touch.txt" );
 
-        // This parameter should be aligned to the basedir as the parameter type is specified
-        // as java.io.File
-
-        if ( basedirAlignmentDirectory.getPath().equals( "target/test-basedir-alignment" ) )
-        {
-            throw new MojoExecutionException( "basedirAlignmentDirectory not aligned" );
-        }
-        
-        touch( basedirAlignmentDirectory, "touch.txt" );
-
-        // Test parameter setting
-        if ( pluginItem != null )
-        {
-            touch( outputDirectory, pluginItem );
-        }
-
-        if ( goalItem != null )
-        {
-            touch( outputDirectory, goalItem );
-        }
-        
-        if ( artifactToFile != null )
-        {
-            Artifact artifact = (Artifact) pluginArtifacts.get( artifactToFile );
-            
-            File artifactFile = artifact.getFile();
-            
-            String filename = artifactFile.getAbsolutePath().replace('/', '_').replace(':', '_') + ".txt";
-            
-            touch( outputDirectory, filename );
-        }
-
         project.getBuild().setFinalName( FINAL_NAME );
     }
 
     static void touch( File dir, String file )
-        throws MojoExecutionException
-    {
-        touch( dir, file, false );
-    }
-
-    static void touch( File dir, String file, boolean append )
         throws MojoExecutionException
     {
         try
@@ -151,8 +75,9 @@ public class TouchMojo
              }
              
              File touch = new File( dir, file );
-     
-             OutputStreamWriter w = new OutputStreamWriter( new FileOutputStream( touch, append ), "UTF-8" );
+
+             // NOTE: Using append mode to track execution count
+             OutputStreamWriter w = new OutputStreamWriter( new FileOutputStream( touch, true ), "UTF-8" );
              
              w.write( file );
              w.write( "\n" );
@@ -164,4 +89,5 @@ public class TouchMojo
             throw new MojoExecutionException( "Error touching file", e );
         }
     }
+
 }
