@@ -217,7 +217,7 @@ public class DefaultLifecycleExecutor
         logger.debug( "-----------------------------------------------------------------------" );
         logger.debug( "Goal:          " + mojoExecId );
         logger.debug( "Style:         "
-            + ( mojoExecution.getMojoDescriptor().isAggregating() ? "Aggregating" : "Regular" ) );
+            + ( mojoExecution.getMojoDescriptor().isAggregator() ? "Aggregating" : "Regular" ) );
         logger.debug( "Configuration: " + mojoExecution.getConfiguration() );
     }
 
@@ -490,7 +490,7 @@ public class DefaultLifecycleExecutor
             this.scopesToCollect = new TreeSet<String>();
             this.scopesToResolve = new TreeSet<String>();
             collectDependencyRequirements( scopesToResolve, scopesToCollect, mojoExecution );
-            this.aggregating = mojoExecution.getMojoDescriptor().isAggregating();
+            this.aggregating = mojoExecution.getMojoDescriptor().isAggregator();
         }
 
         public DependencyContext clone()
@@ -821,7 +821,7 @@ public class DefaultLifecycleExecutor
 
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, session.getTopLevelProject() );
 
-                boolean aggregating = mojoDescriptor.isAggregating();
+                boolean aggregating = mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
 
                 if ( currentSegment == null || currentSegment.aggregating != aggregating )
                 {
@@ -1135,7 +1135,7 @@ public class DefaultLifecycleExecutor
 
         List<MavenProject> forkedProjects;
 
-        if ( mojoDescriptor.isAggregating() )
+        if ( mojoDescriptor.isAggregator() )
         {
             forkedProjects = session.getProjects();
         }
