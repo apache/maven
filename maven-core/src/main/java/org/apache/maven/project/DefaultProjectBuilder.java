@@ -338,6 +338,8 @@ public class DefaultProjectBuilder
                             continue;
                         }
 
+                        module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+
                         File moduleFile = new File( basedir, module );
 
                         if ( moduleFile.isDirectory() )

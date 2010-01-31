@@ -39,6 +39,8 @@ public class DefaultPathTranslator
 
         if ( path != null && basedir != null )
         {
+            path = path.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+
             File file = new File( path );
             if ( file.isAbsolute() )
             {
