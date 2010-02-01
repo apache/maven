@@ -61,6 +61,8 @@ public class DefaultPluginVersionResolver
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
+        logger.debug( "Resolving plugin version for " + request.getGroupId() + ":" + request.getArtifactId() );
+
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
         Metadata mergedMetadata = new Metadata();
@@ -151,6 +153,13 @@ public class DefaultPluginVersionResolver
             throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
                                                         request.getLocalRepository(), request.getRemoteRepositories(),
                                                         "Plugin not found in any plugin repository" );
+        }
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
+                + " to " + result.getVersion() + " from repository "
+                + ( result.getRepository() != null ? result.getRepository().getId() : "null" ) );
         }
 
         return result;
