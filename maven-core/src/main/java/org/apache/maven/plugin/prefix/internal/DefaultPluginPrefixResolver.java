@@ -21,6 +21,7 @@ package org.apache.maven.plugin.prefix.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +69,8 @@ public class DefaultPluginPrefixResolver
     public PluginPrefixResult resolve( PluginPrefixRequest request )
         throws NoPluginFoundForPrefixException
     {
+        logger.debug( "Resolving plugin prefix " + request.getPrefix() + " from " + request.getPluginGroups() );
+
         PluginPrefixResult result = resolveFromProject( request );
 
         if ( result == null )
@@ -80,6 +83,17 @@ public class DefaultPluginPrefixResolver
                                                            request.getLocalRepository(),
                                                            request.getRemoteRepositories() );
             }
+            else if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Resolved plugin prefix " + request.getPrefix() + " to " + result.getGroupId() + ":"
+                    + result.getArtifactId() + " from repository "
+                    + ( result.getRepository() != null ? result.getRepository().getId() : "null" ) );
+            }
+        }
+        else if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Resolved plugin prefix " + request.getPrefix() + " to " + result.getGroupId() + ":"
+                + result.getArtifactId() + " from POM " + request.getPom() );
         }
 
         return result;
@@ -142,12 +156,12 @@ public class DefaultPluginPrefixResolver
         //
         for ( String pluginGroup : request.getPluginGroups() )
         {
-            String localPath =
-                pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata-" + localRepository.getId() + ".xml";
+            String localPath = getLocalMetadataPath( pluginGroup, localRepository );
 
-            File destination = new File( localRepository.getBasedir(), localPath );
+            File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
 
-            PluginPrefixResult result = resolveFromRepository( request, pluginGroup, destination, localRepository );
+            PluginPrefixResult result =
+                resolveFromRepository( request, pluginGroup, groupMetadataFile, localRepository );
 
             if ( result != null )
             {
@@ -155,24 +169,26 @@ public class DefaultPluginPrefixResolver
             }
         }
 
+        List<ArtifactRepository> recheck = new ArrayList<ArtifactRepository>();
+
         // Process all the remote repositories.
         //
         for ( String pluginGroup : request.getPluginGroups() )
         {
             for ( ArtifactRepository repository : request.getRemoteRepositories() )
             {
-                String localPath =
-                    pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata-" + repository.getId() + ".xml";
+                String localPath = getLocalMetadataPath( pluginGroup, repository );
 
-                File destination = new File( localRepository.getBasedir(), localPath );
+                File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
 
-                if ( !request.isOffline() )
+                if ( !request.isOffline() && ( !groupMetadataFile.exists() || request.isForceUpdate() ) )
                 {
-                    String remotePath = pluginGroup.replace( '.', '/' ) + "/" + "maven-metadata.xml";
+                    String remotePath = getRemoteMetadataPath( pluginGroup, repository );
 
                     try
                     {
-                        repositorySystem.retrieve( repository, destination, remotePath, request.getTransferListener() );
+                        repositorySystem.retrieve( repository, groupMetadataFile, remotePath,
+                                                   request.getTransferListener() );
                     }
                     catch ( ArtifactTransferFailedException e )
                     {
@@ -190,8 +206,53 @@ public class DefaultPluginPrefixResolver
                         continue;
                     }
                 }
+                else if ( !request.isOffline() && !request.isForceUpdate() )
+                {
+                    recheck.add( repository );
+                }
 
-                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, destination, repository );
+                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile, repository );
+
+                if ( result != null )
+                {
+                    return result;
+                }
+            }
+        }
+
+        // Retry the remote repositories for which we previously only consulted the possibly outdated local cache.
+        //
+        for ( String pluginGroup : request.getPluginGroups() )
+        {
+            for ( ArtifactRepository repository : recheck )
+            {
+                String localPath = getLocalMetadataPath( pluginGroup, repository );
+
+                File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
+
+                String remotePath = getRemoteMetadataPath( pluginGroup, repository );
+
+                try
+                {
+                    repositorySystem.retrieve( repository, groupMetadataFile, remotePath, request.getTransferListener() );
+                }
+                catch ( ArtifactTransferFailedException e )
+                {
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage(), e );
+                    }
+                    else
+                    {
+                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage() );
+                    }
+                }
+                catch ( ArtifactDoesNotExistException e )
+                {
+                    continue;
+                }
+
+                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile, repository );
 
                 if ( result != null )
                 {
@@ -241,6 +302,16 @@ public class DefaultPluginPrefixResolver
         }
 
         return null;
+    }
+
+    private String getLocalMetadataPath( String groupId, ArtifactRepository repository )
+    {
+        return groupId.replace( '.', '/' ) + "/" + "maven-metadata-" + repository.getId() + ".xml";
+    }
+
+    private String getRemoteMetadataPath( String groupId, ArtifactRepository repository )
+    {
+        return groupId.replace( '.', '/' ) + "/" + "maven-metadata.xml";
     }
 
 }
