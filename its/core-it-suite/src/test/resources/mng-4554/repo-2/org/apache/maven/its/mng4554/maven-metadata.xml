@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>Maven Integration Test Plugin :: Touch</name>
+      <prefix>a</prefix>
+      <artifactId>a-maven-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>Maven Integration Test Plugin :: Touch</name>
+      <prefix>b</prefix>
+      <artifactId>b-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
