@@ -21,10 +21,10 @@ package org.apache.maven.plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -105,7 +105,7 @@ public class DefaultPluginRealmCache
         }
     }
 
-    protected final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
+    protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<CacheKey, CacheRecord>();
 
     public CacheRecord get( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
                             ArtifactFilter dependencyFilter, ArtifactRepository localRepository,

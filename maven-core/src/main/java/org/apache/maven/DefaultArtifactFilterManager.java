@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
@@ -49,7 +50,7 @@ public class DefaultArtifactFilterManager
 
     static
     {
-        Set<String> artifacts = new HashSet<String>();
+        List<String> artifacts = new ArrayList<String>();
 
         artifacts.add( "classworlds" );
         artifacts.add( "plexus-classworlds" );
@@ -86,7 +87,7 @@ public class DefaultArtifactFilterManager
          * wagon from their plugin realm.
          */
 
-        DEFAULT_EXCLUSIONS = artifacts;
+        DEFAULT_EXCLUSIONS = new CopyOnWriteArraySet<String>( artifacts);
     }
 
     protected Set<String> excludedArtifacts = new HashSet<String>( DEFAULT_EXCLUSIONS );

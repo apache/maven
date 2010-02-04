@@ -23,11 +23,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
@@ -68,6 +68,9 @@ public class MavenSession
     private ProjectDependencyGraph projectDependencyGraph;
 
     private Collection<String> blackListedProjects;
+
+    private final Map<String,Map<String,Map<String,Object>>>  pluginContextsByProjectAndPluginKey =
+        new ConcurrentHashMap<String,Map<String,Map<String,Object>>> ();
 
     @Deprecated
     public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
@@ -284,8 +287,7 @@ public class MavenSession
         return result;
     }        
 
-    private Map<String,Map<String,Map<String,Object>>>  pluginContextsByProjectAndPluginKey = new HashMap<String,Map<String,Map<String,Object>>> ();
-    
+
     // Backward compat
     public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
@@ -295,7 +297,7 @@ public class MavenSession
 
         if ( pluginContextsByKey == null )
         {
-            pluginContextsByKey = new HashMap<String, Map<String, Object>>();
+            pluginContextsByKey = new ConcurrentHashMap<String, Map<String, Object>>();
 
             pluginContextsByProjectAndPluginKey.put( projectKey, pluginContextsByKey );
         }
@@ -306,7 +308,7 @@ public class MavenSession
 
         if ( pluginContext == null )
         {
-            pluginContext = new HashMap<String, Object>();
+            pluginContext = new ConcurrentHashMap<String, Object>();
 
             pluginContextsByKey.put( pluginKey, pluginContext );
         }

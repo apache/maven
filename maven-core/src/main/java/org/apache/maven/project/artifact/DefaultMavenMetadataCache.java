@@ -18,13 +18,13 @@ package org.apache.maven.project.artifact;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -38,6 +38,8 @@ public class DefaultMavenMetadataCache
     implements MavenMetadataCache
 {
 
+    protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<CacheKey, CacheRecord>();
+    
     public static class CacheKey 
     {
         private final Artifact artifact;
@@ -286,7 +288,6 @@ public class DefaultMavenMetadataCache
         }
     }
 
-    protected Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
 
     public ResolutionGroup get( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
                                 List<ArtifactRepository> remoteRepositories )

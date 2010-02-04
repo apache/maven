@@ -19,8 +19,8 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
@@ -34,7 +34,7 @@ class SessionRepositoryCache
     implements RepositoryCache
 {
 
-    private Map<Object, Object> cache = new HashMap<Object, Object>( 256 );
+    private Map<Object, Object> cache = new ConcurrentHashMap<Object, Object>( 256 );
 
     public Object get( RepositoryRequest request, Object key )
     {
