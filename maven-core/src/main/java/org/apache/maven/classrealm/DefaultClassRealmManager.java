@@ -23,7 +23,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -81,7 +81,7 @@ public class DefaultClassRealmManager
     private ClassRealm createRealm( String baseRealmId, RealmType type, ClassLoader parent, List<String> imports,
                                     boolean importXpp3Dom, List<Artifact> artifacts )
     {
-        Set<String> artifactIds = new HashSet<String>();
+        Set<String> artifactIds = new LinkedHashSet<String>();
 
         List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
 
