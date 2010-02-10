@@ -55,7 +55,7 @@ public class DefaultArtifact
 
     private String scope;
 
-    private File file;
+    private volatile File file;
 
     private ArtifactRepository repository;
 
@@ -71,7 +71,7 @@ public class DefaultArtifact
 
     private VersionRange versionRange;
 
-    private boolean resolved;
+    private volatile boolean resolved;
 
     private boolean release;
 
