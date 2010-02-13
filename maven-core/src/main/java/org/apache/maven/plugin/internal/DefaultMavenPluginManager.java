@@ -29,14 +29,11 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -45,11 +42,8 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
@@ -121,13 +115,13 @@ public class DefaultMavenPluginManager
     private ResolutionErrorHandler resolutionErrorHandler;
 
     @Requirement
-    private ArtifactFilterManager artifactFilterManager;
-
-    @Requirement
     private PluginDescriptorCache pluginDescriptorCache;
 
     @Requirement
     private PluginRealmCache pluginRealmCache;
+
+    @Requirement
+    private PluginDependenciesResolver pluginDependenciesResolver;
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
@@ -409,90 +403,7 @@ public class DefaultMavenPluginManager
                                                      ArtifactFilter dependencyFilter )
         throws PluginResolutionException
     {
-        Set<Artifact> overrideArtifacts = new LinkedHashSet<Artifact>();
-        for ( Dependency dependency : plugin.getDependencies() )
-        {
-            overrideArtifacts.add( repositorySystem.createDependencyArtifact( dependency ) );
-        }
-
-        ArtifactFilter collectionFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
-
-        /*
-         * NOTE: This is a hack to support maven-deploy-plugin:[2.2.1,2.4] which has dependencies on old/buggy wagons.
-         * Under our class loader hierarchy those would take precedence over the wagons from the distro, causing grief
-         * due to their bugs (e.g. MNG-4528).
-         */
-        if ( "maven-deploy-plugin".equals( plugin.getArtifactId() )
-            && "org.apache.maven.plugins".equals( plugin.getGroupId() ) )
-        {
-            collectionFilter =
-                new AndArtifactFilter( Arrays.asList( collectionFilter,
-                                                      new ExclusionSetFilter( new String[] { "maven-core" } ) ) );
-        }
-
-        ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
-
-        if ( dependencyFilter != null )
-        {
-            resolutionFilter = new AndArtifactFilter( Arrays.asList( resolutionFilter, dependencyFilter ) );
-        }
-
-        request.setArtifact( pluginArtifact );
-        request.setArtifactDependencies( overrideArtifacts );
-        request.setCollectionFilter( collectionFilter );
-        request.setResolutionFilter( resolutionFilter );
-        request.setResolveRoot( true );
-        request.setResolveTransitively( true );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-        try
-        {
-            resolutionErrorHandler.throwErrors( request, result );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( plugin, e );
-        }
-
-        List<Artifact> pluginArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
-
-        addPlexusUtils( pluginArtifacts, plugin, request );
-
-        return pluginArtifacts;
-    }
-
-    // backward-compatibility with Maven 2.x
-    private void addPlexusUtils( List<Artifact> pluginArtifacts, Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginResolutionException
-    {
-        for ( Artifact artifact : pluginArtifacts )
-        {
-            if ( "org.codehaus.plexus:plexus-utils:jar".equals( artifact.getDependencyConflictId() ) )
-            {
-                return;
-            }
-        }
-
-        Artifact plexusUtils =
-            repositorySystem.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.1", Artifact.SCOPE_RUNTIME,
-                                             "jar" );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
-        request.setArtifact( plexusUtils );
-        request.setResolveRoot( true );
-        request.setResolveTransitively( false );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-        try
-        {
-            resolutionErrorHandler.throwErrors( request, result );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( plugin, e );
-        }
-
-        pluginArtifacts.add( plexusUtils );
+        return pluginDependenciesResolver.resolve( plugin, pluginArtifact, request, dependencyFilter );
     }
 
     public <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )

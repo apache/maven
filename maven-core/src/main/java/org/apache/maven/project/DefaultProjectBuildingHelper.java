@@ -28,22 +28,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -51,6 +45,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -96,13 +91,10 @@ public class DefaultProjectBuildingHelper
     private RepositorySystem repositorySystem;
 
     @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;
-
-    @Requirement
-    private ArtifactFilterManager artifactFilterManager;
-
-    @Requirement
     private PluginVersionResolver pluginVersionResolver;
+
+    @Requirement
+    private PluginDependenciesResolver pluginDependenciesResolver;
 
     private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
@@ -270,14 +262,15 @@ public class DefaultProjectBuildingHelper
                 exportedArtifacts.put( extensionRealm, extensionDescriptor.getExportedArtifacts() );
             }
 
-            if ( !plugin.isExtensions() && artifacts.size() == 1 && artifacts.get( 0 ).getFile() != null )
+            if ( !plugin.isExtensions() && artifacts.size() == 2 && artifacts.get( 0 ).getFile() != null
+                && "plexus-utils".equals( artifacts.get( 1 ).getArtifactId() ) )
             {
                 /*
                  * This is purely for backward-compat with 2.x where <extensions> consisting of a single artifact where
                  * loaded into the core and hence available to plugins, in contrast to bigger extensions that were
-                 * loaded into a dedicated realm which is invisible to plugins.
+                 * loaded into a dedicated realm which is invisible to plugins (MNG-2749).
                  */
-                publicArtifacts.addAll( artifacts );
+                publicArtifacts.add( artifacts.get( 0 ) );
             }
         }
 
@@ -339,43 +332,12 @@ public class DefaultProjectBuildingHelper
                                                       ProjectBuildingRequest request )
         throws PluginResolutionException
     {
-        Artifact extensionArtifact = repositorySystem.createPluginArtifact( extensionPlugin );
-
-        Set<Artifact> overrideArtifacts = new LinkedHashSet<Artifact>();
-        for ( Dependency dependency : extensionPlugin.getDependencies() )
-        {
-            overrideArtifacts.add( repositorySystem.createDependencyArtifact( dependency ) );
-        }
-
-        ArtifactFilter collectionFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
-
-        ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
-
         ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest( repositoryRequest );
-        artifactRequest.setArtifact( extensionArtifact );
-        artifactRequest.setArtifactDependencies( overrideArtifacts );
-        artifactRequest.setCollectionFilter( collectionFilter );
-        artifactRequest.setResolutionFilter( resolutionFilter );
-        artifactRequest.setResolveRoot( true );
-        artifactRequest.setResolveTransitively( true );
         artifactRequest.setServers( request.getServers() );
         artifactRequest.setMirrors( request.getMirrors() );
         artifactRequest.setProxies( request.getProxies() );
 
-        ArtifactResolutionResult result = repositorySystem.resolve( artifactRequest );
-
-        try
-        {
-            resolutionErrorHandler.throwErrors( artifactRequest, result );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( extensionPlugin, e );
-        }
-
-        List<Artifact> extensionArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
-
-        return extensionArtifacts;
+        return pluginDependenciesResolver.resolve( extensionPlugin, null, artifactRequest, null );
     }
 
     public void selectProjectRealm( MavenProject project )
