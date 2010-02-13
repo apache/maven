@@ -25,12 +25,12 @@ under the License.
     <mirror>
       <id>it-mirror-a</id>
       <mirrorOf>maven-core-it-repo-a</mirrorOf>
-      <url>http://bad.host/repo-a</url>
+      <url>http://mng4561.bad.host/repo-a</url>
     </mirror>
     <mirror>
       <id>it-mirror-b</id>
       <mirrorOf>maven-core-it-repo-b</mirrorOf>
-      <url>http://bad.host/repo-b</url>
+      <url>http://mng4561.bad.host/repo-b</url>
     </mirror>
     <mirror>
       <id>central-mirror</id>
