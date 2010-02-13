@@ -21,9 +21,14 @@ under the License.
 
 <settings>
   <mirrors>
-    <!-- if the mirror is not applied, Maven would try downloading from the wrong dir -->
+    <!-- if the mirror is not applied, Maven would try downloading from the wrong directory -->
     <mirror>
-      <id>it-mirror</id>
+      <id>it-mirror-a</id>
+      <mirrorOf>maven-core-it-repo-a</mirrorOf>
+      <url>http://bad.host/repo-a</url>
+    </mirror>
+    <mirror>
+      <id>it-mirror-b</id>
       <mirrorOf>maven-core-it-repo-b</mirrorOf>
       <url>http://bad.host/repo-b</url>
     </mirror>
@@ -46,7 +51,12 @@ under the License.
   </proxies>
   <servers>
     <server>
-      <id>it-mirror</id>
+      <id>it-mirror-a</id>
+      <username>testuser</username>
+      <password>testtest</password>
+    </server>
+    <server>
+      <id>it-mirror-b</id>
       <username>testuser</username>
       <password>testtest</password>
     </server>
@@ -56,8 +66,8 @@ under the License.
       <id>maven-core-it-repo</id>
       <repositories>
         <repository>
-          <id>maven-core-it</id>
-          <url>@baseurl@/repo-a</url>
+          <id>maven-core-it-repo-a</id>
+          <url>@baseurl@/null</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>
           </releases>
@@ -68,8 +78,8 @@ under the License.
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>maven-core-it</id>
-          <url>@baseurl@/repo-a</url>
+          <id>maven-core-it-repo-a</id>
+          <url>@baseurl@/null</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>
           </releases>
