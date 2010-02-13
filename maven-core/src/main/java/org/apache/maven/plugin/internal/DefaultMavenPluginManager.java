@@ -38,7 +38,6 @@ import java.util.zip.ZipEntry;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -339,12 +338,15 @@ public class DefaultMavenPluginManager
 
         MavenProject project = session.getCurrentProject();
 
-        RepositoryRequest request = new DefaultRepositoryRequest();
+        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
         request.setLocalRepository( session.getLocalRepository() );
         request.setRemoteRepositories( project.getPluginArtifactRepositories() );
         request.setCache( session.getRepositoryCache() );
         request.setOffline( session.isOffline() );
         request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
+        request.setServers( session.getRequest().getServers() );
+        request.setMirrors( session.getRequest().getMirrors() );
+        request.setProxies( session.getRequest().getProxies() );
         request.setTransferListener( session.getRequest().getTransferListener() );
 
         ArtifactFilter dependencyFilter = project.getExtensionArtifactFilter();
@@ -403,7 +405,7 @@ public class DefaultMavenPluginManager
      */
     // FIXME: only exposed to allow workaround for MNG-4194
     protected List<Artifact> resolvePluginArtifacts( Plugin plugin, Artifact pluginArtifact,
-                                                     RepositoryRequest repositoryRequest,
+                                                     ArtifactResolutionRequest request,
                                                      ArtifactFilter dependencyFilter )
         throws PluginResolutionException
     {
@@ -435,7 +437,6 @@ public class DefaultMavenPluginManager
             resolutionFilter = new AndArtifactFilter( Arrays.asList( resolutionFilter, dependencyFilter ) );
         }
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
         request.setArtifact( pluginArtifact );
         request.setArtifactDependencies( overrideArtifacts );
         request.setCollectionFilter( collectionFilter );
@@ -455,7 +456,7 @@ public class DefaultMavenPluginManager
 
         List<Artifact> pluginArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
 
-        addPlexusUtils( pluginArtifacts, plugin, repositoryRequest );
+        addPlexusUtils( pluginArtifacts, plugin, request );
 
         return pluginArtifacts;
     }
