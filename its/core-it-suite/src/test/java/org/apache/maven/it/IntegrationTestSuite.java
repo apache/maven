@@ -89,6 +89,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4554PluginPrefixMappingUpdateTest.class );
         suite.addTestSuite( MavenITmng4544ActiveComponentCollectionThreadSafeTest.class );
         suite.addTestSuite( MavenITmng4536RequiresNoProjectForkingMojoTest.class );
+        suite.addTestSuite( MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest.class );
         suite.addTestSuite( MavenITmng4526MavenProjectArtifactsScopeTest.class );
         suite.addTestSuite( MavenITmng4522FailUponMissingDependencyParentPomTest.class );
         suite.addTestSuite( MavenITmng4500NoUpdateOfTimestampedSnapshotsTest.class );
