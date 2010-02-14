@@ -55,6 +55,7 @@ under the License.
   </scm>
 
   <properties>
+    <surefireMemory>-Xmx256m -XX:MaxPermSize=128m</surefireMemory>
     <!-- The original Maven distribution to test. -->
     <mavenHome>${maven.home}</mavenHome>
     <!-- The (possibly instrumented copy of the) Maven distribution we actually use for the tests. -->
@@ -190,6 +191,26 @@ under the License.
                   <!-- Pass this through to the tests (if set!) to have them pick the right repository -->
                   <name>maven.repo.local</name>
                   <value>${maven.repo.local}</value>
+                </property>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>embedded</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <forkMode>once</forkMode>
+              <argLine>${surefireMemory}</argLine>
+              <systemProperties combine.children="append">
+                <property>
+                  <name>verifier.forkMode</name>
+                  <value>auto</value>
                 </property>
               </systemProperties>
             </configuration>
