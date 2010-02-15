@@ -212,6 +212,10 @@ under the License.
                   <name>verifier.forkMode</name>
                   <value>auto</value>
                 </property>
+                <property>
+                  <name>emma.rt.control</name>
+                  <value>false</value>
+                </property>
               </systemProperties>
             </configuration>
           </plugin>
