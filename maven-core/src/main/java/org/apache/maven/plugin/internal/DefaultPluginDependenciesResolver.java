@@ -63,6 +63,29 @@ public class DefaultPluginDependenciesResolver
     @Requirement
     private ArtifactFilterManager artifactFilterManager;
 
+    public Artifact resolve( Plugin plugin, ArtifactResolutionRequest request )
+        throws PluginResolutionException
+    {
+        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
+
+        request.setArtifact( pluginArtifact );
+        request.setResolveRoot( true );
+        request.setResolveTransitively( false );
+
+        ArtifactResolutionResult result = repositorySystem.resolve( request );
+
+        try
+        {
+            resolutionErrorHandler.throwErrors( request, result );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            throw new PluginResolutionException( plugin, e );
+        }
+
+        return pluginArtifact;
+    }
+
     public List<Artifact> resolve( Plugin plugin, Artifact pluginArtifact, ArtifactResolutionRequest request,
                                    ArtifactFilter dependencyFilter )
         throws PluginResolutionException

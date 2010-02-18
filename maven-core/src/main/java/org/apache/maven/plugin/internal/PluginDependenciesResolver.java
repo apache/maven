@@ -38,6 +38,18 @@ public interface PluginDependenciesResolver
 {
 
     /**
+     * Resolves the main artifact of the specified plugin.
+     * 
+     * @param plugin The plugin for which to resolve the main artifact, must not be {@code null}.
+     * @param request A prepopulated resolution request that will be completed and used for the resolution, must not be
+     *            {@code null}.
+     * @return The resolved plugin artifact, never {@code null}.
+     * @throws PluginResolutionException If the plugin artifact could not be resolved.
+     */
+    public Artifact resolve( Plugin plugin, ArtifactResolutionRequest request )
+        throws PluginResolutionException;
+
+    /**
      * Resolves the runtime dependencies of the specified plugin.
      * 
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
@@ -49,7 +61,7 @@ public interface PluginDependenciesResolver
      * @throws PluginResolutionException If any dependency could not be resolved.
      */
     List<Artifact> resolve( Plugin plugin, Artifact pluginArtifact, ArtifactResolutionRequest request,
-                                           ArtifactFilter dependencyFilter )
+                            ArtifactFilter dependencyFilter )
         throws PluginResolutionException;
 
 }

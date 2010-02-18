@@ -36,10 +36,7 @@ import java.util.zip.ZipEntry;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
@@ -65,7 +62,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -109,12 +105,6 @@ public class DefaultMavenPluginManager
     private ClassRealmManager classRealmManager;
 
     @Requirement
-    protected RepositorySystem repositorySystem;
-
-    @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;
-
-    @Requirement
     private PluginDescriptorCache pluginDescriptorCache;
 
     @Requirement
@@ -134,7 +124,8 @@ public class DefaultMavenPluginManager
 
         if ( pluginDescriptor == null )
         {
-            Artifact pluginArtifact = resolvePluginArtifact( plugin, repositoryRequest );
+            Artifact pluginArtifact =
+                pluginDependenciesResolver.resolve( plugin, new ArtifactResolutionRequest( repositoryRequest ) );
 
             pluginDescriptor = extractPluginDescriptor( pluginArtifact, plugin );
 
@@ -144,29 +135,6 @@ public class DefaultMavenPluginManager
         pluginDescriptor.setPlugin( plugin );
 
         return pluginDescriptor;
-    }
-
-    private Artifact resolvePluginArtifact( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginResolutionException
-    {
-        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
-        request.setArtifact( pluginArtifact );
-        request.setResolveTransitively( false );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        try
-        {
-            resolutionErrorHandler.throwErrors( request, result );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( plugin, e );
-        }
-
-        return pluginArtifact;
     }
 
     private PluginDescriptor extractPluginDescriptor( Artifact pluginArtifact, Plugin plugin )
@@ -353,7 +321,8 @@ public class DefaultMavenPluginManager
             dependencyFilter = new AndArtifactFilter( Arrays.asList( dependencyFilter, filter ) );
         }
 
-        List<Artifact> pluginArtifacts = resolvePluginArtifacts( plugin, pluginArtifact, request, dependencyFilter );
+        List<Artifact> pluginArtifacts =
+            pluginDependenciesResolver.resolve( plugin, pluginArtifact, request, dependencyFilter );
 
         ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports, pluginArtifacts );
 
@@ -390,20 +359,6 @@ public class DefaultMavenPluginManager
             throw new PluginContainerException( plugin, pluginRealm, "Error in component graph of plugin "
                 + plugin.getId() + ": " + e.getMessage(), e );
         }
-    }
-
-    /**
-     * Gets all artifacts required for the class realm of the specified plugin. An artifact in the result list that has
-     * no file set is meant to be excluded from the plugin realm in favor of the equivalent library from the current
-     * core distro.
-     */
-    // FIXME: only exposed to allow workaround for MNG-4194
-    protected List<Artifact> resolvePluginArtifacts( Plugin plugin, Artifact pluginArtifact,
-                                                     ArtifactResolutionRequest request,
-                                                     ArtifactFilter dependencyFilter )
-        throws PluginResolutionException
-    {
-        return pluginDependenciesResolver.resolve( plugin, pluginArtifact, request, dependencyFilter );
     }
 
     public <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )
