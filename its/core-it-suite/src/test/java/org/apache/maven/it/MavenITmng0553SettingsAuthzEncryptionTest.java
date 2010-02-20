@@ -54,7 +54,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
     public MavenITmng0553SettingsAuthzEncryptionTest()
     {
-        super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-3,)" ); // 2.1.0-M2+
+        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
     public void setUp()
@@ -124,8 +124,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getSystemProperties().setProperty( "settings.security", 
-            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
+        setUserHome( verifier, new File( testDir, "userhome" ) );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
@@ -177,12 +176,13 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
     public void testitEncryption()
         throws Exception
     {
+        requiresMavenVersion( "[2.1.0,3.0-alpha-1),[3.0-alpha-7,)" );
+
         testDir = new File( testDir, "test-3" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.getSystemProperties().setProperty( "settings.security", 
-            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
+        setUserHome( verifier, new File( testDir, "user.home" ) );
         verifier.getCliOptions().add( "--encrypt-master-password" );
         verifier.getCliOptions().add( "test" );
         verifier.setLogFileName( "log-emp.txt" );
@@ -195,8 +195,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.getSystemProperties().setProperty( "settings.security", 
-            new File( testDir, "settings-security.xml" ).getAbsolutePath() );
+        setUserHome( verifier, new File( testDir, "userhome" ) );
         verifier.getCliOptions().add( "--encrypt-password" );
         verifier.getCliOptions().add( "testpass" );
         verifier.setLogFileName( "log-ep.txt" );
@@ -221,6 +220,13 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         }
         
         return null;
+    }
+
+    private void setUserHome( Verifier verifier, File home )
+    {
+        // NOTE: We set the user.home directory instead of say settings.security to reflect Maven's normal behavior
+        String path = home.getAbsolutePath();
+        verifier.setEnvironmentVariable( "MAVEN_OPTS", "\"-Duser.home=" + path + "\"" );
     }
 
 }
