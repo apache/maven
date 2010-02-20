@@ -365,7 +365,7 @@ public class MavenCli
 
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
-        dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class );
+        dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
     }
     
     protected void customizeContainer( PlexusContainer container )
