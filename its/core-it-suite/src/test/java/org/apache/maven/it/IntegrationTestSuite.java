@@ -88,6 +88,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4572ModelVersionSurroundedByWhitespaceTest.class );
         suite.addTestSuite( MavenITmng4561MirroringOfPluginRepoTest.class );
         suite.addTestSuite( MavenITmng4554PluginPrefixMappingUpdateTest.class );
+        suite.addTestSuite( MavenITmng4553CoreArtifactFilterConsidersGroupIdTest.class );
         suite.addTestSuite( MavenITmng4544ActiveComponentCollectionThreadSafeTest.class );
         suite.addTestSuite( MavenITmng4536RequiresNoProjectForkingMojoTest.class );
         suite.addTestSuite( MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest.class );
