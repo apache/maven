@@ -19,9 +19,5 @@ under the License.
 
 <plexus>
   <components>
-    <component>
-      <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
-      <implementation>org.apache.maven.artifact.deployer.SimpleArtifactMetadataSource</implementation>      
-    </component>
   </components>
 </plexus>

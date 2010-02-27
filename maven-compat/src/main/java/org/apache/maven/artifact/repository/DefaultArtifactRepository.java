@@ -48,6 +48,10 @@ public class DefaultArtifactRepository
     private ArtifactRepositoryPolicy releases;
 
     private boolean blacklisted;
+
+    private Authentication authentication;
+
+    private Proxy proxy;
     
     /**
      * Create a local repository or a test repository.
@@ -212,30 +216,24 @@ public class DefaultArtifactRepository
         return Collections.emptyList();
     }
 
-    //
-    // This implementation does not support authentication
-    //
     public Authentication getAuthentication()
     {
-        return null;
+        return authentication;
     }
 
     public void setAuthentication( Authentication authentication )
     {
-        // do nothing
+        this.authentication = authentication;
     }
-    
-    //
-    // This implementation does not support proxies
-    //
+
     public Proxy getProxy()
     {
-        return null;
+        return proxy;
     }
 
     public void setProxy( Proxy proxy )
     {
-        // do nothing
+        this.proxy = proxy;
     }
 
     public boolean isUniqueVersion()

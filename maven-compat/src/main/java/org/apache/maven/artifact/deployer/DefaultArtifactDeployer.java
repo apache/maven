@@ -17,14 +17,19 @@ package org.apache.maven.artifact.deployer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.legacy.TransferListenerAdapter;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
@@ -50,6 +55,9 @@ public class DefaultArtifactDeployer
     private RepositoryMetadataManager repositoryMetadataManager;
 
     @Requirement
+    private RepositorySystem repositorySystem;
+
+    @Requirement
     private LegacySupport legacySupport;
 
     /**
@@ -68,6 +76,8 @@ public class DefaultArtifactDeployer
     public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository, ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
+        deploymentRepository = injectSession( deploymentRepository );
+
         try
         {
             transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
@@ -111,6 +121,34 @@ public class DefaultArtifactDeployer
         }
 
         return TransferListenerAdapter.newAdapter( session.getRequest().getTransferListener() );
+    }
+
+    private ArtifactRepository injectSession( ArtifactRepository repository )
+    {
+        /*
+         * NOTE: This provides backward-compat with maven-deploy-plugin:2.4 which bypasses the repository factory when
+         * using an alternative deployment location.
+         */
+        if ( repository instanceof DefaultArtifactRepository && repository.getAuthentication() == null )
+        {
+            MavenSession session = legacySupport.getSession();
+
+            if ( session != null )
+            {
+                MavenExecutionRequest request = session.getRequest();
+
+                if ( request != null )
+                {
+                    List<ArtifactRepository> repositories = Arrays.asList( repository );
+
+                    repositorySystem.injectProxy( repositories, request.getProxies() );
+
+                    repositorySystem.injectAuthentication( repositories, request.getServers() );
+                }
+            }
+        }
+
+        return repository;
     }
 
 }
