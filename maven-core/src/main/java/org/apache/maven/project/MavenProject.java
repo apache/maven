@@ -824,7 +824,7 @@ public class MavenProject
         }
         else
         {
-            return "Unnamed - " + getId();
+            return getArtifactId();
         }
     }
 
