@@ -52,33 +52,32 @@ public class DefaultArtifactFilterManager
     {
         Set<String> artifacts = new HashSet<String>();
 
-        artifacts.add( "classworlds" );
-        artifacts.add( "plexus-classworlds" );
-        artifacts.add( "maven-artifact" );
-        artifacts.add( "maven-artifact-manager" );
-        artifacts.add( "maven-artifact-resolver" );
-        artifacts.add( "maven-build-context" );
-        artifacts.add( "maven-compat" );
-        artifacts.add( "maven-core" );
-        artifacts.add( "maven-error-diagnoser" );
-        artifacts.add( "maven-error-diagnostics" );
-        artifacts.add( "maven-lifecycle" );
-        artifacts.add( "maven-model" );
-        artifacts.add( "maven-model-builder" );
-        artifacts.add( "maven-monitor" );
-        artifacts.add( "maven-plugin-api" );
-        artifacts.add( "maven-plugin-descriptor" );
-        artifacts.add( "maven-plugin-parameter-documenter" );
-        artifacts.add( "maven-plugin-registry" );
-        artifacts.add( "maven-profile" );
-        artifacts.add( "maven-project" );
-        artifacts.add( "maven-repository-metadata" );
-        artifacts.add( "maven-settings" );
-        artifacts.add( "maven-toolchain" );
-        artifacts.add( "plexus-component-api" );
-        artifacts.add( "plexus-container-default" );
-        artifacts.add( "wagon-provider-api" );
-        artifacts.add( "wagon-manager" );
+        artifacts.add( "classworlds:classworlds" );
+        artifacts.add( "org.codehaus.plexus:plexus-classworlds" );
+        artifacts.add( "org.codehaus.plexus:plexus-component-api" );
+        artifacts.add( "org.codehaus.plexus:plexus-container-default" );
+        artifacts.add( "org.apache.maven:maven-artifact" );
+        artifacts.add( "org.apache.maven:maven-artifact-manager" );
+        artifacts.add( "org.apache.maven:maven-artifact-resolver" );
+        artifacts.add( "org.apache.maven:maven-build-context" );
+        artifacts.add( "org.apache.maven:maven-compat" );
+        artifacts.add( "org.apache.maven:maven-core" );
+        artifacts.add( "org.apache.maven:maven-error-diagnoser" );
+        artifacts.add( "org.apache.maven:maven-error-diagnostics" );
+        artifacts.add( "org.apache.maven:maven-lifecycle" );
+        artifacts.add( "org.apache.maven:maven-model" );
+        artifacts.add( "org.apache.maven:maven-model-builder" );
+        artifacts.add( "org.apache.maven:maven-monitor" );
+        artifacts.add( "org.apache.maven:maven-plugin-api" );
+        artifacts.add( "org.apache.maven:maven-plugin-descriptor" );
+        artifacts.add( "org.apache.maven:maven-plugin-parameter-documenter" );
+        artifacts.add( "org.apache.maven:maven-plugin-registry" );
+        artifacts.add( "org.apache.maven:maven-profile" );
+        artifacts.add( "org.apache.maven:maven-project" );
+        artifacts.add( "org.apache.maven:maven-repository-metadata" );
+        artifacts.add( "org.apache.maven:maven-settings" );
+        artifacts.add( "org.apache.maven:maven-toolchain" );
+        artifacts.add( "org.apache.maven.wagon:wagon-provider-api" );
 
         /*
          * NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise

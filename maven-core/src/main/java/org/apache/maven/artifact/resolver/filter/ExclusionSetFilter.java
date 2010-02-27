@@ -46,7 +46,21 @@ public class ExclusionSetFilter
 
     public boolean include( Artifact artifact )
     {
-        return !excludes.contains( artifact.getArtifactId() );
+        String id = artifact.getArtifactId();
+
+        if ( excludes.contains( id ) )
+        {
+            return false;
+        }
+
+        id = artifact.getGroupId() + ':' + id;
+
+        if ( excludes.contains( id ) )
+        {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
