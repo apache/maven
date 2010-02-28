@@ -34,7 +34,7 @@ public interface SettingsDecryptionResult
 {
 
     /**
-     * Gets the decrypted server. This is a convenience method to retrieve the first element from {@link #getServer()}.
+     * Gets the decrypted server. This is a convenience method to retrieve the first element from {@link #getServers()}.
      * 
      * @return The decrypted server or {@code null}.
      */
@@ -48,7 +48,7 @@ public interface SettingsDecryptionResult
     List<Server> getServers();
 
     /**
-     * Gets the decrypted proxy. This is a convenience method to retrieve the first element from {@link #getProxy()}.
+     * Gets the decrypted proxy. This is a convenience method to retrieve the first element from {@link #getProxies()}.
      * 
      * @return The decrypted proxy or {@code null}.
      */
