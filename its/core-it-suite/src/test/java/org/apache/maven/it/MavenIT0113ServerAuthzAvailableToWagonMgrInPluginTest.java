@@ -32,8 +32,7 @@ public class MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest
 {
     public MavenIT0113ServerAuthzAvailableToWagonMgrInPluginTest()
     {
-        // wagon manager not fully supported in 3.x
-        super( "[2.0,3.0-alpha-1)" );
+        super( "[2.0,3.0-alpha-1),[3.0-alpha-7,)" );
     }
 
     /**
