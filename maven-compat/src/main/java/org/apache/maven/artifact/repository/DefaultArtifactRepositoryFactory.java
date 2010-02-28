@@ -104,7 +104,7 @@ public class DefaultArtifactRepositoryFactory
     {
         MavenSession session = legacySupport.getSession();
 
-        if ( session != null && repository != null )
+        if ( session != null && repository != null && !isLocalRepository( repository ) )
         {
             MavenExecutionRequest request = session.getRequest();
             if ( request != null )
@@ -123,6 +123,12 @@ public class DefaultArtifactRepositoryFactory
         }
 
         return repository;
+    }
+
+    private boolean isLocalRepository( ArtifactRepository repository )
+    {
+        // unfortunately, the API doesn't allow to tell a remote repo and the local repo apart...
+        return "local".equals( repository.getId() );
     }
 
 }
