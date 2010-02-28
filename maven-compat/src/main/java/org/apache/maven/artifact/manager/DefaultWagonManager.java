@@ -23,26 +23,109 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
+import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 @Component(role=WagonManager.class) 
 public class DefaultWagonManager
     extends org.apache.maven.repository.legacy.DefaultWagonManager
     implements WagonManager
 {
-    // only here for backward compat project-info-reports:dependencies
+
+    @Requirement
+    private LegacySupport legacySupport;
+
+    @Requirement
+    private SettingsDecrypter settingsDecrypter;
+
     public AuthenticationInfo getAuthenticationInfo( String id )
     {
-       // empty one to prevent NPE
+        MavenSession session = legacySupport.getSession();
+
+        if ( session != null && id != null )
+        {
+            MavenExecutionRequest request = session.getRequest();
+
+            if ( request != null )
+            {
+                List<Server> servers = request.getServers();
+
+                if ( servers != null )
+                {
+                    for ( Server server : servers )
+                    {
+                        if ( id.equalsIgnoreCase( server.getId() ) )
+                        {
+                            SettingsDecryptionResult result =
+                                settingsDecrypter.decrypt( new DefaultSettingsDecryptionRequest( server ) );
+                            server = result.getServer();
+
+                            AuthenticationInfo authInfo = new AuthenticationInfo();
+                            authInfo.setUserName( server.getUsername() );
+                            authInfo.setPassword( server.getPassword() );
+                            authInfo.setPrivateKey( server.getPrivateKey() );
+                            authInfo.setPassphrase( server.getPassphrase() );
+
+                            return authInfo;
+                        }
+                    }
+                }
+            }
+        }
+
+        // empty one to prevent NPE
        return new AuthenticationInfo();
     }
 
     public ProxyInfo getProxy( String protocol )
     {
+        MavenSession session = legacySupport.getSession();
+
+        if ( session != null && protocol != null )
+        {
+            MavenExecutionRequest request = session.getRequest();
+
+            if ( request != null )
+            {
+                List<Proxy> proxies = request.getProxies();
+
+                if ( proxies != null )
+                {
+                    for ( Proxy proxy : proxies )
+                    {
+                        if ( proxy.isActive() && protocol.equalsIgnoreCase( proxy.getProtocol() ) )
+                        {
+                            SettingsDecryptionResult result =
+                                settingsDecrypter.decrypt( new DefaultSettingsDecryptionRequest( proxy ) );
+                            proxy = result.getProxy();
+
+                            ProxyInfo proxyInfo = new ProxyInfo();
+                            proxyInfo.setHost( proxy.getHost() );
+                            proxyInfo.setType( proxy.getProtocol() );
+                            proxyInfo.setPort( proxy.getPort() );
+                            proxyInfo.setNonProxyHosts( proxy.getNonProxyHosts() );
+                            proxyInfo.setUserName( proxy.getUsername() );
+                            proxyInfo.setPassword( proxy.getPassword() );
+
+                            return proxyInfo;
+                        }
+                    }
+                }
+            }
+        }
+
         return null;
     }
 
