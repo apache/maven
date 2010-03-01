@@ -350,43 +350,26 @@ public class StringSearchModelInterpolatorTest
     public void testConcurrentInterpolation() throws Exception {
         final Model model = new Model();
 
-        Properties p = new Properties();
+        final Properties p = new Properties();
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
         p.setProperty( "key3", "value3" );
         p.setProperty( "key4", "value4" );
+        p.setProperty( "key5", "value5" );
 
-        List<String[]> values = new ArrayList<String[]>();
-
-        values.add( new String[] { "${key}", "${key2}" } );
-        values.add( new String[] { "${key3}", "${key4}" } );
-        List values2 = new ArrayList();
-        values.add( new String[] { "${key}", "${key2}" } );
-        values.add( new String[] { "${key3}", "${key4}" } );
-        List values3 = new ArrayList();
-        values.add( new String[] { "${key}", "${key2}" } );
-        values.add( new String[] { "${key3}", "${key4}" } );
-
-        // There is an interesting issue here; if I send three identical collections into the three Lists in "obj",
-        // like this:
-        // final ObjectWithMixedProtection obj = new ObjectWithMixedProtection( values, values, values );
-        // I will have concurrency issues on the interpolation of the individual collections, since current
-        // synchronization is per-field and not per-underlying object.
-        // If this turns out to be a realistic use case, we will need to synchronize on the underlying collection
-        // in the interpolate method.
-
-        final ObjectWithMixedProtection obj = new ObjectWithMixedProtection( values, values2, values3 );
         final StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
-        final ModelBuildingRequest config = createModelBuildingRequest(p);
 
 
-        int numItems = 250;
+        int numItems = 100;
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         List<Future<SimpleProblemCollector>>  futures = new ArrayList<Future<SimpleProblemCollector>>();
         for (int i = 0; i < numItems; i++){
             Callable<SimpleProblemCollector> future = new Callable<SimpleProblemCollector>() {
                 public SimpleProblemCollector call() throws Exception {
+                    final ObjectWithMixedProtection obj = getValueList();
+                    final ModelBuildingRequest config = createModelBuildingRequest(p);
+
                     countDownLatch.await();
                     final SimpleProblemCollector collector = new SimpleProblemCollector();
                     interpolator.interpolateObject( obj, model, new File( "." ), config, collector);
@@ -399,8 +382,26 @@ public class StringSearchModelInterpolatorTest
         }
         countDownLatch.countDown(); // Start all the threads
         for(Future<SimpleProblemCollector> result : futures){
-            result.get(); // ArrayIndexOutOfBoundsException are typical indication of threading issues
+            SimpleProblemCollector problemCollector = result.get(); // ArrayIndexOutOfBoundsException are typical indication of threading issues
+            assertProblemFree(  problemCollector );
+            
         }
+    }
+
+    private ObjectWithMixedProtection getValueList()
+    {
+        List<String[]> values = new ArrayList<String[]>();
+
+        values.add( new String[] { "${key}", "${key2}" } );
+        values.add( new String[] { "${key3}", "${key4}" } );
+        List values2 = new ArrayList();
+        values.add( new String[] { "${key}", "${key2}" } );
+        values.add( new String[] { "${key3}", "${key4}" } );
+        List values3 = new ArrayList();
+        values.add( new String[] { "${key}", "${key2}" } );
+        values.add( new String[] { "${key3}", "${key4}" } );
+
+        return new ObjectWithMixedProtection( values, values2, values3, "${key5}" );
     }
 
 
@@ -440,11 +441,25 @@ public class StringSearchModelInterpolatorTest
         private List values1;
         protected List values2;
         List values3;
+        private String fooBar;
 
         private ObjectWithMixedProtection(List values1, List values2, List values3) {
             this.values1 = values1;
             this.values2 = values2;
             this.values3 = values3;
+        }
+
+        private ObjectWithMixedProtection( List values1, List values2, List values3, String fooBar )
+        {
+            this.values1 = values1;
+            this.values2 = values2;
+            this.values3 = values3;
+            this.fooBar = fooBar;
+        }
+
+        public String getFooBar()
+        {
+            return fooBar;
         }
     }
     
