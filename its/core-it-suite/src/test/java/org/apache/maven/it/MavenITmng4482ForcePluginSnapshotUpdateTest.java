@@ -53,6 +53,12 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
 
+        /*
+         * NOTE: The update of the extension plugin while still being referenced by a class loader from the first test
+         * run make this test intermittently fail on *nix boxes, hence we enforce forking.
+         */
+        verifier.setForkJvm( true );
+
         Properties filterProps = verifier.newDefaultFilterProperties();
 
         filterProps.setProperty( "@repo@", "repo-1" );
