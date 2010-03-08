@@ -857,7 +857,9 @@
           <name>defaultGoal</name>
           <version>3.0.0+</version>
           <description>The default goal (or phase in Maven 2) to execute when none is specified for
-            the project.</description>
+            the project. Note that in case of a multi-module build, only the default goal of the top-level
+            project is relevant, i.e. the default goals of child modules are ignored. Since Maven 3,
+            multiple goals/phases can be separated by whitespace.</description>
           <type>String</type>
         </field>
         <field>

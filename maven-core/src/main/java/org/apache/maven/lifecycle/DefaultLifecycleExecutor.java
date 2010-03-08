@@ -42,7 +42,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultLifecycleEvent;
@@ -745,7 +744,7 @@ public class DefaultLifecycleExecutor
         {
             if ( !StringUtils.isEmpty( rootProject.getDefaultGoal() ) )
             {
-                tasks = Collections.singletonList( rootProject.getDefaultGoal() );
+                tasks = Arrays.asList( StringUtils.split( rootProject.getDefaultGoal() ) );
             }
         }
 
