@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest.class );
         suite.addTestSuite( MavenITmng4572ModelVersionSurroundedByWhitespaceTest.class );
         suite.addTestSuite( MavenITmng4561MirroringOfPluginRepoTest.class );
         suite.addTestSuite( MavenITmng4554PluginPrefixMappingUpdateTest.class );
