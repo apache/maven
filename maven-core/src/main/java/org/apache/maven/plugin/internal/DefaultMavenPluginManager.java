@@ -370,6 +370,11 @@ public class DefaultMavenPluginManager
 
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();
 
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Configuring mojo " + mojoDescriptor.getId() + " from plugin realm " + pluginRealm );
+        }
+
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
