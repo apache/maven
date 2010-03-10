@@ -790,7 +790,9 @@ public class DefaultLifecycleExecutor
         {
             if ( task instanceof GoalTask )
             {
-                MojoDescriptor mojoDescriptor = ( (GoalTask) task ).mojoDescriptor;
+                String pluginGoal = ( (GoalTask) task ).pluginGoal;
+
+                MojoDescriptor mojoDescriptor = getMojoDescriptor( pluginGoal, session, project );
 
                 MojoExecution mojoExecution =
                     new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
@@ -868,7 +870,7 @@ public class DefaultLifecycleExecutor
                     taskSegments.add( currentSegment );
                 }
 
-                currentSegment.tasks.add( new GoalTask( mojoDescriptor ) );
+                currentSegment.tasks.add( new GoalTask( task ) );
             }
             else
             {
@@ -937,17 +939,17 @@ public class DefaultLifecycleExecutor
     private static final class GoalTask
     {
 
-        final MojoDescriptor mojoDescriptor;
+        final String pluginGoal;
 
-        GoalTask( MojoDescriptor mojoDescriptor )
+        GoalTask( String pluginGoal )
         {
-            this.mojoDescriptor = mojoDescriptor;
+            this.pluginGoal = pluginGoal;
         }
 
         @Override
         public String toString()
         {
-            return mojoDescriptor.getId();
+            return pluginGoal;
         }
 
     }
@@ -1092,6 +1094,7 @@ public class DefaultLifecycleExecutor
                         for ( String goal : execution.getGoals() )
                         {
                             MojoExecution mojoExecution = new MojoExecution( plugin, goal, execution.getId() );
+                            mojoExecution.setLifecyclePhase( execution.getPhase() );
                             addMojoExecution( phaseBindings, mojoExecution, execution.getPriority() );
                         }
                     }
@@ -1108,6 +1111,7 @@ public class DefaultLifecycleExecutor
                         if ( phaseBindings != null )
                         {
                             MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, execution.getId() );
+                            mojoExecution.setLifecyclePhase( mojoDescriptor.getPhase() );
                             addMojoExecution( phaseBindings, mojoExecution, execution.getPriority() );
                         }
                     }
