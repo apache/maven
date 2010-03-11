@@ -54,6 +54,7 @@ import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -859,6 +860,8 @@ public class DefaultLifecycleExecutor
             if ( isGoalSpecification( task ) )
             {
                 // "pluginPrefix:goal" or "groupId:artifactId[:version]:goal"
+
+                resolveMissingPluginVersions( session.getTopLevelProject(), session );
 
                 MojoDescriptor mojoDescriptor = getMojoDescriptor( task, session, session.getTopLevelProject() );
 
@@ -1741,12 +1744,32 @@ public class DefaultLifecycleExecutor
     private void resolveMissingPluginVersions( MavenProject project, MavenSession session )
         throws PluginVersionResolutionException
     {
+        Map<String, String> versions = new HashMap<String, String>();
+
         for ( Plugin plugin : project.getBuildPlugins() )
         {
             if ( plugin.getVersion() == null )
             {
                 PluginVersionRequest request = new DefaultPluginVersionRequest( plugin, session );
                 plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
+            }
+            versions.put( plugin.getKey(), plugin.getVersion() );
+        }
+
+        PluginManagement pluginManagement = project.getPluginManagement();
+        if ( pluginManagement != null )
+        {
+            for ( Plugin plugin : pluginManagement.getPlugins() )
+            {
+                if ( plugin.getVersion() == null )
+                {
+                    plugin.setVersion( versions.get( plugin.getKey() ) );
+                    if ( plugin.getVersion() == null )
+                    {
+                        PluginVersionRequest request = new DefaultPluginVersionRequest( plugin, session );
+                        plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
+                    }
+                }
             }
         }
     }
