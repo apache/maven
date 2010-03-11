@@ -135,11 +135,12 @@ public class DefaultPluginPrefixResolver
             {
                 if ( logger.isDebugEnabled() )
                 {
-                    logger.warn( "Failed to retrieve plugin descriptor for " + plugin + ": " + e.getMessage(), e );
+                    logger.warn( "Failed to retrieve plugin descriptor for " + plugin.getId() + ": " + e.getMessage(),
+                                 e );
                 }
                 else
                 {
-                    logger.warn( "Failed to retrieve plugin descriptor for " + plugin + ": " + e.getMessage() );
+                    logger.warn( "Failed to retrieve plugin descriptor for " + plugin.getId() + ": " + e.getMessage() );
                 }
             }
         }
