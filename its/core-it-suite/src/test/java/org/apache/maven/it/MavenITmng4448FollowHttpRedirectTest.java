@@ -28,14 +28,15 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.mortbay.jetty.security.SslSocketConnector;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4448">MNG-4448</a>.
@@ -53,69 +54,79 @@ public class MavenITmng4448FollowHttpRedirectTest
     }
 
     /**
-     * Verify that HTTP redirects are getting followed.
+     * Verify that redirects from HTTP to HTTP are getting followed.
      */
-    public void testit()
+    public void testitHttpToHttp()
+        throws Exception
+    {
+        testit( true, true );
+    }
+
+    /**
+     * Verify that redirects from HTTPS to HTTPS are getting followed.
+     */
+    public void testitHttpsToHttps()
+        throws Exception
+    {
+        testit( false, false );
+    }
+
+    /**
+     * Verify that redirects from HTTP to HTTPS are getting followed.
+     */
+    public void testitHttpToHttps()
+        throws Exception
+    {
+        requiresMavenVersion( "2.2.0" );
+
+        testit( true, false );
+    }
+
+    /**
+     * Verify that redirects from HTTPS to HTTP are getting followed.
+     */
+    public void testitHttpsToHttp()
+        throws Exception
+    {
+        requiresMavenVersion( "2.2.0" );
+
+        testit( false, true );
+    }
+
+    private void testit( boolean fromHttp, boolean toHttp )
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4448" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        Handler repoHandler = new AbstractHandler()
-        {
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
-            {
-                System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
-
-                PrintWriter writer = response.getWriter();
-
-                response.setStatus( HttpServletResponse.SC_OK );
-
-                if ( request.getRequestURI().startsWith( "/repo/" ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_MOVED_PERMANENTLY );
-                    response.setHeader( "Location", "/redirected/" + request.getRequestURI().substring( 6 ) );
-                }
-                else if ( request.getRequestURI().endsWith( ".pom" ) )
-                {
-                    writer.println( "<project>" );
-                    writer.println( "  <modelVersion>4.0.0</modelVersion>" );
-                    writer.println( "  <groupId>org.apache.maven.its.mng4448</groupId>" );
-                    writer.println( "  <artifactId>dep</artifactId>" );
-                    writer.println( "  <version>0.1</version>" );
-                    writer.println( "</project>" );
-                }
-                else if ( request.getRequestURI().endsWith( ".jar" ) )
-                {
-                    writer.println( "empty" );
-                }
-                else if ( request.getRequestURI().endsWith( ".md5" ) || request.getRequestURI().endsWith( ".sha1" ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_NOT_FOUND );
-                }
-
-                ( (Request) request ).setHandled( true );
-            }
-        };
+        // keytool -genkey -alias localhost -keypass key-passwd -keystore keystore -storepass store-passwd \
+        //   -validity 4096 -dname "cn=localhost, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
+        String storePath = new File( testDir, "keystore" ).getAbsolutePath();
+        String storePwd = "store-passwd";
+        String keyPwd = "key-passwd";
 
         Server server = new Server( 0 );
-        server.setHandler( repoHandler );
+        server.addConnector( newHttpsConnector( storePath, storePwd, keyPwd ) );
+        Connector from = server.getConnectors()[ fromHttp ? 0 : 1 ];
+        Connector to = server.getConnectors()[ toHttp ? 0 : 1 ];
+        server.setHandler( new RedirectHandler( toHttp ? "http" : "https", to ) );
         server.start();
 
         try
         {
-            int port = server.getConnectors()[0].getLocalPort();
-
             verifier.setAutoclean( false );
             verifier.deleteArtifacts( "org.apache.maven.its.mng4448" );
             verifier.deleteDirectory( "target" );
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@port@", Integer.toString( port ) );
+            filterProps.setProperty( "@protocol@", fromHttp ? "http" : "https" );
+            filterProps.setProperty( "@port@", Integer.toString( from.getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( "-X --settings" );
             verifier.getCliOptions().add( "settings.xml" );
+            verifier.setSystemProperty( "javax.net.ssl.trustStore", storePath );
+            verifier.setSystemProperty( "javax.net.ssl.trustStorePassword", storePwd );
+            verifier.setLogFileName( "log-" + getName().substring( 6 ) + ".txt" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
@@ -127,6 +138,76 @@ public class MavenITmng4448FollowHttpRedirectTest
 
         List cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "dep-0.1.jar" ) );
+    }
+
+    private Connector newHttpsConnector( String keystore, String storepwd, String keypwd )
+    {
+        SslSocketConnector connector = new SslSocketConnector();
+        connector.setPort( 0 );
+        connector.setKeystore( keystore );
+        connector.setPassword( storepwd );
+        connector.setKeyPassword( keypwd );
+        return connector;
+    }
+
+    static class RedirectHandler extends AbstractHandler
+    {
+
+        private final String protocol;
+
+        private final Connector connector;
+
+        public RedirectHandler( String protocol, Connector connector )
+        {
+            this.protocol = protocol;
+            this.connector = connector;
+        }
+
+        public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            throws IOException
+        {
+            System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
+
+            PrintWriter writer = response.getWriter();
+
+            String uri = request.getRequestURI();
+            if ( uri.startsWith( "/repo/" ) )
+            {
+                String location = protocol + "://localhost:" + connector.getLocalPort() + "/redirected/"
+                    + uri.substring( 6 );
+                if ( uri.endsWith( ".pom" ) )
+                {
+                    response.setStatus( HttpServletResponse.SC_MOVED_TEMPORARILY );
+                }
+                else
+                {
+                    response.setStatus( HttpServletResponse.SC_MOVED_PERMANENTLY );
+                }
+                response.setHeader( "Location", location );
+            }
+            else if ( uri.endsWith( ".pom" ) )
+            {
+                writer.println( "<project>" );
+                writer.println( "  <modelVersion>4.0.0</modelVersion>" );
+                writer.println( "  <groupId>org.apache.maven.its.mng4448</groupId>" );
+                writer.println( "  <artifactId>dep</artifactId>" );
+                writer.println( "  <version>0.1</version>" );
+                writer.println( "</project>" );
+                response.setStatus( HttpServletResponse.SC_OK );
+            }
+            else if ( uri.endsWith( ".jar" ) )
+            {
+                writer.println( "empty" );
+                response.setStatus( HttpServletResponse.SC_OK );
+            }
+            else
+            {
+                response.setStatus( HttpServletResponse.SC_NOT_FOUND );
+            }
+
+            ( (Request) request ).setHandled( true );
+        }
+
     }
 
 }
