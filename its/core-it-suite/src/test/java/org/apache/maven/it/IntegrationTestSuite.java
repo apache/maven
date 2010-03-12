@@ -111,11 +111,11 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4459InMemorySettingsKeptEncryptedTest.class );
         suite.addTestSuite( MavenITmng4453PluginVersionFromLifecycleMappingTest.class );
         suite.addTestSuite( MavenITmng4450StubModelForMissingDependencyPomTest.class );
-        suite.addTestSuite( MavenITmng4448FollowHttpRedirectTest.class );
         suite.addTestSuite( MavenITmng4436SingletonComponentLookupTest.class );
         suite.addTestSuite( MavenITmng4433ForceParentSnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng4430DistributionManagementStatusTest.class );
         suite.addTestSuite( MavenITmng4429CompRequirementOnNonDefaultImplTest.class );
+        suite.addTestSuite( MavenITmng4428FollowHttpRedirectTest.class );
         suite.addTestSuite( MavenITmng4423SessionDataFromPluginParameterExpressionTest.class );
         suite.addTestSuite( MavenITmng4422PluginExecutionPhaseInterpolationTest.class );
         suite.addTestSuite( MavenITmng4421DeprecatedPomInterpolationExpressionsTest.class );

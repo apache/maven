@@ -39,16 +39,16 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.security.SslSocketConnector;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4448">MNG-4448</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4428">MNG-4428</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class MavenITmng4448FollowHttpRedirectTest
+public class MavenITmng4428FollowHttpRedirectTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4448FollowHttpRedirectTest()
+    public MavenITmng4428FollowHttpRedirectTest()
     {
         super( "[2.0.3,3.0-alpha-1),(3.0-alpha-1,)" );
     }
@@ -96,7 +96,7 @@ public class MavenITmng4448FollowHttpRedirectTest
     private void testit( boolean fromHttp, boolean toHttp )
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4448" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4428" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
@@ -116,7 +116,7 @@ public class MavenITmng4448FollowHttpRedirectTest
         try
         {
             verifier.setAutoclean( false );
-            verifier.deleteArtifacts( "org.apache.maven.its.mng4448" );
+            verifier.deleteArtifacts( "org.apache.maven.its.mng4428" );
             verifier.deleteDirectory( "target" );
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@protocol@", fromHttp ? "http" : "https" );
@@ -189,7 +189,7 @@ public class MavenITmng4448FollowHttpRedirectTest
             {
                 writer.println( "<project>" );
                 writer.println( "  <modelVersion>4.0.0</modelVersion>" );
-                writer.println( "  <groupId>org.apache.maven.its.mng4448</groupId>" );
+                writer.println( "  <groupId>org.apache.maven.its.mng4428</groupId>" );
                 writer.println( "  <artifactId>dep</artifactId>" );
                 writer.println( "  <version>0.1</version>" );
                 writer.println( "</project>" );

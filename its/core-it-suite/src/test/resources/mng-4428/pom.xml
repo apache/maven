@@ -22,18 +22,18 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng4448</groupId>
+  <groupId>org.apache.maven.its.mng4428</groupId>
   <artifactId>test</artifactId>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-4448</name>
+  <name>Maven Integration Test :: MNG-4428</name>
   <description>
     Verify that HTTP redirects are getting followed.
   </description>
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven.its.mng4448</groupId>
+      <groupId>org.apache.maven.its.mng4428</groupId>
       <artifactId>dep</artifactId>
       <version>0.1</version>
     </dependency>
