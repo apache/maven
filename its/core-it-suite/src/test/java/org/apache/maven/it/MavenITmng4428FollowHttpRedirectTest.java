@@ -77,7 +77,7 @@ public class MavenITmng4428FollowHttpRedirectTest
     public void testitHttpToHttps()
         throws Exception
     {
-        requiresMavenVersion( "2.2.0" );
+        requiresMavenVersion( "[2.2.0]" );
 
         testit( true, false );
     }
@@ -88,7 +88,7 @@ public class MavenITmng4428FollowHttpRedirectTest
     public void testitHttpsToHttp()
         throws Exception
     {
-        requiresMavenVersion( "2.2.0" );
+        requiresMavenVersion( "[2.2.0]" );
 
         testit( false, true );
     }
