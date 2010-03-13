@@ -380,10 +380,14 @@
             <useJava5>true</useJava5>
           </configuration>
           <executions>
-            <!--
-              <execution> <id>site-docs</id> <phase>pre-site</phase> <goals> <goal>xdoc</goal> <goal>xsd</goal> </goals>
-              </execution>
-            -->
+            <execution>
+              <id>site-docs</id>
+              <phase>pre-site</phase>
+              <goals>
+                <goal>xdoc</goal>
+                <goal>xsd</goal>
+              </goals>
+            </execution>
             <execution>
               <id>standard</id>
               <goals>
