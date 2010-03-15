@@ -128,8 +128,8 @@ public abstract class AbstractMavenTransferListener
         if ( contentLength >= 0 )
         {
             String type =
-                ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "uploaded" : "downloaded" );
-            String l = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
+                ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploaded" : "Downloaded" );
+            String len = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
 
             String throughput = "";
             long duration = System.currentTimeMillis() - artifact.getTransferStartTime();
@@ -140,7 +140,7 @@ public abstract class AbstractMavenTransferListener
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            out.println( l + " " + type + throughput );
+            out.println( type + ": " + artifact.getUrl() + " (" + len + throughput + ")" );
         }
     }
 
