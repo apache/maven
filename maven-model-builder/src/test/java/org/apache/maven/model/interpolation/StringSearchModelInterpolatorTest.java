@@ -298,7 +298,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
 
-        Map values = Collections.unmodifiableMap( Collections.singletonMap( "key", "${key}" ) );
+        Map<String, String> values = Collections.unmodifiableMap( Collections.singletonMap( "key", "${key}" ) );
 
         ObjectWithMapField obj = new ObjectWithMapField( values );
 
@@ -394,10 +394,10 @@ public class StringSearchModelInterpolatorTest
 
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
-        List values2 = new ArrayList();
+        List<String> values2 = new ArrayList<String>();
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
-        List values3 = new ArrayList();
+        List<String> values3 = new ArrayList<String>();
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
 
@@ -417,9 +417,9 @@ public class StringSearchModelInterpolatorTest
 
     private static final class ObjectWithListField
     {
-        private final List values;
+        private final List<?> values;
 
-        public ObjectWithListField( List values )
+        public ObjectWithListField( List<?> values )
         {
             this.values = values;
         }
@@ -427,29 +427,29 @@ public class StringSearchModelInterpolatorTest
 
     private static final class ObjectWithMapField
     {
-        private final Map values;
+        private final Map<?, ?> values;
 
-        public ObjectWithMapField( Map values )
+        public ObjectWithMapField( Map<?, ?> values )
         {
             this.values = values;
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings({"UnusedDeclaration", "unused"})
     private static final class ObjectWithMixedProtection
     {
-        private List values1;
-        protected List values2;
-        List values3;
+        private List<?> values1;
+        protected List<?> values2;
+        List<?> values3;
         private String fooBar;
 
-        private ObjectWithMixedProtection(List values1, List values2, List values3) {
+        private ObjectWithMixedProtection(List<?> values1, List<?> values2, List<?> values3) {
             this.values1 = values1;
             this.values2 = values2;
             this.values3 = values3;
         }
 
-        private ObjectWithMixedProtection( List values1, List values2, List values3, String fooBar )
+        private ObjectWithMixedProtection( List<?> values1, List<?> values2, List<?> values3, String fooBar )
         {
             this.values1 = values1;
             this.values2 = values2;

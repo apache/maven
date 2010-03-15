@@ -424,15 +424,15 @@ public void testBasedir()
         assertColllectorState( 0, 0, 2, collector );
         
         
-        List outResources = out.getBuild().getResources();
-        Iterator resIt = outResources.iterator();
+        List<Resource> outResources = out.getBuild().getResources();
+        Iterator<Resource> resIt = outResources.iterator();
 
-        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
-        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
-        assertEquals( build.getSourceDirectory(), ( (Resource) resIt.next() ).getDirectory() );
+        assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
+        assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
+        assertEquals( build.getSourceDirectory(), resIt.next().getDirectory() );
     }
 
-public void testShouldInterpolateUnprefixedBasedirExpression()
+    public void testShouldInterpolateUnprefixedBasedirExpression()
         throws Exception
     {
         File basedir = new File( "/test/path" );
@@ -449,11 +449,11 @@ public void testShouldInterpolateUnprefixedBasedirExpression()
         assertProblemFree(  collector );
         
 
-        List rDeps = result.getDependencies();
+        List<Dependency> rDeps = result.getDependencies();
         assertNotNull( rDeps );
         assertEquals( 1, rDeps.size() );
-        assertEquals( new File( basedir, "artifact.jar" ).getAbsolutePath(), new File( ( (Dependency) rDeps.get( 0 ) )
-            .getSystemPath() ).getAbsolutePath() );
+        assertEquals( new File( basedir, "artifact.jar" ).getAbsolutePath(),
+                      new File( rDeps.get( 0 ).getSystemPath() ).getAbsolutePath() );
     }
 
     protected abstract ModelInterpolator createInterpolator( PathTranslator translator )
