@@ -695,6 +695,9 @@ public class DefaultModelBuilder
                 {
                     importRequest = new DefaultModelBuildingRequest();
                     importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+                    importRequest.setModelCache( request.getModelCache() );
+                    importRequest.setSystemProperties( request.getSystemProperties() );
+                    importRequest.setUserProperties( request.getUserProperties() );
                 }
 
                 importRequest.setModelSource( importSource );
