@@ -65,6 +65,36 @@ public class DefaultModelBuildingRequest
 
     private ModelCache modelCache;
 
+    /**
+     * Creates an empty request.
+     */
+    public DefaultModelBuildingRequest()
+    {
+    }
+
+    /**
+     * Creates a shallow copy of the specified request.
+     * 
+     * @param request The request to copy, must not be {@code null}.
+     */
+    public DefaultModelBuildingRequest( ModelBuildingRequest request )
+    {
+        setPomFile( request.getPomFile() );
+        setModelSource( request.getModelSource() );
+        setValidationLevel( request.getValidationLevel() );
+        setProcessPlugins( request.isProcessPlugins() );
+        setTwoPhaseBuilding( request.isTwoPhaseBuilding() );
+        setProfiles( request.getProfiles() );
+        setActiveProfileIds( request.getActiveProfileIds() );
+        setInactiveProfileIds( request.getInactiveProfileIds() );
+        setSystemProperties( request.getSystemProperties() );
+        setUserProperties( request.getUserProperties() );
+        setBuildStartTime( request.getBuildStartTime() );
+        setModelResolver( request.getModelResolver() );
+        setModelBuildingListener( request.getModelBuildingListener() );
+        setModelCache( request.getModelCache() );
+    }
+
     public File getPomFile()
     {
         return pomFile;
