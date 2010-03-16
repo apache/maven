@@ -561,7 +561,7 @@ public class DefaultArtifact
     {
         if ( getBaseVersion() != null )
         {
-            return getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION );
+            return ArtifactUtils.isSnapshot( getBaseVersion() );
         }
         else
         {
