@@ -396,6 +396,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2576MakeLikeReactorTest.class );
         suite.addTestSuite( MavenITmng2562TimestampTest.class );
         suite.addTestSuite( MavenITmng2539PluginDependenciesComeFromPluginReposTest.class );
+        suite.addTestSuite( MavenITmng2486TimestampedDependencyVersionInterpolationTest.class );
         suite.addTestSuite( MavenITmng2432PluginPrefixOrderTest.class );
         suite.addTestSuite( MavenITmng2387InactiveProxyTest.class );
         suite.addTestSuite( MavenITmng2363BasedirAwareFileActivatorTest.class );
