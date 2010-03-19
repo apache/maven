@@ -81,6 +81,13 @@ public class DefaultDependencyManagementInjector
         }
 
         @Override
+        protected void mergeDependency_Optional( Dependency target, Dependency source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+        {
+            // optional flag is not managed
+        }
+
+        @Override
         protected void mergeDependency_Exclusions( Dependency target, Dependency source, boolean sourceDominant,
                                                    Map<Object, Object> context )
         {
@@ -91,8 +98,7 @@ public class DefaultDependencyManagementInjector
 
                 for ( Exclusion element : src )
                 {
-                    Exclusion clone = new Exclusion();
-                    mergeExclusion( clone, element, true, context );
+                    Exclusion clone = element.clone();
                     target.addExclusion( clone );
                 }
             }
