@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.mng4600</groupId>
+  <artifactId>transitive</artifactId>
+  <version>0.1</version>
+  <versioning>
+    <versions>
+      <version>0.1</version>
+    </versions>
+    <lastUpdated>20100319225254</lastUpdated>
+  </versioning>
+</metadata>

@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4600DependencyOptionalFlagManagementTest.class );
         suite.addTestSuite( MavenITmng4590ImportedPomUsesSystemPropertiesTest.class );
         suite.addTestSuite( MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMngtTest.class );
         suite.addTestSuite( MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest.class );
