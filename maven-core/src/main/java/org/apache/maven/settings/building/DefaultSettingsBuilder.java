@@ -166,8 +166,6 @@ public class DefaultSettingsBuilder
 
     private Settings interpolate( Settings settings, SettingsBuildingRequest request, List<SettingsProblem> problems )
     {
-        List<String> activeProfiles = settings.getActiveProfiles();
-
         StringWriter writer = new StringWriter( 1024 * 4 );
 
         try
@@ -221,8 +219,6 @@ public class DefaultSettingsBuilder
                                                       SettingsProblem.Severity.ERROR, "", -1, -1, e ) );
             return settings;
         }
-
-        result.setActiveProfiles( activeProfiles );
 
         return result;
     }

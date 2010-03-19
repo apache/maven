@@ -21,25 +21,18 @@ package org.apache.maven.settings;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.List;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
-import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
+import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsBuilder;
+import org.apache.maven.settings.building.SettingsBuildingException;
+import org.apache.maven.settings.building.SettingsBuildingRequest;
+import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.validation.SettingsValidationResult;
-import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
-import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
-import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -50,200 +43,138 @@ public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
     implements MavenSettingsBuilder
 {
+
     @Requirement
-    private SettingsValidator validator;
+    private SettingsBuilder settingsBuilder;
+
+    public Settings buildSettings()
+        throws IOException, XmlPullParserException
+    {
+        File userSettingsFile =
+            getFile( "${user.home}/.m2/settings.xml", "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+
+        return buildSettings( userSettingsFile );
+    }
+
+    public Settings buildSettings( boolean useCachedSettings )
+        throws IOException, XmlPullParserException
+    {
+        return buildSettings();
+    }
+
+    public Settings buildSettings( File userSettingsFile )
+        throws IOException, XmlPullParserException
+    {
+        File globalSettingsFile =
+            getFile( "${maven.home}/conf/settings.xml", "maven.home",
+                     MavenSettingsBuilder.ALT_GLOBAL_SETTINGS_XML_LOCATION );
+
+        SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setUserSettingsFile( userSettingsFile );
+        request.setGlobalSettingsFile( globalSettingsFile );
+        request.setSystemProperties( System.getProperties() );
+        return build(request);
+    }
+
+    public Settings buildSettings( File userSettingsFile, boolean useCachedSettings )
+        throws IOException, XmlPullParserException
+    {
+        return buildSettings( userSettingsFile );
+    }
+
+    private Settings build( SettingsBuildingRequest request )
+        throws IOException, XmlPullParserException
+    {
+        try
+        {
+            return settingsBuilder.build( request ).getEffectiveSettings();
+        }
+        catch ( SettingsBuildingException e )
+        {
+            throw (IOException) new IOException( e.getMessage() ).initCause( e );
+        }
+    }
 
     /** @since 2.1 */
     public Settings buildSettings( MavenExecutionRequest request )
         throws IOException, XmlPullParserException
     {
-        File userSettingsFile = request.getUserSettingsFile();
-
-        File globalSettingsFile = request.getGlobalSettingsFile();
-
-        if ( ( globalSettingsFile == null ) && ( userSettingsFile == null ) )
-        {
-            getLogger().debug(
-                "No settings files provided, and default locations are disabled for this request. Returning empty Settings instance." );
-            return new Settings();
-        }
-
-        getLogger().debug( "Reading global settings from: " + globalSettingsFile );
-
-        Settings globalSettings = readSettings( globalSettingsFile );
-
-        if ( globalSettings == null )
-        {
-            globalSettings = new Settings();
-        }
-
-        getLogger().debug( "Reading user settings from: " + userSettingsFile );
-
-        Settings userSettings = readSettings( userSettingsFile );
-
-        if ( userSettings == null )
-        {
-            userSettings = new Settings();
-        }
-
-        validateSettings(
-            globalSettings,
-            globalSettingsFile );
-
-        validateSettings(
-            userSettings,
-            userSettingsFile );
-
-        SettingsUtils.merge(
-            userSettings,
-            globalSettings,
-            TrackableBase.GLOBAL_LEVEL );
-
-        userSettings = interpolate( userSettings, request );
-
-        // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
-        String localRepository = userSettings.getLocalRepository();
-        if ( localRepository != null && localRepository.length() > 0 )
-        {
-            File file = new File( localRepository );
-            if ( !file.isAbsolute() && file.getPath().startsWith( File.separator ) )
-            {
-                userSettings.setLocalRepository( file.getAbsolutePath() );
-            }
-        }
-
-        return userSettings;
-    }
-
-
-    private Settings interpolate( Settings settings, MavenExecutionRequest request )
-        throws IOException, XmlPullParserException
-    {
-        List<String> activeProfiles = settings.getActiveProfiles();
-
-        StringWriter writer = new StringWriter();
-
-        new SettingsXpp3Writer().write(
-            writer,
-            settings );
-
-        String serializedSettings = writer.toString();
-
-        RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
-
-        interpolator.addValueSource( new PropertiesBasedValueSource( request.getUserProperties() ) );
-
-        interpolator.addValueSource( new PropertiesBasedValueSource( request.getSystemProperties() ) );
-
-        interpolator.addValueSource( new EnvarBasedValueSource() );
-
-        try
-        {
-            serializedSettings = interpolator.interpolate(
-                serializedSettings,
-                "settings" );
-        }
-        catch ( InterpolationException e )
-        {
-            IOException error = new IOException( "Failed to interpolate settings." );
-            error.initCause( e );
-
-            throw error;
-        }
-
-        Settings result = new SettingsXpp3Reader().read( new StringReader( serializedSettings ) );
-
-        result.setActiveProfiles( activeProfiles );
-
-        return result;
-    }
-
-    private Settings readSettings( File settingsFile )
-        throws IOException, XmlPullParserException
-    {
-        if ( settingsFile == null )
-        {
-            getLogger().debug( "Settings file is null. Returning null." );
-
-            return null;
-        }
-
-        if ( !settingsFile.exists() )
-        {
-            getLogger().debug( "Settings file doesn't exist. Returning null." );
-
-            return null;
-        }
-
-        Settings settings = null;
-
-        Reader reader = null;
-
-        try
-        {
-            reader = ReaderFactory.newXmlReader( settingsFile );
-
-            SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
-
-            settings = modelReader.read( reader );
-        }
-        catch ( XmlPullParserException e )
-        {
-            getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing XmlPullParserException..." );
-
-            throw e;
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Failed to read settings from: " + settingsFile + ". Throwing IOException..." );
-
-            throw e;
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        return settings;
-    }
-
-    private void validateSettings( Settings settings,
-                                   File location )
-        throws IOException
-    {
-        SettingsValidationResult validationResult = validator.validate( settings );
-
-        if ( validationResult.getMessageCount() > 0 )
-        {
-            throw new IOException( "Failed to validate Settings file at " + location + "\n" + validationResult.render( "\n" ) );
-        }
+        SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
+        settingsRequest.setUserSettingsFile( request.getUserSettingsFile() );
+        settingsRequest.setGlobalSettingsFile( request.getGlobalSettingsFile() );
+        settingsRequest.setUserProperties( request.getUserProperties() );
+        settingsRequest.setSystemProperties( request.getSystemProperties() );
+        
+        return build(settingsRequest);
     }
 
     public SettingsValidationResult validateSettings( File settingsFile )
     {
-        SettingsValidationResult result = new SettingsValidationResult();
-        if ( settingsFile != null && !settingsFile.canRead() )
-        {
-            try
-            {
-                Settings settings = readSettings( settingsFile );
+        SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setUserSettingsFile( settingsFile );
 
-                return validator.validate( settings );
-            }
-            catch ( IOException e )
-            {
-                result.addMessage( e.getMessage() );
-            }
-            catch ( XmlPullParserException e )
-            {
-                result.addMessage( e.getMessage() );
-            }
-        }
-        else
+        SettingsValidationResult result = new SettingsValidationResult();
+
+        try
         {
-            // TODO do we have anything to say?
+            settingsBuilder.build( request );
+        }
+        catch ( SettingsBuildingException e )
+        {
+            for ( SettingsProblem problem : e.getProblems() )
+            {
+                result.addMessage( problem.getMessage() );
+            }
         }
 
         return result;
     }
+
+    private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )
+    {
+        // -------------------------------------------------------------------------------------
+        // Alright, here's the justification for all the regexp wizardry below...
+        //
+        // Continuum and other server-like apps may need to locate the user-level and
+        // global-level settings somewhere other than ${user.home} and ${maven.home},
+        // respectively. Using a simple replacement of these patterns will allow them
+        // to specify the absolute path to these files in a customized components.xml
+        // file. Ideally, we'd do full pattern-evaluation against the sysprops, but this
+        // is a first step. There are several replacements below, in order to normalize
+        // the path character before we operate on the string as a regex input, and
+        // in order to avoid surprises with the File construction...
+        // -------------------------------------------------------------------------------------
+
+        String path = System.getProperty( altLocationSysProp );
+
+        if ( StringUtils.isEmpty( path ) )
+        {
+            // TODO: This replacing shouldn't be necessary as user.home should be in the
+            // context of the container and thus the value would be interpolated by Plexus
+            String basedir = System.getProperty( basedirSysProp );
+            if ( basedir == null )
+            {
+                basedir = System.getProperty( "user.dir" );
+            }
+
+            basedir = basedir.replaceAll( "\\\\", "/" );
+            basedir = basedir.replaceAll( "\\$", "\\\\\\$" );
+
+            path = pathPattern.replaceAll( "\\$\\{" + basedirSysProp + "\\}", basedir );
+            path = path.replaceAll( "\\\\", "/" );
+            // ---------------------------------------------------------------------------------
+            // I'm not sure if this last regexp was really intended to disallow the usage of
+            // network paths as user.home directory. Unfortunately it did. I removed it and
+            // have not detected any problems yet.
+            // ---------------------------------------------------------------------------------
+            // path = path.replaceAll( "//", "/" );
+
+            return new File( path ).getAbsoluteFile();
+        }
+        else
+        {
+            return new File( path ).getAbsoluteFile();
+        }
+    }
+
 }
