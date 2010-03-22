@@ -1554,6 +1554,16 @@ public class DefaultLifecycleExecutor
         return pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
     }
 
+    // NOTE: Backward-compat with maven-help-plugin:2.1
+    MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project, String invokedVia,
+                                      boolean canUsePrefix, boolean isOptionalMojo )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginVersionResolutionException
+    {
+        return getMojoDescriptor( task, session, project );
+    }
+
     private void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
         throws PluginVersionResolutionException
     {
