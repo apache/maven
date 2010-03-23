@@ -93,7 +93,23 @@ public class MavenITmng4428FollowHttpRedirectTest
         testit( false, true );
     }
 
+    /**
+     * Verify that redirects using a relative location URL are getting followed. While a relative URL violates the
+     * HTTP spec, popular HTTP clients do support them so we better do, too.
+     */
+    public void testitRelativeLocation()
+        throws Exception
+    {
+        testit( true, true );
+    }
+
     private void testit( boolean fromHttp, boolean toHttp )
+        throws Exception
+    {
+        testit( fromHttp, toHttp, false );
+    }
+
+    private void testit( boolean fromHttp, boolean toHttp, boolean relativeLocation )
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4428" );
@@ -110,7 +126,7 @@ public class MavenITmng4428FollowHttpRedirectTest
         server.addConnector( newHttpsConnector( storePath, storePwd, keyPwd ) );
         Connector from = server.getConnectors()[ fromHttp ? 0 : 1 ];
         Connector to = server.getConnectors()[ toHttp ? 0 : 1 ];
-        server.setHandler( new RedirectHandler( toHttp ? "http" : "https", to ) );
+        server.setHandler( new RedirectHandler( toHttp ? "http" : "https", relativeLocation ? null : to ) );
         server.start();
 
         try
@@ -173,8 +189,11 @@ public class MavenITmng4428FollowHttpRedirectTest
             String uri = request.getRequestURI();
             if ( uri.startsWith( "/repo/" ) )
             {
-                String location = protocol + "://localhost:" + connector.getLocalPort() + "/redirected/"
-                    + uri.substring( 6 );
+                String location = "/redirected/" + uri.substring( 6 );
+                if ( protocol != null && connector != null )
+                {
+                    location = protocol + "://localhost:" + connector.getLocalPort() + location;
+                }
                 if ( uri.endsWith( ".pom" ) )
                 {
                     response.setStatus( HttpServletResponse.SC_MOVED_TEMPORARILY );
