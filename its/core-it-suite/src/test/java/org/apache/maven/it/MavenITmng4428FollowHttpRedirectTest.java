@@ -100,7 +100,7 @@ public class MavenITmng4428FollowHttpRedirectTest
     public void testitRelativeLocation()
         throws Exception
     {
-        testit( true, true );
+        testit( true, true, true );
     }
 
     private void testit( boolean fromHttp, boolean toHttp )
