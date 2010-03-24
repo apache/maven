@@ -238,7 +238,7 @@ public class DefaultProjectBuilder
                                                 "Error resolving project artifact: " + e.getMessage(), e );
         }
 
-        boolean localProject = artifact.getRepository() != null && "reactor".equals( artifact.getRepository().getId() );
+        boolean localProject = artifact.getRepository() != null && artifact.getRepository().isProjectAware();
 
         File pomFile = artifact.getFile();
 

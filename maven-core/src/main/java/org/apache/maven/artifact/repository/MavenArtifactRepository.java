@@ -375,4 +375,9 @@ public class MavenArtifactRepository
         return true;
     }
 
+    public boolean isProjectAware()
+    {
+        return false;
+    }
+
 }

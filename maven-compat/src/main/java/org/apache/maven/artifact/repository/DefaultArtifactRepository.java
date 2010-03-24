@@ -216,6 +216,11 @@ public class DefaultArtifactRepository
         return Collections.emptyList();
     }
 
+    public boolean isProjectAware()
+    {
+        return false;
+    }
+
     public Authentication getAuthentication()
     {
         return authentication;

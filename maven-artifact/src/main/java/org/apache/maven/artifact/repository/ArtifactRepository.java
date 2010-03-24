@@ -75,6 +75,14 @@ public interface ArtifactRepository
      */
     List<String> findVersions( Artifact artifact );
 
+    /**
+     * Indicates whether this repository is backed by actual projects. For instance, the build reactor or IDE workspace
+     * are examples of such repositories.
+     * 
+     * @return {@code true} if the repository is backed by actual projects, {@code false} otherwise.
+     */
+    boolean isProjectAware();
+
     void setAuthentication( Authentication authentication );    
     Authentication getAuthentication();
     

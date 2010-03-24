@@ -276,4 +276,11 @@ public class ReactorArtifactRepository
 
         return eq( reactorProjects.keySet(), other.reactorProjects.keySet() );
     }
+
+    @Override
+    public boolean isProjectAware()
+    {
+        return true;
+    }
+
 }
