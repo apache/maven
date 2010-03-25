@@ -26,16 +26,13 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.model.ReportPlugin;
-import org.apache.maven.model.ReportSet;
-import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- * Handles expansion of general plugin configuration into individual executions and report sets.
+ * Handles expansion of general build plugin configuration into individual executions.
  * 
  * @author Benjamin Bentmann
  */
@@ -47,7 +44,6 @@ public class DefaultPluginConfigurationExpander
     public void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Build build = model.getBuild();
-        Reporting reporting = model.getReporting();
 
         if ( build != null )
         {
@@ -58,24 +54,6 @@ public class DefaultPluginConfigurationExpander
             if ( pluginManagement != null )
             {
                 expand( pluginManagement.getPlugins() );
-            }
-        }
-
-        if ( reporting != null )
-        {
-            for ( ReportPlugin reportPlugin : reporting.getPlugins() )
-            {
-                Xpp3Dom parentDom = (Xpp3Dom) reportPlugin.getConfiguration();
-
-                if ( parentDom != null )
-                {
-                    for ( ReportSet execution : reportPlugin.getReportSets() )
-                    {
-                        Xpp3Dom childDom = (Xpp3Dom) execution.getConfiguration();
-                        childDom = Xpp3Dom.mergeXpp3Dom( childDom, new Xpp3Dom( parentDom ) );
-                        execution.setConfiguration( childDom );
-                    }
-                }
             }
         }
     }

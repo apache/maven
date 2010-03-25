@@ -108,7 +108,7 @@ public class DefaultReportingConverter
             Xpp3Dom reportPlugin = convert( plugin );
             reportPlugins.addChild( reportPlugin );
 
-            if ( !reporting.isExcludeDefaults()
+            if ( !reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin
                 && "org.apache.maven.plugins".equals( reportPlugin.getChild( "groupId" ).getValue() )
                 && "maven-project-info-reports-plugin".equals( reportPlugin.getChild( "artifactId" ).getValue() ) )
             {
@@ -118,7 +118,7 @@ public class DefaultReportingConverter
 
         if ( !reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin )
         {
-            Xpp3Dom dom = new Xpp3Dom( "plugin" );
+            Xpp3Dom dom = new Xpp3Dom( "reportPlugin" );
 
             addDom( dom, "groupId", "org.apache.maven.plugins" );
             addDom( dom, "artifactId", "maven-project-info-reports-plugin" );
@@ -160,7 +160,7 @@ public class DefaultReportingConverter
 
     private Xpp3Dom convert( ReportPlugin plugin )
     {
-        Xpp3Dom dom = new Xpp3Dom( "plugin" );
+        Xpp3Dom dom = new Xpp3Dom( "reportPlugin" );
 
         addDom( dom, "groupId", plugin.getGroupId() );
         addDom( dom, "artifactId", plugin.getArtifactId() );
@@ -172,19 +172,42 @@ public class DefaultReportingConverter
             configuration = new Xpp3Dom( configuration );
             dom.addChild( configuration );
         }
-        Xpp3Dom reports = new Xpp3Dom( "reports" );
 
-        if (! plugin.getReportSets().isEmpty())
+        if ( !plugin.getReportSets().isEmpty() )
         {
-            dom.addChild( reports );
+            Xpp3Dom reportSets = new Xpp3Dom( "reportSets" );
+            for ( ReportSet reportSet : plugin.getReportSets() )
+            {
+                Xpp3Dom rs = convert( reportSet );
+                reportSets.addChild( rs );
+            }
+            dom.addChild( reportSets );
         }
-        // TODO: Clarifiy conversion f reporset.configuration
-        for ( ReportSet reportSet : plugin.getReportSets() )
+
+        return dom;
+    }
+
+    private Xpp3Dom convert( ReportSet reportSet )
+    {
+        Xpp3Dom dom = new Xpp3Dom( "reportSet" );
+
+        addDom( dom, "id", reportSet.getId() );
+
+        Xpp3Dom configuration = (Xpp3Dom) reportSet.getConfiguration();
+        if ( configuration != null )
         {
-            for (String report : reportSet.getReports())
+            configuration = new Xpp3Dom( configuration );
+            dom.addChild( configuration );
+        }
+
+        if ( !reportSet.getReports().isEmpty() )
+        {
+            Xpp3Dom reports = new Xpp3Dom( "reports" );
+            for ( String report : reportSet.getReports() )
             {
                 addDom( reports, "report", report );
             }
+            dom.addChild( reports );
         }
 
         return dom;

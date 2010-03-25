@@ -46,6 +46,7 @@ import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
+import org.apache.maven.model.plugin.ReportConfigurationExpander;
 import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
 import org.apache.maven.model.profile.ProfileActivationContext;
@@ -107,6 +108,9 @@ public class DefaultModelBuilder
 
     @Requirement
     private PluginConfigurationExpander pluginConfigurationExpander;
+
+    @Requirement
+    private ReportConfigurationExpander reportConfigurationExpander;
 
     @Requirement
     private ReportingConverter reportingConverter;
@@ -276,9 +280,11 @@ public class DefaultModelBuilder
 
         if ( request.isProcessPlugins() )
         {
-            pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
+            reportConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
 
             reportingConverter.convertReporting( resultModel, request, problems );
+
+            pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
         }
 
         modelValidator.validateEffectiveModel( resultModel, request, problems );
