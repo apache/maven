@@ -426,4 +426,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getWarnings().get( 0 ).contains( "test:a:jar" ) );
     }
 
+    public void testEmptyModule()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "empty-module.xml" );
+
+        assertViolations( result, 0, 0, 1 );
+
+        assertTrue( result.getWarnings().get( 0 ).contains( "Child module has been specified without path" ) );
+    }
+
 }

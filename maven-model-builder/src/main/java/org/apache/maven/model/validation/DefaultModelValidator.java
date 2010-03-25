@@ -134,10 +134,22 @@ public class DefaultModelValidator
 
         validateStringNotEmpty( "packaging", problems, Severity.ERROR, model.getPackaging() );
 
-        if ( !model.getModules().isEmpty() && !"pom".equals( model.getPackaging() ) )
+        if ( !model.getModules().isEmpty() )
         {
-            addViolation( problems, Severity.ERROR, "Packaging '" + model.getPackaging()
-                + "' is invalid. Aggregator projects " + "require 'pom' as packaging." );
+            if ( !"pom".equals( model.getPackaging() ) )
+            {
+                addViolation( problems, Severity.ERROR, "Packaging '" + model.getPackaging()
+                    + "' is invalid. Aggregator projects " + "require 'pom' as packaging." );
+            }
+
+            for ( String module : model.getModules() )
+            {
+                if ( StringUtils.isBlank( module ) )
+                {
+                    addViolation( problems, Severity.WARNING,
+                                  "Child module has been specified without path to its project directory." );
+                }
+            }
         }
 
         validateStringNotEmpty( "version", problems, Severity.ERROR, model.getVersion() );
