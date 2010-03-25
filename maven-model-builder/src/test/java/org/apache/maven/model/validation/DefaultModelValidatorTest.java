@@ -199,7 +199,8 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.artifactId' is missing" ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf(
+                                                         "'dependencies.dependency.artifactId' for groupId:null:jar is missing" ) > -1 );
     }
 
     public void testMissingDependencyGroupId()
@@ -209,7 +210,8 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.groupId' is missing" ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf(
+                                                         "'dependencies.dependency.groupId' for null:artifactId:jar is missing" ) > -1 );
     }
 
     public void testMissingDependencyVersion()
@@ -219,7 +221,8 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).indexOf( "'dependencies.dependency.version' is missing" ) > -1 );
+        assertTrue( result.getErrors().get( 0 ).indexOf(
+                                                         "'dependencies.dependency.version' for groupId:artifactId:jar is missing" ) > -1 );
     }
 
     public void testMissingDependencyManagementArtifactId()
@@ -230,7 +233,7 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf(
-                                                         "'dependencyManagement.dependencies.dependency.artifactId' is missing" ) > -1 );
+                                                         "'dependencyManagement.dependencies.dependency.artifactId' for groupId:null:jar is missing" ) > -1 );
     }
 
     public void testMissingDependencyManagementGroupId()
@@ -241,7 +244,7 @@ public class DefaultModelValidatorTest
         assertViolations( result, 0, 1, 0 );
 
         assertTrue( result.getErrors().get( 0 ).indexOf(
-                                                         "'dependencyManagement.dependencies.dependency.groupId' is missing" ) > -1 );
+                                                         "'dependencyManagement.dependencies.dependency.groupId' for null:artifactId:jar is missing" ) > -1 );
     }
 
     public void testMissingAll()
@@ -278,7 +281,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertEquals( "'build.plugins.plugin.version' is missing for org.apache.maven.plugins:maven-it-plugin",
+        assertEquals( "'build.plugins.plugin.version' for org.apache.maven.plugins:maven-it-plugin is missing.",
                       result.getErrors().get( 0 ) );
 
         result = validateEffective( "missing-plugin-version-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
@@ -293,8 +296,8 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 1, 0 );
 
-        assertEquals( "'build.plugins.plugin.version' must be a valid version "
-            + "for org.apache.maven.plugins:maven-it-plugin but is ''.", result.getErrors().get( 0 ) );
+        assertEquals( "'build.plugins.plugin.version' for org.apache.maven.plugins:maven-it-plugin"
+            + " must be a valid version but is ''.", result.getErrors().get( 0 ) );
     }
 
     public void testMissingRepositoryId()
@@ -433,7 +436,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 0, 1 );
 
-        assertTrue( result.getWarnings().get( 0 ).contains( "Child module has been specified without path" ) );
+        assertTrue( result.getWarnings().get( 0 ).contains( "'modules.module' has been specified without a path" ) );
     }
 
 }
