@@ -22,11 +22,14 @@ package org.apache.maven.plugin.version.internal;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
@@ -63,6 +66,38 @@ public class DefaultPluginVersionResolver
     {
         logger.debug( "Resolving plugin version for " + request.getGroupId() + ":" + request.getArtifactId() );
 
+        PluginVersionResult result = resolveFromProject( request );
+
+        if ( result == null )
+        {
+            result = resolveFromRepository( request );
+
+            if ( StringUtils.isEmpty( result.getVersion() ) )
+            {
+                throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
+                                                            request.getLocalRepository(),
+                                                            request.getRemoteRepositories(),
+                                                            "Plugin not found in any plugin repository" );
+            }
+            else if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
+                    + " to " + result.getVersion() + " from repository "
+                    + ( result.getRepository() != null ? result.getRepository().getId() : "null" ) );
+            }
+        }
+        else if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
+                + " to " + result.getVersion() + " from POM " + request.getPom() );
+        }
+
+        return result;
+    }
+
+    private PluginVersionResult resolveFromRepository( PluginVersionRequest request )
+        throws PluginVersionResolutionException
+    {
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
         Metadata mergedMetadata = new Metadata();
@@ -155,13 +190,6 @@ public class DefaultPluginVersionResolver
                                                         "Plugin not found in any plugin repository" );
         }
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
-                + " to " + result.getVersion() + " from repository "
-                + ( result.getRepository() != null ? result.getRepository().getId() : "null" ) );
-        }
-
         return result;
     }
 
@@ -207,6 +235,45 @@ public class DefaultPluginVersionResolver
     private boolean mergeMetadata( Metadata target, Metadata source )
     {
         return target.merge( source );
+    }
+
+    private PluginVersionResult resolveFromProject( PluginVersionRequest request )
+    {
+        PluginVersionResult result = null;
+
+        if ( request.getPom() != null && request.getPom().getBuild() != null )
+        {
+            Build build = request.getPom().getBuild();
+
+            result = resolveFromProject( request, build.getPlugins() );
+
+            if ( result == null && build.getPluginManagement() != null )
+            {
+                result = resolveFromProject( request, build.getPluginManagement().getPlugins() );
+            }
+        }
+
+        return result;
+    }
+
+    private PluginVersionResult resolveFromProject( PluginVersionRequest request, List<Plugin> plugins )
+    {
+        for ( Plugin plugin : plugins )
+        {
+            if ( request.getGroupId().equals( plugin.getGroupId() )
+                && request.getArtifactId().equals( plugin.getArtifactId() ) )
+            {
+                if ( plugin.getVersion() != null )
+                {
+                    return new DefaultPluginVersionResult( plugin.getVersion() );
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 
 }

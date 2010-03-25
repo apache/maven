@@ -26,6 +26,7 @@ import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.ArtifactTransferListener;
@@ -42,6 +43,8 @@ public class DefaultPluginVersionRequest
     private String groupId;
 
     private String artifactId;
+
+    private Model pom;
 
     private RepositoryRequest repositoryRequest;
 
@@ -122,6 +125,18 @@ public class DefaultPluginVersionRequest
     public DefaultPluginVersionRequest setArtifactId( String artifactId )
     {
         this.artifactId = artifactId;
+
+        return this;
+    }
+
+    public Model getPom()
+    {
+        return pom;
+    }
+
+    public DefaultPluginVersionRequest setPom( Model pom )
+    {
+        this.pom = pom;
 
         return this;
     }

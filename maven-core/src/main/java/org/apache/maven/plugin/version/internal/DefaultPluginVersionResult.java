@@ -35,6 +35,16 @@ class DefaultPluginVersionResult
 
     private ArtifactRepository repository;
 
+    public DefaultPluginVersionResult()
+    {
+        // does nothing
+    }
+
+    public DefaultPluginVersionResult( String version )
+    {
+        this.version = version;
+    }
+
     public String getVersion()
     {
         return version;

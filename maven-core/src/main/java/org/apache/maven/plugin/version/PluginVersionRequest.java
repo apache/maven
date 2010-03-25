@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.model.Model;
 import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
@@ -64,6 +65,23 @@ public interface PluginVersionRequest
      * @return This request, never {@code null}.
      */
     PluginVersionRequest setArtifactId( String artifactId );
+
+    /**
+     * Gets the POM whose build plugins are to be scanned for the version.
+     * 
+     * @return The POM whose build plugins are to be scanned for the verion or {@code null} to only search the plugin
+     *         repositories.
+     */
+    Model getPom();
+
+    /**
+     * Sets the POM whose build plugins are to be scanned for the version.
+     * 
+     * @param pom The POM whose build plugins are to be scanned for the version, may be {@code null} to only search the
+     *            plugin repositories.
+     * @return This request, never {@code null}.
+     */
+    PluginVersionRequest setPom( Model pom );
 
     /**
      * Indicates whether network access to remote repositories has been disabled.
