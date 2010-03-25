@@ -351,6 +351,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3355TranslatedPathInterpolationTest.class );
         suite.addTestSuite( MavenITmng3331ModulePathNormalizationTest.class );
         suite.addTestSuite( MavenITmng3314OfflineSnapshotsTest.class );
+        suite.addTestSuite( MavenITmng3297DependenciesNotLeakedToMojoTest.class );
         suite.addTestSuite( MavenITmng3288SystemScopeDirTest.class );
         suite.addTestSuite( MavenITmng3284UsingCachedPluginsTest.class );
         suite.addTestSuite( MavenITmng3271DefaultReportsSuppressionTest.class );
