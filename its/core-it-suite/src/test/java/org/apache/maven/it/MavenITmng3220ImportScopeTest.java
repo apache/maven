@@ -88,7 +88,8 @@ public class MavenITmng3220ImportScopeTest
         for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
             String line = (String) it.next();
-            if ( line.indexOf( "\'dependencies.dependency.version\' is missing for junit:junit") > -1 )
+            if ( line.indexOf( "\'dependencies.dependency.version\' is missing for junit:junit") > -1 ||
+                line.indexOf( "\'dependencies.dependency.version\' for junit:junit:jar is missing") > -1 )
             {
                 found = true;
                 break;
