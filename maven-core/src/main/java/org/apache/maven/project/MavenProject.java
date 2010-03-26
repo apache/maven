@@ -175,7 +175,7 @@ public class MavenProject
 
     private ArtifactFilter extensionArtifactFilter;
 
-    //
+    private Set<String> lifecyclePhases;
 
     public MavenProject()
     {
@@ -1947,6 +1947,8 @@ public class MavenProject
         {
             setManagedVersionMap( new HashMap<String, Artifact>( project.getManagedVersionMap() ) );
         }
+
+        lifecyclePhases = null;
     }
 
     private void addArtifactPath( Artifact artifact, List<String> classpath )
@@ -2079,6 +2081,35 @@ public class MavenProject
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
+    }
+
+    /**
+     * Gets the set of lifecycle phases this project has successfully completed.
+     * 
+     * @return The (unmodifiable) set of lifecycle phases this project has successfully completed, can be empty but
+     *         never {@code null}.
+     */
+    public Set<String> getLifecyclePhases()
+    {
+        return ( lifecyclePhases != null ) ? Collections.unmodifiableSet( lifecyclePhases )
+                        : Collections.<String> emptySet();
+    }
+
+    /**
+     * Adds the specified lifecycle phase to the phases this project has successfully completed.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     * 
+     * @param lifecyclePhase The lifecycle phase to add, must not be {@code null}.
+     */
+    public void addLifecyclePhase( String lifecyclePhase )
+    {
+        if ( lifecyclePhases == null )
+        {
+            lifecyclePhases = new LinkedHashSet<String>();
+        }
+        lifecyclePhases.add( lifecyclePhase );
     }
 
 }

@@ -319,10 +319,7 @@ public class DefaultLifecycleExecutor
                 DependencyContext dependencyContext =
                     new DependencyContext( executionPlan, projectBuild.taskSegment.aggregating );
 
-                for ( MojoExecution mojoExecution : executionPlan.getExecutions() )
-                {
-                    execute( session, mojoExecution, projectIndex, dependencyContext );
-                }
+                execute( session, executionPlan.getExecutions(), projectIndex, dependencyContext );
 
                 long buildEndTime = System.currentTimeMillis();
 
@@ -525,6 +522,39 @@ public class DefaultLifecycleExecutor
         }
     }
 
+    private void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex,
+                          DependencyContext dependencyContext )
+        throws LifecycleExecutionException
+    {
+        MavenProject project = session.getCurrentProject();
+
+        String lastLifecyclePhase = null;
+
+        for ( MojoExecution mojoExecution : mojoExecutions )
+        {
+            execute( session, mojoExecution, projectIndex, dependencyContext );
+
+            String lifecyclePhase = mojoExecution.getLifecyclePhase();
+            if ( lifecyclePhase != null )
+            {
+                if ( lastLifecyclePhase == null )
+                {
+                    lastLifecyclePhase = lifecyclePhase;
+                }
+                else if ( !lifecyclePhase.equals( lastLifecyclePhase ) )
+                {
+                    project.addLifecyclePhase( lastLifecyclePhase );
+                    lastLifecyclePhase = lifecyclePhase;
+                }
+            }
+        }
+
+        if ( lastLifecyclePhase != null )
+        {
+            project.addLifecyclePhase( lastLifecyclePhase );
+        }
+    }
+
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                           DependencyContext dependencyContext )
         throws LifecycleExecutionException
@@ -680,10 +710,7 @@ public class DefaultLifecycleExecutor
                         session.getProjects().set( index, executedProject );
                         projectIndex.projects.put( fork.getKey(), executedProject );
 
-                        for ( MojoExecution forkedExecution : fork.getValue() )
-                        {
-                            execute( session, forkedExecution, projectIndex, dependencyContext );
-                        }
+                        execute( session, fork.getValue(), projectIndex, dependencyContext );
                     }
                     finally
                     {

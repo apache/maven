@@ -10,8 +10,6 @@ import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.execution.BuildSuccess;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.LocalArtifactRepository;
@@ -22,7 +20,6 @@ import org.apache.maven.repository.LocalArtifactRepository;
  * @author Jason van Zyl
  */
 
-//TODO: need phase information here to determine whether to hand back the classes/ or archive.
 public class ReactorArtifactRepository
     extends LocalArtifactRepository
 {
@@ -30,14 +27,11 @@ public class ReactorArtifactRepository
 
     private Map<String, List<String>> availableVersions;
 
-    private MavenExecutionResult executionResult;
-
     private final int hashCode;
 
     public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects, MavenSession session )
     {
         this.reactorProjects = reactorProjects;
-        this.executionResult = ( session != null ) ? session.getResult() : null;
         hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
 
         availableVersions = new HashMap<String, List<String>>( reactorProjects.size() * 2 );
@@ -84,22 +78,26 @@ public class ReactorArtifactRepository
 
                     resolve( artifact, projectArtifact.getFile() );
                 }
-                else if ( isProjectOutputValid( project ) )
+                else
                 {
-                    File classesDir;
+                    Collection<String> lifecyclePhases = project.getLifecyclePhases();
 
-                    if ( isTestArtifact( artifact ) )
+                    if ( !lifecyclePhases.contains( "package" ) )
                     {
-                        classesDir = new File( project.getBuild().getTestOutputDirectory() );
-                    }
-                    else
-                    {
-                        classesDir = new File( project.getBuild().getOutputDirectory() );
-                    }
-
-                    if ( classesDir.isDirectory() )
-                    {
-                        resolve( artifact, classesDir );
+                        if ( isTestArtifact( artifact ) )
+                        {
+                            if ( lifecyclePhases.contains( "test-compile" ) )
+                            {
+                                resolve( artifact, new File( project.getBuild().getTestOutputDirectory() ) );
+                            }
+                        }
+                        else
+                        {
+                            if ( lifecyclePhases.contains( "compile" ) )
+                            {
+                                resolve( artifact, new File( project.getBuild().getOutputDirectory() ) );
+                            }
+                        }
                     }
                 }
             }
@@ -217,18 +215,6 @@ public class ReactorArtifactRepository
             buffer.append( ':' ).append( artifact.getClassifier() );
         }
         return buffer.toString();
-    }
-
-    /**
-     * Determines whether the output directories of the specified project have valid contents and can be used for
-     * artifact resolution.
-     * 
-     * @param project The project to check, must not be {@code null}.
-     * @return {@code true} if the output directories are valid, {@code false} otherwise.
-     */
-    private boolean isProjectOutputValid( MavenProject project )
-    {
-        return executionResult != null && executionResult.getBuildSummary( project ) instanceof BuildSuccess;
     }
 
     /**
