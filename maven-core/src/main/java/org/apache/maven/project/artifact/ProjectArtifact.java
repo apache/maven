@@ -63,7 +63,7 @@ public class ProjectArtifact
     {
         public String getClassifier()
         {
-            return "pom";
+            return null;
         }
 
         public String getDirectory()
