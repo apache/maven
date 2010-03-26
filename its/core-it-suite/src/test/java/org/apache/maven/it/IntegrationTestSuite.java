@@ -413,6 +413,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
         suite.addTestSuite( MavenITmng2228ComponentInjectionTest.class );
+        suite.addTestSuite( MavenITmng2222OutputDirectoryReactorResolutionTest.class );
         suite.addTestSuite( MavenITmng2201PluginConfigInterpolationTest.class );
         suite.addTestSuite( MavenITmng2196ParentResolutionTest.class );
         suite.addTestSuite( MavenITmng2174PluginDepsManagedByParentProfileTest.class );
