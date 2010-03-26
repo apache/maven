@@ -51,7 +51,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
-        verifier.executeGoal( "validate" );
+        verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
