@@ -958,7 +958,7 @@ public class MavenCli
         String workingDirectory;
         boolean debug;
         boolean quiet;
-        boolean showErrors; 
+        boolean showErrors = true; 
         PrintStream fileStream;
         Properties userProperties = new Properties();
         Properties systemProperties = new Properties();
