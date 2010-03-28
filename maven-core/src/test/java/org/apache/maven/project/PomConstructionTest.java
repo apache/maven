@@ -173,7 +173,7 @@ public class PomConstructionTest
 
     }
 
-    /** MNG-4005 */
+    /** MNG-4005: postponed to 3.1
     public void testValidationErrorUponNonUniqueDependencyKey()
         throws Exception
     {
@@ -229,6 +229,7 @@ public class PomConstructionTest
             // expected
         }
     }
+    */
 
     public void testDuplicateDependenciesCauseLastDeclarationToBePickedInLenientMode()
         throws Exception

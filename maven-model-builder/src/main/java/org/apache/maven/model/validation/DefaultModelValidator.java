@@ -299,6 +299,7 @@ public class DefaultModelValidator
                                        ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
+        Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
         Map<String, Dependency> index = new HashMap<String, Dependency>();
 
@@ -340,7 +341,7 @@ public class DefaultModelValidator
                             + StringUtils.defaultString( dependency.getVersion(), "(?)" );
                 }
 
-                addViolation( problems, errOn30, prefix + ".(groupId:artifactId:type:classifier)", null,
+                addViolation( problems, errOn31, prefix + ".(groupId:artifactId:type:classifier)", null,
                               "must be unique: " + key + " -> " + msg );
             }
             else
