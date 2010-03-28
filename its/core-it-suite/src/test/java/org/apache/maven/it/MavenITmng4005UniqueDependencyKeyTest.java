@@ -23,8 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public class MavenITmng4005UniqueDependencyKeyTest
 
     public MavenITmng4005UniqueDependencyKeyTest()
     {
-        super( "[3.0-alpha-3,)" );
+        super( "[3.0-alpha-8,)" );
     }
 
     /**
@@ -85,20 +84,23 @@ public class MavenITmng4005UniqueDependencyKeyTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        try
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        List lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+        boolean foundWarning = false;
+        for ( Iterator it = lines.iterator(); it.hasNext(); )
         {
-            verifier.executeGoal( "validate" );
-            verifier.verifyErrorFreeLog();
-            fail( "Duplicate dependency did not cause validation error" );
+            String line = (String) it.next();
+            
+            if ( line.startsWith( "[WARNING]" ) && line.indexOf( "must be unique: junit:junit:jar" ) > 0 )
+            {
+                foundWarning = true;
+            }
         }
-        catch ( VerificationException e )
-        {
-            // expected
-        }
-        finally
-        {
-            verifier.resetStreams();
-        }
+        
+        assertTrue( "Duplicate dependency warning wasn't generated.", foundWarning );
     }
 
 }
