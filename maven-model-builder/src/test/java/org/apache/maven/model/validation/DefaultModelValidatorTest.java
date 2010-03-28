@@ -439,4 +439,15 @@ public class DefaultModelValidatorTest
         assertTrue( result.getWarnings().get( 0 ).contains( "'modules.module' has been specified without a path" ) );
     }
 
+    public void testDuplicatePlugin()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "duplicate-plugin.xml" );
+
+        assertViolations( result, 0, 0, 2 );
+
+        assertTrue( result.getWarnings().get( 0 ).contains( "duplicate declaration of plugin test:duplicate" ) );
+        assertTrue( result.getWarnings().get( 1 ).contains( "duplicate declaration of plugin test:managed-duplicate" ) );
+    }
+
 }

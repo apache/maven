@@ -34,6 +34,7 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
@@ -95,6 +96,18 @@ public class DefaultModelValidator
 
             validateRepositories( problems, model.getPluginRepositories(), "pluginRepositories.pluginRepository", request );
 
+            Build build = model.getBuild();
+            if ( build != null )
+            {
+                validateRawPlugins( problems, build.getPlugins(), false, request );
+
+                PluginManagement mngt = build.getPluginManagement();
+                if ( mngt != null )
+                {
+                    validateRawPlugins( problems, mngt.getPlugins(), true, request );
+                }
+            }
+
             Set<String> profileIds = new HashSet<String>();
 
             for ( Profile profile : model.getProfiles() )
@@ -120,6 +133,33 @@ public class DefaultModelValidator
 
                 validateRepositories( problems, profile.getPluginRepositories(), "profiles.profile[" + profile.getId()
                     + "].pluginRepositories.pluginRepository", request );
+            }
+        }
+    }
+
+    private void validateRawPlugins( ModelProblemCollector problems, List<Plugin> plugins, boolean managed,
+                                     ModelBuildingRequest request )
+    {
+        Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+
+        String prefix = ( managed ? "build.pluginManagement." : "build." ) + "plugins.plugin.";
+
+        Map<String, Plugin> index = new HashMap<String, Plugin>();
+
+        for ( Plugin plugin : plugins )
+        {
+            String key = plugin.getKey();
+
+            Plugin existing = index.get( key );
+
+            if ( existing != null )
+            {
+                addViolation( problems, errOn31, prefix + "(groupId:artifactId)", null,
+                              "must be unique but found duplicate declaration of plugin " + key );
+            }
+            else
+            {
+                index.put( key, plugin );
             }
         }
     }
