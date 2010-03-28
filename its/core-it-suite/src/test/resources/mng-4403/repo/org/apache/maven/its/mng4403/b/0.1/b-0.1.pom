@@ -137,6 +137,22 @@ under the License.
         <!-- unresolvable property in plugin version (MNG-4405) -->
         <version>${missing.property}</version>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.its.mng4405</groupId>
+        <artifactId>a</artifactId>
+        <!-- missing plugin version -->
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.its.mng1701</groupId>
+        <artifactId>b</artifactId>
+        <version>1.0</version>
+      </plugin>
+      <plugin>
+        <!-- duplicate plugin declaration (MNG-1701) -->
+        <groupId>org.apache.maven.its.mng1701</groupId>
+        <artifactId>b</artifactId>
+        <version>1.0</version>
+      </plugin>
     </plugins>
   </build>
 
