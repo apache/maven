@@ -154,11 +154,11 @@ if $cygwin; then
     HOME=`cygpath --path --windows "$HOME"`
 fi
 
-exec "$JAVACMD" \
+maven_exec_cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
-  -classpath "${M2_HOME}"/boot/plexus-classworlds-*.jar \
-  "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
-  "-Dmaven.home=${M2_HOME}"  \
-  ${CLASSWORLDS_LAUNCHER} $QUOTED_ARGS
+  -classpath \"${M2_HOME}\"/boot/plexus-classworlds-*.jar \
+  \"-Dclassworlds.conf=${M2_HOME}/bin/m2.conf\" \
+  \"-Dmaven.home=${M2_HOME}\"  \
+  ${CLASSWORLDS_LAUNCHER}"
 
-
+eval $maven_exec_cmd "$QUOTED_ARGS"

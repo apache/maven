@@ -935,7 +935,7 @@ public class MavenCli
         {
             name = property.substring( 0, i ).trim();
 
-            value = property.substring( i + 1 ).trim();
+            value = property.substring( i + 1 );
         }
 
         properties.setProperty( name, value );
