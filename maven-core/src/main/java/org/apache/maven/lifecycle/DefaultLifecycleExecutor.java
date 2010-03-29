@@ -248,7 +248,22 @@ public class DefaultLifecycleExecutor
 
         try
         {
+            if ( !session.isUsingPOMsFromFilesystem() && requiresProject( session ) )
+            {
+                throw new MissingProjectException( "The goal you specified requires a project to execute"
+                    + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
+                    + " Please verify you invoked Maven from the correct directory." );
+            }
+
             projectBuilds = calculateProjectBuilds( session );
+
+            if ( projectBuilds.isEmpty() )
+            {
+                throw new NoGoalSpecifiedException( "No goals have been specified for this build."
+                    + " You must specify a valid lifecycle phase or a goal in the format <plugin-prefix>:<goal> or"
+                    + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>."
+                    + " Available lifecycle phases are: " + getLifecyclePhaseList() + "." );
+            }
 
             projectIndex = new ProjectIndex( session.getProjects() );
         }
@@ -564,7 +579,9 @@ public class DefaultLifecycleExecutor
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
             Throwable cause =
-                new IllegalStateException( "Goal requires a project to execute but there is no POM in this build." );
+                new MissingProjectException( "Goal requires a project to execute"
+                    + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
+                    + " Please verify you invoked Maven from the correct directory." );
             throw new LifecycleExecutionException( mojoExecution, null, cause );
         }
 
@@ -1080,7 +1097,10 @@ public class DefaultLifecycleExecutor
 
         if ( lifecycle == null )
         {
-            throw new LifecyclePhaseNotFoundException( lifecyclePhase );
+            throw new LifecyclePhaseNotFoundException( "Unknown lifecycle phase \"" + lifecyclePhase
+                + "\". You must specify a valid lifecycle phase" + " or a goal in the format <plugin-prefix>:<goal> or"
+                + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: "
+                + getLifecyclePhaseList() + ".", lifecyclePhase );
         }
 
         /*
@@ -2066,6 +2086,34 @@ public class DefaultLifecycleExecutor
     public Map<String, Lifecycle> getPhaseToLifecycleMap()
     {
         return phaseToLifecycleMap;
+    }
+
+    private String getLifecyclePhaseList()
+    {
+        Set<String> phases = new LinkedHashSet<String>();
+
+        for ( Lifecycle lifecycle : lifecycles )
+        {
+            phases.addAll( lifecycle.getPhases() );
+        }
+
+        return StringUtils.join( phases.iterator(), ", " );
+    }
+
+    private boolean requiresProject( MavenSession session )
+    {
+        List<String> goals = session.getGoals();
+        if ( goals != null )
+        {
+            for ( String goal : goals )
+            {
+                if ( !isGoalSpecification( goal ) )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }

@@ -20,36 +20,22 @@ package org.apache.maven.lifecycle;
  */
 
 /**
- * Signals a failure to locate the lifecycle for some phase.
+ * Signals a failure to execute a lifecycle phase or mojo because a project is required but not present.
  * 
  * @author Benjamin Bentmann
  */
-public class LifecyclePhaseNotFoundException
+public class MissingProjectException
     extends Exception
 {
 
-    private final String lifecyclePhase;
-
     /**
-     * Creates a new exception to indicate that the specified lifecycle phase is not defined by any known lifecycle.
+     * Creates a new exception.
      * 
      * @param message The detail message, may be {@code null}.
-     * @param lifecyclePhase The name of the lifecycle phase that could not be located, may be {@code null}.
      */
-    public LifecyclePhaseNotFoundException( String message, String lifecyclePhase )
+    public MissingProjectException( String message )
     {
         super( message );
-        this.lifecyclePhase = ( lifecyclePhase != null ) ? lifecyclePhase : "";
-    }
-
-    /**
-     * Gets the lifecycle phase that was not found.
-     * 
-     * @return The lifecycle phase that was not found, never {@code null}.
-     */
-    public String getLifecyclePhase()
-    {
-        return lifecyclePhase;
     }
 
 }
