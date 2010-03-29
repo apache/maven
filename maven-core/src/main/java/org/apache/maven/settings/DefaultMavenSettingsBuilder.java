@@ -27,8 +27,6 @@ import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -106,28 +104,6 @@ public class DefaultMavenSettingsBuilder
         settingsRequest.setSystemProperties( request.getSystemProperties() );
         
         return build(settingsRequest);
-    }
-
-    public SettingsValidationResult validateSettings( File settingsFile )
-    {
-        SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
-        request.setUserSettingsFile( settingsFile );
-
-        SettingsValidationResult result = new SettingsValidationResult();
-
-        try
-        {
-            settingsBuilder.build( request );
-        }
-        catch ( SettingsBuildingException e )
-        {
-            for ( SettingsProblem problem : e.getProblems() )
-            {
-                result.addMessage( problem.getMessage() );
-            }
-        }
-
-        return result;
     }
 
     private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )

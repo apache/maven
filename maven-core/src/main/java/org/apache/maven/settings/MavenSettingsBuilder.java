@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -42,8 +41,6 @@ public interface MavenSettingsBuilder
 
     Settings buildSettings( MavenExecutionRequest request )
         throws IOException, XmlPullParserException;
-
-    SettingsValidationResult validateSettings( File settingsFile );
 
     /**
      * @return a <code>Settings</code> object from the user settings file.

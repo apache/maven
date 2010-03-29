@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
-import org.apache.maven.settings.validation.SettingsValidationResult;
 import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -65,13 +63,15 @@ public class DefaultSettingsBuilder
     public SettingsBuildingResult build( SettingsBuildingRequest request )
         throws SettingsBuildingException
     {
-        List<SettingsProblem> problems = new ArrayList<SettingsProblem>();
+        DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector( null );
 
         Settings globalSettings = readSettings( request.getGlobalSettingsFile(), request, problems );
 
         Settings userSettings = readSettings( request.getUserSettingsFile(), request, problems );
 
         SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+
+        problems.setSource( "" );
 
         userSettings = interpolate( userSettings, request, problems );
 
@@ -86,12 +86,12 @@ public class DefaultSettingsBuilder
             }
         }
 
-        if ( hasErrors( problems ) )
+        if ( hasErrors( problems.getProblems() ) )
         {
-            throw new SettingsBuildingException( problems );
+            throw new SettingsBuildingException( problems.getProblems() );
         }
 
-        return new DefaultSettingsBuildingResult( userSettings, problems );
+        return new DefaultSettingsBuildingResult( userSettings, problems.getProblems() );
     }
 
     private boolean hasErrors( List<SettingsProblem> problems )
@@ -110,12 +110,15 @@ public class DefaultSettingsBuilder
         return false;
     }
 
-    private Settings readSettings( File settingsFile, SettingsBuildingRequest request, List<SettingsProblem> problems )
+    private Settings readSettings( File settingsFile, SettingsBuildingRequest request,
+                                   DefaultSettingsProblemCollector problems )
     {
         if ( settingsFile == null || !settingsFile.exists() )
         {
             return new Settings();
         }
+
+        problems.setSource( settingsFile.getAbsolutePath() );
 
         Settings settings;
 
@@ -133,38 +136,29 @@ public class DefaultSettingsBuilder
 
                 settings = settingsReader.read( settingsFile, options );
 
-                problems.add( new DefaultSettingsProblem( e.getMessage(), SettingsProblem.Severity.WARNING,
-                                                          settingsFile.getAbsolutePath(), e.getLineNumber(),
-                                                          e.getColumnNumber(), e ) );
+                problems.add( SettingsProblem.Severity.WARNING, e.getMessage(), e.getLineNumber(), e.getColumnNumber(),
+                              e );
             }
         }
         catch ( SettingsParseException e )
         {
-            problems.add( new DefaultSettingsProblem( "Non-parseable settings " + settingsFile + ": " + e.getMessage(),
-                                                      SettingsProblem.Severity.FATAL, settingsFile.getAbsolutePath(),
-                                                      e.getLineNumber(), e.getColumnNumber(), e ) );
+            problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsFile + ": "
+                + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
             return new Settings();
         }
         catch ( IOException e )
         {
-            problems.add( new DefaultSettingsProblem( "Non-readable settings " + settingsFile + ": " + e.getMessage(),
-                                                      SettingsProblem.Severity.FATAL, settingsFile.getAbsolutePath(),
-                                                      -1, -1, e ) );
+            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsFile + ": "
+                + e.getMessage(), -1, -1, e );
             return new Settings();
         }
 
-        SettingsValidationResult result = settingsValidator.validate( settings );
-
-        for ( String error : result.getMessages() )
-        {
-            problems.add( new DefaultSettingsProblem( error, SettingsProblem.Severity.ERROR,
-                                                      settingsFile.getAbsolutePath(), -1, -1, null ) );
-        }
+        settingsValidator.validate( settings, problems );
 
         return settings;
     }
 
-    private Settings interpolate( Settings settings, SettingsBuildingRequest request, List<SettingsProblem> problems )
+    private Settings interpolate( Settings settings, SettingsBuildingRequest request, SettingsProblemCollector problems )
     {
         StringWriter writer = new StringWriter( 1024 * 4 );
 
@@ -191,8 +185,8 @@ public class DefaultSettingsBuilder
         }
         catch ( IOException e )
         {
-            problems.add( new DefaultSettingsProblem( "Failed to use environment variables for interpolation: "
-                + e.getMessage(), SettingsProblem.Severity.WARNING, "", -1, -1, e ) );
+            problems.add( SettingsProblem.Severity.WARNING, "Failed to use environment variables for interpolation: "
+                + e.getMessage(), -1, -1, e );
         }
 
         try
@@ -201,8 +195,8 @@ public class DefaultSettingsBuilder
         }
         catch ( InterpolationException e )
         {
-            problems.add( new DefaultSettingsProblem( "Failed to interpolate settings: " + e.getMessage(),
-                                                      SettingsProblem.Severity.ERROR, "", -1, -1, e ) );
+            problems.add( SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1,
+                          e );
 
             return settings;
         }
@@ -215,8 +209,8 @@ public class DefaultSettingsBuilder
         }
         catch ( IOException e )
         {
-            problems.add( new DefaultSettingsProblem( "Failed to interpolate settings: " + e.getMessage(),
-                                                      SettingsProblem.Severity.ERROR, "", -1, -1, e ) );
+            problems.add( SettingsProblem.Severity.ERROR, "Failed to interpolate settings: " + e.getMessage(), -1, -1,
+                          e );
             return settings;
         }
 

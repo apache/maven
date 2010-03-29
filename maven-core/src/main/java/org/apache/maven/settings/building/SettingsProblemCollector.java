@@ -1,4 +1,4 @@
-package org.apache.maven.settings.validation;
+package org.apache.maven.settings.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.settings.validation;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,23 +19,23 @@ package org.apache.maven.settings.validation;
  * under the License.
  */
 
-import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.building.SettingsProblemCollector;
-
 /**
- * Validate a model settings
+ * Collects problems that are encountered during settings building.
  * 
- * @author Milos Kleint
+ * @author Benjamin Bentmann
  */
-public interface SettingsValidator
+public interface SettingsProblemCollector
 {
 
     /**
-     * Validate the specified settings.
+     * Adds the specified problem.
      * 
-     * @param settings The settings to validate, must not be {@code null}.
-     * @param problems The container used to collect problems that were encountered, must not be {@code null}.
+     * @param severity The severity of the problem, must not be {@code null}.
+     * @param message The detail message of the problem, may be {@code null}.
+     * @param line The one-based index of the line containing the problem or {@code -1} if unknown.
+     * @param column The one-based index of the column containing the problem or {@code -1} if unknown.
+     * @param cause The cause of the problem, may be {@code null}.
      */
-    void validate( Settings settings, SettingsProblemCollector problems );
+    void add( SettingsProblem.Severity severity, String message, int line, int column, Exception cause );
 
 }

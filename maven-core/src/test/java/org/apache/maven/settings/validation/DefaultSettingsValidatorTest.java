@@ -19,11 +19,16 @@ package org.apache.maven.settings.validation;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.building.SettingsProblemCollector;
+import org.apache.maven.settings.building.SettingsProblem.Severity;
 
 /**
  *
@@ -57,21 +62,38 @@ public class DefaultSettingsValidatorTest
         prof.setId( "xxx" );
         model.addProfile( prof );
         DefaultSettingsValidator instance = new DefaultSettingsValidator();
-        SettingsValidationResult result = instance.validate( model );
-        assertEquals( 0, result.getMessageCount() );
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        instance.validate( model, problems );
+        assertEquals( 0, problems.messages.size() );
 
         Repository repo = new Repository();
         prof.addRepository( repo );
-        result = instance.validate( model );
-        assertEquals( 2, result.getMessageCount() );
+        problems = new SimpleProblemCollector();
+        instance.validate( model, problems );
+        assertEquals( 2, problems.messages.size() );
 
         repo.setUrl( "http://xxx.xxx.com" );
-        result = instance.validate( model );
-        assertEquals( 1, result.getMessageCount() );
+        problems = new SimpleProblemCollector();
+        instance.validate( model, problems );
+        assertEquals( 1, problems.messages.size() );
 
         repo.setId( "xxx" );
-        result = instance.validate( model );
-        assertEquals( 0, result.getMessageCount() );
+        problems = new SimpleProblemCollector();
+        instance.validate( model, problems );
+        assertEquals( 0, problems.messages.size() );
+
+    }
+
+    private static class SimpleProblemCollector
+        implements SettingsProblemCollector
+    {
+
+        public List<String> messages = new ArrayList<String>();
+
+        public void add( Severity severity, String message, int line, int column, Exception cause )
+        {
+            messages.add( message );
+        }
 
     }
 

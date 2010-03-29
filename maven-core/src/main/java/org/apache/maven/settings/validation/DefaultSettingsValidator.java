@@ -24,6 +24,8 @@ import java.util.List;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -33,43 +35,38 @@ import org.codehaus.plexus.component.annotations.Component;
 public class DefaultSettingsValidator
     implements SettingsValidator
 {
-    public SettingsValidationResult validate( Settings model )
-    {
-        SettingsValidationResult result = new SettingsValidationResult();
 
-        List<Profile> profiles = model.getProfiles();
+    public void validate( Settings settings, SettingsProblemCollector problems )
+    {
+        List<Profile> profiles = settings.getProfiles();
+
         if ( profiles != null )
         {
-            for (Profile prof : profiles )
+            for ( Profile prof : profiles )
             {
-                validateRepositories( result, prof.getRepositories(), "repositories.repository" );
-                validateRepositories( result, prof.getPluginRepositories(), "pluginRepositories.pluginRepository" );
+                validateRepositories( problems, prof.getRepositories(), "repositories.repository" );
+                validateRepositories( problems, prof.getPluginRepositories(), "pluginRepositories.pluginRepository" );
             }
         }
-
-        return result;
     }
 
-    private void validateRepositories( SettingsValidationResult result, List<Repository> repositories, String prefix )
+    private void validateRepositories( SettingsProblemCollector problems, List<Repository> repositories, String prefix )
     {
         for ( Repository repository : repositories )
         {
-            validateStringNotEmpty( prefix + ".id", result, repository.getId() );
+            validateStringNotEmpty( problems, prefix + ".id", repository.getId() );
 
-            validateStringNotEmpty( prefix + ".url", result, repository.getUrl() );
+            validateStringNotEmpty( problems, prefix + ".url", repository.getUrl() );
         }
     }
-
-
 
     // ----------------------------------------------------------------------
     // Field validation
     // ----------------------------------------------------------------------
 
-
-    private boolean validateStringNotEmpty( String fieldName, SettingsValidationResult result, String string )
+    private boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string )
     {
-        return validateStringNotEmpty( fieldName, result, string, null );
+        return validateStringNotEmpty( problems, fieldName, string, null );
     }
 
     /**
@@ -80,9 +77,9 @@ public class DefaultSettingsValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateStringNotEmpty( String fieldName, SettingsValidationResult result, String string, String sourceHint )
+    private boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string, String sourceHint )
     {
-        if ( !validateNotNull( fieldName, result, string, sourceHint ) )
+        if ( !validateNotNull( problems, fieldName, string, sourceHint ) )
         {
             return false;
         }
@@ -92,14 +89,16 @@ public class DefaultSettingsValidator
             return true;
         }
 
+        String msg;
         if ( sourceHint != null )
         {
-            result.addMessage( "'" + fieldName + "' is missing for " + sourceHint );
+            msg = "'" + fieldName + "' is missing for " + sourceHint;
         }
         else
         {
-            result.addMessage( "'" + fieldName + "' is missing." );
+            msg = "'" + fieldName + "' is missing.";
         }
+        addError( problems, msg );
 
         return false;
     }
@@ -111,23 +110,31 @@ public class DefaultSettingsValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateNotNull( String fieldName, SettingsValidationResult result, Object object, String sourceHint )
+    private boolean validateNotNull( SettingsProblemCollector problems, String fieldName, Object object,
+                                     String sourceHint )
     {
         if ( object != null )
         {
             return true;
         }
 
+        String msg;
         if ( sourceHint != null )
         {
-            result.addMessage( "'" + fieldName + "' is missing for " + sourceHint );
+            msg = "'" + fieldName + "' is missing for " + sourceHint;
         }
         else
         {
-            result.addMessage( "'" + fieldName + "' is missing." );
+            msg = "'" + fieldName + "' is missing.";
         }
+        addError( problems, msg );
 
         return false;
+    }
+
+    private void addError( SettingsProblemCollector problems, String msg )
+    {
+        problems.add( SettingsProblem.Severity.ERROR, msg, -1, -1, null );
     }
 
 }
