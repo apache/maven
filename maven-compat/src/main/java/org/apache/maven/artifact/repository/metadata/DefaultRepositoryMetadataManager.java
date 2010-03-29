@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -108,6 +109,8 @@ public class DefaultRepositoryMetadataManager
 
         if ( !request.isOffline() )
         {
+            Date localCopyLastModified = getLocalCopyLastModified( localRepository, metadata );
+
             for ( ArtifactRepository repository : remoteRepositories )
             {
                 ArtifactRepositoryPolicy policy =
@@ -116,9 +119,46 @@ public class DefaultRepositoryMetadataManager
                 File file =
                     new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata,
                                                                                                            repository ) );
+                boolean update;
 
-                if ( ( policy.isEnabled() && request.isForceUpdate() )
-                    || updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+                if ( !policy.isEnabled() )
+                {
+                    update = false;
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                                           "Skipping update check for " + metadata.getKey() + " (" + file
+                                               + ") from disabled repository " + repository.getId() + " ("
+                                               + repository.getUrl() + ")" );
+                    }
+                }
+                else if ( request.isForceUpdate() )
+                {
+                    update = true;
+                }
+                else if ( localCopyLastModified != null && !policy.checkOutOfDate( localCopyLastModified ) )
+                {
+                    update = false;
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                                           "Skipping update check for " + metadata.getKey() + " (" + file
+                                               + ") from repository " + repository.getId() + " (" + repository.getUrl()
+                                               + ") in favor of local copy" );
+                    }
+                }
+                else if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+                {
+                    update = true;
+                }
+                else
+                {
+                    update = false;
+                }
+
+                if ( update )
                 {
                     getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
                     try
@@ -169,6 +209,13 @@ public class DefaultRepositoryMetadataManager
         {
             cache.put( request, cacheKey, new CacheRecord( metadata ) );
         }
+    }
+
+    private Date getLocalCopyLastModified( ArtifactRepository localRepository, RepositoryMetadata metadata )
+    {
+        String metadataPath = localRepository.pathOfLocalRepositoryMetadata( metadata, localRepository );
+        File metadataFile = new File( localRepository.getBasedir(), metadataPath );
+        return metadataFile.isFile() ? new Date( metadataFile.lastModified() ) : null;
     }
 
     private static final class CacheKey
