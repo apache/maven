@@ -167,6 +167,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4331DependencyCollectionTest.class );
         suite.addTestSuite( MavenITmng4328PrimitiveMojoParameterConfigurationTest.class );
         suite.addTestSuite( MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest.class );
+        suite.addTestSuite( MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest.class );
         suite.addTestSuite( MavenITmng4321CliUsesPluginMgmtConfigTest.class );
         suite.addTestSuite( MavenITmng4320AggregatorAndDependenciesTest.class );
         suite.addTestSuite( MavenITmng4319PluginExecutionGoalInterpolationTest.class );
