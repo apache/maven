@@ -367,6 +367,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3203DefaultLifecycleExecIdTest.class );
         suite.addTestSuite( MavenITmng3183LoggingToFileTest.class );
         suite.addTestSuite( MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest.class );
+        suite.addTestSuite( MavenITmng3122ActiveProfilesNoDuplicatesTest.class );
         suite.addTestSuite( MavenITmng3118TestClassPathOrderTest.class );
         suite.addTestSuite( MavenITmng3106ProfileMultipleActivatorsTest.class );
         suite.addTestSuite( MavenITmng3099SettingsProfilesWithNoPomTest.class );
