@@ -1062,7 +1062,7 @@ public class MavenProject
     {
         if ( artifacts == null )
         {
-            if ( artifactFilter == null )
+            if ( artifactFilter == null || resolvedArtifacts == null )
             {
                 artifacts = new LinkedHashSet<Artifact>();
             }
