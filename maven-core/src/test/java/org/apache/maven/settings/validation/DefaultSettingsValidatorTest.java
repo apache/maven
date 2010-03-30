@@ -24,6 +24,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
@@ -31,27 +32,27 @@ import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 
 /**
- *
  * @author mkleint
  */
 public class DefaultSettingsValidatorTest
     extends TestCase
 {
 
-    public DefaultSettingsValidatorTest( String testName )
-    {
-        super( testName );
-    }
+    private DefaultSettingsValidator validator;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
+
+        validator = new DefaultSettingsValidator();
     }
 
     protected void tearDown()
         throws Exception
     {
+        validator = null;
+
         super.tearDown();
     }
 
@@ -61,27 +62,40 @@ public class DefaultSettingsValidatorTest
         Profile prof = new Profile();
         prof.setId( "xxx" );
         model.addProfile( prof );
-        DefaultSettingsValidator instance = new DefaultSettingsValidator();
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        instance.validate( model, problems );
+        validator.validate( model, problems );
         assertEquals( 0, problems.messages.size() );
 
         Repository repo = new Repository();
         prof.addRepository( repo );
         problems = new SimpleProblemCollector();
-        instance.validate( model, problems );
+        validator.validate( model, problems );
         assertEquals( 2, problems.messages.size() );
 
         repo.setUrl( "http://xxx.xxx.com" );
         problems = new SimpleProblemCollector();
-        instance.validate( model, problems );
+        validator.validate( model, problems );
         assertEquals( 1, problems.messages.size() );
 
         repo.setId( "xxx" );
         problems = new SimpleProblemCollector();
-        instance.validate( model, problems );
+        validator.validate( model, problems );
         assertEquals( 0, problems.messages.size() );
+    }
 
+    public void testValidateMirror()
+        throws Exception
+    {
+        Mirror mirror = new Mirror();
+        Settings settings = new Settings();
+        settings.addMirror( mirror );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate( settings, problems );
+        assertEquals( 2, problems.messages.size() );
+        assertTrue( problems.messages.get( 0 ), problems.messages.get( 0 ).contains( "'mirrors.mirror.url' is missing" ) );
+        assertTrue( problems.messages.get( 1 ),
+                    problems.messages.get( 1 ).contains( "'mirrors.mirror.mirrorOf' is missing" ) );
     }
 
     private static class SimpleProblemCollector
