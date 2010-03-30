@@ -87,15 +87,36 @@ public class DefaultSettingsValidatorTest
         throws Exception
     {
         Mirror mirror = new Mirror();
+        mirror.setId( "local" );
         Settings settings = new Settings();
         settings.addMirror( mirror );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
+        assertEquals( 3, problems.messages.size() );
+        assertTrue( problems.messages.get( 0 ), problems.messages.get( 0 ).contains( "'mirrors.mirror.id' must not be 'local'" ) );
+        assertTrue( problems.messages.get( 1 ), problems.messages.get( 1 ).contains( "'mirrors.mirror.url' is missing" ) );
+        assertTrue( problems.messages.get( 2 ),
+                    problems.messages.get( 2 ).contains( "'mirrors.mirror.mirrorOf' is missing" ) );
+    }
+
+    public void testValidateRepository()
+        throws Exception
+    {
+        Repository repo = new Repository();
+        repo.setId( "local" );
+        Profile profile = new Profile();
+        profile.addRepository( repo );
+        Settings settings = new Settings();
+        settings.addProfile( profile );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate( settings, problems );
         assertEquals( 2, problems.messages.size() );
-        assertTrue( problems.messages.get( 0 ), problems.messages.get( 0 ).contains( "'mirrors.mirror.url' is missing" ) );
+        assertTrue( problems.messages.get( 0 ),
+                    problems.messages.get( 0 ).contains( "'repositories.repository.id' must not be 'local'" ) );
         assertTrue( problems.messages.get( 1 ),
-                    problems.messages.get( 1 ).contains( "'mirrors.mirror.mirrorOf' is missing" ) );
+                    problems.messages.get( 1 ).contains( "'repositories.repository.url' is missing" ) );
     }
 
     private static class SimpleProblemCollector

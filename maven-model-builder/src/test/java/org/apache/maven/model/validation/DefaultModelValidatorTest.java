@@ -450,4 +450,19 @@ public class DefaultModelValidatorTest
         assertTrue( result.getWarnings().get( 1 ).contains( "duplicate declaration of plugin test:managed-duplicate" ) );
     }
 
+    public void testReservedRepositoryId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "reserved-repository-id.xml" );
+
+        assertViolations( result, 0, 4, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "'repositories.repository.id' must not be 'local'" ) );
+        assertTrue( result.getErrors().get( 1 ).contains(
+                                                          "'pluginRepositories.pluginRepository.id' must not be 'local'" ) );
+        assertTrue( result.getErrors().get( 2 ).contains( "'distributionManagement.repository.id' must not be 'local'" ) );
+        assertTrue( result.getErrors().get( 3 ).contains(
+                                                          "'distributionManagement.snapshotRepository.id' must not be 'local'" ) );
+    }
+
 }

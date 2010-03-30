@@ -270,12 +270,12 @@ public class DefaultModelValidator
 
             for ( Repository repository : model.getRepositories() )
             {
-                validateRepositoryLayout( problems, repository, "repositories.repository", request );
+                validateRepository( problems, repository, "repositories.repository", request );
             }
 
             for ( Repository repository : model.getPluginRepositories() )
             {
-                validateRepositoryLayout( problems, repository, "pluginRepositories.pluginRepository", request );
+                validateRepository( problems, repository, "pluginRepositories.pluginRepository", request );
             }
 
             DistributionManagement distMgmt = model.getDistributionManagement();
@@ -287,10 +287,9 @@ public class DefaultModelValidator
                                   "must not be specified." );
                 }
 
-                validateRepositoryLayout( problems, distMgmt.getRepository(), "distributionManagement.repository",
-                                          request );
-                validateRepositoryLayout( problems, distMgmt.getSnapshotRepository(),
-                                          "distributionManagement.snapshotRepository", request );
+                validateRepository( problems, distMgmt.getRepository(), "distributionManagement.repository", request );
+                validateRepository( problems, distMgmt.getSnapshotRepository(),
+                                    "distributionManagement.snapshotRepository", request );
             }
         }
     }
@@ -457,13 +456,21 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateRepositoryLayout( ModelProblemCollector problems, Repository repository, String prefix,
-                                           ModelBuildingRequest request )
+    private void validateRepository( ModelProblemCollector problems, Repository repository, String prefix,
+                                     ModelBuildingRequest request )
     {
-        if ( repository != null && "legacy".equals( repository.getLayout() ) )
+        if ( repository != null )
         {
-            addViolation( problems, Severity.WARNING, prefix + ".layout", repository.getId(),
-                          "uses the deprecated value 'legacy'." );
+            if ( "local".equals( repository.getId() ) )
+            {
+                addViolation( problems, Severity.ERROR, prefix + ".id", null,
+                              "must not be 'local', this identifier is reserved." );
+            }
+            if ( "legacy".equals( repository.getLayout() ) )
+            {
+                addViolation( problems, Severity.WARNING, prefix + ".layout", repository.getId(),
+                              "uses the deprecated value 'legacy'." );
+            }
         }
     }
 

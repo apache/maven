@@ -88,6 +88,11 @@ public class DefaultSettingsValidator
             {
                 validateStringNotEmpty( problems, "mirrors.mirror.id", mirror.getId(), mirror.getUrl() );
 
+                if ( "local".equals( mirror.getId() ) )
+                {
+                    addError( problems, "'mirrors.mirror.id' must not be 'local', this identifier is reserved." );
+                }
+
                 validateStringNotEmpty( problems, "mirrors.mirror.url", mirror.getUrl(), mirror.getId() );
 
                 validateStringNotEmpty( problems, "mirrors.mirror.mirrorOf", mirror.getMirrorOf(), mirror.getId() );
@@ -111,6 +116,11 @@ public class DefaultSettingsValidator
         for ( Repository repository : repositories )
         {
             validateStringNotEmpty( problems, prefix + ".id", repository.getId(), repository.getUrl() );
+
+            if ( "local".equals( repository.getId() ) )
+            {
+                addError( problems, "'" + prefix + ".id' must not be 'local', this identifier is reserved." );
+            }
 
             validateStringNotEmpty( problems, prefix + ".url", repository.getUrl(), repository.getId() );
 
