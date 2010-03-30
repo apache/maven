@@ -36,7 +36,8 @@ under the License.
 
   <distributionManagement>
     <repository>
-      <id>maven-core-it</id>
+      <!-- reserved id (MNG-4418) -->
+      <id>local</id>
       <url>file:///${basedir}/repo</url>
     </repository>
     <!-- remote-only field (MNG-4430) -->
