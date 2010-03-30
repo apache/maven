@@ -359,7 +359,20 @@ public class DefaultModelBuilder
         }
         catch ( IOException e )
         {
-            problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+            String msg = e.getMessage();
+            if ( msg == null || msg.length() <= 0 )
+            {
+                // NOTE: There's java.nio.charset.MalformedInputException and sun.io.MalformedInputException
+                if ( e.getClass().getName().endsWith( "MalformedInputException" ) )
+                {
+                    msg = "Some input bytes do not match the file encoding.";
+                }
+                else
+                {
+                    msg = e.getClass().getSimpleName();
+                }
+            }
+            problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + msg, e );
             throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
         }
 
