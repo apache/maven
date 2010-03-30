@@ -339,6 +339,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
+        suite.addTestSuite( MavenITmng3477DependencyResolutionErrorMessageTest.class );
         suite.addTestSuite( MavenITmng3475BaseAlignedDirTest.class );
         suite.addTestSuite( MavenITmng3461MirrorMatchingTest.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
