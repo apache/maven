@@ -631,11 +631,11 @@ public class LegacyRepositorySystem
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
-            throw new ArtifactTransferFailedException( "Error transferring artifact.", e );
+            throw new ArtifactTransferFailedException( getMessage( e, "Error transferring artifact." ), e );
         }
         catch ( org.apache.maven.wagon.ResourceDoesNotExistException e )
         {
-            throw new ArtifactDoesNotExistException( "Requested artifact does not exist.", e );            
+            throw new ArtifactDoesNotExistException( getMessage( e, "Requested artifact does not exist." ), e );
         }
     }
 
@@ -649,7 +649,7 @@ public class LegacyRepositorySystem
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
-            throw new ArtifactTransferFailedException( "Error transferring artifact.", e );
+            throw new ArtifactTransferFailedException( getMessage( e, "Error transferring artifact." ), e );
         }
     }
 
@@ -706,6 +706,20 @@ public class LegacyRepositorySystem
         ArtifactRepository artifactRepository = artifactRepositoryFactory.createArtifactRepository( repositoryId, url, repositoryLayout, snapshots, releases );
 
         return artifactRepository;
+    }
+
+    private static String getMessage( Throwable error, String def )
+    {
+        if ( error == null )
+        {
+            return def;
+        }
+        String msg = error.getMessage();
+        if ( StringUtils.isNotEmpty( msg ) )
+        {
+            return msg;
+        }
+        return getMessage( error.getCause(), def );
     }
 
 }

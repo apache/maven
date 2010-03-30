@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -170,7 +171,7 @@ public class DefaultPluginPrefixResolver
             }
         }
 
-        List<ArtifactRepository> recheck = new ArrayList<ArtifactRepository>();
+        Map<String, List<ArtifactRepository>> recheck = new HashMap<String, List<ArtifactRepository>>();
 
         // Process all the remote repositories.
         //
@@ -195,11 +196,13 @@ public class DefaultPluginPrefixResolver
                     {
                         if ( logger.isDebugEnabled() )
                         {
-                            logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage(), e );
+                            logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
+                                + e.getMessage(), e );
                         }
                         else
                         {
-                            logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage() );
+                            logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
+                                + e.getMessage() );
                         }
                     }
                     catch ( ArtifactDoesNotExistException e )
@@ -209,7 +212,13 @@ public class DefaultPluginPrefixResolver
                 }
                 else if ( !request.isOffline() && !request.isForceUpdate() )
                 {
-                    recheck.add( repository );
+                    List<ArtifactRepository> repos = recheck.get( pluginGroup );
+                    if ( repos == null )
+                    {
+                        repos = new ArrayList<ArtifactRepository>();
+                        recheck.put( pluginGroup, repos );
+                    }
+                    repos.add( repository );
                 }
 
                 PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile, repository );
@@ -225,7 +234,13 @@ public class DefaultPluginPrefixResolver
         //
         for ( String pluginGroup : request.getPluginGroups() )
         {
-            for ( ArtifactRepository repository : recheck )
+            List<ArtifactRepository> repos = recheck.get( pluginGroup );
+            if ( repos == null )
+            {
+                continue;
+            }
+
+            for ( ArtifactRepository repository : repos )
             {
                 String localPath = getLocalMetadataPath( pluginGroup, repository );
 
@@ -241,11 +256,13 @@ public class DefaultPluginPrefixResolver
                 {
                     if ( logger.isDebugEnabled() )
                     {
-                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage(), e );
+                        logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
+                            + e.getMessage(), e );
                     }
                     else
                     {
-                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage() );
+                        logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
+                            + e.getMessage() );
                     }
                 }
                 catch ( ArtifactDoesNotExistException e )

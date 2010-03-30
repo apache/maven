@@ -128,11 +128,13 @@ public class DefaultPluginVersionResolver
                 {
                     if ( logger.isDebugEnabled() )
                     {
-                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage(), e );
+                        logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
+                            + e.getMessage(), e );
                     }
                     else
                     {
-                        logger.warn( "Failed to retrieve " + remotePath + ": " + e.getMessage() );
+                        logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
+                            + e.getMessage() );
                     }
 
                     continue;
