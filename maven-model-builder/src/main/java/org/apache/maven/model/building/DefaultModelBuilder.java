@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Properties;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -133,6 +134,17 @@ public class DefaultModelBuilder
         problems.setSource( "(external profiles)" );
         List<Profile> activeExternalProfiles =
             profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext, problems );
+
+        if ( !activeExternalProfiles.isEmpty() )
+        {
+            Properties profileProps = new Properties();
+            for ( Profile profile : activeExternalProfiles )
+            {
+                profileProps.putAll( profile.getProperties() );
+            }
+            profileProps.putAll( profileActivationContext.getUserProperties() );
+            profileActivationContext.setUserProperties( profileProps );
+        }
 
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
