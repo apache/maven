@@ -95,8 +95,15 @@ public class CoreItMojo
 
         if ( selected >= 0 )
         {
-            ToolchainPrivate toolchain = tcs[selected];
-            toolchainManager.storeToolchainToBuildContext( toolchain, session );
+            if ( selected < tcs.length )
+            {
+                ToolchainPrivate toolchain = tcs[selected];
+                toolchainManager.storeToolchainToBuildContext( toolchain, session );
+            }
+            else
+            {
+                getLog().warn( "[MAVEN-CORE-IT-LOG] Toolchain #" + selected + " can't be selected, found only " + tcs.length );
+            }
         }
 
         Properties properties = new Properties();

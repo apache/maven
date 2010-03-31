@@ -297,6 +297,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3805ExtensionClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3796ClassImportInconsistencyTest.class );
         suite.addTestSuite( MavenITmng3769ExclusionRelocatedTransdepsTest.class );
+        suite.addTestSuite( MavenITmng3766ToolchainsFromExtensionTest.class );
         suite.addTestSuite( MavenITmng3760BaseUriPropertyTest.class );
         suite.addTestSuite( MavenITmng3748BadSettingsXmlTest.class );
         suite.addTestSuite( MavenITmng3747PrefixedPathExpressionTest.class );
