@@ -91,6 +91,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest.class );
         suite.addTestSuite( MavenITmng4572ModelVersionSurroundedByWhitespaceTest.class );
         suite.addTestSuite( MavenITmng4561MirroringOfPluginRepoTest.class );
+        suite.addTestSuite( MavenITmng4555MetaversionResolutionOfflineTest.class );
         suite.addTestSuite( MavenITmng4554PluginPrefixMappingUpdateTest.class );
         suite.addTestSuite( MavenITmng4553CoreArtifactFilterConsidersGroupIdTest.class );
         suite.addTestSuite( MavenITmng4544ActiveComponentCollectionThreadSafeTest.class );
