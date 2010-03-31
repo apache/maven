@@ -22,13 +22,11 @@ package org.apache.maven.repository.legacy.resolver.transform;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeploymentException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
@@ -36,7 +34,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutio
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
@@ -55,16 +52,6 @@ public class SnapshotTransformation
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
-
-    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
-        throws ArtifactResolutionException, ArtifactNotFoundException
-    {
-        RepositoryRequest request = new DefaultRepositoryRequest();
-        request.setLocalRepository( localRepository );
-        request.setRemoteRepositories( remoteRepositories );
-        transformForResolve( artifact, request );
-    }
 
     public void transformForResolve( Artifact artifact, RepositoryRequest request )
         throws ArtifactResolutionException

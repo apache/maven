@@ -19,10 +19,9 @@ package org.apache.maven.repository.legacy.resolver.transform;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -33,23 +32,22 @@ import org.codehaus.plexus.component.annotations.Component;
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
-    public void transformForResolve( Artifact artifact,
-                                     List<ArtifactRepository> remoteRepositories,
-                                     ArtifactRepository localRepository )
+
+    public void transformForResolve( Artifact artifact, RepositoryRequest request )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
         {
             try
             {
-                String version = resolveVersion( artifact, localRepository, remoteRepositories );
+                String version = resolveVersion( artifact, request );
                 if ( Artifact.LATEST_VERSION.equals( version ) )
                 {
                     throw new ArtifactNotFoundException( "Unable to determine the latest version", artifact );
                 }
 
                 artifact.setBaseVersion( version );
-                artifact.updateVersion( version, localRepository );
+                artifact.updateVersion( version, request.getLocalRepository() );
             }
             catch ( RepositoryMetadataResolutionException e )
             {

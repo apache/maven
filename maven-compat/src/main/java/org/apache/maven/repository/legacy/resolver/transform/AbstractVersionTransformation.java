@@ -55,10 +55,14 @@ public abstract class AbstractVersionTransformation
     @Requirement
     protected WagonManager wagonManager;
 
-    public void transformForResolve( Artifact artifact, RepositoryRequest request )
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                                     ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        transformForResolve( artifact, request.getRemoteRepositories(), request.getLocalRepository() );
+        RepositoryRequest request = new DefaultRepositoryRequest();
+        request.setLocalRepository( localRepository );
+        request.setRemoteRepositories( remoteRepositories );
+        transformForResolve( artifact, request );
     }
 
     protected String resolveVersion( Artifact artifact, ArtifactRepository localRepository,
