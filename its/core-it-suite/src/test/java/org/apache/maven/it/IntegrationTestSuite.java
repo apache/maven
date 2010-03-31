@@ -388,6 +388,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2871PrePackageSubartifactResolutionTest.class );
         suite.addTestSuite( MavenITmng2865MirrorWildcardTest.class );
         suite.addTestSuite( MavenITmng2861RelocationsAndRangesTest.class );
+        suite.addTestSuite( MavenITmng2848ProfileActivationByEnvironmentVariableTest.class );
         suite.addTestSuite( MavenITmng2843PluginConfigPropertiesInjectionTest.class );
         suite.addTestSuite( MavenITmng2831CustomArtifactHandlerAndCustomLifecycleTest.class );
         suite.addTestSuite( MavenITmng2820PomCommentsTest.class );
