@@ -36,7 +36,7 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
 
     public MavenITmng2741PluginMetadataResolutionErrorMessageTest()
     {
-        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-8,)" );
+        super( "[2.1.0,3.0-alpha-1),[3.0-beta-1,)" );
     }
 
     /**

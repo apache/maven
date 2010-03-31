@@ -35,7 +35,7 @@ public class MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMngtTest
 
     public MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMngtTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

@@ -36,7 +36,7 @@ public class MavenITmng4162ReportingMigrationTest
 
     public MavenITmng4162ReportingMigrationTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

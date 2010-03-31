@@ -36,7 +36,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
 
     public MavenITmng2222OutputDirectoryReactorResolutionTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

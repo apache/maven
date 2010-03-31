@@ -36,7 +36,7 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
 
     public MavenITmng3477DependencyResolutionErrorMessageTest()
     {
-        super( "[2.1.0,3.0-alpha-1),[3.0-alpha-8,)" );
+        super( "[2.1.0,3.0-alpha-1),[3.0-beta-1,)" );
     }
 
     /**

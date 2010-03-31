@@ -37,7 +37,7 @@ public class MavenITmng4005UniqueDependencyKeyTest
 
     public MavenITmng4005UniqueDependencyKeyTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

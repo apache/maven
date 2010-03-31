@@ -35,7 +35,7 @@ public class MavenITmng4418ReservedRepoIdLocalTest
 
     public MavenITmng4418ReservedRepoIdLocalTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

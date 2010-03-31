@@ -36,7 +36,7 @@ public class MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest
 
     public MavenITmng4580ProjectLevelPluginDepUsedForCliInvocInReactorTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

@@ -36,7 +36,7 @@ public class MavenITmng3529QuotedCliArgTest
 
     public MavenITmng3529QuotedCliArgTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**

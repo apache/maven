@@ -36,7 +36,7 @@ public class MavenITmng4590ImportedPomUsesSystemPropertiesTest
 
     public MavenITmng4590ImportedPomUsesSystemPropertiesTest()
     {
-        super( "[2.0.9,3.0-alpha-1),[3.0-alpha-8,)" );
+        super( "[2.0.9,3.0-alpha-1),[3.0-beta-1,)" );
     }
 
     /**

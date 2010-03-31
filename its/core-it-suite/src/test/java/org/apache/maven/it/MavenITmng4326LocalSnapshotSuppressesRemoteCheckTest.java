@@ -50,7 +50,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
 
     public MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest()
     {
-        super( "[3.0-alpha-8,)" );
+        super( "[3.0-beta-1,)" );
     }
 
     /**
