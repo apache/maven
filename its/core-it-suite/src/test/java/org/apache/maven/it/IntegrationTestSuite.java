@@ -418,6 +418,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2309ProfileInjectionOrderTest.class );
         suite.addTestSuite( MavenITmng2293CustomPluginParamImplTest.class );
         suite.addTestSuite( MavenITmng2277AggregatorAndResolutionPluginsTest.class );
+        suite.addTestSuite( MavenITmng2276ProfileActivationBySettingsPropertyTest.class );
         suite.addTestSuite( MavenITmng2254PomEncodingTest.class );
         suite.addTestSuite( MavenITmng2234ActiveProfilesFromSettingsTest.class );
         suite.addTestSuite( MavenITmng2228ComponentInjectionTest.class );
