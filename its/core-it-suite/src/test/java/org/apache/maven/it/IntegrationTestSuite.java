@@ -344,6 +344,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3482DependencyPomInterpolationTest.class );
         suite.addTestSuite( MavenITmng3477DependencyResolutionErrorMessageTest.class );
         suite.addTestSuite( MavenITmng3475BaseAlignedDirTest.class );
+        suite.addTestSuite( MavenITmng3470StrictCheckumVerificationOfDependencyPomTest.class );
         suite.addTestSuite( MavenITmng3461MirrorMatchingTest.class );
         suite.addTestSuite( MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest.class );
         suite.addTestSuite( MavenITmng3428PluginDescriptorArtifactsIncompleteTest.class );
