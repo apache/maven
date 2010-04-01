@@ -73,6 +73,8 @@ public class MavenITmng4400RepositoryOrderTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

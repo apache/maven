@@ -40,19 +40,6 @@ under the License.
     </dependency>
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>maven-core-it-repo-d</id>
-      <url>@baseurl@/repo-d</url>
-      <releases>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-      <snapshots>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-    </repository>
-  </repositories>
-
   <build>
     <plugins>
       <plugin>
