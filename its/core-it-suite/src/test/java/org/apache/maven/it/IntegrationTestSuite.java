@@ -489,6 +489,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng0479OverrideCentralRepoTest.class );
         suite.addTestSuite( MavenITmng0471CustomLifecycleTest.class );
         suite.addTestSuite( MavenITmng0469ReportConfigTest.class );
+        suite.addTestSuite( MavenITmng0461TolerateMissingDependencyPomTest.class );
         suite.addTestSuite( MavenITmng0449PluginVersionResolutionTest.class );
         suite.addTestSuite( MavenITmng0377PluginLookupFromPrefixTest.class );
         suite.addTestSuite( MavenITmng0294MergeGlobalAndUserSettingsTest.class );
