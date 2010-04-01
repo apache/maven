@@ -41,6 +41,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExcludesArtifactFilter;
@@ -587,10 +588,15 @@ public class MavenMetadataSource
 
                     String message;
 
-                    // missing/incompatible POM (e.g. a Maven 1 POM)
-                    if ( isMissingPom( e ) )
+                    if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
                     {
                         message = "Missing POM for " + relocatedArtifact.getId();
+                    }
+                    else if ( e.getCause() instanceof ArtifactResolutionException )
+                    {
+                        throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for "
+                            + relocatedArtifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
+                                                                      relocatedArtifact );
                     }
                     else
                     {
@@ -703,11 +709,6 @@ public class MavenMetadataSource
         rel.relocatedArtifact = ( relocatedArtifact == artifact ) ? null : relocatedArtifact;
 
         return rel;
-    }
-
-    private boolean isMissingPom( ProjectBuildingException e )
-    {
-        return e.getCause() instanceof ArtifactResolutionException;
     }
 
     private ModelProblem hasMissingParentPom( ProjectBuildingException e )

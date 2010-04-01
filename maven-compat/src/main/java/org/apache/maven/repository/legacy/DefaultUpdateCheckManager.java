@@ -36,6 +36,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.apache.maven.repository.Proxy;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
@@ -45,6 +46,9 @@ public class DefaultUpdateCheckManager
     extends AbstractLogEnabled
     implements UpdateCheckManager
 {
+
+    private static final String ERROR_KEY_SUFFIX = ".error";
+
     public DefaultUpdateCheckManager()
     {
 
@@ -154,7 +158,13 @@ public class DefaultUpdateCheckManager
         return readLastUpdated( touchfile, key );
     }
 
-    public void touch( Artifact artifact, ArtifactRepository repository )
+    public String getError( Artifact artifact, ArtifactRepository repository )
+    {
+        File touchFile = getTouchfile( artifact );
+        return getError( touchFile, getRepositoryKey( repository ) );
+    }
+
+    public void touch( Artifact artifact, ArtifactRepository repository, String error )
     {
         File file = artifact.getFile();
 
@@ -166,7 +176,7 @@ public class DefaultUpdateCheckManager
         }
         else
         {
-            writeLastUpdated( touchfile, getRepositoryKey( repository ) );
+            writeLastUpdated( touchfile, getRepositoryKey( repository ), error );
         }
     }
 
@@ -176,7 +186,7 @@ public class DefaultUpdateCheckManager
 
         String key = getMetadataKey( repository, file );
 
-        writeLastUpdated( touchfile, key );
+        writeLastUpdated( touchfile, key, null );
     }
 
     String getMetadataKey( ArtifactRepository repository, File file )
@@ -187,6 +197,17 @@ public class DefaultUpdateCheckManager
     String getRepositoryKey( ArtifactRepository repository )
     {
         StringBuilder buffer = new StringBuilder( 256 );
+
+        Proxy proxy = repository.getProxy();
+        if ( proxy != null )
+        {
+            if ( proxy.getUserName() != null )
+            {
+                int hash = ( proxy.getUserName() + proxy.getPassword() ).hashCode();
+                buffer.append( hash ).append( '@' );
+            }
+            buffer.append( proxy.getHost() ).append( ':' ).append( proxy.getPort() ).append( '>' );
+        }
 
         // consider the username&password because a repo manager might block artifacts depending on authorization
         Authentication auth = repository.getAuthentication();
@@ -202,7 +223,7 @@ public class DefaultUpdateCheckManager
         return buffer.toString();
     }
 
-    private void writeLastUpdated( File touchfile, String key )
+    private void writeLastUpdated( File touchfile, String key, String error )
     {
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
@@ -235,6 +256,15 @@ public class DefaultUpdateCheckManager
                 }
 
                 props.setProperty( key, Long.toString( System.currentTimeMillis() ) );
+
+                if ( error != null )
+                {
+                    props.setProperty( key + ERROR_KEY_SUFFIX, error );
+                }
+                else
+                {
+                    props.remove( key + ERROR_KEY_SUFFIX );
+                }
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -285,19 +315,49 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    public Date readLastUpdated( File touchfile, String key )
+    Date readLastUpdated( File touchfile, String key )
+    {
+        getLogger().debug( "Searching for " + key + " in resolution tracking file." );
+
+        Properties props = read( touchfile );
+        if ( props != null )
+        {
+            String rawVal = props.getProperty( key );
+            if ( rawVal != null )
+            {
+                try
+                {
+                    return new Date( Long.parseLong( rawVal ) );
+                }
+                catch ( NumberFormatException e )
+                {
+                    getLogger().debug( "Cannot parse lastUpdated date: \'" + rawVal + "\'. Ignoring.", e );
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getError( File touchFile, String key )
+    {
+        Properties props = read( touchFile );
+        if ( props != null )
+        {
+            return props.getProperty( key + ERROR_KEY_SUFFIX );
+        }
+        return null;
+    }
+
+    private Properties read( File touchfile )
     {
         if ( !touchfile.canRead() )
         {
-            getLogger().debug( "Skipped unreadable touchfile " + touchfile + " for key " + key );
+            getLogger().debug( "Skipped unreadable resolution tracking file " + touchfile );
             return null;
         }
 
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
-            getLogger().debug( "Searching for: " + key + " in touchfile." );
-
-            Date result = null;
             FileInputStream stream = null;
             FileLock lock = null;
             FileChannel channel = null;
@@ -312,24 +372,13 @@ public class DefaultUpdateCheckManager
                 getLogger().debug( "Reading resolution-state from: " + touchfile );
                 props.load( stream );
 
-                String rawVal = props.getProperty( key );
-                if ( rawVal != null )
-                {
-                    try
-                    {
-                        result = new Date( Long.parseLong( rawVal ) );
-                    }
-                    catch ( NumberFormatException e )
-                    {
-                        getLogger().debug( "Cannot parse lastUpdated date: \'" + rawVal + "\'. Ignoring.", e );
-                        result = null;
-                    }
-                }
+                return props;
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Failed to read lastUpdated information.\nFile: "
-                                       + touchfile.toString() + "; key: " + key, e );
+                getLogger().debug( "Failed to read resolution tracking file " + touchfile, e );
+
+                return null;
             }
             finally
             {
@@ -341,8 +390,7 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error releasing shared lock for resolution tracking file: "
-                                               + touchfile, e );
+                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " + touchfile, e );
                     }
                 }
 
@@ -354,13 +402,10 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error closing FileChannel for resolution tracking file: "
-                                           + touchfile, e );
+                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " + touchfile, e );
                     }
                 }
             }
-
-            return result;
         }
     }
 

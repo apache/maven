@@ -98,10 +98,19 @@ public class DefaultWagonManager
                 {
                     getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor,
                                    policy.getChecksumPolicy(), false );
+
+                    updateCheckManager.touch( artifact, repository, null );
                 }
-                finally
+                catch ( ResourceDoesNotExistException e )
                 {
-                    updateCheckManager.touch( artifact, repository );
+                    updateCheckManager.touch( artifact, repository, null );
+                    throw e;
+                }
+                catch ( TransferFailedException e )
+                {
+                    String error = ( e.getMessage() != null ) ? e.getMessage() : e.getClass().getSimpleName();
+                    updateCheckManager.touch( artifact, repository, error );
+                    throw e;
                 }
 
                 logger.debug( "  Artifact " + artifact.getId() + " resolved to " + artifact.getFile() );
@@ -110,10 +119,21 @@ public class DefaultWagonManager
             }
             else if ( !artifact.getFile().exists() )
             {
-                throw new ResourceDoesNotExistException( "Failure to resolve " + remotePath + " from "
-                    + repository.getUrl() + " was cached in the local repository. "
-                    + "Resolution will not be reattempted until the update interval of " + repository.getId()
-                    + " has elapsed or updates are forced." );
+                String error = updateCheckManager.getError( artifact, repository );
+                if ( error != null )
+                {
+                    throw new TransferFailedException( "Failure to resolve " + remotePath + " from "
+                        + repository.getUrl() + " was cached in the local repository. "
+                        + "Resolution will not be reattempted until the update interval of " + repository.getId()
+                        + " has elapsed or updates are forced. Original error: " + error );
+                }
+                else
+                {
+                    throw new ResourceDoesNotExistException( "Failure to resolve " + remotePath + " from "
+                        + repository.getUrl() + " was cached in the local repository. "
+                        + "Resolution will not be reattempted until the update interval of " + repository.getId()
+                        + " has elapsed or updates are forced." );
+                }
             }
         }
     }

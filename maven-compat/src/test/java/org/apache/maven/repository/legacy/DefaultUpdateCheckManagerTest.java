@@ -71,7 +71,7 @@ public class DefaultUpdateCheckManagerTest
 
         file.getParentFile().mkdirs();
         file.createNewFile();
-        updateCheckManager.touch( a, remoteRepository );
+        updateCheckManager.touch( a, remoteRepository, null );
 
         assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
@@ -99,7 +99,7 @@ public class DefaultUpdateCheckManagerTest
 
         assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
-        updateCheckManager.touch( a, remoteRepository );
+        updateCheckManager.touch( a, remoteRepository, null );
 
         assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
@@ -127,7 +127,7 @@ public class DefaultUpdateCheckManagerTest
 
         file.getParentFile().mkdirs();
         file.createNewFile();
-        updateCheckManager.touch( a, remoteRepository );
+        updateCheckManager.touch( a, remoteRepository, null );
 
         assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
@@ -155,7 +155,7 @@ public class DefaultUpdateCheckManagerTest
 
         assertTrue( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 
-        updateCheckManager.touch( a, remoteRepository );
+        updateCheckManager.touch( a, remoteRepository, null );
 
         assertFalse( updateCheckManager.isUpdateRequired( a, remoteRepository ) );
 

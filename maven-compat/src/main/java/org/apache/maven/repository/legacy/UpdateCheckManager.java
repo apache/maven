@@ -30,7 +30,9 @@ public interface UpdateCheckManager
 
     boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository );
 
-    void touch( Artifact artifact, ArtifactRepository repository );
+    void touch( Artifact artifact, ArtifactRepository repository, String error );
+
+    String getError( Artifact artifact, ArtifactRepository repository );
 
     boolean isUpdateRequired( RepositoryMetadata metadata, ArtifactRepository repository, File file );
 
