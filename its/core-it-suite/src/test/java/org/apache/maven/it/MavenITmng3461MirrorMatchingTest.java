@@ -96,6 +96,16 @@ public class MavenITmng3461MirrorMatchingTest
                     response.setStatus( HttpServletResponse.SC_OK );
                     response.getWriter().println( request.getRequestURI() );
                 }
+                else if ( request.getRequestURI().endsWith( "/b-0.1.pom" ) )
+                {
+                    response.setStatus( HttpServletResponse.SC_OK );
+                    response.getWriter().println( "<project>" );
+                    response.getWriter().println( "  <modelVersion>4.0.0</modelVersion>" );
+                    response.getWriter().println( "  <groupId>org.apache.maven.its.mng3461</groupId>" );
+                    response.getWriter().println( "  <artifactId>b</artifactId>" );
+                    response.getWriter().println( "  <version>0.1</version>" );
+                    response.getWriter().println( "</project>" );
+                }
                 else
                 {
                     response.setStatus( HttpServletResponse.SC_NOT_FOUND );

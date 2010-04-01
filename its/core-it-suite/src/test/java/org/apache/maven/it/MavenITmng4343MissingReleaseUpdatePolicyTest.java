@@ -71,7 +71,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
                 if ( request.getRequestURI().startsWith( "/org/apache/maven/its/mng4343" ) )
                 {
-                    requestedUris.add( request.getRequestURI() );
+                    requestedUris.add( request.getRequestURI().substring( 29 ) );
                 }
 
                 if ( blockAccess )
@@ -159,7 +159,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
             // expected
         }
 
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/org/apache/maven/its/mng4343/dep/0.1/dep-0.1.jar" ) );
+        assertTrue( requestedUris.toString(), 
+            requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) || requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
         requestedUris.clear();
 
         blockAccess = false;
@@ -168,8 +169,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/org/apache/maven/its/mng4343/dep/0.1/dep-0.1.jar" ) );
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/org/apache/maven/its/mng4343/dep/0.1/dep-0.1.pom" ) );
+        assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
+        assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
         verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
         verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
@@ -210,7 +211,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
             // expected
         }
 
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/org/apache/maven/its/mng4343/dep/0.1/dep-0.1.jar" ) );
+        assertTrue( requestedUris.toString(), 
+            requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) || requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
         requestedUris.clear();
 
         blockAccess = false;
@@ -236,8 +238,8 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/org/apache/maven/its/mng4343/dep/0.1/dep-0.1.jar" ) );
-        assertTrue( requestedUris.toString(), requestedUris.contains( "/org/apache/maven/its/mng4343/dep/0.1/dep-0.1.pom" ) );
+        assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.jar" ) );
+        assertTrue( requestedUris.toString(), requestedUris.contains( "/dep/0.1/dep-0.1.pom" ) );
         verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
         verifier.assertArtifactPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
