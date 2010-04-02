@@ -222,6 +222,12 @@ public class DefaultWagonManager
     private void connectWagon( Wagon wagon, ArtifactRepository repository ) 
         throws ConnectionException, AuthenticationException
     {
+        if ( repository.getProxy() != null && logger.isDebugEnabled() )
+        {
+            logger.debug( "Using proxy " + repository.getProxy().getHost() + ":" + repository.getProxy().getPort()
+                + " for " + repository.getUrl() );
+        }
+
         if ( repository.getAuthentication() != null && repository.getProxy() != null )
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ),
