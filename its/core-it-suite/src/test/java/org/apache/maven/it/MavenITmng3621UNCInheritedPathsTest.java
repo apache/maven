@@ -34,9 +34,9 @@ import java.util.Properties;
 public class MavenITmng3621UNCInheritedPathsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3621UNCInheritedPathsTest()
     {
-        // TODO: fix for 3.0+
         super( "[2.0.11,2.1.0-M1),[2.1.0,)" );
     }
 

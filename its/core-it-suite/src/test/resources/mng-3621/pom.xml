@@ -35,7 +35,7 @@
   <distributionManagement>
     <site>
       <id>site</id>
-      <url>file:////host/site/</url>
+      <url>file:////host/site</url>
     </site>
   </distributionManagement>
 </project>
