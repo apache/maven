@@ -22,11 +22,9 @@ package org.apache.maven.model.merge;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.CiManagement;
@@ -560,80 +558,39 @@ public class MavenModelMerger
 
     private String appendPath( String parentPath, String childPath, String pathAdjustment )
     {
-        String uncleanPath = parentPath;
-
-        if ( pathAdjustment != null && pathAdjustment.length() > 0 )
-        {
-            uncleanPath += "/" + pathAdjustment;
-        }
-
-        if ( childPath != null )
-        {
-            uncleanPath += "/" + childPath;
-        }
-
-        String cleanedPath = "";
-
-        int protocolIdx = uncleanPath.indexOf( "://" );
-
-        if ( protocolIdx > -1 )
-        {
-            cleanedPath = uncleanPath.substring( 0, protocolIdx + 3 );
-            uncleanPath = uncleanPath.substring( protocolIdx + 3 );
-        }
-
-        if ( uncleanPath.startsWith( "//" ) )
-        {
-            // preserve leading double slash for UNC paths like "file:////host/pom.xml"
-            cleanedPath += "//";
-        }
-        else if ( uncleanPath.startsWith( "/" ) )
-        {
-            cleanedPath += "/";
-        }
-
-        return cleanedPath + resolvePath( uncleanPath );
+        String path = parentPath;
+        path = concatPath( path, pathAdjustment );
+        path = concatPath( path, childPath );
+        return path;
     }
 
-    private String resolvePath( String uncleanPath )
+    private String concatPath( String base, String path )
     {
-        LinkedList<String> pathElements = new LinkedList<String>();
+        String result = base;
 
-        StringTokenizer tokenizer = new StringTokenizer( uncleanPath, "/" );
-
-        while ( tokenizer.hasMoreTokens() )
+        if ( path != null && path.length() > 0 )
         {
-            String token = tokenizer.nextToken();
-
-            if ( token.equals( "" ) )
+            if ( ( result.endsWith( "/" ) && !path.startsWith( "/" ) )
+                || ( !result.endsWith( "/" ) && path.startsWith( "/" ) ) )
             {
-                // Empty path entry ("...//.."), remove.
+                result += path;
             }
-            else if ( token.equals( ".." ) )
+            else if ( result.endsWith( "/" ) && path.startsWith( "/" ) )
             {
-                if ( !pathElements.isEmpty() )
-                {
-                    pathElements.removeLast();
-                }
+                result += path.substring( 1 );
             }
             else
             {
-                pathElements.addLast( token );
+                result += '/';
+                result += path;
             }
-        }
-
-        StringBuilder cleanedPath = new StringBuilder( 128 );
-
-        while ( !pathElements.isEmpty() )
-        {
-            cleanedPath.append( pathElements.removeFirst() );
-            if ( !pathElements.isEmpty() )
+            if ( base.endsWith( "/" ) && !result.endsWith( "/" ) )
             {
-                cleanedPath.append( '/' );
+                result += '/';
             }
         }
 
-        return cleanedPath.toString();
+        return result;
     }
 
 }

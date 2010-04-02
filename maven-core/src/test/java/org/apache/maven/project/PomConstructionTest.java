@@ -600,7 +600,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "url-inheritance/sub" );
         assertEquals( "http://parent.url/child", pom.getValue( "url" ) );
-        assertEquals( "http://parent.url/org/", pom.getValue( "organization/url" ) );
+        assertEquals( "http://parent.url/org", pom.getValue( "organization/url" ) );
         assertEquals( "http://parent.url/license.txt", pom.getValue( "licenses[1]/url" ) );
         assertEquals( "http://parent.url/viewvc/child", pom.getValue( "scm/url" ) );
         assertEquals( "http://parent.url/scm/child", pom.getValue( "scm/connection" ) );
@@ -619,7 +619,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "url-inheritance/another-parent/sub" );
         assertEquals( "http://parent.url/ap/child", pom.getValue( "url" ) );
-        assertEquals( "http://parent.url/org/", pom.getValue( "organization/url" ) );
+        assertEquals( "http://parent.url/org", pom.getValue( "organization/url" ) );
         assertEquals( "http://parent.url/license.txt", pom.getValue( "licenses[1]/url" ) );
         assertEquals( "http://parent.url/viewvc/ap/child", pom.getValue( "scm/url" ) );
         assertEquals( "http://parent.url/scm/ap/child", pom.getValue( "scm/connection" ) );

@@ -32,10 +32,10 @@ under the License.
     Test that inheritance of certain URLs automatically appends the child's artifact id.
   </description>
 
-  <url>http://parent.url/</url>
+  <url>http://parent.url</url>
   <organization>
     <name>parent-org</name>
-    <url>http://parent.url/org/</url>
+    <url>http://parent.url/org</url>
   </organization>
   <licenses>
     <license>

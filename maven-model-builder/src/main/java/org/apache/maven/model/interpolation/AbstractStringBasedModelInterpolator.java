@@ -24,6 +24,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
@@ -94,6 +95,9 @@ public abstract class AbstractStringBasedModelInterpolator
 
     @Requirement
     private PathTranslator pathTranslator;
+
+    @Requirement
+    private UrlNormalizer urlNormalizer;
 
     private Interpolator interpolator;
 
@@ -187,16 +191,14 @@ public abstract class AbstractStringBasedModelInterpolator
                                                                                final File projectDir,
                                                                                final ModelBuildingRequest config )
     {
+        List<InterpolationPostProcessor> processors = new ArrayList<InterpolationPostProcessor>( 2 );
         if ( projectDir != null )
         {
-            return Collections.singletonList( new PathTranslatingPostProcessor( PROJECT_PREFIXES,
-                                                                                TRANSLATED_PATH_EXPRESSIONS,
-                                                                                projectDir, pathTranslator ) );
+            processors.add( new PathTranslatingPostProcessor( PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,
+                                                              projectDir, pathTranslator ) );
         }
-        else
-        {
-            return Collections.emptyList();
-        }
+        processors.add( new UrlNormalizingPostProcessor( urlNormalizer ) );
+        return processors;
     }
 
     protected String interpolateInternal( String src, List<? extends ValueSource> valueSources,

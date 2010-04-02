@@ -45,6 +45,7 @@ import org.apache.maven.model.management.DependencyManagementInjector;
 import org.apache.maven.model.management.PluginManagementInjector;
 import org.apache.maven.model.normalization.ModelNormalizer;
 import org.apache.maven.model.path.ModelPathTranslator;
+import org.apache.maven.model.path.ModelUrlNormalizer;
 import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
@@ -82,6 +83,9 @@ public class DefaultModelBuilder
 
     @Requirement
     private ModelPathTranslator modelPathTranslator;
+
+    @Requirement
+    private ModelUrlNormalizer modelUrlNormalizer;
 
     @Requirement
     private SuperPomProvider superPomProvider;
@@ -224,6 +228,8 @@ public class DefaultModelBuilder
 
         resultModel = interpolateModel( resultModel, request, problems );
         resultData.setModel( resultModel );
+
+        modelUrlNormalizer.normalize( resultModel, request );
 
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );

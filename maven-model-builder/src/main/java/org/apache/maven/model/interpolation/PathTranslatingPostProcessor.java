@@ -60,7 +60,7 @@ class PathTranslatingPostProcessor
             }
         }
 
-        return value;
+        return null;
     }
 
 }
