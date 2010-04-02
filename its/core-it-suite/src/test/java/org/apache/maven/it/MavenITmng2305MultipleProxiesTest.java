@@ -39,124 +39,76 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.security.SslSocketConnector;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4428">MNG-4428</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2305">MNG-2305</a>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
-public class MavenITmng4428FollowHttpRedirectTest
+public class MavenITmng2305MultipleProxiesTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4428FollowHttpRedirectTest()
+    public MavenITmng2305MultipleProxiesTest()
     {
-        super( "[2.0.3,3.0-alpha-1),(3.0-alpha-1,)" );
+        super( "[3.0-alpha-3,)" );
     }
 
     /**
-     * Verify that redirects from HTTP to HTTP are getting followed.
+     * Verify that proxies can be setup for multiple protocols, in this case HTTP and HTTPS. As a nice side effect,
+     * this checks HTTPS tunneling over a web proxy.
      */
-    public void testitHttpToHttp()
+    public void testit()
         throws Exception
     {
-        testit( true, true );
-    }
-
-    /**
-     * Verify that redirects from HTTPS to HTTPS are getting followed.
-     */
-    public void testitHttpsToHttps()
-        throws Exception
-    {
-        testit( false, false );
-    }
-
-    /**
-     * Verify that redirects from HTTP to HTTPS are getting followed.
-     */
-    public void testitHttpToHttps()
-        throws Exception
-    {
-        requiresMavenVersion( "[2.2.0]" );
-
-        testit( true, false );
-    }
-
-    /**
-     * Verify that redirects from HTTPS to HTTP are getting followed.
-     */
-    public void testitHttpsToHttp()
-        throws Exception
-    {
-        requiresMavenVersion( "[2.2.0]" );
-
-        testit( false, true );
-    }
-
-    /**
-     * Verify that redirects using a relative location URL are getting followed. While a relative URL violates the
-     * HTTP spec, popular HTTP clients do support them so we better do, too.
-     */
-    public void testitRelativeLocation()
-        throws Exception
-    {
-        testit( true, true, true );
-    }
-
-    private void testit( boolean fromHttp, boolean toHttp )
-        throws Exception
-    {
-        testit( fromHttp, toHttp, false );
-    }
-
-    private void testit( boolean fromHttp, boolean toHttp, boolean relativeLocation )
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4428" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2305" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
         // NOTE: trust store cannot be reliably configured for the current JVM
         verifier.setForkJvm( true );
 
-        // keytool -genkey -alias localhost -keypass key-passwd -keystore keystore -storepass store-passwd \
-        //   -validity 4096 -dname "cn=localhost, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
+        // keytool -genkey -alias https.mngit -keypass key-passwd -keystore keystore -storepass store-passwd \
+        //   -validity 4096 -dname "cn=https.mngit, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
         String storePath = new File( testDir, "keystore" ).getAbsolutePath();
         String storePwd = "store-passwd";
         String keyPwd = "key-passwd";
 
         Server server = new Server( 0 );
         server.addConnector( newHttpsConnector( storePath, storePwd, keyPwd ) );
-        Connector from = server.getConnectors()[ fromHttp ? 0 : 1 ];
-        Connector to = server.getConnectors()[ toHttp ? 0 : 1 ];
-        server.setHandler( new RedirectHandler( toHttp ? "http" : "https", relativeLocation ? null : to ) );
+        server.setHandler( new RepoHandler() );
         server.start();
+        int httpPort = server.getConnectors()[0].getLocalPort();
+        int httpsPort = server.getConnectors()[1].getLocalPort();
+
+        TunnelingProxyServer proxy = new TunnelingProxyServer( 0, "localhost", httpsPort, "https.mngit:443" );
+        proxy.start();
+        int proxyPort = proxy.getPort();
 
         try
         {
             verifier.setAutoclean( false );
-            verifier.deleteArtifacts( "org.apache.maven.its.mng4428" );
             verifier.deleteDirectory( "target" );
+            verifier.deleteArtifacts( "org.apache.maven.its.mng2305" );
             Properties filterProps = verifier.newDefaultFilterProperties();
-            filterProps.setProperty( "@protocol@", fromHttp ? "http" : "https" );
-            filterProps.setProperty( "@port@", Integer.toString( from.getLocalPort() ) );
+            filterProps.setProperty( "@proxy.http@", Integer.toString( httpPort ) );
+            filterProps.setProperty( "@proxy.https@", Integer.toString( proxyPort ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-X --settings" );
+            verifier.getCliOptions().add( "--settings" );
             verifier.getCliOptions().add( "settings.xml" );
             verifier.setSystemProperty( "javax.net.ssl.trustStore", storePath );
             verifier.setSystemProperty( "javax.net.ssl.trustStorePassword", storePwd );
-            verifier.setLogFileName( "log-" + getName().substring( 6 ) + ".txt" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
         }
         finally
         {
+            proxy.stop();
             server.stop();
         }
 
         List cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
-        assertTrue( cp.toString(), cp.contains( "dep-0.1.jar" ) );
+        assertTrue( cp.toString(), cp.contains( "http-0.1.jar" ) );
+        assertTrue( cp.toString(), cp.contains( "https-0.1.jar" ) );
     }
 
     private Connector newHttpsConnector( String keystore, String storepwd, String keypwd )
@@ -169,50 +121,27 @@ public class MavenITmng4428FollowHttpRedirectTest
         return connector;
     }
 
-    static class RedirectHandler extends AbstractHandler
+    static class RepoHandler extends AbstractHandler
     {
-
-        private final String protocol;
-
-        private final Connector connector;
-
-        public RedirectHandler( String protocol, Connector connector )
-        {
-            this.protocol = protocol;
-            this.connector = connector;
-        }
 
         public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
             throws IOException
         {
-            System.out.println( "Handling " + request.getMethod() + " " + request.getRequestURL() );
-
             PrintWriter writer = response.getWriter();
 
             String uri = request.getRequestURI();
-            if ( uri.startsWith( "/repo/" ) )
+
+            if ( !uri.startsWith( "/repo/org/apache/maven/its/mng2305/" + request.getScheme() + "/" ) )
             {
-                String location = "/redirected/" + uri.substring( 6 );
-                if ( protocol != null && connector != null )
-                {
-                    location = protocol + "://localhost:" + connector.getLocalPort() + location;
-                }
-                if ( uri.endsWith( ".pom" ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_MOVED_TEMPORARILY );
-                }
-                else
-                {
-                    response.setStatus( HttpServletResponse.SC_MOVED_PERMANENTLY );
-                }
-                response.setHeader( "Location", location );
+                // HTTP connector serves only http-0.1.jar and HTTPS connector serves only https-0.1.jar
+                response.setStatus( HttpServletResponse.SC_NOT_FOUND );
             }
             else if ( uri.endsWith( ".pom" ) )
             {
                 writer.println( "<project>" );
                 writer.println( "  <modelVersion>4.0.0</modelVersion>" );
-                writer.println( "  <groupId>org.apache.maven.its.mng4428</groupId>" );
-                writer.println( "  <artifactId>dep</artifactId>" );
+                writer.println( "  <groupId>org.apache.maven.its.mng2305</groupId>" );
+                writer.println( "  <artifactId>" + request.getScheme() + "</artifactId>" );
                 writer.println( "  <version>0.1</version>" );
                 writer.println( "</project>" );
                 response.setStatus( HttpServletResponse.SC_OK );
