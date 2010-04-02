@@ -41,6 +41,7 @@ under the License.
   </description>
 
   <properties>
+    <!-- these check that the normalized URL is already available during interpolation -->
     <projectUrl>${project.url}/it</projectUrl>
     <projectScmUrl>${project.scm.url}/it</projectScmUrl>
     <projectScmConn>${project.scm.connection}/it</projectScmConn>
