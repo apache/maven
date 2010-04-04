@@ -553,12 +553,14 @@ public class DefaultModelBuilder
 
         Parent parent = childModel.getParent();
 
-        if ( groupId == null || !groupId.equals( parent.getGroupId() ) )
+        if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
+            || !artifactId.equals( parent.getArtifactId() ) )
         {
-            return null;
-        }
-        if ( artifactId == null || !artifactId.equals( parent.getArtifactId() ) )
-        {
+            problems.setSource( childModel );
+            problems.add( Severity.WARNING, "'parent.relativePath' of POM "
+                + ModelProblemUtils.toSourceHint( childModel ) + " points at " + groupId + ":" + artifactId
+                + " instead of " + parent.getGroupId() + ":" + parent.getArtifactId()
+                + ", please verify your project structure", null );
             return null;
         }
         if ( version == null || !version.equals( parent.getVersion() ) )
