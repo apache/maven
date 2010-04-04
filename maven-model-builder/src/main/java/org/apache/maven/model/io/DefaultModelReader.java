@@ -20,6 +20,7 @@ package org.apache.maven.model.io;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -50,7 +51,7 @@ public class DefaultModelReader
             throw new IllegalArgumentException( "input file missing" );
         }
 
-        Model model = read( ReaderFactory.newXmlReader( input ), options );
+        Model model = read( new FileInputStream( input ), options );
 
         model.setPomFile( input );
 
@@ -67,12 +68,7 @@ public class DefaultModelReader
 
         try
         {
-            MavenXpp3Reader r = new MavenXpp3Reader();
-            return r.read( input, isStrict( options ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+            return read( input, isStrict( options ) );
         }
         finally
         {
@@ -90,12 +86,7 @@ public class DefaultModelReader
 
         try
         {
-            MavenXpp3Reader r = new MavenXpp3Reader();
-            return r.read( input, isStrict( options ) );
-        }
-        catch ( XmlPullParserException e )
-        {
-            throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+            return read( ReaderFactory.newXmlReader( input ), isStrict( options ) );
         }
         finally
         {
@@ -107,6 +98,20 @@ public class DefaultModelReader
     {
         Object value = ( options != null ) ? options.get( IS_STRICT ) : null;
         return value == null || Boolean.parseBoolean( value.toString() );
+    }
+
+    private Model read( Reader reader, boolean strict )
+        throws IOException
+    {
+        try
+        {
+            MavenXpp3Reader r = new MavenXpp3Reader();
+            return r.read( reader, strict );
+        }
+        catch ( XmlPullParserException e )
+        {
+            throw new ModelParseException( e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+        }
     }
 
 }
