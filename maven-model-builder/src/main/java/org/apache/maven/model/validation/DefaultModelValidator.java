@@ -671,11 +671,11 @@ public class DefaultModelValidator
                                            String sourceHint, ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
-        Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
-        if ( !validateNotNull( fieldName, problems, errOn31, string, sourceHint ) )
+        if ( string == null )
         {
-            return false;
+            // NOTE: The check for missing plugin versions is handled directly by the model builder
+            return true;
         }
 
         if ( string.length() > 0 && !hasExpression( string ) && !"RELEASE".equals( string )

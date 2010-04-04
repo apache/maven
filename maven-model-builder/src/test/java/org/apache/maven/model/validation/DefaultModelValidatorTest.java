@@ -273,22 +273,6 @@ public class DefaultModelValidatorTest
         assertEquals( "'build.plugins.plugin.artifactId' is missing.", result.getErrors().get( 0 ) );
     }
 
-    public void testMissingPluginVersion()
-        throws Exception
-    {
-        SimpleProblemCollector result =
-            validateEffective( "missing-plugin-version-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
-
-        assertViolations( result, 0, 1, 0 );
-
-        assertEquals( "'build.plugins.plugin.version' for org.apache.maven.plugins:maven-it-plugin is missing.",
-                      result.getErrors().get( 0 ) );
-
-        result = validateEffective( "missing-plugin-version-pom.xml", ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
-
-        assertViolations( result, 0, 0, 1 );
-    }
-
     public void testEmptyPluginVersion()
         throws Exception
     {

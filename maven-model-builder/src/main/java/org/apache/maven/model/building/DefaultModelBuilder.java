@@ -30,10 +30,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Properties;
 
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
@@ -219,6 +222,9 @@ public class DefaultModelBuilder
             }
         }
 
+        problems.setSource( inputModel );
+        checkPluginVersions( lineage, request, problems );
+        
         assembleInheritance( lineage, request, problems );
 
         Model resultModel = resultData.getModel();
@@ -440,6 +446,55 @@ public class DefaultModelBuilder
             catch ( InvalidRepositoryException e )
             {
                 problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(), e );
+            }
+        }
+    }
+
+    private void checkPluginVersions( List<ModelData> lineage, ModelBuildingRequest request,
+                                      ModelProblemCollector problems )
+    {
+        if ( request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            return;
+        }
+
+        Map<String, String> versions = new HashMap<String, String>();
+        Map<String, String> managedVersions = new HashMap<String, String>();
+
+        for ( int i = 0, n = lineage.size() - 1; i < n; i++ )
+        {
+            Model model = lineage.get( i ).getModel();
+            Build build = model.getBuild();
+            if ( build != null )
+            {
+                for ( Plugin plugin : build.getPlugins() )
+                {
+                    String key = plugin.getKey();
+                    if ( versions.get( key ) == null )
+                    {
+                        versions.put( key, plugin.getVersion() );
+                    }
+                }
+                PluginManagement mngt = build.getPluginManagement();
+                if ( mngt != null )
+                {
+                    for ( Plugin plugin : mngt.getPlugins() )
+                    {
+                        String key = plugin.getKey();
+                        if ( managedVersions.get( key ) == null )
+                        {
+                            managedVersions.put( key, plugin.getVersion() );
+                        }
+                    }
+                }
+            }
+        }
+
+        for ( String key : versions.keySet() )
+        {
+            if ( versions.get( key ) == null && managedVersions.get( key ) == null )
+            {
+                problems.add( Severity.WARNING, "'build.plugins.plugin.version' for " + key + " is missing.", null );
             }
         }
     }
