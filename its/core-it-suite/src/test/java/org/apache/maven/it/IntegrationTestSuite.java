@@ -233,6 +233,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4034ManagedProfileDependencyTest.class );
         suite.addTestSuite( MavenITmng4026ReactorDependenciesOrderTest.class );
         suite.addTestSuite( MavenITmng4023ParentProfileOneTimeInjectionTest.class );
+        suite.addTestSuite( MavenITmng4022IdempotentPluginConfigMergingTest.class );
         suite.addTestSuite( MavenITmng4016PrefixedPropertyInterpolationTest.class );
         suite.addTestSuite( MavenITmng4009InheritProfileEffectsTest.class );
         suite.addTestSuite( MavenITmng4008MergedFilterOrderTest.class );
