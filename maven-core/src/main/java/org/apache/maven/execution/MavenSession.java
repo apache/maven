@@ -124,11 +124,23 @@ public class MavenSession
 
     public void setProjects( List<MavenProject> projects )
     {
-        //TODO: Current for testing classes creating the session
-        if ( projects.size() > 0 )
+        if ( !projects.isEmpty() )
         {
             this.currentProject = projects.get( 0 );
-            this.topLevelProject = projects.get(  0 );
+            this.topLevelProject = currentProject;
+            for ( MavenProject project : projects )
+            {
+                if ( project.isExecutionRoot() )
+                {
+                    topLevelProject = project;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            this.currentProject = null;
+            this.topLevelProject = null;
         }
         this.projects = projects;
     }    

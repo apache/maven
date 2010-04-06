@@ -451,18 +451,16 @@ public class DefaultProjectBuilder
                 MavenProject project = interimResult.listener.getProject();
                 initProject( project, result );
 
-                projects.add( project );
-
-                results.add( new DefaultProjectBuildingResult( project, result.getProblems(), null ) );
-
-                project.setExecutionRoot( interimResult.root );
-
                 List<MavenProject> modules = new ArrayList<MavenProject>();
                 noErrors = build( results, modules, interimResult.modules, config ) && noErrors;
 
                 projects.addAll( modules );
+                projects.add( project );
 
+                project.setExecutionRoot( interimResult.root );
                 project.setCollectedProjects( modules );
+
+                results.add( new DefaultProjectBuildingResult( project, result.getProblems(), null ) );
             }
             catch ( ModelBuildingException e )
             {
