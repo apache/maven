@@ -438,6 +438,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2130ParentLookupFromReactorCacheTest.class );
         suite.addTestSuite( MavenITmng2124PomInterpolationWithParentValuesTest.class );
         suite.addTestSuite( MavenITmng2123VersionRangeDependencyTest.class );
+        suite.addTestSuite( MavenITmng2103PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest.class );
         suite.addTestSuite( MavenITmng2068ReactorRelativeParentsTest.class );
         suite.addTestSuite( MavenITmng2054PluginExecutionInheritanceTest.class );
