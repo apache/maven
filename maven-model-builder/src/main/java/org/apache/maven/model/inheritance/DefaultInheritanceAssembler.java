@@ -123,16 +123,14 @@ public class DefaultInheritanceAssembler
                 for ( Plugin element : src )
                 {
                     Object key = getPluginKey( element );
-                    if ( element.isInherited() )
-                    {
-                        // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
-                        Plugin plugin = new Plugin();
-                        plugin.setGroupId( element.getGroupId() );
-                        plugin.setArtifactId( element.getArtifactId() );
-                        mergePlugin( plugin, element, sourceDominant, context );
 
-                        master.put( key, plugin );
-                    }
+                    // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
+                    Plugin plugin = new Plugin();
+                    plugin.setGroupId( element.getGroupId() );
+                    plugin.setArtifactId( element.getArtifactId() );
+                    mergePlugin( plugin, element, sourceDominant, context );
+
+                    master.put( key, plugin );
                 }
 
                 Map<Object, List<Plugin>> predecessors = new LinkedHashMap<Object, List<Plugin>>();

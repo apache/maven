@@ -470,7 +470,7 @@ public class MavenModelMerger
 
             for ( PluginExecution element : src )
             {
-                if ( sourceDominant || ( source.isInherited() && element.isInherited() ) )
+                if ( sourceDominant || ( element.getInherited() != null ? element.isInherited() : source.isInherited() ) )
                 {
                     Object key = getPluginExecutionKey( element );
                     merged.put( key, element );
