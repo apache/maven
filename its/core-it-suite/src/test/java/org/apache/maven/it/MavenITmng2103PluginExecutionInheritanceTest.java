@@ -48,14 +48,18 @@ public class MavenITmng2103PluginExecutionInheritanceTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2103" );
 
-        Verifier verifier = new Verifier( new File( testDir, "child" ).getAbsolutePath() );
+        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "child-1/target" );
+        verifier.deleteDirectory( "child-2/target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List execs = verifier.loadLines( "target/log.txt", "UTF-8" );
+        List execs = verifier.loadLines( "child-1/target/log.txt", "UTF-8" );
+        assertEquals( Arrays.asList( new String[] { "inherited" } ), execs );
+
+        execs = verifier.loadLines( "child-2/target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "inherited" } ), execs );
     }
 

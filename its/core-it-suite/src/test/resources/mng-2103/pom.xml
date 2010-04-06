@@ -32,6 +32,11 @@ under the License.
     Verify that the plugin-level inherited flag can be overriden by the execution-level flag.
   </description>
 
+  <modules>
+    <module>child-1</module>
+    <module>child-2</module>
+  </modules>
+
   <build>
     <plugins>
       <plugin>

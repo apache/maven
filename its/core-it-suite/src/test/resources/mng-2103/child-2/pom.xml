@@ -29,12 +29,23 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven.its.mng2103</groupId>
-  <artifactId>test</artifactId>
+  <artifactId>child-2</artifactId>
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-2103</name>
+  <name>Maven Integration Test :: MNG-2103 :: Child-2</name>
   <description>
     Verify that the plugin-level inherited flag can be overriden by the execution-level flag.
   </description>
+
+  <!-- NOTE: This module mentions the build plugin with the inherited execution -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-log-file</artifactId>
+        <version>2.1-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </build>
 </project>
