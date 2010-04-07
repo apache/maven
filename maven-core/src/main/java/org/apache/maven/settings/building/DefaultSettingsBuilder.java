@@ -38,6 +38,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.EnvarBasedValueSource;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
@@ -188,6 +189,20 @@ public class DefaultSettingsBuilder
             problems.add( SettingsProblem.Severity.WARNING, "Failed to use environment variables for interpolation: "
                 + e.getMessage(), -1, -1, e );
         }
+
+        interpolator.addPostProcessor( new InterpolationPostProcessor()
+        {
+            public Object execute( String expression, Object value )
+            {
+                if ( value != null )
+                {
+                    // we're going to parse this back in as XML so we need to escape XML markup
+                    value = value.toString().replace( "&", "&amp;" ).replace( "<", "&lt;" ).replace( ">", "&gt;" );
+                    return value;
+                }
+                return null;
+            }
+        } );
 
         try
         {
