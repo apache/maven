@@ -362,7 +362,15 @@ public class DefaultModelBuilder
 
                 options.put( ModelProcessor.IS_STRICT, Boolean.FALSE );
 
-                model = modelProcessor.read( modelSource.getInputStream(), options );
+                try
+                {
+                    model = modelProcessor.read( modelSource.getInputStream(), options );
+                }
+                catch ( ModelParseException ne )
+                {
+                    // still unreadable even in non-strict mode, rethrow original error
+                    throw e;
+                }
 
                 if ( pomFile != null )
                 {
