@@ -181,6 +181,23 @@ public class DefaultMaven
         
         result.setProject( session.getTopLevelProject() );
 
+        try
+        {
+            Map<String, MavenProject> projectMap;
+            projectMap = getProjectMap( session.getProjects() );
+    
+            // Desired order of precedence for local artifact repositories
+            //
+            // Reactor
+            // Workspace
+            // User Local Repository
+            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap, session ) );
+        }
+        catch ( org.apache.maven.DuplicateProjectException e )
+        {
+            return processResult( result, e );
+        }
+
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
@@ -200,11 +217,8 @@ public class DefaultMaven
             Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
-        Map<String, MavenProject> projectMap;
         try
         {
-            projectMap = getProjectMap( session.getProjects() );
-
             ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
 
             ProjectDependencyGraph projectDependencyGraph = createDependencyGraph( projectSorter, request );
@@ -231,13 +245,6 @@ public class DefaultMaven
         }
 
         result.setTopologicallySortedProjects( session.getProjects() );
-
-        // Desired order of precedence for local artifact repositories
-        //
-        // Reactor
-        // Workspace
-        // User Local Repository
-        delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap, session ) );
         
         if ( result.hasExceptions() )
         {
