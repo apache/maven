@@ -33,25 +33,27 @@ import java.io.File;
 public class MavenITmng2994SnapshotRangeRepositoryTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng2994SnapshotRangeRepositoryTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.0-beta-1,)" );
     }
 
     /**
      * Test that snapshot repositories are checked for ranges with snapshot boundaries.
      */
-    public void testitMNG2994()
+    public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2994" );
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0123" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng2994" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
+
 }
