@@ -85,23 +85,6 @@ public class DefaultPluginManager
     @Requirement
     private LegacySupport legacySupport;
 
-    private RepositoryRequest getRepositoryRequest( MavenSession session, MavenProject project )
-    {
-        RepositoryRequest request = new DefaultRepositoryRequest();
-
-        request.setCache( session.getRepositoryCache() );
-        request.setLocalRepository( session.getLocalRepository() );
-        if ( project != null )
-        {
-            request.setRemoteRepositories( project.getPluginArtifactRepositories() );
-        }
-        request.setOffline( session.isOffline() );
-        request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
-        request.setTransferListener( session.getRequest().getTransferListener() );
-
-        return request;
-    }
-
     public void executeMojo( MavenProject project, MojoExecution execution, MavenSession session )
         throws MojoExecutionException, ArtifactResolutionException, MojoFailureException, ArtifactNotFoundException,
         InvalidDependencyVersionException, PluginManagerException, PluginConfigurationException
@@ -117,7 +100,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor;
         try
         {
-            RepositoryRequest repositoryRequest = getRepositoryRequest( session, session.getCurrentProject() );
+            RepositoryRequest repositoryRequest = DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
 
             pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
 
@@ -149,7 +132,7 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor;
         try
         {
-            RepositoryRequest repositoryRequest = getRepositoryRequest( session, session.getCurrentProject() );
+            RepositoryRequest repositoryRequest = DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
 
             pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
 

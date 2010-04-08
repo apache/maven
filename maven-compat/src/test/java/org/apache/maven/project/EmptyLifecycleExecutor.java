@@ -25,11 +25,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.*;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.LifecycleExecutor;
-import org.apache.maven.lifecycle.LifecycleNotFoundException;
-import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -55,7 +52,7 @@ public class EmptyLifecycleExecutor
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException
     {
-        return new MavenExecutionPlan( Collections.<MojoExecution> emptyList(), null, null );
+        return new MavenExecutionPlan(null, null, null );
     }
 
     public void execute( MavenSession session )

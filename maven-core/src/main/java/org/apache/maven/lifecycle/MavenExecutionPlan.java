@@ -19,10 +19,11 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 //TODO: lifecycles being executed
 //TODO: what runs in each phase
@@ -30,29 +31,77 @@ import org.apache.maven.plugin.MojoExecution;
 //TODO: project dependencies that need downloading
 //TODO: unfortunately the plugins need to be downloaded in order to get the plugin.xml file. need to externalize this from the plugin archive.
 //TODO: this will be the class that people get in IDEs to modify
-public class MavenExecutionPlan
+public class MavenExecutionPlan  implements Iterable<ExecutionPlanItem>
 {
-    /** Individual executions that must be performed. */
-    private List<MojoExecution> executions;
-    
+
+    /*
+       At the moment, this class is totally immutable, and this is in line with thoughts about the
+       pre-calculated execution plan that stays the same during the execution.
+
+       If deciding to add mutable state to this class, it should be at least considered to
+       separate this into a separate mutable structure.
+
+     */
     /** For project dependency resolution, the scopes of resolution required if any. */
-    private Set<String> requiredDependencyResolutionScopes;
+    private final Set<String> requiredDependencyResolutionScopes;
 
     /** For project dependency collection, the scopes of collection required if any. */
-    private Set<String> requiredDependencyCollectionScopes;
+    private final Set<String> requiredDependencyCollectionScopes;
 
-    public MavenExecutionPlan( List<MojoExecution> executions, Set<String> requiredDependencyResolutionScopes,
-                               Set<String> requiredDependencyCollectionScopes )
-    {
-        this.executions = executions;
+    private final List<ExecutionPlanItem> planItem;
+
+    private final Map<String, ExecutionPlanItem> lastInPhase;
+    private final List<String> phasesInOrder;
+
+    public MavenExecutionPlan(Set<String> requiredDependencyResolutionScopes, Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem) {
         this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
         this.requiredDependencyCollectionScopes = requiredDependencyCollectionScopes;
+        this.planItem = planItem;
+        lastInPhase = new HashMap<String, ExecutionPlanItem>();
+        phasesInOrder = new ArrayList<String>();
+        for (ExecutionPlanItem executionPlanItem : getExecutionPlanItems()) {
+            final String phaseName = getPhase( executionPlanItem );
+            if (!lastInPhase.containsKey(  phaseName )){
+                phasesInOrder.add( phaseName );
+            }
+            lastInPhase.put( phaseName, executionPlanItem );
+        }
+
+
     }
 
-    public List<MojoExecution> getExecutions()
-    {
-        return executions;
+    private String getPhase( ExecutionPlanItem executionPlanItem){
+        final MojoExecution mojoExecution = executionPlanItem.getMojoExecution();
+        final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        return mojoDescriptor.getPhase();
+
     }
+    public Iterator<ExecutionPlanItem> iterator() {
+        return getExecutionPlanItems().iterator();
+    }
+
+    /**
+     * Returns the last ExecutionPlanItem in the supplied phase. If no items are in the specified phase,
+     * the closest upstream item will be returned.
+     * @param executionPlanItem The execution plan item
+     * @return The ExecutionPlanItem or null if none can be found
+     */
+    public ExecutionPlanItem findLastInPhase( ExecutionPlanItem executionPlanItem){
+        ExecutionPlanItem executionPlanItem1 = lastInPhase.get( getPhase( executionPlanItem ) );
+        return executionPlanItem1;
+    }
+
+    private List<ExecutionPlanItem> getExecutionPlanItems()
+     {
+         return planItem;
+     }
+
+    public void forceAllComplete(){
+        for (ExecutionPlanItem executionPlanItem : getExecutionPlanItems()) {
+             executionPlanItem.forceComplete();
+        }
+    }
+
 
     public Set<String> getRequiredResolutionScopes()
     {
@@ -64,4 +113,17 @@ public class MavenExecutionPlan
         return requiredDependencyCollectionScopes;
     }
 
+
+    public List<MojoExecution> getMojoExecutions(){
+        List<MojoExecution> result = new ArrayList<MojoExecution>();
+        for ( ExecutionPlanItem executionPlanItem : planItem )
+        {
+            result.add( executionPlanItem.getMojoExecution());
+        }
+        return result;
+    }
+
+    public int size() {
+        return planItem.size();
+    }
 }

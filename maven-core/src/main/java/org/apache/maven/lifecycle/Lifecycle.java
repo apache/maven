@@ -27,6 +27,14 @@ import java.util.Map;
  */
 public class Lifecycle
 {
+    public Lifecycle() {
+    }
+
+    public Lifecycle(String id, List<String> phases, Map<String, String> defaultPhases) {
+        this.id = id;
+        this.phases = phases;
+        this.defaultPhases = defaultPhases;
+    }
 
     // <lifecycle>
     //   <id>clean</id>

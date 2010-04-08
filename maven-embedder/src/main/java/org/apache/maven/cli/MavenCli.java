@@ -37,6 +37,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -68,6 +69,8 @@ import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 public class MavenCli
 {
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
+
+    public static final String THREADS_DEPRECATED = "maven.threads.experimental";
 
     public static final String userHome = System.getProperty( "user.home" );
 
@@ -862,6 +865,21 @@ public class MavenCli
         {
             request.setLocalRepositoryPath( localRepoProperty );
         }
+
+
+        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS ) ?
+                commandLine.getOptionValue( CLIManager.THREADS) :
+                request.getSystemProperties().getProperty(MavenCli.THREADS_DEPRECATED); // TODO: Remove this setting. Note that the int-tests use it
+
+        if (threadConfiguration != null){
+            request.setPerCoreThreadCount( threadConfiguration.contains("C"));
+            if (threadConfiguration.contains("W"))
+            {
+                LifecycleWeaveBuilder.setWeaveMode(request.getUserProperties());
+            }
+            request.setThreadCount(threadConfiguration.replace("C", "").replace("W", "").replace("auto", ""));
+        }
+
 
         return request;
     }

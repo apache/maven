@@ -1,0 +1,96 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
+ */
+
+package org.apache.maven.lifecycle.internal;
+
+import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
+import org.apache.maven.lifecycle.LifecycleEventCatapult;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
+/**
+ * Builds one or more lifecycles for a full module
+ *
+ * @author Benjamin Bentmann
+ * @author Jason van Zyl
+ * @author Kristian Rosenvold (extracted class)
+ *         <p/>
+ *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
+ */
+@Component(role = LifecycleModuleBuilder.class)
+public class LifecycleModuleBuilder
+{
+    @Requirement
+    private MojoExecutor mojoExecutor;
+
+    @Requirement
+    private BuilderCommon builderCommon;
+
+    public void buildProject( MavenSession session, ReactorContext reactorContext, MavenProject currentProject,
+                              TaskSegment taskSegment )
+    {
+        buildProject( session, session, reactorContext, currentProject, taskSegment );
+    }
+
+    public void buildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
+                              MavenProject currentProject, TaskSegment taskSegment )
+    {
+        boolean isAggregating = taskSegment.isAggregating();
+
+        session.setCurrentProject( currentProject );
+
+        long buildStartTime = System.currentTimeMillis();
+
+        try
+        {
+
+            if ( reactorContext.getReactorBuildStatus().isHaltedOrBlacklisted( currentProject ) )
+            {
+                DefaultLifecycleExecutor.fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
+                return;
+            }
+
+            DefaultLifecycleExecutor.fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
+
+            BuilderCommon.attachToThread( currentProject );
+            MavenExecutionPlan executionPlan = builderCommon.resolveBuildPlan( session, currentProject, taskSegment );
+
+            DependencyContext dependencyContext = new DependencyContext( executionPlan, isAggregating );
+            mojoExecutor.execute( session, executionPlan.getMojoExecutions(), reactorContext.getProjectIndex(),
+                                  dependencyContext );
+
+            long buildEndTime = System.currentTimeMillis();
+
+            reactorContext.getResult().addBuildSummary(
+                new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
+
+            DefaultLifecycleExecutor.fireEvent( session, null, LifecycleEventCatapult.PROJECT_SUCCEEDED );
+        }
+        catch ( Exception e )
+        {
+            BuilderCommon.handleBuildError( reactorContext, rootSession, currentProject, e, buildStartTime );
+        }
+        finally
+        {
+            session.setCurrentProject( null );
+
+            Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );
+        }
+    }
+}

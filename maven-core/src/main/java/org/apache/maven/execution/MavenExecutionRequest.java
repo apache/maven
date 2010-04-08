@@ -152,6 +152,15 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setMakeBehavior( String makeBehavior );
     String getMakeBehavior();
 
+    void setThreadCount( String threadCount );
+    String getThreadCount();
+    boolean isThreadConfigurationPresent();
+    void setPerCoreThreadCount(boolean perCoreThreadCount);
+    boolean isPerCoreThreadCount();
+
+    boolean isWeaveMode();
+
+
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
     boolean isRecursive();
@@ -269,6 +278,6 @@ public interface MavenExecutionRequest
     ExecutionListener getExecutionListener();
     MavenExecutionRequest setExecutionListener( ExecutionListener executionListener );
 
-    ProjectBuildingRequest getProjectBuildingRequest();    
+    ProjectBuildingRequest getProjectBuildingRequest();
 
 }

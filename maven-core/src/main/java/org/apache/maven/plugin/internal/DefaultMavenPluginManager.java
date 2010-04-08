@@ -475,7 +475,7 @@ public class DefaultMavenPluginManager
         }
     }
 
-    private void populatePluginFields( Object mojo, MojoDescriptor mojoDescriptor, ClassRealm pluginRealm,
+    private synchronized void populatePluginFields( Object mojo, MojoDescriptor mojoDescriptor, ClassRealm pluginRealm,
                                        PlexusConfiguration configuration, ExpressionEvaluator expressionEvaluator )
         throws PluginConfigurationException
     {

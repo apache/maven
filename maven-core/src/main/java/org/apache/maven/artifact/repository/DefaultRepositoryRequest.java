@@ -22,6 +22,8 @@ package org.apache.maven.artifact.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
@@ -66,6 +68,21 @@ public class DefaultRepositoryRequest
         setCache( repositoryRequest.getCache() );
         setForceUpdate( repositoryRequest.isForceUpdate() );
         setTransferListener( repositoryRequest.getTransferListener() );
+    }
+
+    public static RepositoryRequest getRepositoryRequest(MavenSession session, MavenProject project) {
+        RepositoryRequest request = new DefaultRepositoryRequest();
+
+        request.setCache(session.getRepositoryCache());
+        request.setLocalRepository(session.getLocalRepository());
+        if (project != null) {
+            request.setRemoteRepositories(project.getPluginArtifactRepositories());
+        }
+        request.setOffline(session.isOffline());
+        request.setForceUpdate(session.getRequest().isUpdateSnapshots());
+        request.setTransferListener(session.getRequest().getTransferListener());
+
+        return request;
     }
 
     public boolean isOffline()

@@ -98,6 +98,8 @@ public class CLIManager
 
     public static final String ENCRYPT_PASSWORD = "ep";
 
+    public static final String THREADS = "T";
+
     private Options options;
 
     @SuppressWarnings("static-access")
@@ -136,7 +138,8 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
-        
+        options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
+
         // Adding this back in for compatibility with the verifier that hard codes this option.
         
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );

@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>About these stubs</title>
+</head>
+<body>
+<h2>Design</h2>
+These stubs can be thought of as hand-coded mock obects. They allow unit tests to test only specific
+aspects of a component while ignoring others.
+
+These stubs form an internally consistent data-set that is not expected to change. They are
+used to test the individual components in the lifecycle with data that has expected characteristics
+and can be asserted as desired.
+
+You can change/extend these stubs, and tests should not be breaking too much, since most tests
+assert using expected values from the stubs. Normally, when you try to use data from the stubs that
+have not been properly populated, you'll get a nullpointer in your test and you then have to
+identify which stub creates that specific piece of data.
+                                            
+The most important stubs are:
+LifecycleExecutionPlanCalculatorStub
+ProjectDependencyGraphStub
+
+Since they define the primary structure of the project/build.
+
+The stubs define three top-level targets that are defined in  LifecycleTaskSegmentCalculatorStub;
+clean, aggr and install. "aggr" is an aggregating task while clean and install are lifecyclephases.
+There will be three items in the task list for this dataset.
+
+The stubs also exist at different "levels", where one test might wire stubs into a specific live implementation.
+In the next test that same "live implementation" will be used in a stub version instead.
+
+Not all live services have stubs, but can be added as needed.
+</body>
+</html>

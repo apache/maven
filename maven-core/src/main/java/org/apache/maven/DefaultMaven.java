@@ -40,6 +40,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
@@ -191,7 +192,8 @@ public class DefaultMaven
             // Reactor
             // Workspace
             // User Local Repository
-            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap, session ) );
+            final boolean isWeaveMode = LifecycleWeaveBuilder.isWeaveMode( request);
+            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap, isWeaveMode ) );
         }
         catch ( org.apache.maven.DuplicateProjectException e )
         {
@@ -245,7 +247,7 @@ public class DefaultMaven
         }
 
         result.setTopologicallySortedProjects( session.getProjects() );
-        
+
         if ( result.hasExceptions() )
         {
             return result;

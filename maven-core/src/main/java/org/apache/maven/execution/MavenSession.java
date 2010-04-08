@@ -22,6 +22,7 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -44,9 +45,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @version $Id$
  */
 public class MavenSession
+    implements Cloneable
 {
     private PlexusContainer container;
-    
+
     private MavenExecutionRequest request;
 
     private MavenExecutionResult result;
@@ -56,27 +58,28 @@ public class MavenSession
     private Properties executionProperties;
 
     private MavenProject currentProject;
-        
+
     /**
      * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
      * being passed into the session.
      */
     private List<MavenProject> projects;
-    
+
     private MavenProject topLevelProject;
 
     private ProjectDependencyGraph projectDependencyGraph;
 
-    private Collection<String> blackListedProjects;
+    private boolean parallel;
 
-    private final Map<String,Map<String,Map<String,Object>>>  pluginContextsByProjectAndPluginKey =
-        new ConcurrentHashMap<String,Map<String,Map<String,Object>>> ();
+    private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
+        new ConcurrentHashMap<String, Map<String, Map<String, Object>>>();
 
     @Deprecated
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, MavenProject project )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
+                         MavenProject project )
     {
-        this( container, request, result, Arrays.asList( new MavenProject[]{ project } ) );        
-    }    
+        this( container, request, result, Arrays.asList( new MavenProject[]{project} ) );
+    }
 
     @Deprecated
     public MavenSession( PlexusContainer container, Settings settings, ArtifactRepository localRepository,
@@ -105,7 +108,8 @@ public class MavenSession
     }
 
     @Deprecated
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result, List<MavenProject> projects )
+    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result,
+                         List<MavenProject> projects )
     {
         this.container = container;
         this.request = request;
@@ -143,8 +147,8 @@ public class MavenSession
             this.topLevelProject = null;
         }
         this.projects = projects;
-    }    
-        
+    }
+
     @Deprecated
     public PlexusContainer getContainer()
     {
@@ -198,7 +202,7 @@ public class MavenSession
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @return The user properties, never {@code null}.
      */
     public Properties getUserProperties()
@@ -209,7 +213,7 @@ public class MavenSession
     /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @return The system properties, never {@code null}.
      */
     public Properties getSystemProperties()
@@ -237,7 +241,7 @@ public class MavenSession
     {
         return settings;
     }
-    
+
     public List<MavenProject> getProjects()
     {
         return projects;
@@ -278,16 +282,16 @@ public class MavenSession
     {
         return request.getProjectBuildingRequest();
     }
-    
+
     public List<String> getPluginGroups()
     {
         return request.getPluginGroups();
     }
-    
+
     public boolean isOffline()
     {
         return request.isOffline();
-    }        
+    }
 
     public MavenProject getTopLevelProject()
     {
@@ -297,10 +301,10 @@ public class MavenSession
     public MavenExecutionResult getResult()
     {
         return result;
-    }        
-
+    }
 
     // Backward compat
+
     public Map<String, Object> getPluginContext( PluginDescriptor plugin, MavenProject project )
     {
         String projectKey = project.getId();
@@ -328,6 +332,11 @@ public class MavenSession
         return pluginContext;
     }
 
+    public ProjectDependencyGraph getProjectDependencyGraph()
+    {
+        return projectDependencyGraph;
+    }
+
     public void setProjectDependencyGraph( ProjectDependencyGraph projectDependencyGraph )
     {
         this.projectDependencyGraph = projectDependencyGraph;
@@ -338,24 +347,16 @@ public class MavenSession
         return request.getReactorFailureBehavior();
     }
 
-    public boolean isBlackListed( MavenProject project )
+    @Override
+    public MavenSession clone()
     {
-        return blackListedProjects != null && blackListedProjects.contains( getId( project ) );
-    }
-
-    public void blackList( MavenProject project )
-    {
-        if ( blackListedProjects == null )
+        try
         {
-            blackListedProjects = new HashSet<String>();
+            return (MavenSession) super.clone();
         }
-
-        if ( blackListedProjects.add( getId( project ) ) && projectDependencyGraph != null )
+        catch ( CloneNotSupportedException e )
         {
-            for ( MavenProject downstreamProject : projectDependencyGraph.getDownstreamProjects( project, true ) )
-            {
-                blackListedProjects.add( getId( downstreamProject ) );
-            }
+            throw new RuntimeException( "Bug", e );
         }
     }
 
@@ -375,4 +376,11 @@ public class MavenSession
         return request.getStartTime();
     }
 
+    public boolean isParallel() {
+        return parallel;
+    }
+
+    public void setParallel(boolean parallel) {
+        this.parallel = parallel;
+    }
 }

@@ -28,7 +28,7 @@ import org.apache.maven.execution.ExecutionListener;
  * 
  * @author Benjamin Bentmann
  */
-interface LifecycleEventCatapult
+public interface LifecycleEventCatapult
 {
 
     /**

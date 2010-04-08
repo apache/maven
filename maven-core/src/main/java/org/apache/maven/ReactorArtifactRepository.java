@@ -1,18 +1,12 @@
 package org.apache.maven;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.LocalArtifactRepository;
+
+import java.io.File;
+import java.util.*;
 
 /**
  * An implementation of a repository that knows how to search the Maven reactor for artifacts.
@@ -27,11 +21,15 @@ public class ReactorArtifactRepository
 
     private Map<String, List<String>> availableVersions;
 
+    private final boolean isWeaveMode;
+
     private final int hashCode;
 
-    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects, MavenSession session )
+        @SuppressWarnings({"ConstantConditions"})
+    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects, boolean isWeaveMode )
     {
         this.reactorProjects = reactorProjects;
+        this.isWeaveMode = isWeaveMode;
         hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
 
         availableVersions = new HashMap<String, List<String>>( reactorProjects.size() * 2 );
@@ -70,7 +68,7 @@ public class ReactorArtifactRepository
 
                 Artifact projectArtifact = findMatchingArtifact( project, artifact );
 
-                if ( projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists() )
+                if ( !isWeaveMode && (projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists()) )
                 {
                     //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
                     // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package

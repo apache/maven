@@ -201,7 +201,7 @@ public class DefaultExceptionHandler
                     reference = exception.getClass().getSimpleName();
                 }
             }
-            else if ( exception instanceof LifecycleExecutionException )
+            else if ( exception instanceof LifecycleExecutionException)
             {
                 reference = getReference( exception.getCause() );
             }
