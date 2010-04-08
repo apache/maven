@@ -72,7 +72,6 @@ public class IntegrationTestSuite
         // Tests that currently don't pass for any Maven version, i.e. the corresponding issue hasn't been resolved yet
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
-        // suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
         // suite.addTestSuite( MavenITmng2994SnapshotRangeRepositoryTest.class );
         // suite.addTestSuite( MavenITmng2771PomExtensionComponentOverrideTest.class );
@@ -327,6 +326,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3671PluginLevelDepInterpolationTest.class );
         suite.addTestSuite( MavenITmng3667ResolveDepsWithBadPomVersionTest.class );
         suite.addTestSuite( MavenITmng3652UserAgentHeaderTest.class );
+        suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
         suite.addTestSuite( MavenITmng3641ProfileActivationWarningTest.class );
         suite.addTestSuite( MavenITmng3621UNCInheritedPathsTest.class );

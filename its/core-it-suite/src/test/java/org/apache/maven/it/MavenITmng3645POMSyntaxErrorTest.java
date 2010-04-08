@@ -37,23 +37,27 @@ import java.io.File;
 public class MavenITmng3645POMSyntaxErrorTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3645POMSyntaxErrorTest()
     {
-        super( "(2.0.9,2.1.0-M1),(2.1.0-M1,)" ); // only test in 2.0.10+, but not 2.1.0-M1
+        super( "[2.0.10,2.1.0-M1),[2.1.0,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
-    public void testitMNG3645 ()
+    /**
+     * Verify that POMs of reactor projects are parsed in strict mode.
+     */
+    public void testit()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3645" );
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
 
         try
         {
             verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
 
             fail( "Should fail to validate the POM syntax due to missing dependency element inside dependencyManagement section." );
         }
@@ -61,5 +65,10 @@ public class MavenITmng3645POMSyntaxErrorTest
         {
             // expect this.
         }
+        finally
+        {
+            verifier.resetStreams();
+        }
     }
+
 }
