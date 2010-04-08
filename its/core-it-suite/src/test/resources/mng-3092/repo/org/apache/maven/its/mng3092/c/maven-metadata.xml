@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>org.apache.maven.its.mng3092</groupId>
+  <artifactId>c</artifactId>
+  <version>1.1-SNAPSHOT</version>
+  <versioning>
+    <versions>
+      <version>1.1-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20100408111330</lastUpdated>
+  </versioning>
+</metadata>
