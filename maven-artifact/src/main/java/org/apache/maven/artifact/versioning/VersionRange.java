@@ -50,7 +50,7 @@ public class VersionRange
         return recommendedVersion;
     }
 
-    public List getRestrictions()
+    public List<Restriction> getRestrictions()
     {
         return restrictions;
     }
@@ -312,10 +312,10 @@ public class VersionRange
     private List<Restriction> intersection( List<Restriction> r1, List<Restriction> r2 )
     {
         List<Restriction> restrictions = new ArrayList<Restriction>( r1.size() + r2.size() );
-        Iterator i1 = r1.iterator();
-        Iterator i2 = r2.iterator();
-        Restriction res1 = (Restriction) i1.next();
-        Restriction res2 = (Restriction) i2.next();
+        Iterator<Restriction> i1 = r1.iterator();
+        Iterator<Restriction> i2 = r2.iterator();
+        Restriction res1 = i1.next();
+        Restriction res2 = i2.next();
 
         boolean done = false;
         while ( !done )
@@ -505,9 +505,9 @@ public class VersionRange
         else
         {
             StringBuilder buf = new StringBuilder();
-            for ( Iterator i = restrictions.iterator(); i.hasNext(); )
+            for ( Iterator<Restriction> i = restrictions.iterator(); i.hasNext(); )
             {
-                Restriction r = (Restriction) i.next();
+                Restriction r = i.next();
 
                 buf.append( r.toString() );
 
