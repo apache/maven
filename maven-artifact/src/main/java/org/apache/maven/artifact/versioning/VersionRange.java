@@ -268,16 +268,13 @@ public class VersionRange
         ArtifactVersion version = null;
         if ( restrictions.size() > 0 )
         {
-            boolean found = false;
-            for ( Iterator i = restrictions.iterator(); i.hasNext() && !found; )
+            for ( Restriction r : restrictions )
             {
-                Restriction r = (Restriction) i.next();
-
                 if ( recommendedVersion != null && r.containsVersion( recommendedVersion ) )
                 {
                     // if we find the original, use that
                     version = recommendedVersion;
-                    found = true;
+                    break;
                 }
                 else if ( version == null && restriction.getRecommendedVersion() != null
                     && r.containsVersion( restriction.getRecommendedVersion() ) )
@@ -287,7 +284,7 @@ public class VersionRange
                 }
             }
         }
-        // Either the original or the specified version ranges have no restructions
+        // Either the original or the specified version ranges have no restrictions
         else if ( recommendedVersion != null )
         {
             // Use the original recommended version since it exists
@@ -408,7 +405,7 @@ public class VersionRange
                         // advance res2
                         if ( i2.hasNext() )
                         {
-                            res2 = (Restriction) i2.next();
+                            res2 = i2.next();
                         }
                         else
                         {
@@ -420,7 +417,7 @@ public class VersionRange
                         // advance res1
                         if ( i1.hasNext() )
                         {
-                            res1 = (Restriction) i1.next();
+                            res1 = i1.next();
                         }
                         else
                         {
@@ -433,7 +430,7 @@ public class VersionRange
                     // move on to next in r1
                     if ( i1.hasNext() )
                     {
-                        res1 = (Restriction) i1.next();
+                        res1 = i1.next();
                     }
                     else
                     {
@@ -446,7 +443,7 @@ public class VersionRange
                 // move on to next in r2
                 if ( i2.hasNext() )
                 {
-                    res2 = (Restriction) i2.next();
+                    res2 = i2.next();
                 }
                 else
                 {
@@ -513,7 +510,7 @@ public class VersionRange
 
                 if ( i.hasNext() )
                 {
-                    buf.append( "," );
+                    buf.append( ',' );
                 }
             }
             return buf.toString();
