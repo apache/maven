@@ -23,6 +23,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.BuildListCalculator;
 import org.apache.maven.lifecycle.internal.ConcurrencyDependencyGraph;
 import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
+import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleThreadedBuilder;
@@ -40,6 +41,7 @@ import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -92,6 +94,9 @@ public class DefaultLifecycleExecutor
 
     @Requirement
     private LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
+
+    @Requirement
+    private LifecycleExecutionPlanCalculator lifecycleExecutionPlanCalculator;
 
     @Requirement
     private ThreadConfigurationService threadConfigService;
@@ -148,7 +153,7 @@ public class DefaultLifecycleExecutor
             {
                 ExecutorService executor = threadConfigService.getExecutorService( executionRequest.getThreadCount(),
                                                                                    executionRequest.isPerCoreThreadCount(),
-                                                                                   session.getProjects().size());
+                                                                                   session.getProjects().size() );
                 try
                 {
 
@@ -169,7 +174,8 @@ public class DefaultLifecycleExecutor
                         CompletionService<ProjectSegment> service =
                             new ExecutorCompletionService<ProjectSegment>( executor );
 
-                        lifecycleThreadedBuilder.build( session, callableContext, projectBuilds, taskSegments, analyzer, service );
+                        lifecycleThreadedBuilder.build( session, callableContext, projectBuilds, taskSegments, analyzer,
+                                                        service );
                     }
                 }
                 finally
@@ -208,7 +214,8 @@ public class DefaultLifecycleExecutor
             {
                 try
                 {
-                    lifecycleModuleBuilder.buildProject( session, callableContext, projectBuild.getProject(), taskSegment );
+                    lifecycleModuleBuilder.buildProject( session, callableContext, projectBuild.getProject(),
+                                                         taskSegment );
                     if ( reactorBuildStatus.isHalted() )
                     {
                         break;
@@ -279,5 +286,27 @@ public class DefaultLifecycleExecutor
         return mojoDescriptorCreator.getMojoDescriptor( task, session, project );
     }
 
+    // Used by m2eclipse
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
+        PluginVersionResolutionException
+    {
+
+        List<TaskSegment> taskSegments = buildListCalculator.calculateTaskSegments( session );
+
+        TaskSegment mergedSegment = new TaskSegment( false );
+
+        for ( TaskSegment taskSegment : taskSegments )
+        {
+            mergedSegment.getTasks().addAll( taskSegment.getTasks() );
+        }
+
+        return lifecycleExecutionPlanCalculator.calculateExecutionPlan( session, session.getCurrentProject(),
+                                                                        mergedSegment.getTasks() );
+    }
 
 }

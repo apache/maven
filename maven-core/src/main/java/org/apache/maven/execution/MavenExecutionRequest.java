@@ -158,9 +158,6 @@ public interface MavenExecutionRequest
     void setPerCoreThreadCount(boolean perCoreThreadCount);
     boolean isPerCoreThreadCount();
 
-    boolean isWeaveMode();
-
-
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
     boolean isRecursive();

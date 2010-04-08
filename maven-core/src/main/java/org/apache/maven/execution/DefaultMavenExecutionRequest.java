@@ -127,8 +127,8 @@ public class DefaultMavenExecutionRequest
     private ExecutionListener executionListener;
 
     private String threadCount;
+
     private boolean perCoreThreadCount;
-    private boolean weaveMode;
 
     /**
      * Suppress SNAPSHOT updates.
@@ -1028,28 +1028,29 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public String getThreadCount() {
+    public String getThreadCount()
+    {
         return threadCount;
     }
 
-    public void setThreadCount(String threadCount) {
+    public void setThreadCount( String threadCount )
+    {
         this.threadCount = threadCount;
     }
 
-    public boolean isThreadConfigurationPresent() {
+    public boolean isThreadConfigurationPresent()
+    {
         return getThreadCount() != null;
     }
 
-    public boolean isPerCoreThreadCount() {
+    public boolean isPerCoreThreadCount()
+    {
         return perCoreThreadCount;
     }
 
-    public void setPerCoreThreadCount(boolean perCoreThreadCount) {
+    public void setPerCoreThreadCount( boolean perCoreThreadCount )
+    {
         this.perCoreThreadCount = perCoreThreadCount;
-    }
-
-    public boolean isWeaveMode() {
-        return weaveMode;
     }
 
 }

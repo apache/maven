@@ -866,20 +866,20 @@ public class MavenCli
             request.setLocalRepositoryPath( localRepoProperty );
         }
 
+        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
+            ? commandLine.getOptionValue( CLIManager.THREADS )
+            : request.getSystemProperties().getProperty(
+                MavenCli.THREADS_DEPRECATED ); // TODO: Remove this setting. Note that the int-tests use it
 
-        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS ) ?
-                commandLine.getOptionValue( CLIManager.THREADS) :
-                request.getSystemProperties().getProperty(MavenCli.THREADS_DEPRECATED); // TODO: Remove this setting. Note that the int-tests use it
-
-        if (threadConfiguration != null){
-            request.setPerCoreThreadCount( threadConfiguration.contains("C"));
-            if (threadConfiguration.contains("W"))
+        if ( threadConfiguration != null )
+        {
+            request.setPerCoreThreadCount( threadConfiguration.contains( "C" ) );
+            if ( threadConfiguration.contains( "W" ) )
             {
-                LifecycleWeaveBuilder.setWeaveMode(request.getUserProperties());
+                LifecycleWeaveBuilder.setWeaveMode( request.getUserProperties() );
             }
-            request.setThreadCount(threadConfiguration.replace("C", "").replace("W", "").replace("auto", ""));
+            request.setThreadCount( threadConfiguration.replace( "C", "" ).replace( "W", "" ).replace( "auto", "" ) );
         }
-
 
         return request;
     }

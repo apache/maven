@@ -376,11 +376,13 @@ public class MavenSession
         return request.getStartTime();
     }
 
-    public boolean isParallel() {
+    public boolean isParallel()
+    {
         return parallel;
     }
 
-    public void setParallel(boolean parallel) {
+    public void setParallel( boolean parallel )
+    {
         this.parallel = parallel;
     }
 }
