@@ -31,7 +31,7 @@ under the License.
     </default>
   </defaults>
   <classes>
-    <class rootElement="true">
+    <class rootElement="true" java.clone="deep">
       <name>Metadata</name>
       <version>1.0.0</version>
       <fields>
@@ -201,7 +201,7 @@ under the License.
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Versioning</name>
       <version>1.0.0</version>
       <description>Versioning information for an artifact</description>
@@ -262,7 +262,7 @@ under the License.
         </codeSegment>
       </codeSegments>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Snapshot</name>
       <version>1.0.0</version>
       <description>Snapshot data for the current version</description>
@@ -288,7 +288,7 @@ under the License.
         </field>
       </fields>
     </class>
-    <class>
+    <class java.clone="deep">
       <name>Plugin</name>
       <version>1.0.0</version>
       <description>Mapping information for a single plugin within this group</description>

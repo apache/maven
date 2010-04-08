@@ -1,7 +1,5 @@
 package org.apache.maven.artifact.repository.metadata;
 
-import java.util.ArrayList;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -29,78 +27,13 @@ import java.util.ArrayList;
 class MetadataUtils
 {
 
-    // TODO: Kill this class once MODELLO-191 is released
-
     public static Metadata cloneMetadata( Metadata src )
     {
         if ( src == null )
         {
             return null;
         }
-
-        Metadata target = new Metadata();
-
-        target.setGroupId( src.getGroupId() );
-        target.setArtifactId( src.getArtifactId() );
-        target.setVersion( src.getVersion() );
-        target.setVersioning( cloneVersioning( src.getVersioning() ) );
-
-        for ( Plugin plugin : src.getPlugins() )
-        {
-            target.addPlugin( clonePlugin( plugin ) );
-        }
-
-        return target;
-    }
-
-    public static Plugin clonePlugin( Plugin src )
-    {
-        if ( src == null )
-        {
-            return null;
-        }
-
-        Plugin target = new Plugin();
-
-        target.setArtifactId( src.getArtifactId() );
-        target.setName( src.getName() );
-        target.setPrefix( src.getPrefix() );
-
-        return target;
-    }
-
-    public static Versioning cloneVersioning( Versioning src )
-    {
-        if ( src == null )
-        {
-            return null;
-        }
-
-        Versioning target = new Versioning();
-
-        target.setLastUpdated( src.getLastUpdated() );
-        target.setLatest( src.getLatest() );
-        target.setRelease( src.getRelease() );
-        target.setSnapshot( cloneSnapshot( src.getSnapshot() ) );
-        target.setVersions( new ArrayList<String>( src.getVersions() ) );
-
-        return target;
-    }
-
-    public static Snapshot cloneSnapshot( Snapshot src )
-    {
-        if ( src == null )
-        {
-            return null;
-        }
-
-        Snapshot target = new Snapshot();
-
-        target.setBuildNumber( src.getBuildNumber() );
-        target.setLocalCopy( src.isLocalCopy() );
-        target.setTimestamp( src.getTimestamp() );
-
-        return target;
+        return src.clone();
     }
 
 }
