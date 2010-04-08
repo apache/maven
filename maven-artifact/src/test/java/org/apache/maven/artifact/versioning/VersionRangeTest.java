@@ -56,7 +56,7 @@ public class VersionRangeTest
         Artifact artifact = null;
         
         VersionRange range = VersionRange.createFromVersionSpec( "(,1.0]" );
-        List restrictions = range.getRestrictions();
+        List<Restriction> restrictions = range.getRestrictions();
         assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
         Restriction restriction = (Restriction) restrictions.get( 0 );
         assertNull( CHECK_LOWER_BOUND, restriction.getLowerBound() );
@@ -148,7 +148,7 @@ public class VersionRangeTest
         range = VersionRange.createFromVersionSpec( "[1.0,)" );
         assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
 
-        range = VersionRange.createFromVersionSpec( "[1.0,1.1]" );
+        range = VersionRange.createFromVersionSpec( "[1.0,1.1-SNAPSHOT]" );
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
 
         range = VersionRange.createFromVersionSpec( "[5.0.9.0,5.0.10.0)" );
@@ -182,7 +182,7 @@ public class VersionRangeTest
         // TODO: current policy is to retain the original version - is this correct, do we need strategies or is that handled elsewhere?
 //        assertEquals( CHECK_VERSION_RECOMMENDATION, "1.1", mergedRange.getRecommendedVersion().toString() );
         assertEquals( CHECK_VERSION_RECOMMENDATION, "1.0", mergedRange.getRecommendedVersion().toString() );
-        List restrictions = mergedRange.getRestrictions();
+        List<Restriction> restrictions = mergedRange.getRestrictions();
         assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );
         Restriction restriction = (Restriction) restrictions.get( 0 );
         assertNull( CHECK_LOWER_BOUND, restriction.getLowerBound() );
@@ -653,6 +653,37 @@ public class VersionRangeTest
         assertNull( CHECK_VERSION_RECOMMENDATION, mergedRange.getRecommendedVersion() );
         restrictions = mergedRange.getRestrictions();
         assertEquals( CHECK_NUM_RESTRICTIONS, 0, restrictions.size() );
+    }
+
+    public void testReleaseRangeBoundsCannotContainSnapshots()
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange range = VersionRange.createFromVersionSpec( "[1.0,1.2]" );
+
+        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.2-SNAPSHOT" ) ) );
+    }
+
+    public void testSnapshotRangeBoundsCanContainSnapshots()
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange range = VersionRange.createFromVersionSpec( "[1.0,1.2-SNAPSHOT]" );
+
+        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.2-SNAPSHOT" ) ) );
+
+        range = VersionRange.createFromVersionSpec( "[1.0-SNAPSHOT,1.2]" );
+
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
+        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+    }
+
+    public void testSnapshotSoftVersionCanContainSnapshot()
+        throws InvalidVersionSpecificationException
+    {
+        VersionRange range = VersionRange.createFromVersionSpec( "1.0-SNAPSHOT" );
+
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
     }
 
     private void checkInvalidRange( String version )
