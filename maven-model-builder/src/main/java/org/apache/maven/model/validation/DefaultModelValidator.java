@@ -397,7 +397,7 @@ public class DefaultModelValidator
                         {
                             msg += ". Please verify that you run Maven using a JDK and not just a JRE.";
                         }
-                        addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), msg );
+                        addViolation( problems, Severity.WARNING, prefix + "systemPath", d.getManagementKey(), msg );
                     }
                 }
             }
