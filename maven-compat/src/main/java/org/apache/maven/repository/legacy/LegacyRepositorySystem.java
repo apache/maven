@@ -411,64 +411,15 @@ public class LegacyRepositorySystem
         {
             if ( effectivePolicy == null )
             {
-                effectivePolicy = new ArtifactRepositoryPolicy( policy.isEnabled(), policy.getUpdatePolicy(), policy.getChecksumPolicy() );
+                effectivePolicy = new ArtifactRepositoryPolicy( policy );
             }
             else
             {
-                if ( policy.isEnabled() )
-                {
-                    effectivePolicy.setEnabled( true );
-
-                    if ( ordinalOfChecksumPolicy( policy.getChecksumPolicy() ) < ordinalOfChecksumPolicy( effectivePolicy.getChecksumPolicy() ) )
-                    {
-                        effectivePolicy.setChecksumPolicy( policy.getChecksumPolicy() );
-                    }
-
-                    if ( ordinalOfUpdatePolicy( policy.getUpdatePolicy() ) < ordinalOfUpdatePolicy( effectivePolicy.getUpdatePolicy() ) )
-                    {
-                        effectivePolicy.setUpdatePolicy( policy.getUpdatePolicy() );
-                    }
-                }
+                effectivePolicy.merge( policy );
             }
         }
 
         return effectivePolicy;
-    }
-
-    private int ordinalOfChecksumPolicy( String policy )
-    {
-        if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( policy ) )
-        {
-            return 2;
-        }
-        else if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals( policy ) )
-        {
-            return 0;
-        }
-        else
-        {
-            return 1;
-        }
-    }
-
-    private int ordinalOfUpdatePolicy( String policy )
-    {
-        if ( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals( policy ) )
-        {
-            return 1440;
-        }
-        else if ( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( policy ) )
-        {
-            return 0;
-        }
-        else if ( policy != null && policy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
-        {
-            return 60;
-        }
-        else
-        {
-            return Integer.MAX_VALUE;
-        }
     }
 
     public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )

@@ -56,6 +56,11 @@ public class ArtifactRepositoryPolicy
         this( true, null, null );
     }
 
+    public ArtifactRepositoryPolicy( ArtifactRepositoryPolicy policy )
+    {
+        this( policy.isEnabled(), policy.getUpdatePolicy(), policy.getChecksumPolicy() );
+    }
+
     public ArtifactRepositoryPolicy( boolean enabled,
                                      String updatePolicy,
                                      String checksumPolicy )
@@ -161,6 +166,61 @@ public class ArtifactRepositoryPolicy
         buffer.append( updatePolicy );
         buffer.append( "}" );
         return buffer.toString();
+    }
+
+    public void merge( ArtifactRepositoryPolicy policy )
+    {
+        if ( policy != null && policy.isEnabled() )
+        {
+            setEnabled( true );
+
+            if ( ordinalOfChecksumPolicy( policy.getChecksumPolicy() ) < ordinalOfChecksumPolicy( getChecksumPolicy() ) )
+            {
+                setChecksumPolicy( policy.getChecksumPolicy() );
+            }
+
+            if ( ordinalOfUpdatePolicy( policy.getUpdatePolicy() ) < ordinalOfUpdatePolicy( getUpdatePolicy() ) )
+            {
+                setUpdatePolicy( policy.getUpdatePolicy() );
+            }
+        }
+    }
+
+    private int ordinalOfChecksumPolicy( String policy )
+    {
+        if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( policy ) )
+        {
+            return 2;
+        }
+        else if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals( policy ) )
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+
+    private int ordinalOfUpdatePolicy( String policy )
+    {
+        if ( ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY.equals( policy ) )
+        {
+            return 1440;
+        }
+        else if ( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( policy ) )
+        {
+            return 0;
+        }
+        else if ( policy != null && policy.startsWith( ArtifactRepositoryPolicy.UPDATE_POLICY_INTERVAL ) )
+        {
+            String s = policy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
+            return Integer.valueOf( s );
+        }
+        else
+        {
+            return Integer.MAX_VALUE;
+        }
     }
 
 }

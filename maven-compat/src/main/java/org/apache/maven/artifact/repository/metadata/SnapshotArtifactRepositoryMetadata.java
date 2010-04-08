@@ -82,6 +82,11 @@ public class SnapshotArtifactRepositoryMetadata
         return artifact.isSnapshot();
     }
 
+    public int getNature()
+    {
+        return isSnapshot() ? SNAPSHOT : RELEASE;
+    }
+
     public ArtifactRepository getRepository()
     {
         return artifact.getRepository();

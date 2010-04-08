@@ -113,8 +113,7 @@ public class DefaultRepositoryMetadataManager
 
             for ( ArtifactRepository repository : remoteRepositories )
             {
-                ArtifactRepositoryPolicy policy =
-                    metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+                ArtifactRepositoryPolicy policy = metadata.getPolicy( repository );
 
                 File file =
                     new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata,
@@ -352,7 +351,7 @@ public class DefaultRepositoryMetadataManager
         ArtifactRepository selected = null;
         for ( ArtifactRepository repository : remoteRepositories )
         {
-            ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+            ArtifactRepositoryPolicy policy = metadata.getPolicy( repository );
 
             if ( policy.isEnabled() && loadMetadata( metadata, repository, localRepository, previousMetadata ) )
             {

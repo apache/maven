@@ -27,6 +27,7 @@ import java.io.Writer;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
@@ -214,4 +215,29 @@ public abstract class AbstractRepositoryMetadata
 
         return buffer.toString();
     }
+
+    public int getNature()
+    {
+        return RELEASE;
+    }
+
+    public ArtifactRepositoryPolicy getPolicy( ArtifactRepository repository )
+    {
+        int nature = getNature();
+        if ( ( nature & RepositoryMetadata.RELEASE_OR_SNAPSHOT ) == RepositoryMetadata.RELEASE_OR_SNAPSHOT )
+        {
+            ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy( repository.getReleases() );
+            policy.merge( repository.getSnapshots() );
+            return policy;
+        }
+        else if ( ( nature & RepositoryMetadata.SNAPSHOT ) != 0 )
+        {
+            return repository.getSnapshots();
+        }
+        else
+        {
+            return repository.getReleases();
+        }
+    }
+
 }

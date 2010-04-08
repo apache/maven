@@ -117,7 +117,7 @@ public class DefaultUpdateCheckManager
         // NOTE: Release metadata includes version information about artifacts that have been released, to allow
         // meta-versions like RELEASE and LATEST to resolve, and also to allow retrieval of the range of valid, released
         // artifacts available.
-        ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+        ArtifactRepositoryPolicy policy = metadata.getPolicy( repository );
 
         if ( !policy.isEnabled() )
         {
