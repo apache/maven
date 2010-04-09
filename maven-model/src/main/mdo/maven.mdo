@@ -1948,7 +1948,9 @@
       <version>4.0.0</version>
       <description>
         <![CDATA[
-        The <code>&lt;parent&gt;</code> element contains informations required to the parent project.
+        The <code>&lt;parent&gt;</code> element contains information required to locate the parent project from which
+        this project will inherit from.
+        <strong>Note:</strong> The children of this element are not interpolated and must be given as literal values.
         ]]>
       </description>
       <fields>
@@ -1979,7 +1981,7 @@
             <![CDATA[
             The relative path of the parent <code>pom.xml</code> file within the check out.
             The default value is <code>../pom.xml</code>.
-            Maven looks for the parent pom first in the reactor of currently building projects, then in this location on
+            Maven looks for the parent pom first in this location on
             the filesystem, then the local repository, and lastly in the remote repo.
             <code>relativePath</code> allows you to select a different location,
             for example when your structure is flat, or deeper without an intermediate parent pom.
