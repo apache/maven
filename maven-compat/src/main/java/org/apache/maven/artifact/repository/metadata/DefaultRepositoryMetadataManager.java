@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,6 +33,7 @@ import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -41,6 +43,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
@@ -452,7 +455,7 @@ public class DefaultRepositoryMetadataManager
     }
 
     /** @todo share with DefaultPluginMappingManager. */
-    protected static Metadata readMetadata( File mappingFile )
+    protected Metadata readMetadata( File mappingFile )
         throws RepositoryMetadataReadException
     {
         Metadata result;
@@ -482,7 +485,66 @@ public class DefaultRepositoryMetadataManager
         {
             IOUtil.close( reader );
         }
+
         return result;
+    }
+
+    /**
+     * Ensures the last updated timestamp of the specified metadata does not refer to the future and fixes the local metadata if necessary to allow
+     * proper merging/updating of metadata during deployment.
+     */
+    private void fixTimestamp( File metadataFile, Metadata metadata, Metadata reference )
+    {
+        boolean changed = false;
+
+        if ( metadata != null && reference != null )
+        {
+            Versioning versioning = metadata.getVersioning();
+            Versioning versioningRef = reference.getVersioning();
+            if ( versioning != null && versioningRef != null )
+            {
+                String lastUpdated = versioning.getLastUpdated();
+                String now = versioningRef.getLastUpdated();
+                if ( lastUpdated != null && now != null && now.compareTo( lastUpdated ) < 0 )
+                {
+                    getLogger().warn(
+                                      "The last updated timestamp in " + metadataFile + " refers to the future (now = "
+                                          + now + ", lastUpdated = " + lastUpdated
+                                          + "). Please verify that the clocks of all"
+                                          + " deploying machines are reasonably synchronized." );
+                    versioning.setLastUpdated( now );
+                    changed = true;
+                }
+            }
+        }
+
+        if ( changed )
+        {
+            getLogger().debug( "Repairing metadata in " + metadataFile );
+
+            Writer writer = null;
+            try
+            {
+                writer = WriterFactory.newXmlWriter( metadataFile );
+                new MetadataXpp3Writer().write( writer, metadata );
+            }
+            catch ( IOException e )
+            {
+                String msg = "Could not write fixed metadata to " + metadataFile + ": " + e.getMessage();
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().warn( msg, e );
+                }
+                else
+                {
+                    getLogger().warn( msg );
+                }
+            }
+            finally
+            {
+                IOUtil.close( writer );
+            }
+        }
     }
 
     public void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
@@ -555,6 +617,18 @@ public class DefaultRepositoryMetadataManager
             catch ( TransferFailedException e )
             {
                 throw new RepositoryMetadataDeploymentException( metadata + " could not be retrieved from repository: " + deploymentRepository.getId() + " due to an error: " + e.getMessage(), e );
+            }
+
+            if ( file.isFile() )
+            {
+                try
+                {
+                    fixTimestamp( file, readMetadata( file ), ( (RepositoryMetadata) metadata ).getMetadata() );
+                }
+                catch ( RepositoryMetadataReadException e )
+                {
+                    // will be reported via storeInlocalRepository
+                }
             }
         }
         else
