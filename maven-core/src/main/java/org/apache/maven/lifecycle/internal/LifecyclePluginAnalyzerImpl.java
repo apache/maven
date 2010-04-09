@@ -146,6 +146,10 @@ public class LifecyclePluginAnalyzerImpl
             Plugin existing = plugins.get( plugin );
             if ( existing != null )
             {
+                if ( existing.getVersion() == null )
+                {
+                    existing.setVersion( plugin.getVersion() );
+                }
                 plugin = existing;
             }
             else

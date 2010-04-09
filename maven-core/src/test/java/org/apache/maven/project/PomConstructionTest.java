@@ -1453,7 +1453,7 @@ public class PomConstructionTest
 	    throws Exception
 	{
 	    PomTestWrapper pom = this.buildPom( "plugin-management-duplicate/sub");
-	    assertEquals( 20, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );   
+	    assertEquals( 12, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );   
 	} 
     
     public void testDistributionManagement()

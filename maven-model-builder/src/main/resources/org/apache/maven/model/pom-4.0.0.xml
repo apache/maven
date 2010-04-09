@@ -69,6 +69,8 @@ under the License.
       </testResource>
     </testResources>
     <pluginManagement>
+      <!-- NOTE: These plugins will be removed from future versions of the super POM -->
+      <!-- They are kept for the moment as they are very unlikely to conflict with lifecycle mappings (MNG-4453) -->
       <plugins>
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
@@ -79,72 +81,12 @@ under the License.
           <version>2.2-beta-5</version>
         </plugin>
         <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.4</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.1</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.1</version>
         </plugin>
         <plugin>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-ear-plugin</artifactId>
-          <version>2.4.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-ejb-plugin</artifactId>
-          <version>2.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-plugin-plugin</artifactId>
-          <version>2.5.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-rar-plugin</artifactId>
-          <version>2.2</version>
-        </plugin>
-        <plugin>
           <artifactId>maven-release-plugin</artifactId>
           <version>2.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>2.0.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.1</version>
-        </plugin>
-        <plugin>
-           <artifactId>maven-surefire-plugin</artifactId>
-           <version>2.5</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>2.1-beta-1</version>
         </plugin>
       </plugins>
     </pluginManagement>

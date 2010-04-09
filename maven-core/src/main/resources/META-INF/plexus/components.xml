@@ -97,7 +97,8 @@
                 <phase>post-clean</phase>
               </phases>
               <default-phases>
-                <clean>org.apache.maven.plugins:maven-clean-plugin:clean
+                <clean>
+                  org.apache.maven.plugins:maven-clean-plugin:2.4:clean
                 </clean>
               </default-phases>
             </lifecycle>
@@ -110,9 +111,11 @@
                 <phase>site-deploy</phase>
               </phases>
               <default-phases>
-                <site>org.apache.maven.plugins:maven-site-plugin:site
+                <site>
+                  org.apache.maven.plugins:maven-site-plugin:2.0.1:site
                 </site>
-                <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy
+                <site-deploy>
+                  org.apache.maven.plugins:maven-site-plugin:2.0.1:deploy
                 </site-deploy>
               </default-phases>
             </lifecycle>

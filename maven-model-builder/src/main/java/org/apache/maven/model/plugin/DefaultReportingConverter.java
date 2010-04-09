@@ -66,7 +66,13 @@ public class DefaultReportingConverter
         {
             sitePlugin = new Plugin();
             sitePlugin.setArtifactId( "maven-site-plugin" );
-            build.addPlugin( sitePlugin );
+            PluginManagement pluginManagement = build.getPluginManagement();
+            if ( pluginManagement == null )
+            {
+                pluginManagement = new PluginManagement();
+                build.setPluginManagement( pluginManagement );
+            }
+            pluginManagement.addPlugin( sitePlugin );
         }
 
         Xpp3Dom configuration = (Xpp3Dom) sitePlugin.getConfiguration();
