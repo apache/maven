@@ -647,6 +647,11 @@ public class DefaultModelBuilder
 
         String parentPath = childModel.getParent().getRelativePath();
 
+        if ( parentPath == null || parentPath.length() <= 0 )
+        {
+            return null;
+        }
+
         parentPath = parentPath.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
 
         File pomFile = new File( new File( projectDirectory, parentPath ).toURI().normalize() );
