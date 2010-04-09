@@ -454,6 +454,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1957JdkActivationWithVersionRangeTest.class );
         suite.addTestSuite( MavenITmng1908LegacySnapshotUpdateTest.class );
         suite.addTestSuite( MavenITmng1830ShowVersionTest.class );
+        suite.addTestSuite( MavenITmng1751ForcedMetadataUpdateDuringDeploymentTest.class );
         suite.addTestSuite( MavenITmng1703PluginMgmtDepInheritanceTest.class );
         suite.addTestSuite( MavenITmng1701DuplicatePluginTest.class );
         suite.addTestSuite( MavenITmng1493NonStandardModulePomNamesTest.class );
