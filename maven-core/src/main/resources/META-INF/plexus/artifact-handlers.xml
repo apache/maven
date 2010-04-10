@@ -75,13 +75,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
@@ -133,13 +133,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
@@ -199,13 +199,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
@@ -276,13 +276,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
@@ -367,13 +367,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
@@ -470,13 +470,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
@@ -526,13 +526,13 @@ problem.
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.2:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.1:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.3:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
