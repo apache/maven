@@ -99,4 +99,19 @@ public class AbstractExecutionListener
         // default does nothing
     }
 
+    public void forkedProjectStarted( ExecutionEvent event )
+    {
+        // default does nothing
+    }
+
+    public void forkedProjectSucceeded( ExecutionEvent event )
+    {
+        // default does nothing
+    }
+
+    public void forkedProjectFailed( ExecutionEvent event )
+    {
+        // default does nothing
+    }
+
 }

@@ -143,4 +143,28 @@ public interface LifecycleEventCatapult
         }
     };
 
+    static final LifecycleEventCatapult FORKED_PROJECT_STARTED = new LifecycleEventCatapult()
+    {
+        public void fire( ExecutionListener listener, ExecutionEvent event )
+        {
+            listener.forkedProjectStarted( event );
+        }
+    };
+
+    static final LifecycleEventCatapult FORKED_PROJECT_SUCCEEDED = new LifecycleEventCatapult()
+    {
+        public void fire( ExecutionListener listener, ExecutionEvent event )
+        {
+            listener.forkedProjectSucceeded( event );
+        }
+    };
+
+    static final LifecycleEventCatapult FORKED_PROJECT_FAILED = new LifecycleEventCatapult()
+    {
+        public void fire( ExecutionListener listener, ExecutionEvent event )
+        {
+            listener.forkedProjectFailed( event );
+        }
+    };
+
 }

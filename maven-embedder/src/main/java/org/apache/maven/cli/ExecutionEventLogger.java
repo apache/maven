@@ -261,17 +261,11 @@ class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            MojoExecution me = event.getMojoExecution();
             StringBuilder buffer = new StringBuilder( 128 );
 
             buffer.append( "--- " );
-            buffer.append( me.getArtifactId() ).append( ':' ).append( me.getVersion() );
-            buffer.append( ':' ).append( me.getGoal() );
-            if ( me.getExecutionId() != null )
-            {
-                buffer.append( " (" ).append( me.getExecutionId() ).append( ')' );
-            }
-            buffer.append( " @ " ).append( event.getProject().getArtifactId() );
+            append( buffer, event.getMojoExecution() );
+            append( buffer, event.getProject() );
             buffer.append( " ---" );
 
             logger.info( "" );
@@ -282,18 +276,63 @@ class ExecutionEventLogger
     @Override
     public void forkStarted( ExecutionEvent event )
     {
-        if ( logger.isDebugEnabled() )
+        if ( logger.isInfoEnabled() )
         {
-            logger.debug( "Forking execution for " + event.getMojoExecution().getMojoDescriptor().getId() );
+            StringBuilder buffer = new StringBuilder( 128 );
+
+            buffer.append( ">>> " );
+            append( buffer, event.getMojoExecution() );
+            append( buffer, event.getProject() );
+            buffer.append( " >>>" );
+
+            logger.info( "" );
+            logger.info( buffer.toString() );
         }
     }
 
     @Override
     public void forkSucceeded( ExecutionEvent event )
     {
-        if ( logger.isDebugEnabled() )
+        if ( logger.isInfoEnabled() )
         {
-            logger.debug( "Completed forked execution for " + event.getMojoExecution().getMojoDescriptor().getId() );
+            StringBuilder buffer = new StringBuilder( 128 );
+
+            buffer.append( "<<< " );
+            append( buffer, event.getMojoExecution() );
+            append( buffer, event.getProject() );
+            buffer.append( " <<<" );
+
+            logger.info( "" );
+            logger.info( buffer.toString() );
+        }
+    }
+
+    private void append( StringBuilder buffer, MojoExecution me )
+    {
+        buffer.append( me.getArtifactId() ).append( ':' ).append( me.getVersion() );
+        buffer.append( ':' ).append( me.getGoal() );
+        if ( me.getExecutionId() != null )
+        {
+            buffer.append( " (" ).append( me.getExecutionId() ).append( ')' );
+        }
+    }
+
+    private void append( StringBuilder buffer, MavenProject project )
+    {
+        buffer.append( " @ " ).append( project.getArtifactId() );
+    }
+
+    @Override
+    public void forkedProjectStarted( ExecutionEvent event )
+    {
+        if ( logger.isInfoEnabled() && event.getMojoExecution().getForkedExecutions().size() > 1 )
+        {
+            logger.info( chars( ' ', LINE_LENGTH ) );
+            logger.info( chars( '>', LINE_LENGTH ) );
+
+            logger.info( "Forking " + event.getProject().getName() + " " + event.getProject().getVersion() );
+
+            logger.info( chars( '>', LINE_LENGTH ) );
         }
     }
 

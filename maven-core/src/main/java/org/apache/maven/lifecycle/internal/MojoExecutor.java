@@ -130,8 +130,6 @@ public class MojoExecutor
             try
             {
                 pluginManager.executeMojo( session, mojoExecution );
-
-                DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
             }
             catch ( MojoFailureException e )
             {
@@ -230,8 +228,20 @@ public class MojoExecutor
                         session.getProjects().set( index, executedProject );
                         projectIndex.getProjects().put( fork.getKey(), executedProject );
 
+                        DefaultLifecycleExecutor.fireEvent( session, mojoExecution,
+                                                            LifecycleEventCatapult.FORKED_PROJECT_STARTED );
+
                         execute( session, fork.getValue(), projectIndex, dependencyContext );
 
+                        DefaultLifecycleExecutor.fireEvent( session, mojoExecution,
+                                                            LifecycleEventCatapult.FORKED_PROJECT_SUCCEEDED );
+                    }
+                    catch ( LifecycleExecutionException e )
+                    {
+                        DefaultLifecycleExecutor.fireEvent( session, mojoExecution,
+                                                            LifecycleEventCatapult.FORKED_PROJECT_FAILED );
+
+                        throw e;
                     }
                     finally
                     {

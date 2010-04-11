@@ -57,4 +57,10 @@ public interface ExecutionListener
 
     void forkFailed( ExecutionEvent event );
 
+    void forkedProjectStarted( ExecutionEvent event );
+
+    void forkedProjectSucceeded( ExecutionEvent event );
+
+    void forkedProjectFailed( ExecutionEvent event );
+
 }
