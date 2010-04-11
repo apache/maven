@@ -31,12 +31,13 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng4189UniqueVersionSnapshotTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng4189UniqueVersionSnapshotTest()
     {
-        super( "[2.2.1,)" );
+        super( "[2.2.1,),[3.0-alpha-3,)" );
     }
 
-    public void testmng4189()
+    public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4189" );
@@ -45,45 +46,40 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4189" );
-        Properties filterProps = verifier.newDefaultFilterProperties();
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
-        
+
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar 
-        //      which contains add() method
         verifier.setLogFileName( "log-1.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-       
+
+        Properties checksums = verifier.loadProperties( "target/checksum.properties" );
+        assertEquals( "da2e54f69a9ba120f9211c476029f049967d840c", checksums.getProperty( "dep-1.0-SNAPSHOT.jar" ) );
+
+        // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-2:jar 
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-f" );
         verifier.getCliOptions().add( "dependent-on-newer-timestamp-pom.xml" );
         verifier.setLogFileName( "log-2.txt" );
-        try
-        {
-         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090532-2-1:jar 
-         //     which DOES NOT contains add() method
-            verifier.executeGoal( "compile" );
-            fail( "Build should have failed due to compile errors!" );
-        }
-        catch ( VerificationException e )
-        {
-            assertTrue( true );
-        }
-        verifier.verifyTextInLog( "org.apache.maven.plugin.CompilationFailureException: Compilation failure" );
-        
-        verifier.deleteDirectory( "target" );
-        
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+
+        checksums = verifier.loadProperties( "target/checksum.properties" );
+        assertEquals( "835979c28041014c5fd55daa15302d92976924a7", checksums.getProperty( "dep-1.0-SNAPSHOT.jar" ) );
+
         // revert back to org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar 
-        //      which contains the add() method
+        verifier.deleteDirectory( "target" );
         verifier.getCliOptions().remove( "-f" );
         verifier.getCliOptions().remove( "dependent-on-newer-timestamp-pom.xml" );
         verifier.setLogFileName( "log-3.txt" );
-        verifier.executeGoal( "compile" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.deleteArtifacts( "org.apache.maven.its.mng4189" );
+        checksums = verifier.loadProperties( "target/checksum.properties" );
+        assertEquals( "da2e54f69a9ba120f9211c476029f049967d840c", checksums.getProperty( "dep-1.0-SNAPSHOT.jar" ) );
     }
+
 }
