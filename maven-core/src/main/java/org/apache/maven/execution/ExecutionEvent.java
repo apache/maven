@@ -31,6 +31,37 @@ public interface ExecutionEvent
 {
 
     /**
+     * The possible types of execution events.
+     */
+    enum Type
+    {
+        ProjectDiscoveryStarted,
+        SessionStarted,
+        SessionEnded,
+        ProjectSkipped,
+        ProjectStarted,
+        ProjectSucceeded,
+        ProjectFailed,
+        MojoSkipped,
+        MojoStarted,
+        MojoSucceeded,
+        MojoFailed,
+        ForkStarted,
+        ForkSucceeded,
+        ForkFailed,
+        ForkedProjectStarted,
+        ForkedProjectSucceeded,
+        ForkedProjectFailed,
+    }
+
+    /**
+     * Gets the type of the event.
+     * 
+     * @return The type of the event, never {@code null}.
+     */
+    Type getType();
+
+    /**
      * Gets the session from which this event originates.
      * 
      * @return The current session, never {@code null}.

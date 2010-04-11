@@ -15,6 +15,7 @@
 package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.*;
@@ -50,6 +51,7 @@ import java.util.concurrent.Future;
 @Component(role = LifecycleWeaveBuilder.class)
 public class LifecycleWeaveBuilder
 {
+
     @Requirement
     private MojoExecutor mojoExecutor;
 
@@ -62,6 +64,8 @@ public class LifecycleWeaveBuilder
     @Requirement
     private LifecycleDependencyResolver lifecycleDependencyResolver;
 
+    @Requirement
+    private ExecutionEventCatapult eventCatapult;
 
     private final Map<MavenProject, MavenExecutionPlan> executionPlans =
         Collections.synchronizedMap( new HashMap<MavenProject, MavenExecutionPlan>() );
@@ -73,12 +77,13 @@ public class LifecycleWeaveBuilder
     }
 
     public LifecycleWeaveBuilder( MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
-                                  LifecycleDependencyResolver lifecycleDependencyResolver )
+                                  LifecycleDependencyResolver lifecycleDependencyResolver, ExecutionEventCatapult eventCatapult )
     {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.logger = logger;
         this.lifecycleDependencyResolver = lifecycleDependencyResolver;
+        this.eventCatapult = eventCatapult;
     }
 
     public void build( ProjectBuildList projectBuilds, ReactorContext buildContext, List<TaskSegment> taskSegments,
@@ -157,13 +162,11 @@ public class LifecycleWeaveBuilder
 
                 if ( reactorBuildStatus.isHaltedOrBlacklisted( projectBuild.getProject() ) )
                 {
-                    DefaultLifecycleExecutor.fireEvent( projectBuild.getSession(), null,
-                                                        LifecycleEventCatapult.PROJECT_SKIPPED );
+                    eventCatapult.fire( ExecutionEvent.Type.ProjectSkipped, projectBuild.getSession(), null );
                     return null;
                 }
 
-                DefaultLifecycleExecutor.fireEvent( projectBuild.getSession(), null,
-                                                    LifecycleEventCatapult.PROJECT_STARTED );
+                eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, projectBuild.getSession(), null );
 
                 boolean packagePhaseSeen = false;
                 boolean runBAbyRun = false;
@@ -238,13 +241,11 @@ public class LifecycleWeaveBuilder
                     final BuildSuccess summary =
                         new BuildSuccess( projectBuild.getProject(), wallClockTime ); // - waitingTime 
                     reactorContext.getResult().addBuildSummary( summary );
-                    DefaultLifecycleExecutor.fireEvent( projectBuild.getSession(), null,
-                                                        LifecycleEventCatapult.PROJECT_SUCCEEDED );
-
+                    eventCatapult.fire( ExecutionEvent.Type.ProjectSucceeded, projectBuild.getSession(), null );
                 }
                 catch ( Exception e )
                 {
-                    BuilderCommon.handleBuildError( reactorContext, rootSession, projectBuild.getProject(), e,
+                    builderCommon.handleBuildError( reactorContext, rootSession, projectBuild.getProject(), e,
                                                     buildStartTime );
                 }
                 finally

@@ -14,14 +14,13 @@
  */
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.execution.DefaultLifecycleEvent;
 import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.BuildListCalculator;
 import org.apache.maven.lifecycle.internal.ConcurrencyDependencyGraph;
+import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleDebugLogger;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
@@ -38,7 +37,6 @@ import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.ThreadConfigurationService;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
@@ -68,6 +66,10 @@ import java.util.concurrent.ExecutorService;
 public class DefaultLifecycleExecutor
     implements LifecycleExecutor
 {
+
+    @Requirement
+    private ExecutionEventCatapult eventCatapult;
+
     @Requirement
     private LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
 
@@ -107,7 +109,7 @@ public class DefaultLifecycleExecutor
 
     public void execute( MavenSession session )
     {
-        fireEvent( session, null, LifecycleEventCatapult.SESSION_STARTED );
+        eventCatapult.fire( ExecutionEvent.Type.SessionStarted, session, null );
 
         MavenExecutionResult result = session.getResult();
 
@@ -200,8 +202,7 @@ public class DefaultLifecycleExecutor
             result.addException( e );
         }
 
-        fireEvent( session, null, LifecycleEventCatapult.SESSION_ENDED );
-
+        eventCatapult.fire( ExecutionEvent.Type.SessionEnded, session, null );
     }
 
     private void singleThreadedBuild( MavenSession session, ReactorContext callableContext,
@@ -229,18 +230,6 @@ public class DefaultLifecycleExecutor
             }
         }
     }
-
-    public static void fireEvent( MavenSession session, MojoExecution mojoExecution, LifecycleEventCatapult catapult )
-    {
-        ExecutionListener listener = session.getRequest().getExecutionListener();
-        if ( listener != null )
-        {
-            ExecutionEvent event = new DefaultLifecycleEvent( session, mojoExecution );
-
-            catapult.fire( listener, event );
-        }
-    }
-
 
     /**
      * * CRUFT GOES BELOW HERE ***

@@ -21,6 +21,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.internal.stub.CompletionServiceStub;
+import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
 import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
@@ -121,8 +122,8 @@ public class LifecycleWeaveBuilderTest
         final LoggerStub loggerStub = new LoggerStub();
         final LifecycleDependencyResolver lifecycleDependencyResolver =
             new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), loggerStub );
-        return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, lifecycleDependencyResolver );
-
+        return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, lifecycleDependencyResolver,
+                                          new ExecutionEventCatapultStub() );
     }
 
     private BuilderCommon getBuilderCommon()

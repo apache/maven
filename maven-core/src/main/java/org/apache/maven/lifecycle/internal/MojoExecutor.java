@@ -16,9 +16,8 @@ package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
-import org.apache.maven.lifecycle.LifecycleEventCatapult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.plugin.*;
@@ -51,6 +50,9 @@ public class MojoExecutor
 
     @Requirement
     private LifecycleDependencyResolver lifeCycleDependencyResolver;
+
+    @Requirement
+    private ExecutionEventCatapult eventCatapult;
 
     public MojoExecutor()
     {
@@ -103,7 +105,7 @@ public class MojoExecutor
             }
             else
             {
-                DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SKIPPED );
+                eventCatapult.fire( ExecutionEvent.Type.MojoSkipped, session, mojoExecution );
 
                 return;
             }
@@ -114,7 +116,7 @@ public class MojoExecutor
         List<MavenProject> forkedProjects =
             executeForkedExecutions( mojoExecution, session, projectIndex, dependencyContext );
 
-        DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_STARTED );
+        eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
 
         ArtifactFilter artifactFilter = getArtifactFilter( mojoDescriptor );
         List<MavenProject> resolvedProjects =
@@ -148,11 +150,11 @@ public class MojoExecutor
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
             }
 
-            DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_SUCCEEDED );
+            eventCatapult.fire( ExecutionEvent.Type.MojoSucceeded, session, mojoExecution );
         }
         catch ( LifecycleExecutionException e )
         {
-            DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.MOJO_FAILED );
+            eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution );
 
             throw e;
         }
@@ -200,7 +202,7 @@ public class MojoExecutor
 
         if ( !forkedExecutions.isEmpty() )
         {
-            DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_STARTED );
+            eventCatapult.fire( ExecutionEvent.Type.ForkStarted, session, mojoExecution );
 
             MavenProject project = session.getCurrentProject();
 
@@ -228,18 +230,15 @@ public class MojoExecutor
                         session.getProjects().set( index, executedProject );
                         projectIndex.getProjects().put( fork.getKey(), executedProject );
 
-                        DefaultLifecycleExecutor.fireEvent( session, mojoExecution,
-                                                            LifecycleEventCatapult.FORKED_PROJECT_STARTED );
+                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectStarted, session, mojoExecution );
 
                         execute( session, fork.getValue(), projectIndex, dependencyContext );
 
-                        DefaultLifecycleExecutor.fireEvent( session, mojoExecution,
-                                                            LifecycleEventCatapult.FORKED_PROJECT_SUCCEEDED );
+                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectSucceeded, session, mojoExecution );
                     }
                     catch ( LifecycleExecutionException e )
                     {
-                        DefaultLifecycleExecutor.fireEvent( session, mojoExecution,
-                                                            LifecycleEventCatapult.FORKED_PROJECT_FAILED );
+                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectFailed, session, mojoExecution );
 
                         throw e;
                     }
@@ -251,11 +250,11 @@ public class MojoExecutor
                     }
                 }
 
-                DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_SUCCEEDED );
+                eventCatapult.fire( ExecutionEvent.Type.ForkSucceeded, session, mojoExecution );
             }
             catch ( LifecycleExecutionException e )
             {
-                DefaultLifecycleExecutor.fireEvent( session, mojoExecution, LifecycleEventCatapult.FORK_FAILED );
+                eventCatapult.fire( ExecutionEvent.Type.ForkFailed, session, mojoExecution );
 
                 throw e;
             }

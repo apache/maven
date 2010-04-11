@@ -16,9 +16,8 @@
 package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.DefaultLifecycleExecutor;
-import org.apache.maven.lifecycle.LifecycleEventCatapult;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -36,11 +35,15 @@ import org.codehaus.plexus.component.annotations.Requirement;
 @Component(role = LifecycleModuleBuilder.class)
 public class LifecycleModuleBuilder
 {
+
     @Requirement
     private MojoExecutor mojoExecutor;
 
     @Requirement
     private BuilderCommon builderCommon;
+
+    @Requirement
+    private ExecutionEventCatapult eventCatapult;
 
     public void buildProject( MavenSession session, ReactorContext reactorContext, MavenProject currentProject,
                               TaskSegment taskSegment )
@@ -62,11 +65,11 @@ public class LifecycleModuleBuilder
 
             if ( reactorContext.getReactorBuildStatus().isHaltedOrBlacklisted( currentProject ) )
             {
-                DefaultLifecycleExecutor.fireEvent( session, null, LifecycleEventCatapult.PROJECT_SKIPPED );
+                eventCatapult.fire( ExecutionEvent.Type.ProjectSkipped, session, null );
                 return;
             }
 
-            DefaultLifecycleExecutor.fireEvent( session, null, LifecycleEventCatapult.PROJECT_STARTED );
+            eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
 
             BuilderCommon.attachToThread( currentProject );
             MavenExecutionPlan executionPlan = builderCommon.resolveBuildPlan( session, currentProject, taskSegment );
@@ -80,11 +83,11 @@ public class LifecycleModuleBuilder
             reactorContext.getResult().addBuildSummary(
                 new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
 
-            DefaultLifecycleExecutor.fireEvent( session, null, LifecycleEventCatapult.PROJECT_SUCCEEDED );
+            eventCatapult.fire( ExecutionEvent.Type.ProjectSucceeded, session, null );
         }
         catch ( Exception e )
         {
-            BuilderCommon.handleBuildError( reactorContext, rootSession, currentProject, e, buildStartTime );
+            builderCommon.handleBuildError( reactorContext, rootSession, currentProject, e, buildStartTime );
         }
         finally
         {

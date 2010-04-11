@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.lifecycle.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,6 +19,8 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -27,18 +29,26 @@ import org.apache.maven.project.MavenProject;
  * 
  * @author Benjamin Bentmann
  */
-public class DefaultLifecycleEvent
+class DefaultExecutionEvent
     implements ExecutionEvent
 {
+
+    private final Type type;
 
     private final MavenSession session;
 
     private final MojoExecution mojoExecution;
 
-    public DefaultLifecycleEvent( MavenSession session, MojoExecution mojoExecution )
+    public DefaultExecutionEvent( Type type, MavenSession session, MojoExecution mojoExecution )
     {
+        this.type = type;
         this.session = session;
         this.mojoExecution = mojoExecution;
+    }
+
+    public Type getType()
+    {
+        return type;
     }
 
     public MavenSession getSession()

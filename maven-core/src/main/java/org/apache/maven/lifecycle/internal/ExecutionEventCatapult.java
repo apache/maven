@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.lifecycle.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,31 +20,19 @@ package org.apache.maven;
  */
 
 import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.ExecutionListener;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
 
 /**
- * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
- * listener.
+ * Assists in firing execution events. <strong>Warning:</strong> This is an internal utility interface that is only
+ * public for technical reasons, it is not part of the public API. In particular, this interface can be changed or
+ * deleted without prior notice.
  * 
  * @author Benjamin Bentmann
  */
-interface ExecutionEventCatapult
+public interface ExecutionEventCatapult
 {
 
-    /**
-     * Notifies the specified listener of the given event.
-     * 
-     * @param listener The listener to notify, must not be {@code null}.
-     * @param event The event to fire, must not be {@code null}.
-     */
-    void fire( ExecutionListener listener, ExecutionEvent event );
-
-    static final ExecutionEventCatapult PROJECT_DISCOVERY_STARTED = new ExecutionEventCatapult()
-    {
-        public void fire( ExecutionListener listener, ExecutionEvent event )
-        {
-            listener.projectDiscoveryStarted( event );
-        }
-    };
+    void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution );
 
 }

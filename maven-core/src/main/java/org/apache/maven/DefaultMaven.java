@@ -29,10 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.execution.DefaultLifecycleEvent;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
@@ -40,6 +38,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
@@ -84,17 +83,8 @@ public class DefaultMaven
     @Requirement
     MavenExecutionRequestPopulator populator;
 
-    private void fireEvent( MavenSession session, ExecutionEventCatapult catapult )
-    {
-        ExecutionListener listener = session.getRequest().getExecutionListener();
-
-        if ( listener != null )
-        {
-            ExecutionEvent event = new DefaultLifecycleEvent( session, null );
-
-            catapult.fire( listener, event );
-        }
-    }
+    @Requirement
+    private ExecutionEventCatapult eventCatapult;
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
@@ -162,7 +152,7 @@ public class DefaultMaven
             return processResult( result, e );
         }
 
-        fireEvent( session, ExecutionEventCatapult.PROJECT_DISCOVERY_STARTED );
+        eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
         //TODO: optimize for the single project or no project
         

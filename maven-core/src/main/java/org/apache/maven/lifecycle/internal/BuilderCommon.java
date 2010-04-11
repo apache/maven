@@ -15,6 +15,7 @@
 package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.execution.BuildFailure;
+import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.*;
@@ -44,6 +45,9 @@ public class BuilderCommon
 
     @Requirement
     private LifecycleDependencyResolver lifecycleDependencyResolver;
+
+    @Requirement
+    private ExecutionEventCatapult eventCatapult;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public BuilderCommon()
@@ -79,7 +83,7 @@ public class BuilderCommon
     }
 
 
-    public static void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
+    public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
                                          final MavenProject mavenProject, final Exception e, final long buildStartTime )
     {
         buildContext.getResult().addException( e );
@@ -88,7 +92,7 @@ public class BuilderCommon
 
         buildContext.getResult().addBuildSummary( new BuildFailure( mavenProject, buildEndTime - buildStartTime, e ) );
 
-        DefaultLifecycleExecutor.fireEvent( rootSession, null, LifecycleEventCatapult.PROJECT_FAILED );
+        eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, rootSession, null );
 
         if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( rootSession.getReactorFailureBehavior() ) )
         {
