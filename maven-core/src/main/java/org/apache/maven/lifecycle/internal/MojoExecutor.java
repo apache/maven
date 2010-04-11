@@ -68,7 +68,6 @@ public class MojoExecutor
         {
             execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
         }
-
     }
 
     public void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
@@ -214,9 +213,11 @@ public class MojoExecutor
             {
                 for ( Map.Entry<String, List<MojoExecution>> fork : forkedExecutions.entrySet() )
                 {
-                    int index = projectIndex.getIndices().get( fork.getKey() );
+                    String projectId = fork.getKey();
 
-                    MavenProject forkedProject = projectIndex.getProjects().get( fork.getKey() );
+                    int index = projectIndex.getIndices().get( projectId );
+
+                    MavenProject forkedProject = projectIndex.getProjects().get( projectId );
 
                     forkedProjects.add( forkedProject );
 
@@ -224,15 +225,22 @@ public class MojoExecutor
 
                     forkedProject.setExecutionProject( executedProject );
 
+                    List<MojoExecution> mojoExecutions = fork.getValue();
+
+                    if ( mojoExecutions.isEmpty() )
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         session.setCurrentProject( executedProject );
                         session.getProjects().set( index, executedProject );
-                        projectIndex.getProjects().put( fork.getKey(), executedProject );
+                        projectIndex.getProjects().put( projectId, executedProject );
 
                         eventCatapult.fire( ExecutionEvent.Type.ForkedProjectStarted, session, mojoExecution );
 
-                        execute( session, fork.getValue(), projectIndex, dependencyContext );
+                        execute( session, mojoExecutions, projectIndex, dependencyContext );
 
                         eventCatapult.fire( ExecutionEvent.Type.ForkedProjectSucceeded, session, mojoExecution );
                     }
@@ -244,7 +252,7 @@ public class MojoExecutor
                     }
                     finally
                     {
-                        projectIndex.getProjects().put( fork.getKey(), forkedProject );
+                        projectIndex.getProjects().put( projectId, forkedProject );
                         session.getProjects().set( index, forkedProject );
                         session.setCurrentProject( project );
                     }
