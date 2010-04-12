@@ -19,7 +19,12 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.plugin.MojoExecution;
@@ -31,7 +36,8 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 //TODO: project dependencies that need downloading
 //TODO: unfortunately the plugins need to be downloaded in order to get the plugin.xml file. need to externalize this from the plugin archive.
 //TODO: this will be the class that people get in IDEs to modify
-public class MavenExecutionPlan  implements Iterable<ExecutionPlanItem>
+public class MavenExecutionPlan
+    implements Iterable<ExecutionPlanItem>
 {
 
     /*
@@ -53,30 +59,35 @@ public class MavenExecutionPlan  implements Iterable<ExecutionPlanItem>
     private final Map<String, ExecutionPlanItem> lastInPhase;
     private final List<String> phasesInOrder;
 
-    public MavenExecutionPlan(Set<String> requiredDependencyResolutionScopes, Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem) {
+    public MavenExecutionPlan( Set<String> requiredDependencyResolutionScopes,
+                               Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem )
+    {
         this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
         this.requiredDependencyCollectionScopes = requiredDependencyCollectionScopes;
         this.planItem = planItem;
         lastInPhase = new HashMap<String, ExecutionPlanItem>();
         phasesInOrder = new ArrayList<String>();
-        for (ExecutionPlanItem executionPlanItem : getExecutionPlanItems()) {
+        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
+        {
             final String phaseName = getPhase( executionPlanItem );
-            if (!lastInPhase.containsKey(  phaseName )){
+            if ( !lastInPhase.containsKey( phaseName ) )
+            {
                 phasesInOrder.add( phaseName );
             }
             lastInPhase.put( phaseName, executionPlanItem );
         }
-
-
     }
 
-    private String getPhase( ExecutionPlanItem executionPlanItem){
+    private String getPhase( ExecutionPlanItem executionPlanItem )
+    {
         final MojoExecution mojoExecution = executionPlanItem.getMojoExecution();
         final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
         return mojoDescriptor.getPhase();
 
     }
-    public Iterator<ExecutionPlanItem> iterator() {
+
+    public Iterator<ExecutionPlanItem> iterator()
+    {
         return getExecutionPlanItems().iterator();
     }
 
@@ -86,22 +97,24 @@ public class MavenExecutionPlan  implements Iterable<ExecutionPlanItem>
      * @param executionPlanItem The execution plan item
      * @return The ExecutionPlanItem or null if none can be found
      */
-    public ExecutionPlanItem findLastInPhase( ExecutionPlanItem executionPlanItem){
+    public ExecutionPlanItem findLastInPhase( ExecutionPlanItem executionPlanItem )
+    {
         ExecutionPlanItem executionPlanItem1 = lastInPhase.get( getPhase( executionPlanItem ) );
         return executionPlanItem1;
     }
 
     private List<ExecutionPlanItem> getExecutionPlanItems()
-     {
-         return planItem;
-     }
-
-    public void forceAllComplete(){
-        for (ExecutionPlanItem executionPlanItem : getExecutionPlanItems()) {
-             executionPlanItem.forceComplete();
-        }
+    {
+        return planItem;
     }
 
+    public void forceAllComplete()
+    {
+        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
+        {
+            executionPlanItem.forceComplete();
+        }
+    }
 
     public Set<String> getRequiredResolutionScopes()
     {
@@ -113,17 +126,19 @@ public class MavenExecutionPlan  implements Iterable<ExecutionPlanItem>
         return requiredDependencyCollectionScopes;
     }
 
-
-    public List<MojoExecution> getMojoExecutions(){
+    public List<MojoExecution> getMojoExecutions()
+    {
         List<MojoExecution> result = new ArrayList<MojoExecution>();
         for ( ExecutionPlanItem executionPlanItem : planItem )
         {
-            result.add( executionPlanItem.getMojoExecution());
+            result.add( executionPlanItem.getMojoExecution() );
         }
         return result;
     }
 
-    public int size() {
+    public int size()
+    {
         return planItem.size();
     }
+
 }
