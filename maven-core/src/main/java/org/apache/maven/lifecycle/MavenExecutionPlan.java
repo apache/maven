@@ -136,6 +136,12 @@ public class MavenExecutionPlan
         return result;
     }
 
+    @Deprecated
+    public List<MojoExecution> getExecutions()
+    {
+        return getMojoExecutions();
+    }
+
     public int size()
     {
         return planItem.size();
