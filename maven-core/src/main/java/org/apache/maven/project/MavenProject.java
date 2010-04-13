@@ -175,7 +175,7 @@ public class MavenProject
 
     private ArtifactFilter extensionArtifactFilter;
 
-    private Set<String> lifecyclePhases;
+    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
 
     public MavenProject()
     {
@@ -1947,7 +1947,7 @@ public class MavenProject
             setManagedVersionMap( new HashMap<String, Artifact>( project.getManagedVersionMap() ) );
         }
 
-        lifecyclePhases = null;
+        lifecyclePhases.addAll( project.lifecyclePhases );
     }
 
     private void addArtifactPath( Artifact artifact, List<String> classpath )
@@ -2090,7 +2090,7 @@ public class MavenProject
      */
     public boolean hasCompletedPhase( String phase )
     {
-        return lifecyclePhases != null && lifecyclePhases.contains( phase );
+        return lifecyclePhases.contains( phase );
     }
 
     /**
@@ -2103,10 +2103,6 @@ public class MavenProject
      */
     public void addLifecyclePhase( String lifecyclePhase )
     {
-        if ( lifecyclePhases == null )
-        {
-            lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
-        }
         lifecyclePhases.add( lifecyclePhase );
     }
 
