@@ -19,7 +19,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @author Benjamin Bentmann
- * @author Kristian Rosenvold (extrace class)
+ * @author Kristian Rosenvold (extract class)
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */

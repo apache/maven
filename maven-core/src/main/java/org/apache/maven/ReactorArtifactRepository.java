@@ -21,15 +21,12 @@ public class ReactorArtifactRepository
 
     private Map<String, List<String>> availableVersions;
 
-    private final boolean isWeaveMode;
-
     private final int hashCode;
 
-        @SuppressWarnings({"ConstantConditions"})
-    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects, boolean isWeaveMode )
+    @SuppressWarnings({"ConstantConditions"})
+    public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects )
     {
         this.reactorProjects = reactorProjects;
-        this.isWeaveMode = isWeaveMode;
         hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
 
         availableVersions = new HashMap<String, List<String>>( reactorProjects.size() * 2 );
@@ -53,7 +50,7 @@ public class ReactorArtifactRepository
     public Artifact find( Artifact artifact )
     {
         String projectKey = ArtifactUtils.key( artifact );
-        
+
         MavenProject project = reactorProjects.get( projectKey );
 
         if ( project != null )
@@ -68,40 +65,42 @@ public class ReactorArtifactRepository
 
                 Artifact projectArtifact = findMatchingArtifact( project, artifact );
 
-                if ( !isWeaveMode && (projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists()) )
+                if ( hasArtifactFileFromPackagePhase( projectArtifact ) )
                 {
-                    //TODO: This is really completely wrong and should probably be based on the phase that is currently being executed.
-                    // If we are running before the packaging phase there is going to be no archive anyway, but if we are running prior to package
-                    // we shouldn't even take the archive anyway.
 
                     resolve( artifact, projectArtifact.getFile() );
                 }
                 else
                 {
-                    Collection<String> lifecyclePhases = project.getLifecyclePhases();
-
-                    if ( !lifecyclePhases.contains( "package" ) )
+                    if ( !project.hasCompletedPhase( "package" ) )
                     {
                         if ( isTestArtifact( artifact ) )
                         {
-                            if ( lifecyclePhases.contains( "test-compile" ) )
+                            if ( project.hasCompletedPhase( "test-compile" ) )
                             {
                                 resolve( artifact, new File( project.getBuild().getTestOutputDirectory() ) );
                             }
                         }
                         else
                         {
-                            if ( lifecyclePhases.contains( "compile" ) )
+                            if ( project.hasCompletedPhase( "compile" ) )
                             {
                                 resolve( artifact, new File( project.getBuild().getOutputDirectory() ) );
                             }
                         }
                     }
+                    // The fall-through indicates that the artifact cannot be found;
+                    // for instance if package produced nothing or classifier problems.
                 }
             }
         }
 
         return artifact;
+    }
+
+    private boolean hasArtifactFileFromPackagePhase( Artifact projectArtifact )
+    {
+        return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
     }
 
     private void resolve( Artifact artifact, File file )

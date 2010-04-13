@@ -222,7 +222,6 @@ public class MavenProject
     /**
      * Constructor
      * 
-     * @param artifactFactory - may not be null
      * @param repositorySystem - may not be null
      * @param mavenProjectBuilder
      * @param projectBuilderConfiguration
@@ -2084,15 +2083,14 @@ public class MavenProject
     }
 
     /**
-     * Gets the set of lifecycle phases this project has successfully completed.
-     * 
-     * @return The (unmodifiable) set of lifecycle phases this project has successfully completed, can be empty but
-     *         never {@code null}.
+     * Indicates if the project has completed the specified lifecycle phase.
+     *
+     * @param phase The phase to check for completion
+     * @return true if the phase has been completed
      */
-    public Set<String> getLifecyclePhases()
+    public boolean hasCompletedPhase( String phase )
     {
-        return ( lifecyclePhases != null ) ? Collections.unmodifiableSet( lifecyclePhases )
-                        : Collections.<String> emptySet();
+        return lifecyclePhases != null && lifecyclePhases.contains( phase );
     }
 
     /**
@@ -2107,7 +2105,7 @@ public class MavenProject
     {
         if ( lifecyclePhases == null )
         {
-            lifecyclePhases = new LinkedHashSet<String>();
+            lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
         }
         lifecyclePhases.add( lifecyclePhase );
     }

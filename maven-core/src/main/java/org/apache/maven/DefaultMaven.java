@@ -39,7 +39,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
-import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
@@ -112,6 +111,7 @@ public class DefaultMaven
         return result;
     }
 
+    @SuppressWarnings({"ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored"})
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
         //TODO: Need a general way to inject standard properties
@@ -182,8 +182,7 @@ public class DefaultMaven
             // Reactor
             // Workspace
             // User Local Repository
-            final boolean isWeaveMode = LifecycleWeaveBuilder.isWeaveMode( request);
-            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap, isWeaveMode ) );
+            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap ) );
         }
         catch ( org.apache.maven.DuplicateProjectException e )
         {
@@ -248,13 +247,14 @@ public class DefaultMaven
         validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
 
         if ( session.getResult().hasExceptions() )
-        {        
+        {
             return processResult( result, session.getResult().getExceptions().get( 0 ) );
         }
 
         return result;
     }
 
+    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     private void validateLocalRepository( MavenExecutionRequest request )
         throws LocalRepositoryNotAccessibleException
     {
