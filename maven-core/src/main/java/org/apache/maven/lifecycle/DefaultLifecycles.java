@@ -133,8 +133,7 @@ public class DefaultLifecycles
     public Map<String, Lifecycle> getPhaseToLifecycleMap()
     {
         // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly
-        // so
-        // that they don't interfere with internally defined lifecycles.
+        // so that they don't interfere with internally defined lifecycles.
 
         HashMap<String, Lifecycle> phaseToLifecycleMap = new HashMap<String, Lifecycle>();
 
@@ -142,7 +141,7 @@ public class DefaultLifecycles
         {
             if ( logger.isDebugEnabled() )
             {
-                logger.debug( "Custom lifecycle " + lifecycle.toString() );
+                logger.debug( "Lifecycle " + lifecycle );
             }
             
             for ( String phase : lifecycle.getPhases() )
