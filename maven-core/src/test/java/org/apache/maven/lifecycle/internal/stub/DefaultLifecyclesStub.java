@@ -15,14 +15,13 @@
 
 package org.apache.maven.lifecycle.internal.stub;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.Schedule;
 import org.apache.maven.lifecycle.Scheduling;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Kristian Rosenvold
@@ -37,14 +36,6 @@ public class DefaultLifecyclesStub
         final List<Lifecycle> lifeCycles = Arrays.asList( lifecycle1, lifecycle2 );
         final List<Scheduling> schedulingList = getSchedulingList();
         final DefaultLifecycles defaultLifecycles = new DefaultLifecycles( lifeCycles, schedulingList );
-        try
-        {
-            defaultLifecycles.initialize();
-        }
-        catch ( InitializationException e )
-        {
-            throw new RuntimeException( e );
-        }
         return defaultLifecycles;
     }
 

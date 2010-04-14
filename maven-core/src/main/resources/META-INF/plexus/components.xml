@@ -57,69 +57,18 @@
         <role>org.apache.maven.lifecycle.DefaultLifecycles</role>
         <implementation>org.apache.maven.lifecycle.DefaultLifecycles</implementation>
 
+        <requirements>
+          <requirement>
+            <role>org.codehaus.plexus.logging.Logger</role>
+            <field-name>logger</field-name>
+          </requirement>
+          <requirement>
+            <role>org.apache.maven.lifecycle.Lifecycle</role>
+            <field-name>lifecycles</field-name>
+          </requirement>
+        </requirements>
+
         <configuration>
-          <lifecycles>
-            <lifecycle>
-              <id>default</id>
-              <!-- START SNIPPET: lifecycle -->
-              <phases>
-                <phase>validate</phase>
-                <phase>initialize</phase>
-                <phase>generate-sources</phase>
-                <phase>process-sources</phase>
-                <phase>generate-resources</phase>
-                <phase>process-resources</phase>
-                <phase>compile</phase>
-                <phase>process-classes</phase>
-                <phase>generate-test-sources</phase>
-                <phase>process-test-sources</phase>
-                <phase>generate-test-resources</phase>
-                <phase>process-test-resources</phase>
-                <phase>test-compile</phase>
-                <phase>process-test-classes</phase>
-                <phase>test</phase>
-                <phase>prepare-package</phase>
-                <phase>package</phase>
-                <phase>pre-integration-test</phase>
-                <phase>integration-test</phase>
-                <phase>post-integration-test</phase>
-                <phase>verify</phase>
-                <phase>install</phase>
-                <phase>deploy</phase>
-              </phases>
-              <!-- END SNIPPET: lifecycle -->
-            </lifecycle>
-            <lifecycle>
-              <id>clean</id>
-              <phases>
-                <phase>pre-clean</phase>
-                <phase>clean</phase>
-                <phase>post-clean</phase>
-              </phases>
-              <default-phases>
-                <clean>
-                  org.apache.maven.plugins:maven-clean-plugin:2.4:clean
-                </clean>
-              </default-phases>
-            </lifecycle>
-            <lifecycle>
-              <id>site</id>
-              <phases>
-                <phase>pre-site</phase>
-                <phase>site</phase>
-                <phase>post-site</phase>
-                <phase>site-deploy</phase>
-              </phases>
-              <default-phases>
-                <site>
-                  org.apache.maven.plugins:maven-site-plugin:2.0.1:site
-                </site>
-                <site-deploy>
-                  org.apache.maven.plugins:maven-site-plugin:2.0.1:deploy
-                </site-deploy>
-              </default-phases>
-            </lifecycle>
-          </lifecycles>
           <schedules>
               <scheduling>
                    <lifecycle>default</lifecycle>
@@ -140,6 +89,82 @@
                   </schedules>
               </scheduling>
           </schedules>
+        </configuration>
+      </component>
+
+      <component>
+        <role>org.apache.maven.lifecycle.Lifecycle</role>
+        <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+        <role-hint>default</role-hint>
+        <configuration>
+          <id>default</id>
+          <!-- START SNIPPET: lifecycle -->
+          <phases>
+            <phase>validate</phase>
+            <phase>initialize</phase>
+            <phase>generate-sources</phase>
+            <phase>process-sources</phase>
+            <phase>generate-resources</phase>
+            <phase>process-resources</phase>
+            <phase>compile</phase>
+            <phase>process-classes</phase>
+            <phase>generate-test-sources</phase>
+            <phase>process-test-sources</phase>
+            <phase>generate-test-resources</phase>
+            <phase>process-test-resources</phase>
+            <phase>test-compile</phase>
+            <phase>process-test-classes</phase>
+            <phase>test</phase>
+            <phase>prepare-package</phase>
+            <phase>package</phase>
+            <phase>pre-integration-test</phase>
+            <phase>integration-test</phase>
+            <phase>post-integration-test</phase>
+            <phase>verify</phase>
+            <phase>install</phase>
+            <phase>deploy</phase>
+          </phases>
+          <!-- END SNIPPET: lifecycle -->
+        </configuration>
+      </component>
+      <component>
+        <role>org.apache.maven.lifecycle.Lifecycle</role>
+        <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+        <role-hint>clean</role-hint>
+        <configuration>
+          <id>clean</id>
+          <phases>
+            <phase>pre-clean</phase>
+            <phase>clean</phase>
+            <phase>post-clean</phase>
+          </phases>
+          <default-phases>
+            <clean>
+              org.apache.maven.plugins:maven-clean-plugin:2.4:clean
+            </clean>
+          </default-phases>
+        </configuration>
+      </component>
+      <component>
+        <role>org.apache.maven.lifecycle.Lifecycle</role>
+        <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+        <role-hint>site</role-hint>
+        <configuration>
+          <id>site</id>
+          <phases>
+            <phase>pre-site</phase>
+            <phase>site</phase>
+            <phase>post-site</phase>
+            <phase>site-deploy</phase>
+          </phases>
+          <default-phases>
+            <site>
+              org.apache.maven.plugins:maven-site-plugin:2.0.1:site
+            </site>
+            <site-deploy>
+              org.apache.maven.plugins:maven-site-plugin:2.0.1:deploy
+            </site-deploy>
+          </default-phases>
         </configuration>
       </component>
       <component>

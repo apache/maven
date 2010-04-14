@@ -14,81 +14,64 @@
  */
 package org.apache.maven.lifecycle;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.lifecycle.internal.BuilderCommon;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.util.*;
 
 /**
  * @author Jason van Zyl
  * @author Kristian Rosenvold
  */
-//TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the wiring and reference and external source for the lifecycle configuration.
+// TODO: The configuration for the lifecycle needs to be externalized so that I can use the annotations properly for the
+// wiring and reference and external source for the lifecycle configuration.
 public class DefaultLifecycles
-    implements Initializable
 {
+    public static final String[] STANDARD_LIFECYCLES = { "default", "clean", "site" };
+
     // @Configuration(source="org/apache/maven/lifecycle/lifecycles.xml")
 
-    private List<Lifecycle> lifecycles;
+    // @Requirement(role=Lifecycle.class)
+    private Map<String, Lifecycle> lifecycles;
+
+    // @Requirement
+    private Logger logger;
 
     private List<Scheduling> schedules;
 
-    /**
-     * We use this to display all the lifecycles available and their phases to users. Currently this is primarily
-     * used in the IDE integrations where a UI is presented to the user and they can select the lifecycle phase
-     * they would like to execute.
-     */
-    private Map<String, Lifecycle> lifecycleMap;
-
-    /**
-     * We use this to map all phases to the lifecycle that contains it. This is used so that a user can specify the
-     * phase they want to execute and we can easily determine what lifecycle we need to run.
-     */
-    private Map<String, Lifecycle> phaseToLifecycleMap;
-
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public DefaultLifecycles()
     {
     }
 
     public DefaultLifecycles( List<Lifecycle> lifecycles, List<Scheduling> schedules )
     {
-        this.lifecycles = lifecycles;
+        this.lifecycles = new LinkedHashMap<String, Lifecycle>();
         this.schedules = schedules;
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        lifecycleMap = new HashMap<String, Lifecycle>();
-
-        // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly so
-        // that they don't interfere with internally defined lifecycles.
-
-        phaseToLifecycleMap = new HashMap<String, Lifecycle>();
 
         for ( Lifecycle lifecycle : lifecycles )
         {
-            for ( String phase : lifecycle.getPhases() )
-            {
-                // The first definition wins.
-                if ( !phaseToLifecycleMap.containsKey( phase ) )
-                {
-                    phaseToLifecycleMap.put( phase, lifecycle );
-                }
-            }
-
-            lifecycleMap.put( lifecycle.getId(), lifecycle );
+            this.lifecycles.put( lifecycle.getId(), lifecycle );
         }
     }
-
 
     public List<ExecutionPlanItem> createExecutionPlanItem( MavenProject mavenProject, List<MojoExecution> executions )
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
@@ -121,7 +104,7 @@ public class DefaultLifecycles
      * Gets scheduling associated with a given phase.
      * <p/>
      * This is part of the experimental weave mode and therefore not part of the public api.
-     *
+     * 
      * @param lifecyclePhaseName
      * @return
      */
@@ -140,17 +123,62 @@ public class DefaultLifecycles
 
     public Lifecycle get( String key )
     {
-        return phaseToLifecycleMap.get( key );
+        return getPhaseToLifecycleMap().get( key );
     }
 
+    /**
+     * We use this to map all phases to the lifecycle that contains it. This is used so that a user can specify the
+     * phase they want to execute and we can easily determine what lifecycle we need to run.
+     */
     public Map<String, Lifecycle> getPhaseToLifecycleMap()
     {
+        // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly
+        // so
+        // that they don't interfere with internally defined lifecycles.
+
+        HashMap<String, Lifecycle> phaseToLifecycleMap = new HashMap<String, Lifecycle>();
+
+        for ( Lifecycle lifecycle : getLifeCycles() )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Custom lifecycle " + lifecycle.toString() );
+            }
+            
+            for ( String phase : lifecycle.getPhases() )
+            {
+                // The first definition wins.
+                if ( !phaseToLifecycleMap.containsKey( phase ) )
+                {
+                    phaseToLifecycleMap.put( phase, lifecycle );
+                }
+                else
+                {
+                    Lifecycle original = phaseToLifecycleMap.get( phase );
+                    logger.warn( "Duplicated lifecycle phase " + phase + ". Defined in " + original.getId()
+                        + " but also in " + lifecycle.getId() );
+                }
+            }
+        }
+
         return phaseToLifecycleMap;
     }
 
     public List<Lifecycle> getLifeCycles()
     {
-        return lifecycles;
+        // ensure canonical order of standard lifecycles
+
+        Map<String, Lifecycle> lifecycles = new LinkedHashMap<String, Lifecycle>( this.lifecycles );
+
+        LinkedHashSet<String> lifecycleNames = new LinkedHashSet<String>( Arrays.asList( STANDARD_LIFECYCLES ) );
+        lifecycleNames.addAll( lifecycles.keySet() );
+        ArrayList<Lifecycle> result = new ArrayList<Lifecycle>();
+        for ( String name : lifecycleNames )
+        {
+            result.add( lifecycles.get( name ) );
+        }
+
+        return result;
     }
 
     public List<Scheduling> getSchedules()
@@ -162,7 +190,7 @@ public class DefaultLifecycles
     {
         Set<String> phases = new LinkedHashSet<String>();
 
-        for ( Lifecycle lifecycle : lifecycles )
+        for ( Lifecycle lifecycle : lifecycles.values() )
         {
             phases.addAll( lifecycle.getPhases() );
         }
