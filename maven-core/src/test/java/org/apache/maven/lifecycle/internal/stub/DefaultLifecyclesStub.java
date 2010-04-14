@@ -19,7 +19,6 @@ import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.Schedule;
 import org.apache.maven.lifecycle.Scheduling;
-import org.omg.CORBA.INITIALIZE;
 
 import java.util.Arrays;
 import java.util.HashMap;
