@@ -15,13 +15,19 @@
 
 package org.apache.maven.lifecycle.internal.stub;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.Schedule;
 import org.apache.maven.lifecycle.Scheduling;
+import org.omg.CORBA.INITIALIZE;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub.*;
 
 /**
  * @author Kristian Rosenvold
@@ -31,12 +37,31 @@ public class DefaultLifecyclesStub
 {
     public static DefaultLifecycles createDefaultLifeCycles()
     {
-        final Lifecycle lifecycle1 = new Lifecycle( "abc", Arrays.asList( "compile" ), null );
-        final Lifecycle lifecycle2 = new Lifecycle( "abc", Arrays.asList( "test" ), null );
-        final List<Lifecycle> lifeCycles = Arrays.asList( lifecycle1, lifecycle2 );
+
+        List<String> stubDefaultCycle =
+            Arrays.asList( VALIDATE.getPhase(), INITIALIZE.getPhase(), PROCESS_RESOURCES.getPhase(), COMPILE.getPhase(),
+                           TEST.getPhase(), PROCESS_TEST_RESOURCES.getPhase(), PACKAGE.getPhase(), "BEER",
+                           INSTALL.getPhase() );
+
+        // The two phases below are really for future expansion, some would say they lack a drink
+        // The point being that they do not really have to match the "real" stuff,
+        List<String> stubCleanCycle =
+            Arrays.asList( PRE_CLEAN.getPhase(), CLEAN.getPhase(), POST_CLEAN.getPhase() );
+
+        List<String> stubSiteCycle =
+            Arrays.asList( PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase());
+
+        Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
+
+        Map<String, Lifecycle> lifeCycles = new HashMap<String, Lifecycle>();
+        for ( String s : DefaultLifecycles.STANDARD_LIFECYCLES )
+        {
+            final Lifecycle lifecycle = new Lifecycle( s, lcs.next(), null );
+            lifeCycles.put( s, lifecycle );
+
+        }
         final List<Scheduling> schedulingList = getSchedulingList();
-        final DefaultLifecycles defaultLifecycles = new DefaultLifecycles( lifeCycles, schedulingList );
-        return defaultLifecycles;
+        return new DefaultLifecycles( lifeCycles, schedulingList, new LoggerStub() );
     }
 
     public static List<Scheduling> getSchedulingList()

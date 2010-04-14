@@ -233,22 +233,4 @@ public class LifecycleDependencyResolver
         return projectKeys;
     }
 
-
-    public void reResolveReactorArtifacts( ProjectBuildList projectBuilds, boolean aggregating, MavenProject project,
-                                           MavenSession session, MavenExecutionPlan executionPlan )
-        throws LifecycleExecutionException
-    {
-        final Set<String> reactorProjectKeys = projectBuilds.getReactorProjectKeys();
-        final Set<Artifact> artifactSet = project.getArtifacts();
-        for ( Artifact artifact : artifactSet )
-        {
-            String key = ArtifactUtils.key( artifact );
-            if ( reactorProjectKeys.contains( key ) )
-            {
-                artifact.setResolved( false );
-            }
-
-        }
-        resolveDependencies( aggregating, project, session, executionPlan );
-    }
 }

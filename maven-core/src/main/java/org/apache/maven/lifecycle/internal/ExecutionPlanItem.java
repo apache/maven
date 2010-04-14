@@ -50,6 +50,16 @@ public class ExecutionPlanItem
         return mojoExecution;
     }
 
+    public String getLifecyclePhase()
+    {
+        final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        if ( mojoDescriptor.getPhase() != null )
+        {
+            return mojoDescriptor.getPhase();
+        }
+        return mojoExecution.getLifecyclePhase();
+    }
+
     public void setComplete()
     {
         boolean transitionSuccessful = ensureComplete();

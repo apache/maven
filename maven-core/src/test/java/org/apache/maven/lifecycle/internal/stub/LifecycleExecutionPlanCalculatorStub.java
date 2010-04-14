@@ -49,10 +49,16 @@ import java.util.Set;
 public class LifecycleExecutionPlanCalculatorStub
     implements LifecycleExecutionPlanCalculator
 {
+    // clean
+    public final static MojoDescriptor PRE_CLEAN = createMojoDescriptor( "pre-clean" );
     public final static MojoDescriptor CLEAN = createMojoDescriptor( "clean" );
+    public final static MojoDescriptor POST_CLEAN = createMojoDescriptor( "post-clean" );
 
+    // default (or at least some of them)
     public final static MojoDescriptor VALIDATE = createMojoDescriptor( "validate" );
 
+    public final static MojoDescriptor INITIALIZE = createMojoDescriptor( "initialize" );
+    
     public final static MojoDescriptor TEST_COMPILE = createMojoDescriptor( "test-compile" );
 
     public final static MojoDescriptor PROCESS_TEST_RESOURCES = createMojoDescriptor( "process-test-resources" );
@@ -66,6 +72,15 @@ public class LifecycleExecutionPlanCalculatorStub
     public final static MojoDescriptor PACKAGE = createMojoDescriptor( "package" );
 
     public final static MojoDescriptor INSTALL = createMojoDescriptor( "install" );
+
+
+    // site
+    public final static MojoDescriptor PRE_SITE = createMojoDescriptor( "pre-site" );
+    public final static MojoDescriptor SITE = createMojoDescriptor( "site" );
+    public final static MojoDescriptor POST_SITE = createMojoDescriptor( "post-site" );
+    public final static MojoDescriptor SITE_DEPLOY = createMojoDescriptor( "site-deploy" );
+
+
 
     public int getNumberOfExceutions( ProjectBuildList projectBuildList )
         throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
@@ -99,9 +114,7 @@ public class LifecycleExecutionPlanCalculatorStub
         List<MojoExecution> me = new ArrayList<MojoExecution>();
         me.add( createMojoExecution( new Plugin(), "resources", "default-resources", PROCESS_RESOURCES ) );
         me.add( createMojoExecution( new Plugin(), "compile", "default-compile", COMPILE ) );
-        return new MavenExecutionPlan( getScopes(), getScopes(),
-                                       DefaultLifecyclesStub.createDefaultLifeCycles().createExecutionPlanItem( project,
-                                                                                                                me ) );
+        return createExecutionPlan( project, me );
     }
 
     public static MavenExecutionPlan getProjectAExceutionPlan()
@@ -110,7 +123,7 @@ public class LifecycleExecutionPlanCalculatorStub
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         List<MojoExecution> me = new ArrayList<MojoExecution>();
-        me.add( createMojoExecution( new Plugin(), "enforce", "enforce-versions", VALIDATE ) );
+        me.add( createMojoExecution( new Plugin(), "initialize", "default-initialize", INITIALIZE ) ); 
         me.add( createMojoExecution( new Plugin(), "resources", "default-resources", PROCESS_RESOURCES ) );
         me.add( createMojoExecution( new Plugin(), "compile", "default-compile", COMPILE ) );
         me.add( createMojoExecution( new Plugin(), "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
@@ -118,11 +131,9 @@ public class LifecycleExecutionPlanCalculatorStub
         me.add( createMojoExecution( new Plugin(), "test", "default-test", TEST ) );
         me.add( createMojoExecution( new Plugin(), "war", "default-war", PACKAGE ) );
         me.add( createMojoExecution( new Plugin(), "install", "default-install", INSTALL ) );
-        final List<ExecutionPlanItem> executionPlanItem =
-            DefaultLifecyclesStub.createDefaultLifeCycles().createExecutionPlanItem(
-                ProjectDependencyGraphStub.A.getExecutionProject(), me );
-        return new MavenExecutionPlan( getScopes(), getScopes(), executionPlanItem );
+        return createExecutionPlan( ProjectDependencyGraphStub.A.getExecutionProject(), me );
     }
+
 
     public static MavenExecutionPlan getProjectBExecutionPlan()
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
@@ -136,10 +147,19 @@ public class LifecycleExecutionPlanCalculatorStub
         me.add( createMojoExecution( new Plugin(), "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
         me.add( createMojoExecution( new Plugin(), "testCompile", "default-testCompile", TEST_COMPILE ) );
         me.add( createMojoExecution( new Plugin(), "test", "default-test", TEST ) );
-        final List<ExecutionPlanItem> planItem =
-            DefaultLifecyclesStub.createDefaultLifeCycles().createExecutionPlanItem(
-                ProjectDependencyGraphStub.B.getExecutionProject(), me );
-        return new MavenExecutionPlan( getScopes(), getScopes(), planItem );
+        return createExecutionPlan( ProjectDependencyGraphStub.B.getExecutionProject(), me );
+    }
+
+
+    private static MavenExecutionPlan createExecutionPlan( MavenProject project, List<MojoExecution> mojoExecutions )
+        throws InvalidPluginDescriptorException, PluginVersionResolutionException, PluginDescriptorParsingException,
+        NoPluginFoundForPrefixException, MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException
+    {
+        final List<ExecutionPlanItem> planItemList =
+            DefaultLifecyclesStub.createDefaultLifeCycles().createExecutionPlanItem( project, mojoExecutions );
+        return new MavenExecutionPlan( getScopes(), getScopes(), planItemList,
+                                       DefaultLifecyclesStub.createDefaultLifeCycles() );
     }
 
     private static MojoExecution createMojoExecution( Plugin plugin, String goal, String executionId,

@@ -55,7 +55,7 @@ public class EmptyLifecycleExecutor
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException
     {
-        return new MavenExecutionPlan(null, null, null );
+        return new MavenExecutionPlan(null, null, null, null );
     }
 
     public void execute( MavenSession session )

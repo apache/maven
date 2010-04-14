@@ -92,7 +92,7 @@ public class LifecycleExecutionPlanCalculatorImpl
         final List<ExecutionPlanItem> planItem = defaultLifeCycles.createExecutionPlanItem( project, executions );
 
         return new MavenExecutionPlan( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
-                                       planItem );
+                                       planItem, defaultLifeCycles );
 
 
     }

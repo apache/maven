@@ -18,13 +18,21 @@ import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.*;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.Schedule;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -62,9 +70,6 @@ public class LifecycleWeaveBuilder
     private Logger logger;
 
     @Requirement
-    private LifecycleDependencyResolver lifecycleDependencyResolver;
-
-    @Requirement
     private ExecutionEventCatapult eventCatapult;
 
     private final Map<MavenProject, MavenExecutionPlan> executionPlans =
@@ -77,17 +82,17 @@ public class LifecycleWeaveBuilder
     }
 
     public LifecycleWeaveBuilder( MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
-                                  LifecycleDependencyResolver lifecycleDependencyResolver, ExecutionEventCatapult eventCatapult )
+                                  ExecutionEventCatapult eventCatapult )
     {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
         this.logger = logger;
-        this.lifecycleDependencyResolver = lifecycleDependencyResolver;
         this.eventCatapult = eventCatapult;
     }
 
     public void build( ProjectBuildList projectBuilds, ReactorContext buildContext, List<TaskSegment> taskSegments,
-                       MavenSession session, CompletionService<ProjectSegment> service, ReactorBuildStatus reactorBuildStatus )
+                       MavenSession session, CompletionService<ProjectSegment> service,
+                       ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException
     {
         ConcurrentBuildLogger concurrentBuildLogger = new ConcurrentBuildLogger();
@@ -97,7 +102,7 @@ public class LifecycleWeaveBuilder
 
             for ( TaskSegment taskSegment : taskSegments )
             {
-                ProjectBuildList segmentChunks = projectBuilds.getByTaskSegment(  taskSegment );
+                ProjectBuildList segmentChunks = projectBuilds.getByTaskSegment( taskSegment );
                 ThreadOutputMuxer muxer = null;  // new ThreadOutputMuxer( segmentChunks, System.out );
                 for ( ProjectSegment projectBuild : segmentChunks )
                 {
@@ -113,8 +118,7 @@ public class LifecycleWeaveBuilder
                         final Callable<ProjectSegment> projectBuilder =
                             createCallableForBuildingOneFullModule( buildContext, session, reactorBuildStatus,
                                                                     executionPlan, projectBuild, muxer,
-                                                                    dependencyContext, concurrentBuildLogger,
-                                                                    projectBuilds );
+                                                                    dependencyContext, concurrentBuildLogger );
 
                         futures.add( service.submit( projectBuilder ) );
                     }
@@ -140,14 +144,13 @@ public class LifecycleWeaveBuilder
     }
 
     private Callable<ProjectSegment> createCallableForBuildingOneFullModule( final ReactorContext reactorContext,
-                                                                           final MavenSession rootSession,
-                                                                           final ReactorBuildStatus reactorBuildStatus,
-                                                                           final MavenExecutionPlan executionPlan,
-                                                                           final ProjectSegment projectBuild,
-                                                                           final ThreadOutputMuxer muxer,
-                                                                           final DependencyContext dependencyContext,
-                                                                           final ConcurrentBuildLogger concurrentBuildLogger,
-                                                                           final ProjectBuildList projectBuilds )
+                                                                             final MavenSession rootSession,
+                                                                             final ReactorBuildStatus reactorBuildStatus,
+                                                                             final MavenExecutionPlan executionPlan,
+                                                                             final ProjectSegment projectBuild,
+                                                                             final ThreadOutputMuxer muxer,
+                                                                             final DependencyContext dependencyContext,
+                                                                             final ConcurrentBuildLogger concurrentBuildLogger )
     {
         return new Callable<ProjectSegment>()
         {
@@ -168,26 +171,12 @@ public class LifecycleWeaveBuilder
 
                 eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, projectBuild.getSession(), null );
 
-                boolean packagePhaseSeen = false;
-                boolean runBAbyRun = false;
                 try
                 {
                     while ( current != null && !reactorBuildStatus.isHalted() &&
                         !reactorBuildStatus.isBlackListed( projectBuild.getProject() ) )
                     {
-                        final String phase = current.getMojoExecution().getMojoDescriptor().getPhase();
                         PhaseRecorder phaseRecorder = new PhaseRecorder( projectBuild.getProject() );
-
-                        if ( !packagePhaseSeen && phase != null && phase.equals( "package" ) )
-                        {
-                            // Re-resolve. A bit of a kludge ATM
-                            packagePhaseSeen = true;
-                            lifecycleDependencyResolver.reResolveReactorArtifacts( projectBuilds, false,
-                                                                                   projectBuild.getProject(),
-                                                                                   projectBuild.getSession(),
-                                                                                   executionPlan );
-
-                        }
 
                         BuiltLogItem builtLogItem =
                             concurrentBuildLogger.createBuildLogItem( projectBuild.getProject(), current );
@@ -210,16 +199,17 @@ public class LifecycleWeaveBuilder
                         current.setComplete();
                         builtLogItem.setComplete();
 
-                        ExecutionPlanItem next = planItems.hasNext() ? planItems.next() : null;
-                        if ( next != null )
+                        ExecutionPlanItem nextPlanItem = planItems.hasNext() ? planItems.next() : null;
+                        if ( nextPlanItem != null )
                         {
-                            final Schedule scheduleOfNext = next.getSchedule();
-                            if ( !runBAbyRun && ( scheduleOfNext == null || !scheduleOfNext.isParallel() ) )
+                            final Schedule scheduleOfNext = nextPlanItem.getSchedule();
+                            if ( scheduleOfNext == null || !scheduleOfNext.isParallel() )
                             {
                                 for ( MavenProject upstreamProject : projectBuild.getImmediateUpstreamProjects() )
                                 {
                                     final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
-                                    final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( next );
+                                    final String nextPhase = nextPlanItem.getLifecyclePhase();
+                                    final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( nextPhase );
                                     if ( inSchedule != null )
                                     {
                                         long startWait = System.currentTimeMillis();
@@ -229,12 +219,7 @@ public class LifecycleWeaveBuilder
                                 }
                             }
                         }
-                        current = next;
-
-                        if ( packagePhaseSeen && !runBAbyRun )
-                        {
-                            runBAbyRun = true;
-                        }
+                        current = nextPlanItem;
                     }
 
                     final long wallClockTime = System.currentTimeMillis() - buildStartTime;

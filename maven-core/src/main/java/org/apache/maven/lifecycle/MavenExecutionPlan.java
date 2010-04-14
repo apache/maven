@@ -19,6 +19,9 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
+import org.apache.maven.plugin.MojoExecution;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,16 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-
 //TODO: lifecycles being executed
 //TODO: what runs in each phase
 //TODO: plugins that need downloading
 //TODO: project dependencies that need downloading
 //TODO: unfortunately the plugins need to be downloaded in order to get the plugin.xml file. need to externalize this from the plugin archive.
 //TODO: this will be the class that people get in IDEs to modify
+
 public class MavenExecutionPlan
     implements Iterable<ExecutionPlanItem>
 {
@@ -48,43 +48,88 @@ public class MavenExecutionPlan
        separate this into a separate mutable structure.
 
      */
-    /** For project dependency resolution, the scopes of resolution required if any. */
+
+    /**
+     * For project dependency resolution, the scopes of resolution required if any.
+     */
     private final Set<String> requiredDependencyResolutionScopes;
 
-    /** For project dependency collection, the scopes of collection required if any. */
+    /**
+     * For project dependency collection, the scopes of collection required if any.
+     */
     private final Set<String> requiredDependencyCollectionScopes;
 
     private final List<ExecutionPlanItem> planItem;
 
-    private final Map<String, ExecutionPlanItem> lastInPhase;
-    private final List<String> phasesInOrder;
+    private final Map<String, ExecutionPlanItem> lastMojoExecutionForAllPhases;
+
+
+    final List<String> phases;
 
     public MavenExecutionPlan( Set<String> requiredDependencyResolutionScopes,
-                               Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem )
+                               Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem,
+                               DefaultLifecycles defaultLifecycles )
     {
         this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
         this.requiredDependencyCollectionScopes = requiredDependencyCollectionScopes;
         this.planItem = planItem;
-        lastInPhase = new HashMap<String, ExecutionPlanItem>();
-        phasesInOrder = new ArrayList<String>();
+        lastMojoExecutionForAllPhases = new HashMap<String, ExecutionPlanItem>();
+
+        String firstPhasePreset = getFirstPhasePresentInPlan();
+
+        List<String> phases = null;
+        if ( defaultLifecycles != null )
+        {
+            final Lifecycle lifecycle = defaultLifecycles.get( firstPhasePreset );
+            if ( lifecycle != null )
+            {
+                phases = lifecycle.getPhases();
+            }
+        }
+        this.phases = phases;
+
+        Map<String, ExecutionPlanItem> lastInExistingPhases = new HashMap<String, ExecutionPlanItem>();
         for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
         {
-            final String phaseName = getPhase( executionPlanItem );
-            if ( !lastInPhase.containsKey( phaseName ) )
+            final String phaseName = executionPlanItem.getLifecyclePhase();
+            if ( phaseName != null )
             {
-                phasesInOrder.add( phaseName );
+                lastInExistingPhases.put( phaseName, executionPlanItem );
             }
-            lastInPhase.put( phaseName, executionPlanItem );
         }
+
+        ExecutionPlanItem lastSeenExecutionPlanItem = null;
+        ExecutionPlanItem forThis;
+
+        if ( phases != null )
+        {
+            for ( String phase : phases )
+            {
+                forThis = lastInExistingPhases.get( phase );
+                if ( forThis != null )
+                {
+                    lastSeenExecutionPlanItem = forThis;
+                }
+                lastMojoExecutionForAllPhases.put( phase, lastSeenExecutionPlanItem );
+
+            }
+        }
+
     }
 
-    private String getPhase( ExecutionPlanItem executionPlanItem )
+    private String getFirstPhasePresentInPlan()
     {
-        final MojoExecution mojoExecution = executionPlanItem.getMojoExecution();
-        final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        return mojoDescriptor.getPhase();
-
+        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
+        {
+            final String phase = executionPlanItem.getLifecyclePhase();
+            if ( phase != null )
+            {
+                return phase;
+            }
+        }
+        return null;
     }
+
 
     public Iterator<ExecutionPlanItem> iterator()
     {
@@ -93,14 +138,23 @@ public class MavenExecutionPlan
 
     /**
      * Returns the last ExecutionPlanItem in the supplied phase. If no items are in the specified phase,
-     * the closest upstream item will be returned.
-     * @param executionPlanItem The execution plan item
+     * the closest executionPlanItem from an earlier phase item will be returned.
+     *
+     * @param requestedPhase the requested phase
+     *                       The execution plan item
      * @return The ExecutionPlanItem or null if none can be found
      */
-    public ExecutionPlanItem findLastInPhase( ExecutionPlanItem executionPlanItem )
+    public ExecutionPlanItem findLastInPhase( String requestedPhase )
     {
-        ExecutionPlanItem executionPlanItem1 = lastInPhase.get( getPhase( executionPlanItem ) );
-        return executionPlanItem1;
+        ExecutionPlanItem result = lastMojoExecutionForAllPhases.get( requestedPhase );
+        int i = phases.indexOf( requestedPhase );
+        while ( result == null && i > 0 )
+        {
+            final String previousPhase = phases.get( --i );
+            result = lastMojoExecutionForAllPhases.get( previousPhase );
+
+        }
+        return result;
     }
 
     private List<ExecutionPlanItem> getExecutionPlanItems()
@@ -136,6 +190,8 @@ public class MavenExecutionPlan
         return result;
     }
 
+    // Used by m2e but will be removed, really. 
+    @SuppressWarnings({"UnusedDeclaration"})
     @Deprecated
     public List<MojoExecution> getExecutions()
     {
