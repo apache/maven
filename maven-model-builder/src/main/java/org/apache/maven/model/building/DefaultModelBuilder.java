@@ -218,7 +218,8 @@ public class DefaultModelBuilder
                 message += currentData.getId();
 
                 problems.add( ModelProblem.Severity.FATAL, message, null );
-                throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
+                throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
+                                                  problems.getProblems() );
             }
         }
 
@@ -315,7 +316,7 @@ public class DefaultModelBuilder
 
         if ( problems.hasErrors() )
         {
-            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
+            throw new ModelBuildingException( resultModel, problems.getRootModelId(), problems.getProblems() );
         }
 
         return result;
@@ -386,7 +387,8 @@ public class DefaultModelBuilder
         catch ( ModelParseException e )
         {
             problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
-            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
+                                              problems.getProblems() );
         }
         catch ( IOException e )
         {
@@ -404,7 +406,8 @@ public class DefaultModelBuilder
                 }
             }
             problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + msg, e );
-            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
+                                              problems.getProblems() );
         }
 
         model.setPomFile( pomFile );
@@ -414,7 +417,8 @@ public class DefaultModelBuilder
 
         if ( problems.hasFatalErrors() )
         {
-            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
+                                              problems.getProblems() );
         }
 
         return model;
@@ -694,7 +698,8 @@ public class DefaultModelBuilder
             problems.add( Severity.FATAL, "Non-resolvable parent POM "
                 + ModelProblemUtils.toId( groupId, artifactId, version ) + " for "
                 + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), e );
-            throw new ModelBuildingException( problems.getRootModelId(), problems.getProblems() );
+            throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
+                                              problems.getProblems() );
         }
 
         ModelBuildingRequest lenientRequest = request;

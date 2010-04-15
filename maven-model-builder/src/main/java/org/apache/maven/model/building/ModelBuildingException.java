@@ -24,6 +24,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Model;
+
 /**
  * Signals one ore more errors during model building. The model builder tries to collect as many problems as possible
  * before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to query the
@@ -35,6 +37,8 @@ public class ModelBuildingException
     extends Exception
 {
 
+    private final Model model;
+
     private final String modelId;
 
     private final List<ModelProblem> problems;
@@ -42,13 +46,15 @@ public class ModelBuildingException
     /**
      * Creates a new exception with the specified problems.
      * 
+     * @param model The model that could not be built, may be {@code null}.
      * @param modelId The identifier of the model that could not be built, may be {@code null}.
      * @param problems The problems that causes this exception, may be {@code null}.
      */
-    public ModelBuildingException( String modelId, List<ModelProblem> problems )
+    public ModelBuildingException( Model model, String modelId, List<ModelProblem> problems )
     {
         super( toMessage( modelId, problems ) );
 
+        this.model = model;
         this.modelId = ( modelId != null ) ? modelId : "";
 
         this.problems = new ArrayList<ModelProblem>();
@@ -56,6 +62,16 @@ public class ModelBuildingException
         {
             this.problems.addAll( problems );
         }
+    }
+
+    /**
+     * Gets the model that could not be built properly.
+     * 
+     * @return The erroneous model or {@code null} if not available.
+     */
+    public Model getModel()
+    {
+        return model;
     }
 
     /**
