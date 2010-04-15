@@ -52,11 +52,6 @@ public class ExecutionPlanItem
 
     public String getLifecyclePhase()
     {
-        final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-        if ( mojoDescriptor.getPhase() != null )
-        {
-            return mojoDescriptor.getPhase();
-        }
         return mojoExecution.getLifecyclePhase();
     }
 
@@ -108,18 +103,6 @@ public class ExecutionPlanItem
     public Schedule getSchedule()
     {
         return schedule;
-    }
-
-    public boolean hasSchedule( Schedule other )
-    {
-        if ( getSchedule() != null && !getSchedule().isMissingPhase() )
-        {
-            if ( other.getPhase().equals( getSchedule().getPhase() ) )
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     public Plugin getPlugin()

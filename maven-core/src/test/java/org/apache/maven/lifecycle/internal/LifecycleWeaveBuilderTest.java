@@ -122,7 +122,8 @@ public class LifecycleWeaveBuilderTest
         final LoggerStub loggerStub = new LoggerStub();
         final LifecycleDependencyResolver lifecycleDependencyResolver =
             new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), loggerStub );
-        return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, new ExecutionEventCatapultStub() );
+        return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, lifecycleDependencyResolver,
+                                          new ExecutionEventCatapultStub() );
     }
 
     private BuilderCommon getBuilderCommon()

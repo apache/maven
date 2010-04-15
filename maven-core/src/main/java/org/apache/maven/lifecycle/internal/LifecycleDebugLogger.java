@@ -142,7 +142,7 @@ public class LifecycleDebugLogger
         }
 
         final ProjectDependencyGraph dependencyGraph = session.getProjectDependencyGraph();
-        logger.info( "=== WEAVE CONCURRENCY BUILD PLAN ================================================" );
+        logger.info( "=== WEAVE CONCURRENCY BUILD PLAN ======================================" );
         for ( MavenProject mavenProject : dependencyGraph.getSortedProjects() )
         {
 

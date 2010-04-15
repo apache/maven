@@ -14,9 +14,12 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +47,12 @@ public class ConcurrentBuildLogger
     }
 
 
-    List<BuiltLogItem> items = Collections.synchronizedList( new ArrayList<BuiltLogItem>() );
+    List<BuildLogItem> items = Collections.synchronizedList( new ArrayList<BuildLogItem>() );
 
-    public BuiltLogItem createBuildLogItem( MavenProject project, ExecutionPlanItem current )
+    public BuildLogItem createBuildLogItem( MavenProject project, ExecutionPlanItem current )
     {
         threadMap.put( project, Thread.currentThread() );
-        BuiltLogItem result = new BuiltLogItem( project, current );
+        BuildLogItem result = new BuildLogItem( project, current );
         items.add( result );
         return result;
     }
@@ -65,11 +68,44 @@ public class ConcurrentBuildLogger
             result.append( "\n" );
         }
 
-        for ( BuiltLogItem builtLogItem : items )
+        for ( BuildLogItem builtLogItem : items )
         {
             result.append( builtLogItem.toString( startTime ) );
             result.append( "\n" );
         }
         return result.toString();
     }
+
+    public String toGraph()
+    {
+        StringBuilder result = new StringBuilder();
+
+        Multimap<MavenProject, BuildLogItem> multiMap = ArrayListMultimap.create();
+        for ( BuildLogItem builtLogItem : items )
+        {
+            multiMap.put( builtLogItem.getProject(), builtLogItem );
+        }
+
+        result.append( "digraph build" );
+        result.append( " {\n " );
+
+        for ( MavenProject mavenProject : multiMap.keySet() )
+        {
+            final Collection<BuildLogItem> builtLogItems = multiMap.get( mavenProject );
+            result.append( "   subgraph " );
+            result.append( mavenProject.getArtifactId() );
+            result.append( "   {\n" );
+
+            for ( BuildLogItem builtLogItem : builtLogItems )
+            {
+                result.append( builtLogItem.toGraph( startTime ) );
+            }
+
+            result.append( "\n   }\n" );
+        }
+
+        result.append( "\n}\n " );
+        return result.toString();
+    }
+
 }

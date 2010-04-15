@@ -25,6 +25,8 @@ import org.apache.maven.plugin.MojoExecution;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +66,7 @@ public class MavenExecutionPlan
     private final Map<String, ExecutionPlanItem> lastMojoExecutionForAllPhases;
 
 
-    final List<String> phases;
+    final List<String> phasesInExecutionPlan;
 
     public MavenExecutionPlan( Set<String> requiredDependencyResolutionScopes,
                                Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem,
@@ -73,61 +75,43 @@ public class MavenExecutionPlan
         this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
         this.requiredDependencyCollectionScopes = requiredDependencyCollectionScopes;
         this.planItem = planItem;
-        lastMojoExecutionForAllPhases = new HashMap<String, ExecutionPlanItem>();
+        lastMojoExecutionForAllPhases = new LinkedHashMap<String, ExecutionPlanItem>();
 
-        String firstPhasePreset = getFirstPhasePresentInPlan();
-
-        List<String> phases = null;
+        LinkedHashSet<String> totalPhaseSet = new LinkedHashSet<String>();
         if ( defaultLifecycles != null )
         {
-            final Lifecycle lifecycle = defaultLifecycles.get( firstPhasePreset );
-            if ( lifecycle != null )
+            for ( String phase : getDistinctPhasesInOrderOfExecutionPlanAppearance( planItem ) )
             {
-                phases = lifecycle.getPhases();
+                final Lifecycle lifecycle = defaultLifecycles.get( phase );
+                if ( lifecycle != null )
+                {
+                    totalPhaseSet.addAll( lifecycle.getPhases() );
+                }
             }
         }
-        this.phases = phases;
+        this.phasesInExecutionPlan = new ArrayList<String>( totalPhaseSet );
 
         Map<String, ExecutionPlanItem> lastInExistingPhases = new HashMap<String, ExecutionPlanItem>();
         for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
         {
-            final String phaseName = executionPlanItem.getLifecyclePhase();
-            if ( phaseName != null )
-            {
-                lastInExistingPhases.put( phaseName, executionPlanItem );
-            }
+            lastInExistingPhases.put( executionPlanItem.getLifecyclePhase(), executionPlanItem );
         }
 
         ExecutionPlanItem lastSeenExecutionPlanItem = null;
-        ExecutionPlanItem forThis;
+        ExecutionPlanItem forThisPhase;
 
-        if ( phases != null )
+        for ( String phase : totalPhaseSet )
         {
-            for ( String phase : phases )
+            forThisPhase = lastInExistingPhases.get( phase );
+            if ( forThisPhase != null )
             {
-                forThis = lastInExistingPhases.get( phase );
-                if ( forThis != null )
-                {
-                    lastSeenExecutionPlanItem = forThis;
-                }
-                lastMojoExecutionForAllPhases.put( phase, lastSeenExecutionPlanItem );
-
+                lastSeenExecutionPlanItem = forThisPhase;
             }
+            lastMojoExecutionForAllPhases.put( phase, lastSeenExecutionPlanItem );
+
         }
 
-    }
 
-    private String getFirstPhasePresentInPlan()
-    {
-        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
-        {
-            final String phase = executionPlanItem.getLifecyclePhase();
-            if ( phase != null )
-            {
-                return phase;
-            }
-        }
-        return null;
     }
 
 
@@ -146,20 +130,28 @@ public class MavenExecutionPlan
      */
     public ExecutionPlanItem findLastInPhase( String requestedPhase )
     {
-        ExecutionPlanItem result = lastMojoExecutionForAllPhases.get( requestedPhase );
-        int i = phases.indexOf( requestedPhase );
-        while ( result == null && i > 0 )
-        {
-            final String previousPhase = phases.get( --i );
-            result = lastMojoExecutionForAllPhases.get( previousPhase );
-
-        }
-        return result;
+        return lastMojoExecutionForAllPhases.get( requestedPhase );
     }
 
     private List<ExecutionPlanItem> getExecutionPlanItems()
     {
         return planItem;
+    }
+
+
+    private static Iterable<String> getDistinctPhasesInOrderOfExecutionPlanAppearance(
+        List<ExecutionPlanItem> planItems )
+    {
+        LinkedHashSet<String> result = new LinkedHashSet<String>();
+        for ( ExecutionPlanItem executionPlanItem : planItems )
+        {
+            final String phase = executionPlanItem.getLifecyclePhase();
+            if ( !result.contains( phase ) )
+            {
+                result.add( phase );
+            }
+        }
+        return result;
     }
 
     public void forceAllComplete()
@@ -168,6 +160,20 @@ public class MavenExecutionPlan
         {
             executionPlanItem.forceComplete();
         }
+    }
+
+    public void waitUntilAllDone()
+        throws InterruptedException
+    {
+        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
+        {
+            executionPlanItem.waitUntilDone();
+        }
+    }
+
+    public boolean containsPhase( String phase )
+    {
+        return phasesInExecutionPlan.contains( phase );
     }
 
     public Set<String> getRequiredResolutionScopes()
@@ -191,6 +197,7 @@ public class MavenExecutionPlan
     }
 
     // Used by m2e but will be removed, really. 
+
     @SuppressWarnings({"UnusedDeclaration"})
     @Deprecated
     public List<MojoExecution> getExecutions()

@@ -14,6 +14,8 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -33,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -70,6 +73,9 @@ public class LifecycleWeaveBuilder
     private Logger logger;
 
     @Requirement
+    private LifecycleDependencyResolver lifecycleDependencyResolver;
+
+    @Requirement
     private ExecutionEventCatapult eventCatapult;
 
     private final Map<MavenProject, MavenExecutionPlan> executionPlans =
@@ -82,6 +88,7 @@ public class LifecycleWeaveBuilder
     }
 
     public LifecycleWeaveBuilder( MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
+                                  LifecycleDependencyResolver lifecycleDependencyResolver,
                                   ExecutionEventCatapult eventCatapult )
     {
         this.mojoExecutor = mojoExecutor;
@@ -118,7 +125,8 @@ public class LifecycleWeaveBuilder
                         final Callable<ProjectSegment> projectBuilder =
                             createCallableForBuildingOneFullModule( buildContext, session, reactorBuildStatus,
                                                                     executionPlan, projectBuild, muxer,
-                                                                    dependencyContext, concurrentBuildLogger );
+                                                                    dependencyContext, concurrentBuildLogger,
+                                                                    projectBuilds );
 
                         futures.add( service.submit( projectBuilder ) );
                     }
@@ -150,7 +158,8 @@ public class LifecycleWeaveBuilder
                                                                              final ProjectSegment projectBuild,
                                                                              final ThreadOutputMuxer muxer,
                                                                              final DependencyContext dependencyContext,
-                                                                             final ConcurrentBuildLogger concurrentBuildLogger )
+                                                                             final ConcurrentBuildLogger concurrentBuildLogger,
+                                                                             final ProjectBuildList projectBuilds )
     {
         return new Callable<ProjectSegment>()
         {
@@ -178,7 +187,7 @@ public class LifecycleWeaveBuilder
                     {
                         PhaseRecorder phaseRecorder = new PhaseRecorder( projectBuild.getProject() );
 
-                        BuiltLogItem builtLogItem =
+                        BuildLogItem builtLogItem =
                             concurrentBuildLogger.createBuildLogItem( projectBuild.getProject(), current );
                         final Schedule schedule = current.getSchedule();
 
@@ -202,6 +211,9 @@ public class LifecycleWeaveBuilder
                         ExecutionPlanItem nextPlanItem = planItems.hasNext() ? planItems.next() : null;
                         if ( nextPlanItem != null )
                         {
+
+                            boolean mustReResolved = false;
+
                             final Schedule scheduleOfNext = nextPlanItem.getSchedule();
                             if ( scheduleOfNext == null || !scheduleOfNext.isParallel() )
                             {
@@ -210,13 +222,51 @@ public class LifecycleWeaveBuilder
                                     final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
                                     final String nextPhase = nextPlanItem.getLifecyclePhase();
                                     final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( nextPhase );
+
                                     if ( inSchedule != null )
                                     {
+                                        if ( upstreamPhaseModifiesArtifactResolutionState( inSchedule ) )
+                                        {
+                                            String key = ArtifactUtils.key( upstreamProject.getGroupId(),
+                                                                            upstreamProject.getArtifactId(),
+                                                                            upstreamProject.getVersion() );
+                                            final Set<Artifact> deps =
+                                                projectBuild.getProject().getDependencyArtifacts();
+                                            for ( Artifact dep : deps )
+                                            {
+                                                String depKey =
+                                                    ArtifactUtils.key( dep.getGroupId(), dep.getArtifactId(),
+                                                                       dep.getVersion() );
+                                                if ( key.equals( depKey ) )
+                                                {
+                                                    dep.setResolved( false );
+                                                    mustReResolved = true;
+                                                }
+                                            }
+                                        }
                                         long startWait = System.currentTimeMillis();
                                         inSchedule.waitUntilDone();
                                         builtLogItem.addWait( upstreamProject, inSchedule, startWait );
                                     }
+                                    else if ( !upstreamPlan.containsPhase( nextPhase ) )
+                                    {
+                                        // Still a bit of a kludge; if we cannot connect in a sensible way to
+                                        // the upstream build plan we just revert to waiting for it all to
+                                        // complete. Real problem is per-mojo phase->lifecycle mapping
+                                        builtLogItem.addDependency( upstreamProject, "No phase tracking possible " );
+                                        upstreamPlan.waitUntilAllDone();
+                                    }
+                                    else
+                                    {
+                                        builtLogItem.addDependency( upstreamProject, "No schedule" );
+                                    }
                                 }
+                            }
+                            if ( mustReResolved )
+                            {
+                                lifecycleDependencyResolver.resolveDependencies( false, projectBuild.getProject(),
+                                                                                 projectBuild.getSession(),
+                                                                                 executionPlan );
                             }
                         }
                         current = nextPlanItem;
@@ -244,6 +294,12 @@ public class LifecycleWeaveBuilder
                 return null;
             }
         };
+    }
+
+    private boolean upstreamPhaseModifiesArtifactResolutionState( ExecutionPlanItem inSchedule )
+    {
+        final String phase = inSchedule.getLifecyclePhase();
+        return "install".equals( phase ) || "compile".equals( phase ) || "test-compile".equals( phase );
     }
 
     private void buildExecutionPlanItem( ReactorContext reactorContext, ExecutionPlanItem node,

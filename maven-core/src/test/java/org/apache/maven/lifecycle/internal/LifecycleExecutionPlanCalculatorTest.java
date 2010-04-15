@@ -59,7 +59,7 @@ public class LifecycleExecutionPlanCalculatorTest
 
     // Maybe also make one with LifeCycleTasks
 
-    private LifecycleExecutionPlanCalculator createExecutionPlaceCalculator(
+    public static LifecycleExecutionPlanCalculator createExecutionPlaceCalculator(
         MojoDescriptorCreator mojoDescriptorCreator )
     {
         LifecyclePluginResolver lifecyclePluginResolver =
@@ -69,7 +69,7 @@ public class LifecycleExecutionPlanCalculatorTest
                                                          mojoDescriptorCreator, lifecyclePluginResolver );
     }
 
-    private MojoDescriptorCreator createMojoDescriptorCreator()
+    public static MojoDescriptorCreator createMojoDescriptorCreator()
     {
         return new MojoDescriptorCreator( new PluginVersionResolverStub(), new BuildPluginManagerStub(),
                                           new PluginPrefixResolverStub() );
