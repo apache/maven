@@ -34,6 +34,7 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
@@ -71,7 +72,8 @@ public class DefaultModelValidator
             if ( equals( parent.getGroupId(), model.getGroupId() )
                 && equals( parent.getArtifactId(), model.getArtifactId() ) )
             {
-                addViolation( problems, Severity.FATAL, "The parent element cannot have the same ID as the project." );
+                addViolation( problems, Severity.FATAL, "parent.artifactId", null, "must be changed"
+                    + ", the parent element cannot have the same groupId:artifactId as the project." );
             }
         }
 
@@ -160,6 +162,18 @@ public class DefaultModelValidator
             else
             {
                 index.put( key, plugin );
+            }
+
+            Set<String> executionIds = new HashSet<String>();
+
+            for ( PluginExecution exec : plugin.getExecutions() )
+            {
+                if ( !executionIds.add( exec.getId() ) )
+                {
+                    addViolation( problems, Severity.ERROR, "build.plugins.plugin[" + plugin.getKey()
+                        + "].executions.execution.id", null, "must be unique but found duplicate execution with id "
+                        + exec.getId() );
+                }
             }
         }
     }
@@ -265,8 +279,6 @@ public class DefaultModelValidator
                                             p.getKey() );
                 }
             }
-
-            forcePluginExecutionIdCollision( model, problems );
 
             for ( Repository repository : model.getRepositories() )
             {
@@ -484,32 +496,6 @@ public class DefaultModelValidator
 
             validateBoolean( prefix + ".filtering", problems, errOn30, resource.getFiltering(),
                              resource.getDirectory() );
-        }
-    }
-
-    private void forcePluginExecutionIdCollision( Model model, ModelProblemCollector problems )
-    {
-        Build build = model.getBuild();
-
-        if ( build != null )
-        {
-            List<Plugin> plugins = build.getPlugins();
-
-            if ( plugins != null )
-            {
-                for ( Plugin plugin : plugins )
-                {
-                    // this will force an IllegalStateException, even if we don't have to do inheritance assembly.
-                    try
-                    {
-                        plugin.getExecutionsAsMap();
-                    }
-                    catch ( IllegalStateException collisionException )
-                    {
-                        addViolation( problems, Severity.ERROR, collisionException.getMessage() );
-                    }
-                }
-            }
         }
     }
 
