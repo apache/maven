@@ -346,7 +346,6 @@ public class DefaultModelBuilder
 
             Map<String, Object> options = new HashMap<String, Object>();
             options.put( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );
-            options.put( ModelProcessor.LOCATION, modelSource.getLocation() );
             options.put( ModelProcessor.SOURCE, modelSource );
 
             try
