@@ -101,8 +101,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
-                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+                target.setUrl( appendPath( src, context ) );
             }
         }
     }
@@ -164,6 +163,12 @@ public class MavenModelMerger
 
     @Override
     protected void mergeModel_ModelVersion( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    {
+        // neither inherited nor injected
+    }
+
+    @Override
+    protected void mergeModel_ArtifactId( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
@@ -396,8 +401,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
-                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+                target.setUrl( appendPath( src, context ) );
             }
         }
     }
@@ -414,8 +418,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( appendPath( src, context.get( ARTIFACT_ID ).toString(),
-                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+                target.setUrl( appendPath( src, context ) );
             }
         }
     }
@@ -432,8 +435,7 @@ public class MavenModelMerger
             }
             else if ( target.getConnection() == null )
             {
-                target.setConnection( appendPath( src, context.get( ARTIFACT_ID ).toString(),
-                                                  context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+                target.setConnection( appendPath( src, context ) );
             }
         }
     }
@@ -451,8 +453,7 @@ public class MavenModelMerger
             }
             else if ( target.getDeveloperConnection() == null )
             {
-                target.setDeveloperConnection( appendPath( src, context.get( ARTIFACT_ID ).toString(),
-                                                           context.get( CHILD_PATH_ADJUSTMENT ).toString() ) );
+                target.setDeveloperConnection( appendPath( src, context ) );
             }
         }
     }
@@ -554,6 +555,21 @@ public class MavenModelMerger
     protected Object getExtensionKey( Extension object )
     {
         return object.getGroupId() + ':' + object.getArtifactId();
+    }
+
+    private String appendPath( String parentPath, Map<Object, Object> context )
+    {
+        Object artifactId = context.get( ARTIFACT_ID );
+        Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
+
+        if ( artifactId != null && childPathAdjustment != null )
+        {
+            return appendPath( parentPath, artifactId.toString(), childPathAdjustment.toString() );
+        }
+        else
+        {
+            return parentPath;
+        }
     }
 
     private String appendPath( String parentPath, String childPath, String pathAdjustment )

@@ -1089,14 +1089,15 @@ public class PomConstructionTest
     	assertEquals(1, ( (Properties) pom.getValue( "properties" ) ).size());
     	assertEquals("child",  pom.getValue( "properties/pomProfile" ) );
     }
-    
+
     public void testPomInheritance()
-		throws Exception
-	{
-		PomTestWrapper pom = buildPom( "pom-inheritance/sub" );	
-		assertEquals("parent-description", pom.getValue("description"));
-	}   
-    
+        throws Exception
+    {
+        PomTestWrapper pom = buildPom( "pom-inheritance/sub" );
+        assertEquals( "parent-description", pom.getValue( "description" ) );
+        assertEquals( "jar", pom.getValue( "packaging" ) );
+    }
+
     public void testCompleteModelWithoutParent()
         throws Exception
     {
@@ -1754,6 +1755,20 @@ public class PomConstructionTest
         actual.retainAll( expected );
 
         assertEquals( actual, expected );
+    }
+
+    public void testProjectArtifactIdIsNotInheritedButMandatory()
+        throws Exception
+    {
+        try
+        {
+            buildPom( "artifact-id-inheritance/child" );
+            fail( "Missing artifactId did not cause validation error" );
+        }
+        catch ( ProjectBuildingException e )
+        {
+            // expected
+        }
     }
 
     private void assertPathSuffixEquals( String expected, Object actual )
