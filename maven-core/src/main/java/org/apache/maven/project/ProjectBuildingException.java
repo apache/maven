@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemUtils;
 
 /**
  * @author Jason van Zyl
@@ -134,7 +135,7 @@ public class ProjectBuildingException
                 writer.print( "] " );
                 writer.print( problem.getMessage() );
                 writer.print( " @ " );
-                writer.println( problem.getLocation() );
+                writer.println( ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
             }
         }
         writer.close();

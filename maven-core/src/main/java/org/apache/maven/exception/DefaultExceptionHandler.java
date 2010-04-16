@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -149,17 +150,7 @@ public class DefaultExceptionHandler
         {
             String message = problem.getMessage();
 
-            String location = "";
-
-            if ( !problem.getModelId().equals( projectId ) )
-            {
-                location += problem.getModelId();
-
-                if ( StringUtils.isNotEmpty( problem.getSource() ) )
-                {
-                    location += " (" + problem.getSource() + ")";
-                }
-            }
+            String location = ModelProblemUtils.formatLocation( problem, projectId );
 
             if ( StringUtils.isNotEmpty( location ) )
             {

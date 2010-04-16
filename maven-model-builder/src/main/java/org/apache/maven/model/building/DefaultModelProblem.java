@@ -106,42 +106,6 @@ public class DefaultModelProblem
         return modelId;
     }
 
-    public String getLocation()
-    {
-        StringBuilder buffer = new StringBuilder( 256 );
-
-        buffer.append( getModelId() );
-
-        if ( getSource().length() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
-            }
-            buffer.append( getSource() );
-        }
-
-        if ( getLineNumber() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
-            }
-            buffer.append( "line " ).append( getLineNumber() );
-        }
-
-        if ( getColumnNumber() > 0 )
-        {
-            if ( buffer.length() > 0 )
-            {
-                buffer.append( ", " );
-            }
-            buffer.append( "column " ).append( getColumnNumber() );
-        }
-
-        return buffer.toString();
-    }
-
     public Exception getException()
     {
         return exception;
@@ -180,7 +144,7 @@ public class DefaultModelProblem
 
         buffer.append( "[" ).append( getSeverity() ).append( "] " );
         buffer.append( getMessage() );
-        buffer.append( " @ " ).append( getLocation() );
+        buffer.append( " @ " ).append( ModelProblemUtils.formatLocation( this, null ) );
 
         return buffer.toString();
     }

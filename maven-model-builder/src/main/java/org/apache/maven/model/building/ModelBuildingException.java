@@ -119,7 +119,7 @@ public class ModelBuildingException
             writer.print( "] " );
             writer.print( problem.getMessage() );
             writer.print( " @ " );
-            writer.println( problem.getLocation() );
+            writer.println( ModelProblemUtils.formatLocation( problem, modelId ) );
         }
 
         return buffer.toString();

@@ -40,6 +40,7 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.project.DuplicateProjectException;
@@ -414,7 +415,8 @@ public class DefaultMaven
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
-                    logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                    logger.warn( problem.getMessage() + " @ "
+                        + ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
                 }
 
                 problems = true;

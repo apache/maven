@@ -79,15 +79,6 @@ public interface ModelProblem
     String getModelId();
 
     /**
-     * Gets the location of the problem. The location is a user-friendly combination of the values from
-     * {@link #getModelId()}, {@link #getSource()}, {@link #getLineNumber()} and {@link #getColumnNumber()}. The exact
-     * syntax of the returned value is undefined.
-     * 
-     * @return The location of the problem, never {@code null}.
-     */
-    String getLocation();
-
-    /**
      * Gets the exception that caused this problem (if any).
      * 
      * @return The exception that caused this problem or {@code null} if not applicable.
