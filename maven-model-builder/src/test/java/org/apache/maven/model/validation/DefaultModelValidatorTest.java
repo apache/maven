@@ -420,7 +420,7 @@ public class DefaultModelValidatorTest
 
         assertViolations( result, 0, 0, 1 );
 
-        assertTrue( result.getWarnings().get( 0 ).contains( "'modules.module' has been specified without a path" ) );
+        assertTrue( result.getWarnings().get( 0 ).contains( "'modules.module[0]' has been specified without a path" ) );
     }
 
     public void testDuplicatePlugin()

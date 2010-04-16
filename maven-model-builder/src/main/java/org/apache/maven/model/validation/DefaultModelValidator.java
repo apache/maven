@@ -196,11 +196,12 @@ public class DefaultModelValidator
                     + "' is invalid. Aggregator projects " + "require 'pom' as packaging." );
             }
 
-            for ( String module : model.getModules() )
+            for ( int i = 0, n = model.getModules().size(); i < n; i++ )
             {
+                String module = model.getModules().get( i );
                 if ( StringUtils.isBlank( module ) )
                 {
-                    addViolation( problems, Severity.WARNING, "modules.module", null,
+                    addViolation( problems, Severity.WARNING, "modules.module[" + i + "]", null,
                                   "has been specified without a path to the project directory." );
                 }
             }
@@ -221,12 +222,13 @@ public class DefaultModelValidator
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
             Set<String> modules = new HashSet<String>();
-            for ( String module : model.getModules() )
+            for ( int i = 0, n = model.getModules().size(); i < n; i++ )
             {
+                String module = model.getModules().get( i );
                 if ( !modules.add( module ) )
                 {
-                    addViolation( problems, Severity.ERROR, "modules.module", null, "specifies duplicate child module "
-                        + module );
+                    addViolation( problems, Severity.ERROR, "modules.module[" + i + "]", null,
+                                  "specifies duplicate child module " + module );
                 }
             }
 
