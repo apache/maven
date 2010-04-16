@@ -1,5 +1,7 @@
 package org.apache.maven.model.building;
 
+import org.apache.maven.model.InputLocation;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -36,8 +38,9 @@ public interface ModelProblemCollector
      * 
      * @param severity The severity of the problem, must not be {@code null}.
      * @param message The detail message of the problem, may be {@code null}.
+     * @param location The location of the problem, may be {@code null}.
      * @param cause The cause of the problem, may be {@code null}.
      */
-    void add( ModelProblem.Severity severity, String message, Exception cause );
+    void add( ModelProblem.Severity severity, String message, InputLocation location, Exception cause );
 
 }

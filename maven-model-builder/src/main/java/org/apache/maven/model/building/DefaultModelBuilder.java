@@ -33,6 +33,8 @@ import java.util.Properties;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -217,7 +219,7 @@ public class DefaultModelBuilder
                 }
                 message += currentData.getId();
 
-                problems.add( ModelProblem.Severity.FATAL, message, null );
+                problems.add( ModelProblem.Severity.FATAL, message, null, null );
                 throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                                   problems.getProblems() );
             }
@@ -344,9 +346,11 @@ public class DefaultModelBuilder
         try
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+            InputSource source = strict ? new InputSource() : null;
 
             Map<String, Object> options = new HashMap<String, Object>();
             options.put( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );
+            options.put( ModelProcessor.INPUT_SOURCE, source );
             options.put( ModelProcessor.SOURCE, modelSource );
 
             try
@@ -375,18 +379,24 @@ public class DefaultModelBuilder
                 if ( pomFile != null )
                 {
                     problems.add( Severity.ERROR, "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                  e );
+                                  null, e );
                 }
                 else
                 {
                     problems.add( Severity.WARNING, "Malformed POM " + modelSource.getLocation() + ": "
-                        + e.getMessage(), e );
+                        + e.getMessage(), null, e );
                 }
+            }
+
+            if ( source != null )
+            {
+                source.setModelId( ModelProblemUtils.toId( model ) );
+                source.setLocation( pomFile != null ? pomFile.getAbsolutePath() : null );
             }
         }
         catch ( ModelParseException e )
         {
-            problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), e );
+            problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), null, e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                               problems.getProblems() );
         }
@@ -405,7 +415,7 @@ public class DefaultModelBuilder
                     msg = e.getClass().getSimpleName();
                 }
             }
-            problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + msg, e );
+            problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + msg, null, e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                               problems.getProblems() );
         }
@@ -456,7 +466,7 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(), e );
+                problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(), null, e );
             }
         }
     }
@@ -469,10 +479,11 @@ public class DefaultModelBuilder
             return;
         }
 
+        Map<String, Plugin> plugins = new HashMap<String, Plugin>();
         Map<String, String> versions = new HashMap<String, String>();
         Map<String, String> managedVersions = new HashMap<String, String>();
 
-        for ( int i = 0, n = lineage.size() - 1; i < n; i++ )
+        for ( int i = lineage.size() - 1; i >= 0; i-- )
         {
             Model model = lineage.get( i ).getModel();
             Build build = model.getBuild();
@@ -484,6 +495,7 @@ public class DefaultModelBuilder
                     if ( versions.get( key ) == null )
                     {
                         versions.put( key, plugin.getVersion() );
+                        plugins.put( key, plugin );
                     }
                 }
                 PluginManagement mngt = build.getPluginManagement();
@@ -505,7 +517,9 @@ public class DefaultModelBuilder
         {
             if ( versions.get( key ) == null && managedVersions.get( key ) == null )
             {
-                problems.add( Severity.WARNING, "'build.plugins.plugin.version' for " + key + " is missing.", null );
+                InputLocation location = plugins.get( key ).getLocation( "" );
+                problems.add( Severity.WARNING, "'build.plugins.plugin.version' for " + key + " is missing.", location,
+                              null );
             }
         }
     }
@@ -581,7 +595,7 @@ public class DefaultModelBuilder
             {
                 problems.add( Severity.ERROR, "Invalid packaging for parent POM "
                     + ModelProblemUtils.toSourceHint( parentModel ) + ", must be \"pom\" but is \""
-                    + parentModel.getPackaging() + "\"", null );
+                    + parentModel.getPackaging() + "\"", null, null );
             }
         }
         else
@@ -626,7 +640,7 @@ public class DefaultModelBuilder
             problems.add( Severity.WARNING, "'parent.relativePath' of POM "
                 + ModelProblemUtils.toSourceHint( childModel ) + " points at " + groupId + ":" + artifactId
                 + " instead of " + parent.getGroupId() + ":" + parent.getArtifactId()
-                + ", please verify your project structure", null );
+                + ", please verify your project structure", null, null );
             return null;
         }
         if ( version == null || !version.equals( parent.getVersion() ) )
@@ -697,7 +711,7 @@ public class DefaultModelBuilder
         {
             problems.add( Severity.FATAL, "Non-resolvable parent POM "
                 + ModelProblemUtils.toId( groupId, artifactId, version ) + " for "
-                + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), e );
+                + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), null, e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                               problems.getProblems() );
         }
@@ -773,7 +787,7 @@ public class DefaultModelBuilder
                     message += modelId + " -> ";
                 }
                 message += imported;
-                problems.add( Severity.ERROR, message, null );
+                problems.add( Severity.ERROR, message, null, null );
 
                 continue;
             }
@@ -798,7 +812,7 @@ public class DefaultModelBuilder
                 catch ( UnresolvableModelException e )
                 {
                     problems.add( Severity.ERROR, "Non-resolvable import POM "
-                        + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), e );
+                        + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), null, e );
                     continue;
                 }
 

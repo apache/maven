@@ -125,10 +125,9 @@ public class DefaultInheritanceAssembler
                     Object key = getPluginKey( element );
 
                     // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
-                    Plugin plugin = new Plugin();
-                    plugin.setGroupId( element.getGroupId() );
-                    plugin.setArtifactId( element.getArtifactId() );
-                    mergePlugin( plugin, element, sourceDominant, context );
+                    Plugin plugin = element.clone();
+                    plugin.setExecutions( null );
+                    mergePlugin_Executions( plugin, element, sourceDominant, context );
 
                     master.put( key, plugin );
                 }

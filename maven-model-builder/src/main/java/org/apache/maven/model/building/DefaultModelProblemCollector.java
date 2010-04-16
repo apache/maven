@@ -24,6 +24,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.io.ModelParseException;
@@ -139,25 +140,38 @@ class DefaultModelProblemCollector
         }
     }
 
-    public void add( Severity severity, String message, Exception cause )
+    public void add( Severity severity, String message, InputLocation location, Exception cause )
     {
         int line = -1;
         int column = -1;
+        String source = null;
+        String modelId = null;
 
-        if ( cause instanceof ModelParseException )
+        if ( location != null )
+        {
+            line = location.getLineNumber();
+            column = location.getColumnNumber();
+            if ( location.getSource() != null )
+            {
+                modelId = location.getSource().getModelId();
+                source = location.getSource().getLocation();
+            }
+        }
+
+        if ( modelId == null )
+        {
+            modelId = getModelId();
+            source = getSource();
+        }
+
+        if ( line <= 0 && column <= 0 && cause instanceof ModelParseException )
         {
             ModelParseException e = (ModelParseException) cause;
             line = e.getLineNumber();
             column = e.getColumnNumber();
         }
 
-        add( severity, message, line, column, cause );
-    }
-
-    private void add( ModelProblem.Severity severity, String message, int line, int column, Exception cause )
-    {
-        ModelProblem problem =
-            new DefaultModelProblem( message, severity, getSource(), line, column, getModelId(), cause );
+        ModelProblem problem = new DefaultModelProblem( message, severity, source, line, column, modelId, cause );
 
         add( problem );
     }

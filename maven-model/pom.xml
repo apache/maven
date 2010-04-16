@@ -45,12 +45,24 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <version>1.4-SNAPSHOT</version>
         <configuration>
           <version>4.0.0</version>
           <models>
             <model>src/main/mdo/maven.mdo</model>
           </models>
         </configuration>
+        <executions>
+          <execution>
+            <id>standard</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-extended-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

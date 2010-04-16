@@ -114,9 +114,7 @@ public class DefaultPluginManagementInjector
                 for ( PluginExecution element : src )
                 {
                     Object key = getPluginExecutionKey( element );
-                    PluginExecution clone = new PluginExecution();
-                    mergePluginExecution( clone, element, true, context );
-                    merged.put( key, clone );
+                    merged.put( key, element.clone() );
                 }
 
                 for ( PluginExecution element : tgt )

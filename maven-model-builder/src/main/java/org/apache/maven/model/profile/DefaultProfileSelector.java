@@ -104,7 +104,8 @@ public class DefaultProfileSelector
             }
             catch ( RuntimeException e )
             {
-                problems.add( Severity.ERROR, "Failed to determine activation for profile " + profile.getId(), e );
+                problems.add( Severity.ERROR, "Failed to determine activation for profile " + profile.getId(),
+                              profile.getLocation( "" ), e );
                 return false;
             }
         }

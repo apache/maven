@@ -106,7 +106,7 @@ public class DefaultReportingConverter
         {
 
             problems.add( Severity.WARNING, "The <reporting> section is deprecated"
-                + ", please move the reports to the <configuration> section of the new Maven Site Plugin.", null );
+                + ", please move the reports to the <configuration> section of the new Maven Site Plugin.", null, null );
         }
 
         for ( ReportPlugin plugin : reporting.getPlugins() )

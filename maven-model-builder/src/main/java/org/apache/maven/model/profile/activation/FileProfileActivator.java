@@ -120,7 +120,7 @@ public class FileProfileActivator
         catch ( Exception e )
         {
             problems.add( Severity.ERROR, "Failed to interpolate file location " + path + " for profile "
-                + profile.getId() + ": " + e.getMessage(), e );
+                + profile.getId() + ": " + e.getMessage(), null, e );
             return false;
         }
 

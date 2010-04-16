@@ -40,6 +40,7 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.FileSet;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -146,6 +147,7 @@ public class ModelMerger
             if ( sourceDominant || target.getModelVersion() == null )
             {
                 target.setModelVersion( src );
+                target.setLocation( "modelVersion", source.getLocation( "modelVersion" ) );
             }
         }
     }
@@ -173,6 +175,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -186,6 +189,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -198,6 +202,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -210,6 +215,7 @@ public class ModelMerger
             if ( sourceDominant || target.getPackaging() == null )
             {
                 target.setPackaging( src );
+                target.setLocation( "packaging", source.getLocation( "packaging" ) );
             }
         }
     }
@@ -222,6 +228,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -235,6 +242,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDescription() == null )
             {
                 target.setDescription( src );
+                target.setLocation( "description", source.getLocation( "description" ) );
             }
         }
     }
@@ -247,6 +255,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -260,6 +269,7 @@ public class ModelMerger
             if ( sourceDominant || target.getInceptionYear() == null )
             {
                 target.setInceptionYear( src );
+                target.setLocation( "inceptionYear", source.getLocation( "inceptionYear" ) );
             }
         }
     }
@@ -670,6 +680,8 @@ public class ModelMerger
             merged.putAll( target.getProperties() );
         }
         target.setProperties( merged );
+        target.setLocation( "properties", InputLocation.merge( target.getLocation( "properties" ),
+                                                               source.getLocation( "properties" ), sourceDominant ) );
     }
 
     protected void mergeDistributionManagement( DistributionManagement target, DistributionManagement source,
@@ -741,6 +753,7 @@ public class ModelMerger
             if ( sourceDominant || target.getStatus() == null )
             {
                 target.setStatus( src );
+                target.setLocation( "status", source.getLocation( "status" ) );
             }
         }
     }
@@ -755,6 +768,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDownloadUrl() == null )
             {
                 target.setDownloadUrl( src );
+                target.setLocation( "downloadUrl", source.getLocation( "downloadUrl" ) );
             }
         }
     }
@@ -777,6 +791,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -790,6 +805,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -803,6 +819,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -816,6 +833,7 @@ public class ModelMerger
             if ( sourceDominant || target.getMessage() == null )
             {
                 target.setMessage( src );
+                target.setLocation( "message", source.getLocation( "message" ) );
             }
         }
     }
@@ -833,6 +851,7 @@ public class ModelMerger
         if ( sourceDominant )
         {
             target.setUniqueVersion( source.isUniqueVersion() );
+            target.setLocation( "uniqueVersion", source.getLocation( "uniqueVersion" ) );
         }
     }
 
@@ -851,6 +870,7 @@ public class ModelMerger
             if ( sourceDominant || target.getId() == null )
             {
                 target.setId( src );
+                target.setLocation( "id", source.getLocation( "id" ) );
             }
         }
     }
@@ -863,6 +883,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -875,6 +896,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -937,6 +959,7 @@ public class ModelMerger
             if ( sourceDominant || target.getId() == null )
             {
                 target.setId( src );
+                target.setLocation( "id", source.getLocation( "id" ) );
             }
         }
     }
@@ -950,6 +973,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -963,6 +987,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -976,6 +1001,7 @@ public class ModelMerger
             if ( sourceDominant || target.getLayout() == null )
             {
                 target.setLayout( src );
+                target.setLocation( "layout", source.getLocation( "layout" ) );
             }
         }
     }
@@ -997,6 +1023,7 @@ public class ModelMerger
             if ( sourceDominant || target.getEnabled() == null )
             {
                 target.setEnabled( src );
+                target.setLocation( "enabled", source.getLocation( "enabled" ) );
             }
         }
     }
@@ -1010,6 +1037,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUpdatePolicy() == null )
             {
                 target.setUpdatePolicy( src );
+                target.setLocation( "updatePolicy", source.getLocation( "updatePolicy" ) );
             }
         }
     }
@@ -1023,6 +1051,7 @@ public class ModelMerger
             if ( sourceDominant || target.getChecksumPolicy() == null )
             {
                 target.setChecksumPolicy( src );
+                target.setLocation( "checksumPolicy", source.getLocation( "checksumPolicy" ) );
             }
         }
     }
@@ -1050,6 +1079,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -1063,6 +1093,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -1076,6 +1107,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -1089,6 +1121,7 @@ public class ModelMerger
             if ( sourceDominant || target.getType() == null )
             {
                 target.setType( src );
+                target.setLocation( "type", source.getLocation( "type" ) );
             }
         }
     }
@@ -1102,6 +1135,7 @@ public class ModelMerger
             if ( sourceDominant || target.getClassifier() == null )
             {
                 target.setClassifier( src );
+                target.setLocation( "classifier", source.getLocation( "classifier" ) );
             }
         }
     }
@@ -1115,6 +1149,7 @@ public class ModelMerger
             if ( sourceDominant || target.getScope() == null )
             {
                 target.setScope( src );
+                target.setLocation( "scope", source.getLocation( "scope" ) );
             }
         }
     }
@@ -1128,6 +1163,7 @@ public class ModelMerger
             if ( sourceDominant || target.getSystemPath() == null )
             {
                 target.setSystemPath( src );
+                target.setLocation( "systemPath", source.getLocation( "systemPath" ) );
             }
         }
     }
@@ -1141,6 +1177,7 @@ public class ModelMerger
             if ( sourceDominant || target.getOptional() == null )
             {
                 target.setOptional( src );
+                target.setLocation( "optional", source.getLocation( "optional" ) );
             }
         }
     }
@@ -1190,6 +1227,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -1203,6 +1241,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -1224,6 +1263,7 @@ public class ModelMerger
             if ( sourceDominant || target.getOutputDirectory() == null )
             {
                 target.setOutputDirectory( src );
+                target.setLocation( "outputDirectory", source.getLocation( "outputDirectory" ) );
             }
         }
     }
@@ -1237,6 +1277,7 @@ public class ModelMerger
             if ( sourceDominant || target.getExcludeDefaults() == null )
             {
                 target.setExcludeDefaults( src );
+                target.setLocation( "excludeDefaults", source.getLocation( "excludeDefaults" ) );
             }
         }
     }
@@ -1290,6 +1331,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -1303,6 +1345,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -1316,6 +1359,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -1329,6 +1373,7 @@ public class ModelMerger
             if ( sourceDominant || target.getInherited() == null )
             {
                 target.setInherited( src );
+                target.setLocation( "inherited", source.getLocation( "inherited" ) );
             }
         }
     }
@@ -1431,6 +1476,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -1444,6 +1490,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -1457,6 +1504,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -1470,6 +1518,7 @@ public class ModelMerger
             if ( sourceDominant || target.getRelativePath() == null )
             {
                 target.setRelativePath( src );
+                target.setLocation( "relativePath", source.getLocation( "relativePath" ) );
             }
         }
     }
@@ -1490,6 +1539,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -1503,6 +1553,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -1524,6 +1575,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -1536,6 +1588,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -1549,6 +1602,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDistribution() == null )
             {
                 target.setDistribution( src );
+                target.setLocation( "distribution", source.getLocation( "distribution" ) );
             }
         }
     }
@@ -1562,6 +1616,7 @@ public class ModelMerger
             if ( sourceDominant || target.getComments() == null )
             {
                 target.setComments( src );
+                target.setLocation( "comments", source.getLocation( "comments" ) );
             }
         }
     }
@@ -1585,6 +1640,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -1598,6 +1654,7 @@ public class ModelMerger
             if ( sourceDominant || target.getSubscribe() == null )
             {
                 target.setSubscribe( src );
+                target.setLocation( "subscribe", source.getLocation( "subscribe" ) );
             }
         }
     }
@@ -1611,6 +1668,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUnsubscribe() == null )
             {
                 target.setUnsubscribe( src );
+                target.setLocation( "unsubscribe", source.getLocation( "unsubscribe" ) );
             }
         }
     }
@@ -1624,6 +1682,7 @@ public class ModelMerger
             if ( sourceDominant || target.getPost() == null )
             {
                 target.setPost( src );
+                target.setLocation( "post", source.getLocation( "post" ) );
             }
         }
     }
@@ -1637,6 +1696,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArchive() == null )
             {
                 target.setArchive( src );
+                target.setLocation( "archive", source.getLocation( "archive" ) );
             }
         }
     }
@@ -1671,6 +1731,7 @@ public class ModelMerger
             if ( sourceDominant || target.getId() == null )
             {
                 target.setId( src );
+                target.setLocation( "id", source.getLocation( "id" ) );
             }
         }
     }
@@ -1697,6 +1758,7 @@ public class ModelMerger
             if ( sourceDominant || target.getName() == null )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -1710,6 +1772,7 @@ public class ModelMerger
             if ( sourceDominant || target.getEmail() == null )
             {
                 target.setEmail( src );
+                target.setLocation( "email", source.getLocation( "email" ) );
             }
         }
     }
@@ -1723,6 +1786,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -1736,6 +1800,7 @@ public class ModelMerger
             if ( sourceDominant || target.getOrganization() == null )
             {
                 target.setOrganization( src );
+                target.setLocation( "organization", source.getLocation( "organization" ) );
             }
         }
     }
@@ -1749,6 +1814,7 @@ public class ModelMerger
             if ( sourceDominant || target.getOrganizationUrl() == null )
             {
                 target.setOrganizationUrl( src );
+                target.setLocation( "organizationUrl", source.getLocation( "organizationUrl" ) );
             }
         }
     }
@@ -1762,6 +1828,7 @@ public class ModelMerger
             if ( sourceDominant || target.getTimezone() == null )
             {
                 target.setTimezone( src );
+                target.setLocation( "timezone", source.getLocation( "timezone" ) );
             }
         }
     }
@@ -1795,6 +1862,8 @@ public class ModelMerger
             merged.putAll( target.getProperties() );
         }
         target.setProperties( merged );
+        target.setLocation( "properties", InputLocation.merge( target.getLocation( "properties" ),
+                                                               source.getLocation( "properties" ), sourceDominant ) );
     }
 
     protected void mergeIssueManagement( IssueManagement target, IssueManagement source, boolean sourceDominant,
@@ -1813,6 +1882,7 @@ public class ModelMerger
             if ( sourceDominant || target.getSystem() == null )
             {
                 target.setSystem( src );
+                target.setLocation( "system", source.getLocation( "system" ) );
             }
         }
     }
@@ -1826,6 +1896,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -1846,6 +1917,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -1858,6 +1930,7 @@ public class ModelMerger
             if ( sourceDominant || target.getConnection() == null )
             {
                 target.setConnection( src );
+                target.setLocation( "connection", source.getLocation( "connection" ) );
             }
         }
     }
@@ -1871,6 +1944,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDeveloperConnection() == null )
             {
                 target.setDeveloperConnection( src );
+                target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
     }
@@ -1883,6 +1957,7 @@ public class ModelMerger
             if ( sourceDominant || target.getTag() == null )
             {
                 target.setTag( src );
+                target.setLocation( "tag", source.getLocation( "tag" ) );
             }
         }
     }
@@ -1904,6 +1979,7 @@ public class ModelMerger
             if ( sourceDominant || target.getSystem() == null )
             {
                 target.setSystem( src );
+                target.setLocation( "system", source.getLocation( "system" ) );
             }
         }
     }
@@ -1917,6 +1993,7 @@ public class ModelMerger
             if ( sourceDominant || target.getUrl() == null )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -2054,6 +2131,7 @@ public class ModelMerger
             if ( sourceDominant || target.getMaven() == null )
             {
                 target.setMaven( src );
+                target.setLocation( "maven", source.getLocation( "maven" ) );
             }
         }
     }
@@ -2078,6 +2156,7 @@ public class ModelMerger
             if ( sourceDominant || target.getSourceDirectory() == null )
             {
                 target.setSourceDirectory( src );
+                target.setLocation( "sourceDirectory", source.getLocation( "sourceDirectory" ) );
             }
         }
     }
@@ -2091,6 +2170,7 @@ public class ModelMerger
             if ( sourceDominant || target.getScriptSourceDirectory() == null )
             {
                 target.setScriptSourceDirectory( src );
+                target.setLocation( "scriptSourceDirectory", source.getLocation( "scriptSourceDirectory" ) );
             }
         }
     }
@@ -2104,6 +2184,7 @@ public class ModelMerger
             if ( sourceDominant || target.getTestSourceDirectory() == null )
             {
                 target.setTestSourceDirectory( src );
+                target.setLocation( "testSourceDirectory", source.getLocation( "testSourceDirectory" ) );
             }
         }
     }
@@ -2117,6 +2198,7 @@ public class ModelMerger
             if ( sourceDominant || target.getOutputDirectory() == null )
             {
                 target.setOutputDirectory( src );
+                target.setLocation( "outputDirectory", source.getLocation( "outputDirectory" ) );
             }
         }
     }
@@ -2130,6 +2212,7 @@ public class ModelMerger
             if ( sourceDominant || target.getTestOutputDirectory() == null )
             {
                 target.setTestOutputDirectory( src );
+                target.setLocation( "testOutputDirectory", source.getLocation( "testOutputDirectory" ) );
             }
         }
     }
@@ -2179,6 +2262,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -2192,6 +2276,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -2205,6 +2290,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -2230,6 +2316,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDefaultGoal() == null )
             {
                 target.setDefaultGoal( src );
+                target.setLocation( "defaultGoal", source.getLocation( "defaultGoal" ) );
             }
         }
     }
@@ -2243,6 +2330,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDirectory() == null )
             {
                 target.setDirectory( src );
+                target.setLocation( "directory", source.getLocation( "directory" ) );
             }
         }
     }
@@ -2256,6 +2344,7 @@ public class ModelMerger
             if ( sourceDominant || target.getFinalName() == null )
             {
                 target.setFinalName( src );
+                target.setLocation( "finalName", source.getLocation( "finalName" ) );
             }
         }
     }
@@ -2413,6 +2502,7 @@ public class ModelMerger
             if ( sourceDominant || target.getGroupId() == null )
             {
                 target.setGroupId( src );
+                target.setLocation( "groupId", source.getLocation( "groupId" ) );
             }
         }
     }
@@ -2426,6 +2516,7 @@ public class ModelMerger
             if ( sourceDominant || target.getArtifactId() == null )
             {
                 target.setArtifactId( src );
+                target.setLocation( "artifactId", source.getLocation( "artifactId" ) );
             }
         }
     }
@@ -2439,6 +2530,7 @@ public class ModelMerger
             if ( sourceDominant || target.getVersion() == null )
             {
                 target.setVersion( src );
+                target.setLocation( "version", source.getLocation( "version" ) );
             }
         }
     }
@@ -2452,6 +2544,7 @@ public class ModelMerger
             if ( sourceDominant || target.getExtensions() == null )
             {
                 target.setExtensions( src );
+                target.setLocation( "extensions", source.getLocation( "extensions" ) );
             }
         }
     }
@@ -2530,6 +2623,7 @@ public class ModelMerger
             if ( sourceDominant || target.getInherited() == null )
             {
                 target.setInherited( src );
+                target.setLocation( "inherited", source.getLocation( "inherited" ) );
             }
         }
     }
@@ -2572,6 +2666,7 @@ public class ModelMerger
             if ( sourceDominant || target.getId() == null )
             {
                 target.setId( src );
+                target.setLocation( "id", source.getLocation( "id" ) );
             }
         }
     }
@@ -2585,6 +2680,7 @@ public class ModelMerger
             if ( sourceDominant || target.getPhase() == null )
             {
                 target.setPhase( src );
+                target.setLocation( "phase", source.getLocation( "phase" ) );
             }
         }
     }
@@ -2620,6 +2716,7 @@ public class ModelMerger
             if ( sourceDominant || target.getTargetPath() == null )
             {
                 target.setTargetPath( src );
+                target.setLocation( "targetPath", source.getLocation( "targetPath" ) );
             }
         }
     }
@@ -2633,6 +2730,7 @@ public class ModelMerger
             if ( sourceDominant || target.getFiltering() == null )
             {
                 target.setFiltering( src );
+                target.setLocation( "filtering", source.getLocation( "filtering" ) );
             }
         }
     }
@@ -2665,6 +2763,7 @@ public class ModelMerger
             if ( sourceDominant || target.getDirectory() == null )
             {
                 target.setDirectory( src );
+                target.setLocation( "directory", source.getLocation( "directory" ) );
             }
         }
     }
