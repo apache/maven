@@ -56,7 +56,9 @@ class DefaultProjectBuildingResult
     public DefaultProjectBuildingResult( MavenProject project, List<ModelProblem> problems,
                                          ArtifactResolutionResult dependencyResolutionResult )
     {
-        this.projectId = ( project != null ) ? project.getId() : "";
+        this.projectId =
+            ( project != null ) ? project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion()
+                            : "";
         this.pomFile = ( project != null ) ? project.getFile() : null;
         this.project = project;
         this.problems = problems;
