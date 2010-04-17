@@ -32,7 +32,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.LocationTracker;
+import org.apache.maven.model.InputLocationTracker;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
@@ -509,13 +509,13 @@ public class DefaultModelValidator
     // Field validation
     // ----------------------------------------------------------------------
 
-    private boolean validateId( String fieldName, ModelProblemCollector problems, String id, LocationTracker tracker )
+    private boolean validateId( String fieldName, ModelProblemCollector problems, String id, InputLocationTracker tracker )
     {
         return validateId( fieldName, problems, id, null, tracker );
     }
 
     private boolean validateId( String fieldName, ModelProblemCollector problems, String id, String sourceHint,
-                                LocationTracker tracker )
+                                InputLocationTracker tracker )
     {
         if ( !validateStringNotEmpty( fieldName, problems, Severity.ERROR, id, sourceHint, tracker ) )
         {
@@ -534,7 +534,7 @@ public class DefaultModelValidator
     }
 
     private boolean validateStringNoExpression( String fieldName, ModelProblemCollector problems, Severity severity,
-                                                String string, LocationTracker tracker )
+                                                String string, InputLocationTracker tracker )
     {
         if ( !hasExpression( string ) )
         {
@@ -552,7 +552,7 @@ public class DefaultModelValidator
     }
 
     private boolean validateStringNotEmpty( String fieldName, ModelProblemCollector problems, Severity severity,
-                                            String string, LocationTracker tracker )
+                                            String string, InputLocationTracker tracker )
     {
         return validateStringNotEmpty( fieldName, problems, severity, string, null, tracker );
     }
@@ -566,7 +566,7 @@ public class DefaultModelValidator
      * </ul>
      */
     private boolean validateStringNotEmpty( String fieldName, ModelProblemCollector problems, Severity severity,
-                                            String string, String sourceHint, LocationTracker tracker )
+                                            String string, String sourceHint, InputLocationTracker tracker )
     {
         if ( !validateNotNull( fieldName, problems, severity, string, sourceHint, tracker ) )
         {
@@ -591,7 +591,7 @@ public class DefaultModelValidator
      * </ul>
      */
     private boolean validateNotNull( String fieldName, ModelProblemCollector problems, Severity severity,
-                                     Object object, String sourceHint, LocationTracker tracker )
+                                     Object object, String sourceHint, InputLocationTracker tracker )
     {
         if ( object != null )
         {
@@ -604,7 +604,7 @@ public class DefaultModelValidator
     }
 
     private boolean validateBoolean( String fieldName, ModelProblemCollector problems, Severity severity, String string,
-                                     String sourceHint, LocationTracker tracker )
+                                     String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -623,7 +623,7 @@ public class DefaultModelValidator
     }
 
     private boolean validateEnum( String fieldName, ModelProblemCollector problems, Severity severity, String string,
-                                  String sourceHint, LocationTracker tracker, String... validValues )
+                                  String sourceHint, InputLocationTracker tracker, String... validValues )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -644,7 +644,7 @@ public class DefaultModelValidator
     }
 
     private boolean validateVersion( String fieldName, ModelProblemCollector problems, Severity severity, String string,
-                                     String sourceHint, LocationTracker tracker )
+                                     String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -663,7 +663,7 @@ public class DefaultModelValidator
     }
 
     private boolean validatePluginVersion( String fieldName, ModelProblemCollector problems, String string,
-                                           String sourceHint, LocationTracker tracker, ModelBuildingRequest request )
+                                           String sourceHint, InputLocationTracker tracker, ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
@@ -686,7 +686,7 @@ public class DefaultModelValidator
     }
 
     private static void addViolation( ModelProblemCollector problems, Severity severity, String fieldName,
-                                      String sourceHint, String message, LocationTracker tracker )
+                                      String sourceHint, String message, InputLocationTracker tracker )
     {
         StringBuilder buffer = new StringBuilder( 256 );
         buffer.append( '\'' ).append( fieldName ).append( '\'' );
@@ -701,7 +701,7 @@ public class DefaultModelValidator
         problems.add( severity, buffer.toString(), getLocation( fieldName, tracker ), null );
     }
 
-    private static InputLocation getLocation( String fieldName, LocationTracker tracker )
+    private static InputLocation getLocation( String fieldName, InputLocationTracker tracker )
     {
         InputLocation location = null;
 
