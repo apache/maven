@@ -16,10 +16,21 @@ package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.*;
+import org.apache.maven.lifecycle.DefaultLifecycles;
+import org.apache.maven.lifecycle.DefaultSchedules;
+import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.LifecycleNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -36,7 +47,16 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * @author Benjamin Bentmann
@@ -44,7 +64,7 @@ import java.util.*;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component(role = LifecycleExecutionPlanCalculator.class)
+@Component( role = LifecycleExecutionPlanCalculator.class )
 public class LifecycleExecutionPlanCalculatorImpl
     implements LifecycleExecutionPlanCalculator
 {
@@ -58,24 +78,29 @@ public class LifecycleExecutionPlanCalculatorImpl
     private DefaultLifecycles defaultLifeCycles;
 
     @Requirement
+    private DefaultSchedules defaultSchedules;
+
+    @Requirement
     private MojoDescriptorCreator mojoDescriptorCreator;
 
     @Requirement
     private LifecyclePluginResolver lifecyclePluginResolver;
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecycleExecutionPlanCalculatorImpl()
     {
     }
 
     public LifecycleExecutionPlanCalculatorImpl( BuildPluginManager pluginManager, DefaultLifecycles defaultLifeCycles,
                                                  MojoDescriptorCreator mojoDescriptorCreator,
-                                                 LifecyclePluginResolver lifecyclePluginResolver )
+                                                 LifecyclePluginResolver lifecyclePluginResolver,
+                                                 DefaultSchedules defaultSchedules )
     {
         this.pluginManager = pluginManager;
         this.defaultLifeCycles = defaultLifeCycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
+        this.defaultSchedules = defaultSchedules;
     }
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks )
@@ -93,7 +118,7 @@ public class LifecycleExecutionPlanCalculatorImpl
         setupMojoExections( session, project, requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
                             executions );
 
-        final List<ExecutionPlanItem> planItem = defaultLifeCycles.createExecutionPlanItem( project, executions );
+        final List<ExecutionPlanItem> planItem = defaultSchedules.createExecutionPlanItem( project, executions );
 
         return new MavenExecutionPlan( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes, planItem,
                                        defaultLifeCycles );

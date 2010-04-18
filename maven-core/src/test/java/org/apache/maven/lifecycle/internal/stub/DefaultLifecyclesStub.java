@@ -34,7 +34,7 @@ import static org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCal
 
 public class DefaultLifecyclesStub
 {
-    public static DefaultLifecycles createDefaultLifeCycles()
+    public static DefaultLifecycles createDefaultLifecycles()
     {
 
         List<String> stubDefaultCycle =
@@ -44,11 +44,10 @@ public class DefaultLifecyclesStub
 
         // The two phases below are really for future expansion, some would say they lack a drink
         // The point being that they do not really have to match the "real" stuff,
-        List<String> stubCleanCycle =
-            Arrays.asList( PRE_CLEAN.getPhase(), CLEAN.getPhase(), POST_CLEAN.getPhase() );
+        List<String> stubCleanCycle = Arrays.asList( PRE_CLEAN.getPhase(), CLEAN.getPhase(), POST_CLEAN.getPhase() );
 
         List<String> stubSiteCycle =
-            Arrays.asList( PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase());
+            Arrays.asList( PRE_SITE.getPhase(), SITE.getPhase(), POST_SITE.getPhase(), SITE_DEPLOY.getPhase() );
 
         Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
 
@@ -59,8 +58,7 @@ public class DefaultLifecyclesStub
             lifeCycles.put( s, lifecycle );
 
         }
-        final List<Scheduling> schedulingList = getSchedulingList();
-        return new DefaultLifecycles( lifeCycles, schedulingList, new LoggerStub() );
+        return new DefaultLifecycles( lifeCycles, new LoggerStub() );
     }
 
     public static List<Scheduling> getSchedulingList()
