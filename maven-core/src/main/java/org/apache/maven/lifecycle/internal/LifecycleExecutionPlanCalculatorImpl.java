@@ -86,27 +86,61 @@ public class LifecycleExecutionPlanCalculatorImpl
         Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
         Set<String> requiredDependencyCollectionScopes = new TreeSet<String>();
 
-        final List<MojoExecution> executions =
-            calculateExecutionPlan( session, project, tasks, requiredDependencyResolutionScopes,
-                                    requiredDependencyCollectionScopes );
+        lifecyclePluginResolver.resolveMissingPluginVersions( project, session );
+
+        final List<MojoExecution> executions = calculateMojoExecutions( session, project, tasks );
+
+        setupMojoExections( session, project, requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
+                            executions );
+
         final List<ExecutionPlanItem> planItem = defaultLifeCycles.createExecutionPlanItem( project, executions );
 
-        return new MavenExecutionPlan( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
-                                       planItem, defaultLifeCycles );
+        return new MavenExecutionPlan( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes, planItem,
+                                       defaultLifeCycles );
 
 
     }
 
-    public List<MojoExecution> calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks,
-                                                       Set<String> requiredDependencyResolutionScopes,
-                                                       Set<String> requiredDependencyCollectionScopes )
-        throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
-        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
-        NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
+    private void setupMojoExections( MavenSession session, MavenProject project,
+                                     Set<String> requiredDependencyResolutionScopes,
+                                     Set<String> requiredDependencyCollectionScopes,
+                                     List<MojoExecution> mojoExecutions )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
-        lifecyclePluginResolver.resolveMissingPluginVersions( project, session );
+        for ( MojoExecution mojoExecution : mojoExecutions )
+        {
+            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-        List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+            if ( mojoDescriptor == null )
+            {
+                mojoDescriptor = pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
+                                                                  DefaultRepositoryRequest.getRepositoryRequest(
+                                                                      session, project ) );
+
+                mojoExecution.setMojoDescriptor( mojoDescriptor );
+            }
+
+            populateMojoExecutionConfiguration( project, mojoExecution,
+                                                MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
+
+            finalizeMojoConfiguration( mojoExecution );
+
+            calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
+
+            collectDependencyRequirements( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
+                                           mojoExecution );
+        }
+    }
+
+    private List<MojoExecution> calculateMojoExecutions( MavenSession session, MavenProject project,
+                                                         List<Object> tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginVersionResolutionException, LifecyclePhaseNotFoundException
+    {
+        final List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
 
         for ( Object task : tasks )
         {
@@ -138,31 +172,6 @@ public class LifecycleExecutionPlanCalculatorImpl
                 throw new IllegalStateException( "unexpected task " + task );
             }
         }
-
-        for ( MojoExecution mojoExecution : mojoExecutions )
-        {
-            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-            if ( mojoDescriptor == null )
-            {
-                mojoDescriptor = pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
-                                                                  DefaultRepositoryRequest.getRepositoryRequest(
-                                                                      session, project ) );
-
-                mojoExecution.setMojoDescriptor( mojoDescriptor );
-            }
-
-            populateMojoExecutionConfiguration( project, mojoExecution,
-                                                MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
-
-            finalizeMojoConfiguration( mojoExecution );
-
-            calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
-
-            collectDependencyRequirements( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
-                                           mojoExecution );
-        }
-
         return mojoExecutions;
     }
 

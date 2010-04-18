@@ -14,11 +14,15 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.*;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.LifecycleNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.*;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -26,6 +30,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+
+import java.util.Set;
 
 /**
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
@@ -63,7 +69,8 @@ public class BuilderCommon
         this.lifecycleDependencyResolver = lifecycleDependencyResolver;
     }
 
-    public MavenExecutionPlan resolveBuildPlan( MavenSession session, MavenProject project, TaskSegment taskSegment )
+    public MavenExecutionPlan resolveBuildPlan( MavenSession session, MavenProject project, TaskSegment taskSegment,
+                                                Set<Artifact> projectArtifacts )
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException,
@@ -78,13 +85,14 @@ public class BuilderCommon
         // this later by looking at the build plan. Would be better to just batch download everything required
         // by the reactor.
 
-        lifecycleDependencyResolver.resolveDependencies( taskSegment.isAggregating(), project, session, executionPlan );
+        lifecycleDependencyResolver.resolveDependencies( taskSegment.isAggregating(), project, session, executionPlan,
+                                                         projectArtifacts );
         return executionPlan;
     }
 
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
-                                         final MavenProject mavenProject, final Exception e, final long buildStartTime )
+                                  final MavenProject mavenProject, final Exception e, final long buildStartTime )
     {
         buildContext.getResult().addException( e );
 
