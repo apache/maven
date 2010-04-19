@@ -62,7 +62,7 @@ import java.util.concurrent.ExecutorService;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  */
-@Component(role = LifecycleExecutor.class)
+@Component( role = LifecycleExecutor.class )
 public class DefaultLifecycleExecutor
     implements LifecycleExecutor
 {
@@ -126,7 +126,7 @@ public class DefaultLifecycleExecutor
             boolean isThreaded = executionRequest.isThreadConfigurationPresent();
             session.setParallel( isThreaded );
 
-            List<TaskSegment> taskSegments = buildListCalculator.calculateTaskSegments( session );
+            List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
 
             ProjectBuildList projectBuilds = buildListCalculator.calculateProjectBuilds( session, taskSegments );
 
@@ -256,7 +256,7 @@ public class DefaultLifecycleExecutor
 
     // USED BY MAVEN HELP PLUGIN
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     @Deprecated
     public Map<String, Lifecycle> getPhaseToLifecycleMap()
     {
@@ -265,7 +265,7 @@ public class DefaultLifecycleExecutor
 
     // NOTE: Backward-compat with maven-help-plugin:2.1
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project, String invokedVia,
                                       boolean canUsePrefix, boolean isOptionalMojo )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -277,7 +277,7 @@ public class DefaultLifecycleExecutor
 
     // Used by m2eclipse
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
@@ -285,7 +285,7 @@ public class DefaultLifecycleExecutor
         PluginVersionResolutionException
     {
 
-        List<TaskSegment> taskSegments = buildListCalculator.calculateTaskSegments( session );
+        List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
 
         TaskSegment mergedSegment = new TaskSegment( false );
 

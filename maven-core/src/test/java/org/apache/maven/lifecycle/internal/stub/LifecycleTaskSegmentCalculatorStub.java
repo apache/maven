@@ -18,7 +18,7 @@ package org.apache.maven.lifecycle.internal.stub;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.GoalTask;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
-import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
+import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculatorImpl;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -36,13 +36,14 @@ import java.util.List;
  */
 
 public class LifecycleTaskSegmentCalculatorStub
-    implements LifecycleTaskSegmentCalculator
+    extends LifecycleTaskSegmentCalculatorImpl
 {
     public static final String clean = "clean";
 
     public static final String aggr = "aggr";
 
     public static final String install = "install";
+
 
     public List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,

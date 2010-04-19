@@ -20,13 +20,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
-import org.apache.maven.lifecycle.internal.stub.CompletionServiceStub;
-import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
-import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
-import org.apache.maven.lifecycle.internal.stub.LoggerStub;
-import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
-import org.apache.maven.lifecycle.internal.stub.ProjectDependenciesResolverStub;
-import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+import org.apache.maven.lifecycle.internal.stub.*;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
@@ -85,9 +79,9 @@ public class LifecycleWeaveBuilderTest
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try
         {
-            BuildListCalculator buildListCalculator = BuildListCalculatorTest.createBuildListCalculator();
+            BuildListCalculator buildListCalculator = new BuildListCalculator();
             final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
-            List<TaskSegment> taskSegments = buildListCalculator.calculateTaskSegments( session );
+            List<TaskSegment> taskSegments = getTaskSegmentCalculator().calculateTaskSegments( session );
             ProjectBuildList projectBuildList = buildListCalculator.calculateProjectBuilds( session, taskSegments );
 
             final MojoExecutorStub mojoExecutorStub = new MojoExecutorStub();
@@ -109,6 +103,11 @@ public class LifecycleWeaveBuilderTest
     }
 
 
+    private static LifecycleTaskSegmentCalculator getTaskSegmentCalculator()
+    {
+        return new LifecycleTaskSegmentCalculatorStub();
+    }
+
     private ReactorContext createBuildContext( MavenSession session )
     {
         MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
@@ -120,8 +119,6 @@ public class LifecycleWeaveBuilderTest
     {
         final BuilderCommon builderCommon = getBuilderCommon();
         final LoggerStub loggerStub = new LoggerStub();
-        final LifecycleDependencyResolver lifecycleDependencyResolver =
-            new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), loggerStub );
         return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, new ExecutionEventCatapultStub() );
     }
 

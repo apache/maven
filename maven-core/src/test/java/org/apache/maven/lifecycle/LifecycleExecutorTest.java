@@ -305,9 +305,6 @@ public class LifecycleExecutorTest
         System.out.println( dom );
     }
 
-    // Todo: This method is kind of an oddity. It is only called from the LifecycleExecutorTest, hence it should
-    // really not exist, or at least be moved into the test class.
-
     MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,

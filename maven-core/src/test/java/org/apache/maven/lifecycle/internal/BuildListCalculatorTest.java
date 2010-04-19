@@ -29,9 +29,10 @@ public class BuildListCalculatorTest
     public void testCalculateProjectBuilds()
         throws Exception
     {
-        BuildListCalculator buildListCalculator = createBuildListCalculator();
+        LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator = getTaskSegmentCalculator();
+        BuildListCalculator buildListCalculator = new BuildListCalculator();
         final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
-        List<TaskSegment> taskSegments = buildListCalculator.calculateTaskSegments( session );
+        List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
         final ProjectBuildList buildList = buildListCalculator.calculateProjectBuilds( session, taskSegments );
         final ProjectBuildList segments = buildList.getByTaskSegment( taskSegments.get( 0 ) );
         assertEquals( "Stub data contains 3 segments", 3, taskSegments.size() );
@@ -40,10 +41,9 @@ public class BuildListCalculatorTest
         assertNotNull( build );
     }
 
-    public static BuildListCalculator createBuildListCalculator()
+    private static LifecycleTaskSegmentCalculator getTaskSegmentCalculator()
     {
-        LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator = new LifecycleTaskSegmentCalculatorStub();
-        return new BuildListCalculator( lifecycleTaskSegmentCalculator );
+        return new LifecycleTaskSegmentCalculatorStub();
     }
 
 }
