@@ -22,37 +22,6 @@
           <implementation>org.apache.maven.plugin.MavenPluginCollector
           </implementation>
       </component>
-      <!-- component>
-          <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
-          <implementation>org.apache.maven.lifecycle.DefaultLifecycleExecutor
-          </implementation>
-          <requirements>
-              <requirement>
-                  <role>org.apache.maven.lifecycle.LifeCyclePluginAnalyzer</role>
-              </requirement>
-              <requirement>
-                  <role>org.apache.maven.lifecycle.DefaultLifecycles</role>
-              </requirement>
-              <requirement>
-                  <role>org.codehaus.plexus.logging.Logger</role>
-                  <role-hint>default</role-hint>
-                  <field-name>logger</field-name>
-              </requirement>
-              <requirement>
-                  <role>org.apache.maven.lifecycle.internal.LifecycleModuleBuilder</role>
-              </requirement>
-              <requirement>
-                  <role>org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder</role>
-              </requirement>
-              <requirement>
-                  <role>org.apache.maven.lifecycle.internal.BuildListCalculator</role>
-              </requirement>
-              <requirement>
-                  <role>org.apache.maven.lifecycle.internal.LifecycleDebugLogger</role>
-              </requirement>
-          </requirements>
-          
-      </component -->
       <component>
         <role>org.apache.maven.lifecycle.DefaultLifecycles</role>
         <implementation>org.apache.maven.lifecycle.DefaultLifecycles</implementation>
@@ -67,30 +36,30 @@
             <field-name>lifecycles</field-name>
           </requirement>
         </requirements>
-
-        <configuration>
-          <schedules>
-              <scheduling>
-                   <lifecycle>default</lifecycle>
-                  <schedules>
-                      <schedule>
-                          <phase>test</phase>
-                          <mojoSynchronized>false</mojoSynchronized>
-                          <parallel>true</parallel>
-                      </schedule>
-                      <schedule>
-                          <mojoClass>org.apache.maven.plugins:maven-assembly-plugin</mojoClass>
-                          <mojoSynchronized>true</mojoSynchronized>
-                      </schedule>
-                      <!--schedule>
-                          <mojoClass>org.codehaus.modello:modello-maven-plugin</mojoClass>
-                          <mojoSynchronized>true</mojoSynchronized>
-                      </schedule -->
-                  </schedules>
-              </scheduling>
-          </schedules>
-        </configuration>
       </component>
+    <component>
+      <role>org.apache.maven.lifecycle.DefaultSchedules</role>
+      <implementation>org.apache.maven.lifecycle.DefaultSchedules</implementation>
+
+      <configuration>
+        <schedules>
+            <scheduling>
+                 <lifecycle>default</lifecycle>
+                <schedules>
+                    <schedule>
+                        <phase>test</phase>
+                        <mojoSynchronized>false</mojoSynchronized>
+                        <parallel>true</parallel>
+                    </schedule>
+                    <schedule>
+                        <mojoClass>org.apache.maven.plugins:maven-assembly-plugin</mojoClass>
+                        <mojoSynchronized>true</mojoSynchronized>
+                    </schedule>
+                </schedules>
+            </scheduling>
+        </schedules>
+      </configuration>
+    </component>
 
       <component>
         <role>org.apache.maven.lifecycle.Lifecycle</role>

@@ -29,8 +29,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -73,13 +73,9 @@ public class LifecycleWeaveBuilder
     private Logger logger;
 
     @Requirement
-    private LifecycleDependencyResolver lifecycleDependencyResolver;
-
-    @Requirement
     private ExecutionEventCatapult eventCatapult;
 
-    private final Map<MavenProject, MavenExecutionPlan> executionPlans =
-        Collections.synchronizedMap( new HashMap<MavenProject, MavenExecutionPlan>() );
+    private Map<MavenProject, MavenExecutionPlan> executionPlans = new HashMap<MavenProject, MavenExecutionPlan>( );
 
 
     @SuppressWarnings({"UnusedDeclaration"})
@@ -87,9 +83,8 @@ public class LifecycleWeaveBuilder
     {
     }
 
-    public LifecycleWeaveBuilder( MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
-                                  LifecycleDependencyResolver lifecycleDependencyResolver,
-                                  ExecutionEventCatapult eventCatapult )
+    public LifecycleWeaveBuilder(MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
+                                 ExecutionEventCatapult eventCatapult)
     {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
@@ -110,14 +105,32 @@ public class LifecycleWeaveBuilder
             for ( TaskSegment taskSegment : taskSegments )
             {
                 ProjectBuildList segmentChunks = projectBuilds.getByTaskSegment( taskSegment );
-                ThreadOutputMuxer muxer = null;  // new ThreadOutputMuxer( segmentChunks, System.out );
+                    ThreadOutputMuxer muxer = null;  // new ThreadOutputMuxer( segmentChunks, System.out );
+                Set<String> projectArtifacts = new HashSet<String>();
+                Set<Artifact> projectArtifactsA = new HashSet<Artifact>();
+                for (ProjectSegment segmentChunk : segmentChunks) {
+                    Artifact artifact = segmentChunk.getProject().getArtifact();
+                    if (artifact != null) {
+                        projectArtifacts.add( ArtifactUtils.key(artifact));
+                        projectArtifactsA.add( artifact);
+                    }
+                }
                 for ( ProjectSegment projectBuild : segmentChunks )
                 {
                     try
                     {
                         MavenExecutionPlan executionPlan =
                             builderCommon.resolveBuildPlan( projectBuild.getSession(), projectBuild.getProject(),
-                                                            projectBuild.getTaskSegment() );
+                                                            projectBuild.getTaskSegment(), projectArtifactsA );
+                        for (Artifact dependency : projectBuild.getProject().getDependencyArtifacts()) {
+                            String s = ArtifactUtils.key(dependency);
+                            if ( projectArtifacts.contains(s)){
+                                dependency.setFile( null);
+                                dependency.setResolved( false);
+                                dependency.setRepository( null);
+                            }
+                        }
+                        
                         executionPlans.put( projectBuild.getProject(), executionPlan );
                         DependencyContext dependencyContext =
                             new DependencyContext( executionPlan, projectBuild.getTaskSegment().isAggregating() );
@@ -182,8 +195,7 @@ public class LifecycleWeaveBuilder
 
                 try
                 {
-                    while ( current != null && !reactorBuildStatus.isHalted() &&
-                        !reactorBuildStatus.isBlackListed( projectBuild.getProject() ) )
+                    while (current != null && !reactorBuildStatus.isHaltedOrBlacklisted( projectBuild.getProject() ))
                     {
                         PhaseRecorder phaseRecorder = new PhaseRecorder( projectBuild.getProject() );
 
@@ -191,19 +203,7 @@ public class LifecycleWeaveBuilder
                             concurrentBuildLogger.createBuildLogItem( projectBuild.getProject(), current );
                         final Schedule schedule = current.getSchedule();
 
-                        if ( schedule != null && schedule.isMojoSynchronized() )
-                        {
-                            synchronized ( current.getPlugin() )
-                            {
-                                buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext,
-                                                        phaseRecorder );
-                            }
-                        }
-                        else
-                        {
-                            buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext,
-                                                    phaseRecorder );
-                        }
+                        buildExecutionPlanItem(current, phaseRecorder, schedule, reactorContext, projectBuild, dependencyContext);
 
                         current.setComplete();
                         builtLogItem.setComplete();
@@ -212,62 +212,12 @@ public class LifecycleWeaveBuilder
                         if ( nextPlanItem != null )
                         {
 
-                            boolean mustReResolved = false;
-
                             final Schedule scheduleOfNext = nextPlanItem.getSchedule();
                             if ( scheduleOfNext == null || !scheduleOfNext.isParallel() )
                             {
-                                for ( MavenProject upstreamProject : projectBuild.getImmediateUpstreamProjects() )
-                                {
-                                    final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
-                                    final String nextPhase = nextPlanItem.getLifecyclePhase();
-                                    final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( nextPhase );
-
-                                    if ( inSchedule != null )
-                                    {
-                                        if ( upstreamPhaseModifiesArtifactResolutionState( inSchedule ) )
-                                        {
-                                            String key = ArtifactUtils.key( upstreamProject.getGroupId(),
-                                                                            upstreamProject.getArtifactId(),
-                                                                            upstreamProject.getVersion() );
-                                            final Set<Artifact> deps =
-                                                projectBuild.getProject().getDependencyArtifacts();
-                                            for ( Artifact dep : deps )
-                                            {
-                                                String depKey =
-                                                    ArtifactUtils.key( dep.getGroupId(), dep.getArtifactId(),
-                                                                       dep.getVersion() );
-                                                if ( key.equals( depKey ) )
-                                                {
-                                                    dep.setResolved( false );
-                                                    mustReResolved = true;
-                                                }
-                                            }
-                                        }
-                                        long startWait = System.currentTimeMillis();
-                                        inSchedule.waitUntilDone();
-                                        builtLogItem.addWait( upstreamProject, inSchedule, startWait );
-                                    }
-                                    else if ( !upstreamPlan.containsPhase( nextPhase ) )
-                                    {
-                                        // Still a bit of a kludge; if we cannot connect in a sensible way to
-                                        // the upstream build plan we just revert to waiting for it all to
-                                        // complete. Real problem is per-mojo phase->lifecycle mapping
-                                        builtLogItem.addDependency( upstreamProject, "No phase tracking possible " );
-                                        upstreamPlan.waitUntilAllDone();
-                                    }
-                                    else
-                                    {
-                                        builtLogItem.addDependency( upstreamProject, "No schedule" );
-                                    }
-                                }
+                                waitForAppropriateUpstreamExecutionsToFinish(builtLogItem, nextPlanItem, projectBuild);
                             }
-                            if ( mustReResolved )
-                            {
-                                lifecycleDependencyResolver.resolveDependencies( false, projectBuild.getProject(),
-                                                                                 projectBuild.getSession(),
-                                                                                 executionPlan );
-                            }
+                            reResolveReactorDependencies(nextPlanItem, projectBuild);
                         }
                         current = nextPlanItem;
                     }
@@ -293,14 +243,138 @@ public class LifecycleWeaveBuilder
                 }
                 return null;
             }
+
         };
     }
 
-    private boolean upstreamPhaseModifiesArtifactResolutionState( ExecutionPlanItem inSchedule )
-    {
-        final String phase = inSchedule.getLifecyclePhase();
-        return "install".equals( phase ) || "compile".equals( phase ) || "test-compile".equals( phase );
+    private void reResolveReactorDependencies(ExecutionPlanItem nextPlanItem, ProjectSegment projectBuild) {
+        if ( requiresReResolutionOfUpstreamReactorArtifacts( nextPlanItem ) )
+        {
+            reresolveUpstreamProjectArtifacts(projectBuild);
+        }
+        else if (requiresReResolutionOfUpstreamTestScopedReactorArtifacts( nextPlanItem))
+        {
+            reresolveUpstreamTestScopedArtifacts( projectBuild);
+        }
     }
+
+    private void waitForAppropriateUpstreamExecutionsToFinish(BuildLogItem builtLogItem, ExecutionPlanItem nextPlanItem, ProjectSegment projectBuild) throws InterruptedException {
+        for ( MavenProject upstreamProject : projectBuild.getImmediateUpstreamProjects() )
+        {
+            final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
+            final String nextPhase = nextPlanItem.getLifecyclePhase();
+            final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( nextPhase );
+
+            if ( inSchedule != null )
+            {
+                long startWait = System.currentTimeMillis();
+                inSchedule.waitUntilDone();
+                builtLogItem.addWait( upstreamProject, inSchedule, startWait );
+            }
+            else if ( !upstreamPlan.containsPhase( nextPhase ) )
+            {
+                // Still a bit of a kludge; if we cannot connect in a sensible way to
+                // the upstream build plan we just revert to waiting for it all to
+                // complete. Real problem is per-mojo phase->lifecycle mapping
+                builtLogItem.addDependency( upstreamProject, "No phase tracking possible " );
+                upstreamPlan.waitUntilAllDone();
+            }
+            else
+            {
+                builtLogItem.addDependency( upstreamProject, "No schedule" );
+            }
+        }
+    }
+
+    private void reresolveUpstreamProjectArtifacts(ProjectSegment projectBuild) {
+        for ( MavenProject upstreamProject : projectBuild.getTransitiveUpstreamProjects() ){
+            Artifact upStreamArtifact = upstreamProject.getArtifact();
+            Artifact dependencyArtifact =  findDependency(projectBuild.getProject(), upStreamArtifact);
+            if (dependencyArtifact != null){
+                dependencyArtifact.setFile( upStreamArtifact.getFile());
+                dependencyArtifact.setResolved( true );
+                dependencyArtifact.setRepository( upStreamArtifact.getRepository());
+            }
+
+        }
+    }
+
+    private void reresolveUpstreamTestScopedArtifacts(ProjectSegment projectBuild) {
+        for ( MavenProject upstreamProject : projectBuild.getTransitiveUpstreamProjects() ){
+            Artifact upStreamArtifact = findTestScopedArtifact(upstreamProject);
+            Artifact dependencyArtifact =  findDependency(projectBuild.getProject(), upStreamArtifact);
+            if (dependencyArtifact != null){
+                dependencyArtifact.setFile( upStreamArtifact.getFile());
+                dependencyArtifact.setResolved( upStreamArtifact.isResolved());
+                dependencyArtifact.setRepository( upStreamArtifact.getRepository());
+            }
+
+        }
+    }
+
+    private Artifact findTestScopedArtifact(MavenProject upstreamProject) {
+        if ( upstreamProject == null){
+            return null;
+        }
+        
+        List<Artifact> artifactList = upstreamProject.getAttachedArtifacts();
+        for (Artifact artifact : artifactList) {
+            if (Artifact.SCOPE_TEST.equals( artifact.getScope())){
+                return artifact;
+            }
+        }
+        return null;
+    }
+
+    private static Artifact findDependency(MavenProject project, Artifact upStreamArtifact) {
+        if (upStreamArtifact == null){
+            return null;
+        }
+        
+        String key = ArtifactUtils.key( upStreamArtifact.getGroupId(),
+                                        upStreamArtifact.getArtifactId(),
+                                        upStreamArtifact.getVersion() );
+        final Set<Artifact> deps = project.getDependencyArtifacts();
+        for ( Artifact dep : deps )
+        {
+            String depKey = ArtifactUtils.key(dep.getGroupId(), dep.getArtifactId(), dep.getVersion());
+            if ( key.equals( depKey ) )
+            {
+                return dep;
+            }
+        }
+        return null;
+
+    }
+
+    private boolean requiresReResolutionOfUpstreamReactorArtifacts( ExecutionPlanItem nextExecutionPlanItem )
+    {
+        final String phase = nextExecutionPlanItem.getLifecyclePhase();
+        return "package".equals(phase) ||  "install".equals( phase ) || "compile".equals( phase );
+    }
+
+    private boolean requiresReResolutionOfUpstreamTestScopedReactorArtifacts( ExecutionPlanItem nextExecutionPlanItem )
+    {
+        final String phase = nextExecutionPlanItem.getLifecyclePhase();
+        return "package".equals(phase) || "install".equals( phase ) || "compile".equals( phase ) || "test-compile".equals( phase );
+    }
+
+    private void buildExecutionPlanItem(ExecutionPlanItem current, PhaseRecorder phaseRecorder, Schedule schedule, ReactorContext reactorContext, ProjectSegment projectBuild, DependencyContext dependencyContext) throws LifecycleExecutionException {
+        if ( schedule != null && schedule.isMojoSynchronized() )
+        {
+            synchronized ( current.getPlugin() )
+            {
+                buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext,
+                                        phaseRecorder );
+            }
+        }
+        else
+        {
+            buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext,
+                                    phaseRecorder );
+        }
+    }
+
 
     private void buildExecutionPlanItem( ReactorContext reactorContext, ExecutionPlanItem node,
                                          ProjectSegment projectBuild, DependencyContext dependencyContext,

@@ -14,17 +14,6 @@
  */
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.lifecycle.internal.BuilderCommon;
-import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
-import org.apache.maven.plugin.InvalidPluginDescriptorException;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoNotFoundException;
-import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -53,67 +42,16 @@ public class DefaultLifecycles
 
     private Logger logger;
 
-    private List<Scheduling> schedules;
-
     @SuppressWarnings( { "UnusedDeclaration" } )
     public DefaultLifecycles()
     {
     }
 
-    public DefaultLifecycles( Map<String, Lifecycle> lifecycles, List<Scheduling> schedules, Logger logger )
+    public DefaultLifecycles( Map<String, Lifecycle> lifecycles, Logger logger )
     {
         this.lifecycles = new LinkedHashMap<String, Lifecycle>();
-        this.schedules = schedules;
         this.logger = logger;
         this.lifecycles = lifecycles;
-    }
-
-    public List<ExecutionPlanItem> createExecutionPlanItem( MavenProject mavenProject, List<MojoExecution> executions )
-        throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
-        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
-        NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
-    {
-        BuilderCommon.attachToThread( mavenProject );
-
-        List<ExecutionPlanItem> result = new ArrayList<ExecutionPlanItem>();
-        for ( MojoExecution mojoExecution : executions )
-        {
-            String lifeCyclePhase = mojoExecution.getMojoDescriptor().getPhase();
-            final Scheduling scheduling = getScheduling( "default" );
-            Schedule schedule = null;
-            if ( scheduling != null )
-            {
-                schedule = scheduling.getSchedule( mojoExecution.getPlugin() );
-                if ( schedule == null )
-                {
-                    schedule = scheduling.getSchedule( lifeCyclePhase );
-                }
-            }
-            result.add( new ExecutionPlanItem( mojoExecution, schedule ) );
-
-        }
-        return result;
-    }
-
-    /**
-     * Gets scheduling associated with a given phase.
-     * <p/>
-     * This is part of the experimental weave mode and therefore not part of the public api.
-     *
-     * @param lifecyclePhaseName The name of the lifecycle phase
-     * @return Schecduling information related to phase
-     */
-
-    private Scheduling getScheduling( String lifecyclePhaseName )
-    {
-        for ( Scheduling schedule : schedules )
-        {
-            if ( lifecyclePhaseName.equals( schedule.getLifecycle() ) )
-            {
-                return schedule;
-            }
-        }
-        return null;
     }
 
     public Lifecycle get( String key )
@@ -124,7 +62,7 @@ public class DefaultLifecycles
     /**
      * We use this to map all phases to the lifecycle that contains it. This is used so that a user can specify the
      * phase they want to execute and we can easily determine what lifecycle we need to run.
-     * 
+     *
      * @return A map of lifecycles, indexed on id
      */
     public Map<String, Lifecycle> getPhaseToLifecycleMap()
@@ -176,11 +114,6 @@ public class DefaultLifecycles
         }
 
         return result;
-    }
-
-    public List<Scheduling> getSchedules()
-    {
-        return schedules;
     }
 
     public String getLifecyclePhaseList()

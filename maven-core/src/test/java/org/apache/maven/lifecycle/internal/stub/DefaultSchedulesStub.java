@@ -12,48 +12,30 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.maven.lifecycle;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.component.annotations.Requirement;
+package org.apache.maven.lifecycle.internal.stub;
 
+import org.apache.maven.lifecycle.DefaultSchedules;
+import org.apache.maven.lifecycle.Schedule;
+import org.apache.maven.lifecycle.Scheduling;
+
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author Kristian Rosenvold
  */
 
-public class DefaultLifecyclesTest
-    extends PlexusTestCase
+public class DefaultSchedulesStub
 {
-    @Requirement
-    private DefaultLifecycles defaultLifeCycles;
-
-
-    protected void setUp()
-        throws Exception
+    public static DefaultSchedules createDefaultSchedules()
     {
-        super.setUp();
-        defaultLifeCycles = lookup( DefaultLifecycles.class );
+        return new DefaultSchedules( getSchedulingList() );
     }
 
-    @Override
-    protected void tearDown()
-        throws Exception
+    public static List<Scheduling> getSchedulingList()
     {
-        defaultLifeCycles = null;
-        super.tearDown();
+        return Arrays.asList( new Scheduling( "default", Arrays.asList( new Schedule( "compile", false, false ),
+                                                                        new Schedule( "test", false, true ) ) ) );
     }
-
-    public void testLifecycle()
-        throws Exception
-    {
-        final List<Lifecycle> cycles = defaultLifeCycles.getLifeCycles();
-        assertNotNull( cycles );
-        final Lifecycle lifecycle = cycles.get( 0 );
-        assertEquals( "default", lifecycle.getId() );
-        assertEquals( 23, lifecycle.getPhases().size() );
-
-    }
-
 }

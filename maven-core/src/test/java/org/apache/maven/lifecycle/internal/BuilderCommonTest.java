@@ -16,12 +16,15 @@
 package org.apache.maven.lifecycle.internal;
 
 import junit.framework.TestCase;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependenciesResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
+
+import java.util.HashSet;
 
 /**
  * @author Kristian Rosenvold
@@ -40,7 +43,8 @@ public class BuilderCommonTest
 
         final BuilderCommon builderCommon = getBuilderCommon();
         final MavenExecutionPlan plan =
-            builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1 );
+            builderCommon.resolveBuildPlan( session1, ProjectDependencyGraphStub.A, taskSegment1,
+                                            new HashSet<Artifact>() );
         assertEquals( LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan().size(), plan.size() );
 
     }

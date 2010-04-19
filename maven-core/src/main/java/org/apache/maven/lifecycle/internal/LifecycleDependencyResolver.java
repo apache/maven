@@ -62,11 +62,12 @@ public class LifecycleDependencyResolver
     }
 
     public void resolveDependencies( boolean aggregating, MavenProject currentProject,
-                                     MavenSession sessionForThisModule, MavenExecutionPlan executionPlan )
+                                     MavenSession sessionForThisModule, MavenExecutionPlan executionPlan,
+                                     Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
         List<MavenProject> projectsToResolve = getProjects( currentProject, sessionForThisModule, aggregating );
-        resolveDependencies( aggregating, sessionForThisModule, executionPlan, projectsToResolve );
+        resolveDependencies( aggregating, sessionForThisModule, executionPlan, projectsToResolve, projectArtifacts );
     }
 
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )
@@ -88,8 +89,8 @@ public class LifecycleDependencyResolver
         if ( dependenctContext.isSameButUpdatedProject( session ) )
         {
             resolveProjectDependencies( dependenctContext.getLastProject(), dependenctContext.getScopesToCollect(),
-                                        dependenctContext.getScopesToResolve(), session,
-                                        dependenctContext.isAggregating() );
+                                         dependenctContext.getScopesToResolve(), session,
+                                         dependenctContext.isAggregating(), new HashSet<Artifact>() );
         }
 
         dependenctContext.setLastProject( session.getCurrentProject() );
@@ -97,30 +98,25 @@ public class LifecycleDependencyResolver
     }
 
     private void resolveDependencies( boolean aggregating, MavenSession session, MavenExecutionPlan executionPlan,
-                                      List<MavenProject> projectsToResolve )
+                                       List<MavenProject> projectsToResolve, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
         for ( MavenProject project : projectsToResolve )
         {
-            resolveDependencies( project, aggregating, session, executionPlan );
+            resolveProjectDependencies( project, executionPlan.getRequiredCollectionScopes(),
+                                         executionPlan.getRequiredResolutionScopes(), session, aggregating,
+                                         projectArtifacts );
         }
     }
 
-    private void resolveDependencies( MavenProject project, boolean aggregating, MavenSession session,
-                                      MavenExecutionPlan executionPlan )
-        throws LifecycleExecutionException
-    {
-        resolveProjectDependencies( project, executionPlan.getRequiredCollectionScopes(),
-                                    executionPlan.getRequiredResolutionScopes(), session, aggregating );
-    }
-
     private void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
-                                             Collection<String> scopesToResolve, MavenSession session,
-                                             boolean aggregating )
+                                              Collection<String> scopesToResolve, MavenSession session,
+                                              boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
         Set<Artifact> artifacts =
-            getProjectDependencies( project, scopesToCollect, scopesToResolve, session, aggregating );
+            getProjectDependencies( project, scopesToCollect, scopesToResolve, session, aggregating,
+                                    projectArtifacts );
         updateProjectArtifacts( project, artifacts );
     }
 
@@ -136,7 +132,7 @@ public class LifecycleDependencyResolver
 
     private Set<Artifact> getProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
                                                   Collection<String> scopesToResolve, MavenSession session,
-                                                  boolean aggregating )
+                                                  boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
         Set<Artifact> artifacts;
@@ -144,7 +140,8 @@ public class LifecycleDependencyResolver
         {
             try
             {
-                artifacts = projectDependenciesResolver.resolve( project, scopesToCollect, scopesToResolve, session );
+                artifacts = projectDependenciesResolver.resolve( project , scopesToCollect,
+                                                                 scopesToResolve, session, projectArtifacts );
             }
             catch ( MultipleArtifactsNotFoundException e )
             {
@@ -153,24 +150,7 @@ public class LifecycleDependencyResolver
                 * plugins that require dependency resolution although they usually run in phases of the build where project
                 * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
                 */
-                if ( aggregating && areAllArtifactsInReactor( session.getProjects(), e.getMissingArtifacts() ) )
-                {
-                    logger.warn( "The following artifacts could not be resolved at this point of the build" +
-                        " but seem to be part of the reactor:" );
-
-                    for ( Artifact artifact : e.getMissingArtifacts() )
-                    {
-                        logger.warn( "o " + artifact.getId() );
-                    }
-
-                    logger.warn( "Try running the build up to the lifecycle phase \"package\"" );
-
-                    artifacts = new LinkedHashSet<Artifact>( e.getResolvedArtifacts() );
-                }
-                else
-                {
-                    throw e;
-                }
+                artifacts = handleException( session, aggregating, e );
             }
 
             return artifacts;
@@ -186,6 +166,36 @@ public class LifecycleDependencyResolver
 
     }
 
+
+    private Set<Artifact> handleException( MavenSession session, boolean aggregating,
+                                           MultipleArtifactsNotFoundException e )
+        throws MultipleArtifactsNotFoundException
+    {
+        Set<Artifact> artifacts;/*
+        * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
+        * plugins that require dependency resolution although they usually run in phases of the build where project
+        * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
+        */
+        if ( aggregating && areAllArtifactsInReactor( session.getProjects(), e.getMissingArtifacts() ) )
+        {
+            logger.warn( "The following artifacts could not be resolved at this point of the build" +
+                " but seem to be part of the reactor:" );
+
+            for ( Artifact artifact : e.getMissingArtifacts() )
+            {
+                logger.warn( "o " + artifact.getId() );
+            }
+
+            logger.warn( "Try running the build up to the lifecycle phase \"package\"" );
+
+            artifacts = new LinkedHashSet<Artifact>( e.getResolvedArtifacts() );
+        }
+        else
+        {
+            throw e;
+        }
+        return artifacts;
+    }
 
     private Set<Artifact> getDependencyArtifacts( MavenProject project, Set<Artifact> artifacts )
     {

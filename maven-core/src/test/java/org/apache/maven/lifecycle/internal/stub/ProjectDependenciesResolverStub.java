@@ -51,4 +51,12 @@ public class ProjectDependenciesResolverStub
     {
         return new HashSet<Artifact>();
     }
+
+    public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
+                                  Collection<String> scopesToResolve, MavenSession session,
+                                  Set<Artifact> ignoreableArtifacts )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        return new HashSet<Artifact>();
+    }
 }

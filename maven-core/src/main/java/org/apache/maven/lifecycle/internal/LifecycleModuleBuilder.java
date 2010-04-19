@@ -15,6 +15,7 @@
 
 package org.apache.maven.lifecycle.internal;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
@@ -22,6 +23,8 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+
+import java.util.HashSet;
 
 /**
  * Builds one or more lifecycles for a full module
@@ -72,7 +75,8 @@ public class LifecycleModuleBuilder
             eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
 
             BuilderCommon.attachToThread( currentProject );
-            MavenExecutionPlan executionPlan = builderCommon.resolveBuildPlan( session, currentProject, taskSegment );
+            MavenExecutionPlan executionPlan =
+                builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<Artifact>() );
 
             DependencyContext dependencyContext = new DependencyContext( executionPlan, isAggregating );
             mojoExecutor.execute( session, executionPlan.getMojoExecutions(), reactorContext.getProjectIndex(),

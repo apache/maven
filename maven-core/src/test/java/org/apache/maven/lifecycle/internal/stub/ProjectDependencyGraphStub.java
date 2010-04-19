@@ -190,10 +190,10 @@ public class ProjectDependencyGraphStub
 
     public List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive )
     {
-        if ( transitive )
+        /*  if ( transitive )
         {
             throw new RuntimeException( "Not implemented yet" );
-        }
+        }*/
         List<MavenProject> result = new ArrayList<MavenProject>();
         final List<Dependency> dependencies = getDependencies();
         for ( Dependency dependency : dependencies )

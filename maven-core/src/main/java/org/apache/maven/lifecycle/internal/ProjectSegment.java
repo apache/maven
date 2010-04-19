@@ -53,12 +53,18 @@ public final class ProjectSegment
 
     private final MavenSession session;
 
+    private final List<MavenProject> nonTransitiveUpstreamProjects;
+
+    private final List<MavenProject> transitiveUpstreamProjects;
 
     public ProjectSegment( MavenProject project, TaskSegment taskSegment, MavenSession copiedSession )
     {
         this.project = project;
         this.taskSegment = taskSegment;
         this.session = copiedSession;
+        final ProjectDependencyGraph dependencyGraph = getSession().getProjectDependencyGraph();
+        nonTransitiveUpstreamProjects = dependencyGraph.getUpstreamProjects( getProject(), false );
+        transitiveUpstreamProjects = dependencyGraph.getUpstreamProjects( getProject(), true );
     }
 
     public MavenSession getSession()
@@ -78,8 +84,12 @@ public final class ProjectSegment
 
     public List<MavenProject> getImmediateUpstreamProjects()
     {
-        final ProjectDependencyGraph dependencyGraph = getSession().getProjectDependencyGraph();
-        return dependencyGraph.getUpstreamProjects( getProject(), false );
+        return nonTransitiveUpstreamProjects;
+    }
+
+    public List<MavenProject> getTransitiveUpstreamProjects()
+    {
+        return transitiveUpstreamProjects;
     }
 
     @Override
