@@ -62,7 +62,7 @@ public class PropertyProfileActivator
                 if ( name == null || name.length() <= 0 )
                 {
                     problems.add( Severity.ERROR, "The property name is required to activate the profile "
-                        + profile.getId(), null, null );
+                        + profile.getId(), property.getLocation( "" ), null );
                     return false;
                 }
 

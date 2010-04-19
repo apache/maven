@@ -466,7 +466,8 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(), null, e );
+                problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(),
+                              repository.getLocation( "" ), e );
             }
         }
     }
@@ -595,7 +596,7 @@ public class DefaultModelBuilder
             {
                 problems.add( Severity.ERROR, "Invalid packaging for parent POM "
                     + ModelProblemUtils.toSourceHint( parentModel ) + ", must be \"pom\" but is \""
-                    + parentModel.getPackaging() + "\"", null, null );
+                    + parentModel.getPackaging() + "\"", parentModel.getLocation( "packaging" ), null );
             }
         }
         else
@@ -640,7 +641,7 @@ public class DefaultModelBuilder
             problems.add( Severity.WARNING, "'parent.relativePath' of POM "
                 + ModelProblemUtils.toSourceHint( childModel ) + " points at " + groupId + ":" + artifactId
                 + " instead of " + parent.getGroupId() + ":" + parent.getArtifactId()
-                + ", please verify your project structure", null, null );
+                + ", please verify your project structure", childModel.getLocation( "parent" ), null );
             return null;
         }
         if ( version == null || !version.equals( parent.getVersion() ) )
@@ -711,7 +712,7 @@ public class DefaultModelBuilder
         {
             problems.add( Severity.FATAL, "Non-resolvable parent POM "
                 + ModelProblemUtils.toId( groupId, artifactId, version ) + " for "
-                + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), null, e );
+                + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), childModel.getLocation( "parent" ), e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                               problems.getProblems() );
         }
@@ -812,7 +813,8 @@ public class DefaultModelBuilder
                 catch ( UnresolvableModelException e )
                 {
                     problems.add( Severity.ERROR, "Non-resolvable import POM "
-                        + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(), null, e );
+                        + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(),
+                                  dependency.getLocation( "" ), e );
                     continue;
                 }
 

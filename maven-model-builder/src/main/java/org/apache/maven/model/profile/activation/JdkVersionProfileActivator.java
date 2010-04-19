@@ -57,7 +57,7 @@ public class JdkVersionProfileActivator
                 if ( version.length() <= 0 )
                 {
                     problems.add( Severity.ERROR, "Failed to determine Java version for profile " + profile.getId(),
-                                  null, null );
+                                  activation.getLocation( "jdk" ), null );
                     return false;
                 }
 
