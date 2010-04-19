@@ -156,6 +156,22 @@ public interface ModelBuildingRequest
     ModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding );
 
     /**
+     * Indicates whether the model should track the line/column number of the model source from which it was parsed.
+     * 
+     * @return {@code true} if location tracking is enabled, {@code false} otherwise.
+     */
+    boolean isLocationTracking();
+
+    /**
+     * Enables/disables the tracking of line/column numbers for the model source being parsed. By default, input
+     * locations are not tracked.
+     * 
+     * @param locationTracking {@code true} to enable location tracking, {@code false} to disable it.
+     * @return This request, never {@code null}.
+     */
+    ModelBuildingRequest setLocationTracking( boolean locationTracking );
+
+    /**
      * Gets the external profiles that should be considered for model building.
      *
      * @return The external profiles that should be considered for model building, never {@code null}.

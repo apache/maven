@@ -47,6 +47,8 @@ public class DefaultModelBuildingRequest
 
     private boolean twoPhaseBuilding;
 
+    private boolean locationTracking;
+
     private List<Profile> profiles;
 
     private List<String> activeProfileIds;
@@ -151,6 +153,18 @@ public class DefaultModelBuildingRequest
     public DefaultModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding )
     {
         this.twoPhaseBuilding = twoPhaseBuilding;
+
+        return this;
+    }
+
+    public boolean isLocationTracking()
+    {
+        return locationTracking;
+    }
+
+    public DefaultModelBuildingRequest setLocationTracking( boolean locationTracking )
+    {
+        this.locationTracking = locationTracking;
 
         return this;
     }

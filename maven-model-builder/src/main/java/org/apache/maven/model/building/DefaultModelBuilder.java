@@ -346,7 +346,7 @@ public class DefaultModelBuilder
         try
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
-            InputSource source = strict ? new InputSource() : null;
+            InputSource source = request.isLocationTracking() ? new InputSource() : null;
 
             Map<String, Object> options = new HashMap<String, Object>();
             options.put( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );

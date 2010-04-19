@@ -104,6 +104,18 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    public boolean isLocationTracking()
+    {
+        return request.isLocationTracking();
+    }
+
+    public FilterModelBuildingRequest setLocationTracking( boolean locationTracking )
+    {
+        request.setLocationTracking( locationTracking );
+
+        return this;
+    }
+
     public List<Profile> getProfiles()
     {
         return request.getProfiles();
