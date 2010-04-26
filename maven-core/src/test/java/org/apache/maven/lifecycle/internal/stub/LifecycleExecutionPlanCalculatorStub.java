@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author <a href="mailto:kristian@zenior.no">Kristian Rosenvold</a>
+ * @author Kristian Rosenvold
  */
 public class LifecycleExecutionPlanCalculatorStub
     implements LifecycleExecutionPlanCalculator

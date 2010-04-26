@@ -27,7 +27,7 @@ import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import java.util.List;
 
 /**
- * @author <a href="mailto:kristian@zenior.no">Kristian Rosenvold</a>
+ * @author Kristian Rosenvold
  */
 public class LifecycleTaskSegmentCalculatorImplTest
     extends TestCase

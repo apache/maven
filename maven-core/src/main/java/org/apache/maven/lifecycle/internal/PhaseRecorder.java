@@ -19,7 +19,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @author Benjamin Bentmann
- * @author Kristian Rosenvold (extract class)
+ * @author Kristian Rosenvold
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
@@ -56,5 +56,17 @@ public class PhaseRecorder
             project.addLifecyclePhase( lastLifecyclePhase );
         }
     }
+
+    public boolean isDifferentPhase( MojoExecution nextMojoExecution )
+    {
+        String lifecyclePhase = nextMojoExecution.getLifecyclePhase();
+        if ( lifecyclePhase == null )
+        {
+            return lastLifecyclePhase != null;
+        }
+        return !lifecyclePhase.equals( lastLifecyclePhase );
+
+    }
+
 
 }
