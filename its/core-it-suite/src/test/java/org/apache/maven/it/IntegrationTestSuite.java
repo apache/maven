@@ -82,6 +82,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4644StrictPomParsingRejectsMisplacedTextTest.class );
         suite.addTestSuite( MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest.class );
         suite.addTestSuite( MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest.class );
         suite.addTestSuite( MavenITmng4618AggregatorBuiltAfterModulesTest.class );
