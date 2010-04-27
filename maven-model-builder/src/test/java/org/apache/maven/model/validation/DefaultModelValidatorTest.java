@@ -449,4 +449,44 @@ public class DefaultModelValidatorTest
                                                           "'distributionManagement.snapshotRepository.id' must not be 'local'" ) );
     }
 
+    public void testMissingPluginDependencyGroupId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-plugin-dependency-groupId.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( ":a:" ) );
+    }
+
+    public void testMissingPluginDependencyArtifactId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-plugin-dependency-artifactId.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:" ) );
+    }
+
+    public void testMissingPluginDependencyVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-plugin-dependency-version.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:a" ) );
+    }
+
+    public void testBadPluginDependencyVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-plugin-dependency-version.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
+    }
+
 }

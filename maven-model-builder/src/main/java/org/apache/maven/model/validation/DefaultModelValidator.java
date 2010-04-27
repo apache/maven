@@ -253,12 +253,7 @@ public class DefaultModelValidator
                     validateBoolean( "build.plugins.plugin.extensions", problems, errOn30, p.getExtensions(),
                                      p.getKey() );
 
-                    for ( Dependency d : p.getDependencies() )
-                    {
-                        validateEnum( "build.plugins.plugin[" + p.getKey() + "].dependencies.dependency.scope",
-                                      problems, errOn30, d.getScope(), d.getManagementKey(),
-                                      "compile", "runtime", "system" );
-                    }
+                    validateEffectivePluginDependencies( problems, p, request );
                 }
 
                 validateResources( problems, build.getResources(), "build.resources.resource", request );
@@ -365,67 +360,21 @@ public class DefaultModelValidator
     }
 
     private void validateEffectiveDependencies( ModelProblemCollector problems, List<Dependency> dependencies,
-                                                boolean managed, ModelBuildingRequest request )
+                                                boolean management, ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
-        String prefix = managed ? "dependencyManagement.dependencies.dependency." : "dependencies.dependency.";
+        String prefix = management ? "dependencyManagement.dependencies.dependency." : "dependencies.dependency.";
 
         for ( Dependency d : dependencies )
         {
-            validateId( prefix + "artifactId", problems, d.getArtifactId(), d.getManagementKey() );
-
-            validateId( prefix + "groupId", problems, d.getGroupId(), d.getManagementKey() );
-
-            if ( !managed )
-            {
-                validateStringNotEmpty( prefix + "type", problems, Severity.ERROR, d.getType(), d.getManagementKey() );
-
-                validateStringNotEmpty( prefix + "version", problems, Severity.ERROR, d.getVersion(),
-                                        d.getManagementKey() );
-            }
-
-            if ( "system".equals( d.getScope() ) )
-            {
-                String systemPath = d.getSystemPath();
-
-                if ( StringUtils.isEmpty( systemPath ) )
-                {
-                    addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "is missing." );
-                }
-                else
-                {
-                    File sysFile = new File( systemPath );
-                    if ( !sysFile.isAbsolute() )
-                    {
-                        addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(),
-                                      "must specify an absolute path but is " + systemPath );
-                    }
-                    else if ( !sysFile.isFile() )
-                    {
-                        String msg = "refers to a non-existing file " + sysFile.getAbsolutePath();
-                        systemPath = systemPath.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
-                        String jdkHome =
-                            request.getSystemProperties().getProperty( "java.home", "" ) + File.separator + "..";
-                        if ( systemPath.startsWith( jdkHome ) )
-                        {
-                            msg += ". Please verify that you run Maven using a JDK and not just a JRE.";
-                        }
-                        addViolation( problems, Severity.WARNING, prefix + "systemPath", d.getManagementKey(), msg );
-                    }
-                }
-            }
-            else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
-            {
-                addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "must be omitted."
-                    + " This field may only be specified for a dependency with system scope." );
-            }
+            validateEffectiveDependency( problems, d, management, prefix, request );
 
             if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
             {
                 validateBoolean( prefix + "optional", problems, errOn30, d.getOptional(), d.getManagementKey() );
 
-                if ( !managed )
+                if ( !management )
                 {
                     validateVersion( prefix + "version", problems, errOn30, d.getVersion(), d.getManagementKey() );
 
@@ -437,6 +386,80 @@ public class DefaultModelValidator
                                   "provided", "compile", "runtime", "test", "system" );
                 }
             }
+        }
+    }
+
+    private void validateEffectivePluginDependencies( ModelProblemCollector problems, Plugin plugin,
+                                                      ModelBuildingRequest request )
+    {
+        List<Dependency> dependencies = plugin.getDependencies();
+
+        if ( !dependencies.isEmpty() )
+        {
+            String prefix = "build.plugins.plugin[" + plugin.getKey() + "].dependencies.dependency.";
+
+            Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
+
+            for ( Dependency d : dependencies )
+            {
+                validateEffectiveDependency( problems, d, false, prefix, request );
+
+                validateVersion( prefix + "version", problems, errOn30, d.getVersion(), d.getManagementKey() );
+
+                validateEnum( prefix + "scope", problems, errOn30, d.getScope(), d.getManagementKey(), "compile",
+                              "runtime", "system" );
+            }
+        }
+    }
+
+    private void validateEffectiveDependency( ModelProblemCollector problems, Dependency d, boolean management,
+                                              String prefix, ModelBuildingRequest request )
+    {
+        validateId( prefix + "artifactId", problems, d.getArtifactId(), d.getManagementKey() );
+
+        validateId( prefix + "groupId", problems, d.getGroupId(), d.getManagementKey() );
+
+        if ( !management )
+        {
+            validateStringNotEmpty( prefix + "type", problems, Severity.ERROR, d.getType(), d.getManagementKey() );
+
+            validateStringNotEmpty( prefix + "version", problems, Severity.ERROR, d.getVersion(), d.getManagementKey() );
+        }
+
+        if ( "system".equals( d.getScope() ) )
+        {
+            String systemPath = d.getSystemPath();
+
+            if ( StringUtils.isEmpty( systemPath ) )
+            {
+                addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "is missing." );
+            }
+            else
+            {
+                File sysFile = new File( systemPath );
+                if ( !sysFile.isAbsolute() )
+                {
+                    addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(),
+                                  "must specify an absolute path but is " + systemPath );
+                }
+                else if ( !sysFile.isFile() )
+                {
+                    String msg = "refers to a non-existing file " + sysFile.getAbsolutePath();
+                    systemPath = systemPath.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
+                    String jdkHome =
+                        request.getSystemProperties().getProperty( "java.home", "" ) + File.separator + "..";
+                    if ( systemPath.startsWith( jdkHome ) )
+                    {
+                        msg += ". Please verify that you run Maven using a JDK and not just a JRE.";
+                    }
+                    addViolation( problems, Severity.WARNING, prefix + "systemPath", d.getManagementKey(), msg );
+                }
+            }
+        }
+        else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
+        {
+            addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "must be omitted."
+                + " This field may only be specified for a dependency with system scope." );
         }
     }
 
