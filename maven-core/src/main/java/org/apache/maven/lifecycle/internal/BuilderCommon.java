@@ -14,6 +14,7 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import org.apache.maven.InternalErrorException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
@@ -92,8 +93,13 @@ public class BuilderCommon
 
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
-                                  final MavenProject mavenProject, final Exception e, final long buildStartTime )
+                                  final MavenProject mavenProject, Exception e, final long buildStartTime )
     {
+        if ( e instanceof RuntimeException )
+        {
+            e = new InternalErrorException( "Internal error: " + e, e );
+        }
+
         buildContext.getResult().addException( e );
 
         long buildEndTime = System.currentTimeMillis();
