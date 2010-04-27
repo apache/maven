@@ -251,6 +251,13 @@ public class PluginDescriptorBuilder
             mojo.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
         }
 
+        String threadSafe = c.getChild( "threadSafe" ).getValue();
+
+        if ( threadSafe != null )
+        {
+            mojo.setThreadSafe( Boolean.valueOf( threadSafe ).booleanValue() );
+        }
+
         // ----------------------------------------------------------------------
         // Parameters
         // ----------------------------------------------------------------------
