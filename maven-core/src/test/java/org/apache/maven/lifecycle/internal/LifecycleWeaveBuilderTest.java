@@ -20,7 +20,14 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
-import org.apache.maven.lifecycle.internal.stub.*;
+import org.apache.maven.lifecycle.internal.stub.CompletionServiceStub;
+import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
+import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
+import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;
+import org.apache.maven.lifecycle.internal.stub.LoggerStub;
+import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
+import org.apache.maven.lifecycle.internal.stub.ProjectDependenciesResolverStub;
+import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
@@ -127,6 +134,7 @@ public class LifecycleWeaveBuilderTest
         final LifecycleDebugLogger logger = new LifecycleDebugLogger( new LoggerStub() );
         final LifecycleDependencyResolver lifecycleDependencyResolver =
             new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), new LoggerStub() );
-        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver );
+        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver,
+                                  new LoggerStub() );
     }
 }

@@ -20,16 +20,10 @@ package org.apache.maven.lifecycle;
  */
 
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 //TODO: lifecycles being executed
 //TODO: what runs in each phase
@@ -196,6 +190,21 @@ public class MavenExecutionPlan
         return result;
     }
 
+
+    public Set<Plugin> getNonThreadSafePlugins()
+    {
+        Set<Plugin> plugins = new HashSet<Plugin>();
+        for ( ExecutionPlanItem executionPlanItem : planItem )
+        {
+            final MojoExecution mojoExecution = executionPlanItem.getMojoExecution();
+            if ( !mojoExecution.getMojoDescriptor().isThreadSafe() )
+            {
+                plugins.add( mojoExecution.getPlugin() );
+            }
+        }
+        return plugins;
+    }
+    
     // Used by m2e but will be removed, really. 
 
     @SuppressWarnings({"UnusedDeclaration"})

@@ -19,9 +19,11 @@ import junit.framework.TestCase;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.stub.DefaultLifecyclesStub;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
+import org.apache.maven.model.Plugin;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Kristian Rosenvold
@@ -34,7 +36,7 @@ public class MavenExecutionPlanTest
     {
         final List<Scheduling> cycles = DefaultLifecyclesStub.getSchedulingList();
         final Schedule schedule = cycles.get( 0 ).getSchedules().get( 0 );
-        assertNotNull( schedule);
+        assertNotNull( schedule );
 
     }
 
@@ -59,13 +61,25 @@ public class MavenExecutionPlanTest
         assertNotNull( expected );
     }
 
+    public void testThreadSafeMojos()
+        throws Exception
+    {
+        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
+        final Set<Plugin> unSafePlugins = plan.getNonThreadSafePlugins();
+        // There is only a single threadsafe plugin here...
+        assertEquals( plan.size() - 1, unSafePlugins.size() );
+
+    }
+
+
     public void testFindLastWhenFirst()
         throws Exception
     {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
 
-        ExecutionPlanItem beerPhase = plan.findLastInPhase(  LifecycleExecutionPlanCalculatorStub.VALIDATE.getPhase());  // Beer comes straight after package in stub
-        assertNull ( beerPhase);
+        ExecutionPlanItem beerPhase = plan.findLastInPhase(
+            LifecycleExecutionPlanCalculatorStub.VALIDATE.getPhase() );  // Beer comes straight after package in stub
+        assertNull( beerPhase );
     }
 
     public void testFindLastInPhaseMisc()
@@ -73,8 +87,8 @@ public class MavenExecutionPlanTest
     {
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
 
-        assertNull( plan.findLastInPhase( "pacXkage" ));
-         // Beer comes straight after package in stub, much like real life.
-        assertNotNull(  plan.findLastInPhase(  LifecycleExecutionPlanCalculatorStub.INITIALIZE.getPhase()));
+        assertNull( plan.findLastInPhase( "pacXkage" ) );
+        // Beer comes straight after package in stub, much like real life.
+        assertNotNull( plan.findLastInPhase( LifecycleExecutionPlanCalculatorStub.INITIALIZE.getPhase() ) );
     }
 }

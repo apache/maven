@@ -50,22 +50,26 @@ public class LifecycleExecutionPlanCalculatorStub
     implements LifecycleExecutionPlanCalculator
 {
     // clean
+
     public final static MojoDescriptor PRE_CLEAN = createMojoDescriptor( "pre-clean" );
+
     public final static MojoDescriptor CLEAN = createMojoDescriptor( "clean" );
+
     public final static MojoDescriptor POST_CLEAN = createMojoDescriptor( "post-clean" );
 
     // default (or at least some of them)
+
     public final static MojoDescriptor VALIDATE = createMojoDescriptor( "validate" );
 
     public final static MojoDescriptor INITIALIZE = createMojoDescriptor( "initialize" );
-    
+
     public final static MojoDescriptor TEST_COMPILE = createMojoDescriptor( "test-compile" );
 
     public final static MojoDescriptor PROCESS_TEST_RESOURCES = createMojoDescriptor( "process-test-resources" );
 
     public final static MojoDescriptor PROCESS_RESOURCES = createMojoDescriptor( "process-resources" );
 
-    public final static MojoDescriptor COMPILE = createMojoDescriptor( "compile" );
+    public final static MojoDescriptor COMPILE = createMojoDescriptor( "compile", true );
 
     public final static MojoDescriptor TEST = createMojoDescriptor( "test" );
 
@@ -73,13 +77,15 @@ public class LifecycleExecutionPlanCalculatorStub
 
     public final static MojoDescriptor INSTALL = createMojoDescriptor( "install" );
 
-
     // site
-    public final static MojoDescriptor PRE_SITE = createMojoDescriptor( "pre-site" );
-    public final static MojoDescriptor SITE = createMojoDescriptor( "site" );
-    public final static MojoDescriptor POST_SITE = createMojoDescriptor( "post-site" );
-    public final static MojoDescriptor SITE_DEPLOY = createMojoDescriptor( "site-deploy" );
 
+    public final static MojoDescriptor PRE_SITE = createMojoDescriptor( "pre-site" );
+
+    public final static MojoDescriptor SITE = createMojoDescriptor( "site" );
+
+    public final static MojoDescriptor POST_SITE = createMojoDescriptor( "post-site" );
+
+    public final static MojoDescriptor SITE_DEPLOY = createMojoDescriptor( "site-deploy" );
 
 
     public int getNumberOfExceutions( ProjectBuildList projectBuildList )
@@ -112,8 +118,8 @@ public class LifecycleExecutionPlanCalculatorStub
         }
         // The remaining are basically "for future expansion"
         List<MojoExecution> me = new ArrayList<MojoExecution>();
-        me.add( createMojoExecution( new Plugin(), "resources", "default-resources", PROCESS_RESOURCES ) );
-        me.add( createMojoExecution( new Plugin(), "compile", "default-compile", COMPILE ) );
+        me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
+        me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
         return createExecutionPlan( project, me );
     }
 
@@ -123,17 +129,16 @@ public class LifecycleExecutionPlanCalculatorStub
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         List<MojoExecution> me = new ArrayList<MojoExecution>();
-        me.add( createMojoExecution( new Plugin(), "initialize", "default-initialize", INITIALIZE ) ); 
-        me.add( createMojoExecution( new Plugin(), "resources", "default-resources", PROCESS_RESOURCES ) );
-        me.add( createMojoExecution( new Plugin(), "compile", "default-compile", COMPILE ) );
-        me.add( createMojoExecution( new Plugin(), "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
-        me.add( createMojoExecution( new Plugin(), "testCompile", "default-testCompile", TEST_COMPILE ) );
-        me.add( createMojoExecution( new Plugin(), "test", "default-test", TEST ) );
-        me.add( createMojoExecution( new Plugin(), "war", "default-war", PACKAGE ) );
-        me.add( createMojoExecution( new Plugin(), "install", "default-install", INSTALL ) );
+        me.add( createMojoExecution( "initialize", "default-initialize", INITIALIZE ) );
+        me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
+        me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
+        me.add( createMojoExecution( "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
+        me.add( createMojoExecution( "testCompile", "default-testCompile", TEST_COMPILE ) );
+        me.add( createMojoExecution( "test", "default-test", TEST ) );
+        me.add( createMojoExecution( "war", "default-war", PACKAGE ) );
+        me.add( createMojoExecution( "install", "default-install", INSTALL ) );
         return createExecutionPlan( ProjectDependencyGraphStub.A.getExecutionProject(), me );
     }
-
 
     public static MavenExecutionPlan getProjectBExecutionPlan()
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
@@ -141,12 +146,12 @@ public class LifecycleExecutionPlanCalculatorStub
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         List<MojoExecution> me = new ArrayList<MojoExecution>();
-        me.add( createMojoExecution( new Plugin(), "enforce", "enforce-versions", VALIDATE ) );
-        me.add( createMojoExecution( new Plugin(), "resources", "default-resources", PROCESS_RESOURCES ) );
-        me.add( createMojoExecution( new Plugin(), "compile", "default-compile", COMPILE ) );
-        me.add( createMojoExecution( new Plugin(), "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
-        me.add( createMojoExecution( new Plugin(), "testCompile", "default-testCompile", TEST_COMPILE ) );
-        me.add( createMojoExecution( new Plugin(), "test", "default-test", TEST ) );
+        me.add( createMojoExecution( "enforce", "enforce-versions", VALIDATE ) );
+        me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
+        me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
+        me.add( createMojoExecution( "testResources", "default-testResources", PROCESS_TEST_RESOURCES ) );
+        me.add( createMojoExecution( "testCompile", "default-testCompile", TEST_COMPILE ) );
+        me.add( createMojoExecution( "test", "default-test", TEST ) );
         return createExecutionPlan( ProjectDependencyGraphStub.B.getExecutionProject(), me );
     }
 
@@ -162,24 +167,35 @@ public class LifecycleExecutionPlanCalculatorStub
                                        DefaultLifecyclesStub.createDefaultLifecycles() );
     }
 
-    private static MojoExecution createMojoExecution( Plugin plugin, String goal, String executionId,
-                                                      MojoDescriptor mojoDescriptor )
+    private static MojoExecution createMojoExecution( String goal, String executionId, MojoDescriptor mojoDescriptor )
     {
+        final Plugin plugin = mojoDescriptor.getPluginDescriptor().getPlugin();
         MojoExecution result = new MojoExecution( plugin, goal, executionId );
         result.setConfiguration( new Xpp3Dom( executionId + "-" + goal ) );
         result.setMojoDescriptor( mojoDescriptor );
-        result.setLifecyclePhase(  mojoDescriptor.getPhase() );
+        result.setLifecyclePhase( mojoDescriptor.getPhase() );
+
         return result;
 
     }
 
     public static MojoDescriptor createMojoDescriptor( String phaseName )
     {
+        return createMojoDescriptor( phaseName, false );
+    }
+
+    public static MojoDescriptor createMojoDescriptor( String phaseName, boolean threadSafe )
+    {
         final MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setPhase( phaseName );
         final PluginDescriptor descriptor = new PluginDescriptor();
+        Plugin plugin = new Plugin();
+        plugin.setArtifactId( "org.apache.maven.test.MavenExecutionPlan" );
+        plugin.setGroupId( "stub-plugin-" + phaseName );
+        descriptor.setPlugin( plugin );
         descriptor.setArtifactId( "artifact." + phaseName );
         mojoDescriptor.setPluginDescriptor( descriptor );
+        mojoDescriptor.setThreadSafe( threadSafe );
         return mojoDescriptor;
     }
 
