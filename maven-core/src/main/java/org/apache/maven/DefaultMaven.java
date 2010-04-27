@@ -415,8 +415,8 @@ public class DefaultMaven
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
-                    logger.warn( problem.getMessage() + " @ "
-                        + ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
+                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
+                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
                 }
 
                 problems = true;
