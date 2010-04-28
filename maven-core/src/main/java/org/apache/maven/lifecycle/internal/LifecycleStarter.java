@@ -154,13 +154,7 @@ public class LifecycleStarter
             }
 
         }
-
-        catch (
-
-            Exception e
-
-            )
-
+        catch ( Exception e )
         {
             result.addException( e );
         }
