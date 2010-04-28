@@ -44,8 +44,8 @@ public class DependencyContext
 
     private volatile int lastDependencyArtifactCount;
 
-    private DependencyContext( Collection<String> scopesToCollect, Collection<String> scopesToResolve,
-                               boolean aggregating )
+    public DependencyContext( Collection<String> scopesToCollect, Collection<String> scopesToResolve,
+                              boolean aggregating )
     {
         this.scopesToCollect = scopesToCollect;
         this.scopesToResolve = scopesToResolve;

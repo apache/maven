@@ -200,7 +200,7 @@ public class LifecycleExecutionPlanCalculatorImpl
         return mojoExecutions;
     }
 
-    private static void collectDependencyRequirements( Collection<String> requiredDependencyResolutionScopes,
+    public static void collectDependencyRequirements( Collection<String> requiredDependencyResolutionScopes,
                                                        Collection<String> requiredDependencyCollectionScopes,
                                                        MojoExecution mojoExecution )
     {
@@ -475,6 +475,16 @@ public class LifecycleExecutionPlanCalculatorImpl
     {
         return MojoDescriptorCreator.convert( mojoDescriptor );
     }
+
+    public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+        throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+            calculateForkedExecutions( mojoExecution, session, session.getCurrentProject(), new HashSet<MojoDescriptor>() );
+
+    }
+
 
     private void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session, MavenProject project,
                                             Collection<MojoDescriptor> alreadyForkedExecutions )

@@ -39,6 +39,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
+import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
@@ -74,8 +75,9 @@ public class DefaultMaven
     @Requirement
     protected ProjectBuilder projectBuilder;
 
+
     @Requirement
-    protected LifecycleExecutor lifecycleExecutor;
+    private LifecycleStarter lifecycleStarter;
 
     @Requirement
     protected PlexusContainer container;
@@ -243,7 +245,7 @@ public class DefaultMaven
             return result;
         }
 
-        lifecycleExecutor.execute( session );
+        lifecycleStarter.execute( session );
 
         validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
 
