@@ -205,7 +205,7 @@ public class LifecycleWeaveBuilder
                         builtLogItem.setComplete();
 
                         ExecutionPlanItem nextPlanItem = planItems.hasNext() ? planItems.next() : null;
-                        if ( nextPlanItem != null )
+                        if ( nextPlanItem != null && phaseRecorder.isDifferentPhase( nextPlanItem.getMojoExecution() ) )
                         {
 
                             final Schedule scheduleOfNext = nextPlanItem.getSchedule();
@@ -215,12 +215,9 @@ public class LifecycleWeaveBuilder
                                                                               projectBuild );
                             }
 
-                            if ( phaseRecorder.isDifferentPhase( nextPlanItem.getMojoExecution() ) )
+                            for ( ArtifactLink dependencyLink : dependencyLinks )
                             {
-                                for ( ArtifactLink dependencyLink : dependencyLinks )
-                                {
-                                    dependencyLink.resolveFromUpstream();
-                                }
+                                dependencyLink.resolveFromUpstream();
                             }
                         }
                         current = nextPlanItem;
@@ -259,13 +256,13 @@ public class LifecycleWeaveBuilder
         {
             final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
             final String nextPhase = nextPlanItem.getLifecyclePhase();
-            final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( nextPhase );
+            final ExecutionPlanItem upstream = upstreamPlan.findLastInPhase( nextPhase );
 
-            if ( inSchedule != null )
+            if ( upstream != null )
             {
                 long startWait = System.currentTimeMillis();
-                inSchedule.waitUntilDone();
-                builtLogItem.addWait( upstreamProject, inSchedule, startWait );
+                upstream.waitUntilDone();
+                builtLogItem.addWait( upstreamProject, upstream, startWait );
             }
             else if ( !upstreamPlan.containsPhase( nextPhase ) )
             {

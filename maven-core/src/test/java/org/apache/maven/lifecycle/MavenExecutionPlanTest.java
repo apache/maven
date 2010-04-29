@@ -46,8 +46,8 @@ public class MavenExecutionPlanTest
         MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
         plan.forceAllComplete();
         final Iterator<ExecutionPlanItem> planItemIterator = plan.iterator();
-        assertFalse( planItemIterator.next().ensureComplete() );
-        assertFalse( planItemIterator.next().ensureComplete() );
+        assertTrue( planItemIterator.next().isDone() );
+        assertTrue( planItemIterator.next().isDone() );
     }
 
     public void testFindLastInPhase()

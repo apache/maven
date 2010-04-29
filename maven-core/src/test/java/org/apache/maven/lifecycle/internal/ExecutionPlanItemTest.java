@@ -31,7 +31,7 @@ public class ExecutionPlanItemTest
     {
         ExecutionPlanItem item = createExecutionPlanItem( "testMojo", null );
         item.setComplete();  // This itself is a valid test
-        assertFalse( item.ensureComplete() );
+        assertTrue( item.isDone() );
     }
 
     public void testWaitUntilDone()
