@@ -59,7 +59,7 @@ public class PluginDescriptorBuilderTest
         assertEquals( "plugin-description", pd.getDescription() );
         assertEquals( false, pd.isIsolatedRealm() );
         assertEquals( true, pd.isInheritedByDefault() );
-        assertEquals( 1, pd.getMojos().size() );
+        assertEquals( 2, pd.getMojos().size() );
         assertEquals( 1, pd.getDependencies().size() );
 
         MojoDescriptor md = pd.getMojos().get( 0 );
@@ -73,6 +73,7 @@ public class PluginDescriptorBuilderTest
         assertEquals( true, md.isInheritedByDefault() );
         assertEquals( false, md.isOnlineRequired() );
         assertEquals( true, md.isProjectRequired() );
+        assertEquals( false, md.isThreadSafe() );
         assertEquals( "package", md.getPhase() );
         assertEquals( "org.apache.maven.plugin.jar.JarMojo", md.getImplementation() );
         assertEquals( "antrun", md.getComponentConfigurator() );
@@ -117,6 +118,13 @@ public class PluginDescriptorBuilderTest
         assertEquals( "maven-plugin-api", cd.getArtifactId() );
         assertEquals( "2.0.6", cd.getVersion() );
         assertEquals( "jar", cd.getType() );
+
+        md = pd.getMojos().get( 1 );
+
+        assertEquals( "war", md.getGoal() );
+        assertEquals( null, md.getDependencyResolutionRequired() );
+        assertEquals( null, md.getDependencyCollectionRequired() );
+        assertEquals( true, md.isThreadSafe() );
     }
 
 }
