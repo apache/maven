@@ -90,7 +90,9 @@ public class DefaultSettingsValidator
 
                 if ( "local".equals( mirror.getId() ) )
                 {
-                    addError( problems, "'mirrors.mirror.id' must not be 'local', this identifier is reserved." );
+                    addWarn( problems, "'mirrors.mirror.id' must not be 'local'"
+                        + ", this identifier is reserved for the local repository"
+                        + ", using it for other repositories will corrupt your repository metadata." );
                 }
 
                 validateStringNotEmpty( problems, "mirrors.mirror.url", mirror.getUrl(), mirror.getId() );
@@ -119,7 +121,9 @@ public class DefaultSettingsValidator
 
             if ( "local".equals( repository.getId() ) )
             {
-                addError( problems, "'" + prefix + ".id' must not be 'local', this identifier is reserved." );
+                addWarn( problems, "'" + prefix + ".id' must not be 'local'"
+                    + ", this identifier is reserved for the local repository"
+                    + ", using it for other repositories will corrupt your repository metadata." );
             }
 
             validateStringNotEmpty( problems, prefix + ".url", repository.getUrl(), repository.getId() );

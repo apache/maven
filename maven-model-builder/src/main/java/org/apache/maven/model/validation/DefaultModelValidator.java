@@ -500,8 +500,10 @@ public class DefaultModelValidator
         {
             if ( "local".equals( repository.getId() ) )
             {
-                addViolation( problems, Severity.ERROR, prefix + ".id", null,
-                              "must not be 'local', this identifier is reserved." );
+                Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+                addViolation( problems, errOn31, prefix + ".id", null, "must not be 'local'"
+                    + ", this identifier is reserved for the local repository"
+                    + ", using it for other repositories will corrupt your repository metadata." );
             }
             if ( "legacy".equals( repository.getLayout() ) )
             {
