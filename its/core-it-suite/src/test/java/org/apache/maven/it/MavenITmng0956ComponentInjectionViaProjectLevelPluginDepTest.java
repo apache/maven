@@ -49,7 +49,7 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.it0081" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0956" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
@@ -58,7 +58,7 @@ public class MavenITmng0956ComponentInjectionViaProjectLevelPluginDepTest
         verifier.resetStreams();
 
         Properties apiProps = verifier.loadProperties( "target/component.properties" );
-        assertEquals( "true", apiProps.getProperty( "org.apache.maven.its.it0081.DefaultComponent" ) );
+        assertEquals( "true", apiProps.getProperty( "org.apache.maven.plugin.coreit.DefaultComponent" ) );
     }
 
 }
