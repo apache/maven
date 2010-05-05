@@ -65,9 +65,6 @@ END SNIPPET: ant-bootstrap -->
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip" />
     <property name="maven.repo.local" value="${user.home}/.m2/repository" />
     <property name="maven.debug" value="-e" />
-    <!--
-    <property name="maven.debug" value="-e -X" />
-    -->
     <property name="maven.test.skip" value="false" />
     <property name="surefire.useFile" value="true" />
     <property name="maven.test.redirectTestOutputToFile" value="${surefire.useFile}" />
