@@ -40,6 +40,8 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
@@ -94,14 +96,17 @@ public class LifecycleWeaveBuilder
     }
 
     public void build( ProjectBuildList projectBuilds, ReactorContext buildContext, List<TaskSegment> taskSegments,
-                       MavenSession session, CompletionService<ProjectSegment> service,
-                       ReactorBuildStatus reactorBuildStatus )
+                       MavenSession session, ExecutorService executoru, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException
     {
         ConcurrentBuildLogger concurrentBuildLogger = new ConcurrentBuildLogger();
+        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executoru );
+
         try
         {
             final List<Future<ProjectSegment>> futures = new ArrayList<Future<ProjectSegment>>();
+            final Map<ProjectSegment, Future<MavenExecutionPlan>> plans =
+                new HashMap<ProjectSegment, Future<MavenExecutionPlan>>();
 
             for ( TaskSegment taskSegment : taskSegments )
             {
@@ -117,13 +122,19 @@ public class LifecycleWeaveBuilder
                 }
                 for ( ProjectSegment projectBuild : segmentChunks )
                 {
+                    plans.put( projectBuild, executoru.submit( createEPFuture( projectBuild, projectArtifacts ) ) );
+                }
+
+                for ( ProjectSegment projectSegment : plans.keySet() )
+                {
+                    executionPlans.put( projectSegment.getProject(), plans.get( projectSegment ).get() );
+
+                }
+                for ( ProjectSegment projectBuild : segmentChunks )
+                {
                     try
                     {
-                        MavenExecutionPlan executionPlan =
-                            builderCommon.resolveBuildPlan( projectBuild.getSession(), projectBuild.getProject(),
-                                                            projectBuild.getTaskSegment(), projectArtifacts );
-
-                        executionPlans.put( projectBuild.getProject(), executionPlan );
+                        final MavenExecutionPlan executionPlan = plans.get( projectBuild ).get();
                         DependencyContext dependencyContext =
                             new DependencyContext( executionPlan, projectBuild.getTaskSegment().isAggregating() );
 
@@ -154,6 +165,21 @@ public class LifecycleWeaveBuilder
         }
         logger.info( concurrentBuildLogger.toString() );
     }
+
+    private Callable<MavenExecutionPlan> createEPFuture( final ProjectSegment projectSegment,
+                                                         final Set<Artifact> projectArtifacts )
+    {
+        return new Callable<MavenExecutionPlan>()
+        {
+            public MavenExecutionPlan call()
+                throws Exception
+            {
+                return builderCommon.resolveBuildPlan( projectSegment.getSession(), projectSegment.getProject(),
+                                                       projectSegment.getTaskSegment(), projectArtifacts );
+            }
+        };
+    }
+
 
     private Callable<ProjectSegment> createCallableForBuildingOneFullModule( final ReactorContext reactorContext,
                                                                              final MavenSession rootSession,
@@ -211,8 +237,8 @@ public class LifecycleWeaveBuilder
                             final Schedule scheduleOfNext = nextPlanItem.getSchedule();
                             if ( scheduleOfNext == null || !scheduleOfNext.isParallel() )
                             {
-                                waitForAppropriateUpstreamExecutionsToFinish( builtLogItem, nextPlanItem,
-                                                                              projectBuild );
+                                waitForAppropriateUpstreamExecutionsToFinish( builtLogItem, nextPlanItem, projectBuild,
+                                                                              scheduleOfNext );
                             }
 
                             for ( ArtifactLink dependencyLink : dependencyLinks )
@@ -249,13 +275,15 @@ public class LifecycleWeaveBuilder
 
     private void waitForAppropriateUpstreamExecutionsToFinish( BuildLogItem builtLogItem,
                                                                ExecutionPlanItem nextPlanItem,
-                                                               ProjectSegment projectBuild )
+                                                               ProjectSegment projectBuild, Schedule scheduleOfNext )
         throws InterruptedException
     {
         for ( MavenProject upstreamProject : projectBuild.getImmediateUpstreamProjects() )
         {
             final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
-            final String nextPhase = nextPlanItem.getLifecyclePhase();
+            final String nextPhase = scheduleOfNext != null && scheduleOfNext.hasUpstreamPhaseDefined()
+                ? scheduleOfNext.getUpstreamPhase()
+                : nextPlanItem.getLifecyclePhase();
             final ExecutionPlanItem upstream = upstreamPlan.findLastInPhase( nextPhase );
 
             if ( upstream != null )

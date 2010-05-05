@@ -126,9 +126,7 @@ public class LifecycleStarter
                     if ( isWeaveMode )
                     {
                         lifecycleDebugLogger.logWeavePlan( session );
-                        CompletionService<ProjectSegment> service =
-                            new ExecutorCompletionService<ProjectSegment>( executor );
-                        lifeCycleWeaveBuilder.build( projectBuilds, callableContext, taskSegments, session, service,
+                        lifeCycleWeaveBuilder.build( projectBuilds, callableContext, taskSegments, session, executor,
                                                      reactorBuildStatus );
                     }
                     else

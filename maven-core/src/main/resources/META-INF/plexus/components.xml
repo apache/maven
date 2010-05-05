@@ -43,20 +43,25 @@
 
       <configuration>
         <schedules>
-            <scheduling>
-                 <lifecycle>default</lifecycle>
-                <schedules>
-                    <schedule>
-                        <phase>test</phase>
-                        <mojoSynchronized>false</mojoSynchronized>
-                        <parallel>true</parallel>
-                    </schedule>
-                    <schedule>
-                        <mojoClass>org.apache.maven.plugins:maven-assembly-plugin</mojoClass>
-                        <mojoSynchronized>true</mojoSynchronized>
-                    </schedule>
-                </schedules>
-            </scheduling>
+          <scheduling>
+            <lifecycle>default</lifecycle>
+            <schedules>
+              <schedule>
+                <phase>test</phase>
+                <mojoSynchronized>false</mojoSynchronized>
+                <parallel>true</parallel>
+              </schedule>
+              <schedule>
+                <pluginKey>org.apache.maven.plugins:maven-assembly-plugin</pluginKey>
+                <mojoSynchronized>true</mojoSynchronized>
+              </schedule>
+              <schedule>
+                <pluginKey>org.apache.maven.plugins:maven-ear-plugin</pluginKey>
+                <mojoGoal>generate-application-xml</mojoGoal>
+                <upstreamPhase>package</upstreamPhase>
+              </schedule>
+            </schedules>
+          </scheduling>
         </schedules>
       </configuration>
     </component>

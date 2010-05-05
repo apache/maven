@@ -15,54 +15,67 @@
 
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.MojoExecution;
 
 /**
  * @author Kristian Rosenvold
  */
-public class Schedule {
+@SuppressWarnings( { "UnusedDeclaration" } )
+public class Schedule
+{
     private String phase;
-    private String mojoClass;
+
+    private String upstreamPhase; // The upstream phase to lock to.
+
+    private String pluginKey;
+
+    private String mojoGoal;
+
     private boolean mojoSynchronized;
     // Indicates that this phase/mojo does not need to respect the reactor-dependency graph
     // (Module lifecycle order still must be respected )
+
     private boolean parallel;
 
-    public Schedule() {
+    public Schedule()
+    {
     }
 
-    public Schedule( String phase, boolean mojoSynchronized, boolean parallel ) {
+    public Schedule( String phase, boolean mojoSynchronized, boolean parallel )
+    {
         this.phase = phase;
         this.mojoSynchronized = mojoSynchronized;
         this.parallel = parallel;
     }
 
 
-    public boolean isMissingPhase(){
-        return null == phase;
-    }
-    public String getPhase() {
+    public String getPhase()
+    {
         return phase;
     }
 
-    public void setPhase(String phase) {
+    public void setPhase( String phase )
+    {
         this.phase = phase;
     }
 
-    public String getMojoClass() {
-        return mojoClass;
+    public String getPluginKey()
+    {
+        return pluginKey;
     }
 
-    public void setMojoClass(String mojoClass) {
-        this.mojoClass = mojoClass;
+    public void setPluginKey( String pluginKey )
+    {
+        this.pluginKey = pluginKey;
     }
 
-    public boolean isMojoSynchronized() {
+    public boolean isMojoSynchronized()
+    {
         return mojoSynchronized;
     }
 
-    public void setMojoSynchronized(boolean mojoSynchronized) {
+    public void setMojoSynchronized( boolean mojoSynchronized )
+    {
         this.mojoSynchronized = mojoSynchronized;
     }
 
@@ -77,14 +90,60 @@ public class Schedule {
         this.parallel = parallel;
     }
 
+    public String getUpstreamPhase()
+    {
+        return upstreamPhase;
+    }
+
+    public void setUpstreamPhase( String upstreamPhase )
+    {
+        this.upstreamPhase = upstreamPhase;
+    }
+
+    public String getMojoGoal()
+    {
+        return mojoGoal;
+    }
+
+    public void setMojoGoal( String mojoGoal )
+    {
+        this.mojoGoal = mojoGoal;
+    }
+
+    public boolean hasUpstreamPhaseDefined()
+    {
+        return getUpstreamPhase() != null;
+    }
+
+    public boolean appliesTo( MojoExecution mojoExecution )
+    {
+        boolean pluginKeyMatches = true;
+        boolean pluginGoalMatches = true;
+        if ( pluginKey == null && mojoGoal == null )
+        {
+            return false;
+        }
+        if ( pluginKey != null )
+        {
+            pluginKeyMatches = pluginKey.equals( mojoExecution.getPlugin().getKey() );
+        }
+        if ( mojoGoal != null )
+        {
+            pluginGoalMatches = mojoGoal.equals( mojoExecution.getGoal() );
+        }
+
+        if ( pluginKeyMatches && pluginGoalMatches )
+        {
+            return true;
+        }
+        return false;
+    }
 
     @Override
-    public String toString() {
-        return "Schedule{" +
-                "phase='" + phase + '\'' +
-                ", mojoClass='" + mojoClass + '\'' +
-                ", mojoSynchronized=" + mojoSynchronized +
-                ", parallel=" + parallel +
-                '}';
+    public String toString()
+    {
+        return "Schedule{" + "phase='" + phase + '\'' + ", upstreamPhase='" + upstreamPhase + '\'' + ", pluginKey='" +
+            pluginKey + '\'' + ", mojoGoal='" + mojoGoal + '\'' + ", mojoSynchronized=" + mojoSynchronized +
+            ", parallel=" + parallel + '}';
     }
 }
