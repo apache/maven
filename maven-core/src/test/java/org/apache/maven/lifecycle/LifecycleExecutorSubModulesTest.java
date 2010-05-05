@@ -21,7 +21,6 @@ import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.lifecycle.internal.LifecycleDependencyResolver;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleModuleBuilder;
-import org.apache.maven.lifecycle.internal.LifecyclePluginAnalyzerImpl;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -66,7 +65,7 @@ public class LifecycleExecutorSubModulesTest
         lifeCycleBuilder = lookup( LifecycleModuleBuilder.class );
         lifeCycleDependencyResolver = lookup( LifecycleDependencyResolver.class );
         lifeCycleExecutionPlanCalculator = lookup( LifecycleExecutionPlanCalculator.class );
-        lifeCyclePluginAnalyzer = lookup( LifecyclePluginAnalyzerImpl.class );
+        lifeCyclePluginAnalyzer = lookup( LifeCyclePluginAnalyzer.class );
         lifeCycleTaskSegmentCalculator = lookup( LifecycleTaskSegmentCalculator.class );
         lookup( ExceptionHandler.class );
     }
