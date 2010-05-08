@@ -54,6 +54,20 @@ END SNIPPET: ant-bootstrap -->
         </or>
       </condition>
     </fail>
+    <available property="maven.home.exists" file="${maven.home}" />
+  </target>
+
+  <target name="prompt-maven-home-exists" depends="isMavenHomeSet" if="maven.home.exists">
+    <input addproperty="maven.home.exists.continue" validargs="yes,no" defaultvalue="no">WARNING:
+The specified target directory
+  ${maven.home}
+already exists. It will be deleted and overwritten by the build.
+Do you want to continue?</input>
+    <fail message="Build was aborted by user">
+      <condition>
+        <equals arg1="${maven.home.exists.continue}" arg2="no" trim="true" casesensitive="false" />
+      </condition>
+    </fail>
   </target>
 
   <target name="init" depends="isMavenHomeSet">
@@ -229,7 +243,7 @@ This goal just validates the presence of that distribution.
     <fail if="build.failed" message="Assembly task seemed to succeed, but couldn't find assembly file: ${maven.assembly}" />
   </target>
 
-  <target name="extract-assembly" depends="init,maven-assembly" description="extracts the maven assembly into maven.home">
+  <target name="extract-assembly" depends="init,prompt-maven-home-exists,maven-assembly" description="extracts the maven assembly into maven.home">
     <echo>Extracting assembly to ${maven.home} ...</echo>
     <!-- If we are starting from scratch make sure the directory is created -->
     <delete dir="${maven.home}" />
