@@ -31,8 +31,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.repository.MirrorSelector;
-import org.apache.maven.settings.Mirror;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -73,8 +71,7 @@ public class DefaultWagonManager
 
     @Requirement
     private UpdateCheckManager updateCheckManager;
-   
-    
+
     //
     // Retriever
     //   
