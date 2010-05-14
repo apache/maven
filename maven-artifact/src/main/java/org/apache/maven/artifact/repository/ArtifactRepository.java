@@ -61,6 +61,9 @@ public interface ArtifactRepository
 
     @Deprecated
     boolean isBlacklisted();
+    
+    @Deprecated
+    void setBlacklisted( boolean blackListed );
 
     //
     // New interface methods for the repository system. 
