@@ -56,6 +56,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "org.codehaus.plexus:plexus-classworlds" );
         artifacts.add( "org.codehaus.plexus:plexus-component-api" );
         artifacts.add( "org.codehaus.plexus:plexus-container-default" );
+        artifacts.add( "plexus:plexus-container-default" );
         artifacts.add( "org.apache.maven:maven-artifact" );
         artifacts.add( "org.apache.maven:maven-artifact-manager" );
         artifacts.add( "org.apache.maven:maven-compat" );
