@@ -41,7 +41,8 @@ import java.util.Set;
 public class LifecyclePluginAnalyzerImpl
     implements LifeCyclePluginAnalyzer
 {
-    @Requirement
+
+    @Requirement( role = LifecycleMapping.class )
     private Map<String, LifecycleMapping> lifecycleMappings;
 
     @Requirement
@@ -49,7 +50,6 @@ public class LifecyclePluginAnalyzerImpl
 
     @Requirement
     private Logger logger;
-
 
     public LifecyclePluginAnalyzerImpl()
     {

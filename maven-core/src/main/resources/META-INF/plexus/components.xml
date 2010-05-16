@@ -17,26 +17,6 @@
   -->
 <component-set>
   <components>
-      <component>
-          <role>org.apache.maven.plugin.MavenPluginCollector</role>
-          <implementation>org.apache.maven.plugin.MavenPluginCollector
-          </implementation>
-      </component>
-      <component>
-        <role>org.apache.maven.lifecycle.DefaultLifecycles</role>
-        <implementation>org.apache.maven.lifecycle.DefaultLifecycles</implementation>
-
-        <requirements>
-          <requirement>
-            <role>org.codehaus.plexus.logging.Logger</role>
-            <field-name>logger</field-name>
-          </requirement>
-          <requirement>
-            <role>org.apache.maven.lifecycle.Lifecycle</role>
-            <field-name>lifecycles</field-name>
-          </requirement>
-        </requirements>
-      </component>
     <component>
       <role>org.apache.maven.lifecycle.DefaultSchedules</role>
       <implementation>org.apache.maven.lifecycle.DefaultSchedules</implementation>
@@ -140,24 +120,6 @@
             </site-deploy>
           </default-phases>
         </configuration>
-      </component>
-      <component>
-        <role>org.apache.maven.lifecycle.LifeCyclePluginAnalyzer</role>
-        <implementation>org.apache.maven.lifecycle.internal.LifecyclePluginAnalyzerImpl</implementation>
-          <requirements>
-              <requirement>
-                <role>org.apache.maven.lifecycle.DefaultLifecycles</role>
-              </requirement>
-              <requirement>
-                <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-                <field-name>lifecycleMappings</field-name>
-              </requirement>
-              <requirement>
-                <role>org.codehaus.plexus.logging.Logger</role>
-                <role-hint>default</role-hint>
-                <field-name>logger</field-name>
-              </requirement>
-          </requirements>
       </component>
 
     <component>
