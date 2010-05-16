@@ -114,7 +114,7 @@
           </phases>
           <default-phases>
             <clean>
-              org.apache.maven.plugins:maven-clean-plugin:2.4:clean
+              org.apache.maven.plugins:maven-clean-plugin:2.4.1:clean
             </clean>
           </default-phases>
         </configuration>
