@@ -122,15 +122,18 @@ public class DefaultInheritanceAssembler
 
                 for ( Plugin element : src )
                 {
-                    Object key = getPluginKey( element );
+                    if ( element.isInherited() || !element.getExecutions().isEmpty() )
+                    {
+                        // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
+                        Plugin plugin = new Plugin();
+                        plugin.setGroupId( element.getGroupId() );
+                        plugin.setArtifactId( element.getArtifactId() );
+                        mergePlugin( plugin, element, sourceDominant, context );
 
-                    // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
-                    Plugin plugin = new Plugin();
-                    plugin.setGroupId( element.getGroupId() );
-                    plugin.setArtifactId( element.getArtifactId() );
-                    mergePlugin( plugin, element, sourceDominant, context );
+                        Object key = getPluginKey( element );
 
-                    master.put( key, plugin );
+                        master.put( key, plugin );
+                    }
                 }
 
                 Map<Object, List<Plugin>> predecessors = new LinkedHashMap<Object, List<Plugin>>();
@@ -171,6 +174,21 @@ public class DefaultInheritanceAssembler
 
                 target.setPlugins( result );
             }
+        }
+
+        @Override
+        protected void mergePlugin( Plugin target, Plugin source, boolean sourceDominant, Map<Object, Object> context )
+        {
+            if ( source.isInherited() )
+            {
+                mergeConfigurationContainer( target, source, sourceDominant, context );
+            }
+            mergePlugin_GroupId( target, source, sourceDominant, context );
+            mergePlugin_ArtifactId( target, source, sourceDominant, context );
+            mergePlugin_Version( target, source, sourceDominant, context );
+            mergePlugin_Extensions( target, source, sourceDominant, context );
+            mergePlugin_Dependencies( target, source, sourceDominant, context );
+            mergePlugin_Executions( target, source, sourceDominant, context );
         }
 
         @Override
