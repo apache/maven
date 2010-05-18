@@ -20,11 +20,7 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -132,7 +128,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
     {
         File file = getFile( verifier, gid, aid, ver, cls, ext );
         assertTrue( file.getAbsolutePath(), file.isFile() );
-        assertEquals( sha1, calcHash( file, "SHA-1" ) );
+        assertEquals( sha1, ItUtils.calcHash( file, "SHA-1" ) );
     }
 
     private void assertMetadata( Verifier verifier, String gid, String aid, String ver, String sha1 )
@@ -141,7 +137,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         File file = getFile( verifier, gid, aid, ver, "", "pom" );
         file = new File( file.getParent(), "maven-metadata-maven-core-it.xml" );
         assertTrue( file.getAbsolutePath(), file.isFile() );
-        assertEquals( sha1, calcHash( file, "SHA-1" ) );
+        assertEquals( sha1, ItUtils.calcHash( file, "SHA-1" ) );
     }
 
     private void assertMetadata( Verifier verifier, String gid, String aid, String sha1 )
@@ -150,7 +146,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         File file = getFile( verifier, gid, aid, "0.2", "", "pom" );
         file = new File( file.getParentFile().getParent(), "maven-metadata-maven-core-it.xml" );
         assertTrue( file.getAbsolutePath(), file.isFile() );
-        assertEquals( sha1, calcHash( file, "SHA-1" ) );
+        assertEquals( sha1, ItUtils.calcHash( file, "SHA-1" ) );
     }
 
     private File getFile( Verifier verifier, String gid, String aid, String ver, String cls, String ext )
@@ -167,45 +163,6 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
         }
         buffer.append( '.' ).append( ext );
         return new File( buffer.toString() );
-    }
-
-    private String calcHash( File file, String algo )
-        throws IOException, NoSuchAlgorithmException
-    {
-        MessageDigest digester = MessageDigest.getInstance( algo );
-
-        FileInputStream is = new FileInputStream( file );
-        try
-        {
-            DigestInputStream dis = new DigestInputStream( is, digester );
-
-            for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
-            {
-                // just read it
-            }
-        }
-        finally
-        {
-            is.close();
-        }
-
-        byte[] digest = digester.digest();
-
-        StringBuffer hash = new StringBuffer( digest.length * 2 );
-
-        for ( int i = 0; i < digest.length; i++ )
-        {
-            int b = digest[i] & 0xFF;
-
-            if ( b < 0x10 )
-            {
-                hash.append( '0' );
-            }
-
-            hash.append( Integer.toHexString( b ) );
-        }
-
-        return hash.toString();
     }
 
 }

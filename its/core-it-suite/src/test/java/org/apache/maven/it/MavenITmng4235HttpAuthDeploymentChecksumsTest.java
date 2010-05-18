@@ -20,12 +20,8 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -187,50 +183,11 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
     private void assertHash( Verifier verifier, String dataFile, String hashExt, String algo )
         throws Exception
     {
-        String actualHash = calcHash( new File( verifier.getBasedir(), dataFile ), algo );
+        String actualHash = ItUtils.calcHash( new File( verifier.getBasedir(), dataFile ), algo );
 
         String expectedHash = verifier.loadLines( dataFile + hashExt, "UTF-8" ).get( 0 ).toString().trim();
 
         assertTrue( "expected=" + expectedHash + ", actual=" + actualHash, expectedHash.equalsIgnoreCase( actualHash ) );
-    }
-
-    private String calcHash( File file, String algo )
-        throws IOException, NoSuchAlgorithmException
-    {
-        MessageDigest digester = MessageDigest.getInstance( algo );
-
-        FileInputStream is = new FileInputStream( file );
-        try
-        {
-            DigestInputStream dis = new DigestInputStream( is, digester );
-
-            for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
-            {
-                // just read it
-            }
-        }
-        finally
-        {
-            is.close();
-        }
-
-        byte[] digest = digester.digest();
-
-        StringBuffer hash = new StringBuffer( digest.length * 2 );
-
-        for ( int i = 0; i < digest.length; i++ )
-        {
-            int b = digest[i] & 0xFF;
-
-            if ( b < 0x10 )
-            {
-                hash.append( '0' );
-            }
-
-            hash.append( Integer.toHexString( b ) );
-        }
-
-        return hash.toString();
     }
 
 }
