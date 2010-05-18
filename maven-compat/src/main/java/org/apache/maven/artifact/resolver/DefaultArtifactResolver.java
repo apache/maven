@@ -135,28 +135,25 @@ public class DefaultArtifactResolver
         }
     }
 
-    private void injectSession( RepositoryRequest request )
+    private void injectSession1( RepositoryRequest request, MavenSession session )
     {
-        MavenSession session = legacySupport.getSession();
-
         if ( session != null )
         {
             request.setOffline( session.isOffline() );
+            request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
             request.setTransferListener( session.getRequest().getTransferListener() );
         }
     }
 
-    private void injectSession( ArtifactResolutionRequest request )
+    private void injectSession2( ArtifactResolutionRequest request, MavenSession session )
     {
-        MavenSession session = legacySupport.getSession();
+        injectSession1( request, session );
 
         if ( session != null )
         {
-            request.setOffline( session.isOffline() );
             request.setServers( session.getRequest().getServers() );
             request.setMirrors( session.getRequest().getMirrors() );
             request.setProxies( session.getRequest().getProxies() );
-            request.setTransferListener( session.getRequest().getTransferListener() );
         }
     }
 
@@ -164,7 +161,7 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
-        injectSession( request );
+        injectSession1( request, legacySupport.getSession() );
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         resolve( artifact, request, resolutionListener, false );
@@ -174,7 +171,7 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
-        injectSession( request );
+        injectSession1( request, legacySupport.getSession() );
         request.setLocalRepository( localRepository );
         request.setRemoteRepositories( remoteRepositories );
         resolve( artifact, request, null, true );
@@ -435,7 +432,7 @@ public class DefaultArtifactResolver
             .setCollectionFilter( filter )
             .setListeners( listeners );
 
-        injectSession( request );
+        injectSession2( request, legacySupport.getSession() );
 
         return resolveWithExceptions( request );
     }
