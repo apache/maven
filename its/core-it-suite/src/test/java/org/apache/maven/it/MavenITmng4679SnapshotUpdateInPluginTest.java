@@ -62,7 +62,7 @@ public class MavenITmng4679SnapshotUpdateInPluginTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        assertChecksum( verifier, "jar", "cc7df75103468dd798397a81d0162d70faf92455" );
+        assertChecksum( verifier, "jar", "2ea5c3d713bbaba7b87746449b91cd00e876703d" );
         assertChecksum( verifier, "pom", "7de357a948a8bb2357759c7c585adb504e579bad" );
 
         filterProps.setProperty( "@repo@", "repo-2" );
