@@ -345,7 +345,7 @@ public class MavenModelMerger
         if ( src != null )
         {
             DeploymentRepository tgt = target.getRepository();
-            if ( tgt == null )
+            if ( sourceDominant || tgt == null )
             {
                 tgt = new DeploymentRepository();
                 target.setRepository( tgt );
@@ -363,7 +363,7 @@ public class MavenModelMerger
         if ( src != null )
         {
             DeploymentRepository tgt = target.getSnapshotRepository();
-            if ( tgt == null )
+            if ( sourceDominant || tgt == null )
             {
                 tgt = new DeploymentRepository();
                 target.setSnapshotRepository( tgt );
@@ -380,7 +380,7 @@ public class MavenModelMerger
         if ( src != null )
         {
             Site tgt = target.getSite();
-            if ( tgt == null )
+            if ( sourceDominant || tgt == null )
             {
                 tgt = new Site();
                 target.setSite( tgt );
