@@ -82,6 +82,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0109ReleaseUpdateTest.class );
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4684DistMngtOverridenByProfileTest.class );
         suite.addTestSuite( MavenITmng4679SnapshotUpdateInPluginTest.class );
         suite.addTestSuite( MavenITmng4677DisabledPluginConfigInheritanceTest.class );
         suite.addTestSuite( MavenITmng4666CoreRealmImportTest.class );
