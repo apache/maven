@@ -747,7 +747,11 @@ public class MavenCli
 
         ArtifactTransferListener transferListener;
 
-        if ( request.isInteractiveMode() )
+        if ( quiet )
+        {
+            transferListener = new QuietMavenTransferListener( cliRequest.stdout );
+        }
+        else if ( request.isInteractiveMode() )
         {
             transferListener = new ConsoleMavenTransferListener( cliRequest.stdout );
         }
