@@ -107,6 +107,18 @@ public abstract class AbstractStringBasedModelInterpolator
         recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
     }
 
+    public AbstractStringBasedModelInterpolator setPathTranslator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
+        return this;
+    }
+
+    public AbstractStringBasedModelInterpolator setUrlNormalizer( UrlNormalizer urlNormalizer )
+    {
+        this.urlNormalizer = urlNormalizer;
+        return this;
+    }
+
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
                                                     final ModelBuildingRequest config,
                                                     final ModelProblemCollector problems )

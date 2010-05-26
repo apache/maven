@@ -47,6 +47,12 @@ public class DefaultSuperPomProvider
     @Requirement
     private ModelProcessor modelProcessor;
 
+    public DefaultSuperPomProvider setModelProcessor( ModelProcessor modelProcessor )
+    {
+        this.modelProcessor = modelProcessor;
+        return this;
+    }
+
     public Model getSuperModel( String version )
     {
         if ( superModel == null )
