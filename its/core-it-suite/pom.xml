@@ -205,6 +205,7 @@ under the License.
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
+              <skip>false</skip>
               <forkMode>once</forkMode>
               <argLine>${surefireMemory}</argLine>
               <systemProperties combine.children="append">
