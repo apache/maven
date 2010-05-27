@@ -60,7 +60,7 @@ public class ProjectInheritanceTest
         // load everything...
         MavenProject project1 = getProjectWithDependencies( pom1 );
 
-        assertEquals( pom0Basedir, project1.getParent().getBasedir().getCanonicalFile() );
+        assertEquals( pom0Basedir, project1.getParent().getBasedir() );
         System.out.println("Project " + project1.getId() + " " + project1);
         Set set = project1.getArtifacts();
         assertNotNull("No artifacts", set);
