@@ -28,6 +28,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.Maven;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -163,7 +164,12 @@ public class MavenCli
         {
             return e.exitCode;
         }
-        catch( Exception e )
+        catch ( UnrecognizedOptionException e )
+        {
+            // pure user error, suppress stack trace
+            return 1;
+        }
+        catch ( Exception e )
         {
             CLIReportingUtils.showError( logger, "Error executing Maven.", e, cliRequest.showErrors );
             
