@@ -38,7 +38,7 @@ public class MavenITmng4403LenientDependencyPomParsingTest
 
     public MavenITmng4403LenientDependencyPomParsingTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.3,3.0-alpha-1),[3.0-beta-2,)" );
     }
 
     /**
