@@ -48,7 +48,7 @@
     <wagonVersion>1.0-beta-6</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.4</cipherVersion>
-    <modelloVersion>1.3</modelloVersion>
+    <modelloVersion>1.4</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
   </properties>
