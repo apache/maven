@@ -19,9 +19,12 @@
     <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+
   <artifactId>maven-repository</artifactId>
+
   <name>Maven Repository</name>
   <description>Repository System interface for Maven.</description>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -53,6 +56,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
       <plugin>

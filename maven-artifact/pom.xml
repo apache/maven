@@ -20,6 +20,7 @@
   </parent>
 
   <artifactId>maven-artifact</artifactId>
+
   <name>Maven Artifact</name>
 
   <dependencies>
@@ -28,7 +29,7 @@
       <artifactId>plexus-utils</artifactId>
     </dependency>
   </dependencies>
-   
+
   <build>
     <plugins>
       <plugin>
