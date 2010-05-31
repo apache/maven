@@ -24,7 +24,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelEventListener;
 
 @Deprecated
 public class DefaultProjectBuilderConfiguration
@@ -53,12 +52,6 @@ public class DefaultProjectBuilderConfiguration
     public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
     {
         super.setSystemProperties( executionProperties );
-        return this;
-    }
-
-    public ProjectBuilderConfiguration setModelEventListeners( List<ModelEventListener> listeners )
-    {
-        super.setModelEventListeners( listeners );
         return this;
     }
 

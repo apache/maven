@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelEventListener;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -55,8 +54,6 @@ public class DefaultProjectBuildingRequest
     private List<Mirror> mirrors;
 
     private List<Proxy> proxies;
-
-    private List<ModelEventListener> listeners;
 
     private MavenProject project;
 
@@ -284,17 +281,6 @@ public class DefaultProjectBuildingRequest
             this.userProperties.clear();
         }
 
-        return this;
-    }
-
-    public List<ModelEventListener> getModelEventListeners()
-    {
-        return listeners;
-    }
-
-    public ProjectBuildingRequest setModelEventListeners( List<ModelEventListener> listeners )
-    {
-        this.listeners = listeners;
         return this;
     }
 
