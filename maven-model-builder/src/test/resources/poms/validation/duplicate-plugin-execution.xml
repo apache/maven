@@ -28,23 +28,33 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>test</groupId>
-          <artifactId>managed-duplicate</artifactId>
-        </plugin>
-        <plugin>
-          <groupId>test</groupId>
-          <artifactId>managed-duplicate</artifactId>
+          <groupId>build</groupId>
+          <artifactId>managed-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>test</phase>
+            </execution>
+            <execution>
+              <phase>test</phase>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>test</groupId>
-        <artifactId>duplicate</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>test</groupId>
-        <artifactId>duplicate</artifactId>
+        <groupId>build</groupId>
+        <artifactId>plugin</artifactId>
+        <executions>
+          <execution>
+            <id>a</id>
+            <phase>test</phase>
+          </execution>
+          <execution>
+            <id>a</id>
+            <phase>test</phase>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -57,22 +67,34 @@ under the License.
           <plugins>
             <plugin>
               <groupId>profile</groupId>
-              <artifactId>managed-duplicate</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>profile</groupId>
-              <artifactId>managed-duplicate</artifactId>
+              <artifactId>managed-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>b</id>
+                  <phase>test</phase>
+                </execution>
+                <execution>
+                  <id>b</id>
+                  <phase>test</phase>
+                </execution>
+              </executions>
             </plugin>
           </plugins>
         </pluginManagement>
         <plugins>
           <plugin>
             <groupId>profile</groupId>
-            <artifactId>duplicate</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>profile</groupId>
-            <artifactId>duplicate</artifactId>
+            <artifactId>plugin</artifactId>
+            <executions>
+              <execution>
+                <id>c</id>
+                <phase>test</phase>
+              </execution>
+              <execution>
+                <id>c</id>
+                <phase>test</phase>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

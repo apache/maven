@@ -433,10 +433,25 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validateRaw( "duplicate-plugin.xml" );
 
-        assertViolations( result, 0, 0, 2 );
+        assertViolations( result, 0, 0, 4 );
 
         assertTrue( result.getWarnings().get( 0 ).contains( "duplicate declaration of plugin test:duplicate" ) );
         assertTrue( result.getWarnings().get( 1 ).contains( "duplicate declaration of plugin test:managed-duplicate" ) );
+        assertTrue( result.getWarnings().get( 2 ).contains( "duplicate declaration of plugin profile:duplicate" ) );
+        assertTrue( result.getWarnings().get( 3 ).contains( "duplicate declaration of plugin profile:managed-duplicate" ) );
+    }
+
+    public void testDuplicatePluginExecution()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "duplicate-plugin-execution.xml" );
+
+        assertViolations( result, 0, 4, 0 );
+
+        assertContains( result.getErrors().get( 0 ), "duplicate execution with id a" );
+        assertContains( result.getErrors().get( 1 ), "duplicate execution with id default" );
+        assertContains( result.getErrors().get( 2 ), "duplicate execution with id c" );
+        assertContains( result.getErrors().get( 3 ), "duplicate execution with id b" );
     }
 
     public void testReservedRepositoryId()
