@@ -26,6 +26,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -51,7 +52,7 @@ import java.util.Properties;
  * </pre>
  * 
  * Expressions that reference non-existing objects or use invalid collection/array indices silently resolve to
- * <code>null</code>.
+ * <code>null</code>. For collections and arrays, the special index "*" can be used to iterate all elements.
  * 
  * @goal eval
  * @phase initialize
@@ -176,8 +177,13 @@ public class EvalMojo
 
             for ( int i = 0; i < expressions.length; i++ )
             {
-                Object value = ExpressionUtil.evaluate( expressions[i], contexts );
-                PropertyUtil.store( expressionProperties, expressions[i].replace( '/', '.' ), value );
+                Map values = ExpressionUtil.evaluate( expressions[i], contexts );
+                for ( Iterator it = values.keySet().iterator(); it.hasNext(); )
+                {
+                    Object key = it.next();
+                    Object value = values.get( key );
+                    PropertyUtil.store( expressionProperties, key.toString().replace( '/', '.' ), value );
+                }
             }
         }
 
