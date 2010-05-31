@@ -37,7 +37,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
 
     public MavenITmng1803PomValidationErrorIncludesLineNumberTest()
     {
-        super( "[3.0-beta-1,)" );
+        super( "[3.0-beta-2,)" );
     }
 
     /**
