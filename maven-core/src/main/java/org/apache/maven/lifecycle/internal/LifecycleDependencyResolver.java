@@ -18,14 +18,15 @@ package org.apache.maven.lifecycle.internal;
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.MultipleArtifactsNotFoundException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -49,6 +50,9 @@ public class LifecycleDependencyResolver
 
     @Requirement
     private Logger logger;
+
+    @Requirement
+    private ArtifactFactory artifactFactory;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public LifecycleDependencyResolver()
@@ -117,16 +121,19 @@ public class LifecycleDependencyResolver
         Set<Artifact> artifacts =
             getProjectDependencies( project, scopesToCollect, scopesToResolve, session, aggregating,
                                     projectArtifacts );
-        updateProjectArtifacts( project, artifacts );
-    }
 
-    private void updateProjectArtifacts( MavenProject project, Set<Artifact> artifacts )
-    {
         project.setResolvedArtifacts( artifacts );
 
         if ( project.getDependencyArtifacts() == null )
         {
-            project.setDependencyArtifacts( getDependencyArtifacts( project, artifacts ) );
+            try
+            {
+                project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+            }
+            catch ( InvalidDependencyVersionException e )
+            {
+                throw new LifecycleExecutionException( e );
+            }
         }
     }
 
@@ -195,25 +202,6 @@ public class LifecycleDependencyResolver
             throw e;
         }
         return artifacts;
-    }
-
-    private Set<Artifact> getDependencyArtifacts( MavenProject project, Set<Artifact> artifacts )
-    {
-        Set<String> directDependencies = new HashSet<String>( project.getDependencies().size() * 2 );
-        for ( Dependency dependency : project.getDependencies() )
-        {
-            directDependencies.add( dependency.getManagementKey() );
-        }
-
-        Set<Artifact> dependencyArtifacts = new LinkedHashSet<Artifact>( project.getDependencies().size() * 2 );
-        for ( Artifact artifact : artifacts )
-        {
-            if ( directDependencies.contains( artifact.getDependencyConflictId() ) )
-            {
-                dependencyArtifacts.add( artifact );
-            }
-        }
-        return dependencyArtifacts;
     }
 
     private boolean areAllArtifactsInReactor( Collection<MavenProject> projects, Collection<Artifact> artifacts )
