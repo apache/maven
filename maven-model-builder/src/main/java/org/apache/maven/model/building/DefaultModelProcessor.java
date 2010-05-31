@@ -42,6 +42,18 @@ public class DefaultModelProcessor
     @Requirement
     private ModelReader reader;
 
+    public DefaultModelProcessor setModelLocator( ModelLocator locator )
+    {
+        this.locator = locator;
+        return this;
+    }
+
+    public DefaultModelProcessor setModelReader( ModelReader reader )
+    {
+        this.reader = reader;
+        return this;
+    }
+
     public File locatePom( File projectDirectory )
     {
         return locator.locatePom( projectDirectory );

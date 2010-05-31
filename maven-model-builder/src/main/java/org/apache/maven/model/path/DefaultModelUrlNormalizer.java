@@ -41,6 +41,12 @@ public class DefaultModelUrlNormalizer
     @Requirement
     private UrlNormalizer urlNormalizer;
 
+    public DefaultModelUrlNormalizer setUrlNormalizer( UrlNormalizer urlNormalizer )
+    {
+        this.urlNormalizer = urlNormalizer;
+        return this;
+    }
+
     public void normalize( Model model, ModelBuildingRequest request )
     {
         if ( model == null )

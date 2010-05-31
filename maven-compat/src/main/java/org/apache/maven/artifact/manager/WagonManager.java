@@ -52,5 +52,7 @@ public interface WagonManager
 
     void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException;
+    
+    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
 
 }

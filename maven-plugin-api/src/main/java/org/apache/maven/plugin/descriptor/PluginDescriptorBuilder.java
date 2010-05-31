@@ -63,14 +63,14 @@ public class PluginDescriptorBuilder
 
         if ( isolatedRealm != null )
         {
-            pluginDescriptor.setIsolatedRealm( Boolean.valueOf( isolatedRealm ).booleanValue() );
+            pluginDescriptor.setIsolatedRealm( Boolean.parseBoolean( isolatedRealm ) );
         }
 
         String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
 
         if ( inheritedByDefault != null )
         {
-            pluginDescriptor.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
+            pluginDescriptor.setInheritedByDefault( Boolean.parseBoolean( inheritedByDefault ) );
         }
 
         // ----------------------------------------------------------------------
@@ -213,42 +213,49 @@ public class PluginDescriptorBuilder
 
         if ( directInvocationOnly != null )
         {
-            mojo.setDirectInvocationOnly( Boolean.valueOf( directInvocationOnly ).booleanValue() );
+            mojo.setDirectInvocationOnly( Boolean.parseBoolean( directInvocationOnly ) );
         }
 
         String requiresProject = c.getChild( "requiresProject" ).getValue();
 
         if ( requiresProject != null )
         {
-            mojo.setProjectRequired( Boolean.valueOf( requiresProject ).booleanValue() );
+            mojo.setProjectRequired( Boolean.parseBoolean( requiresProject ) );
         }
 
         String requiresReports = c.getChild( "requiresReports" ).getValue();
 
         if ( requiresReports != null )
         {
-            mojo.setRequiresReports( Boolean.valueOf( requiresReports ).booleanValue() );
+            mojo.setRequiresReports( Boolean.parseBoolean( requiresReports ) );
         }
 
         String aggregator = c.getChild( "aggregator" ).getValue();
 
         if ( aggregator != null )
         {
-            mojo.setAggregator( Boolean.valueOf( aggregator ).booleanValue() );
+            mojo.setAggregator( Boolean.parseBoolean( aggregator ) );
         }
 
         String requiresOnline = c.getChild( "requiresOnline" ).getValue();
 
         if ( requiresOnline != null )
         {
-            mojo.setOnlineRequired( Boolean.valueOf( requiresOnline ).booleanValue() );
+            mojo.setOnlineRequired( Boolean.parseBoolean( requiresOnline ) );
         }
 
         String inheritedByDefault = c.getChild( "inheritedByDefault" ).getValue();
 
         if ( inheritedByDefault != null )
         {
-            mojo.setInheritedByDefault( Boolean.valueOf( inheritedByDefault ).booleanValue() );
+            mojo.setInheritedByDefault( Boolean.parseBoolean( inheritedByDefault ) );
+        }
+
+        String threadSafe = c.getChild( "threadSafe" ).getValue();
+
+        if ( threadSafe != null )
+        {
+            mojo.setThreadSafe( Boolean.parseBoolean( threadSafe ) );
         }
 
         // ----------------------------------------------------------------------
@@ -273,7 +280,7 @@ public class PluginDescriptorBuilder
 
             String required = d.getChild( "required" ).getValue();
 
-            parameter.setRequired( Boolean.valueOf( required ).booleanValue() );
+            parameter.setRequired( Boolean.parseBoolean( required ) );
 
             PlexusConfiguration editableConfig = d.getChild( "editable" );
 
@@ -282,7 +289,7 @@ public class PluginDescriptorBuilder
             {
                 String editable = d.getChild( "editable" ).getValue();
 
-                parameter.setEditable( editable == null || Boolean.valueOf( editable ).booleanValue() );
+                parameter.setEditable( editable == null || Boolean.parseBoolean( editable ) );
             }
 
             parameter.setDescription( d.getChild( "description" ).getValue() );

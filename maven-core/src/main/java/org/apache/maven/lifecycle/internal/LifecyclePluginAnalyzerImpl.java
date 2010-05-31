@@ -37,11 +37,12 @@ import java.util.Set;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component(role = LifecyclePluginAnalyzerImpl.class)
+@Component(role = LifeCyclePluginAnalyzer.class)
 public class LifecyclePluginAnalyzerImpl
     implements LifeCyclePluginAnalyzer
 {
-    @Requirement
+
+    @Requirement( role = LifecycleMapping.class )
     private Map<String, LifecycleMapping> lifecycleMappings;
 
     @Requirement
@@ -49,7 +50,6 @@ public class LifecyclePluginAnalyzerImpl
 
     @Requirement
     private Logger logger;
-
 
     public LifecyclePluginAnalyzerImpl()
     {

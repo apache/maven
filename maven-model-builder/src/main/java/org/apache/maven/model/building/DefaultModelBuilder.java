@@ -125,6 +125,110 @@ public class DefaultModelBuilder
     @Requirement
     private ReportingConverter reportingConverter;
 
+    public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
+    {
+        this.modelProcessor = modelProcessor;
+        return this;
+    }
+
+    public DefaultModelBuilder setModelValidator( ModelValidator modelValidator )
+    {
+        this.modelValidator = modelValidator;
+        return this;
+    }
+
+    public DefaultModelBuilder setModelNormalizer( ModelNormalizer modelNormalizer )
+    {
+        this.modelNormalizer = modelNormalizer;
+        return this;
+    }
+
+    public DefaultModelBuilder setModelInterpolator( ModelInterpolator modelInterpolator )
+    {
+        this.modelInterpolator = modelInterpolator;
+        return this;
+    }
+
+    public DefaultModelBuilder setModelPathTranslator( ModelPathTranslator modelPathTranslator )
+    {
+        this.modelPathTranslator = modelPathTranslator;
+        return this;
+    }
+
+    public DefaultModelBuilder setModelUrlNormalizer( ModelUrlNormalizer modelUrlNormalizer )
+    {
+        this.modelUrlNormalizer = modelUrlNormalizer;
+        return this;
+    }
+
+    public DefaultModelBuilder setSuperPomProvider( SuperPomProvider superPomProvider )
+    {
+        this.superPomProvider = superPomProvider;
+        return this;
+    }
+
+    public DefaultModelBuilder setProfileSelector( ProfileSelector profileSelector )
+    {
+        this.profileSelector = profileSelector;
+        return this;
+    }
+
+    public DefaultModelBuilder setProfileInjector( ProfileInjector profileInjector )
+    {
+        this.profileInjector = profileInjector;
+        return this;
+    }
+
+    public DefaultModelBuilder setInheritanceAssembler( InheritanceAssembler inheritanceAssembler )
+    {
+        this.inheritanceAssembler = inheritanceAssembler;
+        return this;
+    }
+
+    public DefaultModelBuilder setDependencyManagementImporter(
+                                                                DependencyManagementImporter dependencyManagementImporter )
+    {
+        this.dependencyManagementImporter = dependencyManagementImporter;
+        return this;
+    }
+
+    public DefaultModelBuilder setDependencyManagementInjector(
+                                                                DependencyManagementInjector dependencyManagementInjector )
+    {
+        this.dependencyManagementInjector = dependencyManagementInjector;
+        return this;
+    }
+
+    public DefaultModelBuilder setLifecycleBindingsInjector( LifecycleBindingsInjector lifecycleBindingsInjector )
+    {
+        this.lifecycleBindingsInjector = lifecycleBindingsInjector;
+        return this;
+    }
+
+    public DefaultModelBuilder setPluginConfigurationExpander( PluginConfigurationExpander pluginConfigurationExpander )
+    {
+        this.pluginConfigurationExpander = pluginConfigurationExpander;
+        return this;
+    }
+
+    public DefaultModelBuilder setPluginManagementInjector( PluginManagementInjector pluginManagementInjector )
+    {
+        this.pluginManagementInjector = pluginManagementInjector;
+        return this;
+    }
+
+    public DefaultModelBuilder setReportConfigurationExpander( ReportConfigurationExpander reportConfigurationExpander )
+    {
+        this.reportConfigurationExpander = reportConfigurationExpander;
+        return this;
+    }
+
+    public DefaultModelBuilder setReportingConverter( ReportingConverter reportingConverter )
+    {
+        this.reportingConverter = reportingConverter;
+        return this;
+    }
+
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
     {

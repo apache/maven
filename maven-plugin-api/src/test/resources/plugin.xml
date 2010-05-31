@@ -52,6 +52,10 @@
         </requirement>
       </requirements>
     </mojo>
+    <mojo>
+      <goal>war</goal>
+      <threadSafe>true</threadSafe>
+    </mojo>
   </mojos>
   <dependencies>
     <dependency>

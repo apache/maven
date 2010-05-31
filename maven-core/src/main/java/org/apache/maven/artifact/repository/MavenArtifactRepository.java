@@ -370,6 +370,11 @@ public class MavenArtifactRepository
         return false;
     }
 
+    public void setBlacklisted( boolean blackListed )
+    {
+        // no op
+    }
+    
     public boolean isUniqueVersion()
     {
         return true;

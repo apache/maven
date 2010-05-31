@@ -14,6 +14,7 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import org.apache.maven.InternalErrorException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
@@ -23,13 +24,19 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.plugin.*;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 
 import java.util.Set;
 
@@ -55,18 +62,24 @@ public class BuilderCommon
     @Requirement
     private ExecutionEventCatapult eventCatapult;
 
+    @Requirement
+    private Logger logger;
+    
+
+
     @SuppressWarnings({"UnusedDeclaration"})
     public BuilderCommon()
     {
     }
 
-    public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-                          LifecycleDependencyResolver lifecycleDependencyResolver )
+    public BuilderCommon(LifecycleDebugLogger lifecycleDebugLogger,
+                         LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+                         LifecycleDependencyResolver lifecycleDependencyResolver, Logger logger)
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
         this.lifecycleDependencyResolver = lifecycleDependencyResolver;
+        this.logger = logger;
     }
 
     public MavenExecutionPlan resolveBuildPlan( MavenSession session, MavenProject project, TaskSegment taskSegment,
@@ -80,6 +93,29 @@ public class BuilderCommon
             lifeCycleExecutionPlanCalculator.calculateExecutionPlan( session, project, taskSegment.getTasks() );
         lifecycleDebugLogger.debugProjectPlan( project, executionPlan );
 
+        if ( session.getRequest().isThreadConfigurationPresent() )
+        {
+            final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
+            if ( !unsafePlugins.isEmpty() )
+            {
+                logger.warn( "*****************************************************************" );
+                logger.warn( "* Your build is requesting parallel execution, but project      *" );
+                logger.warn( "* contains the following plugin(s) that are not marked as       *" );
+                logger.warn( "* @threadSafe to support parallel building.                     *" );
+                logger.warn( "* While this /may/ work fine, please look for plugin updates    *" );
+                logger.warn( "* and/or request plugins be made thread-safe.                   *" );
+                logger.warn( "* If reporting an issue, report it against the plugin in        *" );
+                logger.warn( "* question, not against maven-core                              *" );
+                logger.warn( "*****************************************************************" );
+                logger.warn( "The following plugins are not marked @threadSafe in " + project.getName() + ":" );
+                for ( Plugin unsafePlugin : unsafePlugins )
+                {
+                    logger.warn( unsafePlugin.getId() );
+                }
+                logger.warn( "*****************************************************************" );
+            }
+        }
+
         // TODO: once we have calculated the build plan then we should accurately be able to download
         // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
         // this later by looking at the build plan. Would be better to just batch download everything required
@@ -92,8 +128,13 @@ public class BuilderCommon
 
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
-                                  final MavenProject mavenProject, final Exception e, final long buildStartTime )
+                                  final MavenProject mavenProject, Exception e, final long buildStartTime )
     {
+        if ( e instanceof RuntimeException )
+        {
+            e = new InternalErrorException( "Internal error: " + e, e );
+        }
+
         buildContext.getResult().addException( e );
 
         long buildEndTime = System.currentTimeMillis();

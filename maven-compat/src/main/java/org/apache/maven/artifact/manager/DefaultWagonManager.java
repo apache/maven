@@ -23,9 +23,12 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.repository.MirrorSelector;
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
@@ -37,6 +40,7 @@ import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 
 @Component(role=WagonManager.class) 
 public class DefaultWagonManager
@@ -45,11 +49,20 @@ public class DefaultWagonManager
 {
 
     @Requirement
+    private Logger logger;    
+    
+    @Requirement
     private LegacySupport legacySupport;
 
     @Requirement
     private SettingsDecrypter settingsDecrypter;
-
+        
+    @Requirement
+    private MirrorSelector mirrorSelector;   
+    
+    @Requirement
+    private ArtifactRepositoryFactory artifactRepositoryFactory;
+    
     public AuthenticationInfo getAuthenticationInfo( String id )
     {
         MavenSession session = legacySupport.getSession();
@@ -140,5 +153,29 @@ public class DefaultWagonManager
     {
         getArtifact( artifact, remoteRepositories, null, false );
     }
+    
+    @Deprecated
+    public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
+    {
+        
+        Mirror mirror = mirrorSelector.getMirror( repository, legacySupport.getSession().getSettings().getMirrors() );
+        
+        if ( mirror != null )
+        {
+            String id = mirror.getId();
+            if ( id == null )
+            {
+                // TODO: this should be illegal in settings.xml
+                id = repository.getId();
+            }
+
+            logger.debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
+            
+            repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(),
+                                                                     repository.getLayout(), repository.getSnapshots(),
+                                                                     repository.getReleases() );
+        }
+        return repository;
+    }     
 
 }

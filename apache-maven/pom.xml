@@ -23,9 +23,12 @@
     <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+
   <artifactId>apache-maven</artifactId>
   <packaging>pom</packaging>
+
   <name>Maven Distribution</name>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

@@ -50,7 +50,8 @@ public class DefaultModelProblem
      * Creates a new problem with the specified message and exception.
      * 
      * @param message The message describing the problem, may be {@code null}.
-     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
+     * @param severity The severity level of the problem, may be {@code null} to default to
+     *            {@link ModelProblem.Severity#ERROR}.
      * @param source The source of the problem, may be {@code null}.
      * @param lineNumber The one-based index of the line containing the error or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
@@ -67,7 +68,8 @@ public class DefaultModelProblem
      * Creates a new problem with the specified message and exception.
      * 
      * @param message The message describing the problem, may be {@code null}.
-     * @param severity The severity level of the problem, may be {@code null} to default to {@link Severity#ERROR}.
+     * @param severity The severity level of the problem, may be {@code null} to default to
+     *            {@link ModelProblem.Severity#ERROR}.
      * @param source A hint about the source of the problem like a file path, may be {@code null}.
      * @param lineNumber The one-based index of the line containing the problem or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.

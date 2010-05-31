@@ -65,7 +65,7 @@ public class DefaultSchedules
             Schedule schedule = null;
             if ( scheduling != null )
             {
-                schedule = scheduling.getSchedule( mojoExecution.getPlugin() );
+                schedule = scheduling.getSchedule( mojoExecution );
                 if ( schedule == null )
                 {
                     schedule = scheduling.getSchedule( lifeCyclePhase );

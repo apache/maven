@@ -29,6 +29,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,6 +40,8 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 /**
@@ -59,7 +62,7 @@ import java.util.concurrent.Future;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component(role = LifecycleWeaveBuilder.class)
+@Component( role = LifecycleWeaveBuilder.class )
 public class LifecycleWeaveBuilder
 {
 
@@ -75,16 +78,16 @@ public class LifecycleWeaveBuilder
     @Requirement
     private ExecutionEventCatapult eventCatapult;
 
-    private Map<MavenProject, MavenExecutionPlan> executionPlans = new HashMap<MavenProject, MavenExecutionPlan>( );
+    private Map<MavenProject, MavenExecutionPlan> executionPlans = new HashMap<MavenProject, MavenExecutionPlan>();
 
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecycleWeaveBuilder()
     {
     }
 
-    public LifecycleWeaveBuilder(MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
-                                 ExecutionEventCatapult eventCatapult)
+    public LifecycleWeaveBuilder( MojoExecutor mojoExecutor, BuilderCommon builderCommon, Logger logger,
+                                  ExecutionEventCatapult eventCatapult )
     {
         this.mojoExecutor = mojoExecutor;
         this.builderCommon = builderCommon;
@@ -93,53 +96,52 @@ public class LifecycleWeaveBuilder
     }
 
     public void build( ProjectBuildList projectBuilds, ReactorContext buildContext, List<TaskSegment> taskSegments,
-                       MavenSession session, CompletionService<ProjectSegment> service,
-                       ReactorBuildStatus reactorBuildStatus )
+                       MavenSession session, ExecutorService executoru, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException
     {
         ConcurrentBuildLogger concurrentBuildLogger = new ConcurrentBuildLogger();
+        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executoru );
+
         try
         {
             final List<Future<ProjectSegment>> futures = new ArrayList<Future<ProjectSegment>>();
+            final Map<ProjectSegment, Future<MavenExecutionPlan>> plans =
+                new HashMap<ProjectSegment, Future<MavenExecutionPlan>>();
 
             for ( TaskSegment taskSegment : taskSegments )
             {
                 ProjectBuildList segmentChunks = projectBuilds.getByTaskSegment( taskSegment );
-                    ThreadOutputMuxer muxer = null;  // new ThreadOutputMuxer( segmentChunks, System.out );
-                Set<String> projectArtifacts = new HashSet<String>();
-                Set<Artifact> projectArtifactsA = new HashSet<Artifact>();
-                for (ProjectSegment segmentChunk : segmentChunks) {
+                Set<Artifact> projectArtifacts = new HashSet<Artifact>();
+                for ( ProjectSegment segmentChunk : segmentChunks )
+                {
                     Artifact artifact = segmentChunk.getProject().getArtifact();
-                    if (artifact != null) {
-                        projectArtifacts.add( ArtifactUtils.key(artifact));
-                        projectArtifactsA.add( artifact);
+                    if ( artifact != null )
+                    {
+                        projectArtifacts.add( artifact );
                     }
+                }
+                for ( ProjectSegment projectBuild : segmentChunks )
+                {
+                    plans.put( projectBuild, executoru.submit( createEPFuture( projectBuild, projectArtifacts ) ) );
+                }
+
+                for ( ProjectSegment projectSegment : plans.keySet() )
+                {
+                    executionPlans.put( projectSegment.getProject(), plans.get( projectSegment ).get() );
+
                 }
                 for ( ProjectSegment projectBuild : segmentChunks )
                 {
                     try
                     {
-                        MavenExecutionPlan executionPlan =
-                            builderCommon.resolveBuildPlan( projectBuild.getSession(), projectBuild.getProject(),
-                                                            projectBuild.getTaskSegment(), projectArtifactsA );
-                        for (Artifact dependency : projectBuild.getProject().getDependencyArtifacts()) {
-                            String s = ArtifactUtils.key(dependency);
-                            if ( projectArtifacts.contains(s)){
-                                dependency.setFile( null);
-                                dependency.setResolved( false);
-                                dependency.setRepository( null);
-                            }
-                        }
-                        
-                        executionPlans.put( projectBuild.getProject(), executionPlan );
+                        final MavenExecutionPlan executionPlan = plans.get( projectBuild ).get();
                         DependencyContext dependencyContext =
                             new DependencyContext( executionPlan, projectBuild.getTaskSegment().isAggregating() );
 
                         final Callable<ProjectSegment> projectBuilder =
                             createCallableForBuildingOneFullModule( buildContext, session, reactorBuildStatus,
-                                                                    executionPlan, projectBuild, muxer,
-                                                                    dependencyContext, concurrentBuildLogger,
-                                                                    projectBuilds );
+                                                                    executionPlan, projectBuild, dependencyContext,
+                                                                    concurrentBuildLogger );
 
                         futures.add( service.submit( projectBuilder ) );
                     }
@@ -164,15 +166,28 @@ public class LifecycleWeaveBuilder
         logger.info( concurrentBuildLogger.toString() );
     }
 
+    private Callable<MavenExecutionPlan> createEPFuture( final ProjectSegment projectSegment,
+                                                         final Set<Artifact> projectArtifacts )
+    {
+        return new Callable<MavenExecutionPlan>()
+        {
+            public MavenExecutionPlan call()
+                throws Exception
+            {
+                return builderCommon.resolveBuildPlan( projectSegment.getSession(), projectSegment.getProject(),
+                                                       projectSegment.getTaskSegment(), projectArtifacts );
+            }
+        };
+    }
+
+
     private Callable<ProjectSegment> createCallableForBuildingOneFullModule( final ReactorContext reactorContext,
                                                                              final MavenSession rootSession,
                                                                              final ReactorBuildStatus reactorBuildStatus,
                                                                              final MavenExecutionPlan executionPlan,
                                                                              final ProjectSegment projectBuild,
-                                                                             final ThreadOutputMuxer muxer,
                                                                              final DependencyContext dependencyContext,
-                                                                             final ConcurrentBuildLogger concurrentBuildLogger,
-                                                                             final ProjectBuildList projectBuilds )
+                                                                             final ConcurrentBuildLogger concurrentBuildLogger )
     {
         return new Callable<ProjectSegment>()
         {
@@ -193,38 +208,49 @@ public class LifecycleWeaveBuilder
 
                 eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, projectBuild.getSession(), null );
 
+                Collection<ArtifactLink> dependencyLinks = getUpstreamReactorDependencies( projectBuild );
+
                 try
                 {
-                    while (current != null && !reactorBuildStatus.isHaltedOrBlacklisted( projectBuild.getProject() ))
+                    PhaseRecorder phaseRecorder = new PhaseRecorder( projectBuild.getProject() );
+                    long totalMojoTime = 0;
+                    long mojoStart;
+                    while ( current != null && !reactorBuildStatus.isHaltedOrBlacklisted( projectBuild.getProject() ) )
                     {
-                        PhaseRecorder phaseRecorder = new PhaseRecorder( projectBuild.getProject() );
 
                         BuildLogItem builtLogItem =
                             concurrentBuildLogger.createBuildLogItem( projectBuild.getProject(), current );
                         final Schedule schedule = current.getSchedule();
 
-                        buildExecutionPlanItem(current, phaseRecorder, schedule, reactorContext, projectBuild, dependencyContext);
+                        mojoStart = System.currentTimeMillis();
+                        buildExecutionPlanItem( current, phaseRecorder, schedule, reactorContext, projectBuild,
+                                                dependencyContext );
+                        totalMojoTime += ( System.currentTimeMillis() - mojoStart );
 
                         current.setComplete();
                         builtLogItem.setComplete();
 
                         ExecutionPlanItem nextPlanItem = planItems.hasNext() ? planItems.next() : null;
-                        if ( nextPlanItem != null )
+                        if ( nextPlanItem != null && phaseRecorder.isDifferentPhase( nextPlanItem.getMojoExecution() ) )
                         {
 
                             final Schedule scheduleOfNext = nextPlanItem.getSchedule();
                             if ( scheduleOfNext == null || !scheduleOfNext.isParallel() )
                             {
-                                waitForAppropriateUpstreamExecutionsToFinish(builtLogItem, nextPlanItem, projectBuild);
+                                waitForAppropriateUpstreamExecutionsToFinish( builtLogItem, nextPlanItem, projectBuild,
+                                                                              scheduleOfNext );
                             }
-                            reResolveReactorDependencies(nextPlanItem, projectBuild);
+
+                            for ( ArtifactLink dependencyLink : dependencyLinks )
+                            {
+                                dependencyLink.resolveFromUpstream();
+                            }
                         }
                         current = nextPlanItem;
                     }
 
-                    final long wallClockTime = System.currentTimeMillis() - buildStartTime;
                     final BuildSuccess summary =
-                        new BuildSuccess( projectBuild.getProject(), wallClockTime ); // - waitingTime 
+                        new BuildSuccess( projectBuild.getProject(), totalMojoTime ); // - waitingTime
                     reactorContext.getResult().addBuildSummary( summary );
                     eventCatapult.fire( ExecutionEvent.Type.ProjectSucceeded, projectBuild.getSession(), null );
                 }
@@ -247,29 +273,24 @@ public class LifecycleWeaveBuilder
         };
     }
 
-    private void reResolveReactorDependencies(ExecutionPlanItem nextPlanItem, ProjectSegment projectBuild) {
-        if ( requiresReResolutionOfUpstreamReactorArtifacts( nextPlanItem ) )
-        {
-            reresolveUpstreamProjectArtifacts(projectBuild);
-        }
-        else if (requiresReResolutionOfUpstreamTestScopedReactorArtifacts( nextPlanItem))
-        {
-            reresolveUpstreamTestScopedArtifacts( projectBuild);
-        }
-    }
-
-    private void waitForAppropriateUpstreamExecutionsToFinish(BuildLogItem builtLogItem, ExecutionPlanItem nextPlanItem, ProjectSegment projectBuild) throws InterruptedException {
+    private void waitForAppropriateUpstreamExecutionsToFinish( BuildLogItem builtLogItem,
+                                                               ExecutionPlanItem nextPlanItem,
+                                                               ProjectSegment projectBuild, Schedule scheduleOfNext )
+        throws InterruptedException
+    {
         for ( MavenProject upstreamProject : projectBuild.getImmediateUpstreamProjects() )
         {
             final MavenExecutionPlan upstreamPlan = executionPlans.get( upstreamProject );
-            final String nextPhase = nextPlanItem.getLifecyclePhase();
-            final ExecutionPlanItem inSchedule = upstreamPlan.findLastInPhase( nextPhase );
+            final String nextPhase = scheduleOfNext != null && scheduleOfNext.hasUpstreamPhaseDefined()
+                ? scheduleOfNext.getUpstreamPhase()
+                : nextPlanItem.getLifecyclePhase();
+            final ExecutionPlanItem upstream = upstreamPlan.findLastInPhase( nextPhase );
 
-            if ( inSchedule != null )
+            if ( upstream != null )
             {
                 long startWait = System.currentTimeMillis();
-                inSchedule.waitUntilDone();
-                builtLogItem.addWait( upstreamProject, inSchedule, startWait );
+                upstream.waitUntilDone();
+                builtLogItem.addWait( upstreamProject, upstream, startWait );
             }
             else if ( !upstreamPlan.containsPhase( nextPhase ) )
             {
@@ -286,58 +307,66 @@ public class LifecycleWeaveBuilder
         }
     }
 
-    private void reresolveUpstreamProjectArtifacts(ProjectSegment projectBuild) {
-        for ( MavenProject upstreamProject : projectBuild.getTransitiveUpstreamProjects() ){
+    private Collection<ArtifactLink> getUpstreamReactorDependencies( ProjectSegment projectBuild )
+    {
+        Collection<ArtifactLink> result = new ArrayList<ArtifactLink>();
+        for ( MavenProject upstreamProject : projectBuild.getTransitiveUpstreamProjects() )
+        {
             Artifact upStreamArtifact = upstreamProject.getArtifact();
-            Artifact dependencyArtifact =  findDependency(projectBuild.getProject(), upStreamArtifact);
-            if (dependencyArtifact != null){
-                dependencyArtifact.setFile( upStreamArtifact.getFile());
-                dependencyArtifact.setResolved( true );
-                dependencyArtifact.setRepository( upStreamArtifact.getRepository());
+            if ( upStreamArtifact != null )
+            {
+                Artifact dependencyArtifact = findDependency( projectBuild.getProject(), upStreamArtifact );
+                if ( dependencyArtifact != null )
+                {
+                    result.add( new ArtifactLink( dependencyArtifact, upStreamArtifact ) );
+                }
             }
 
-        }
-    }
-
-    private void reresolveUpstreamTestScopedArtifacts(ProjectSegment projectBuild) {
-        for ( MavenProject upstreamProject : projectBuild.getTransitiveUpstreamProjects() ){
-            Artifact upStreamArtifact = findTestScopedArtifact(upstreamProject);
-            Artifact dependencyArtifact =  findDependency(projectBuild.getProject(), upStreamArtifact);
-            if (dependencyArtifact != null){
-                dependencyArtifact.setFile( upStreamArtifact.getFile());
-                dependencyArtifact.setResolved( upStreamArtifact.isResolved());
-                dependencyArtifact.setRepository( upStreamArtifact.getRepository());
+            Artifact upStreamTestScopedArtifact = findTestScopedArtifact( upstreamProject );
+            if ( upStreamTestScopedArtifact != null )
+            {
+                Artifact dependencyArtifact = findDependency( projectBuild.getProject(), upStreamArtifact );
+                if ( dependencyArtifact != null )
+                {
+                    result.add( new ArtifactLink( dependencyArtifact, upStreamTestScopedArtifact ) );
+                }
             }
-
         }
+        return result;
     }
 
-    private Artifact findTestScopedArtifact(MavenProject upstreamProject) {
-        if ( upstreamProject == null){
+
+    private Artifact findTestScopedArtifact( MavenProject upstreamProject )
+    {
+        if ( upstreamProject == null )
+        {
             return null;
         }
-        
+
         List<Artifact> artifactList = upstreamProject.getAttachedArtifacts();
-        for (Artifact artifact : artifactList) {
-            if (Artifact.SCOPE_TEST.equals( artifact.getScope())){
+        for ( Artifact artifact : artifactList )
+        {
+            if ( Artifact.SCOPE_TEST.equals( artifact.getScope() ) )
+            {
                 return artifact;
             }
         }
         return null;
     }
 
-    private static Artifact findDependency(MavenProject project, Artifact upStreamArtifact) {
-        if (upStreamArtifact == null){
+    private static Artifact findDependency( MavenProject project, Artifact upStreamArtifact )
+    {
+        if ( upStreamArtifact == null )
+        {
             return null;
         }
-        
-        String key = ArtifactUtils.key( upStreamArtifact.getGroupId(),
-                                        upStreamArtifact.getArtifactId(),
+
+        String key = ArtifactUtils.key( upStreamArtifact.getGroupId(), upStreamArtifact.getArtifactId(),
                                         upStreamArtifact.getVersion() );
         final Set<Artifact> deps = project.getDependencyArtifacts();
         for ( Artifact dep : deps )
         {
-            String depKey = ArtifactUtils.key(dep.getGroupId(), dep.getArtifactId(), dep.getVersion());
+            String depKey = ArtifactUtils.key( dep.getGroupId(), dep.getArtifactId(), dep.getVersion() );
             if ( key.equals( depKey ) )
             {
                 return dep;
@@ -347,31 +376,21 @@ public class LifecycleWeaveBuilder
 
     }
 
-    private boolean requiresReResolutionOfUpstreamReactorArtifacts( ExecutionPlanItem nextExecutionPlanItem )
+    private void buildExecutionPlanItem( ExecutionPlanItem current, PhaseRecorder phaseRecorder, Schedule schedule,
+                                         ReactorContext reactorContext, ProjectSegment projectBuild,
+                                         DependencyContext dependencyContext )
+        throws LifecycleExecutionException
     {
-        final String phase = nextExecutionPlanItem.getLifecyclePhase();
-        return "package".equals(phase) ||  "install".equals( phase ) || "compile".equals( phase );
-    }
-
-    private boolean requiresReResolutionOfUpstreamTestScopedReactorArtifacts( ExecutionPlanItem nextExecutionPlanItem )
-    {
-        final String phase = nextExecutionPlanItem.getLifecyclePhase();
-        return "package".equals(phase) || "install".equals( phase ) || "compile".equals( phase ) || "test-compile".equals( phase );
-    }
-
-    private void buildExecutionPlanItem(ExecutionPlanItem current, PhaseRecorder phaseRecorder, Schedule schedule, ReactorContext reactorContext, ProjectSegment projectBuild, DependencyContext dependencyContext) throws LifecycleExecutionException {
         if ( schedule != null && schedule.isMojoSynchronized() )
         {
             synchronized ( current.getPlugin() )
             {
-                buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext,
-                                        phaseRecorder );
+                buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext, phaseRecorder );
             }
         }
         else
         {
-            buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext,
-                                    phaseRecorder );
+            buildExecutionPlanItem( reactorContext, current, projectBuild, dependencyContext, phaseRecorder );
         }
     }
 
@@ -419,4 +438,26 @@ public class LifecycleWeaveBuilder
     {
         properties.setProperty( "maven3.weaveMode", "true" );
     }
+
+    static class ArtifactLink
+    {
+        private final Artifact artifactInThis;
+
+        private final Artifact upstream;
+
+        ArtifactLink( Artifact artifactInThis, Artifact upstream )
+        {
+            this.artifactInThis = artifactInThis;
+            this.upstream = upstream;
+        }
+
+        public void resolveFromUpstream()
+        {
+            artifactInThis.setFile( upstream.getFile() );
+            artifactInThis.setRepository( upstream.getRepository() );
+            artifactInThis.setResolved( true ); // Or maybe upstream.isResolved()....
+
+        }
+    }
+
 }

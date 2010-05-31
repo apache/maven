@@ -191,7 +191,7 @@ public class MojoExecutor
         }
     }
 
-    private List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session,
+    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session,
                                                         ProjectIndex projectIndex, DependencyContext dependencyContext )
         throws LifecycleExecutionException
     {

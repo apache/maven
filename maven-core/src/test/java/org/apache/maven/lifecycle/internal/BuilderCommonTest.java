@@ -70,7 +70,8 @@ public class BuilderCommonTest
         final LifecycleDebugLogger logger = new LifecycleDebugLogger( new LoggerStub() );
         final LifecycleDependencyResolver lifecycleDependencyResolver =
             new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), new LoggerStub() );
-        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver );
+        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver,
+                                  new LoggerStub() );
     }
 
 }

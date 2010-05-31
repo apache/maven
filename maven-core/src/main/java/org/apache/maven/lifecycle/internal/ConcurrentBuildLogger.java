@@ -14,13 +14,12 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,10 +79,17 @@ public class ConcurrentBuildLogger
     {
         StringBuilder result = new StringBuilder();
 
-        Multimap<MavenProject, BuildLogItem> multiMap = ArrayListMultimap.create();
+        Map<MavenProject, Collection<BuildLogItem>> multiMap = new HashMap<MavenProject, Collection<BuildLogItem>>();
         for ( BuildLogItem builtLogItem : items )
         {
-            multiMap.put( builtLogItem.getProject(), builtLogItem );
+            MavenProject project = builtLogItem.getProject();
+            Collection<BuildLogItem> bag = multiMap.get( project );
+            if ( bag == null )
+            {
+                bag = new ArrayList<BuildLogItem>();
+                multiMap.put( project, bag );
+            }
+            bag.add( builtLogItem );
         }
 
         result.append( "digraph build" );

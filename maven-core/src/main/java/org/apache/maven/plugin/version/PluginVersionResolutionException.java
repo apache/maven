@@ -87,10 +87,10 @@ public class PluginVersionResolutionException
 
         if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
         {
-            repos += ", ";
-
             for ( ArtifactRepository repository : remoteRepositories )
             {
+                repos += ", ";
+
                 if ( repository != null )
                 {
                     repos += repository.getId() + " (" + repository.getUrl() + ")";

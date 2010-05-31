@@ -84,6 +84,11 @@ public class DefaultModelValidatorTest
         return problems;
     }
 
+    private void assertContains( String msg, String substring )
+    {
+        assertTrue( "\"" + substring + "\" was not found in: " + msg, msg.contains( substring ) );
+    }
+
     @Override
     protected void setUp()
         throws Exception
@@ -439,14 +444,53 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "reserved-repository-id.xml" );
 
-        assertViolations( result, 0, 4, 0 );
+        assertViolations( result, 0, 0, 4 );
 
-        assertTrue( result.getErrors().get( 0 ).contains( "'repositories.repository.id' must not be 'local'" ) );
-        assertTrue( result.getErrors().get( 1 ).contains(
-                                                          "'pluginRepositories.pluginRepository.id' must not be 'local'" ) );
-        assertTrue( result.getErrors().get( 2 ).contains( "'distributionManagement.repository.id' must not be 'local'" ) );
-        assertTrue( result.getErrors().get( 3 ).contains(
-                                                          "'distributionManagement.snapshotRepository.id' must not be 'local'" ) );
+        assertContains( result.getWarnings().get( 0 ), "'repositories.repository.id'" + " must not be 'local'" );
+        assertContains( result.getWarnings().get( 1 ), "'pluginRepositories.pluginRepository.id' must not be 'local'" );
+        assertContains( result.getWarnings().get( 2 ), "'distributionManagement.repository.id' must not be 'local'" );
+        assertContains( result.getWarnings().get( 3 ),
+                        "'distributionManagement.snapshotRepository.id' must not be 'local'" );
+    }
+
+    public void testMissingPluginDependencyGroupId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-plugin-dependency-groupId.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( ":a:" ) );
+    }
+
+    public void testMissingPluginDependencyArtifactId()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-plugin-dependency-artifactId.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:" ) );
+    }
+
+    public void testMissingPluginDependencyVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-plugin-dependency-version.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:a" ) );
+    }
+
+    public void testBadPluginDependencyVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-plugin-dependency-version.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
     }
 
 }

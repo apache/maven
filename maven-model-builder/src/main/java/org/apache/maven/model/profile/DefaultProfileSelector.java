@@ -43,7 +43,16 @@ public class DefaultProfileSelector
 {
 
     @Requirement( role = ProfileActivator.class )
-    private List<ProfileActivator> activators;
+    private List<ProfileActivator> activators = new ArrayList<ProfileActivator>();
+
+    public DefaultProfileSelector addProfileActivator( ProfileActivator profileActivator )
+    {
+        if ( profileActivator != null )
+        {
+            activators.add( profileActivator );
+        }
+        return this;
+    }
 
     public List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
                                             ModelProblemCollector problems )

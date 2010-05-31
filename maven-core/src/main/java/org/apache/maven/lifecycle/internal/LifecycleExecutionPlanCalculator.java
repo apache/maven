@@ -30,7 +30,6 @@ import java.util.List;
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold  (extract interface only)
  *         <p/>
- *         NOTE: interface is not part of any public api and can be changed or deleted without prior notice.
  */
 public interface LifecycleExecutionPlanCalculator
 {
@@ -38,5 +37,12 @@ public interface LifecycleExecutionPlanCalculator
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException;
+
+    public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+        throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+        PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException;
+
+
 
 }

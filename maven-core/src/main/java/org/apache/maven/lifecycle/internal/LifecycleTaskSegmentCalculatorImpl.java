@@ -15,14 +15,23 @@
 package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.*;
+import org.apache.maven.lifecycle.LifecycleNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,7 +45,7 @@ import java.util.List;
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 
-@Component(role = LifecycleTaskSegmentCalculator.class)
+@Component( role = LifecycleTaskSegmentCalculator.class )
 public class LifecycleTaskSegmentCalculatorImpl
     implements LifecycleTaskSegmentCalculator
 {
@@ -48,6 +57,27 @@ public class LifecycleTaskSegmentCalculatorImpl
 
     public LifecycleTaskSegmentCalculatorImpl()
     {
+    }
+
+    public List<TaskSegment> calculateTaskSegments( MavenSession session )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginVersionResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException
+    {
+
+        MavenProject rootProject = session.getTopLevelProject();
+
+        List<String> tasks = session.getGoals();
+
+        if ( tasks == null || tasks.isEmpty() )
+        {
+            if ( !StringUtils.isEmpty( rootProject.getDefaultGoal() ) )
+            {
+                tasks = Arrays.asList( StringUtils.split( rootProject.getDefaultGoal() ) );
+            }
+        }
+
+        return calculateTaskSegments( session, tasks );
     }
 
     public List<TaskSegment> calculateTaskSegments( MavenSession session, List<String> tasks )

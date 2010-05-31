@@ -19,7 +19,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Wraps individual MojoExecutions, containing information about completion status and scheduling.
@@ -35,9 +35,7 @@ public class ExecutionPlanItem
     private final Schedule schedule;
     // Completeness just indicates that it has been run or failed
 
-    private final AtomicBoolean complete = new AtomicBoolean( false );
-
-    private final Object monitor = new Object();
+    private final CountDownLatch done = new CountDownLatch( 1 );
 
     public ExecutionPlanItem( MojoExecution mojoExecution, Schedule schedule )
     {
@@ -57,47 +55,23 @@ public class ExecutionPlanItem
 
     public void setComplete()
     {
-        boolean transitionSuccessful = ensureComplete();
-        if ( !transitionSuccessful )
-        {
-            throw new IllegalStateException( "Expected to be able to setComplete node, but was complete already" );
-        }
+        done.countDown();
     }
 
-    public boolean ensureComplete()
+    public boolean isDone()
     {
-        boolean f = complete.compareAndSet( false, true );
-        notifyListeners();
-        return f;
-    }
-
-    private void notifyListeners()
-    {
-        synchronized ( monitor )
-        {
-            monitor.notifyAll();
-        }
+        return done.getCount() < 1;
     }
 
     public void forceComplete()
     {
-        final boolean b = complete.getAndSet( true );
-        if ( !b )
-        {
-            notifyListeners();
-        } // Release anyone waiting for us
+        setComplete();
     }
 
     public void waitUntilDone()
         throws InterruptedException
     {
-        synchronized ( monitor )
-        {
-            while ( !complete.get() )
-            {
-                monitor.wait( 100 );
-            }
-        }
+        done.await();
     }
 
     public Schedule getSchedule()

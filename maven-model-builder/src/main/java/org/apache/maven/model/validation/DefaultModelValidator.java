@@ -256,12 +256,7 @@ public class DefaultModelValidator
                     validateBoolean( "build.plugins.plugin.extensions", problems, errOn30, p.getExtensions(),
                                      p.getKey(), p );
 
-                    for ( Dependency d : p.getDependencies() )
-                    {
-                        validateEnum( "build.plugins.plugin[" + p.getKey() + "].dependencies.dependency.scope",
-                                      problems, errOn30, d.getScope(), d.getManagementKey(), d, "compile", "runtime",
-                                      "system" );
-                    }
+                    validateEffectivePluginDependencies( problems, p, request );
                 }
 
                 validateResources( problems, build.getResources(), "build.resources.resource", request );
@@ -368,68 +363,21 @@ public class DefaultModelValidator
     }
 
     private void validateEffectiveDependencies( ModelProblemCollector problems, List<Dependency> dependencies,
-                                                boolean managed, ModelBuildingRequest request )
+                                                boolean management, ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
-        String prefix = managed ? "dependencyManagement.dependencies.dependency." : "dependencies.dependency.";
+        String prefix = management ? "dependencyManagement.dependencies.dependency." : "dependencies.dependency.";
 
         for ( Dependency d : dependencies )
         {
-            validateId( prefix + "artifactId", problems, d.getArtifactId(), d.getManagementKey(), d );
-
-            validateId( prefix + "groupId", problems, d.getGroupId(), d.getManagementKey(), d );
-
-            if ( !managed )
-            {
-                validateStringNotEmpty( prefix + "type", problems, Severity.ERROR, d.getType(), d.getManagementKey(), d );
-
-                validateStringNotEmpty( prefix + "version", problems, Severity.ERROR, d.getVersion(),
-                                        d.getManagementKey(), d );
-            }
-
-            if ( "system".equals( d.getScope() ) )
-            {
-                String systemPath = d.getSystemPath();
-
-                if ( StringUtils.isEmpty( systemPath ) )
-                {
-                    addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "is missing.",
-                                  d );
-                }
-                else
-                {
-                    File sysFile = new File( systemPath );
-                    if ( !sysFile.isAbsolute() )
-                    {
-                        addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(),
-                                      "must specify an absolute path but is " + systemPath, d );
-                    }
-                    else if ( !sysFile.isFile() )
-                    {
-                        String msg = "refers to a non-existing file " + sysFile.getAbsolutePath();
-                        systemPath = systemPath.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
-                        String jdkHome =
-                            request.getSystemProperties().getProperty( "java.home", "" ) + File.separator + "..";
-                        if ( systemPath.startsWith( jdkHome ) )
-                        {
-                            msg += ". Please verify that you run Maven using a JDK and not just a JRE.";
-                        }
-                        addViolation( problems, Severity.WARNING, prefix + "systemPath", d.getManagementKey(), msg, d );
-                    }
-                }
-            }
-            else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
-            {
-                addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "must be omitted."
-                    + " This field may only be specified for a dependency with system scope.", d );
-            }
+            validateEffectiveDependency( problems, d, management, prefix, request );
 
             if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
             {
                 validateBoolean( prefix + "optional", problems, errOn30, d.getOptional(), d.getManagementKey(), d );
 
-                if ( !managed )
+                if ( !management )
                 {
                     validateVersion( prefix + "version", problems, errOn30, d.getVersion(), d.getManagementKey(), d );
 
@@ -441,6 +389,81 @@ public class DefaultModelValidator
                                   "provided", "compile", "runtime", "test", "system" );
                 }
             }
+        }
+    }
+
+    private void validateEffectivePluginDependencies( ModelProblemCollector problems, Plugin plugin,
+                                                      ModelBuildingRequest request )
+    {
+        List<Dependency> dependencies = plugin.getDependencies();
+
+        if ( !dependencies.isEmpty() )
+        {
+            String prefix = "build.plugins.plugin[" + plugin.getKey() + "].dependencies.dependency.";
+
+            Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
+
+            for ( Dependency d : dependencies )
+            {
+                validateEffectiveDependency( problems, d, false, prefix, request );
+
+                validateVersion( prefix + "version", problems, errOn30, d.getVersion(), d.getManagementKey(), d );
+
+                validateEnum( prefix + "scope", problems, errOn30, d.getScope(), d.getManagementKey(), d, "compile",
+                              "runtime", "system" );
+            }
+        }
+    }
+
+    private void validateEffectiveDependency( ModelProblemCollector problems, Dependency d, boolean management,
+                                              String prefix, ModelBuildingRequest request )
+    {
+        validateId( prefix + "artifactId", problems, d.getArtifactId(), d.getManagementKey(), d );
+
+        validateId( prefix + "groupId", problems, d.getGroupId(), d.getManagementKey(), d );
+
+        if ( !management )
+        {
+            validateStringNotEmpty( prefix + "type", problems, Severity.ERROR, d.getType(), d.getManagementKey(), d );
+
+            validateStringNotEmpty( prefix + "version", problems, Severity.ERROR, d.getVersion(), d.getManagementKey(),
+                                    d );
+        }
+
+        if ( "system".equals( d.getScope() ) )
+        {
+            String systemPath = d.getSystemPath();
+
+            if ( StringUtils.isEmpty( systemPath ) )
+            {
+                addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "is missing.", d );
+            }
+            else
+            {
+                File sysFile = new File( systemPath );
+                if ( !sysFile.isAbsolute() )
+                {
+                    addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(),
+                                  "must specify an absolute path but is " + systemPath, d );
+                }
+                else if ( !sysFile.isFile() )
+                {
+                    String msg = "refers to a non-existing file " + sysFile.getAbsolutePath();
+                    systemPath = systemPath.replace( '/', File.separatorChar ).replace( '\\', File.separatorChar );
+                    String jdkHome =
+                        request.getSystemProperties().getProperty( "java.home", "" ) + File.separator + "..";
+                    if ( systemPath.startsWith( jdkHome ) )
+                    {
+                        msg += ". Please verify that you run Maven using a JDK and not just a JRE.";
+                    }
+                    addViolation( problems, Severity.WARNING, prefix + "systemPath", d.getManagementKey(), msg, d );
+                }
+            }
+        }
+        else if ( StringUtils.isNotEmpty( d.getSystemPath() ) )
+        {
+            addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "must be omitted."
+                + " This field may only be specified for a dependency with system scope.", d );
         }
     }
 
@@ -481,8 +504,10 @@ public class DefaultModelValidator
         {
             if ( "local".equals( repository.getId() ) )
             {
-                addViolation( problems, Severity.ERROR, prefix + ".id", null,
-                              "must not be 'local', this identifier is reserved.", repository );
+                Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+                addViolation( problems, errOn31, prefix + ".id", null, "must not be 'local'"
+                    + ", this identifier is reserved for the local repository"
+                    + ", using it for other repositories will corrupt your repository metadata.", repository );
             }
             if ( "legacy".equals( repository.getLayout() ) )
             {

@@ -44,6 +44,12 @@ public class DefaultModelPathTranslator
     @Requirement
     private PathTranslator pathTranslator;
 
+    public DefaultModelPathTranslator setPathTranslator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
+        return this;
+    }
+
     public void alignToBaseDirectory( Model model, File basedir, ModelBuildingRequest request )
     {
         if ( model == null || basedir == null )

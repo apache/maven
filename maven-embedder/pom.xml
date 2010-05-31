@@ -18,8 +18,11 @@
     <artifactId>maven</artifactId>
     <version>3.0-SNAPSHOT</version>
   </parent>
+
   <artifactId>maven-embedder</artifactId>
+
   <name>Maven Embedder</name>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -72,6 +75,7 @@
       <artifactId>commons-cli</artifactId>
     </dependency>
   </dependencies>
+
   <build>
     <resources>
       <resource>

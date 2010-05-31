@@ -20,9 +20,9 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
-import org.apache.maven.lifecycle.internal.stub.CompletionServiceStub;
 import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
+import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
 import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependenciesResolverStub;
@@ -36,7 +36,6 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
 import java.util.List;
-import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -49,7 +48,7 @@ public class LifecycleWeaveBuilderTest
     extends TestCase
 {
 
-    public void testBuildProjectSynchronously()
+/*    public void testBuildProjectSynchronously()
         throws Exception
     {
         final CompletionService<ProjectSegment> service = new CompletionServiceStub( true );
@@ -57,13 +56,14 @@ public class LifecycleWeaveBuilderTest
         assertEquals( "Expect all tasks to be scheduled", projectBuildList.size(),
                       ( (CompletionServiceStub) service ).size() );
     }
+  */
 
     public void testBuildProjectThreaded()
         throws Exception
     {
         ExecutorService executor = Executors.newFixedThreadPool( 10 );
         ExecutorCompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
-        runWithCompletionService( service );
+        runWithCompletionService( executor );
         executor.shutdown();
     }
 
@@ -72,11 +72,11 @@ public class LifecycleWeaveBuilderTest
     {
         ExecutorService executor = Executors.newFixedThreadPool( 10 );
         ExecutorCompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
-        runWithCompletionService( service );
+        runWithCompletionService( executor );
         executor.shutdown();
     }
 
-    private ProjectBuildList runWithCompletionService( CompletionService<ProjectSegment> service )
+    private ProjectBuildList runWithCompletionService( ExecutorService service )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginVersionResolutionException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
@@ -85,9 +85,9 @@ public class LifecycleWeaveBuilderTest
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         try
         {
-            BuildListCalculator buildListCalculator = BuildListCalculatorTest.createBuildListCalculator();
+            BuildListCalculator buildListCalculator = new BuildListCalculator();
             final MavenSession session = ProjectDependencyGraphStub.getMavenSession();
-            List<TaskSegment> taskSegments = buildListCalculator.calculateTaskSegments( session );
+            List<TaskSegment> taskSegments = getTaskSegmentCalculator().calculateTaskSegments( session );
             ProjectBuildList projectBuildList = buildListCalculator.calculateProjectBuilds( session, taskSegments );
 
             final MojoExecutorStub mojoExecutorStub = new MojoExecutorStub();
@@ -109,6 +109,11 @@ public class LifecycleWeaveBuilderTest
     }
 
 
+    private static LifecycleTaskSegmentCalculator getTaskSegmentCalculator()
+    {
+        return new LifecycleTaskSegmentCalculatorStub();
+    }
+
     private ReactorContext createBuildContext( MavenSession session )
     {
         MavenExecutionResult mavenExecutionResult = new DefaultMavenExecutionResult();
@@ -120,8 +125,6 @@ public class LifecycleWeaveBuilderTest
     {
         final BuilderCommon builderCommon = getBuilderCommon();
         final LoggerStub loggerStub = new LoggerStub();
-        final LifecycleDependencyResolver lifecycleDependencyResolver =
-            new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), loggerStub );
         return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, new ExecutionEventCatapultStub() );
     }
 
@@ -130,6 +133,7 @@ public class LifecycleWeaveBuilderTest
         final LifecycleDebugLogger logger = new LifecycleDebugLogger( new LoggerStub() );
         final LifecycleDependencyResolver lifecycleDependencyResolver =
             new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), new LoggerStub() );
-        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver );
+        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver,
+                                  new LoggerStub() );
     }
 }

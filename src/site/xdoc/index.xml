@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+
+<!--
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+
+<document>
+
+  <properties>
+    <title>Apache Maven 3.x</title>
+    <author email="hboutemy_AT_apache_DOT_org">Hervé Boutemy</author>
+  </properties>
+
+  <body>
+
+    <section name="Apache Maven 3.x">
+
+      <p>Maven is a project development management and
+    comprehension tool. Based on the concept of a project object model:
+    builds, dependency management, documentation creation, site
+    publication, and distribution publication are all controlled from
+    the declarative file. Maven can be extended by plugins to utilise a
+    number of other development tools for reporting or the build
+    process.</p>
+
+      <p>
+        <img src="images/maven-deps.png" width="704" height="399" border="0" usemap="#Maven_dependencies" />
+        <map name="Maven_dependencies">
+          <area shape="rect" coords="140,0,264,33" href="apache-maven/" />
+          <area shape="rect" coords="140,53,264,86" href="maven-embedder/" />
+          <area shape="rect" coords="140,106,264,138" href="maven-compat/" />
+          <area shape="rect" coords="140,155,264,188" href="maven-core/" />
+          <area shape="rect" coords="0,216,125,248" href="maven-settings/" />
+          <area shape="rect" coords="140,238,264,271" href="maven-plugin-api/" />
+          <area shape="rect" coords="283,216,407,248" href="maven-model-builder/" />
+          <area shape="rect" coords="66,291,190,324" href="maven-artifact/" />
+          <area shape="rect" coords="215,291,339,324" href="maven-model/" />
+          <area shape="rect" coords="445,53,591,86" href="http://commons.apache.org/cli/" />
+          <area shape="rect" coords="445,106,621,138" href="http://maven.apache.org/wagon/wagon-provider-api/" />
+          <area shape="rect" coords="445,197,591,229" href="http://plexus.codehaus.org/plexus-components/plexus-interpolation/" />
+          <!--area shape="rect" coords="445,155,591,188" href="http://spice.sonatype.org/plexus-sec-dispatcher/" />
+          <area shape="rect" coords="623,155,696,188" href="http://spice.sonatype.org/plexus-cipher/" /-->
+          <area shape="rect" coords="445,238,655,271" href="http://plexus.codehaus.org/plexus-containers/plexus-component-annotations/" />
+          <area shape="rect" coords="445,280,606,312" href="http://plexus.codehaus.org/plexus-containers/plexus-container-default/" />
+          <area shape="rect" coords="463,333,588,366" href="http://plexus.codehaus.org/plexus-classworlds/" />
+          <area shape="rect" coords="608,355,693,388" href="http://plexus.codehaus.org/plexus-utils/" />
+          <area shape="rect" coords="438,148,704,399" href="http://plexus.codehaus.org/" />
+        </map>
+      </p>
+
+    </section>
+
+  </body>
+
+</document>

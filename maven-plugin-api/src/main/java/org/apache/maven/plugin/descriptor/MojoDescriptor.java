@@ -117,6 +117,9 @@ public class MojoDescriptor
     /**  By default, the Mojo don't need reports to run */
     private boolean requiresReports = false;
 
+    /** By default, mojos are not threadsafe */
+    private boolean threadSafe = false;
+
     /**
      * Default constructor.
      */
@@ -640,6 +643,23 @@ public class MojoDescriptor
     public String getExecuteGoal()
     {
         return executeGoal;
+    }
+
+
+    /**
+     * @return True if the <code>Mojo</code> is thread-safe and can be run safely in parallel
+     */
+    public boolean isThreadSafe()
+    {
+        return threadSafe;
+    }
+
+    /**
+     * @param threadSafe indicates that the mojo is thread-safe and can be run safely in parallel
+     */
+    public void setThreadSafe( boolean threadSafe )
+    {
+        this.threadSafe = threadSafe;
     }
 
     /**

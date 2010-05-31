@@ -45,7 +45,6 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.4-SNAPSHOT</version>
         <configuration>
           <version>4.0.0</version>
           <models>

@@ -42,7 +42,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -52,7 +51,6 @@ import java.util.Properties;
  *
  * @author jdcasey Created on Feb 3, 2005
  * @version $Id$
- * @todo Consolidate this logic with the PluginParameterExpressionEvaluator, minus deprecations/bans.
  */
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
@@ -107,6 +105,18 @@ public abstract class AbstractStringBasedModelInterpolator
     {
         interpolator = createInterpolator();
         recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
+    }
+
+    public AbstractStringBasedModelInterpolator setPathTranslator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
+        return this;
+    }
+
+    public AbstractStringBasedModelInterpolator setUrlNormalizer( UrlNormalizer urlNormalizer )
+    {
+        this.urlNormalizer = urlNormalizer;
+        return this;
     }
 
     protected List<ValueSource> createValueSources( final Model model, final File projectDir,
