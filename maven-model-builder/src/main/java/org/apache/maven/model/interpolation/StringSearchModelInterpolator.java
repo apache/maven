@@ -283,12 +283,12 @@ public class StringSearchModelInterpolator
                             catch ( IllegalArgumentException e )
                             {
                                 problems.add( Severity.ERROR, "Failed to interpolate field3: " + currentField +
-                                    " on class: " + cls.getName(), e );
+                                    " on class: " + cls.getName(), null, e );
                             }
                             catch ( IllegalAccessException e )
                             {
                                 problems.add( Severity.ERROR, "Failed to interpolate field4: " + currentField +
-                                    " on class: " + cls.getName(), e );
+                                    " on class: " + cls.getName(), null, e );
                             }
                             finally
                             {

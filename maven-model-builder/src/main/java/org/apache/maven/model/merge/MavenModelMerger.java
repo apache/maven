@@ -34,6 +34,7 @@ import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Extension;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -85,6 +86,7 @@ public class MavenModelMerger
             if ( sourceDominant )
             {
                 target.setName( src );
+                target.setLocation( "name", source.getLocation( "name" ) );
             }
         }
     }
@@ -98,10 +100,12 @@ public class MavenModelMerger
             if ( sourceDominant )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
             else if ( target.getUrl() == null )
             {
                 target.setUrl( appendPath( src, context ) );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -231,18 +235,27 @@ public class MavenModelMerger
         List<String> src = source.getModules();
         if ( !src.isEmpty() && sourceDominant )
         {
+            List<Integer> indices = new ArrayList<Integer>();
             List<String> tgt = target.getModules();
             Set<String> excludes = new LinkedHashSet<String>( tgt );
             List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
             merged.addAll( tgt );
-            for ( String s : src )
+            for ( int i = 0, n = tgt.size(); i < n; i++ )
             {
+                indices.add( Integer.valueOf( i ) );
+            }
+            for ( int i = 0, n = src.size(); i < n; i++ )
+            {
+                String s = src.get( i );
                 if ( !excludes.contains( s ) )
                 {
                     merged.add( s );
+                    indices.add( Integer.valueOf( ~i ) );
                 }
             }
             target.setModules( merged );
+            target.setLocation( "modules", InputLocation.merge( target.getLocation( "modules" ),
+                                                                source.getLocation( "modules" ), indices ) );
         }
     }
 
@@ -398,10 +411,12 @@ public class MavenModelMerger
             if ( sourceDominant )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
             else if ( target.getUrl() == null )
             {
                 target.setUrl( appendPath( src, context ) );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -415,10 +430,12 @@ public class MavenModelMerger
             if ( sourceDominant )
             {
                 target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
             else if ( target.getUrl() == null )
             {
                 target.setUrl( appendPath( src, context ) );
+                target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
     }
@@ -432,10 +449,12 @@ public class MavenModelMerger
             if ( sourceDominant )
             {
                 target.setConnection( src );
+                target.setLocation( "connection", source.getLocation( "connection" ) );
             }
             else if ( target.getConnection() == null )
             {
                 target.setConnection( appendPath( src, context ) );
+                target.setLocation( "connection", source.getLocation( "connection" ) );
             }
         }
     }
@@ -450,10 +469,12 @@ public class MavenModelMerger
             if ( sourceDominant )
             {
                 target.setDeveloperConnection( src );
+                target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
             else if ( target.getDeveloperConnection() == null )
             {
                 target.setDeveloperConnection( appendPath( src, context ) );
+                target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
     }

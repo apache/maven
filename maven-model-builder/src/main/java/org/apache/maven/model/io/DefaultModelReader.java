@@ -26,8 +26,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.model.io.xpp3.MavenXpp3ReaderEx;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
@@ -68,7 +70,7 @@ public class DefaultModelReader
 
         try
         {
-            return read( input, isStrict( options ) );
+            return read( input, isStrict( options ), getSource( options ) );
         }
         finally
         {
@@ -86,7 +88,7 @@ public class DefaultModelReader
 
         try
         {
-            return read( ReaderFactory.newXmlReader( input ), isStrict( options ) );
+            return read( ReaderFactory.newXmlReader( input ), isStrict( options ), getSource( options ) );
         }
         finally
         {
@@ -100,13 +102,25 @@ public class DefaultModelReader
         return value == null || Boolean.parseBoolean( value.toString() );
     }
 
-    private Model read( Reader reader, boolean strict )
+    private InputSource getSource( Map<String, ?> options )
+    {
+        Object value = ( options != null ) ? options.get( INPUT_SOURCE ) : null;
+        return (InputSource) value;
+    }
+
+    private Model read( Reader reader, boolean strict, InputSource source )
         throws IOException
     {
         try
         {
-            MavenXpp3Reader r = new MavenXpp3Reader();
-            return r.read( reader, strict );
+            if ( source != null )
+            {
+                return new MavenXpp3ReaderEx().read( reader, strict, source );
+            }
+            else
+            {
+                return new MavenXpp3Reader().read( reader, strict );
+            }
         }
         catch ( XmlPullParserException e )
         {

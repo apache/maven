@@ -62,7 +62,7 @@ class ProblemDetectingValueSource
             {
                 msg += " Please use ${" + newPrefix + expression.substring( bannedPrefix.length() ) + "} instead.";
             }
-            problems.add( Severity.WARNING, msg, null );
+            problems.add( Severity.WARNING, msg, null, null );
         }
 
         return value;

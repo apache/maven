@@ -19,6 +19,8 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import org.apache.maven.model.InputLocation;
+
 /**
  * Collects problems that are encountered during model building. The primary purpose of this component is to account for
  * the fact that the problem reporter has/should not have information about the calling context and hence cannot provide
@@ -36,8 +38,9 @@ public interface ModelProblemCollector
      * 
      * @param severity The severity of the problem, must not be {@code null}.
      * @param message The detail message of the problem, may be {@code null}.
+     * @param location The location of the problem, may be {@code null}.
      * @param cause The cause of the problem, may be {@code null}.
      */
-    void add( ModelProblem.Severity severity, String message, Exception cause );
+    void add( ModelProblem.Severity severity, String message, InputLocation location, Exception cause );
 
 }

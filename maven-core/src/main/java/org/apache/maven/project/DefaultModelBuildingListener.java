@@ -95,7 +95,7 @@ class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().add( Severity.ERROR, "Invalid plugin repository: " + e.getMessage(), e );
+            event.getProblems().add( Severity.ERROR, "Invalid plugin repository: " + e.getMessage(), null, e );
         }
         project.setPluginArtifactRepositories( pluginRepositories );
 
@@ -111,11 +111,11 @@ class DefaultModelBuildingListener
             }
             catch ( PluginResolutionException e )
             {
-                event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), e );
+                event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), null, e );
             }
             catch ( PluginVersionResolutionException e )
             {
-                event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), e );
+                event.getProblems().add( Severity.ERROR, "Unresolveable build extension: " + e.getMessage(), null, e );
             }
 
             projectBuildingHelper.selectProjectRealm( project );
@@ -130,7 +130,7 @@ class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().add( Severity.ERROR, "Invalid artifact repository: " + e.getMessage(), e );
+            event.getProblems().add( Severity.ERROR, "Invalid artifact repository: " + e.getMessage(), null, e );
         }
         project.setRemoteArtifactRepositories( remoteRepositories );
     }

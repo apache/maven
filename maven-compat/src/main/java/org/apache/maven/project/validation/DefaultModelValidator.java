@@ -19,6 +19,7 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -66,7 +67,7 @@ public class DefaultModelValidator
             this.result = result;
         }
 
-        public void add( Severity severity, String message, Exception cause )
+        public void add( Severity severity, String message, InputLocation location, Exception cause )
         {
             if ( !ModelProblem.Severity.WARNING.equals( severity ) )
             {

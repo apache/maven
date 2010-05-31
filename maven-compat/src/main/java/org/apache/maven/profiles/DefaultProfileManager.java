@@ -20,6 +20,7 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -194,7 +195,7 @@ public class DefaultProfileManager
             profileSelector.getActiveProfiles( profilesById.values(), context, new ModelProblemCollector()
             {
 
-                public void add( Severity severity, String message, Exception cause )
+                public void add( Severity severity, String message, InputLocation location, Exception cause )
                 {
                     if ( !ModelProblem.Severity.WARNING.equals( severity ) )
                     {

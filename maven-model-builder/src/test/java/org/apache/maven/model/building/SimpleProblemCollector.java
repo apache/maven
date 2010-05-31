@@ -22,6 +22,7 @@ package org.apache.maven.model.building;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.building.ModelProblem.Severity;
 
 /**
@@ -54,7 +55,7 @@ public class SimpleProblemCollector
         return fatals;
     }
 
-    public void add( Severity severity, String message, Exception cause )
+    public void add( Severity severity, String message, InputLocation location, Exception cause )
     {
         switch ( severity )
         {

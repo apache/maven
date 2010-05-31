@@ -126,8 +126,7 @@ public class DefaultInheritanceAssembler
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
                         Plugin plugin = new Plugin();
-                        plugin.setGroupId( element.getGroupId() );
-                        plugin.setArtifactId( element.getArtifactId() );
+                        plugin.setGroupId( null );
                         mergePlugin( plugin, element, sourceDominant, context );
 
                         Object key = getPluginKey( element );
@@ -209,8 +208,7 @@ public class DefaultInheritanceAssembler
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
                         ReportPlugin plugin = new ReportPlugin();
-                        plugin.setGroupId( element.getGroupId() );
-                        plugin.setArtifactId( element.getArtifactId() );
+                        plugin.setGroupId( null );
                         mergeReportPlugin( plugin, element, sourceDominant, context );
 
                         merged.put( key, plugin );

@@ -110,6 +110,7 @@ public class DefaultProjectBuilder
     
                 request.setPomFile( pomFile );
                 request.setModelSource( modelSource );
+                request.setLocationTracking( pomFile != null );
     
                 ModelBuildingResult result;
                 try
@@ -310,6 +311,7 @@ public class DefaultProjectBuilder
 
             request.setPomFile( pomFile );
             request.setTwoPhaseBuilding( true );
+            request.setLocationTracking( true );
             request.setModelCache( modelCache );
 
             DefaultModelBuildingListener listener =

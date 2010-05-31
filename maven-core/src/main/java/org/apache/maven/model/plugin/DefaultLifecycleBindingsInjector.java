@@ -64,7 +64,7 @@ public class DefaultLifecycleBindingsInjector
 
         if ( defaultPlugins == null )
         {
-            problems.add( Severity.ERROR, "Unknown packaging: " + packaging, null );
+            problems.add( Severity.ERROR, "Unknown packaging: " + packaging, model.getLocation( "packaging" ), null );
         }
         else if ( !defaultPlugins.isEmpty() )
         {

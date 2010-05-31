@@ -242,7 +242,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 }
                 catch ( InterpolationException e )
                 {
-                    problems.add( Severity.ERROR, e.getMessage(), e );
+                    problems.add( Severity.ERROR, e.getMessage(), null, e );
                 }
 
                 interpolator.clearFeedback();

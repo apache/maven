@@ -34,11 +34,19 @@ import org.apache.maven.model.Model;
  */
 public interface ModelReader
 {
+
     /**
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
      * true}. If {@code false}, unknown elements will be ignored instead of causing a failure.
      */
     String IS_STRICT = "org.apache.maven.model.io.isStrict";
+
+    /**
+     * The key for the option to enable tracking of line/column numbers. This option is of type
+     * {@link org.apache.maven.model.InputSource} and defaults to {@code null}. Providing an input source enables
+     * location tracking.
+     */
+    String INPUT_SOURCE = "org.apache.maven.model.io.inputSource";
 
     /**
      * Reads the model from the specified file.
