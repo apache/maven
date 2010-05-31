@@ -181,7 +181,16 @@ Do you want to continue?</input>
       </sequential>
     </macrodef>
 
-    <modello file="maven-model/src/main/mdo/maven.mdo" version="4.0.0" />
+    <macrodef name="modello-ex">
+      <attribute name="file" />
+      <attribute name="version" default="1.0.0" />
+      <sequential>
+        <modello file="@{file}" version="@{version}" />
+        <modello-single-mode file="@{file}" version="@{version}" mode="xpp3-extended-reader" />
+      </sequential>
+    </macrodef>
+
+    <modello-ex file="maven-model/src/main/mdo/maven.mdo" version="4.0.0" />
     <modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo" />
     <modello file="maven-model-builder/src/main/mdo/profiles.mdo" />
     <modello file="maven-settings/src/main/mdo/settings.mdo" version="1.1.0" />
