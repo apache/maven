@@ -225,9 +225,8 @@ public class ResolutionNode
         boolean success = true;
         if ( filter != null )
         {
-            for ( Iterator i = getTrail().iterator(); i.hasNext() && success; )
+            for ( Artifact artifact : getTrail() )
             {
-                Artifact artifact = (Artifact) i.next();
                 if ( !filter.include( artifact ) )
                 {
                     success = false;

@@ -61,7 +61,7 @@ public interface MavenExecutionRequest
     // Reactor Failure Mode
     // ----------------------------------------------------------------------
 
-    static final String REACTOR_FAIL_FAST = "FAIL_FAST";    
+    static final String REACTOR_FAIL_FAST = "FAIL_FAST";
 
     static final String REACTOR_FAIL_AT_END = "FAIL_AT_END";
 
@@ -78,7 +78,7 @@ public interface MavenExecutionRequest
     static final String REACTOR_MAKE_BOTH = "make-both";
 
     // ----------------------------------------------------------------------
-    // Artifactr repository policies
+    // Artifact repository policies
     // ----------------------------------------------------------------------
 
     static final String CHECKSUM_POLICY_FAIL = ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL;
@@ -106,7 +106,7 @@ public interface MavenExecutionRequest
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -115,7 +115,7 @@ public interface MavenExecutionRequest
     /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @return The system properties, never {@code null}.
      */
     Properties getSystemProperties();
@@ -124,7 +124,7 @@ public interface MavenExecutionRequest
      * Sets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @param userProperties The user properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -134,7 +134,7 @@ public interface MavenExecutionRequest
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @return The user properties, never {@code null}.
      */
     Properties getUserProperties();
@@ -251,12 +251,12 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
     MavenExecutionRequest addPluginArtifactRepository( ArtifactRepository repository );
-    
+
     /**
      * Set a new list of remote repositories to use the execution request. This is necessary if you perform
      * transformations on the remote repositories being used. For example if you replace existing repositories with
      * mirrors then it's easier to just replace the whole list with a new list of transformed repositories.
-     * 
+     *
      * @param repositories
      * @return
      */

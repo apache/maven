@@ -22,7 +22,6 @@ package org.apache.maven.execution;
 import java.util.List;
 
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -52,7 +51,7 @@ public interface MavenExecutionResult
 
     /**
      * Gets the build summary for the specified project.
-     * 
+     *
      * @param project The project to get the build summary for, must not be {@code null}.
      * @return The build summary for the project or {@code null} if the project has not been built (yet).
      */
@@ -60,7 +59,7 @@ public interface MavenExecutionResult
 
     /**
      * Add the specified build summary.
-     * 
+     *
      * @param summary The build summary to add, must not be {@code null}.
      */
     void addBuildSummary( BuildSummary summary );

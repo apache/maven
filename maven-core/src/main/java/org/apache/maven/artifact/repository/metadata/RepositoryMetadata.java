@@ -19,7 +19,6 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
-//import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 
@@ -35,9 +34,9 @@ public interface RepositoryMetadata
 {
 
     int RELEASE = 1;
-    
+
     int SNAPSHOT = 2;
-    
+
     int RELEASE_OR_SNAPSHOT = RELEASE | SNAPSHOT;
 
     /**
@@ -73,19 +72,19 @@ public interface RepositoryMetadata
      *
      * @return if it is a snapshot
      */
-    boolean isSnapshot();       
+    boolean isSnapshot();
 
     /**
      * Gets the artifact quality this metadata refers to. One of {@link #RELEASE}, {@link #SNAPSHOT} or
      * {@link #RELEASE_OR_SNAPSHOT}.
-     * 
-     * @return The artifact qualitiy this metadata refers to.
+     *
+     * @return The artifact quality this metadata refers to.
      */
     int getNature();
 
     /**
      * Gets the policy that applies to this metadata regarding the specified repository.
-     * 
+     *
      * @param repository The repository for which to determine the policy, must not be {@code null}.
      * @return The policy, never {@code null}.
      */
