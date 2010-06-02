@@ -134,6 +134,7 @@
     <module>maven-model</module>
     <module>maven-settings</module>
     <module>maven-artifact</module>
+    <module>maven-repository-metadata</module>
     <module>maven-plugin-api</module>
     <module>maven-model-builder</module>
     <module>maven-embedder</module>
@@ -224,6 +225,11 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-repository-metadata</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
