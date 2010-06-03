@@ -41,10 +41,11 @@
       <p>
         <img src="images/maven-deps.png" width="704" height="399" border="0" usemap="#Maven_dependencies" />
         <map name="Maven_dependencies">
-          <area shape="rect" coords="140,0,264,33" href="apache-maven/" />
-          <area shape="rect" coords="140,53,264,86" href="maven-embedder/" />
-          <area shape="rect" coords="140,106,264,138" href="maven-compat/" />
-          <area shape="rect" coords="140,155,264,188" href="maven-core/" />
+          <area shape="rect" coords="212,0,336,33" href="apache-maven/" />
+          <area shape="rect" coords="212,53,336,86" href="maven-embedder/" />
+          <area shape="rect" coords="212,106,336,138" href="maven-compat/" />
+          <area shape="rect" coords="212,155,336,188" href="maven-core/" />
+          <area shape="rect" coords="3,155,183,188" href="maven-repository-metadata/" />
           <area shape="rect" coords="0,216,125,248" href="maven-settings/" />
           <area shape="rect" coords="140,238,264,271" href="maven-plugin-api/" />
           <area shape="rect" coords="283,216,407,248" href="maven-model-builder/" />
