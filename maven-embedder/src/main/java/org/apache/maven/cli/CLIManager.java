@@ -60,12 +60,6 @@ public class CLIManager
 
     public static final char ACTIVATE_PROFILES = 'P';
 
-    public static final String FORCE_PLUGIN_UPDATES = "cpu";
-
-    public static final String FORCE_PLUGIN_UPDATES2 = "up";
-
-    public static final String SUPPRESS_PLUGIN_UPDATES = "npu";
-
     public static final String SUPRESS_SNAPSHOT_UPDATES = "nsu";
 
     public static final char CHECKSUM_FAILURE_POLICY = 'C';
@@ -118,9 +112,6 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "update-snapshots" ).withDescription( "Forces a check for updated releases and snapshots on remote repositories" ).create( UPDATE_SNAPSHOTS ) );
         options.addOption( OptionBuilder.withLongOpt( "activate-profiles" ).withDescription( "Comma-delimited list of profiles to activate" ).hasArg().create( ACTIVATE_PROFILES ) );
         options.addOption( OptionBuilder.withLongOpt( "batch-mode" ).withDescription( "Run in non-interactive (batch) mode" ).create( BATCH_MODE ) );
-        options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription( "Force upToDate check for any relevant registered plugins" ).create( FORCE_PLUGIN_UPDATES ) );
-        options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Synonym for " + FORCE_PLUGIN_UPDATES ).create( FORCE_PLUGIN_UPDATES2 ) );
-        options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription( "Suppress upToDate check for any relevant registered plugins" ).create( SUPPRESS_PLUGIN_UPDATES ) );
         options.addOption( OptionBuilder.withLongOpt( "no-snapshot-updates" ).withDescription( "Supress SNAPSHOT updates" ).create( SUPRESS_SNAPSHOT_UPDATES ) );
         options.addOption( OptionBuilder.withLongOpt( "strict-checksums" ).withDescription( "Fail the build if checksums don't match" ).create( CHECKSUM_FAILURE_POLICY ) );
         options.addOption( OptionBuilder.withLongOpt( "lax-checksums" ).withDescription( "Warn if checksums don't match" ).create( CHECKSUM_WARNING_POLICY ) );
@@ -143,6 +134,9 @@ public class CLIManager
         // Adding this back in for compatibility with the verifier that hard codes this option.
         
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );
+        options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "cpu" ) );
+        options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "up" ) );
+        options.addOption( OptionBuilder.withLongOpt( "no-plugin-updates" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npu" ) );
     }
 
     public CommandLine parse( String[] args )

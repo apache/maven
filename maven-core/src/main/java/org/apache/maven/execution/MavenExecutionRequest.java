@@ -237,9 +237,6 @@ public interface MavenExecutionRequest
     MavenExecutionRequest addPluginGroup( String pluginGroup );
     MavenExecutionRequest addPluginGroups( List<String> pluginGroups );
 
-    boolean isUsePluginUpdateOverride();
-    MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride );
-
     boolean isProjectPresent();
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );
 

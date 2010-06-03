@@ -62,8 +62,6 @@ public class DefaultMavenExecutionRequest
 
     private List<String> pluginGroups;
 
-    private boolean usePluginUpdateOverride;
-
     private boolean isProjectPresent = true;
 
     // ----------------------------------------------------------------------------
@@ -153,7 +151,6 @@ public class DefaultMavenExecutionRequest
         copy.setMirrors( original.getMirrors() );
         copy.setProfiles( original.getProfiles() );
         copy.setPluginGroups( original.getPluginGroups() );
-        copy.setUsePluginUpdateOverride( original.isUsePluginUpdateOverride() );
         copy.setProjectPresent( original.isProjectPresent() );
         copy.setUserSettingsFile( original.getUserSettingsFile() );
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
@@ -832,18 +829,6 @@ public class DefaultMavenExecutionRequest
         {
             addPluginGroup( pluginGroup );
         }
-
-        return this;
-    }
-
-    public boolean isUsePluginUpdateOverride()
-    {
-        return usePluginUpdateOverride;
-    }
-
-    public MavenExecutionRequest setUsePluginUpdateOverride( boolean usePluginUpdateOverride )
-    {
-        this.usePluginUpdateOverride = usePluginUpdateOverride;
 
         return this;
     }

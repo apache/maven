@@ -630,6 +630,16 @@ public class MavenCli
         boolean debug = cliRequest.debug;
         boolean quiet = cliRequest.quiet;
         boolean showErrors = cliRequest.showErrors;
+
+        String[] deprecatedOptions = { "up", "npu", "cpu", "npr" };
+        for ( String deprecatedOption : deprecatedOptions )
+        {
+            if ( commandLine.hasOption( deprecatedOption ) )
+            {
+                cliRequest.stdout.println( "[WARNING] Command line option -" + deprecatedOption
+                    + " is deprecated and will be removed in future Maven versions." );
+            }
+        }
         
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
@@ -639,17 +649,6 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             request.setInteractiveMode( false );
-        }
-
-        boolean pluginUpdateOverride = false;
-
-        if ( commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES ) || commandLine.hasOption( CLIManager.FORCE_PLUGIN_UPDATES2 ) )
-        {
-            pluginUpdateOverride = true;
-        }
-        else if ( commandLine.hasOption( CLIManager.SUPPRESS_PLUGIN_UPDATES ) )
-        {
-            pluginUpdateOverride = false;
         }
 
         boolean noSnapshotUpdates = false;
@@ -809,7 +808,7 @@ public class MavenCli
             .setReactorFailureBehavior( reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false
-            .setUsePluginUpdateOverride( pluginUpdateOverride ).addActiveProfiles( activeProfiles ) // optional
+            .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional
             .setLoggingLevel( loggingLevel ) // default: info
             .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
