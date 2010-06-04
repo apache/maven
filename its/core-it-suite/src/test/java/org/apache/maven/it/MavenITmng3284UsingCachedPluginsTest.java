@@ -68,6 +68,8 @@ public class MavenITmng3284UsingCachedPluginsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" ); 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

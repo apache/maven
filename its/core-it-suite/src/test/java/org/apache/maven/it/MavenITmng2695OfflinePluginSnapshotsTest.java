@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Collections;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2695">MNG-2695</a>.
@@ -72,8 +71,10 @@ public class MavenITmng2695OfflinePluginSnapshotsTest
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
             verifier.deleteDirectory( "target" );
             verifier.setAutoclean( false );
-            verifier.setCliOptions( Collections.singletonList( "-o" ) );
             verifier.setLogFileName( "log2.txt" );
+            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( "settings.xml" );
+            verifier.getCliOptions().add( "--offline" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/a.txt" );
             verifier.assertFilePresent( "target/b.txt" );
