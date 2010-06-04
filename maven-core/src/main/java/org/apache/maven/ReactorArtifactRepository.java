@@ -1,5 +1,24 @@
 package org.apache.maven;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.project.MavenProject;
@@ -13,36 +32,36 @@ import java.util.*;
  * 
  * @author Jason van Zyl
  */
-
 public class ReactorArtifactRepository
     extends LocalArtifactRepository
 {
-    private Map<String, MavenProject> reactorProjects;
 
-    private Map<String, List<String>> availableVersions;
+    private Map<String, MavenProject> projectsByGAV;
+
+    private Map<String, List<MavenProject>> projectsByGA;
 
     private final int hashCode;
 
     @SuppressWarnings({"ConstantConditions"})
     public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects )
     {
-        this.reactorProjects = reactorProjects;
+        projectsByGAV = reactorProjects;
         hashCode = ( reactorProjects != null ) ? reactorProjects.keySet().hashCode() : 0;
 
-        availableVersions = new HashMap<String, List<String>>( reactorProjects.size() * 2 );
+        projectsByGA = new HashMap<String, List<MavenProject>>( reactorProjects.size() * 2 );
         for ( MavenProject project : reactorProjects.values() )
         {
             String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
-            List<String> versions = availableVersions.get( key );
+            List<MavenProject> projects = projectsByGA.get( key );
 
-            if ( versions == null )
+            if ( projects == null )
             {
-                versions = new ArrayList<String>( 1 );
-                availableVersions.put( key, versions );
+                projects = new ArrayList<MavenProject>( 1 );
+                projectsByGA.put( key, projects );
             }
 
-            versions.add( project.getVersion() );
+            projects.add( project );
         }
     }
 
@@ -51,51 +70,54 @@ public class ReactorArtifactRepository
     {
         String projectKey = ArtifactUtils.key( artifact );
 
-        MavenProject project = reactorProjects.get( projectKey );
+        MavenProject project = projectsByGAV.get( projectKey );
 
         if ( project != null )
         {
-            if ( "pom".equals( artifact.getType() ) )
+            File file = find( project, artifact );
+            if ( file != null )
             {
-                resolve( artifact, project.getFile() );
-            }
-            else
-            {
-                //TODO Need to look for plugins
-
-                Artifact projectArtifact = findMatchingArtifact( project, artifact );
-
-                if ( hasArtifactFileFromPackagePhase( projectArtifact ) )
-                {
-
-                    resolve( artifact, projectArtifact.getFile() );
-                }
-                else
-                {
-                    if ( !project.hasCompletedPhase( "package" ) )
-                    {
-                        if ( isTestArtifact( artifact ) )
-                        {
-                            if ( project.hasCompletedPhase( "test-compile" ) )
-                            {
-                                resolve( artifact, new File( project.getBuild().getTestOutputDirectory() ) );
-                            }
-                        }
-                        else
-                        {
-                            if ( project.hasCompletedPhase( "compile" ) )
-                            {
-                                resolve( artifact, new File( project.getBuild().getOutputDirectory() ) );
-                            }
-                        }
-                    }
-                    // The fall-through indicates that the artifact cannot be found;
-                    // for instance if package produced nothing or classifier problems.
-                }
+                resolve( artifact, file );
             }
         }
 
         return artifact;
+    }
+
+    private File find( MavenProject project, Artifact artifact )
+    {
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            return project.getFile();
+        }
+
+        Artifact projectArtifact = findMatchingArtifact( project, artifact );
+
+        if ( hasArtifactFileFromPackagePhase( projectArtifact ) )
+        {
+            return projectArtifact.getFile();
+        }
+        else if ( !project.hasCompletedPhase( "package" ) )
+        {
+            if ( isTestArtifact( artifact ) )
+            {
+                if ( project.hasCompletedPhase( "test-compile" ) )
+                {
+                    return new File( project.getBuild().getTestOutputDirectory() );
+                }
+            }
+            else
+            {
+                if ( project.hasCompletedPhase( "compile" ) )
+                {
+                    return new File( project.getBuild().getOutputDirectory() );
+                }
+            }
+        }
+
+        // The fall-through indicates that the artifact cannot be found;
+        // for instance if package produced nothing or classifier problems.
+        return null;
     }
 
     private boolean hasArtifactFileFromPackagePhase( Artifact projectArtifact )
@@ -117,9 +139,23 @@ public class ReactorArtifactRepository
     {
         String key = ArtifactUtils.versionlessKey( artifact );
 
-        List<String> versions = availableVersions.get( key );
+        List<MavenProject> projects = projectsByGA.get( key );
+        if ( projects == null || projects.isEmpty() )
+        {
+            return Collections.emptyList();
+        }
 
-        return ( versions != null ) ? Collections.unmodifiableList( versions ) : Collections.<String> emptyList();
+        List<String> versions = new ArrayList<String>();
+
+        for ( MavenProject project : projects )
+        {
+            if ( find( project, artifact ) != null )
+            {
+                versions.add( project.getVersion() );
+            }
+        }
+
+        return Collections.unmodifiableList( versions );
     }
 
     @Override
@@ -257,7 +293,7 @@ public class ReactorArtifactRepository
 
         ReactorArtifactRepository other = (ReactorArtifactRepository) obj;
 
-        return eq( reactorProjects.keySet(), other.reactorProjects.keySet() );
+        return eq( projectsByGAV.keySet(), other.projectsByGAV.keySet() );
     }
 
     @Override
