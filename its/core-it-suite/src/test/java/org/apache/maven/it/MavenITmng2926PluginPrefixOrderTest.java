@@ -53,12 +53,12 @@ public class MavenITmng2926PluginPrefixOrderTest
 
         verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2926" );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "mng-2926", "0.1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.plugins", "mng-2926", "0.1", "pom" );
+        verifier.deleteArtifacts( "org.apache.maven.plugins", "mng-2926", "0.1" );
+        verifier.deleteArtifacts( "org.apache.maven.plugins", "mng-2926", "0.1" );
         new File( verifier.localRepo, "org/apache/maven/plugins/maven-metadata-maven-core-it.xml" ).delete();
         new File( verifier.localRepo, "org/apache/maven/plugins/resolver-status.properties" ).delete();
-        verifier.deleteArtifact( "org.codehaus.mojo", "mng-2926", "0.1", "jar" );
-        verifier.deleteArtifact( "org.codehaus.mojo", "mng-2926", "0.1", "pom" );
+        verifier.deleteArtifacts( "org.codehaus.mojo", "mng-2926", "0.1" );
+        verifier.deleteArtifacts( "org.codehaus.mojo", "mng-2926", "0.1" );
         new File( verifier.localRepo, "org/codehaus/mojo/maven-metadata-maven-core-it.xml" ).delete();
         new File( verifier.localRepo, "org/codehaus/mojo/resolver-status.properties" ).delete();
         verifier.resetStreams();
