@@ -42,6 +42,7 @@
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.4</plexusVersion>
+    <spiceInjectVersion>1.2.1-SNAPSHOT</spiceInjectVersion>
     <plexusInterpolationVersion>1.11</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.4</plexusUtilsVersion>
     <wagonVersion>1.0-beta-6</wagonVersion>
@@ -240,15 +241,9 @@
         <version>${plexusUtilsVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <version>${plexusVersion}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>spice-inject-plexus</artifactId>
+        <version>${spiceInjectVersion}</version>      
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
