@@ -45,6 +45,11 @@
       <artifactId>spice-inject-plexus</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
+      <scope>test</scope>
+    </dependency>    
   </dependencies>
 
   <build>

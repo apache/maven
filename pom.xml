@@ -246,6 +246,11 @@
         <version>${spiceInjectVersion}</version>      
       </dependency>
       <dependency>
+        <groupId>org.sonatype.spice.inject</groupId>
+        <artifactId>guice-plexus-shim</artifactId>
+        <version>${spiceInjectVersion}</version>      
+      </dependency>      
+      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
         <version>${plexusVersion}</version>
@@ -539,4 +544,18 @@
       </build>
     </profile>
   </profiles>
+  
+  <repositories>
+    <repository>
+      <id>sonatype.forge</id>
+      <url>https://repository.sonatype.org/content/groups/forge</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  
 </project>
