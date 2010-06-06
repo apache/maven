@@ -73,13 +73,15 @@ public interface LifecycleExecutor
 
     void execute( MavenSession session );
 
-    public void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+    // used by the site plugin 3.x
+    void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
         throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
         PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException;
 
 
-    public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
+    // used by the site plugin 3.x
+    List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
         throws LifecycleExecutionException;
 
 
