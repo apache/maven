@@ -26,7 +26,7 @@ under the License.
   <artifactId>sub-b</artifactId>
   <version>0.1</version>
 
-  <name>Maven Integration Test :: MNG-4381</name>
+  <name>Maven Integration Test :: MNG-4381 :: B</name>
   <description>
     Test that extension plugins can contribute non-core components that can be accessed by other plugins in the same
     project and in projects with the same extension.
