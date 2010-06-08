@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -66,6 +67,13 @@ public class InjectMojo
     private MavenProject project;
 
     /**
+     * The artifact factory.
+     * 
+     * @component
+     */
+    private ArtifactFactory factory;
+
+    /**
      * Runs this mojo.
      * 
      * @throws MojoExecutionException If an error occured.
@@ -99,6 +107,9 @@ public class InjectMojo
 
             if ( artifactKeys.remove( artifactKey ) )
             {
+                artifact = factory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), 
+                    artifact.getVersion(), Artifact.SCOPE_COMPILE, artifact.getType() );
+
                 getLog().info( "[MAVEN-CORE-IT-LOG] Injecting dependency artifact " + artifact );
 
                 dependencyArtifacts.add( artifact );
