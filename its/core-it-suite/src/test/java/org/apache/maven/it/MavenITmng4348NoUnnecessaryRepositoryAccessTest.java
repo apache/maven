@@ -25,6 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -63,7 +64,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
 
-        final List requestedUris = new ArrayList();
+        final List requestedUris = Collections.synchronizedList( new ArrayList() );
 
         Handler repoHandler = new AbstractHandler()
         {

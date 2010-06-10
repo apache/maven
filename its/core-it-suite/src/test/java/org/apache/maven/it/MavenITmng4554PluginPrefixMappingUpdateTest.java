@@ -26,6 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -64,7 +65,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List requestedUris = new ArrayList();
+        final List requestedUris = Collections.synchronizedList( new ArrayList() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -141,7 +142,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List requestedUris = new ArrayList();
+        final List requestedUris = Collections.synchronizedList( new ArrayList() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -221,7 +222,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List requestedUris = new ArrayList();
+        final List requestedUris = Collections.synchronizedList( new ArrayList() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {

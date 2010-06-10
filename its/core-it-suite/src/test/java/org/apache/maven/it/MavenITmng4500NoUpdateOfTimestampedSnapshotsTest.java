@@ -25,6 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -64,7 +65,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
         String pomUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.pom";
         String jarUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.jar";
 
-        final List requestedUris = new ArrayList();
+        final List requestedUris = Collections.synchronizedList( new ArrayList() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {

@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -52,7 +53,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
     private List requestedUris;
 
-    private boolean blockAccess;
+    private volatile boolean blockAccess;
 
     public MavenITmng4343MissingReleaseUpdatePolicyTest()
     {
@@ -111,7 +112,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         server.setHandler( repoHandler );
         server.start();
 
-        requestedUris = new ArrayList();
+        requestedUris = Collections.synchronizedList( new ArrayList() );
     }
 
     protected void tearDown()
