@@ -31,9 +31,9 @@ under the License.
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven.its.it0069</groupId>
-      <artifactId>it</artifactId>
-      <version>1.0.3</version>
+      <groupId>org.apache.maven.its.mng0768</groupId>
+      <artifactId>dep</artifactId>
+      <version>0.1</version>
     </dependency>
   </dependencies>
 
