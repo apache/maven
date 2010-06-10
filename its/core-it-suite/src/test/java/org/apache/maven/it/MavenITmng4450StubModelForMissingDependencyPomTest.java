@@ -56,10 +56,10 @@ public class MavenITmng4450StubModelForMissingDependencyPomTest
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
 
-        assertEquals( "org.apache.maven.its.mng4450:missing:pom:0.1", 
-            props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.project.id" ) );
-        assertEquals( "org.apache.maven.its.mng4450:missing:pom:0.1", 
-            props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.artifact.id" ) );
+        assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1", 
+            props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.project.id" ).replaceAll( "pom", "jar" ) );
+        assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1", 
+            props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.artifact.id" ).replaceAll( "pom", "jar" ) );
     }
 
 }
