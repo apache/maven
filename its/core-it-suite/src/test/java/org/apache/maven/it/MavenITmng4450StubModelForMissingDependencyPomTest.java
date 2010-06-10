@@ -56,6 +56,7 @@ public class MavenITmng4450StubModelForMissingDependencyPomTest
 
         Properties props = verifier.loadProperties( "target/pom.properties" );
 
+        // NOTE: Some Maven versions generate faulty packaging for the stub model (always "pom"), not our business here
         assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1", 
             props.getProperty( "org.apache.maven.its.mng4450:missing:jar:0.1.project.id" ).replaceAll( "pom", "jar" ) );
         assertEquals( "org.apache.maven.its.mng4450:missing:jar:0.1", 
