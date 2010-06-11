@@ -67,8 +67,10 @@ public class MavenITmng3314OfflineSnapshotsTest
         {
             // phase 2: run build in offline mode to check it still passes
             Verifier verifier = new Verifier( testDir.getAbsolutePath() );
-            verifier.setCliOptions( Collections.singletonList( "-o" ) );
             verifier.setLogFileName( "log2.txt" );
+            verifier.getCliOptions().add( "-o" );
+            verifier.getCliOptions().add( "--settings" );
+            verifier.getCliOptions().add( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.assertFilePresent( "target/compile.txt" );
             verifier.verifyErrorFreeLog();
