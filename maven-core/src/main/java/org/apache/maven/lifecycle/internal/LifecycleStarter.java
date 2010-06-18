@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Starts the build life cycle
@@ -144,6 +145,9 @@ public class LifecycleStarter
                 finally
                 {
                     executor.shutdown();
+                    // If the builder has terminated with an exception we want to catch any stray threads before going
+                    // to System.exit in the mavencli.
+                    executor.awaitTermination( 5, TimeUnit.SECONDS ) ;
                 }
             }
             else

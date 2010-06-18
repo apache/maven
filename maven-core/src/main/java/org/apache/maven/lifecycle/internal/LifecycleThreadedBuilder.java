@@ -66,12 +66,7 @@ public class LifecycleThreadedBuilder
                 try
                 {
                     multiThreadedProjectTaskSegmentBuild( analyzer, reactorContext, session, service, taskSegment, projectBuildMap, muxer );
-                    if ( reactorContext.getReactorBuildStatus().isHalted() )
-                    {
-                        break;
-                    }
-
-                    if ( reactorContext.getReactorBuildStatus().isHalted() )
+                    if ( reactorContext.getReactorBuildStatus().isHalted( ) )
                     {
                         break;
                     }
