@@ -537,15 +537,6 @@ public class DefaultLegacyArtifactCollector
                                 {
                                     break;
                                 }
-
-                                Artifact relocated = rGroup.getRelocatedArtifact();
-                                if ( relocated != null && !artifact.equals( relocated ) )
-                                {
-                                    relocated.setDependencyFilter( artifact.getDependencyFilter() );
-                                    artifact = relocated;
-                                    child.setArtifact( artifact );
-                                    metadataRequest.setArtifact( artifact );
-                                }
                             }
                             while( !childKey.equals( child.getKey() ) );
 

@@ -535,23 +535,23 @@ public class MavenMetadataSource
         MavenProject project;
 
         Artifact pomArtifact;
-        Artifact relocatedArtifact = artifact;
+        Artifact relocatedArtifact = null;
         boolean done = false;
         do
         {
             project = null;
 
             pomArtifact =
-                repositorySystem.createProjectArtifact( relocatedArtifact.getGroupId(),
-                                                        relocatedArtifact.getArtifactId(),
-                                                        relocatedArtifact.getVersion(), relocatedArtifact.getScope() );
+                repositorySystem.createProjectArtifact( artifact.getGroupId(),
+                                                        artifact.getArtifactId(),
+                                                        artifact.getVersion(), artifact.getScope() );
 
-            if ( "pom".equals( relocatedArtifact.getType() ) )
+            if ( "pom".equals( artifact.getType() ) )
             {
-                pomArtifact.setFile( relocatedArtifact.getFile() );
+                pomArtifact.setFile( artifact.getFile() );
             }
 
-            if ( Artifact.SCOPE_SYSTEM.equals( relocatedArtifact.getScope() ) )
+            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
             {
                 done = true;
             }
@@ -581,27 +581,27 @@ public class MavenMetadataSource
                     if ( missingParentPom != null )
                     {
                         throw new ArtifactMetadataRetrievalException( "Failed to process POM for "
-                            + relocatedArtifact.getId() + ": " + missingParentPom.getMessage(),
+                            + artifact.getId() + ": " + missingParentPom.getMessage(),
                                                                       missingParentPom.getException(),
-                                                                      relocatedArtifact );
+                                                                      artifact );
                     }
 
                     String message;
 
                     if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
                     {
-                        message = "Missing POM for " + relocatedArtifact.getId();
+                        message = "Missing POM for " + artifact.getId();
                     }
                     else if ( e.getCause() instanceof ArtifactResolutionException )
                     {
                         throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for "
-                            + relocatedArtifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
-                                                                      relocatedArtifact );
+                            + artifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
+                                                                      artifact );
                     }
                     else
                     {
                         message =
-                            "Invalid POM for " + relocatedArtifact.getId()
+                            "Invalid POM for " + artifact.getId()
                                 + ", transitive dependencies (if any) will not be available"
                                 + ", enable debug logging for more details";
                     }
@@ -623,36 +623,34 @@ public class MavenMetadataSource
                     {
                         relocation = distMgmt.getRelocation();
 
-                        relocatedArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
+                        artifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                         pomArtifact.setDownloadUrl( distMgmt.getDownloadUrl() );
                     }
 
                     if ( relocation != null )
                     {
-                        if ( relocatedArtifact == artifact )
-                        {
-                            relocatedArtifact = ArtifactUtils.copyArtifact( artifact );
-                        }
-
                         if ( relocation.getGroupId() != null )
                         {
-                            relocatedArtifact.setGroupId( relocation.getGroupId() );
+                            artifact.setGroupId( relocation.getGroupId() );
+                            relocatedArtifact = artifact;
                             project.setGroupId( relocation.getGroupId() );
                         }
                         if ( relocation.getArtifactId() != null )
                         {
-                            relocatedArtifact.setArtifactId( relocation.getArtifactId() );
+                            artifact.setArtifactId( relocation.getArtifactId() );
+                            relocatedArtifact = artifact;
                             project.setArtifactId( relocation.getArtifactId() );
                         }
                         if ( relocation.getVersion() != null )
                         {
                             // note: see MNG-3454. This causes a problem, but fixing it may break more.
-                            relocatedArtifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
+                            artifact.setVersionRange( VersionRange.createFromVersion( relocation.getVersion() ) );
+                            relocatedArtifact = artifact;
                             project.setVersion( relocation.getVersion() );
                         }
 
                         if ( artifact.getDependencyFilter() != null
-                            && !artifact.getDependencyFilter().include( relocatedArtifact ) )
+                            && !artifact.getDependencyFilter().include( artifact ) )
                         {
                             return null;
                         }
@@ -665,14 +663,14 @@ public class MavenMetadataSource
                         {
                             MetadataResolutionRequest metadataRequest =
                                 new DefaultMetadataResolutionRequest( repositoryRequest );
-                            metadataRequest.setArtifact( relocatedArtifact );
+                            metadataRequest.setArtifact( artifact );
                             available = retrieveAvailableVersions( metadataRequest );
-                            relocatedArtifact.setAvailableVersions( available );
+                            artifact.setAvailableVersions( available );
                         }
 
                         String message =
-                            "\n  This artifact has been relocated to " + relocatedArtifact.getGroupId() + ":"
-                                + relocatedArtifact.getArtifactId() + ":" + relocatedArtifact.getVersion() + ".\n";
+                            "\n  This artifact has been relocated to " + artifact.getGroupId() + ":"
+                                + artifact.getArtifactId() + ":" + artifact.getVersion() + ".\n";
 
                         if ( relocation.getMessage() != null )
                         {
@@ -706,7 +704,7 @@ public class MavenMetadataSource
         ProjectRelocation rel = new ProjectRelocation();
         rel.project = project;
         rel.pomArtifact = pomArtifact;
-        rel.relocatedArtifact = ( relocatedArtifact == artifact ) ? null : relocatedArtifact;
+        rel.relocatedArtifact = relocatedArtifact;
 
         return rel;
     }
