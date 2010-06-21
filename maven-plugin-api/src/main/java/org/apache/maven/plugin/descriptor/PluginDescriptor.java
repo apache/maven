@@ -28,7 +28,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -281,20 +280,15 @@ public class PluginDescriptor
         }
 
         // TODO: could we use a map? Maybe if the parent did that for components too, as this is too vulnerable to
-        // changes above not being propogated to the map
-
-        MojoDescriptor mojoDescriptor = null;
-
-        for ( Iterator<?> i = getMojos().iterator(); i.hasNext() && mojoDescriptor == null; )
+        // changes above not being propagated to the map
+        for ( MojoDescriptor desc : getMojos() )
         {
-            MojoDescriptor desc = (MojoDescriptor) i.next();
-
             if ( goal.equals( desc.getGoal() ) )
             {
-                mojoDescriptor = desc;
+                return desc;
             }
         }
-        return mojoDescriptor;
+        return null;
     }
 
     public void setClassRealm( ClassRealm classRealm )

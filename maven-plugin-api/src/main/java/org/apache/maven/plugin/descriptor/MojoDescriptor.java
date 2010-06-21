@@ -108,7 +108,7 @@ public class MojoDescriptor
     /**  Plugin descriptor */
     private PluginDescriptor pluginDescriptor;
 
-    /**  By default, the Mojo is herited */
+    /**  By default, the Mojo is inherited */
     private boolean inheritedByDefault = true;
 
     /**  By default, the Mojo could not be invoke directly */
@@ -200,13 +200,13 @@ public class MojoDescriptor
                 + getImplementation() + ")" );
         }
 
-            if ( parameters == null )
-            {
-                parameters = new LinkedList<Parameter>();
-            }
-
-            parameters.add( parameter );
+        if ( parameters == null )
+        {
+            parameters = new LinkedList<Parameter>();
         }
+
+        parameters.add( parameter );
+    }
 
     /**
      * @return the list parameters as a Map
@@ -535,12 +535,7 @@ public class MojoDescriptor
             return false;
         }
 
-        if ( !first.equals( second ) )
-        {
-            return false;
-        }
-
-        return true;
+        return first.equals( second );
     }
 
     /** {@inheritDoc} */

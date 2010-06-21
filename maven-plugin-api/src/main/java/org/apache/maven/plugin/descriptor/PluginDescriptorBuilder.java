@@ -55,7 +55,7 @@ public class PluginDescriptorBuilder
         pluginDescriptor.setArtifactId( c.getChild( "artifactId" ).getValue() );
         pluginDescriptor.setVersion( c.getChild( "version" ).getValue() );
         pluginDescriptor.setGoalPrefix( c.getChild( "goalPrefix" ).getValue() );
-        
+
         pluginDescriptor.setName( c.getChild( "name" ).getValue() );
         pluginDescriptor.setDescription( c.getChild( "description" ).getValue() );
 
@@ -79,10 +79,8 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] mojoConfigurations = c.getChild( "mojos" ).getChildren( "mojo" );
 
-        for ( int i = 0; i < mojoConfigurations.length; i++ )
+        for ( PlexusConfiguration component : mojoConfigurations )
         {
-            PlexusConfiguration component = mojoConfigurations[i];
-
             MojoDescriptor mojoDescriptor = buildComponentDescriptor( component, pluginDescriptor );
 
             pluginDescriptor.addMojo( mojoDescriptor );
@@ -96,10 +94,8 @@ public class PluginDescriptorBuilder
 
         List<ComponentDependency> dependencies = new ArrayList<ComponentDependency>();
 
-        for ( int i = 0; i < dependencyConfigurations.length; i++ )
+        for ( PlexusConfiguration d : dependencyConfigurations )
         {
-            PlexusConfiguration d = dependencyConfigurations[i];
-
             ComponentDependency cd = new ComponentDependency();
 
             cd.setArtifactId( d.getChild( "artifactId" ).getValue() );
@@ -125,7 +121,7 @@ public class PluginDescriptorBuilder
         mojo.setPluginDescriptor( pluginDescriptor );
 
         mojo.setGoal( c.getChild( "goal" ).getValue() );
-        
+
         mojo.setImplementation( c.getChild( "implementation" ).getValue() );
 
         PlexusConfiguration langConfig = c.getChild( "language" );
@@ -266,10 +262,8 @@ public class PluginDescriptorBuilder
 
         List<Parameter> parameters = new ArrayList<Parameter>();
 
-        for ( int i = 0; i < parameterConfigurations.length; i++ )
+        for ( PlexusConfiguration d : parameterConfigurations )
         {
-            PlexusConfiguration d = parameterConfigurations[i];
-
             Parameter parameter = new Parameter();
 
             parameter.setName( d.getChild( "name" ).getValue() );
@@ -320,10 +314,8 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] requirements = c.getChild( "requirements" ).getChildren( "requirement" );
 
-        for ( int i = 0; i < requirements.length; i++ )
+        for ( PlexusConfiguration requirement : requirements )
         {
-            PlexusConfiguration requirement = requirements[i];
-
             ComponentRequirement cr = new ComponentRequirement();
 
             cr.setRole( requirement.getChild( "role" ).getValue() );
