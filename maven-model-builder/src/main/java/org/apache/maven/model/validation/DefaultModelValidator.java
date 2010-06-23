@@ -524,7 +524,7 @@ public class DefaultModelValidator
             if ( "legacy".equals( repository.getLayout() ) )
             {
                 addViolation( problems, Severity.WARNING, prefix + ".layout", repository.getId(),
-                              "uses the deprecated value 'legacy'.", repository );
+                              "uses the unsupported value 'legacy', artifact resolution might fail.", repository );
             }
         }
     }
