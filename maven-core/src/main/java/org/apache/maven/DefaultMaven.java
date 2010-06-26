@@ -1,18 +1,22 @@
 package org.apache.maven;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import java.io.File;
@@ -37,7 +41,6 @@ import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
-import org.apache.maven.lifecycle.LifecycleExecutor;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.building.ModelProblem;
@@ -64,7 +67,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 /**
  * @author Jason van Zyl
  */
-@Component(role = Maven.class)
+@Component( role = Maven.class )
 public class DefaultMaven
     implements Maven
 {
@@ -114,17 +117,18 @@ public class DefaultMaven
         return result;
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored" } )
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
         //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
-            request.getSystemProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
-        }        
-        
+            request.getSystemProperties().put( "${build.timestamp}",
+                                               new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
+        }
+
         request.setStartTime( new Date() );
-        
+
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try
@@ -138,11 +142,11 @@ public class DefaultMaven
 
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
             new DelegatingLocalArtifactRepository( request.getLocalRepository() );
-        
-        request.setLocalRepository( delegatingLocalArtifactRepository );        
 
-        MavenSession session = new MavenSession( container, request, result);
-        
+        request.setLocalRepository( delegatingLocalArtifactRepository );
+
+        MavenSession session = new MavenSession( container, request, result );
+
         try
         {
             for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject> emptyList() ) )
@@ -158,11 +162,11 @@ public class DefaultMaven
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
         //TODO: optimize for the single project or no project
-        
+
         List<MavenProject> projects;
         try
         {
-            projects = getProjectsForMavenReactor( request );                                                
+            projects = getProjectsForMavenReactor( request );
         }
         catch ( ProjectBuildingException e )
         {
@@ -172,14 +176,14 @@ public class DefaultMaven
         session.setProjects( projects );
 
         result.setTopologicallySortedProjects( session.getProjects() );
-        
+
         result.setProject( session.getTopLevelProject() );
 
         try
         {
             Map<String, MavenProject> projectMap;
             projectMap = getProjectMap( session.getProjects() );
-    
+
             // Desired order of precedence for local artifact repositories
             //
             // Reactor
@@ -222,7 +226,7 @@ public class DefaultMaven
             session.setProjectDependencyGraph( projectDependencyGraph );
         }
         catch ( CycleDetectedException e )
-        {            
+        {
             String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
 
             ProjectCycleException error = new ProjectCycleException( message, e );
@@ -257,7 +261,7 @@ public class DefaultMaven
         return result;
     }
 
-    @SuppressWarnings({"ResultOfMethodCallIgnored"})
+    @SuppressWarnings( { "ResultOfMethodCallIgnored" } )
     private void validateLocalRepository( MavenExecutionRequest request )
         throws LocalRepositoryNotAccessibleException
     {
@@ -330,7 +334,7 @@ public class DefaultMaven
 
         return result;
     }
-    
+
     private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
         throws ProjectBuildingException
     {
@@ -348,8 +352,8 @@ public class DefaultMaven
             request.setProjectPresent( false );
             return projects;
         }
-        
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );        
+
+        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
         collectProjects( projects, files, request );
         return projects;
     }
@@ -401,7 +405,8 @@ public class DefaultMaven
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
+        List<ProjectBuildingResult> results =
+            projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
 
         boolean problems = false;
 
@@ -418,7 +423,8 @@ public class DefaultMaven
                 for ( ModelProblem problem : result.getProblems() )
                 {
                     String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
+                    logger.warn( problem.getMessage()
+                                 + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
                 }
 
                 problems = true;

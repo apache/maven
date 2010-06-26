@@ -36,7 +36,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-@Component(role=ArtifactTransformation.class, hint="release") 
+@Component( role = ArtifactTransformation.class, hint = "release" )
 public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation
 {
@@ -65,16 +65,14 @@ public class ReleaseArtifactTransformation
         }
     }
 
-    public void transformForInstall( Artifact artifact,
-                                     ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
     {
         ArtifactMetadata metadata = createMetadata( artifact );
 
         artifact.addMetadata( metadata );
     }
 
-    public void transformForDeployment( Artifact artifact,
-                                        ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
     {
         ArtifactMetadata metadata = createMetadata( artifact );
@@ -96,8 +94,7 @@ public class ReleaseArtifactTransformation
         return new ArtifactRepositoryMetadata( artifact, versioning );
     }
 
-    protected String constructVersion( Versioning versioning,
-                                       String baseVersion )
+    protected String constructVersion( Versioning versioning, String baseVersion )
     {
         return versioning.getRelease();
     }

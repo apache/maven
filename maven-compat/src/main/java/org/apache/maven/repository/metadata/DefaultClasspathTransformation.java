@@ -34,9 +34,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-@Component(role=ClasspathTransformation.class)
+@Component( role = ClasspathTransformation.class )
 public class DefaultClasspathTransformation
-implements ClasspathTransformation
+    implements ClasspathTransformation
 {
     @Requirement
     GraphConflictResolver conflictResolver;
@@ -136,7 +136,7 @@ implements ClasspathTransformation
 //                        }
 //                    );
 
-            List<MetadataGraphEdge> exits = graph.getExcidentEdges(node);
+            List<MetadataGraphEdge> exits = graph.getExcidentEdges( node );
 
             if ( exits != null && exits.size() > 0 )
             {

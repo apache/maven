@@ -42,7 +42,7 @@ public class ProjectSorter
     private DAG dag;
 
     private List<MavenProject> sortedProjects;
-    
+
     private Map<String, MavenProject> projectMap;
 
     private MavenProject topLevelProject;
@@ -120,7 +120,8 @@ public class ProjectSorter
 
             if ( parent != null )
             {
-                // Parent is added as an edge, but must not cause a cycle - so we remove any other edges it has in conflict
+                // Parent is added as an edge, but must not cause a cycle - so we remove any other edges it has
+                // in conflict
                 addEdge( projectMap, vertexMap, null, projectVertex, parent.getGroupId(), parent.getArtifactId(),
                          parent.getVersion(), true, false );
             }
@@ -273,15 +274,15 @@ public class ProjectSorter
     {
         return ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
     }
-    
+
     public DAG getDAG()
     {
         return dag;
     }
-    
+
     public Map<String, MavenProject> getProjectMap()
     {
         return projectMap;
     }
-    
+
 }

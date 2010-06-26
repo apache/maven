@@ -46,14 +46,16 @@ public class PluginParameterExpressionEvaluator
 
     private String basedir;
 
-    private Properties properties;    
+    private Properties properties;
 
     @Deprecated //TODO: used by the Enforcer plugin
-    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution, PathTranslator pathTranslator, Logger logger, MavenProject project, Properties properties )    
+    public PluginParameterExpressionEvaluator( MavenSession session, MojoExecution mojoExecution,
+                                               PathTranslator pathTranslator, Logger logger, MavenProject project,
+                                               Properties properties )
     {
         this( session, mojoExecution );
     }
-    
+
     public PluginParameterExpressionEvaluator( MavenSession session )
     {
         this( session, null );
@@ -65,7 +67,7 @@ public class PluginParameterExpressionEvaluator
         this.mojoExecution = mojoExecution;
         this.properties = session.getExecutionProperties();
         this.project = session.getCurrentProject();
-        
+
         String basedir = null;
 
         if ( project != null )
@@ -225,7 +227,7 @@ public class PluginParameterExpressionEvaluator
                 // TODO: don't catch exception
                 throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
                                                          e );
-            }            
+            }
         }
         else if ( expression.equals( "mojo" ) )
         {
@@ -276,13 +278,14 @@ public class PluginParameterExpressionEvaluator
                 else
                 {
                     value = ReflectionValueExtractor.evaluate( expression.substring( 1 ), pluginDescriptor );
-                }                
+                }
             }
             catch ( Exception e )
             {
-                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression, e );
+                throw new ExpressionEvaluationException( "Error evaluating plugin parameter expression: " + expression,
+                                                         e );
             }
-        }       
+        }
         else if ( "settings".equals( expression ) )
         {
             value = session.getSettings();
@@ -389,16 +392,9 @@ public class PluginParameterExpressionEvaluator
         {
             return true;
         }
-        else if ( ( type.isPrimitive() || type.getName().startsWith( "java.lang." ) )
-            && value.getClass().getName().startsWith( "java.lang." ) )
-        {
-            // likely Boolean -> boolean, Short -> int etc. conversions, it's not the problem case we try to avoid
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        // likely Boolean -> boolean, Short -> int etc. conversions, it's not the problem case we try to avoid
+        return ( ( type.isPrimitive() || type.getName().startsWith( "java.lang." ) )
+                        && value.getClass().getName().startsWith( "java.lang." ) );
     }
 
     private String stripTokens( String expr )

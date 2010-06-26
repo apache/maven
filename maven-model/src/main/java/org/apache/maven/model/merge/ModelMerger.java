@@ -167,7 +167,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeModel_GroupId( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_GroupId( Model target, Model source, boolean sourceDominant,
+                                       Map<Object, Object> context )
     {
         String src = source.getGroupId();
         if ( src != null )
@@ -194,7 +195,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeModel_Version( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Version( Model target, Model source, boolean sourceDominant,
+                                       Map<Object, Object> context )
     {
         String src = source.getVersion();
         if ( src != null )
@@ -207,7 +209,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeModel_Packaging( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Packaging( Model target, Model source, boolean sourceDominant,
+                                         Map<Object, Object> context )
     {
         String src = source.getPackaging();
         if ( src != null )
@@ -290,7 +293,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant,
+                                        Map<Object, Object> context )
     {
         List<License> src = source.getLicenses();
         if ( !src.isEmpty() )
@@ -479,7 +483,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant,
+                                        Map<Object, Object> context )
     {
         List<Profile> src = source.getProfiles();
         if ( !src.isEmpty() )
@@ -713,7 +718,8 @@ public class ModelMerger
 
     protected void mergeDistributionManagement_SnapshotRepository( DistributionManagement target,
                                                                    DistributionManagement source,
-                                                                   boolean sourceDominant, Map<Object, Object> context )
+                                                                   boolean sourceDominant,
+                                                                   Map<Object, Object> context )
     {
         DeploymentRepository src = source.getSnapshotRepository();
         if ( src != null )
@@ -1580,7 +1586,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeLicense_Url( License target, License source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeLicense_Url( License target, License source, boolean sourceDominant,
+                                     Map<Object, Object> context )
     {
         String src = source.getUrl();
         if ( src != null )
@@ -2026,7 +2033,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeNotifier( Notifier target, Notifier source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeNotifier( Notifier target, Notifier source, boolean sourceDominant,
+                                  Map<Object, Object> context )
     {
         mergeNotifier_Type( target, source, sourceDominant, context );
         mergeNotifier_Address( target, source, sourceDominant, context );
@@ -2699,7 +2707,8 @@ public class ModelMerger
         }
     }
 
-    protected void mergeResource( Resource target, Resource source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeResource( Resource target, Resource source, boolean sourceDominant,
+                                  Map<Object, Object> context )
     {
         mergeFileSet( target, source, sourceDominant, context );
         mergeResource_TargetPath( target, source, sourceDominant, context );

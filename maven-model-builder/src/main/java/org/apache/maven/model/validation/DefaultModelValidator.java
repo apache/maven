@@ -54,7 +54,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
  * @version $Id$
  */
-@Component(role = ModelValidator.class )
+@Component( role = ModelValidator.class )
 public class DefaultModelValidator
     implements ModelValidator
 {
@@ -99,7 +99,8 @@ public class DefaultModelValidator
 
             validateRepositories( problems, model.getRepositories(), "repositories.repository", request );
 
-            validateRepositories( problems, model.getPluginRepositories(), "pluginRepositories.pluginRepository", request );
+            validateRepositories( problems, model.getPluginRepositories(), "pluginRepositories.pluginRepository",
+                                  request );
 
             Build build = model.getBuild();
             if ( build != null )
@@ -109,7 +110,8 @@ public class DefaultModelValidator
                 PluginManagement mngt = build.getPluginManagement();
                 if ( mngt != null )
                 {
-                    validateRawPlugins( problems, mngt.getPlugins(), "build.pluginManagement.plugins.plugin", request );
+                    validateRawPlugins( problems, mngt.getPlugins(), "build.pluginManagement.plugins.plugin",
+                                        request );
                 }
             }
 
@@ -134,7 +136,8 @@ public class DefaultModelValidator
                         + ".dependencyManagement.dependencies.dependency", request );
                 }
 
-                validateRepositories( problems, profile.getRepositories(), prefix + ".repositories.repository", request );
+                validateRepositories( problems, profile.getRepositories(), prefix + ".repositories.repository",
+                                      request );
 
                 validateRepositories( problems, profile.getPluginRepositories(), prefix
                     + ".pluginRepositories.pluginRepository", request );
@@ -257,7 +260,8 @@ public class DefaultModelValidator
                     validateStringNotEmpty( "build.plugins.plugin.artifactId", problems, Severity.ERROR,
                                             p.getArtifactId(), p );
 
-                    validateStringNotEmpty( "build.plugins.plugin.groupId", problems, Severity.ERROR, p.getGroupId(), p );
+                    validateStringNotEmpty( "build.plugins.plugin.groupId", problems, Severity.ERROR, p.getGroupId(),
+                                            p );
 
                     validatePluginVersion( "build.plugins.plugin.version", problems, p.getVersion(), p.getKey(), p,
                                            request );
@@ -394,8 +398,8 @@ public class DefaultModelValidator
                     validateVersion( prefix + "version", problems, errOn30, d.getVersion(), d.getManagementKey(), d );
 
                     /*
-                     * TODO: Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc. In
-                     * order to don't break backward-compat with those, only warn but don't error out.
+                     * TODO: Extensions like Flex Mojos use custom scopes like "merged", "internal", "external", etc.
+                     * In order to don't break backward-compat with those, only warn but don't error out.
                      */
                     validateEnum( prefix + "scope", problems, Severity.WARNING, d.getScope(), d.getManagementKey(), d,
                                   "provided", "compile", "runtime", "test", "system" );
@@ -448,7 +452,8 @@ public class DefaultModelValidator
 
             if ( StringUtils.isEmpty( systemPath ) )
             {
-                addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "is missing.", d );
+                addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "is missing.",
+                              d );
             }
             else
             {
@@ -529,13 +534,15 @@ public class DefaultModelValidator
         }
     }
 
-    private void validateResources( ModelProblemCollector problems, List<Resource> resources, String prefix, ModelBuildingRequest request )
+    private void validateResources( ModelProblemCollector problems, List<Resource> resources, String prefix,
+                                    ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
         for ( Resource resource : resources )
         {
-            validateStringNotEmpty( prefix + ".directory", problems, Severity.ERROR, resource.getDirectory(), resource );
+            validateStringNotEmpty( prefix + ".directory", problems, Severity.ERROR, resource.getDirectory(),
+                                    resource );
 
             validateBoolean( prefix + ".filtering", problems, errOn30, resource.getFiltering(),
                              resource.getDirectory(), resource );
@@ -546,7 +553,8 @@ public class DefaultModelValidator
     // Field validation
     // ----------------------------------------------------------------------
 
-    private boolean validateId( String fieldName, ModelProblemCollector problems, String id, InputLocationTracker tracker )
+    private boolean validateId( String fieldName, ModelProblemCollector problems, String id,
+                                InputLocationTracker tracker )
     {
         return validateId( fieldName, problems, id, null, tracker );
     }
@@ -578,7 +586,8 @@ public class DefaultModelValidator
             return true;
         }
 
-        addViolation( problems, severity, fieldName, null, "contains an expression but should be a constant.", tracker );
+        addViolation( problems, severity, fieldName, null, "contains an expression but should be a constant.",
+                      tracker );
 
         return false;
     }
@@ -640,8 +649,8 @@ public class DefaultModelValidator
         return false;
     }
 
-    private boolean validateBoolean( String fieldName, ModelProblemCollector problems, Severity severity, String string,
-                                     String sourceHint, InputLocationTracker tracker )
+    private boolean validateBoolean( String fieldName, ModelProblemCollector problems, Severity severity,
+                                     String string, String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -680,8 +689,8 @@ public class DefaultModelValidator
         return false;
     }
 
-    private boolean validateVersion( String fieldName, ModelProblemCollector problems, Severity severity, String string,
-                                     String sourceHint, InputLocationTracker tracker )
+    private boolean validateVersion( String fieldName, ModelProblemCollector problems, Severity severity,
+                                     String string, String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -700,7 +709,8 @@ public class DefaultModelValidator
     }
 
     private boolean validatePluginVersion( String fieldName, ModelProblemCollector problems, String string,
-                                           String sourceHint, InputLocationTracker tracker, ModelBuildingRequest request )
+                                           String sourceHint, InputLocationTracker tracker,
+                                           ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
@@ -733,7 +743,7 @@ public class DefaultModelValidator
             buffer.append( " for " ).append( sourceHint );
         }
 
-        buffer.append(' ').append( message );
+        buffer.append( ' ' ).append( message );
 
         problems.add( severity, buffer.toString(), getLocation( fieldName, tracker ), null );
     }

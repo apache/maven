@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author Milos Kleint
  */
-@Component(role = SettingsValidator.class)
+@Component( role = SettingsValidator.class )
 public class DefaultSettingsValidator
     implements SettingsValidator
 {
@@ -108,7 +108,8 @@ public class DefaultSettingsValidator
             for ( Profile profile : profiles )
             {
                 validateRepositories( problems, profile.getRepositories(), "repositories.repository" );
-                validateRepositories( problems, profile.getPluginRepositories(), "pluginRepositories.pluginRepository" );
+                validateRepositories( problems, profile.getPluginRepositories(),
+                                      "pluginRepositories.pluginRepository" );
             }
         }
     }
@@ -148,7 +149,8 @@ public class DefaultSettingsValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string, String sourceHint )
+    private boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string,
+                                            String sourceHint )
     {
         if ( !validateNotNull( problems, fieldName, string, sourceHint ) )
         {

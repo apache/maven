@@ -26,7 +26,7 @@ import org.codehaus.plexus.logging.Logger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Component(role = ThreadConfigurationService.class)
+@Component( role = ThreadConfigurationService.class )
 public class ThreadConfigurationService
 {
     @Requirement
@@ -35,7 +35,7 @@ public class ThreadConfigurationService
     private final int cpuCores;
 
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public ThreadConfigurationService()
     {
         cpuCores = Runtime.getRuntime().availableProcessors();

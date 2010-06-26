@@ -63,10 +63,10 @@ public class StringSearchModelInterpolator
         throws ModelInterpolationException
     {
         interpolateObject( model, model, projectDir, config, debugEnabled );
-        
+
         return model;
     }
-    
+
     protected void interpolateObject( Object obj, Model model, File projectDir, ProjectBuilderConfiguration config,
                                       boolean debugEnabled )
         throws ModelInterpolationException
@@ -75,13 +75,13 @@ public class StringSearchModelInterpolator
         {
             List<ValueSource> valueSources = createValueSources( model, projectDir, config );
             List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
-            
+
             InterpolateObjectAction action =
                 new InterpolateObjectAction( obj, valueSources, postProcessors, debugEnabled,
                                              this, getLogger() );
-            
+
             ModelInterpolationException error = AccessController.doPrivileged( action );
-            
+
             if ( error != null )
             {
                 throw error;
@@ -97,10 +97,10 @@ public class StringSearchModelInterpolator
     {
         StringSearchInterpolator interpolator = new StringSearchInterpolator();
         interpolator.setCacheAnswers( true );
-        
+
         return interpolator;
     }
-    
+
     private static final class InterpolateObjectAction implements PrivilegedAction<ModelInterpolationException>
     {
 
@@ -110,7 +110,7 @@ public class StringSearchModelInterpolator
         private final Logger logger;
         private final List<ValueSource> valueSources;
         private final List<InterpolationPostProcessor> postProcessors;
-        
+
         public InterpolateObjectAction( Object target, List<ValueSource> valueSources,
                                         List<InterpolationPostProcessor> postProcessors, boolean debugEnabled,
                                         StringSearchModelInterpolator modelInterpolator, Logger logger )
@@ -118,20 +118,20 @@ public class StringSearchModelInterpolator
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
             this.debugEnabled = debugEnabled;
-            
+
             this.interpolationTargets = new LinkedList<Object>();
             interpolationTargets.add( target );
-            
+
             this.modelInterpolator = modelInterpolator;
             this.logger = logger;
         }
 
         public ModelInterpolationException run()
         {
-            while( !interpolationTargets.isEmpty() )
+            while ( !interpolationTargets.isEmpty() )
             {
                 Object obj = interpolationTargets.removeFirst();
-                
+
                 try
                 {
                     traverseObjectWithParents( obj.getClass(), obj );
@@ -141,11 +141,11 @@ public class StringSearchModelInterpolator
                     return e;
                 }
             }
-            
+
             return null;
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         private void traverseObjectWithParents( Class<?> cls, Object target )
             throws ModelInterpolationException
         {
@@ -153,8 +153,8 @@ public class StringSearchModelInterpolator
             {
                 return;
             }
-            
-            
+
+
             if ( cls.isArray() )
             {
                 evaluateArray( target );
@@ -167,7 +167,7 @@ public class StringSearchModelInterpolator
                     fields = cls.getDeclaredFields();
                     fieldsByClass.put( cls, fields );
                 }
-                
+
                 for ( int i = 0; i < fields.length; i++ )
                 {
                     Class<?> type = fields[i].getType();
@@ -185,7 +185,7 @@ public class StringSearchModelInterpolator
                                     if ( value != null )
                                     {
                                         String interpolated = modelInterpolator.interpolateInternal( value, valueSources, postProcessors, debugEnabled );
-                                        
+
                                         if ( !interpolated.equals( value ) )
                                         {
                                             fields[i].set( target, interpolated );
@@ -202,23 +202,28 @@ public class StringSearchModelInterpolator
                                         {
                                             c.clear();
                                         }
-                                        catch( UnsupportedOperationException e )
+                                        catch ( UnsupportedOperationException e )
                                         {
                                             if ( debugEnabled && logger != null )
                                             {
-                                                logger.debug( "Skipping interpolation of field: " + fields[i] + " in: " + cls.getName() + "; it is an unmodifiable collection." );
+                                                logger.debug( "Skipping interpolation of field: " + fields[i] + " in: "
+                                                    + cls.getName() + "; it is an unmodifiable collection." );
                                             }
                                             continue;
                                         }
-                                        
+
                                         for ( Object value : originalValues )
                                         {
                                             if ( value != null )
                                             {
-                                                if( String.class == value.getClass() )
+                                                if ( String.class == value.getClass() )
                                                 {
-                                                    String interpolated = modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, debugEnabled );
-                                                    
+                                                    String interpolated =
+                                                        modelInterpolator.interpolateInternal( (String) value,
+                                                                                               valueSources,
+                                                                                               postProcessors,
+                                                                                               debugEnabled );
+
                                                     if ( !interpolated.equals( value ) )
                                                     {
                                                         c.add( interpolated );
@@ -257,24 +262,31 @@ public class StringSearchModelInterpolator
                                         for ( Map.Entry<Object, Object> entry : m.entrySet() )
                                         {
                                             Object value = entry.getValue();
-                                            
+
                                             if ( value != null )
                                             {
-                                                if( String.class == value.getClass() )
+                                                if ( String.class == value.getClass() )
                                                 {
-                                                    String interpolated = modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, debugEnabled );
-                                                    
+                                                    String interpolated =
+                                                        modelInterpolator.interpolateInternal( (String) value,
+                                                                                               valueSources,
+                                                                                               postProcessors,
+                                                                                               debugEnabled );
+
                                                     if ( !interpolated.equals( value ) )
                                                     {
                                                         try
                                                         {
                                                             entry.setValue( interpolated );
                                                         }
-                                                        catch( UnsupportedOperationException e )
+                                                        catch ( UnsupportedOperationException e )
                                                         {
                                                             if ( debugEnabled && logger != null )
                                                             {
-                                                                logger.debug( "Skipping interpolation of field: " + fields[i] + " (key: " + entry.getKey() + ") in: " + cls.getName() + "; it is an unmodifiable collection." );
+                                                                logger.debug( "Skipping interpolation of field: "
+                                                                    + fields[i] + " (key: " + entry.getKey() + ") in: "
+                                                                    + cls.getName()
+                                                                    + "; it is an unmodifiable collection." );
                                                             }
                                                             continue;
                                                         }
@@ -313,11 +325,13 @@ public class StringSearchModelInterpolator
                             }
                             catch ( IllegalArgumentException e )
                             {
-                                throw new ModelInterpolationException( "Failed to interpolate field: " + fields[i] + " on class: " + cls.getName(), e );
+                                throw new ModelInterpolationException( "Failed to interpolate field: " + fields[i]
+                                    + " on class: " + cls.getName(), e );
                             }
                             catch ( IllegalAccessException e )
                             {
-                                throw new ModelInterpolationException( "Failed to interpolate field: " + fields[i] + " on class: " + cls.getName(), e );
+                                throw new ModelInterpolationException( "Failed to interpolate field: " + fields[i]
+                                    + " on class: " + cls.getName(), e );
                             }
                         }
                         finally
@@ -326,7 +340,7 @@ public class StringSearchModelInterpolator
                         }
                     }
                 }
-                
+
                 traverseObjectWithParents( cls.getSuperclass(), target );
             }
         }
@@ -342,22 +356,22 @@ public class StringSearchModelInterpolator
             {
                 fieldIsPrimitiveByClass.put( fieldType, Boolean.valueOf( fieldType.isPrimitive() ) );
             }
-            
+
             if ( fieldIsPrimitiveByClass.get( fieldType ).booleanValue() )
             {
                 return false;
             }
-            
+
 //            if ( fieldType.isPrimitive() )
 //            {
 //                return false;
 //            }
-            
+
             if ( "parent".equals( field.getName() ) )
             {
                 return false;
             }
-            
+
             return true;
         }
 
@@ -365,15 +379,17 @@ public class StringSearchModelInterpolator
             throws ModelInterpolationException
         {
             int len = Array.getLength( target );
-            for( int i = 0; i < len; i++ )
+            for ( int i = 0; i < len; i++ )
             {
                 Object value = Array.get( target, i );
                 if ( value != null )
                 {
                     if ( String.class == value.getClass() )
                     {
-                        String interpolated = modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, debugEnabled );
-                        
+                        String interpolated =
+                            modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors,
+                                                                   debugEnabled );
+
                         if ( !interpolated.equals( value ) )
                         {
                             Array.set( target, i, interpolated );

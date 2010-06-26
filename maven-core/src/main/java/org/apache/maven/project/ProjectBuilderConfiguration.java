@@ -30,7 +30,7 @@ public interface ProjectBuilderConfiguration
     extends ProjectBuildingRequest
 {
     ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository );
-    
+
     ArtifactRepository getLocalRepository();
 
     ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
@@ -41,36 +41,36 @@ public interface ProjectBuilderConfiguration
 
     Properties getSystemProperties();
 
-    void setProject(MavenProject mavenProject);
+    void setProject( MavenProject mavenProject );
 
     MavenProject getProject();
-        
+
     ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins );
-    
+
     boolean isProcessPlugins();
 
     // Profiles
-    
+
     /**
      * Set any active profiles that the {@link ProjectBuilder} should consider while constructing
      * a {@link MavenProject}.
      */
     void setActiveProfileIds( List<String> activeProfileIds );
-        
+
     List<String> getActiveProfileIds();
 
     void setInactiveProfileIds( List<String> inactiveProfileIds );
 
     List<String> getInactiveProfileIds();
-    
+
     /**
-     * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom configuration
-     * like the MavenCLI settings.xml file, or from a custom dialog in an IDE integration like M2Eclipse.
+     * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom
+     * configuration like the MavenCLI settings.xml file, or from a custom dialog in an IDE integration like M2Eclipse.
      * @param profile
      */
     void addProfile( Profile profile );
-    
+
     void setProfiles( List<Profile> profiles );
-    
+
     List<Profile> getProfiles();
 }

@@ -1,3 +1,5 @@
+package org.apache.maven.toolchain;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,8 +19,6 @@
  * under the License.
  */
 
-package org.apache.maven.toolchain;
-
 import org.apache.maven.execution.MavenSession;
 
 
@@ -36,6 +36,5 @@ public interface ToolchainManager
     /**
      * to be used from plugins capable of working with toolchains.
      */
-    Toolchain getToolchainFromBuildContext( String type,
-                                            MavenSession context );
+    Toolchain getToolchainFromBuildContext( String type, MavenSession context );
 }

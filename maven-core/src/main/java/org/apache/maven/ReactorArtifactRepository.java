@@ -25,11 +25,16 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.LocalArtifactRepository;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of a repository that knows how to search the Maven reactor for artifacts.
- * 
+ *
  * @author Jason van Zyl
  */
 public class ReactorArtifactRepository
@@ -42,7 +47,7 @@ public class ReactorArtifactRepository
 
     private final int hashCode;
 
-    @SuppressWarnings({"ConstantConditions"})
+    @SuppressWarnings( { "ConstantConditions" } )
     public ReactorArtifactRepository( Map<String, MavenProject> reactorProjects )
     {
         projectsByGAV = reactorProjects;
@@ -172,7 +177,7 @@ public class ReactorArtifactRepository
 
     /**
      * Tries to resolve the specified artifact from the artifacts of the given project.
-     * 
+     *
      * @param project The project to try to resolve the artifact from, must not be <code>null</code>.
      * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
      * @return The matching artifact from the project or <code>null</code> if not found.
@@ -226,7 +231,7 @@ public class ReactorArtifactRepository
      * Gets the repository conflict id of the specified artifact. Unlike the dependency conflict id, the repository
      * conflict id uses the artifact file extension instead of the artifact type. Hence, the repository conflict id more
      * closely reflects the identity of artifacts as perceived by a repository.
-     * 
+     *
      * @param artifact The artifact, must not be <code>null</code>.
      * @return The repository conflict id, never <code>null</code>.
      */
@@ -252,7 +257,7 @@ public class ReactorArtifactRepository
 
     /**
      * Determines whether the specified artifact refers to test classes.
-     * 
+     *
      * @param artifact The artifact to check, must not be {@code null}.
      * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
      */

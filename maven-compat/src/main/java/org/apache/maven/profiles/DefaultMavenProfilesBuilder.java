@@ -72,7 +72,8 @@ public class DefaultMavenProfilesBuilder
                 }
                 catch ( Exception e )
                 {
-                    getLogger().warn( "Failed to initialize environment variable resolver. Skipping environment substitution in " + PROFILES_XML_FILE + "." );
+                    getLogger().warn( "Failed to initialize environment variable resolver. Skipping environment "
+                                          + "substitution in " + PROFILES_XML_FILE + "." );
                     getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
                 }
 

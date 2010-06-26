@@ -61,20 +61,20 @@ public class MetadataResolutionResult
     }
 
     public void initTreeProcessing( PlexusContainer plexus )
-    throws ComponentLookupException
+        throws ComponentLookupException
     {
         classpathTransformation = (ClasspathTransformation) plexus.lookup( ClasspathTransformation.class );
         conflictResolver = (GraphConflictResolver) plexus.lookup( GraphConflictResolver.class );
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph()
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         return treeRoot == null ? null : new MetadataGraph( treeRoot );
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph( ArtifactScopeEnum scope )
-    throws MetadataResolutionException, GraphConflictResolutionException
+        throws MetadataResolutionException, GraphConflictResolutionException
     {
         if ( treeRoot == null )
         {
@@ -90,7 +90,7 @@ public class MetadataResolutionResult
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph( MetadataResolutionRequestTypeEnum requestType )
-    throws MetadataResolutionException, GraphConflictResolutionException
+        throws MetadataResolutionException, GraphConflictResolutionException
     {
         if ( requestType == null )
         {
@@ -139,7 +139,7 @@ public class MetadataResolutionResult
     }
     //----------------------------------------------------------------------------
     public ClasspathContainer getClasspath( ArtifactScopeEnum scope )
-    throws MetadataGraphTransformationException, MetadataResolutionException
+        throws MetadataGraphTransformationException, MetadataResolutionException
     {
         if ( classpathTransformation == null )
         {
@@ -157,7 +157,7 @@ public class MetadataResolutionResult
 
     //----------------------------------------------------------------------------
     public MetadataTreeNode getClasspathTree( ArtifactScopeEnum scope )
-    throws MetadataGraphTransformationException, MetadataResolutionException
+        throws MetadataGraphTransformationException, MetadataResolutionException
     {
         ClasspathContainer cpc = getClasspath( scope );
         if ( cpc == null )

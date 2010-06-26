@@ -33,5 +33,5 @@ public interface ArtifactHandlerManager
 
     ArtifactHandler getArtifactHandler( String type );
 
-    void addHandlers( Map<String,ArtifactHandler> handlers );
+    void addHandlers( Map<String, ArtifactHandler> handlers );
 }

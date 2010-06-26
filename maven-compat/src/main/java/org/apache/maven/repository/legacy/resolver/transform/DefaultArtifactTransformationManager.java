@@ -34,11 +34,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 /**
  * @author Jason van Zyl
  */
-@Component(role=ArtifactTransformationManager.class)
+@Component( role = ArtifactTransformationManager.class )
 public class DefaultArtifactTransformationManager
     implements ArtifactTransformationManager
 {
-    @Requirement(role=ArtifactTransformation.class, hints={"release", "latest", "snapshot"})
+    @Requirement( role = ArtifactTransformation.class, hints = { "release", "latest", "snapshot" } )
     private List<ArtifactTransformation> artifactTransformations;
 
     public void transformForResolve( Artifact artifact, RepositoryRequest request )
@@ -50,8 +50,7 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public void transformForResolve( Artifact artifact,
-                                     List<ArtifactRepository> remoteRepositories,
+    public void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
                                      ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
@@ -61,8 +60,7 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public void transformForInstall( Artifact artifact,
-                                     ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         for ( ArtifactTransformation transform : artifactTransformations )
@@ -71,8 +69,7 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public void transformForDeployment( Artifact artifact,
-                                        ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {

@@ -31,10 +31,12 @@ public interface RepositoryMetadataManager
     void resolve( RepositoryMetadata repositoryMetadata, RepositoryRequest repositoryRequest )
         throws RepositoryMetadataResolutionException;
 
-    void resolve( RepositoryMetadata repositoryMetadata, List<ArtifactRepository> repositories, ArtifactRepository localRepository )
+    void resolve( RepositoryMetadata repositoryMetadata, List<ArtifactRepository> repositories,
+                  ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException;
 
-    void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
+                        ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException;
 
     /**
@@ -44,7 +46,8 @@ public interface RepositoryMetadataManager
      * @param localRepository      the local repository to install to first
      * @param deploymentRepository the remote repository to deploy to
      */
-    void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository, ArtifactRepository deploymentRepository )
+    void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
+                 ArtifactRepository deploymentRepository )
         throws RepositoryMetadataDeploymentException;
 
     /**

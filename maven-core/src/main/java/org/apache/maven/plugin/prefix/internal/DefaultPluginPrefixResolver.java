@@ -47,7 +47,7 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * Resolves a plugin prefix.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = PluginPrefixResolver.class )
@@ -221,7 +221,8 @@ public class DefaultPluginPrefixResolver
                     repos.add( repository );
                 }
 
-                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile, repository );
+                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile,
+                                                                   repository );
 
                 if ( result != null )
                 {
@@ -250,7 +251,8 @@ public class DefaultPluginPrefixResolver
 
                 try
                 {
-                    repositorySystem.retrieve( repository, groupMetadataFile, remotePath, request.getTransferListener() );
+                    repositorySystem.retrieve( repository, groupMetadataFile, remotePath,
+                                               request.getTransferListener() );
                 }
                 catch ( ArtifactTransferFailedException e )
                 {
@@ -270,7 +272,8 @@ public class DefaultPluginPrefixResolver
                     continue;
                 }
 
-                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile, repository );
+                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile,
+                                                                   repository );
 
                 if ( result != null )
                 {

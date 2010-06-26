@@ -67,15 +67,15 @@ public class ComparableVersion
 
     private interface Item
     {
-        public static final int INTEGER_ITEM = 0;
-        public static final int STRING_ITEM = 1;
-        public static final int LIST_ITEM = 2;
+        final int INTEGER_ITEM = 0;
+        final int STRING_ITEM = 1;
+        final int LIST_ITEM = 2;
 
-        public int compareTo( Item item );
+        int compareTo( Item item );
 
-        public int getType();
+        int getType();
 
-        public boolean isNull();
+        boolean isNull();
     }
 
     /**
@@ -92,7 +92,7 @@ public class ComparableVersion
 
         private IntegerItem()
         {
-        	this.value = BigInteger_ZERO;
+            this.value = BigInteger_ZERO;
         }
 
         public IntegerItem( String str )
@@ -145,21 +145,23 @@ public class ComparableVersion
     private static class StringItem
         implements Item
     {
-        private final static String[] QUALIFIERS = { "alpha", "beta", "milestone", "rc", "snapshot", "", "sp" };
+        private static final String[] QUALIFIERS = { "alpha", "beta", "milestone", "rc", "snapshot", "", "sp" };
 
-        private final static List<String> _QUALIFIERS = Arrays.asList( QUALIFIERS );
+        private static final List<String> _QUALIFIERS = Arrays.asList( QUALIFIERS );
 
-        private final static Properties ALIASES = new Properties();
-        static {
+        private static final Properties ALIASES = new Properties();
+        static
+        {
             ALIASES.put( "ga", "" );
             ALIASES.put( "final", "" );
             ALIASES.put( "cr", "rc" );
         }
+
         /**
-         * A comparable value for the empty-string qualifier. This one is used to determine if a given qualifier makes the
-         * version older than one without a qualifier, or more recent.
+         * A comparable value for the empty-string qualifier. This one is used to determine if a given qualifier makes
+         * the version older than one without a qualifier, or more recent.
          */
-        private static String RELEASE_VERSION_INDEX = String.valueOf( _QUALIFIERS.indexOf( "" ) );
+        private static final String RELEASE_VERSION_INDEX = String.valueOf( _QUALIFIERS.indexOf( "" ) );
 
         private String value;
 
@@ -285,7 +287,7 @@ public class ComparableVersion
                 {
                     return 0; // 1-0 = 1- (normalize) = 1
                 }
-                Item first = (Item) get(0);
+                Item first = get( 0 );
                 return first.compareTo( null );
             }
             switch ( item.getType() )
@@ -302,8 +304,8 @@ public class ComparableVersion
 
                     while ( left.hasNext() || right.hasNext() )
                     {
-                        Item l = left.hasNext() ? (Item) left.next() : null;
-                        Item r = right.hasNext() ? (Item) right.next() : null;
+                        Item l = left.hasNext() ? left.next() : null;
+                        Item r = right.hasNext() ? right.next() : null;
 
                         // if this is shorter, then invert the compare and mul with -1
                         int result = l == null ? -1 * r.compareTo( l ) : l.compareTo( r );
@@ -454,7 +456,7 @@ public class ComparableVersion
 
     public boolean equals( Object o )
     {
-        return ( o instanceof ComparableVersion ) && canonical.equals( ( ( ComparableVersion )o ).canonical );
+        return ( o instanceof ComparableVersion ) && canonical.equals( ( (ComparableVersion) o ).canonical );
     }
 
     public int hashCode()

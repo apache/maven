@@ -38,7 +38,8 @@ import org.codehaus.plexus.util.StringUtils;
 /*
 
 - test projects for each of these
-- how to categorize the problems so that the id of the problem can be match to a page with descriptive help and the test project
+- how to categorize the problems so that the id of the problem can be match to a page with descriptive help and the test
+  project
 - nice little sample projects that could be run in the core as well as integration tests
 
 All Possible Errors
@@ -52,7 +53,7 @@ All Possible Errors
 - extension metadata missing
 - extension artifact missing
 - artifact metadata retrieval problem
-- version range violation 
+- version range violation
 - circular dependency
 - artifact missing
 - artifact retrieval exception
@@ -78,7 +79,7 @@ Plugins:
 
 //PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException;
 
-@Component(role=ExceptionHandler.class)
+@Component( role = ExceptionHandler.class )
 public class DefaultExceptionHandler
     implements ExceptionHandler
 {
@@ -192,7 +193,7 @@ public class DefaultExceptionHandler
                     reference = exception.getClass().getSimpleName();
                 }
             }
-            else if ( exception instanceof LifecycleExecutionException)
+            else if ( exception instanceof LifecycleExecutionException )
             {
                 reference = getReference( exception.getCause() );
             }

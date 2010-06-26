@@ -1,18 +1,22 @@
 package org.apache.maven.cli;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import java.io.File;
@@ -79,7 +83,8 @@ public class MavenCli
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
 
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
+        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
@@ -96,8 +101,8 @@ public class MavenCli
 
     private MavenExecutionRequestPopulator executionRequestPopulator;
 
-    private SettingsBuilder settingsBuilder;            
-    
+    private SettingsBuilder settingsBuilder;
+
     private DefaultSecDispatcher dispatcher;
 
     public MavenCli()
@@ -172,7 +177,7 @@ public class MavenCli
         catch ( Exception e )
         {
             CLIReportingUtils.showError( logger, "Error executing Maven.", e, cliRequest.showErrors );
-            
+
             return 1;
         }
         finally
@@ -208,19 +213,19 @@ public class MavenCli
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
         }
-        
+
         //
         // Make sure the Maven home directory is an absolute path to save us from confusion with say drive-relative
         // Windows paths.
         //
         String mavenHome = System.getProperty( "maven.home" );
-        
+
         if ( mavenHome != null )
         {
             System.setProperty( "maven.home", new File( mavenHome ).getAbsolutePath() );
         }
     }
-    
+
     //
     // Logging needs to be handled in a standard way at the container level.
     //
@@ -239,7 +244,8 @@ public class MavenCli
             // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
             // Ideally, we could use Warn across the board
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
-            // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+            // TODO:Additionally, we can't change the mojo level because the component key includes the version and
+            // it isn't known ahead of time. This seems worth changing.
         }
         else
         {
@@ -268,10 +274,10 @@ public class MavenCli
         {
             logger.setStream( cliRequest.stdout );
         }
-                
-        cliRequest.request.setExecutionListener( new ExecutionEventLogger( logger ) );        
+
+        cliRequest.request.setExecutionListener( new ExecutionEventLogger( logger ) );
     }
-    
+
     //
     // Every bit of information taken from the CLI should be processed here.
     //
@@ -305,7 +311,7 @@ public class MavenCli
             throw new ExitException( 0 );
         }
     }
-        
+
     private void commands( CliRequest cliRequest )
     {
         if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
@@ -319,7 +325,7 @@ public class MavenCli
         }
 
         //
-        // TODO: move checksum policies to 
+        // TODO: move checksum policies to
         //
         if ( MavenExecutionRequest.CHECKSUM_POLICY_WARN.equals( cliRequest.request.getGlobalChecksumPolicy() ) )
         {
@@ -376,11 +382,11 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
     }
-    
+
     protected void customizeContainer( PlexusContainer container )
     {
     }
-    
+
     //
     // This should probably be a separate tool and not be baked into Maven.
     //
@@ -393,7 +399,8 @@ public class MavenCli
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-            cliRequest.stdout.println( cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+            cliRequest.stdout.println( cipher.encryptAndDecorate( passwd,
+                                                                  DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
 
             throw new ExitException( 0 );
         }
@@ -430,11 +437,11 @@ public class MavenCli
             throw new ExitException( 0 );
         }
     }
-    
+
     private int execute( CliRequest cliRequest )
     {
-        MavenExecutionResult result = maven.execute( cliRequest.request );           
-        
+        MavenExecutionResult result = maven.execute( cliRequest.request );
+
         if ( result.hasExceptions() )
         {
             ExceptionHandler handler = new DefaultExceptionHandler();
@@ -469,7 +476,8 @@ public class MavenCli
             if ( !references.isEmpty() )
             {
                 logger.error( "" );
-                logger.error( "For more information about the errors and possible solutions" + ", please read the following articles:" );
+                logger.error( "For more information about the errors and possible solutions"
+                              + ", please read the following articles:" );
 
                 for ( Map.Entry<String, String> entry : references.entrySet() )
                 {
@@ -501,7 +509,8 @@ public class MavenCli
         }
     }
 
-    private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent, boolean showErrors )
+    private void logSummary( ExceptionSummary summary, Map<String, String> references, String indent,
+                             boolean showErrors )
     {
         String referenceKey = "";
 
@@ -579,7 +588,8 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
         {
-            globalSettingsFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
+            globalSettingsFile =
+                new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
             globalSettingsFile = resolveFile( globalSettingsFile, cliRequest.workingDirectory );
 
             if ( !globalSettingsFile.isFile() )
@@ -624,7 +634,7 @@ public class MavenCli
 
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
-        MavenExecutionRequest request = cliRequest.request; 
+        MavenExecutionRequest request = cliRequest.request;
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean debug = cliRequest.debug;
@@ -640,7 +650,7 @@ public class MavenCli
                     + " is deprecated and will be removed in future Maven versions." );
             }
         }
-        
+
         // ----------------------------------------------------------------------
         // Now that we have everything that we need we will fire up plexus and
         // bring the maven component to life for use.
@@ -784,7 +794,8 @@ public class MavenCli
             // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
             // Ideally, we could use Warn across the board
             loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_ERROR;
-            // TODO:Additionally, we can't change the mojo level because the component key includes the version and it isn't known ahead of time. This seems worth changing.
+            // TODO:Additionally, we can't change the mojo level because the component key includes the version and
+            // it isn't known ahead of time. This seems worth changing.
         }
         else
         {
@@ -850,15 +861,18 @@ public class MavenCli
             request.setSelectedProjects( Arrays.asList( projects ) );
         }
 
-        if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && !commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        if ( commandLine.hasOption( CLIManager.ALSO_MAKE )
+                        && !commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
         {
             request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_UPSTREAM );
         }
-        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        else if ( !commandLine.hasOption( CLIManager.ALSO_MAKE )
+                        && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
         {
             request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM );
         }
-        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE ) && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
+        else if ( commandLine.hasOption( CLIManager.ALSO_MAKE )
+                        && commandLine.hasOption( CLIManager.ALSO_MAKE_DEPENDENTS ) )
         {
             request.setMakeBehavior( MavenExecutionRequest.REACTOR_MAKE_BOTH );
         }
@@ -974,23 +988,23 @@ public class MavenCli
 
         System.setProperty( name, value );
     }
-    
+
     static class CliRequest
     {
         String[] args;
         CommandLine commandLine;
         PrintStream stdout;
         PrintStream stderr;
-        ClassWorld classWorld;    
+        ClassWorld classWorld;
         String workingDirectory;
         boolean debug;
         boolean quiet;
-        boolean showErrors = true; 
+        boolean showErrors = true;
         PrintStream fileStream;
         Properties userProperties = new Properties();
         Properties systemProperties = new Properties();
         MavenExecutionRequest request;
-        
+
         CliRequest( String[] args, ClassWorld classWorld )
         {
             this.args = args;

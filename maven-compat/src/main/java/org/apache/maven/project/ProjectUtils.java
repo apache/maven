@@ -40,17 +40,19 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 @Deprecated
 public final class ProjectUtils
 {
-        
+
     private ProjectUtils()
     {
     }
 
-    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
+    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories,
+                                                                      ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                                      PlexusContainer c )
         throws InvalidRepositoryException
     {
 
         List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
-        
+
         for ( Repository r : repositories )
         {
             remoteRepositories.add( buildArtifactRepository( r, artifactRepositoryFactory, c ) );
@@ -59,13 +61,17 @@ public final class ProjectUtils
         return remoteRepositories;
     }
 
-    public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
+    public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
+                                                                        ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                                        PlexusContainer c )
         throws InvalidRepositoryException
     {
         return buildArtifactRepository( repo, artifactRepositoryFactory, c );
     }
 
-    public static ArtifactRepository buildArtifactRepository( Repository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
+    public static ArtifactRepository buildArtifactRepository( Repository repo,
+                                                              ArtifactRepositoryFactory artifactRepositoryFactory,
+                                                              PlexusContainer c )
         throws InvalidRepositoryException
     {
         RepositorySystem repositorySystem = rs( c );

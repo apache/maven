@@ -1,7 +1,5 @@
 package org.apache.maven.settings;
 
-import java.io.File;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +19,7 @@ import java.io.File;
  * under the License.
  */
 
+import java.io.File;
 
 /**
  * To handle runtime informations like local repository or profiles.
@@ -35,14 +34,14 @@ public class RuntimeInfo
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
-    
+
     private File settings;
 
     public RuntimeInfo()
     {
         this.settings = DEFAULT_USER_SETTINGS_FILE;
     }
-    
+
     public RuntimeInfo( File settings )
     {
         this.settings = settings;

@@ -35,7 +35,7 @@ public class Lifecycle
     /**
      * Field phases
      */
-    private Map<String,String> phases;
+    private Map<String, String> phases;
 
     /*
      * NOTE: This exists merely for backward-compat with legacy-style lifecycle definitions and allows configuration
@@ -55,7 +55,7 @@ public class Lifecycle
     /**
      * Method getPhases
      */
-    public Map<String,String> getPhases()
+    public Map<String, String> getPhases()
     {
         return this.phases;
     }
@@ -68,16 +68,16 @@ public class Lifecycle
     public void setId( String id )
     {
         this.id = id;
-    } 
+    }
 
     /**
      * Method setPhases
      *
      * @param phases
      */
-    public void setPhases( Map<String,String> phases )
+    public void setPhases( Map<String, String> phases )
     {
         this.phases = phases;
-    } //-- void setPhases(java.util.List) 
+    } //-- void setPhases(java.util.List)
 
 }

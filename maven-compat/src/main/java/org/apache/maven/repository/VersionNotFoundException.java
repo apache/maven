@@ -35,25 +35,23 @@ public class VersionNotFoundException
     extends Exception
 {
     private Dependency dependency;
-    
+
     private String projectId;
     private File pomFile;
-    private InvalidVersionSpecificationException cause; 
+    private InvalidVersionSpecificationException cause;
 
-    public VersionNotFoundException( String projectId
-                                     , Dependency dependency
-                                     , File pomFile
-                                     , InvalidVersionSpecificationException cause 
-                                     )
+    public VersionNotFoundException( String projectId, Dependency dependency, File pomFile,
+                                     InvalidVersionSpecificationException cause )
     {
-        super( projectId+", "+formatLocationInPom( dependency )+ " " +dependency.getVersion()+", pom file "+pomFile, cause );
-        
+        super( projectId + ", " + formatLocationInPom( dependency ) + " " + dependency.getVersion() + ", pom file "
+            + pomFile, cause );
+
         this.projectId = projectId;
-        
+
         this.pomFile = pomFile;
-        
+
         this.cause = cause;
-        
+
         this.dependency = dependency;
     }
 
@@ -81,6 +79,6 @@ public class VersionNotFoundException
     {
         return cause;
     }
-    
-    
+
+
 }

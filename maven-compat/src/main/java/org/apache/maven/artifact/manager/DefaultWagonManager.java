@@ -42,27 +42,27 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-@Component(role=WagonManager.class) 
+@Component( role = WagonManager.class )
 public class DefaultWagonManager
     extends org.apache.maven.repository.legacy.DefaultWagonManager
     implements WagonManager
 {
 
     @Requirement
-    private Logger logger;    
-    
+    private Logger logger;
+
     @Requirement
     private LegacySupport legacySupport;
 
     @Requirement
     private SettingsDecrypter settingsDecrypter;
-        
+
     @Requirement
-    private MirrorSelector mirrorSelector;   
-    
+    private MirrorSelector mirrorSelector;
+
     @Requirement
     private ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
     public AuthenticationInfo getAuthenticationInfo( String id )
     {
         MavenSession session = legacySupport.getSession();
@@ -153,13 +153,13 @@ public class DefaultWagonManager
     {
         getArtifact( artifact, remoteRepositories, null, false );
     }
-    
+
     @Deprecated
     public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
     {
-        
+
         Mirror mirror = mirrorSelector.getMirror( repository, legacySupport.getSession().getSettings().getMirrors() );
-        
+
         if ( mirror != null )
         {
             String id = mirror.getId();
@@ -170,12 +170,12 @@ public class DefaultWagonManager
             }
 
             logger.debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
-            
+
             repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(),
                                                                      repository.getLayout(), repository.getSnapshots(),
                                                                      repository.getReleases() );
         }
         return repository;
-    }     
+    }
 
 }

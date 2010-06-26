@@ -19,7 +19,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
@@ -35,16 +34,13 @@ public class UnknownRepositoryLayoutException
 
     private final String layoutId;
 
-    public UnknownRepositoryLayoutException( String repositoryId,
-                                             String layoutId )
+    public UnknownRepositoryLayoutException( String repositoryId, String layoutId )
     {
         super( "Cannot find ArtifactRepositoryLayout instance for: " + layoutId, repositoryId );
         this.layoutId = layoutId;
     }
 
-    public UnknownRepositoryLayoutException( String repositoryId,
-                                             String layoutId,
-                                             ComponentLookupException e )
+    public UnknownRepositoryLayoutException( String repositoryId, String layoutId, ComponentLookupException e )
     {
         super( "Cannot find ArtifactRepositoryLayout instance for: " + layoutId, repositoryId, e );
         this.layoutId = layoutId;

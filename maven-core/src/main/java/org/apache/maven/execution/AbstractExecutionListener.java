@@ -1,6 +1,5 @@
 package org.apache.maven.execution;
 
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -22,7 +21,7 @@ package org.apache.maven.execution;
 
 /**
  * Provides a skeleton implementation for execution listeners. The methods of this class are empty.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class AbstractExecutionListener

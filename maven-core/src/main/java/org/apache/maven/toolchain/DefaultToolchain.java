@@ -1,3 +1,5 @@
+package org.apache.maven.toolchain;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -16,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-package org.apache.maven.toolchain;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,14 +68,13 @@ public abstract class DefaultToolchain
         return model;
     }
 
-    public final void addProvideToken( String type,
-                                       RequirementMatcher matcher )
+    public final void addProvideToken( String type, RequirementMatcher matcher )
     {
         provides.put( type, matcher );
     }
 
 
-    public boolean matchesRequirements(Map requirements)
+    public boolean matchesRequirements( Map requirements )
     {
         Iterator it = requirements.keySet().iterator();
         while ( it.hasNext() )
@@ -86,12 +85,12 @@ public abstract class DefaultToolchain
 
             if ( matcher == null )
             {
-                getLog().debug( "Toolchain "  + this + " is missing required property: "  + key );
+                getLog().debug( "Toolchain " + this + " is missing required property: " + key );
                 return false;
             }
-            if ( !matcher.matches( (String) requirements.get(key) ) )
+            if ( !matcher.matches( (String) requirements.get( key ) ) )
             {
-                getLog().debug( "Toolchain "  + this + " doesn't match required property: "  + key );
+                getLog().debug( "Toolchain " + this + " doesn't match required property: " + key );
                 return false;
             }
         }

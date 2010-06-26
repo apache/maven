@@ -1,8 +1,5 @@
 package org.apache.maven.artifact.repository.layout;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +18,9 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 
 public interface ArtifactRepositoryLayout2
     extends ArtifactRepositoryLayout

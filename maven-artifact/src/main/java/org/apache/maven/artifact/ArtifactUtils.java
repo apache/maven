@@ -107,9 +107,9 @@ public final class ArtifactUtils
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    public static Map<String,Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
+    public static Map<String, Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
-        Map<String,Artifact> artifactMap = new LinkedHashMap<String,Artifact>();
+        Map<String, Artifact> artifactMap = new LinkedHashMap<String, Artifact>();
 
         if ( artifacts != null )
         {

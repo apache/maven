@@ -33,7 +33,8 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * The bean containing the Mojo descriptor.
  * <br/>
  * For more information about the usage tag, have a look to:
- * <a href="http://maven.apache.org/developers/mojo-api-specification.html">http://maven.apache.org/developers/mojo-api-specification.html</a>
+ * <a href="http://maven.apache.org/developers/mojo-api-specification.html">
+ * http://maven.apache.org/developers/mojo-api-specification.html</a>
  *
  * @todo is there a need for the delegation of MavenMojoDescriptor to this?
  * Why not just extend ComponentDescriptor here?
@@ -278,7 +279,8 @@ public class MojoDescriptor
     // ----------------------------------------------------------------------
 
     /**
-     * @param requiresProject <code>true</code> if the Mojo needs a Maven project to be executed, <code>false</code> otherwise.
+     * @param requiresProject <code>true</code> if the Mojo needs a Maven project to be executed, <code>false</code>
+     * otherwise.
      */
     public void setProjectRequired( boolean requiresProject )
     {
@@ -577,7 +579,8 @@ public class MojoDescriptor
     }
 
     /**
-     * @param aggregator <code>true</code> if the Mojo uses the Maven project and its child modules, <code>false</code> otherwise.
+     * @param aggregator <code>true</code> if the Mojo uses the Maven project and its child modules,
+     * <code>false</code> otherwise.
      */
     public void setAggregator( boolean aggregator )
     {
@@ -585,7 +588,8 @@ public class MojoDescriptor
     }
 
     /**
-     * @return <code>true</code> if the Mojo uses the Maven project and its child modules, <code>false</code> otherwise.
+     * @return <code>true</code> if the Mojo uses the Maven project and its child modules,
+     * <code>false</code> otherwise.
      */
     public boolean isAggregator()
     {
@@ -601,7 +605,8 @@ public class MojoDescriptor
     }
 
     /**
-     * @param directInvocationOnly <code>true</code> if the Mojo could not be invoke directly, <code>false</code> otherwise.
+     * @param directInvocationOnly <code>true</code> if the Mojo could not be invoke directly,
+     * <code>false</code> otherwise.
      */
     public void setDirectInvocationOnly( boolean directInvocationOnly )
     {

@@ -1,18 +1,23 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
 package org.apache.maven.lifecycle.internal;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.artifact.Artifact;
@@ -47,7 +52,7 @@ import java.util.Set;
  *         Builds one or more lifecycles for a full module
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component(role = BuilderCommon.class)
+@Component( role = BuilderCommon.class )
 public class BuilderCommon
 {
     @Requirement
@@ -64,17 +69,17 @@ public class BuilderCommon
 
     @Requirement
     private Logger logger;
-    
 
 
-    @SuppressWarnings({"UnusedDeclaration"})
+
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public BuilderCommon()
     {
     }
 
-    public BuilderCommon(LifecycleDebugLogger lifecycleDebugLogger,
-                         LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-                         LifecycleDependencyResolver lifecycleDependencyResolver, Logger logger)
+    public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
+                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
+                          LifecycleDependencyResolver lifecycleDependencyResolver, Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
@@ -172,8 +177,8 @@ public class BuilderCommon
         }
     }
 
-    // Todo: I'm really wondering where this method belongs; smells like it should be on MavenProject, but for some reason it isn't ?
-    // This localization is kind-of a code smell.
+    // Todo: I'm really wondering where this method belongs; smells like it should be on MavenProject, but for some reason
+    // it isn't ? This localization is kind-of a code smell.
 
     public static String getKey( MavenProject project )
     {

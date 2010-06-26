@@ -22,7 +22,7 @@ package org.apache.maven.model.building;
 /**
  * Assists in firing events from a generic method by abstracting from the actual callback method to be called on the
  * listener.
- * 
+ *
  * @author Benjamin Bentmann
  */
 interface ModelBuildingEventCatapult
@@ -30,13 +30,13 @@ interface ModelBuildingEventCatapult
 
     /**
      * Notifies the specified listener of the given event.
-     * 
+     *
      * @param listener The listener to notify, must not be {@code null}.
      * @param event The event to fire, must not be {@code null}.
      */
     void fire( ModelBuildingListener listener, ModelBuildingEvent event );
 
-    static final ModelBuildingEventCatapult BUILD_EXTENSIONS_ASSEMBLED = new ModelBuildingEventCatapult()
+    final ModelBuildingEventCatapult BUILD_EXTENSIONS_ASSEMBLED = new ModelBuildingEventCatapult()
     {
         public void fire( ModelBuildingListener listener, ModelBuildingEvent event )
         {

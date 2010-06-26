@@ -1,18 +1,23 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
 package org.apache.maven.lifecycle.internal;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -20,7 +25,12 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -41,7 +51,7 @@ import java.util.Map;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component(role = MojoExecutor.class)
+@Component( role = MojoExecutor.class )
 public class MojoExecutor
 {
 
@@ -78,7 +88,7 @@ public class MojoExecutor
         phaseRecorder.observeExecution( mojoExecution );
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown"})
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                           DependencyContext dependencyContext )
         throws LifecycleExecutionException
@@ -87,10 +97,10 @@ public class MojoExecutor
 
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {
-            Throwable cause = new MissingProjectException(
-                "Goal requires a project to execute" + " but there is no POM in this directory (" +
-                    session.getExecutionRootDirectory() + ")." +
-                    " Please verify you invoked Maven from the correct directory." );
+            Throwable cause =
+                new MissingProjectException( "Goal requires a project to execute"
+                    + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
+                    + " Please verify you invoked Maven from the correct directory." );
             throw new LifecycleExecutionException( mojoExecution, null, cause );
         }
 
@@ -98,8 +108,9 @@ public class MojoExecutor
         {
             if ( MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) )
             {
-                Throwable cause = new IllegalStateException(
-                    "Goal requires online mode for execution" + " but Maven is currently offline." );
+                Throwable cause =
+                    new IllegalStateException( "Goal requires online mode for execution"
+                        + " but Maven is currently offline." );
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), cause );
             }
             else
@@ -270,6 +281,4 @@ public class MojoExecutor
 
         return forkedProjects;
     }
-
-
 }

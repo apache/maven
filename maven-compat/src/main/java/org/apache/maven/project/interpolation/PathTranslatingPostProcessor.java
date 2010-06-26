@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * 
+ *
  * @version $Id$
  */
 @Deprecated
@@ -40,7 +40,8 @@ public class PathTranslatingPostProcessor
     private final PathTranslator pathTranslator;
     private final List<String> expressionPrefixes;
 
-    public PathTranslatingPostProcessor( List<String> expressionPrefixes, List<String> unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
+    public PathTranslatingPostProcessor( List<String> expressionPrefixes, List<String> unprefixedPathKeys,
+                                         File projectDir, PathTranslator pathTranslator )
     {
         this.expressionPrefixes = expressionPrefixes;
         this.unprefixedPathKeys = unprefixedPathKeys;
@@ -52,7 +53,7 @@ public class PathTranslatingPostProcessor
                                       Object value )
     {
         expression = ValueSourceUtils.trimPrefix( expression, expressionPrefixes, true );
-        
+
         if ( projectDir != null && value != null && unprefixedPathKeys.contains( expression ) )
         {
             return pathTranslator.alignToBaseDirectory( String.valueOf( value ), projectDir );

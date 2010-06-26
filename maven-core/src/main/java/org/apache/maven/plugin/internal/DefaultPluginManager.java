@@ -100,7 +100,8 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor;
         try
         {
-            RepositoryRequest repositoryRequest = DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
+            RepositoryRequest repositoryRequest =
+                DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
 
             pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
 
@@ -132,7 +133,8 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor;
         try
         {
-            RepositoryRequest repositoryRequest = DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
+            RepositoryRequest repositoryRequest =
+                DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
 
             pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
 

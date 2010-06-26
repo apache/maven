@@ -36,7 +36,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * @author jdcasey
  */
-@Component(role = MavenSettingsBuilder.class)
+@Component( role = MavenSettingsBuilder.class )
 public class DefaultMavenSettingsBuilder
     extends AbstractLogEnabled
     implements MavenSettingsBuilder
@@ -49,7 +49,8 @@ public class DefaultMavenSettingsBuilder
         throws IOException, XmlPullParserException
     {
         File userSettingsFile =
-            getFile( "${user.home}/.m2/settings.xml", "user.home", MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
+            getFile( "${user.home}/.m2/settings.xml", "user.home",
+                     MavenSettingsBuilder.ALT_USER_SETTINGS_XML_LOCATION );
 
         return buildSettings( userSettingsFile );
     }
@@ -71,7 +72,7 @@ public class DefaultMavenSettingsBuilder
         request.setUserSettingsFile( userSettingsFile );
         request.setGlobalSettingsFile( globalSettingsFile );
         request.setSystemProperties( System.getProperties() );
-        return build(request);
+        return build( request );
     }
 
     public Settings buildSettings( File userSettingsFile, boolean useCachedSettings )
@@ -102,8 +103,8 @@ public class DefaultMavenSettingsBuilder
         settingsRequest.setGlobalSettingsFile( request.getGlobalSettingsFile() );
         settingsRequest.setUserProperties( request.getUserProperties() );
         settingsRequest.setSystemProperties( request.getSystemProperties() );
-        
-        return build(settingsRequest);
+
+        return build( settingsRequest );
     }
 
     private File getFile( String pathPattern, String basedirSysProp, String altLocationSysProp )

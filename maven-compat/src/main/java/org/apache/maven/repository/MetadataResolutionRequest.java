@@ -46,32 +46,33 @@ public class MetadataResolutionRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
-    // This is like a filter but overrides all transitive versions 
+    // This is like a filter but overrides all transitive versions
     private Map managedVersionMap;
 
     /** result type - flat list; the default */
     private boolean asList = true;
-    
+
     /** result type - dirty tree */
     private boolean asDirtyTree = false;
-    
+
     /** result type - resolved tree */
     private boolean asResolvedTree = false;
-    
+
     /** result type - graph */
     private boolean asGraph = false;
-    
+
     public MetadataResolutionRequest()
-    {  
+    {
     }
-    
-    public MetadataResolutionRequest( MavenArtifactMetadata md, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )    
-    {        
+
+    public MetadataResolutionRequest( MavenArtifactMetadata md, ArtifactRepository localRepository,
+                                      List<ArtifactRepository> remoteRepositories )
+    {
         this.mad = md;
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;
     }
-    
+
     public MavenArtifactMetadata getArtifactMetadata()
     {
         return mad;
@@ -141,7 +142,7 @@ public class MetadataResolutionRequest
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" )
                 ;
-        
+
         return sb.toString();
     }
 

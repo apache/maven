@@ -31,7 +31,7 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @version $Id$
  */
-@Component(role=ArtifactRepositoryLayout.class, hint="flat")                                                                         
+@Component( role = ArtifactRepositoryLayout.class, hint = "flat" )
 public class FlatRepositoryLayout
     implements ArtifactRepositoryLayout
 {
@@ -43,7 +43,7 @@ public class FlatRepositoryLayout
     {
         return "flat";
     }
-    
+
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
@@ -65,8 +65,7 @@ public class FlatRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
-                                                 ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
     {
         return pathOfRepositoryMetadata( metadata.getLocalFilename( repository ) );
     }

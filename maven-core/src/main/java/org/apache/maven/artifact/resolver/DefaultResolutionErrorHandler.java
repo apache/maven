@@ -69,7 +69,8 @@ public class DefaultResolutionErrorHandler
         if ( result.hasMissingArtifacts() )
         {
             throw new MultipleArtifactsNotFoundException( request.getArtifact(), toList( result.getArtifacts() ),
-                                                          result.getMissingArtifacts(), request.getRemoteRepositories() );
+                                                          result.getMissingArtifacts(),
+                                                          request.getRemoteRepositories() );
         }
 
         // this should never happen since we checked all possible error sources before but better be sure

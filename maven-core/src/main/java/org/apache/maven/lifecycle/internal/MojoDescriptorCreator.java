@@ -1,27 +1,41 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
- */
 package org.apache.maven.lifecycle.internal;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.*;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.prefix.*;
+import org.apache.maven.plugin.prefix.DefaultPluginPrefixRequest;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.prefix.PluginPrefixRequest;
+import org.apache.maven.plugin.prefix.PluginPrefixResolver;
+import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
@@ -47,7 +61,7 @@ import java.util.StringTokenizer;
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 
-@Component(role = MojoDescriptorCreator.class)
+@Component( role = MojoDescriptorCreator.class )
 public class MojoDescriptorCreator
 {
     @Requirement
@@ -59,7 +73,7 @@ public class MojoDescriptorCreator
     @Requirement
     private PluginPrefixResolver pluginPrefixResolver;
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public MojoDescriptorCreator()
     {
     }
@@ -199,9 +213,10 @@ public class MojoDescriptorCreator
 
         return pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
     }
-    //TODO: take repo mans into account as one may be aggregating prefixes of many
-    //TODO: collect at the root of the repository, read the one at the root, and fetch remote if something is missing
-    //      or the user forces the issue
+
+    // TODO: take repo mans into account as one may be aggregating prefixes of many
+    // TODO: collect at the root of the repository, read the one at the root, and fetch remote if something is missing
+    // or the user forces the issue
 
     public Plugin findPluginForPrefix( String prefix, MavenSession session )
         throws NoPluginFoundForPrefixException
@@ -224,7 +239,6 @@ public class MojoDescriptorCreator
         PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, repositoryRequest );
         plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
     }
-
 
     private void injectPluginDeclarationFromProject( Plugin plugin, MavenProject project )
     {
@@ -251,6 +265,4 @@ public class MojoDescriptorCreator
         return findPlugin( plugin.getGroupId(), plugin.getArtifactId(), plugins );
     }
 
-
 }
-

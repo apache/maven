@@ -34,11 +34,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 /**
  * @author jdcasey
  */
-@Component(role=ArtifactRepositoryFactory.class)
+@Component( role = ArtifactRepositoryFactory.class )
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
-    
+
     @Requirement
     private org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory factory;
 
@@ -54,26 +54,22 @@ public class DefaultArtifactRepositoryFactory
         return factory.getLayout( layoutId );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id,
-                                                                  String url,
-                                                                  String layoutId,
+    public ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
                                                                   boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
         return injectSession( factory.createDeploymentArtifactRepository( id, url, layoutId, uniqueVersion ), false );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id,
-                                                                  String url,
+    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
                                                                   ArtifactRepositoryLayout repositoryLayout,
                                                                   boolean uniqueVersion )
     {
-        return injectSession( factory.createDeploymentArtifactRepository( id, url, repositoryLayout, uniqueVersion ), false);
+        return injectSession( factory.createDeploymentArtifactRepository( id, url, repositoryLayout, uniqueVersion ),
+                              false );
     }
 
-    public ArtifactRepository createArtifactRepository( String id,
-                                                        String url,
-                                                        String layoutId,
+    public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
@@ -81,8 +77,7 @@ public class DefaultArtifactRepositoryFactory
         return injectSession( factory.createArtifactRepository( layoutId, url, layoutId, snapshots, releases ), true );
     }
 
-    public ArtifactRepository createArtifactRepository( String id,
-                                                        String url,
+    public ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )

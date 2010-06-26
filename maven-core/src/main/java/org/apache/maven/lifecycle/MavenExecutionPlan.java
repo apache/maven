@@ -19,17 +19,26 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
-
-import java.util.*;
 
 //TODO: lifecycles being executed
 //TODO: what runs in each phase
 //TODO: plugins that need downloading
 //TODO: project dependencies that need downloading
-//TODO: unfortunately the plugins need to be downloaded in order to get the plugin.xml file. need to externalize this from the plugin archive.
+//TODO: unfortunately the plugins need to be downloaded in order to get the plugin.xml file. need to externalize this
+//      from the plugin archive.
 //TODO: this will be the class that people get in IDEs to modify
 
 public class MavenExecutionPlan
@@ -104,8 +113,6 @@ public class MavenExecutionPlan
             lastMojoExecutionForAllPhases.put( phase, lastSeenExecutionPlanItem );
 
         }
-
-
     }
 
 
@@ -204,10 +211,10 @@ public class MavenExecutionPlan
         }
         return plugins;
     }
-    
-    // Used by m2e but will be removed, really. 
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    // Used by m2e but will be removed, really.
+
+    @SuppressWarnings( { "UnusedDeclaration" } )
     @Deprecated
     public List<MojoExecution> getExecutions()
     {

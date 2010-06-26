@@ -1,7 +1,5 @@
 package org.apache.maven.project;
 
-import java.io.File;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +18,8 @@ import java.io.File;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import java.io.File;
 
 /**
  * Exception that occurs when the project list contains duplicate projects instead of ignoring one.

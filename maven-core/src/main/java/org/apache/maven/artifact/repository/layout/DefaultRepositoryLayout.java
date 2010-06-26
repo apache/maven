@@ -28,7 +28,7 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * @author jdcasey
  */
-@Component(role=ArtifactRepositoryLayout.class, hint="default")
+@Component( role = ArtifactRepositoryLayout.class, hint = "default" )
 public class DefaultRepositoryLayout
     implements ArtifactRepositoryLayout
 {
@@ -42,7 +42,7 @@ public class DefaultRepositoryLayout
     {
         return "default";
     }
-    
+
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();

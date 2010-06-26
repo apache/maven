@@ -115,9 +115,10 @@ public class DefaultPluginRealmCache
                                         remoteRepositories ) );
     }
 
-    public CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,ArtifactFilter dependencyFilter,
-                            ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
-                            ClassRealm pluginRealm, List<Artifact> pluginArtifacts )
+    public CacheRecord put( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+                            ArtifactFilter dependencyFilter, ArtifactRepository localRepository,
+                            List<ArtifactRepository> remoteRepositories, ClassRealm pluginRealm,
+                            List<Artifact> pluginArtifacts )
     {
         if ( pluginRealm == null || pluginArtifacts == null )
         {
@@ -177,7 +178,7 @@ public class DefaultPluginRealmCache
     {
         return eq( a.getGroupId(), b.getGroupId() ) //
             && eq( a.getArtifactId(), b.getArtifactId() ) //
-            && eq( a.getVersion(), b.getVersion() ) // 
+            && eq( a.getVersion(), b.getVersion() ) //
             && a.isExtensions() == b.isExtensions() //
             && dependenciesEquals( a.getDependencies(), b.getDependencies() );
     }
@@ -199,7 +200,7 @@ public class DefaultPluginRealmCache
 
             boolean r = eq( aD.getGroupId(), bD.getGroupId() ) //
                 && eq( aD.getArtifactId(), bD.getArtifactId() ) //
-                && eq( aD.getVersion(), bD.getVersion() ) // 
+                && eq( aD.getVersion(), bD.getVersion() ) //
                 && eq( aD.getType(), bD.getType() ) //
                 && eq( aD.getClassifier(), bD.getClassifier() ) //
                 && eq( aD.getScope(), bD.getScope() );

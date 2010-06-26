@@ -65,8 +65,7 @@ public class DebugResolutionListener
         logger.debug( indent + artifact + " (selected for " + artifact.getScope() + ")" );
     }
 
-    public void omitForNearer( Artifact omitted,
-                               Artifact kept )
+    public void omitForNearer( Artifact omitted, Artifact kept )
     {
         String omittedVersion = omitted.getVersion();
         String keptVersion = kept.getVersion();
@@ -82,12 +81,10 @@ public class DebugResolutionListener
         logger.debug( indent + omitted + " (removed - causes a cycle in the graph)" );
     }
 
-    public void updateScopeCurrentPom( Artifact artifact,
-                                       String ignoredScope )
+    public void updateScopeCurrentPom( Artifact artifact, String ignoredScope )
     {
-        logger.debug(
-            indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope " + artifact.getScope()
-                + " wins)" );
+        logger.debug( indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope "
+            + artifact.getScope() + " wins)" );
 
         // TODO: better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
@@ -99,8 +96,7 @@ public class DebugResolutionListener
         }
     }
 
-    public void updateScope( Artifact artifact,
-                             String scope )
+    public void updateScope( Artifact artifact, String scope )
     {
         logger.debug( indent + artifact + " (setting artifactScope to: " + scope + ")" );
     }
@@ -111,9 +107,7 @@ public class DebugResolutionListener
             + artifact.getVersionRange() + ")" );
     }
 
-    public void restrictRange( Artifact artifact,
-                               Artifact replacement,
-                               VersionRange newRange )
+    public void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange )
     {
         logger.debug( indent + artifact + " (range restricted from: " + artifact.getVersionRange() + " and: "
             + replacement.getVersionRange() + " to: " + newRange + " )" );
@@ -125,8 +119,7 @@ public class DebugResolutionListener
      * more information) is needed to be able to determine when and if the version and/or artifactScope changes. See the two
      * added methods, manageArtifactVersion and manageArtifactScope.
      */
-    public void manageArtifact( Artifact artifact,
-                                Artifact replacement )
+    public void manageArtifact( Artifact artifact, Artifact replacement )
     {
         String msg = indent + artifact;
         msg += " (";
@@ -142,8 +135,7 @@ public class DebugResolutionListener
         logger.debug( msg );
     }
 
-    public void manageArtifactVersion( Artifact artifact,
-                                       Artifact replacement )
+    public void manageArtifactVersion( Artifact artifact, Artifact replacement )
     {
         // only show msg if a change is actually taking place
         if ( !replacement.getVersion().equals( artifact.getVersion() ) )
@@ -153,8 +145,7 @@ public class DebugResolutionListener
         }
     }
 
-    public void manageArtifactScope( Artifact artifact,
-                                     Artifact replacement )
+    public void manageArtifactScope( Artifact artifact, Artifact replacement )
     {
         // only show msg if a change is actually taking place
         if ( !replacement.getScope().equals( artifact.getScope() ) )
@@ -164,8 +155,7 @@ public class DebugResolutionListener
         }
     }
 
-    public void manageArtifactSystemPath( Artifact artifact,
-                                          Artifact replacement )
+    public void manageArtifactSystemPath( Artifact artifact, Artifact replacement )
     {
         // only show msg if a change is actually taking place
         if ( !replacement.getScope().equals( artifact.getScope() ) )

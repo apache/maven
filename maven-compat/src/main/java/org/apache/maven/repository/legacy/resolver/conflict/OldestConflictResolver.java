@@ -33,7 +33,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * @see ArtifactVersion#compareTo(Object)
  * @since 3.0
  */
-@Component(role=ConflictResolver.class, hint="oldest")
+@Component( role = ConflictResolver.class, hint = "oldest" )
 public class OldestConflictResolver
     implements ConflictResolver
 {
@@ -44,8 +44,7 @@ public class OldestConflictResolver
     *      org.apache.maven.artifact.resolver.ResolutionNode)
     */
 
-    public ResolutionNode resolveConflict( ResolutionNode node1,
-                                           ResolutionNode node2 )
+    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
     {
         try
         {

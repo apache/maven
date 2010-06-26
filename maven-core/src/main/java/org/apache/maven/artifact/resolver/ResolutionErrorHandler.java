@@ -25,7 +25,7 @@ package org.apache.maven.artifact.resolver;
 public interface ResolutionErrorHandler
 {
 
-    public void throwErrors( ArtifactResolutionRequest request, ArtifactResolutionResult result )
+    void throwErrors( ArtifactResolutionRequest request, ArtifactResolutionResult result )
         throws ArtifactResolutionException;
 
 }

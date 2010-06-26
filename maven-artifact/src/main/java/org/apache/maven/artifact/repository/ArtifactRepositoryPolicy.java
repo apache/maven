@@ -61,9 +61,7 @@ public class ArtifactRepositoryPolicy
         this( policy.isEnabled(), policy.getUpdatePolicy(), policy.getChecksumPolicy() );
     }
 
-    public ArtifactRepositoryPolicy( boolean enabled,
-                                     String updatePolicy,
-                                     String checksumPolicy )
+    public ArtifactRepositoryPolicy( boolean enabled, String updatePolicy, String checksumPolicy )
     {
         this.enabled = enabled;
 

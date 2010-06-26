@@ -34,7 +34,7 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 public class ClasspathContainer
 implements Iterable<ArtifactMetadata>
 {
-	private List<ArtifactMetadata> classpath;
+    private List<ArtifactMetadata> classpath;
 
     private ArtifactScopeEnum scope;
 

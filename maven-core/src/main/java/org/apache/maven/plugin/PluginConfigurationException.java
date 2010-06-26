@@ -49,24 +49,27 @@ public class PluginConfigurationException
         this.originalMessage = originalMessage;
     }
 
-    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage, ExpressionEvaluationException cause )
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage,
+                                         ExpressionEvaluationException cause )
     {
         super( originalMessage, cause );
         this.pluginDescriptor = pluginDescriptor;
         this.originalMessage = originalMessage;
     }
 
-    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage, ComponentConfigurationException cause )
-   {
-       super( originalMessage, cause );
-       this.pluginDescriptor = pluginDescriptor;
-       this.originalMessage = originalMessage;
-   }
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage,
+                                         ComponentConfigurationException cause )
+    {
+        super( originalMessage, cause );
+        this.pluginDescriptor = pluginDescriptor;
+        this.originalMessage = originalMessage;
+    }
 
-    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage, ComponentLookupException cause )
-   {
-       super( originalMessage, cause );
-       this.pluginDescriptor = pluginDescriptor;
-       this.originalMessage = originalMessage;
-   }
+    public PluginConfigurationException( PluginDescriptor pluginDescriptor, String originalMessage,
+                                         ComponentLookupException cause )
+    {
+        super( originalMessage, cause );
+        this.pluginDescriptor = pluginDescriptor;
+        this.originalMessage = originalMessage;
+    }
 }

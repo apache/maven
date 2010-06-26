@@ -64,8 +64,8 @@ public class DefaultProfileManager
     private Properties requestProperties;
 
     /**
-     * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work correctly
-     * in embedded envirnments.
+     * @deprecated without passing in the system properties, the SystemPropertiesProfileActivator will not work
+     *             correctly in embedded envirnments.
      */
     public DefaultProfileManager( PlexusContainer container )
     {

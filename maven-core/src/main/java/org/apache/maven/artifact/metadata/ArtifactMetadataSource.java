@@ -34,15 +34,19 @@ public interface ArtifactMetadataSource
     ResolutionGroup retrieve( MetadataResolutionRequest request )
         throws ArtifactMetadataRetrievalException;
 
-    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                              List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     List<ArtifactVersion> retrieveAvailableVersions( MetadataResolutionRequest request )
         throws ArtifactMetadataRetrievalException;
 
-    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                     List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
-    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
+                                                                             ArtifactRepository localRepository,
+                                                                             ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
 }

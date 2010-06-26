@@ -30,8 +30,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.CyclicDependencyException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.repository.legacy.resolver.DefaultLegacyArtifactCollector;
-
 
 /**
  *
@@ -65,11 +63,11 @@ public class MetadataResolutionResult
     private Set<Artifact> requestedArtifacts;
 
     private Set<Artifact> artifacts;
-    
+
     private MetadataGraph dirtyTree;
-    
+
     private MetadataGraph resolvedTree;
-    
+
     private MetadataGraph resolvedGraph;
 
     public Artifact getOriginatingArtifact()
@@ -235,8 +233,10 @@ public class MetadataResolutionResult
 
     public MetadataResolutionResult addError( Exception e )
     {
-        if( exceptions == null )
+        if ( exceptions == null )
+        {
             initList( exceptions );
+        }
 
         exceptions.add( e );
 
@@ -353,5 +353,5 @@ public class MetadataResolutionResult
     {
         this.resolvedTree = resolvedTree;
     }
-    
+
 }

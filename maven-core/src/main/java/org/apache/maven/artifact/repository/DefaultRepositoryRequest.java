@@ -28,7 +28,7 @@ import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * Collects basic settings to access the repository system.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultRepositoryRequest
@@ -57,7 +57,7 @@ public class DefaultRepositoryRequest
 
     /**
      * Creates a shallow copy of the specified repository request.
-     * 
+     *
      * @param repositoryRequest The repository request to copy from, must not be {@code null}.
      */
     public DefaultRepositoryRequest( RepositoryRequest repositoryRequest )
@@ -70,17 +70,19 @@ public class DefaultRepositoryRequest
         setTransferListener( repositoryRequest.getTransferListener() );
     }
 
-    public static RepositoryRequest getRepositoryRequest(MavenSession session, MavenProject project) {
+    public static RepositoryRequest getRepositoryRequest( MavenSession session, MavenProject project )
+    {
         RepositoryRequest request = new DefaultRepositoryRequest();
 
-        request.setCache(session.getRepositoryCache());
-        request.setLocalRepository(session.getLocalRepository());
-        if (project != null) {
-            request.setRemoteRepositories(project.getPluginArtifactRepositories());
+        request.setCache( session.getRepositoryCache() );
+        request.setLocalRepository( session.getLocalRepository() );
+        if ( project != null )
+        {
+            request.setRemoteRepositories( project.getPluginArtifactRepositories() );
         }
-        request.setOffline(session.isOffline());
-        request.setForceUpdate(session.getRequest().isUpdateSnapshots());
-        request.setTransferListener(session.getRequest().getTransferListener());
+        request.setOffline( session.isOffline() );
+        request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
+        request.setTransferListener( session.getRequest().getTransferListener() );
 
         return request;
     }

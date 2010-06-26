@@ -44,7 +44,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Resolves a version for a plugin.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = PluginVersionResolver.class )
@@ -115,7 +115,7 @@ public class DefaultPluginVersionResolver
 
             File artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
 
-            if ( !request.isOffline() && ( !artifactMetadataFile.exists() /* || user requests snapshot updates */) )
+            if ( !request.isOffline() && ( !artifactMetadataFile.exists() /* || user requests snapshot updates */ ) )
             {
                 String remotePath = getRemoteMetadataPath( request, repository );
 

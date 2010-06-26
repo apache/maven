@@ -29,7 +29,7 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface MetadataReader
@@ -39,11 +39,11 @@ public interface MetadataReader
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
      * true}. If {@code false}, unknown elements will be ignored instead of causing a failure.
      */
-    static final String IS_STRICT = "org.apache.maven.artifact.repository.metadata.io.isStrict";
+    final String IS_STRICT = "org.apache.maven.artifact.repository.metadata.io.isStrict";
 
     /**
      * Reads the metadata from the specified file.
-     * 
+     *
      * @param input The file to deserialize the metadata from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized metadata, never {@code null}.
@@ -56,7 +56,7 @@ public interface MetadataReader
     /**
      * Reads the metadata from the specified character reader. The reader will be automatically closed before the method
      * returns.
-     * 
+     *
      * @param input The reader to deserialize the metadata from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized metadata, never {@code null}.
@@ -69,7 +69,7 @@ public interface MetadataReader
     /**
      * Reads the metadata from the specified byte stream. The stream will be automatically closed before the method
      * returns.
-     * 
+     *
      * @param input The stream to deserialize the metadata from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized metadata, never {@code null}.

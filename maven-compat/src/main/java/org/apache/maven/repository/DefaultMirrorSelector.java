@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Component( role = MirrorSelector.class )
 public class DefaultMirrorSelector
     implements MirrorSelector
-{    
+{
 
     private static final String WILDCARD = "*";
 
@@ -67,7 +67,7 @@ public class DefaultMirrorSelector
      * This method checks if the pattern matches the originalRepository. Valid patterns: * =
      * everything external:* = everything not on the localhost and not file based. repo,repo1 = repo
      * or repo1 *,!repo1 = everything except repo1
-     * 
+     *
      * @param originalRepository to compare for a match.
      * @param pattern used for match. Currently only '*' is supported.
      * @return true if the repository is a match to this pattern.
@@ -122,7 +122,7 @@ public class DefaultMirrorSelector
 
     /**
      * Checks the URL to see if this repository refers to an external repository
-     * 
+     *
      * @param originalRepository
      * @return true if external.
      */
@@ -131,7 +131,8 @@ public class DefaultMirrorSelector
         try
         {
             URL url = new URL( originalRepository.getUrl() );
-            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals( "file" ) );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" )
+                            || url.getProtocol().equals( "file" ) );
         }
         catch ( MalformedURLException e )
         {
@@ -147,7 +148,7 @@ public class DefaultMirrorSelector
 
     /**
      * Checks whether the layouts configured for a mirror match with the layout of the repository.
-     * 
+     *
      * @param repoLayout The layout of the repository, may be {@code null}.
      * @param mirrorLayout The layouts supported by the mirror, may be {@code null}.
      * @return {@code true} if the layouts associated with the mirror match the layout of the original repository,

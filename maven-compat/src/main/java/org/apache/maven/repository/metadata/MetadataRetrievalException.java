@@ -41,15 +41,12 @@ public class MetadataRetrievalException
         this( null, cause, null );
     }
 
-    public MetadataRetrievalException( String message,
-                                       Throwable cause )
+    public MetadataRetrievalException( String message, Throwable cause )
     {
         this( message, cause, null );
     }
 
-    public MetadataRetrievalException( String message,
-                                       Throwable cause,
-                                       ArtifactMetadata artifact )
+    public MetadataRetrievalException( String message, Throwable cause, ArtifactMetadata artifact )
     {
         super( message, cause );
 

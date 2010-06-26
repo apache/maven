@@ -80,7 +80,8 @@ public class ResolutionNode
         return artifact.getDependencyConflictId();
     }
 
-    public void addDependencies( Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories, ArtifactFilter filter )
+    public void addDependencies( Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories,
+                                 ArtifactFilter filter )
         throws CyclicDependencyException, OverConstrainedVersionException
     {
         if ( artifacts != null && !artifacts.isEmpty() )

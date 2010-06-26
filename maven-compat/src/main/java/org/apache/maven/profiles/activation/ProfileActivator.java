@@ -24,7 +24,7 @@ import org.apache.maven.model.Profile;
 @Deprecated
 public interface ProfileActivator
 {
-    static final String ROLE = ProfileActivator.class.getName();
+    final String ROLE = ProfileActivator.class.getName();
 
     boolean canDetermineActivation( Profile profile );
 

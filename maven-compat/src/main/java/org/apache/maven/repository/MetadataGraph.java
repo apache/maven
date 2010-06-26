@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * This is the main graph data structure used by the RepositorySystem to present tree and graph objects. 
+ * This is the main graph data structure used by the RepositorySystem to present tree and graph objects.
  *
  * @author Oleg Gusakov
  * @version $Id$
@@ -36,14 +36,14 @@ public class MetadataGraph
 
     /** entry point for tree-like structures */
     MetadataGraphNode entry;
-    
+
     public MetadataGraph( MetadataGraphNode entry )
     {
         this();
-        
+
         this.entry = entry;
     }
-    
+
     public MetadataGraph()
     {
         nodes = new ArrayList<MetadataGraphNode>( 64 );
@@ -56,38 +56,38 @@ public class MetadataGraph
 
     /**
      * find a node by the GAV (metadata)
-     * 
+     *
      * @param md
      * @return
      */
     public MetadataGraphNode findNode( MavenArtifactMetadata md )
     {
-        for( MetadataGraphNode mgn : nodes )
+        for ( MetadataGraphNode mgn : nodes )
         {
-            if( mgn.metadata.equals( md ) )
+            if ( mgn.metadata.equals( md ) )
             {
                 return mgn;
             }
         }
 
         MetadataGraphNode node = new MetadataGraphNode( md );
-        addNode( node );        
+        addNode( node );
         return node;
     }
-    
+
     /**
      * getter
-     * 
+     *
      * @return
      */
     public MetadataGraphNode getEntry()
     {
         return entry;
     }
-    
+
     /**
      * getter
-     * 
+     *
      * @return
      */
     public Collection<MetadataGraphNode> getNodes()

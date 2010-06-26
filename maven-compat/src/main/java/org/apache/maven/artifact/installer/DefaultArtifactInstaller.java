@@ -39,7 +39,7 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * @author Jason van Zyl
  */
-@Component(role=ArtifactInstaller.class)
+@Component( role = ArtifactInstaller.class )
 public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller

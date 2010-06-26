@@ -31,7 +31,7 @@ import org.apache.maven.plugin.PluginResolutionException;
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
  * that is only public for technical reasons, it is not part of the public API. In particular, this interface can be
  * changed or deleted without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface PluginDependenciesResolver
@@ -39,19 +39,19 @@ public interface PluginDependenciesResolver
 
     /**
      * Resolves the main artifact of the specified plugin.
-     * 
+     *
      * @param plugin The plugin for which to resolve the main artifact, must not be {@code null}.
      * @param request A prepopulated resolution request that will be completed and used for the resolution, must not be
      *            {@code null}.
      * @return The resolved plugin artifact, never {@code null}.
      * @throws PluginResolutionException If the plugin artifact could not be resolved.
      */
-    public Artifact resolve( Plugin plugin, ArtifactResolutionRequest request )
+    Artifact resolve( Plugin plugin, ArtifactResolutionRequest request )
         throws PluginResolutionException;
 
     /**
      * Resolves the runtime dependencies of the specified plugin.
-     * 
+     *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param pluginArtifact The plugin's main artifact, may be {@code null}.
      * @param request A prepopulated resolution request that will be completed and used for the resolution, must not be

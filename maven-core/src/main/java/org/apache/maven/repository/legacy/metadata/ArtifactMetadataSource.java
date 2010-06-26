@@ -38,7 +38,8 @@ public interface ArtifactMetadataSource
     ResolutionGroup retrieve( MetadataResolutionRequest request )
         throws ArtifactMetadataRetrievalException;
 
-    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                              List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
@@ -53,7 +54,8 @@ public interface ArtifactMetadataSource
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.
      */
-    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                     List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
@@ -69,7 +71,9 @@ public interface ArtifactMetadataSource
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.
      */
-    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository remoteRepository )                                                                            
+    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
+                                                                             ArtifactRepository localRepository,
+                                                                             ArtifactRepository remoteRepository )
         throws ArtifactMetadataRetrievalException;
 
 }

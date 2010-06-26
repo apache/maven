@@ -1,7 +1,5 @@
 package org.apache.maven.artifact.handler;
 
-import org.codehaus.plexus.component.annotations.Component;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,12 +19,14 @@ import org.codehaus.plexus.component.annotations.Component;
  * under the License.
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
  * @version $Id$
  */
-@Component(role=ArtifactHandler.class) 
+@Component( role = ArtifactHandler.class )
 public class DefaultArtifactHandler
     implements ArtifactHandler
 {

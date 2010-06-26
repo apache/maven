@@ -36,7 +36,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component(role = MavenExecutionRequestPopulator.class)
+@Component( role = MavenExecutionRequestPopulator.class )
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
 {

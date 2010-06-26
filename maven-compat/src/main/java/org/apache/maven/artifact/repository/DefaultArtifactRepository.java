@@ -52,7 +52,7 @@ public class DefaultArtifactRepository
     private Authentication authentication;
 
     private Proxy proxy;
-    
+
     /**
      * Create a local repository or a test repository.
      *
@@ -88,7 +88,8 @@ public class DefaultArtifactRepository
      * @param snapshots the policies to use for snapshots
      * @param releases  the policies to use for releases
      */
-    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
+    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
+                                      ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
     {
         super( id, url );
 
@@ -121,8 +122,7 @@ public class DefaultArtifactRepository
         return layout.pathOfRemoteRepositoryMetadata( artifactMetadata );
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
-                                                 ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
     {
         return layout.pathOfLocalRepositoryMetadata( metadata, repository );
     }
@@ -131,7 +131,7 @@ public class DefaultArtifactRepository
     {
         this.layout = layout;
     }
-    
+
     public ArtifactRepositoryLayout getLayout()
     {
         return layout;
@@ -141,7 +141,7 @@ public class DefaultArtifactRepository
     {
         this.snapshots = snapshots;
     }
-    
+
     public ArtifactRepositoryPolicy getSnapshots()
     {
         return snapshots;
@@ -171,7 +171,7 @@ public class DefaultArtifactRepository
     {
         this.blacklisted = blacklisted;
     }
-    
+
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
@@ -179,13 +179,13 @@ public class DefaultArtifactRepository
         sb.append( "       id: " ).append( getId() ).append( "\n" );
         sb.append( "      url: " ).append( getUrl() ).append( "\n" );
         sb.append( "   layout: " ).append( layout != null ? layout.getId() : "none" ).append( "\n" );
-        
+
         if ( snapshots != null )
         {
             sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
             sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
         }
-        
+
         if ( releases != null )
         {
             sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
@@ -198,16 +198,16 @@ public class DefaultArtifactRepository
     public Artifact find( Artifact artifact )
     {
         File artifactFile = new File( getBasedir(), pathOf( artifact ) );
-        
+
         // We need to set the file here or the resolver will fail with an NPE, not fully equipped to deal
         // with multiple local repository implementations yet.
         artifact.setFile( artifactFile );
-        
-        if( artifactFile.exists() )
-        {            
-            artifact.setResolved( true );            
+
+        if ( artifactFile.exists() )
+        {
+            artifact.setResolved( true );
         }
-                
+
         return artifact;
     }
 

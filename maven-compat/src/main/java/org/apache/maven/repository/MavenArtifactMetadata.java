@@ -19,7 +19,6 @@ package org.apache.maven.repository;
  * under the License.
  */
 
-
 /**
  *
  *
@@ -37,7 +36,7 @@ public class MavenArtifactMetadata
     String classifier;
     String type;
     String scope;
-    
+
     transient Object datum;
 
     public String getGroupId()
@@ -109,14 +108,13 @@ public class MavenArtifactMetadata
     {
         this.scope = scope;
     }
-    
+
     @Override
     public String toString()
     {
-        return getGroupId()+":"+getArtifactId()+":"+getVersion()
-                +":" + (getClassifier() == null ? "" : getClassifier() )
-                +":" + (getType() == null ? DEFAULT_TYPE : getType() )
-        ;
+        return getGroupId() + ":" + getArtifactId() + ":" + getVersion() + ":"
+            + ( getClassifier() == null ? "" : getClassifier() ) + ":"
+            + ( getType() == null ? DEFAULT_TYPE : getType() );
     }
-    
+
 }

@@ -29,20 +29,20 @@ import org.codehaus.plexus.component.annotations.Configuration;
  *
  * @version $Id$
  */
-@Component(role=GraphConflictResolutionPolicy.class)
+@Component( role = GraphConflictResolutionPolicy.class )
 public class DefaultGraphConflictResolutionPolicy
-implements GraphConflictResolutionPolicy
+    implements GraphConflictResolutionPolicy
 {
     /**
      * artifact, closer to the entry point, is selected
      */
-    @Configuration(name="closer-first", value="true")
+    @Configuration( name = "closer-first", value = "true" )
     private boolean closerFirst = true;
 
     /**
      * newer artifact is selected
      */
-    @Configuration(name="newer-first", value="true")
+    @Configuration( name = "newer-first", value = "true" )
     private boolean newerFirst = true;
 
     public MetadataGraphEdge apply( MetadataGraphEdge e1, MetadataGraphEdge e2 )

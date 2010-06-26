@@ -37,7 +37,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-@Component(role = MavenProjectHelper.class)
+@Component( role = MavenProjectHelper.class )
 public class DefaultMavenProjectHelper
     extends AbstractLogEnabled
     implements MavenProjectHelper
@@ -105,7 +105,8 @@ public class DefaultMavenProjectHelper
         {
             getLogger().warn( dae.getMessage() );
 
-            // We can throw this because it's unchecked, and won't change the MavenProjectHelper API, which would break backward compat if it did.
+            // We can throw this because it's unchecked, and won't change the MavenProjectHelper API, which would break
+            // backward compat if it did.
             throw dae;
         }
     }
@@ -149,7 +150,8 @@ public class DefaultMavenProjectHelper
             {
                 throw new InvalidArtifactRTException( parent.getGroupId(), parent.getArtifactId(), parent.getVersion(),
                                                       parent.getType(),
-                                                      "An attached artifact must have a different ID than its corresponding main artifact." );
+                                                      "An attached artifact must have a different ID than "
+                                                          + "its corresponding main artifact." );
             }
         }
 

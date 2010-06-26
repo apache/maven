@@ -40,17 +40,17 @@ import org.apache.maven.settings.Server;
  */
 public interface RepositorySystem
 {
-    static final String DEFAULT_LOCAL_REPO_ID = "local";
-    
-    static final String userHome = System.getProperty( "user.home" );
-    
-    static final File userMavenConfigurationHome = new File( userHome, ".m2" );
-    
-    static final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
-    
-    static final String DEFAULT_REMOTE_REPO_ID = "central";
+    final String DEFAULT_LOCAL_REPO_ID = "local";
 
-    static final String DEFAULT_REMOTE_REPO_URL = "http://repo1.maven.org/maven2";
+    final String userHome = System.getProperty( "user.home" );
+
+    final File userMavenConfigurationHome = new File( userHome, ".m2" );
+
+    final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
+
+    final String DEFAULT_REMOTE_REPO_ID = "central";
+
+    final String DEFAULT_REMOTE_REPO_URL = "http://repo1.maven.org/maven2";
 
     Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
 
@@ -58,40 +58,42 @@ public interface RepositorySystem
 
     Artifact createProjectArtifact( String groupId, String artifactId, String version );
 
-    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type, String classifier );
-    
+    Artifact createArtifactWithClassifier( String groupId, String artifactId, String version, String type,
+                                           String classifier );
+
     Artifact createPluginArtifact( Plugin plugin );
-    
+
     Artifact createDependencyArtifact( Dependency dependency );
-        
+
     ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException;
-        
+
     ArtifactRepository createDefaultRemoteRepository()
-        throws InvalidRepositoryException;    
-    
+        throws InvalidRepositoryException;
+
     ArtifactRepository createDefaultLocalRepository()
         throws InvalidRepositoryException;
-    
+
     ArtifactRepository createLocalRepository( File localRepository )
         throws InvalidRepositoryException;
 
-    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
+    ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
+                                                 ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
 
     /**
      * Calculates the effective repositories for the given input repositories which are assumed to be already mirrored
      * (if applicable). This process will essentially remove duplicate repositories by merging them into one equivalent
      * repository. It is worth to point out that merging does not simply choose one of the input repositories and
      * discards the others but actually combines their possibly different policies.
-     * 
+     *
      * @param repositories The original repositories, may be {@code null}.
      * @return The effective repositories or {@code null} if the input was {@code null}.
      */
-    List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );    
+    List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories );
 
     /**
      * Determines the mirror for the specified repository.
-     * 
+     *
      * @param repository The repository to determine the mirror for, must not be {@code null}.
      * @param mirrors The available mirrors, may be {@code null}.
      * @return The mirror specification for the repository or {@code null} if no mirror matched.
@@ -103,7 +105,7 @@ public interface RepositorySystem
      * mirror, its URL and ID will be updated to match the values from the mirror specification. Repositories without a
      * matching mirror will pass through unchanged. <em>Note:</em> This method must be called before
      * {@link #injectAuthentication(List, List)} or the repositories will end up with the wrong credentials.
-     * 
+     *
      * @param repositories The repositories into which to inject the mirror information, may be {@code null}.
      * @param mirrors The available mirrors, may be {@code null}.
      */
@@ -114,7 +116,7 @@ public interface RepositorySystem
      * its proxy data will be set accordingly. Repositories without a matching proxy will have their proxy cleared.
      * <em>Note:</em> This method must be called after {@link #injectMirror(List, List)} or the repositories will end up
      * with the wrong proxies.
-     * 
+     *
      * @param repositories The repositories into which to inject the proxy information, may be {@code null}.
      * @param proxies The available proxies, may be {@code null}.
      */
@@ -125,7 +127,7 @@ public interface RepositorySystem
      * server, its credentials will be updated to match the values from the server specification. Repositories without a
      * matching server will have their credentials cleared. <em>Note:</em> This method must be called after
      * {@link #injectMirror(List, List)} or the repositories will end up with the wrong credentials.
-     * 
+     *
      * @param repositories The repositories into which to inject the authentication information, may be {@code null}.
      * @param servers The available servers, may be {@code null}.
      */
@@ -134,18 +136,20 @@ public interface RepositorySystem
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // Install
-    
+
     // Deploy
-    
+
     // Map types of artifacts
-    
+
     //
     // Raw file transfers
     //
-    void publish( ArtifactRepository repository, File source, String remotePath, ArtifactTransferListener transferListener )
+    void publish( ArtifactRepository repository, File source, String remotePath,
+                  ArtifactTransferListener transferListener )
         throws ArtifactTransferFailedException;
-    
-    void retrieve( ArtifactRepository repository, File destination, String remotePath, ArtifactTransferListener transferListener )
-        throws ArtifactTransferFailedException, ArtifactDoesNotExistException; 
+
+    void retrieve( ArtifactRepository repository, File destination, String remotePath,
+                   ArtifactTransferListener transferListener )
+        throws ArtifactTransferFailedException, ArtifactDoesNotExistException;
 
 }

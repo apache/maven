@@ -33,12 +33,13 @@ public class SystemPropertyProfileActivator
     extends DetectedProfileActivator implements Contextualizable
 {
     private Properties properties;
-    
-    public void contextualize(Context context) throws ContextException 
+
+    public void contextualize( Context context )
+        throws ContextException
     {
-        properties = (Properties)context.get("SystemProperties");
+        properties = (Properties) context.get( "SystemProperties" );
     }
-    
+
     protected boolean canDetectActivation( Profile profile )
     {
         return profile.getActivation() != null && profile.getActivation().getProperty() != null;
@@ -55,19 +56,19 @@ public class SystemPropertyProfileActivator
         {
             String name = property.getName();
             boolean reverseName = false;
-            
+
             if ( name == null )
             {
                 throw new ProfileActivationException( "The property name is required to activate the profile '"
                     + profile.getId() + "'" );
             }
-            
+
             if ( name.startsWith("!") )
             {
                 reverseName = true;
                 name = name.substring( 1 );
             }
-            
+
             String sysValue = properties.getProperty( name );
 
             String propValue = property.getValue();
@@ -79,10 +80,10 @@ public class SystemPropertyProfileActivator
                     reverseValue = true;
                     propValue = propValue.substring( 1 );
                 }
-                
+
                 // we have a value, so it has to match the system value...
                 boolean result = propValue.equals( sysValue );
-                
+
                 if ( reverseValue )
                 {
                     return !result;
@@ -95,7 +96,7 @@ public class SystemPropertyProfileActivator
             else
             {
                 boolean result = StringUtils.isNotEmpty( sysValue );
-                
+
                 if ( reverseName )
                 {
                     return !result;

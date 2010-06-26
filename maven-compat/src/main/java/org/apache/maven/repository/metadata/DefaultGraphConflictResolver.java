@@ -29,18 +29,18 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus
- * 
+ *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  * @version $Id$
  */
-@Component(role=GraphConflictResolver.class)
+@Component( role = GraphConflictResolver.class )
 public class DefaultGraphConflictResolver
     implements GraphConflictResolver
 {
     /**
      * artifact, closer to the entry point, is selected
      */
-    @Requirement(role=GraphConflictResolutionPolicy.class)     
+    @Requirement( role = GraphConflictResolutionPolicy.class )
     protected GraphConflictResolutionPolicy policy;
 
     // -------------------------------------------------------------------------------------
@@ -49,20 +49,30 @@ public class DefaultGraphConflictResolver
         throws GraphConflictResolutionException
     {
         if ( policy == null )
+        {
             throw new GraphConflictResolutionException( "no GraphConflictResolutionPolicy injected" );
+        }
 
         if ( graph == null )
+        {
             return null;
+        }
 
         final MetadataGraphVertex entry = graph.getEntry();
         if ( entry == null )
+        {
             return null;
+        }
 
         if ( graph.isEmpty() )
+        {
             throw new GraphConflictResolutionException( "graph with an entry, but not vertices do not exist" );
+        }
 
         if ( graph.isEmptyEdges() )
+        {
             return null; // no edges - nothing to worry about
+        }
 
         final TreeSet<MetadataGraphVertex> vertices = graph.getVertices();
 
@@ -70,7 +80,9 @@ public class DefaultGraphConflictResolver
         {
             // edge case - single vertex graph
             if ( vertices.size() == 1 )
+            {
                 return new MetadataGraph( entry );
+            }
 
             final ArtifactScopeEnum requestedScope = ArtifactScopeEnum.checkScope( scope );
 
@@ -138,7 +150,9 @@ public class DefaultGraphConflictResolver
     private MetadataGraph findLinkedSubgraph( MetadataGraph g )
     {
         if ( g.getVertices().size() == 1 )
+        {
             return g;
+        }
 
         List<MetadataGraphVertex> visited = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
         visit( g.getEntry(), visited, g );
@@ -149,11 +163,15 @@ public class DefaultGraphConflictResolver
         for ( MetadataGraphVertex v : g.getVertices() )
         {
             if ( !visited.contains( v ) )
+            {
                 dropList.add( v );
+            }
         }
 
         if ( dropList.size() < 1 )
+        {
             return g;
+        }
 
         // now - drop vertices
         TreeSet<MetadataGraphVertex> vertices = g.getVertices();
@@ -169,7 +187,9 @@ public class DefaultGraphConflictResolver
     private void visit( MetadataGraphVertex from, List<MetadataGraphVertex> visited, MetadataGraph graph )
     {
         if ( visited.contains( from ) )
+        {
             return;
+        }
 
         visited.add( from );
 
@@ -185,16 +205,21 @@ public class DefaultGraphConflictResolver
     }
 
     // -------------------------------------------------------------------------------------
-    private MetadataGraphEdge cleanEdges( MetadataGraphVertex v, List<MetadataGraphEdge> edges, ArtifactScopeEnum scope )
+    private MetadataGraphEdge cleanEdges( MetadataGraphVertex v, List<MetadataGraphEdge> edges,
+                                          ArtifactScopeEnum scope )
     {
         if ( edges == null || edges.isEmpty() )
+        {
             return null;
+        }
 
         if ( edges.size() == 1 )
         {
             MetadataGraphEdge e = edges.get( 0 );
             if ( scope.encloses( e.getScope() ) )
+            {
                 return e;
+            }
 
             return null;
         }
@@ -204,12 +229,18 @@ public class DefaultGraphConflictResolver
         for ( MetadataGraphEdge e : edges )
         {
             if ( !scope.encloses( e.getScope() ) )
+            {
                 continue;
+            }
 
             if ( res == null )
+            {
                 res = e;
+            }
             else
+            {
                 res = policy.apply( e, res );
+            }
         }
 
         return res;

@@ -21,11 +21,11 @@ package org.apache.maven.repository;
 
 public class Proxy
 {
-    public final static String PROXY_SOCKS5 = "SOCKS_5";
+    public static final String PROXY_SOCKS5 = "SOCKS_5";
 
-    public final static String PROXY_SOCKS4 = "SOCKS4";
+    public static final String PROXY_SOCKS4 = "SOCKS4";
 
-    public final static String PROXY_HTTP = "HTTP";
+    public static final String PROXY_HTTP = "HTTP";
 
     /**
      * Proxy server host
@@ -69,7 +69,7 @@ public class Proxy
 
     /**
      * Return proxy server host name.
-     * 
+     *
      * @return proxy server host name
      */
     public String getHost()
@@ -79,7 +79,7 @@ public class Proxy
 
     /**
      * Set proxy host name.
-     * 
+     *
      * @param host proxy server host name
      */
     public void setHost( String host )
@@ -89,7 +89,7 @@ public class Proxy
 
     /**
      * Get user's password used to login to proxy server.
-     * 
+     *
      * @return user's password at proxy host
      */
     public String getPassword()
@@ -99,7 +99,7 @@ public class Proxy
 
     /**
      * Set the user's password for the proxy server.
-     * 
+     *
      * @param password password to use to login to a proxy server
      */
     public void setPassword( String password )
@@ -109,7 +109,7 @@ public class Proxy
 
     /**
      * Get the proxy port.
-     * 
+     *
      * @return proxy server port
      */
     public int getPort()
@@ -119,7 +119,7 @@ public class Proxy
 
     /**
      * Set the proxy port.
-     * 
+     *
      * @param port proxy server port
      */
     public void setPort( int port )
@@ -129,7 +129,7 @@ public class Proxy
 
     /**
      * Get the proxy username.
-     * 
+     *
      * @return username for the proxy server
      */
     public String getUserName()
@@ -139,7 +139,7 @@ public class Proxy
 
     /**
      * Set the proxy username.
-     * 
+     *
      * @param userName username for the proxy server
      */
     public void setUserName( String userName )
@@ -149,7 +149,7 @@ public class Proxy
 
     /**
      * Get the type of the proxy server.
-     * 
+     *
      * @return the type of the proxy server
      */
     public String getProtocol()

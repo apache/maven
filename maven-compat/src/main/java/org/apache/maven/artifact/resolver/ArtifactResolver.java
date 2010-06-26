@@ -40,51 +40,53 @@ public interface ArtifactResolver
 
     // The rest is deprecated
 
-    // USED BY MAVEN ASSEMBLY PLUGIN 2.2-beta-2 
+    // USED BY MAVEN ASSEMBLY PLUGIN 2.2-beta-2
     @Deprecated
     String ROLE = ArtifactResolver.class.getName();
 
     // USED BY SUREFIRE
     @Deprecated
-    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactMetadataSource source )
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> remoteRepositories,
+                                                  ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter )
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> remoteRepositories,
+                                                  ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     @Deprecated
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source )
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  List<ArtifactRepository> remoteRepositories,
+                                                  ArtifactRepository localRepository, ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     @Deprecated
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactMetadataSource source, ArtifactFilter filter,
-                                                         List<ResolutionListener> listeners )
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  List<ArtifactRepository> remoteRepositories,
+                                                  ArtifactMetadataSource source, ArtifactFilter filter,
+                                                  List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     @Deprecated
-    public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         List<ArtifactRepository> remoteRepositories,
-                                                         ArtifactRepository localRepository,
-                                                         ArtifactMetadataSource source,
-                                                         List<ResolutionListener> listeners )
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                                  List<ArtifactRepository> remoteRepositories,
+                                                  ArtifactRepository localRepository, ArtifactMetadataSource source,
+                                                  List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     // USED BY REMOTE RESOURCES PLUGIN
@@ -94,11 +96,13 @@ public interface ArtifactResolver
 
     // USED BY REMOTE RESOURCES PLUGIN
     @Deprecated
-    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository, TransferListener downloadMonitor )
+    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository,
+                  TransferListener downloadMonitor )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     // USED BY ARCHETYPE DOWNLOADER
     @Deprecated
-    void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+    void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                        ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 }

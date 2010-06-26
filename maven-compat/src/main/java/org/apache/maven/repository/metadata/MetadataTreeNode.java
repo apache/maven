@@ -1,14 +1,33 @@
 package org.apache.maven.repository.metadata;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactScopeEnum;
+
 /**
  * metadata [dirty] Tree
- * 
+ *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-
 public class MetadataTreeNode
 {
     ArtifactMetadata md; // this node
@@ -21,44 +40,38 @@ public class MetadataTreeNode
     MetadataTreeNode[] children; // of cause
 
     public int getNChildren()
-	{
-		return nChildren;
-	}
+    {
+        return nChildren;
+    }
 
-	public void setNChildren(int children)
-	{
-		nChildren = children;
-	}
+    public void setNChildren( int children )
+    {
+        nChildren = children;
+    }
 
-	//------------------------------------------------------------------------
+    //------------------------------------------------------------------------
     public MetadataTreeNode()
     {
     }
     //------------------------------------------------------------------------
-    public MetadataTreeNode( ArtifactMetadata md,
-                             MetadataTreeNode parent,
-                             boolean resolved,
-                             ArtifactScopeEnum scope )
+    public MetadataTreeNode( ArtifactMetadata md, MetadataTreeNode parent, boolean resolved, ArtifactScopeEnum scope )
     {
         if ( md != null )
         {
-            md.setArtifactScope( ArtifactScopeEnum.checkScope(scope) );
-            md.setResolved(resolved);
+            md.setArtifactScope( ArtifactScopeEnum.checkScope( scope ) );
+            md.setResolved( resolved );
         }
 
         this.md = md;
         this.parent = parent;
     }
     //------------------------------------------------------------------------
-    public MetadataTreeNode( Artifact af,
-                             MetadataTreeNode parent,
-                             boolean resolved,
-                             ArtifactScopeEnum scope
-                           )
+    public MetadataTreeNode( Artifact af, MetadataTreeNode parent, boolean resolved, ArtifactScopeEnum scope )
     {
         this( new ArtifactMetadata( af ), parent, resolved, scope );
     }
-    //------------------------------------------------------------------------
+
+    // ------------------------------------------------------------------------
     public void addChild( int index, MetadataTreeNode kid )
     {
         if ( kid == null )
@@ -66,17 +79,21 @@ public class MetadataTreeNode
             return;
         }
 
-        if( children == null )
-        	children = new MetadataTreeNode[nChildren];
-        
+        if ( children == null )
+        {
+            children = new MetadataTreeNode[nChildren];
+        }
+
         children[index % nChildren] = kid;
     }
+
     //------------------------------------------------------------------
     @Override
     public String toString()
     {
         return md == null ? "no metadata" : md.toString();
     }
+
     //------------------------------------------------------------------
     public String graphHash()
         throws MetadataResolutionException
@@ -84,8 +101,7 @@ public class MetadataTreeNode
         if ( md == null )
         {
             throw new MetadataResolutionException( "treenode without metadata, parent: "
-                + ( parent == null ? "null" : parent.toString() )
-            );
+                + ( parent == null ? "null" : parent.toString() ) );
         }
 
         return md.groupId + ":" + md.artifactId;

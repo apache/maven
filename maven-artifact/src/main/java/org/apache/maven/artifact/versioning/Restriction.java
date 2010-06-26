@@ -39,9 +39,7 @@ public class Restriction
 
     public static final Restriction EVERYTHING = new Restriction( null, false, null, false );
 
-    public Restriction( ArtifactVersion lowerBound,
-                        boolean lowerBoundInclusive,
-                        ArtifactVersion upperBound,
+    public Restriction( ArtifactVersion lowerBound, boolean lowerBoundInclusive, ArtifactVersion upperBound,
                         boolean upperBoundInclusive )
     {
         this.lowerBound = lowerBound;
@@ -162,7 +160,7 @@ public class Restriction
             return true;
         }
 
-        if ( !(other instanceof Restriction ) )
+        if ( !( other instanceof Restriction ) )
         {
             return false;
         }

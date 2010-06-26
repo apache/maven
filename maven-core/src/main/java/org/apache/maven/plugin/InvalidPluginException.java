@@ -1,8 +1,5 @@
 package org.apache.maven.plugin;
 
-import org.apache.maven.project.ProjectBuildingException;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +18,9 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 
 /**
  * Thrown when a plugin is not internally consistent.

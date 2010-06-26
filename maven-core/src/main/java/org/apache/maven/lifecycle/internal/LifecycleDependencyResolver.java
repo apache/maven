@@ -1,19 +1,23 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under                    
- * the License.
- */
-
 package org.apache.maven.lifecycle.internal;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 import org.apache.maven.ProjectDependenciesResolver;
 import org.apache.maven.artifact.Artifact;
@@ -42,7 +46,7 @@ import java.util.*;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component(role = LifecycleDependencyResolver.class)
+@Component( role = LifecycleDependencyResolver.class )
 public class LifecycleDependencyResolver
 {
     @Requirement
@@ -54,7 +58,7 @@ public class LifecycleDependencyResolver
     @Requirement
     private ArtifactFactory artifactFactory;
 
-    @SuppressWarnings({"UnusedDeclaration"})
+    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecycleDependencyResolver()
     {
     }
@@ -154,8 +158,8 @@ public class LifecycleDependencyResolver
             {
                 /*
                 * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
-                * plugins that require dependency resolution although they usually run in phases of the build where project
-                * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
+                * plugins that require dependency resolution although they usually run in phases of the build where
+                * project artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
                 */
                 artifacts = handleException( session, aggregating, e );
             }
@@ -178,15 +182,16 @@ public class LifecycleDependencyResolver
                                            MultipleArtifactsNotFoundException e )
         throws MultipleArtifactsNotFoundException
     {
-        Set<Artifact> artifacts;/*
+        Set<Artifact> artifacts;
+        /*
         * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
         * plugins that require dependency resolution although they usually run in phases of the build where project
         * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
         */
         if ( aggregating && areAllArtifactsInReactor( session.getProjects(), e.getMissingArtifacts() ) )
         {
-            logger.warn( "The following artifacts could not be resolved at this point of the build" +
-                " but seem to be part of the reactor:" );
+            logger.warn( "The following artifacts could not be resolved at this point of the build"
+                + " but seem to be part of the reactor:" );
 
             for ( Artifact artifact : e.getMissingArtifacts() )
             {

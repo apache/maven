@@ -21,7 +21,6 @@ package org.apache.maven.project.path;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Build;
@@ -31,7 +30,7 @@ import org.apache.maven.model.Resource;
 import org.codehaus.plexus.component.annotations.Component;
 
 @Deprecated
-@Component(role = PathTranslator.class)
+@Component( role = PathTranslator.class )
 public class DefaultPathTranslator
     implements PathTranslator
 {
@@ -49,27 +48,21 @@ public class DefaultPathTranslator
 
             build.setTestSourceDirectory( alignToBaseDirectory( build.getTestSourceDirectory(), basedir ) );
 
-            for ( Iterator i = build.getResources().iterator(); i.hasNext(); )
+            for ( Resource resource : build.getResources() )
             {
-                Resource resource = (Resource) i.next();
-
                 resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
-            for ( Iterator i = build.getTestResources().iterator(); i.hasNext(); )
+            for ( Resource resource : build.getTestResources() )
             {
-                Resource resource = (Resource) i.next();
-
                 resource.setDirectory( alignToBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
             if ( build.getFilters() != null )
             {
-                List filters = new ArrayList();
-                for ( Iterator i = build.getFilters().iterator(); i.hasNext(); )
+                List<String> filters = new ArrayList<String>();
+                for ( String filter : build.getFilters() )
                 {
-                    String filter = (String) i.next();
-
                     filters.add( alignToBaseDirectory( filter, basedir ) );
                 }
                 build.setFilters( filters );
@@ -183,27 +176,21 @@ public class DefaultPathTranslator
 
             build.setTestSourceDirectory( unalignFromBaseDirectory( build.getTestSourceDirectory(), basedir ) );
 
-            for ( Iterator i = build.getResources().iterator(); i.hasNext(); )
+            for ( Resource resource : build.getResources() )
             {
-                Resource resource = (Resource) i.next();
-
                 resource.setDirectory( unalignFromBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
-            for ( Iterator i = build.getTestResources().iterator(); i.hasNext(); )
+            for ( Resource resource : build.getTestResources() )
             {
-                Resource resource = (Resource) i.next();
-
                 resource.setDirectory( unalignFromBaseDirectory( resource.getDirectory(), basedir ) );
             }
 
             if ( build.getFilters() != null )
             {
-                List filters = new ArrayList();
-                for ( Iterator i = build.getFilters().iterator(); i.hasNext(); )
+                List<String> filters = new ArrayList<String>();
+                for ( String filter : build.getFilters() )
                 {
-                    String filter = (String) i.next();
-
                     filters.add( unalignFromBaseDirectory( filter, basedir ) );
                 }
                 build.setFilters( filters );

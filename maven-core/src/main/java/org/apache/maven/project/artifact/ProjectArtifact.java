@@ -36,7 +36,8 @@ public class ProjectArtifact
 
     public ProjectArtifact( MavenProject project )
     {
-        super( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, "pom", null, new PomArtifactHandler() );
+        super( project.getGroupId(), project.getArtifactId(), project.getVersion(), null, "pom", null,
+               new PomArtifactHandler() );
         this.project = project;
         setFile( project.getFile() );
         setResolved( true );
@@ -46,7 +47,7 @@ public class ProjectArtifact
     {
         return project;
     }
-    
+
     public List<Dependency> getDependencies()
     {
         return project.getDependencies();

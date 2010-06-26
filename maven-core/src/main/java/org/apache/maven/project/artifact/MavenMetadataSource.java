@@ -1,18 +1,22 @@
 package org.apache.maven.project.artifact;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
- * agreements. See the NOTICE file distributed with this work for additional information regarding
- * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance with the License. You may obtain a
- * copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software distributed under the License
- * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
- * or implied. See the License for the specific language governing permissions and limitations under
- * the License.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import java.io.File;
@@ -29,7 +33,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -87,7 +90,7 @@ public class MavenMetadataSource
     @Requirement
     private ArtifactFactory repositorySystem;
 
-    //TODO: This prevents a cycle in the composition which shows us another problem we need to deal with. 
+    //TODO: This prevents a cycle in the composition which shows us another problem we need to deal with.
     //@Requirement
     private ProjectBuilder projectBuilder;
 
@@ -98,7 +101,7 @@ public class MavenMetadataSource
     private Logger logger;
 
     @Requirement
-    private MavenMetadataCache cache;    
+    private MavenMetadataCache cache;
 
     @Requirement
     private LegacySupport legacySupport;
@@ -187,7 +190,7 @@ public class MavenMetadataSource
         else
         {
             ProjectRelocation rel = retrieveRelocatedProject( artifact, request );
-            
+
             if ( rel == null )
             {
                 return null;
@@ -215,8 +218,8 @@ public class MavenMetadataSource
             }
         }
 
-        Set<Artifact> artifacts = Collections.<Artifact>emptySet();       
-        
+        Set<Artifact> artifacts = Collections.<Artifact>emptySet();
+
         if ( !artifact.getArtifactHandler().isIncludesDependencies() )
         {
             artifacts = new LinkedHashSet<Artifact>();
@@ -312,8 +315,8 @@ public class MavenMetadataSource
         }
     }
 
-    private static Artifact createDependencyArtifact( ArtifactFactory factory, Dependency dependency, String inheritedScope,
-                                               ArtifactFilter inheritedFilter )
+    private static Artifact createDependencyArtifact( ArtifactFactory factory, Dependency dependency,
+                                                      String inheritedScope, ArtifactFilter inheritedFilter )
         throws InvalidVersionSpecificationException
     {
         String effectiveScope = getEffectiveScope( dependency.getScope(), inheritedScope );
@@ -412,7 +415,8 @@ public class MavenMetadataSource
         return effectiveFilter;
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                            List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         MetadataResolutionRequest request = new DefaultMetadataResolutionRequest();
@@ -442,7 +446,9 @@ public class MavenMetadataSource
         return retrieveAvailableVersionsFromMetadata( metadata.getMetadata(), availableVersions );
     }
 
-    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact, ArtifactRepository localRepository, ArtifactRepository deploymentRepository )
+    public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
+                                                                                    ArtifactRepository localRepository,
+                                                                                    ArtifactRepository deploymentRepository )
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );
@@ -461,7 +467,8 @@ public class MavenMetadataSource
         return retrieveAvailableVersionsFromMetadata( metadata.getMetadata(), availableVersions );
     }
 
-    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata, List<String> availableVersions )
+    private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata,
+                                                                         List<String> availableVersions )
     {
         Collection<String> versions = new LinkedHashSet<String>();
 
@@ -482,9 +489,11 @@ public class MavenMetadataSource
         return artifactVersions;
     }
 
-    // USED BY MAVEN ASSEMBLY PLUGIN                                                                                                                                                                                                    
+    // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
-    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies, String inheritedScope, ArtifactFilter dependencyFilter, MavenProject project )
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies,
+                                                 String inheritedScope, ArtifactFilter dependencyFilter,
+                                                 MavenProject project )
         throws InvalidDependencyVersionException
     {
         Set<Artifact> artifacts = new LinkedHashSet<Artifact>();

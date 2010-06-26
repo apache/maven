@@ -45,45 +45,45 @@ public interface MavenExecutionRequest
     // Logging
     // ----------------------------------------------------------------------
 
-    static final int LOGGING_LEVEL_DEBUG = Logger.LEVEL_DEBUG;
+    final int LOGGING_LEVEL_DEBUG = Logger.LEVEL_DEBUG;
 
-    static final int LOGGING_LEVEL_INFO = Logger.LEVEL_INFO;
+    final int LOGGING_LEVEL_INFO = Logger.LEVEL_INFO;
 
-    static final int LOGGING_LEVEL_WARN = Logger.LEVEL_WARN;
+    final int LOGGING_LEVEL_WARN = Logger.LEVEL_WARN;
 
-    static final int LOGGING_LEVEL_ERROR = Logger.LEVEL_ERROR;
+    final int LOGGING_LEVEL_ERROR = Logger.LEVEL_ERROR;
 
-    static final int LOGGING_LEVEL_FATAL = Logger.LEVEL_FATAL;
+    final int LOGGING_LEVEL_FATAL = Logger.LEVEL_FATAL;
 
-    static final int LOGGING_LEVEL_DISABLED = Logger.LEVEL_DISABLED;
+    final int LOGGING_LEVEL_DISABLED = Logger.LEVEL_DISABLED;
 
     // ----------------------------------------------------------------------
     // Reactor Failure Mode
     // ----------------------------------------------------------------------
 
-    static final String REACTOR_FAIL_FAST = "FAIL_FAST";
+    final String REACTOR_FAIL_FAST = "FAIL_FAST";
 
-    static final String REACTOR_FAIL_AT_END = "FAIL_AT_END";
+    final String REACTOR_FAIL_AT_END = "FAIL_AT_END";
 
-    static final String REACTOR_FAIL_NEVER = "FAIL_NEVER";
+    final String REACTOR_FAIL_NEVER = "FAIL_NEVER";
 
     // ----------------------------------------------------------------------
     // Reactor Make Mode
     // ----------------------------------------------------------------------
 
-    static final String REACTOR_MAKE_UPSTREAM = "make-upstream";
+    final String REACTOR_MAKE_UPSTREAM = "make-upstream";
 
-    static final String REACTOR_MAKE_DOWNSTREAM = "make-downstream";
+    final String REACTOR_MAKE_DOWNSTREAM = "make-downstream";
 
-    static final String REACTOR_MAKE_BOTH = "make-both";
+    final String REACTOR_MAKE_BOTH = "make-both";
 
     // ----------------------------------------------------------------------
     // Artifact repository policies
     // ----------------------------------------------------------------------
 
-    static final String CHECKSUM_POLICY_FAIL = ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL;
+    final String CHECKSUM_POLICY_FAIL = ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL;
 
-    static final String CHECKSUM_POLICY_WARN = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
+    final String CHECKSUM_POLICY_WARN = ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
 
     // ----------------------------------------------------------------------
     //
@@ -155,7 +155,7 @@ public interface MavenExecutionRequest
     void setThreadCount( String threadCount );
     String getThreadCount();
     boolean isThreadConfigurationPresent();
-    void setPerCoreThreadCount(boolean perCoreThreadCount);
+    void setPerCoreThreadCount( boolean perCoreThreadCount );
     boolean isPerCoreThreadCount();
 
     // Recursive (really to just process the top-level POM)

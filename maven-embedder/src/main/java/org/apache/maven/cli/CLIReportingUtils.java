@@ -164,7 +164,8 @@ public final class CLIReportingUtils
         InputStream resourceAsStream = null;
         try
         {
-            resourceAsStream = MavenCli.class.getClassLoader().getResourceAsStream( "org/apache/maven/messages/build.properties" );
+            resourceAsStream =
+                MavenCli.class.getClassLoader().getResourceAsStream( "org/apache/maven/messages/build.properties" );
 
             if ( resourceAsStream != null )
             {

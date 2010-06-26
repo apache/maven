@@ -1,12 +1,5 @@
 package org.apache.maven.project.artifact;
 
-import java.io.File;
-
-import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.InvalidProjectVersionException;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -25,6 +18,13 @@ import org.apache.maven.project.InvalidProjectVersionException;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import java.io.File;
+
+import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.InvalidProjectVersionException;
 
 /**
  * Thrown if a dependency has an invalid version.

@@ -33,23 +33,23 @@ public class MavenArtifactRepository
     implements ArtifactRepository
 {
     private String id;
-    
+
     private String url;
-    
+
     private String basedir;
-    
+
     private String protocol;
-    
+
     private ArtifactRepositoryLayout layout;
 
     private ArtifactRepositoryPolicy snapshots;
 
     private ArtifactRepositoryPolicy releases;
-    
+
     private Authentication authentication;
-    
+
     private Proxy proxy;
-    
+
     public MavenArtifactRepository()
     {
     }
@@ -63,18 +63,19 @@ public class MavenArtifactRepository
      * @param snapshots the policies to use for snapshots
      * @param releases  the policies to use for releases
      */
-    public MavenArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
+    public MavenArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
+                                    ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
     {
         this.id = id;
         this.url = url;
         this.layout = layout;
         this.snapshots = snapshots;
-        this.releases = releases;        
+        this.releases = releases;
         //
         // Derive these from the URL
         //
         this.protocol = protocol( url );
-        this.basedir = basedir( url );            
+        this.basedir = basedir( url );
     }
 
     public String pathOf( Artifact artifact )
@@ -96,7 +97,7 @@ public class MavenArtifactRepository
     {
         this.layout = layout;
     }
-    
+
     public ArtifactRepositoryLayout getLayout()
     {
         return layout;
@@ -106,7 +107,7 @@ public class MavenArtifactRepository
     {
         this.snapshots = snapshots;
     }
-    
+
     public ArtifactRepositoryPolicy getSnapshots()
     {
         return snapshots;
@@ -126,7 +127,7 @@ public class MavenArtifactRepository
     {
         return getId();
     }
-    
+
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
@@ -134,13 +135,13 @@ public class MavenArtifactRepository
         sb.append( "       id: " ).append( getId() ).append( "\n" );
         sb.append( "      url: " ).append( getUrl() ).append( "\n" );
         sb.append( "   layout: " ).append( layout != null ? layout.getId() : "none" ).append( "\n" );
-        
+
         if ( snapshots != null )
         {
             sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );
             sb.append( ", update => " ).append( snapshots.getUpdatePolicy() ).append( "]\n" );
         }
-        
+
         if ( releases != null )
         {
             sb.append( " releases: [enabled => " ).append( releases.isEnabled() );
@@ -153,7 +154,7 @@ public class MavenArtifactRepository
     public Artifact find( Artifact artifact )
     {
         File artifactFile = new File( getBasedir(), pathOf( artifact ) );
-        
+
         // We need to set the file here or the resolver will fail with an NPE, not fully equipped to deal
         // with multiple local repository implementations yet.
         artifact.setFile( artifactFile );
@@ -200,7 +201,7 @@ public class MavenArtifactRepository
     }
 
     // Path Utils
-    
+
     /**
      * /**
      * Return the protocol name.
@@ -224,7 +225,7 @@ public class MavenArtifactRepository
 
     /**
      * Derive the path portion of the given URL.
-     * 
+     *
      * @param url the repository URL
      * @return the basedir of the repository
      * @todo need to URL decode for spaces?
@@ -289,7 +290,7 @@ public class MavenArtifactRepository
     /**
      * Decodes the specified (portion of a) URL. <strong>Note:</strong> This decoder assumes that ISO-8859-1 is used to
      * convert URL-encoded octets to characters.
-     * 
+     *
      * @param url The URL to decode, may be <code>null</code>.
      * @return The decoded URL or <code>null</code> if the input was <code>null</code>.
      */
@@ -352,7 +353,7 @@ public class MavenArtifactRepository
 
     public void setAuthentication( Authentication authentication )
     {
-        this.authentication = authentication;        
+        this.authentication = authentication;
     }
 
     public Proxy getProxy()
@@ -374,7 +375,7 @@ public class MavenArtifactRepository
     {
         // no op
     }
-    
+
     public boolean isUniqueVersion()
     {
         return true;

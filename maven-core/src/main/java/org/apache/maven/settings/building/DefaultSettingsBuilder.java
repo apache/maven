@@ -44,7 +44,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = SettingsBuilder.class )
@@ -159,7 +159,8 @@ public class DefaultSettingsBuilder
         return settings;
     }
 
-    private Settings interpolate( Settings settings, SettingsBuildingRequest request, SettingsProblemCollector problems )
+    private Settings interpolate( Settings settings, SettingsBuildingRequest request,
+                                  SettingsProblemCollector problems )
     {
         StringWriter writer = new StringWriter( 1024 * 4 );
 

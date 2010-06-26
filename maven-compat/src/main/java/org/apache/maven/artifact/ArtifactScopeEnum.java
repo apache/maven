@@ -22,7 +22,7 @@ package org.apache.maven.artifact;
 /**
  * Type safe reincarnation of Artifact scope. Also supplies the <code>DEFAULT_SCOPE<code> as well
  * as convenience method to deal with scope relationships.
- * 
+ *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
@@ -40,7 +40,7 @@ public enum ArtifactScopeEnum
     {
         this.id = id;
     }
-    
+
     int getId()
     {
         return id;
@@ -49,16 +49,16 @@ public enum ArtifactScopeEnum
 
     /**
      * Helper method to simplify null processing
-     * 
-     * @return 
+     *
+     * @return
      */
     public static final ArtifactScopeEnum checkScope( ArtifactScopeEnum scope )
     {
-    	return scope == null ? DEFAULT_SCOPE : scope;
+        return scope == null ? DEFAULT_SCOPE : scope;
     }
-    
+
     /**
-     * 
+     *
      * @return unsafe String representation of this scope.
      */
     public String getScope()
@@ -90,40 +90,44 @@ public enum ArtifactScopeEnum
             return Artifact.SCOPE_RUNTIME_PLUS_SYSTEM;
         }
     }
-    
+
     private static final ArtifactScopeEnum [][][] _compliancySets = {
-    	  { { compile  }, { compile,                provided, system } }
-      	, { { test     }, { compile, test,          provided, system } }
-    	, { { runtime  }, { compile,       runtime,           system } }
-    	, { { provided }, { compile, test,          provided         } }
+          { { compile  }, { compile,                provided, system } }
+        , { { test     }, { compile, test,          provided, system } }
+        , { { runtime  }, { compile,       runtime,           system } }
+        , { { provided }, { compile, test,          provided         } }
     };
-    
+
     /**
      * scope relationship function. Used by the graph conflict resolution policies
-     * 
+     *
      * @param scope
      * @return true is supplied scope is an inclusive sub-scope of current one.
      */
     public boolean encloses( ArtifactScopeEnum scope )
     {
-    	final ArtifactScopeEnum s = checkScope(scope);
-    	
-    	// system scope is historic only - and simple
-    	if( id == system.id )
-    		return scope.id == system.id;
+        final ArtifactScopeEnum s = checkScope( scope );
 
-    	for( ArtifactScopeEnum[][] set : _compliancySets  )
-    	{
-    		if( id == set[0][0].id )
-    		{
-    			for( ArtifactScopeEnum ase : set[1] )
-    			{
-    				if( s.id == ase.id )
-    					return true;
-    			}
-    			break;
-    		}
-    	}
-    	return false;
+    	// system scope is historic only - and simple
+        if ( id == system.id )
+        {
+            return scope.id == system.id;
+        }
+
+        for ( ArtifactScopeEnum[][] set : _compliancySets )
+        {
+            if ( id == set[0][0].id )
+            {
+                for ( ArtifactScopeEnum ase : set[1] )
+                {
+                    if ( s.id == ase.id )
+                    {
+                        return true;
+                    }
+                }
+                break;
+            }
+        }
+        return false;
     }
 }

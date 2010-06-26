@@ -33,7 +33,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 /**
  * @author jdcasey
  */
-@Component(role=ArtifactRepositoryFactory.class)
+@Component( role = ArtifactRepositoryFactory.class )
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
@@ -42,7 +42,7 @@ public class DefaultArtifactRepositoryFactory
 
     private String globalChecksumPolicy;
 
-    @Requirement(role=ArtifactRepositoryLayout.class)
+    @Requirement( role = ArtifactRepositoryLayout.class )
     private Map<String,ArtifactRepositoryLayout> repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )
@@ -51,9 +51,7 @@ public class DefaultArtifactRepositoryFactory
         return repositoryLayouts.get( layoutId );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id,
-                                                                  String url,
-                                                                  String layoutId,
+    public ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
                                                                   boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
@@ -64,9 +62,7 @@ public class DefaultArtifactRepositoryFactory
         return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
     }
 
-    private void checkLayout( String repositoryId,
-                              String layoutId,
-                              ArtifactRepositoryLayout layout )
+    private void checkLayout( String repositoryId, String layoutId, ArtifactRepositoryLayout layout )
         throws UnknownRepositoryLayoutException
     {
         if ( layout == null )
@@ -75,17 +71,14 @@ public class DefaultArtifactRepositoryFactory
         }
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id,
-                                                                  String url,
+    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
                                                                   ArtifactRepositoryLayout repositoryLayout,
                                                                   boolean uniqueVersion )
     {
         return createArtifactRepository( id, url, repositoryLayout, null, null );
     }
 
-    public ArtifactRepository createArtifactRepository( String id,
-                                                        String url,
-                                                        String layoutId,
+    public ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
@@ -97,8 +90,7 @@ public class DefaultArtifactRepositoryFactory
         return createArtifactRepository( id, url, layout, snapshots, releases );
     }
 
-    public ArtifactRepository createArtifactRepository( String id,
-                                                        String url,
+    public ArtifactRepository createArtifactRepository( String id, String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )

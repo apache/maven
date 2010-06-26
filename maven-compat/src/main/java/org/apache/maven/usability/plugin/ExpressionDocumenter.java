@@ -72,11 +72,13 @@ public class ExpressionDocumenter
                 }
                 catch ( IOException e )
                 {
-                    throw new ExpressionDocumentationException( "Failed to read documentation for expression root: " + EXPRESSION_ROOTS[i], e );
+                    throw new ExpressionDocumentationException( "Failed to read documentation for expression root: "
+                        + EXPRESSION_ROOTS[i], e );
                 }
                 catch ( XmlPullParserException e )
                 {
-                    throw new ExpressionDocumentationException( "Failed to parse documentation for expression root: " + EXPRESSION_ROOTS[i], e );
+                    throw new ExpressionDocumentationException( "Failed to parse documentation for expression root: "
+                        + EXPRESSION_ROOTS[i], e );
                 }
                 finally
                 {
@@ -110,8 +112,8 @@ public class ExpressionDocumenter
      *   ]]></usage>
      *   </expression>
      * <expressions>
-     * @throws IOException 
-     * @throws XmlPullParserException 
+     * @throws IOException
+     * @throws XmlPullParserException
      */
     private static Map parseExpressionDocumentation( InputStream docStream )
         throws IOException, XmlPullParserException

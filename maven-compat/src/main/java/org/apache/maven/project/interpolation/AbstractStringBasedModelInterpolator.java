@@ -90,9 +90,9 @@ public abstract class AbstractStringBasedModelInterpolator
     }
 
     private PathTranslator pathTranslator;
-    
+
     private Interpolator interpolator;
-    
+
     private RecursionInterceptor recursionInterceptor;
 
     // for testing.
@@ -206,7 +206,7 @@ public abstract class AbstractStringBasedModelInterpolator
         {
             List<ValueSource> valueSources = createValueSources( model, projectDir, config );
             List<InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir, config );
-            
+
             return interpolateInternal( src, valueSources, postProcessors, debug );
         }
         finally
@@ -214,8 +214,9 @@ public abstract class AbstractStringBasedModelInterpolator
             interpolator.clearAnswers();
         }
     }
-    
-    protected List<ValueSource> createValueSources( final Model model, final File projectDir, final ProjectBuilderConfiguration config )
+
+    protected List<ValueSource> createValueSources( final Model model, final File projectDir,
+                                                    final ProjectBuilderConfiguration config )
     {
         String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
 
@@ -228,7 +229,8 @@ public abstract class AbstractStringBasedModelInterpolator
         ValueSource modelValueSource1 = new PrefixedObjectValueSource( PROJECT_PREFIXES, model, false );
         ValueSource modelValueSource2 = new ObjectBasedValueSource( model );
 
-        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false ){
+        ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
+        {
             public Object getValue( String expression )
             {
                 if ( projectDir != null && "basedir".equals( expression ) )
@@ -237,9 +239,9 @@ public abstract class AbstractStringBasedModelInterpolator
                 }
                 return null;
             }
-        },
-        PROJECT_PREFIXES, true );
-        ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false ){
+        }, PROJECT_PREFIXES, true );
+        ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
+        {
             public Object getValue( String expression )
             {
                 if ( projectDir != null && "baseUri".equals( expression ) )
@@ -248,11 +250,10 @@ public abstract class AbstractStringBasedModelInterpolator
                 }
                 return null;
             }
-        },
-        PROJECT_PREFIXES, false );
-        
+        }, PROJECT_PREFIXES, false );
+
         List<ValueSource> valueSources = new ArrayList<ValueSource>( 9 );
-        
+
         // NOTE: Order counts here!
         valueSources.add( basedirValueSource );
         valueSources.add( baseUriValueSource );
@@ -269,10 +270,10 @@ public abstract class AbstractStringBasedModelInterpolator
             }
         } );
         valueSources.add( modelValueSource2 );
-        
+
         return valueSources;
     }
-    
+
     protected List<InterpolationPostProcessor> createPostProcessors( final Model model, final File projectDir,
                                                                      final ProjectBuilderConfiguration config )
     {
@@ -282,7 +283,7 @@ public abstract class AbstractStringBasedModelInterpolator
                                                                                                          projectDir,
                                                                                                          pathTranslator ) );
     }
-    
+
     @SuppressWarnings("unchecked")
     protected String interpolateInternal( String src, List<ValueSource> valueSources,
                                           List<InterpolationPostProcessor> postProcessors, boolean debug )
@@ -292,18 +293,18 @@ public abstract class AbstractStringBasedModelInterpolator
         {
             return src;
         }
-        
+
         Logger logger = getLogger();
 
         String result = src;
         synchronized( this )
         {
-            
+
             for ( ValueSource vs : valueSources )
             {
                 interpolator.addValueSource( vs );
             }
-            
+
             for ( InterpolationPostProcessor postProcessor : postProcessors )
             {
                 interpolator.addPostProcessor( postProcessor );
@@ -367,7 +368,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     interpolator.removeValuesSource( vs );
                 }
-                
+
                 for ( InterpolationPostProcessor postProcessor : postProcessors )
                 {
                     interpolator.removePostProcessor( postProcessor );
@@ -377,7 +378,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
         return result;
     }
-    
+
     protected RecursionInterceptor getRecursionInterceptor()
     {
         return recursionInterceptor;
@@ -396,7 +397,7 @@ public abstract class AbstractStringBasedModelInterpolator
         interpolator = createInterpolator();
         recursionInterceptor = new PrefixAwareRecursionInterceptor( PROJECT_PREFIXES );
     }
-    
+
     protected final Interpolator getInterpolator()
     {
         return interpolator;

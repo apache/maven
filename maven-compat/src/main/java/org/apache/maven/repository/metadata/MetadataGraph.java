@@ -33,7 +33,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  *
  */
-
 public class MetadataGraph
 {
     public static final int DEFAULT_VERTICES = 32;
@@ -79,7 +78,7 @@ public class MetadataGraph
      * construct a single vertex
      */
     public MetadataGraph( MetadataGraphVertex entry )
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         checkVertex( entry );
         checkVertices( 1 );
@@ -95,7 +94,7 @@ public class MetadataGraph
      * construct graph from a "dirty" tree
      */
     public MetadataGraph( MetadataTreeNode tree )
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         this( tree, false, false );
     }
@@ -109,7 +108,7 @@ public class MetadataGraph
      *
      */
     public MetadataGraph( MetadataTreeNode tree, boolean versionedVertices, boolean scopedVertices )
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         if ( tree == null )
         {
@@ -129,12 +128,8 @@ public class MetadataGraph
         processTreeNodes( null, tree, 0, 0 );
     }
     //------------------------------------------------------------------------
-    private void processTreeNodes(   MetadataGraphVertex parentVertex
-                               , MetadataTreeNode node
-                               , int depth
-                               , int pomOrder
-                            )
-    throws MetadataResolutionException
+    private void processTreeNodes( MetadataGraphVertex parentVertex, MetadataTreeNode node, int depth, int pomOrder )
+        throws MetadataResolutionException
     {
         if ( node == null )
         {
@@ -150,7 +145,8 @@ public class MetadataGraph
         if ( parentVertex != null ) // then create the edge
         {
             ArtifactMetadata md = node.getMd();
-            MetadataGraphEdge e = new MetadataGraphEdge( md.version, md.resolved, md.artifactScope, md.artifactUri, depth, pomOrder );
+            MetadataGraphEdge e =
+                new MetadataGraphEdge( md.version, md.resolved, md.artifactScope, md.artifactUri, depth, pomOrder );
             addEdge( parentVertex, vertex, e );
         }
         else
@@ -275,7 +271,7 @@ public class MetadataGraph
     }
     //------------------------------------------------------------------------
     private static void checkVertex( MetadataGraphVertex v )
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         if ( v == null )
         {
@@ -288,7 +284,7 @@ public class MetadataGraph
     }
     //------------------------------------------------------------------------
     private static void checkEdge( MetadataGraphEdge e )
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         if ( e == null )
         {
@@ -318,7 +314,7 @@ public class MetadataGraph
     }
     //------------------------------------------------------------------------
     public MetadataGraph addEdge( MetadataGraphVertex vFrom, MetadataGraphVertex vTo, MetadataGraphEdge e )
-    throws MetadataResolutionException
+        throws MetadataResolutionException
     {
         checkVertex( vFrom );
         checkVertex( vTo );

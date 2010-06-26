@@ -30,7 +30,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * @version $Id$
  * @since 3.0
  */
-@Component(role=ConflictResolver.class, hint="farthest")
+@Component( role = ConflictResolver.class, hint = "farthest" )
 public class FarthestConflictResolver
     implements ConflictResolver
 {
@@ -41,8 +41,7 @@ public class FarthestConflictResolver
     *      org.apache.maven.artifact.resolver.ResolutionNode)
     */
 
-    public ResolutionNode resolveConflict( ResolutionNode node1,
-                                           ResolutionNode node2 )
+    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
     {
         return node1.getDepth() >= node2.getDepth() ? node1 : node2;
     }

@@ -1,3 +1,5 @@
+package org.apache.maven.toolchain;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,8 +19,6 @@
  * under the License.
  */
 
-package org.apache.maven.toolchain;
-
 /**
  *
  * @author mkleint
@@ -32,8 +32,7 @@ public class MisconfiguredToolchainException
         super( message );
     }
 
-    public MisconfiguredToolchainException( String message,
-                                            Throwable orig )
+    public MisconfiguredToolchainException( String message, Throwable orig )
     {
         super( message, orig );
     }

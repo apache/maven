@@ -36,17 +36,16 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * @todo you don't need the container in here with the active maps (jvz).
  * @since 3.0
  */
-@Component(role=ConflictResolverFactory.class) 
+@Component( role = ConflictResolverFactory.class )
 public class DefaultConflictResolverFactory
-    implements ConflictResolverFactory,
-    Contextualizable
+    implements ConflictResolverFactory, Contextualizable
 {
     // fields -----------------------------------------------------------------
 
     /**
      * The plexus container used to obtain instances from.
      */
-	@Requirement
+    @Requirement
     private PlexusContainer container;
 
     // ConflictResolverFactory methods ----------------------------------------

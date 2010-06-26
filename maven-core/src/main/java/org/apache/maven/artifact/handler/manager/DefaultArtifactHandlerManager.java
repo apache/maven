@@ -31,12 +31,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * @author Jason van Zyl
  * @version $Id$
  */
-@Component(role=ArtifactHandlerManager.class) 
+@Component( role = ArtifactHandlerManager.class )
 public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
-    @Requirement(role=ArtifactHandler.class)    
-    private Map<String,ArtifactHandler> artifactHandlers;
+    @Requirement( role = ArtifactHandler.class )
+    private Map<String, ArtifactHandler> artifactHandlers;
 
     public ArtifactHandler getArtifactHandler( String type )
     {
@@ -50,7 +50,7 @@ public class DefaultArtifactHandlerManager
         return handler;
     }
 
-    public void addHandlers( Map<String,ArtifactHandler> handlers )
+    public void addHandlers( Map<String, ArtifactHandler> handlers )
     {
         artifactHandlers.putAll( handlers );
     }

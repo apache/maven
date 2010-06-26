@@ -37,7 +37,7 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * Logs execution events to a user-supplied logger.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class ExecutionEventLogger
@@ -204,7 +204,7 @@ class ExecutionEventLogger
 
         String wallClock = session.getRequest().isThreadConfigurationPresent() ? " (Wall Clock)" : "";
 
-        logger.info( "Total time: " + getFormattedTime( time ) + wallClock);
+        logger.info( "Total time: " + getFormattedTime( time ) + wallClock );
 
         logger.info( "Finished at: " + finish );
 

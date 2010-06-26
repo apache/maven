@@ -36,7 +36,7 @@ public interface ArtifactTransformationManager
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
-     * transformation has occured the original artifact is returned.
+     * transformation has occurred the original artifact is returned.
      *
      * @param artifact           Artifact to be transformed.
      * @param request the repositories to check
@@ -47,18 +47,19 @@ public interface ArtifactTransformationManager
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
-     * transformation has occured the original artifact is returned.
+     * transformation has occurred the original artifact is returned.
      *
      * @param artifact           Artifact to be transformed.
      * @param remoteRepositories the repositories to check
      * @param localRepository    the local repository
      */
-    void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
+    void transformForResolve( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                              ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no
-     * transformation has occured the original artifact is returned.
+     * transformation has occurred the original artifact is returned.
      *
      * @param artifact        Artifact to be transformed.
      * @param localRepository the local repository it will be stored in
@@ -67,14 +68,15 @@ public interface ArtifactTransformationManager
         throws ArtifactInstallationException;
 
     /**
-     * Take in a artifact and return the transformed artifact for distributing toa remote repository. If no
-     * transformation has occured the original artifact is returned.
+     * Take in a artifact and return the transformed artifact for distributing to a remote repository. If no
+     * transformation has occurred the original artifact is returned.
      *
      * @param artifact         Artifact to be transformed.
      * @param remoteRepository the repository to deploy to
      * @param localRepository  the local repository the metadata is stored in
      */
-    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository, ArtifactRepository localRepository )
+    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+                                 ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
 
     List getArtifactTransformations();

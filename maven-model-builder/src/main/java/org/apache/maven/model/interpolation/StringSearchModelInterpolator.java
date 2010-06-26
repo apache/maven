@@ -35,7 +35,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component( role = ModelInterpolator.class )
@@ -44,9 +48,9 @@ public class StringSearchModelInterpolator
 {
 
     private static final Map<Class<?>, Field[]> fieldsByClass =
-            new ConcurrentHashMap<Class<?>, Field[]>(80, 0.75f, 2);  // Empirical data from 3.x, actual =40
+            new ConcurrentHashMap<Class<?>, Field[]>( 80, 0.75f, 2 );  // Empirical data from 3.x, actual =40
     private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass =
-            new ConcurrentHashMap<Class<?>, Boolean>(62, 0.75f, 2); // Empirical data from 3.x, actual 31
+            new ConcurrentHashMap<Class<?>, Boolean>( 62, 0.75f, 2 ); // Empirical data from 3.x, actual 31
 
     public Model interpolateModel( Model model, File projectDir, ModelBuildingRequest config,
                                    ModelProblemCollector problems )
@@ -95,7 +99,8 @@ public class StringSearchModelInterpolator
 
         public InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
                                         List<? extends InterpolationPostProcessor> postProcessors,
-                                        StringSearchModelInterpolator modelInterpolator, ModelProblemCollector problems)
+                                        StringSearchModelInterpolator modelInterpolator,
+                                        ModelProblemCollector problems )
         {
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
@@ -120,7 +125,7 @@ public class StringSearchModelInterpolator
             return null;
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         private void traverseObjectWithParents( Class<?> cls, Object target )
         {
             if ( cls == null )
@@ -128,20 +133,19 @@ public class StringSearchModelInterpolator
                 return;
             }
 
-
             if ( cls.isArray() )
             {
                 evaluateArray( target );
             }
             else if ( isQualifiedForInterpolation( cls ) )
             {
-                Field[] fields = getFields(cls);
-                for (Field currentField : fields)
+                for ( Field currentField : getFields( cls ) )
                 {
                     Class<?> type = currentField.getType();
                     if ( isQualifiedForInterpolation( currentField, type ) )
                     {
-                        synchronized ( currentField){
+                        synchronized ( currentField )
+                        {
                             boolean isAccessible = currentField.isAccessible();
                             currentField.setAccessible( true );
                             try
@@ -282,13 +286,13 @@ public class StringSearchModelInterpolator
                             }
                             catch ( IllegalArgumentException e )
                             {
-                                problems.add( Severity.ERROR, "Failed to interpolate field3: " + currentField +
-                                    " on class: " + cls.getName(), null, e );
+                                problems.add( Severity.ERROR, "Failed to interpolate field3: " + currentField
+                                    + " on class: " + cls.getName(), null, e );
                             }
                             catch ( IllegalAccessException e )
                             {
-                                problems.add( Severity.ERROR, "Failed to interpolate field4: " + currentField +
-                                    " on class: " + cls.getName(), null, e );
+                                problems.add( Severity.ERROR, "Failed to interpolate field4: " + currentField
+                                    + " on class: " + cls.getName(), null, e );
                             }
                             finally
                             {
@@ -302,8 +306,9 @@ public class StringSearchModelInterpolator
             }
         }
 
-        private Field[] getFields(Class<?> cls) {
-            Field[] fields = fieldsByClass.get(cls);
+        private Field[] getFields( Class<?> cls )
+        {
+            Field[] fields = fieldsByClass.get( cls );
             if ( fields == null )
             {
                 fields = cls.getDeclaredFields();
@@ -319,7 +324,7 @@ public class StringSearchModelInterpolator
 
         private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
         {
-            Boolean primitive = fieldIsPrimitiveByClass.get(fieldType);
+            Boolean primitive = fieldIsPrimitiveByClass.get( fieldType );
             if ( primitive == null )
             {
                 primitive = fieldType.isPrimitive();
@@ -331,8 +336,7 @@ public class StringSearchModelInterpolator
                 return false;
             }
 
-            return !"parent".equals(field.getName());
-
+            return !"parent".equals( field.getName() );
         }
 
         private void evaluateArray( Object target )

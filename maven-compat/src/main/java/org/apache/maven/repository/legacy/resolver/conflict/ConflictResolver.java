@@ -30,7 +30,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  */
 public interface ConflictResolver
 {
-    static String ROLE = ConflictResolver.class.getName();
+    String ROLE = ConflictResolver.class.getName();
 
     /**
      * Determines which of the specified versions of an artifact to use when there are conflicting declarations.
@@ -41,6 +41,5 @@ public interface ConflictResolver
      *         this conflict cannot be resolved
      * @since 3.0
      */
-    ResolutionNode resolveConflict( ResolutionNode node1,
-                                    ResolutionNode node2 );
+    ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 );
 }

@@ -28,7 +28,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 
-@Component(role=ArtifactTransformation.class, hint="latest")
+@Component( role = ArtifactTransformation.class, hint = "latest" )
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
@@ -56,21 +56,18 @@ public class LatestArtifactTransformation
         }
     }
 
-    public void transformForInstall( Artifact artifact,
-                                     ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
     {
         // metadata is added via addPluginArtifactMetadata
     }
 
-    public void transformForDeployment( Artifact artifact,
-                                        ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
     {
         // metadata is added via addPluginArtifactMetadata
     }
 
-    protected String constructVersion( Versioning versioning,
-                                       String baseVersion )
+    protected String constructVersion( Versioning versioning, String baseVersion )
     {
         return versioning.getLatest();
     }

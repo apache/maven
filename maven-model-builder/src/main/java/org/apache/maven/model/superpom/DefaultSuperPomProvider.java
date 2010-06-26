@@ -31,7 +31,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Provides the super POM that all models implicitly inherit from.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = SuperPomProvider.class )
@@ -69,7 +69,7 @@ public class DefaultSuperPomProvider
 
             try
             {
-                Map<String,String> options = new HashMap<String,String>();
+                Map<String, String> options = new HashMap<String, String>();
                 options.put( "xml:4.0.0", "xml:4.0.0" );
                 superModel = modelProcessor.read( is, options );
             }

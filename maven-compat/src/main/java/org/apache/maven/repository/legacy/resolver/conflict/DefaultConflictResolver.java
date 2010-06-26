@@ -1,7 +1,5 @@
 package org.apache.maven.repository.legacy.resolver.conflict;
 
-import org.codehaus.plexus.component.annotations.Component;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +19,8 @@ import org.codehaus.plexus.component.annotations.Component;
  * under the License.
  */
 
+import org.codehaus.plexus.component.annotations.Component;
+
 /**
  * The default conflict resolver that delegates to the nearest strategy.
  *
@@ -30,7 +30,7 @@ import org.codehaus.plexus.component.annotations.Component;
  * @deprecated As of 3.0, use a specific implementation instead, e.g. {@link NearestConflictResolver}
  */
 @Deprecated
-@Component(role=ConflictResolver.class)
+@Component( role = ConflictResolver.class )
 public class DefaultConflictResolver
     extends NearestConflictResolver
 {

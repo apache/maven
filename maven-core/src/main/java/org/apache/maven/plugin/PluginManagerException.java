@@ -1,15 +1,5 @@
 package org.apache.maven.plugin;
 
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
-import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -28,6 +18,16 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.component.repository.exception.ComponentRepositoryException;
+import org.codehaus.plexus.configuration.PlexusConfigurationException;
 
 /**
  * Exception in the plugin manager.
@@ -87,7 +87,8 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    protected PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message, Throwable cause )
+    protected PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message,
+                                      Throwable cause )
     {
         super( message, cause );
         this.project = project;
@@ -124,7 +125,8 @@ public class PluginManagerException
         pluginVersion = plugin.getVersion();
     }
 
-    public PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message, NoSuchRealmException cause )
+    public PluginManagerException( MojoDescriptor mojoDescriptor, MavenProject project, String message,
+                                   NoSuchRealmException cause )
     {
         super( message, cause );
 
@@ -135,7 +137,8 @@ public class PluginManagerException
         goal = mojoDescriptor.getGoal();
     }
 
-    public PluginManagerException( MojoDescriptor mojoDescriptor, String message, MavenProject project, PlexusContainerException cause )
+    public PluginManagerException( MojoDescriptor mojoDescriptor, String message, MavenProject project,
+                                   PlexusContainerException cause )
     {
         super( message, cause );
 

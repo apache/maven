@@ -43,7 +43,7 @@ import org.codehaus.plexus.util.StringUtils;
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
  * @version $Id$
  */
-@Component(role=ArtifactTransformation.class, hint="snapshot")
+@Component( role = ArtifactTransformation.class, hint = "snapshot" )
 public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
@@ -71,8 +71,7 @@ public class SnapshotTransformation
         }
     }
 
-    public void transformForInstall( Artifact artifact,
-                                     ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
     {
         if ( artifact.isSnapshot() )
         {
@@ -84,8 +83,7 @@ public class SnapshotTransformation
         }
     }
 
-    public void transformForDeployment( Artifact artifact,
-                                        ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
@@ -126,8 +124,7 @@ public class SnapshotTransformation
         return deploymentTimestamp;
     }
 
-    protected String constructVersion( Versioning versioning,
-                                       String baseVersion )
+    protected String constructVersion( Versioning versioning, String baseVersion )
     {
         String version = null;
         Snapshot snapshot = versioning.getSnapshot();
@@ -146,8 +143,7 @@ public class SnapshotTransformation
         return version;
     }
 
-    private int resolveLatestSnapshotBuildNumber( Artifact artifact,
-                                                  ArtifactRepository localRepository,
+    private int resolveLatestSnapshotBuildNumber( Artifact artifact, ArtifactRepository localRepository,
                                                   ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException
     {

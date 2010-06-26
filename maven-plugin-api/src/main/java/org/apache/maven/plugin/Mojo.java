@@ -28,8 +28,8 @@ import org.apache.maven.plugin.logging.Log;
  * It features an <code>execute()</code> method, which triggers the Mojo's build-process behavior, and can throw
  * a MojoExecutionException or MojoFailureException if error conditions occur.
  * <br/>
- * Also included is the <code>setLog(...)</code> method, which simply allows Maven to inject a logging mechanism which will
- * allow the Mojo to communicate to the outside world through standard Maven channels.
+ * Also included is the <code>setLog(...)</code> method, which simply allows Maven to inject a logging mechanism which
+ * will allow the Mojo to communicate to the outside world through standard Maven channels.
  *
  * @author Jason van Zyl
  */

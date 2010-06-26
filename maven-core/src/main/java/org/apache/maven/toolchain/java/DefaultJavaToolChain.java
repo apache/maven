@@ -1,3 +1,5 @@
+package org.apache.maven.toolchain.java;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,8 +19,6 @@
  * under the License.
  */
 
-package org.apache.maven.toolchain.java;
-
 import java.io.File;
 
 import org.apache.maven.toolchain.DefaultToolchain;
@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.Os;
 /**
  * @author Milos Kleint
  */
-@Component(role=JavaToolChain.class)
+@Component( role = JavaToolChain.class )
 public class DefaultJavaToolChain
     extends DefaultToolchain
     implements JavaToolChain

@@ -44,14 +44,7 @@ public class JdkPrefixProfileActivator
         {
             try
             {
-                if ( matchJdkVersionRange( jdk ) )
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return matchJdkVersionRange( jdk );
             }
             catch ( InvalidVersionSpecificationException e )
             {

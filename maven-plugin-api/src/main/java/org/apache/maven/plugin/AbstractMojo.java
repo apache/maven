@@ -96,7 +96,8 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
  *          The execution of either will not affect the current project, but instead make available the
  *          <code>${executedProject}</code> expression if required. An alternate lifecycle can also be provided:
  *          for more information see the documentation on the
- *          <a href="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html" target="_blank">build lifecycle</a>.
+ *          <a href="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html"
+ *             target="_blank">build lifecycle</a>.
  *      </td>
  *   </tr>
  *   <tr>
@@ -158,15 +159,15 @@ public abstract class AbstractMojo
     }
 
     /**
-     * Returns the logger that has been injected into this mojo. If no logger has been setup yet, a <code>SystemStreamLog</code>
-     * logger will be created and returned.
+     * Returns the logger that has been injected into this mojo. If no logger has been setup yet, a
+     * <code>SystemStreamLog</code> logger will be created and returned.
      * <br/><br/>
      * <strong>Note:</strong>
      * The logger returned by this method must not be cached in an instance field during the construction of the mojo.
      * This would cause the mojo to use a wrongly configured default logger when being run by Maven. The proper logger
      * gets injected by the Plexus container <em>after</em> the mojo has been constructed. Therefore, simply call this
      * method directly whenever you need the logger, it is fast enough and needs no caching.
-     * 
+     *
      * @see org.apache.maven.plugin.Mojo#getLog()
      */
     public Log getLog()

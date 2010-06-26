@@ -166,31 +166,36 @@ public class MavenModelMerger
     }
 
     @Override
-    protected void mergeModel_ModelVersion( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_ModelVersion( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_ArtifactId( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_ArtifactId( Model target, Model source, boolean sourceDominant,
+                                          Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Profiles( Model target, Model source, boolean sourceDominant,
+                                        Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_Prerequisites( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Prerequisites( Model target, Model source, boolean sourceDominant,
+                                             Map<Object, Object> context )
     {
         // neither inherited nor injected
     }
 
     @Override
-    protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
+    protected void mergeModel_Licenses( Model target, Model source, boolean sourceDominant,
+                                        Map<Object, Object> context )
     {
         if ( target.getLicenses().isEmpty() )
         {
@@ -370,7 +375,8 @@ public class MavenModelMerger
     @Override
     protected void mergeDistributionManagement_SnapshotRepository( DistributionManagement target,
                                                                    DistributionManagement source,
-                                                                   boolean sourceDominant, Map<Object, Object> context )
+                                                                   boolean sourceDominant,
+                                                                   Map<Object, Object> context )
     {
         DeploymentRepository src = source.getSnapshotRepository();
         if ( src != null )
@@ -492,7 +498,8 @@ public class MavenModelMerger
 
             for ( PluginExecution element : src )
             {
-                if ( sourceDominant || ( element.getInherited() != null ? element.isInherited() : source.isInherited() ) )
+                if ( sourceDominant
+                                || ( element.getInherited() != null ? element.isInherited() : source.isInherited() ) )
                 {
                     Object key = getPluginExecutionKey( element );
                     merged.put( key, element );

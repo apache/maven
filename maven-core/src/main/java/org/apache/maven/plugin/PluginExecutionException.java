@@ -47,7 +47,8 @@ public class PluginExecutionException
         this.mojoExecution = mojoExecution;
     }
 
-    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project, DuplicateArtifactAttachmentException cause )
+    public PluginExecutionException( MojoExecution mojoExecution, MavenProject project,
+                                     DuplicateArtifactAttachmentException cause )
     {
         super( mojoExecution.getMojoDescriptor(), project, constructMessage( mojoExecution, cause ), cause );
         this.mojoExecution = mojoExecution;

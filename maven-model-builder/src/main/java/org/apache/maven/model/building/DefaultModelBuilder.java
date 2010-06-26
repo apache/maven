@@ -185,17 +185,15 @@ public class DefaultModelBuilder
         return this;
     }
 
-    public DefaultModelBuilder setDependencyManagementImporter(
-                                                                DependencyManagementImporter dependencyManagementImporter )
+    public DefaultModelBuilder setDependencyManagementImporter( DependencyManagementImporter depMngmntImporter )
     {
-        this.dependencyManagementImporter = dependencyManagementImporter;
+        this.dependencyManagementImporter = depMngmntImporter;
         return this;
     }
 
-    public DefaultModelBuilder setDependencyManagementInjector(
-                                                                DependencyManagementInjector dependencyManagementInjector )
+    public DefaultModelBuilder setDependencyManagementInjector( DependencyManagementInjector depMngmntInjector )
     {
-        this.dependencyManagementInjector = dependencyManagementInjector;
+        this.dependencyManagementInjector = depMngmntInjector;
         return this;
     }
 
@@ -331,7 +329,7 @@ public class DefaultModelBuilder
 
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
-        
+
         assembleInheritance( lineage, request, problems );
 
         Model resultModel = resultData.getModel();
@@ -500,7 +498,8 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(), null, e );
+            problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                          null, e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                               problems.getProblems() );
         }
@@ -647,7 +646,8 @@ public class DefaultModelBuilder
         return result;
     }
 
-    private ModelData readParent( Model childModel, ModelBuildingRequest request, DefaultModelProblemCollector problems )
+    private ModelData readParent( Model childModel, ModelBuildingRequest request,
+                                  DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
         ModelData parentData;

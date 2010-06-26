@@ -41,7 +41,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
-@Component(role=UpdateCheckManager.class)
+@Component( role = UpdateCheckManager.class )
 public class DefaultUpdateCheckManager
     extends AbstractLogEnabled
     implements UpdateCheckManager
@@ -390,7 +390,8 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " + touchfile, e );
+                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " + touchfile,
+                                           e );
                     }
                 }
 

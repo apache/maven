@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 
+ *
  * @version $Id$
  */
 class PathTranslatingPostProcessor
@@ -40,7 +40,8 @@ class PathTranslatingPostProcessor
     private final PathTranslator pathTranslator;
     private final List<String> expressionPrefixes;
 
-    public PathTranslatingPostProcessor( List<String> expressionPrefixes, Collection<String> unprefixedPathKeys, File projectDir, PathTranslator pathTranslator )
+    public PathTranslatingPostProcessor( List<String> expressionPrefixes, Collection<String> unprefixedPathKeys,
+                                         File projectDir, PathTranslator pathTranslator )
     {
         this.expressionPrefixes = expressionPrefixes;
         this.unprefixedPathKeys = unprefixedPathKeys;
