@@ -56,13 +56,13 @@ public class ArtifactDeployerTest
         Artifact artifact = createArtifact( "artifact", "1.0" );
 
         File file = new File( artifactBasedir, "artifact-1.0.jar" );
-        assertEquals( "dummy\n", FileUtils.fileRead( file ) );
+        assertEquals( "dummy", FileUtils.fileRead( file, "UTF-8" ).trim() );
 
         artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
 
         ArtifactRepository remoteRepository = remoteRepository();
         File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
         assertTrue( deployedFile.exists() );
-        assertEquals( "dummy\n", FileUtils.fileRead( deployedFile ) );
+        assertEquals( "dummy", FileUtils.fileRead( deployedFile, "UTF-8" ).trim() );
     }
 }
