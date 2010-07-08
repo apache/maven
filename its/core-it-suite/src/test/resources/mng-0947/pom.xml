@@ -28,7 +28,8 @@ under the License.
 
   <name>Maven Integration Test :: MNG-947</name> 
   <description>
-    Verify that optional dependencies of a project's direct dependencies are excluded from the project class path.
+    Verify that direct optional dependencies are included in the project class paths while transitive optional
+    dependencies are excluded.
   </description>
 
   <dependencies>
@@ -37,6 +38,13 @@ under the License.
       <artifactId>c</artifactId>
       <version>0.1</version>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng0947</groupId>
+      <artifactId>e</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 

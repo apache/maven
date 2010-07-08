@@ -40,7 +40,8 @@ public class MavenITmng0947OptionalDependencyTest
     }
 
     /**
-     * Verify that optional dependencies of a project's direct dependencies are excluded from the project class path.
+     * Verify that direct optional dependencies are included in the project class paths while transitive optional
+     * dependencies are excluded.
      */
     public void testit()
         throws Exception
@@ -59,15 +60,21 @@ public class MavenITmng0947OptionalDependencyTest
         verifier.resetStreams();
 
         List compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
-        assertEquals( 0, compile.size() );
+        assertTrue( compile.toString(), compile.contains( "org.apache.maven.its.mng0947:d:jar:0.1" ) );
+        assertTrue( compile.toString(), compile.contains( "org.apache.maven.its.mng0947:e:jar:0.1" ) );
+        assertEquals( 2, compile.size() );
 
         List runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
         assertTrue( runtime.toString(), runtime.contains( "org.apache.maven.its.mng0947:c:jar:0.1" ) );
-        assertEquals( 1, runtime.size() );
+        assertTrue( runtime.toString(), runtime.contains( "org.apache.maven.its.mng0947:d:jar:0.1" ) );
+        assertTrue( runtime.toString(), runtime.contains( "org.apache.maven.its.mng0947:e:jar:0.1" ) );
+        assertEquals( 3, runtime.size() );
 
         List test = verifier.loadLines( "target/test.txt", "UTF-8" );
         assertTrue( test.toString(), test.contains( "org.apache.maven.its.mng0947:c:jar:0.1" ) );
-        assertEquals( 1, test.size() );
+        assertTrue( test.toString(), test.contains( "org.apache.maven.its.mng0947:d:jar:0.1" ) );
+        assertTrue( test.toString(), test.contains( "org.apache.maven.its.mng0947:e:jar:0.1" ) );
+        assertEquals( 3, test.size() );
     }
 
 }
