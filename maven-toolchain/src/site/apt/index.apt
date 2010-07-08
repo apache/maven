@@ -1,7 +1,7 @@
  -----
  Maven Toolchains
  -----
- Hervé Boutemy
+ HervÃ© Boutemy
  -----
  2009-04-26
  -----
@@ -12,6 +12,6 @@ Maven Toolchains
 
  The following are generated from this model:
 
-   * {{{apidocs/index.html}Java sources}} with Reader for the Xpp3 XML parser, to read <<<toolchains.xml>>> file
+   * {{{./apidocs/index.html}Java sources}} with Reader for the Xpp3 XML parser, to read <<<toolchains.xml>>> file
 
-   * A {{{toolchains.html}Descriptor Reference}}
+   * A {{{./toolchains.html}Descriptor Reference}}

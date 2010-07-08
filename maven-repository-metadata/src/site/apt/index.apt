@@ -1,7 +1,7 @@
  -----
  Maven Repository Metadata Model
  -----
- Hervé Boutemy
+ HervÃ© Boutemy
  -----
  2009-04-26
  -----
@@ -12,6 +12,6 @@ Maven Repository Metadata Model
 
  The following are generated from this model:
 
-   * {{{apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, to read and write <<<maven-metadata(-*).xml>>> files
+   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, to read and write <<<maven-metadata(-*).xml>>> files
 
-   * A {{{repository-metadata.html}Descriptor Reference}}
+   * A {{{./repository-metadata.html}Descriptor Reference}}
