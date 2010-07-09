@@ -29,41 +29,17 @@ under the License.
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>maven-it-plugin-class-loader</artifactId>
-  <packaging>maven-plugin</packaging>
+  <groupId>org.apache.maven.its.plugins.class-loader</groupId>
+  <artifactId>dep-c</artifactId>
+  <packaging>jar</packaging>
 
-  <name>Maven Integration Test Plugin :: Class Loader</name>
+  <name>Maven Integration Test Plugin :: Class Loader :: Dependency C</name>
   <description>
-    A test plugin that tries to load classes and/or resources via the plugin class loader or the thread's context class
-    loader.
+    A test dependency for the test plugin.
   </description>
   <inceptionYear>2008</inceptionYear>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
-      <version>2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.2</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- dedicated IT artifact that is surely not shadowed by the Maven core -->
-    <dependency>
-      <groupId>${project.groupId}.class-loader</groupId>
-      <artifactId>dep-b</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}.class-loader</groupId>
-      <artifactId>dep-c</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+  </properties>
 </project>

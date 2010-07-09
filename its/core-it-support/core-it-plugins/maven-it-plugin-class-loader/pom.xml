@@ -43,5 +43,6 @@ under the License.
     <module>maven-it-plugin-class-loader</module>
     <module>dep-a</module>
     <module>dep-b</module>
+    <module>dep-c</module>
   </modules>
 </project>
