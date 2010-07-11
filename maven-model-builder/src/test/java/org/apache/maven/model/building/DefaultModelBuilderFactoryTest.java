@@ -19,22 +19,35 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.io.File;
+
+import junit.framework.TestCase;
+
 /**
- * Defines events that the model builder fires during construction of the effective model. When a listener encounteres
- * errors while processing the event, it can report these problems via {@link ModelBuildingEvent#getProblems()}.
- * <em>Note:</em> To cope with future extensions to this interface, it is strongly recommended to extend
- * {@link AbstractModelBuildingListener} rather than to directly implement this interface.
- * 
  * @author Benjamin Bentmann
  */
-public interface ModelBuildingListener
+public class DefaultModelBuilderFactoryTest
+    extends TestCase
 {
 
-    /**
-     * Notifies the listener that the model has been constructed to the extent where build extensions can be processed.
-     * 
-     * @param event The details about the event.
-     */
-    void buildExtensionsAssembled( ModelBuildingEvent event );
+    private File getPom( String name )
+    {
+        return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
+    }
+
+    public void testCompleteWiring()
+        throws Exception
+    {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        assertNotNull( builder );
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setProcessPlugins( true );
+        request.setPomFile( getPom( "simple" ) );
+
+        ModelBuildingResult result = builder.build( request );
+        assertNotNull( result );
+        assertNotNull( result.getEffectiveModel() );
+    }
 
 }
