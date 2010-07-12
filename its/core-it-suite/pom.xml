@@ -34,16 +34,21 @@ under the License.
 
   <!--
   By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
+  
     mvn clean test -Prun-its
   
   This will subject the Maven version running the build to the integration tests. If you would like to test a different
   Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
+  
     mvn clean test -Prun-its -DmavenHome=<maven-under-test>
   
-  To run the ITs using embedded Maven 3.x, add -D verifier.forkMode=auto. This will require more memory, something like
-    MAVEN_OPTS=-Xmx256m -XX:MaxPermSize=128m
-  seems to work.
-
+  Alternatively, you can just specify the version of a previously installed/deployed Maven distribution which will be
+  downloaded, unpacked and tested:
+  
+    mvn clean test -Prun-its -DmavenVersion=2.2.1
+  
+  To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
+  
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
   Maven dependencies are added to the test class path.
   -->
@@ -219,6 +224,77 @@ under the License.
                 </property>
               </systemProperties>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-distro</id>
+      <activation>
+        <property>
+          <name>mavenVersion</name>
+        </property>
+      </activation>
+      <properties>
+        <mavenHome>${project.build.directory}/apache-maven</mavenHome>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.0</version>
+            <executions>
+              <execution>
+                <id>download-maven-distro</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>${mavenVersion}</version>
+                      <classifier>bin</classifier>
+                      <type>zip</type>
+                      <destFileName>maven-bin.zip</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.3</version>
+            <executions>
+              <execution>
+                <id>unpack-maven-distro</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete dir="${mavenHome}"/>
+                    <unzip src="${project.build.directory}/maven-bin.zip" dest="${mavenHome}">
+                      <globmapper from="apache-maven-${mavenVersion}/*" to="*" handledirsep="true" />
+                    </unzip>
+                    <chmod dir="${mavenHome}/bin" perm="ugo+rx" includes="mvn,mvnDebug"/>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
