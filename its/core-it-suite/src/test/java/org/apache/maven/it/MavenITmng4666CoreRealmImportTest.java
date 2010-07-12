@@ -77,6 +77,10 @@ public class MavenITmng4666CoreRealmImportTest
 
         Properties props = verifier.loadProperties( "target/type.properties" );
         List types = getTypes( props );
+        if ( !matchesVersionRange( "[3.0-beta-2,)" ) )
+        {
+            types.remove( "org.codehaus.plexus.configuration.PlexusConfiguration" );
+        }
         assertFalse( types.isEmpty() );
         for ( Iterator it = types.iterator(); it.hasNext(); )
         {
