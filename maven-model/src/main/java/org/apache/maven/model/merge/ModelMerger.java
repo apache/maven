@@ -2901,7 +2901,7 @@ public class ModelMerger
 
     protected Object getExclusionKey( Exclusion object )
     {
-        return object.getGroupId() + ':' + object.getArtifactId();
+        return object;
     }
 
 }

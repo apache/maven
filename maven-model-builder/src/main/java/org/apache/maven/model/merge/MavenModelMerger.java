@@ -33,6 +33,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.IssueManagement;
@@ -581,6 +582,12 @@ public class MavenModelMerger
 
     @Override
     protected Object getExtensionKey( Extension object )
+    {
+        return object.getGroupId() + ':' + object.getArtifactId();
+    }
+
+    @Override
+    protected Object getExclusionKey( Exclusion object )
     {
         return object.getGroupId() + ':' + object.getArtifactId();
     }
