@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
 import org.apache.maven.settings.io.SettingsReader;
 import org.apache.maven.settings.io.SettingsWriter;
+import org.apache.maven.settings.merge.MavenSettingsMerger;
 import org.apache.maven.settings.validation.SettingsValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -44,7 +44,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- *
+ * 
  * @author Benjamin Bentmann
  */
 @Component( role = SettingsBuilder.class )
@@ -61,6 +61,8 @@ public class DefaultSettingsBuilder
     @Requirement
     private SettingsValidator settingsValidator;
 
+    private MavenSettingsMerger settingsMerger = new MavenSettingsMerger();
+
     public SettingsBuildingResult build( SettingsBuildingRequest request )
         throws SettingsBuildingException
     {
@@ -70,7 +72,7 @@ public class DefaultSettingsBuilder
 
         Settings userSettings = readSettings( request.getUserSettingsFile(), request, problems );
 
-        SettingsUtils.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
         problems.setSource( "" );
 
@@ -159,8 +161,7 @@ public class DefaultSettingsBuilder
         return settings;
     }
 
-    private Settings interpolate( Settings settings, SettingsBuildingRequest request,
-                                  SettingsProblemCollector problems )
+    private Settings interpolate( Settings settings, SettingsBuildingRequest request, SettingsProblemCollector problems )
     {
         StringWriter writer = new StringWriter( 1024 * 4 );
 
