@@ -63,6 +63,24 @@ public class DefaultSettingsBuilder
 
     private MavenSettingsMerger settingsMerger = new MavenSettingsMerger();
 
+    public DefaultSettingsBuilder setSettingsReader( SettingsReader settingsReader )
+    {
+        this.settingsReader = settingsReader;
+        return this;
+    }
+
+    public DefaultSettingsBuilder setSettingsWriter( SettingsWriter settingsWriter )
+    {
+        this.settingsWriter = settingsWriter;
+        return this;
+    }
+
+    public DefaultSettingsBuilder setSettingsValidator( SettingsValidator settingsValidator )
+    {
+        this.settingsValidator = settingsValidator;
+        return this;
+    }
+
     public SettingsBuildingResult build( SettingsBuildingRequest request )
         throws SettingsBuildingException
     {
