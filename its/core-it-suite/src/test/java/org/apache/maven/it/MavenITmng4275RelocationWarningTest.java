@@ -75,6 +75,11 @@ public class MavenITmng4275RelocationWarningTest
             {
                 foundWarning = true;
             }
+            else if ( line.matches( "\\[WARNING\\].* org.apache.maven.its.mng4275:relocation:jar:1 .* org.apache.maven.its.mng4275:relocated:jar:1.*" ) )
+            {
+                foundWarning = true;
+                break;
+            }
         }
         
         assertTrue( "Relocation warning should haven been logged.", foundWarning );
