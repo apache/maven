@@ -61,6 +61,8 @@ public class DefaultModelValidator
 
     private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
 
+    private static final String ILLEGAL_VERSION_CHARS = "\\/:\"<>|?*";
+
     public void validateRawModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Parent parent = model.getParent();
@@ -251,6 +253,9 @@ public class DefaultModelValidator
             }
 
             Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+
+            validateBannedCharacters( "version", problems, errOn31, model.getVersion(), null, model,
+                                      ILLEGAL_VERSION_CHARS );
 
             Build build = model.getBuild();
             if ( build != null )
@@ -687,6 +692,27 @@ public class DefaultModelValidator
             + "'.", tracker );
 
         return false;
+    }
+
+    private boolean validateBannedCharacters( String fieldName, ModelProblemCollector problems, Severity severity,
+                                              String string, String sourceHint, InputLocationTracker tracker,
+                                              String banned )
+    {
+        if ( string != null )
+        {
+            for ( int i = string.length() - 1; i >= 0; i-- )
+            {
+                if ( banned.indexOf( string.charAt( i ) ) >= 0 )
+                {
+                    addViolation( problems, severity, fieldName, sourceHint,
+                                  "must not contain any of these characters " + banned + " but found "
+                                      + string.charAt( i ), tracker );
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private boolean validateVersion( String fieldName, ModelProblemCollector problems, Severity severity,

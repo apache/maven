@@ -508,4 +508,14 @@ public class DefaultModelValidatorTest
         assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
     }
 
+    public void testBadVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-version.xml" );
+
+        assertViolations( result, 0, 0, 1 );
+
+        assertContains( result.getWarnings().get( 0 ), "'version' must not contain any of these characters" );
+    }
+
 }
