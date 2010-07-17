@@ -21,7 +21,7 @@ package org.apache.maven.model.profile;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
@@ -39,14 +39,6 @@ public interface ProfileActivationContext
     List<String> getActiveProfileIds();
 
     /**
-     * Sets the identifiers of those profiles that should be activated by explicit demand.
-     * 
-     * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    ProfileActivationContext setActiveProfileIds( List<String> activeProfileIds );
-
-    /**
      * Gets the identifiers of those profiles that should be deactivated by explicit demand.
      * 
      * @return The identifiers of those profiles to deactivate, never {@code null}.
@@ -54,29 +46,12 @@ public interface ProfileActivationContext
     List<String> getInactiveProfileIds();
 
     /**
-     * Sets the identifiers of those profiles that should be deactivated by explicit demand.
-     * 
-     * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    ProfileActivationContext setInactiveProfileIds( List<String> inactiveProfileIds );
-
-    /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
      * @return The execution properties, never {@code null}.
      */
-    Properties getSystemProperties();
-
-    /**
-     * Sets the system properties to use for interpolation and profile activation. The system properties are collected
-     * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
-     * @param executionProperties The execution properties, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    ProfileActivationContext setSystemProperties( Properties executionProperties );
+    Map<String, String> getSystemProperties();
 
     /**
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
@@ -85,17 +60,7 @@ public interface ProfileActivationContext
      * 
      * @return The user properties, never {@code null}.
      */
-    Properties getUserProperties();
-
-    /**
-     * Sets the user properties to use for interpolation and profile activation. The user properties have been
-     * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
-     * line.
-     * 
-     * @param userProperties The user properties, may be {@code null}.
-     * @return This context, never {@code null}.
-     */
-    ProfileActivationContext setUserProperties( Properties userProperties );
+    Map<String, String> getUserProperties();
 
     /**
      * Gets the base directory of the current project (if any).
@@ -103,14 +68,5 @@ public interface ProfileActivationContext
      * @return The base directory of the current project or {@code null} if none.
      */
     File getProjectDirectory();
-
-    /**
-     * Sets the base directory of the current project.
-     * 
-     * @param projectDirectory The base directory of the current project, may be {@code null} if profile activation
-     *            happens in the context of metadata retrieval rather than project building.
-     * @return This context, never {@code null}.
-     */
-    ProfileActivationContext setProjectDirectory( File projectDirectory );
 
 }

@@ -66,10 +66,10 @@ public class PropertyProfileActivator
                     return false;
                 }
 
-                String sysValue = context.getUserProperties().getProperty( name );
+                String sysValue = context.getUserProperties().get( name );
                 if ( sysValue == null )
                 {
-                    sysValue = context.getSystemProperties().getProperty( name );
+                    sysValue = context.getSystemProperties().get( name );
                 }
 
                 String propValue = property.getValue();

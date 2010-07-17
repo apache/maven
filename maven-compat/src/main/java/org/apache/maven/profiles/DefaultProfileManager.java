@@ -183,7 +183,7 @@ public class DefaultProfileManager
     public List getActiveProfiles()
         throws ProfileActivationException
     {
-        ProfileActivationContext context = new DefaultProfileActivationContext();
+        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
         context.setActiveProfileIds( activatedIds );
         context.setInactiveProfileIds( deactivatedIds );
         context.setSystemProperties( System.getProperties() );

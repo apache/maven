@@ -52,9 +52,9 @@ public class JdkVersionProfileActivator
 
             if ( jdk != null )
             {
-                String version = context.getSystemProperties().getProperty( "java.version", "" );
+                String version = context.getSystemProperties().get( "java.version" );
 
-                if ( version.length() <= 0 )
+                if ( version == null || version.length() <= 0 )
                 {
                     problems.add( Severity.ERROR, "Failed to determine Java version for profile " + profile.getId(),
                                   activation.getLocation( "jdk" ), null );

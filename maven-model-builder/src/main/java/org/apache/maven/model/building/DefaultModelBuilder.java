@@ -240,7 +240,7 @@ public class DefaultModelBuilder
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( null );
 
-        ProfileActivationContext profileActivationContext = getProfileActivationContext( request );
+        DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         problems.setSource( "(external profiles)" );
         List<Profile> activeExternalProfiles =
@@ -537,9 +537,9 @@ public class DefaultModelBuilder
         return model;
     }
 
-    private ProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
+    private DefaultProfileActivationContext getProfileActivationContext( ModelBuildingRequest request )
     {
-        ProfileActivationContext context = new DefaultProfileActivationContext();
+        DefaultProfileActivationContext context = new DefaultProfileActivationContext();
 
         context.setActiveProfileIds( request.getActiveProfileIds() );
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
