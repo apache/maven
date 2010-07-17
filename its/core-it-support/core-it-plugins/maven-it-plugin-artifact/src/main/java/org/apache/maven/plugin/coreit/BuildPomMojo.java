@@ -123,9 +123,15 @@ public class BuildPomMojo
                     MavenProject project = builder.buildFromRepository( artifact, remoteRepositories, localRepository );
 
                     String key = artifact.getId() + ".";
-                    props.setProperty( key + "project.name", project.getName() );
-                    props.setProperty( key + "project.description", project.getDescription() );
                     props.setProperty( key + "project.id", project.getId() );
+                    if ( project.getName() != null )
+                    {
+                        props.setProperty( key + "project.name", project.getName() );
+                    }
+                    if ( project.getDescription() != null )
+                    {
+                        props.setProperty( key + "project.description", project.getDescription() );
+                    }
                     if ( project.getArtifact() != null )
                     {
                         props.setProperty( key + "artifact.id", project.getArtifact().getId() );
