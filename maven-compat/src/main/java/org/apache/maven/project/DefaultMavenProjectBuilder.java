@@ -29,6 +29,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingException;
@@ -148,6 +149,16 @@ public class DefaultMavenProjectBuilder
         MavenSession session = legacySupport.getSession();
         if ( session != null )
         {
+            MavenExecutionRequest request = session.getRequest();
+            if ( request != null )
+            {
+                configuration.setServers( request.getServers() );
+                configuration.setMirrors( request.getMirrors() );
+                configuration.setProxies( request.getProxies() );
+                configuration.setTransferListener( request.getTransferListener() );
+                configuration.setForceUpdate( request.isUpdateSnapshots() );
+            }
+            configuration.setOffline( session.isOffline() );
             configuration.setSystemProperties( session.getSystemProperties() );
             configuration.setUserProperties( session.getUserProperties() );
         }
