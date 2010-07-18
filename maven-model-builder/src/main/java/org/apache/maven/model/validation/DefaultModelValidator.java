@@ -61,7 +61,11 @@ public class DefaultModelValidator
 
     private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
 
-    private static final String ILLEGAL_VERSION_CHARS = "\\/:\"<>|?*";
+    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
+
+    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
+
+    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
 
     public void validateRawModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
@@ -524,13 +528,18 @@ public class DefaultModelValidator
     {
         if ( repository != null )
         {
+            Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
+
+            validateBannedCharacters( prefix + ".id", problems, errOn31, repository.getId(), null, repository,
+                                      ILLEGAL_REPO_ID_CHARS );
+
             if ( "local".equals( repository.getId() ) )
             {
-                Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
                 addViolation( problems, errOn31, prefix + ".id", null, "must not be 'local'"
                     + ", this identifier is reserved for the local repository"
                     + ", using it for other repositories will corrupt your repository metadata.", repository );
             }
+
             if ( "legacy".equals( repository.getLayout() ) )
             {
                 addViolation( problems, Severity.WARNING, prefix + ".layout", repository.getId(),

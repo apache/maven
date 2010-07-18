@@ -56,6 +56,11 @@ public class DefaultSettingsValidatorTest
         super.tearDown();
     }
 
+    private void assertContains( String msg, String substring )
+    {
+        assertTrue( "\"" + substring + "\" was not found in: " + msg, msg.contains( substring ) );
+    }
+
     public void testValidate()
     {
         Settings model = new Settings();
@@ -86,37 +91,45 @@ public class DefaultSettingsValidatorTest
     public void testValidateMirror()
         throws Exception
     {
+        Settings settings = new Settings();
         Mirror mirror = new Mirror();
         mirror.setId( "local" );
-        Settings settings = new Settings();
+        settings.addMirror( mirror );
+        mirror = new Mirror();
+        mirror.setId( "illegal\\:/chars" );
+        mirror.setUrl( "http://void" );
+        mirror.setMirrorOf( "void" );
         settings.addMirror( mirror );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
-        assertEquals( 3, problems.messages.size() );
-        assertTrue( problems.messages.get( 0 ), problems.messages.get( 0 ).contains( "'mirrors.mirror.id' must not be 'local'" ) );
-        assertTrue( problems.messages.get( 1 ), problems.messages.get( 1 ).contains( "'mirrors.mirror.url' is missing" ) );
-        assertTrue( problems.messages.get( 2 ),
-                    problems.messages.get( 2 ).contains( "'mirrors.mirror.mirrorOf' is missing" ) );
+        assertEquals( 4, problems.messages.size() );
+        assertContains( problems.messages.get( 0 ), "'mirrors.mirror.id' must not be 'local'" );
+        assertContains( problems.messages.get( 1 ), "'mirrors.mirror.url' for local is missing" );
+        assertContains( problems.messages.get( 2 ), "'mirrors.mirror.mirrorOf' for local is missing" );
+        assertContains( problems.messages.get( 3 ), "'mirrors.mirror.id' must not contain any of these characters" );
     }
 
     public void testValidateRepository()
         throws Exception
     {
+        Profile profile = new Profile();
         Repository repo = new Repository();
         repo.setId( "local" );
-        Profile profile = new Profile();
+        profile.addRepository( repo );
+        repo = new Repository();
+        repo.setId( "illegal\\:/chars" );
+        repo.setUrl( "http://void" );
         profile.addRepository( repo );
         Settings settings = new Settings();
         settings.addProfile( profile );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
-        assertEquals( 2, problems.messages.size() );
-        assertTrue( problems.messages.get( 0 ),
-                    problems.messages.get( 0 ).contains( "'repositories.repository.id' must not be 'local'" ) );
-        assertTrue( problems.messages.get( 1 ),
-                    problems.messages.get( 1 ).contains( "'repositories.repository.url' is missing" ) );
+        assertEquals( 3, problems.messages.size() );
+        assertContains( problems.messages.get( 0 ), "'repositories.repository.id' must not be 'local'" );
+        assertContains( problems.messages.get( 1 ), "'repositories.repository.url' for local is missing" );
+        assertContains( problems.messages.get( 2 ), "'repositories.repository.id' must not contain any of these characters" );
     }
 
     private static class SimpleProblemCollector
