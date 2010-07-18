@@ -40,7 +40,7 @@ public class MavenITmng0505VersionRangeTest
      */
     public MavenITmng0505VersionRangeTest()
     {
-        super( "(,3.0-alpha-2]" );
+        super( "(,3.0-alpha-1),[3.0-alpha-3,)" );
     }
 
     /**
