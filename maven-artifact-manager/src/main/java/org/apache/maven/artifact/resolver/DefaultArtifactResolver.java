@@ -29,6 +29,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -47,11 +51,6 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
-
-import edu.emory.mathcs.backport.java.util.concurrent.CountDownLatch;
-import edu.emory.mathcs.backport.java.util.concurrent.LinkedBlockingQueue;
-import edu.emory.mathcs.backport.java.util.concurrent.ThreadPoolExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 public class DefaultArtifactResolver
     extends AbstractLogEnabled
@@ -77,26 +76,26 @@ public class DefaultArtifactResolver
         super();
         resolveArtifactPool =
             new ThreadPoolExecutor( DEFAULT_POOL_SIZE, DEFAULT_POOL_SIZE, 3, TimeUnit.SECONDS,
-                                    new LinkedBlockingQueue() );
+                                    new LinkedBlockingQueue<Runnable>() );
     }
 
     // ----------------------------------------------------------------------
     // Implementation
     // ----------------------------------------------------------------------
 
-    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolve( artifact, remoteRepositories, localRepository, false );
     }
 
-    public void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolve( artifact, remoteRepositories, localRepository, true );
     }
 
-    private void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository,
+    private void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository,
                           boolean force )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
@@ -178,7 +177,7 @@ public class DefaultArtifactResolver
                 Date comparisonDate = new Date( destination.lastModified() );
 
                 // cull to list of repositories that would like an update
-                repositories = new ArrayList( remoteRepositories );
+                repositories = new ArrayList<ArtifactRepository>( remoteRepositories );
                 for ( Iterator i = repositories.iterator(); i.hasNext(); )
                 {
                     ArtifactRepository repository = (ArtifactRepository) i.next();

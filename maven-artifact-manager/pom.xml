@@ -61,10 +61,6 @@ under the License.
       <artifactId>wagon-provider-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>backport-util-concurrent</groupId>
-      <artifactId>backport-util-concurrent</artifactId>
-    </dependency>
-    <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
       <version>1.2_Java1.3</version>
@@ -72,7 +68,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>edu.umd.cs.mtc</groupId>
-      <artifactId>multithreadedtc-jdk14</artifactId>
+      <artifactId>multithreadedtc</artifactId>
       <version>1.01</version>
       <scope>test</scope>
     </dependency>
