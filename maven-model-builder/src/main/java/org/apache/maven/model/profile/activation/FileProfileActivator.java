@@ -48,6 +48,12 @@ public class FileProfileActivator
     @Requirement
     private PathTranslator pathTranslator;
 
+    public FileProfileActivator setPathTranslator( PathTranslator pathTranslator )
+    {
+        this.pathTranslator = pathTranslator;
+        return this;
+    }
+
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         Activation activation = profile.getActivation();

@@ -109,7 +109,7 @@ public class DefaultModelBuilderFactory
     protected ProfileActivator[] newProfileActivators()
     {
         return new ProfileActivator[] { new JdkVersionProfileActivator(), new OperatingSystemProfileActivator(),
-            new PropertyProfileActivator(), new FileProfileActivator() };
+            new PropertyProfileActivator(), new FileProfileActivator().setPathTranslator( newPathTranslator() ) };
     }
 
     protected UrlNormalizer newUrlNormalizer()

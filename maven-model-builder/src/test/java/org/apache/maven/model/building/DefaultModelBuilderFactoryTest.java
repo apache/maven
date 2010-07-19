@@ -48,6 +48,7 @@ public class DefaultModelBuilderFactoryTest
         ModelBuildingResult result = builder.build( request );
         assertNotNull( result );
         assertNotNull( result.getEffectiveModel() );
+        assertEquals( "activated", result.getEffectiveModel().getProperties().get( "profile.file" ) );
     }
 
 }

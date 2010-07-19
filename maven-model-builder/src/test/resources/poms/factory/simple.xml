@@ -58,12 +58,23 @@ under the License.
 
   <profiles>
     <profile>
-      <id>test</id>
+      <id>default</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+      </properties>
+    </profile>
+    <profile>
+      <id>file</id>
+      <activation>
+        <file>
+          <exists>simple.xml</exists>
+        </file>
+      </activation>
+      <properties>
+        <profile.file>activated</profile.file>
       </properties>
     </profile>
   </profiles>
