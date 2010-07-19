@@ -49,21 +49,25 @@ import java.util.Set;
 public class DefaultArtifactCollector
     implements ArtifactCollector
 {
-    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact,
-                                             ArtifactRepository localRepository, List remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners )
         throws ArtifactResolutionException
     {
         return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
                         source, filter, listeners );
     }
 
-    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                             ArtifactRepository localRepository, List remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                             Map managedVersions, ArtifactRepository localRepository,
+                                             List<ArtifactRepository> remoteRepositories,
+                                             ArtifactMetadataSource source, ArtifactFilter filter,
+                                             List<ResolutionListener> listeners )
         throws ArtifactResolutionException
     {
-        Map resolvedArtifacts = new LinkedHashMap();
+        Map<Object, List<ResolutionNode>> resolvedArtifacts = new LinkedHashMap<Object, List<ResolutionNode>>();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
 
@@ -71,17 +75,15 @@ public class DefaultArtifactCollector
 
         ManagedVersionMap versionMap = getManagedVersionsMap( originatingArtifact, managedVersions );
 
-        recurse( originatingArtifact, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
-                 listeners );
+        recurse( originatingArtifact, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source,
+                 filter, listeners );
 
-        Set set = new LinkedHashSet();
+        Set<ResolutionNode> set = new LinkedHashSet<ResolutionNode>();
 
-        for ( Iterator i = resolvedArtifacts.values().iterator(); i.hasNext(); )
+        for ( List<ResolutionNode> nodes : resolvedArtifacts.values() )
         {
-            List nodes = (List) i.next();
-            for ( Iterator j = nodes.iterator(); j.hasNext(); )
+            for ( ResolutionNode node : nodes )
             {
-                ResolutionNode node = (ResolutionNode) j.next();
                 if ( !node.equals( root ) && node.isActive() )
                 {
                     Artifact artifact = node.getArtifact();
@@ -140,9 +142,10 @@ public class DefaultArtifactCollector
         return versionMap;
     }
 
-    private void recurse( Artifact originatingArtifact, ResolutionNode node, Map resolvedArtifacts, ManagedVersionMap managedVersions,
-                          ArtifactRepository localRepository, List remoteRepositories, ArtifactMetadataSource source,
-                          ArtifactFilter filter, List listeners )
+    private void recurse( Artifact originatingArtifact, ResolutionNode node,
+                          Map<Object, List<ResolutionNode>> resolvedArtifacts, ManagedVersionMap managedVersions,
+                          ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                          ArtifactMetadataSource source, ArtifactFilter filter, List<ResolutionListener> listeners )
         throws CyclicDependencyException, ArtifactResolutionException, OverConstrainedVersionException
     {
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
@@ -156,13 +159,11 @@ public class DefaultArtifactCollector
             manageArtifact( node, managedVersions, listeners );
         }
 
-        List previousNodes = (List) resolvedArtifacts.get( key );
+        List<ResolutionNode> previousNodes = resolvedArtifacts.get( key );
         if ( previousNodes != null )
         {
-            for ( Iterator i = previousNodes.iterator(); i.hasNext(); )
+            for ( ResolutionNode previous : previousNodes )
             {
-                ResolutionNode previous = (ResolutionNode) i.next();
-
                 if ( previous.isActive() )
                 {
                     // Version mediation
@@ -198,7 +199,7 @@ public class DefaultArtifactCollector
                             {
 
                                 // go find the version. This is a total hack. See previous comment.
-                                List versions = resetArtifact.getAvailableVersions();
+                                List<ArtifactVersion> versions = resetArtifact.getAvailableVersions();
                                 if ( versions == null )
                                 {
                                     try
@@ -271,7 +272,7 @@ public class DefaultArtifactCollector
         }
         else
         {
-            previousNodes = new ArrayList();
+            previousNodes = new ArrayList<ResolutionNode>();
             resolvedArtifacts.put( key, previousNodes );
         }
         previousNodes.add( node );
@@ -288,9 +289,9 @@ public class DefaultArtifactCollector
 
             Artifact parentArtifact = node.getArtifact();
 
-            for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
+            for ( Iterator<ResolutionNode> i = node.getChildrenIterator(); i.hasNext(); )
             {
-                ResolutionNode child = (ResolutionNode) i.next();
+                ResolutionNode child = i.next();
 
                 // We leave in optional ones, but don't pick up its dependencies
                 if ( !child.isResolved() && ( !child.getArtifact().isOptional() || child.isChildOfRootNode() ) )
@@ -298,7 +299,7 @@ public class DefaultArtifactCollector
                     Artifact artifact = child.getArtifact();
                     artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                    List childRemoteRepositories = child.getRemoteRepositories();
+                    List<ArtifactRepository> childRemoteRepositories = child.getRemoteRepositories();
                     try
                     {
                         Object childKey;
@@ -349,7 +350,7 @@ public class DefaultArtifactCollector
                                 else
                                 {
                                     //go find the version
-                                    List versions = artifact.getAvailableVersions();
+                                    List<ArtifactVersion> versions = artifact.getAvailableVersions();
                                     if ( versions == null )
                                     {
                                         versions = source.retrieveAvailableVersions( artifact, localRepository,
@@ -443,7 +444,8 @@ public class DefaultArtifactCollector
         }
     }
 
-    private void manageArtifact( ResolutionNode node, ManagedVersionMap managedVersions, List listeners )
+    private void manageArtifact( ResolutionNode node, ManagedVersionMap managedVersions,
+                                 List<ResolutionListener> listeners )
     {
         Artifact artifact = (Artifact) managedVersions.get( node.getKey() );
 
@@ -477,7 +479,7 @@ public class DefaultArtifactCollector
      * @param nearest   nearest resolution node
      * @param listeners
      */
-    boolean checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List listeners )
+    boolean checkScopeUpdate( ResolutionNode farthest, ResolutionNode nearest, List<ResolutionListener> listeners )
     {
         boolean updateScope = false;
         Artifact farthestArtifact = farthest.getArtifact();
@@ -518,23 +520,21 @@ public class DefaultArtifactCollector
         return updateScope;
     }
 
-    private void fireEvent( int event, List listeners, ResolutionNode node )
+    private void fireEvent( int event, List<ResolutionListener> listeners, ResolutionNode node )
     {
         fireEvent( event, listeners, node, null );
     }
 
-    private void fireEvent( int event, List listeners, ResolutionNode node, Artifact replacement )
+    private void fireEvent( int event, List<ResolutionListener> listeners, ResolutionNode node, Artifact replacement )
     {
         fireEvent( event, listeners, node, replacement, null );
     }
 
-    private void fireEvent( int event, List listeners, ResolutionNode node, Artifact replacement,
+    private void fireEvent( int event, List<ResolutionListener> listeners, ResolutionNode node, Artifact replacement,
                             VersionRange newRange )
     {
-        for ( Iterator i = listeners.iterator(); i.hasNext(); )
+        for ( ResolutionListener listener : listeners )
         {
-            ResolutionListener listener = (ResolutionListener) i.next();
-
             switch ( event )
             {
                 case ResolutionListener.TEST_ARTIFACT:

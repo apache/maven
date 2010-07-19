@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * I want to use it for hidding the fact that sometime artifact must be
+ * I want to use it for hiding the fact that sometime artifact must be
  * downloaded. I am just asking LocalRepository for given artifact and I don't
- * care if it is alredy there or how it will get there.
+ * care if it is already there or how it will get there.
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
  * @version $Id$
@@ -41,58 +41,58 @@ public interface ArtifactResolver
 {
     String ROLE = ArtifactResolver.class.getName();
 
-    void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactRepository localRepository,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactRepository localRepository,
                                                   ArtifactMetadataSource source,
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter,
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 }

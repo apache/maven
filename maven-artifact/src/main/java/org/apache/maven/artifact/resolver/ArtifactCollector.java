@@ -37,13 +37,15 @@ import java.util.Set;
  */
 public interface ArtifactCollector
 {
-    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, ArtifactRepository localRepository,
-                                      List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
-                                      List listeners )
+    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
+                                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                                      ArtifactMetadataSource source, ArtifactFilter filter,
+                                      List<ResolutionListener> listeners )
         throws ArtifactResolutionException;
 
-    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                      ArtifactRepository localRepository, List remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
+    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions,
+                                      ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
+                                      ArtifactMetadataSource source, ArtifactFilter filter,
+                                      List<ResolutionListener> listeners )
         throws ArtifactResolutionException;
 }

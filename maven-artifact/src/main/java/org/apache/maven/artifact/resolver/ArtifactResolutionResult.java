@@ -19,9 +19,10 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.apache.maven.artifact.Artifact;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -29,24 +30,23 @@ import java.util.Set;
  */
 public class ArtifactResolutionResult
 {
-    private Set resolutionNodes;
+    private Set<ResolutionNode> resolutionNodes;
 
     // calculated.
-    private Set artifacts;
+    private Set<Artifact> artifacts;
 
     public ArtifactResolutionResult()
     {
     }
 
-    public Set getArtifacts()
+    public Set<Artifact> getArtifacts()
     {
         if ( artifacts == null )
         {
-            artifacts = new LinkedHashSet();
+            artifacts = new LinkedHashSet<Artifact>();
 
-            for ( Iterator it = resolutionNodes.iterator(); it.hasNext(); )
+            for ( ResolutionNode node : resolutionNodes )
             {
-                ResolutionNode node = (ResolutionNode) it.next();
                 artifacts.add( node.getArtifact() );
             }
         }
@@ -54,12 +54,12 @@ public class ArtifactResolutionResult
         return artifacts;
     }
 
-    public Set getArtifactResolutionNodes()
+    public Set<ResolutionNode> getArtifactResolutionNodes()
     {
         return resolutionNodes;
     }
 
-    public void setArtifactResolutionNodes( Set resolutionNodes )
+    public void setArtifactResolutionNodes( Set<ResolutionNode> resolutionNodes )
     {
         this.resolutionNodes = resolutionNodes;
 
