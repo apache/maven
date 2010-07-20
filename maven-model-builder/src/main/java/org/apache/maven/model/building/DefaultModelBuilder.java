@@ -56,7 +56,6 @@ import org.apache.maven.model.plugin.PluginConfigurationExpander;
 import org.apache.maven.model.plugin.ReportConfigurationExpander;
 import org.apache.maven.model.plugin.ReportingConverter;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileInjector;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.resolution.InvalidRepositoryException;

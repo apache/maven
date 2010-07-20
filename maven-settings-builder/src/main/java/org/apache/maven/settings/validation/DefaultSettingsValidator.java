@@ -26,7 +26,6 @@ import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
