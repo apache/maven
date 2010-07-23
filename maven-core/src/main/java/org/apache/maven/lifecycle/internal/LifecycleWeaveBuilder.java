@@ -109,6 +109,15 @@ public class LifecycleWeaveBuilder
 
         try
         {
+            for ( MavenProject mavenProject : session.getProjects() )
+            {
+                if ( !( mavenProject.getArtifact() instanceof ThreadLockedArtifact ) )
+                {
+                    ThreadLockedArtifact threadLockedArtifact = new ThreadLockedArtifact( mavenProject.getArtifact() );
+                    mavenProject.setArtifact( threadLockedArtifact );
+                }
+            }
+
             final List<Future<ProjectSegment>> futures = new ArrayList<Future<ProjectSegment>>();
             final Map<ProjectSegment, Future<MavenExecutionPlan>> plans =
                 new HashMap<ProjectSegment, Future<MavenExecutionPlan>>();
@@ -201,6 +210,8 @@ public class LifecycleWeaveBuilder
             {
                 Iterator<ExecutionPlanItem> planItems = executionPlan.iterator();
                 ExecutionPlanItem current = planItems.hasNext() ? planItems.next() : null;
+                ThreadLockedArtifact threadLockedArtifact = (ThreadLockedArtifact)projectBuild.getProject().getArtifact();
+                threadLockedArtifact.attachToThread();
                 long buildStartTime = System.currentTimeMillis();
 
                 //muxer.associateThreadWithProjectSegment( projectBuild );
@@ -359,9 +370,13 @@ public class LifecycleWeaveBuilder
         return null;
     }
 
+    private static boolean isThreadLockedAndEmpty(Artifact artifact){
+        return artifact instanceof  ThreadLockedArtifact && !((ThreadLockedArtifact) artifact).hasReal();
+    }
+
     private static Artifact findDependency( MavenProject project, Artifact upStreamArtifact )
     {
-        if ( upStreamArtifact == null )
+        if ( upStreamArtifact == null || isThreadLockedAndEmpty(upStreamArtifact))
         {
             return null;
         }
@@ -409,6 +424,8 @@ public class LifecycleWeaveBuilder
         MavenProject currentProject = projectBuild.getProject();
 
         long buildStartTime = System.currentTimeMillis();
+
+        CurrentPhaseForThread.setPhase(  node.getLifecyclePhase() );
 
         MavenSession sessionForThisModule = projectBuild.getSession();
         try
