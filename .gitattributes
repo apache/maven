@@ -1,1 +1,5 @@
-*.jar          -text -crlf
+*.jar                                  -text -crlf
+*.graffle                              -text -crlf
+apache-maven/src/bin/mvn               eol=lf crlf=input
+apache-maven/src/bin/mvnDebug          eol=lf crlf=input
+apache-maven/src/bin/mvnyjp            eol=lf crlf=input
