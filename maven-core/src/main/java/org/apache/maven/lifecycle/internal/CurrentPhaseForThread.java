@@ -22,11 +22,11 @@ package org.apache.maven.lifecycle.internal;
 /**
  * Knows the phase the current thread is executing.
  * <p/>
- * There may be better ways of doing this once the dust settles.
+ * This class is used in weave-mode only , there may be better ways of doing this once the dust settles.
  *
  * @author Kristian Rosenvold
  */
-public class CurrentPhaseForThread
+class CurrentPhaseForThread
 {
     private static final InheritableThreadLocal<String> threadPhase = new InheritableThreadLocal<String>();
 
