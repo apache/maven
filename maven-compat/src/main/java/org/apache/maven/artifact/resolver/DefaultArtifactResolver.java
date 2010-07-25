@@ -32,8 +32,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
@@ -125,7 +127,7 @@ public class DefaultArtifactResolver
         else
         {
             executor =
-                new ThreadPoolExecutor( threads, threads, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>() );
+                new ThreadPoolExecutor( threads, threads, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new DaemonThreadCreator());
         }
     }
 
@@ -685,6 +687,26 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         resolve( artifact, remoteRepositories, localRepository, null );
+    }
+
+    /**
+     * ThreadCreator for creating daemon threads with fixed ThreadGroup-name.
+     */
+    final static class DaemonThreadCreator
+        implements ThreadFactory
+    {
+        static final String THREADGROUP_NAME = "org.apache.maven.artifact.resolver.DefaultArtifactResolver";
+
+        final static ThreadGroup group = new ThreadGroup( THREADGROUP_NAME );
+
+        final static AtomicInteger threadNumber = new AtomicInteger( 1 );
+
+        public Thread newThread( Runnable r )
+        {
+            Thread newThread = new Thread( group, r, "resolver-" + threadNumber.getAndIncrement() );
+            newThread.setDaemon( true );
+            return newThread;
+        }
     }
 
     private class ResolveTask
