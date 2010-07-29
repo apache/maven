@@ -111,9 +111,10 @@ public class LifecycleWeaveBuilder
         {
             for ( MavenProject mavenProject : session.getProjects() )
             {
-                if ( !( mavenProject.getArtifact() instanceof ThreadLockedArtifact ) )
+                Artifact mainArtifact = mavenProject.getArtifact();
+                if ( mainArtifact != null && !( mainArtifact instanceof ThreadLockedArtifact ) )
                 {
-                    ThreadLockedArtifact threadLockedArtifact = new ThreadLockedArtifact( mavenProject.getArtifact() );
+                    ThreadLockedArtifact threadLockedArtifact = new ThreadLockedArtifact( mainArtifact );
                     mavenProject.setArtifact( threadLockedArtifact );
                 }
             }
@@ -211,7 +212,10 @@ public class LifecycleWeaveBuilder
                 Iterator<ExecutionPlanItem> planItems = executionPlan.iterator();
                 ExecutionPlanItem current = planItems.hasNext() ? planItems.next() : null;
                 ThreadLockedArtifact threadLockedArtifact = (ThreadLockedArtifact)projectBuild.getProject().getArtifact();
-                threadLockedArtifact.attachToThread();
+                if ( threadLockedArtifact != null )
+                {
+                    threadLockedArtifact.attachToThread();
+                }
                 long buildStartTime = System.currentTimeMillis();
 
                 //muxer.associateThreadWithProjectSegment( projectBuild );
