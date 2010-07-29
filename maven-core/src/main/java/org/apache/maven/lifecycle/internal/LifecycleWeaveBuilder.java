@@ -101,11 +101,11 @@ public class LifecycleWeaveBuilder
     }
 
     public void build( ProjectBuildList projectBuilds, ReactorContext buildContext, List<TaskSegment> taskSegments,
-                       MavenSession session, ExecutorService executoru, ReactorBuildStatus reactorBuildStatus )
+                       MavenSession session, ExecutorService executor, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException
     {
         ConcurrentBuildLogger concurrentBuildLogger = new ConcurrentBuildLogger();
-        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executoru );
+        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
 
         try
         {
@@ -136,7 +136,7 @@ public class LifecycleWeaveBuilder
                 }
                 for ( ProjectSegment projectBuild : segmentChunks )
                 {
-                    plans.put( projectBuild, executoru.submit( createEPFuture( projectBuild, projectArtifacts ) ) );
+                    plans.put( projectBuild, executor.submit( createEPFuture( projectBuild, projectArtifacts ) ) );
                 }
 
                 for ( ProjectSegment projectSegment : plans.keySet() )
