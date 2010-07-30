@@ -41,7 +41,7 @@ public class MavenITmng1908LegacySnapshotUpdateTest
     }
     
     /**
-     * Test that legacy repositories with legacy snapshots download correctly.
+     * Test that legacy repositories with legacy snapshots (i.e. without metadata) download correctly.
      */
     public void testitMNG1908()
         throws Exception
