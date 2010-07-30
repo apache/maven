@@ -32,6 +32,7 @@ import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputLocationTracker;
 import org.apache.maven.model.Model;
@@ -443,9 +444,9 @@ public class DefaultModelValidator
     private void validateEffectiveDependency( ModelProblemCollector problems, Dependency d, boolean management,
                                               String prefix, ModelBuildingRequest request )
     {
-        validateId( prefix + "artifactId", problems, d.getArtifactId(), d.getManagementKey(), d );
+        validateId( prefix + "artifactId", problems, Severity.ERROR, d.getArtifactId(), d.getManagementKey(), d );
 
-        validateId( prefix + "groupId", problems, d.getGroupId(), d.getManagementKey(), d );
+        validateId( prefix + "groupId", problems, Severity.ERROR, d.getGroupId(), d.getManagementKey(), d );
 
         if ( !management )
         {
@@ -490,6 +491,18 @@ public class DefaultModelValidator
         {
             addViolation( problems, Severity.ERROR, prefix + "systemPath", d.getManagementKey(), "must be omitted."
                 + " This field may only be specified for a dependency with system scope.", d );
+        }
+
+        if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            for ( Exclusion exclusion : d.getExclusions() )
+            {
+                validateId( prefix + "exclusions.exclusion.groupId", problems, Severity.WARNING,
+                            exclusion.getGroupId(), d.getManagementKey(), exclusion );
+
+                validateId( prefix + "exclusions.exclusion.artifactId", problems, Severity.WARNING,
+                            exclusion.getArtifactId(), d.getManagementKey(), exclusion );
+            }
         }
     }
 
@@ -570,13 +583,13 @@ public class DefaultModelValidator
     private boolean validateId( String fieldName, ModelProblemCollector problems, String id,
                                 InputLocationTracker tracker )
     {
-        return validateId( fieldName, problems, id, null, tracker );
+        return validateId( fieldName, problems, Severity.ERROR, id, null, tracker );
     }
 
-    private boolean validateId( String fieldName, ModelProblemCollector problems, String id, String sourceHint,
-                                InputLocationTracker tracker )
+    private boolean validateId( String fieldName, ModelProblemCollector problems, Severity severity, String id,
+                                String sourceHint, InputLocationTracker tracker )
     {
-        if ( !validateStringNotEmpty( fieldName, problems, Severity.ERROR, id, sourceHint, tracker ) )
+        if ( !validateStringNotEmpty( fieldName, problems, severity, id, sourceHint, tracker ) )
         {
             return false;
         }
@@ -585,7 +598,7 @@ public class DefaultModelValidator
             boolean match = id.matches( ID_REGEX );
             if ( !match )
             {
-                addViolation( problems, Severity.ERROR, fieldName, sourceHint, "with value '" + id
+                addViolation( problems, severity, fieldName, sourceHint, "with value '" + id
                     + "' does not match a valid id pattern.", tracker );
             }
             return match;
