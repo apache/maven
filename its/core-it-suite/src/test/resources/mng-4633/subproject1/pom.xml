@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.apache.maven.its.mng4633</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0</version>
+  </parent>
+
+  <artifactId>subproject1</artifactId>
+  <packaging>jar</packaging>
+
+  <name>Maven Integration Test :: MNG-4633 : Project 1</name>
+
+  <build>
+  </build>
+</project>
