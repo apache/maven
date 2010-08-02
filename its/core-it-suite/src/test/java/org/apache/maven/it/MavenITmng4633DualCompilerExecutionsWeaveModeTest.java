@@ -32,7 +32,7 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
 
     public MavenITmng4633DualCompilerExecutionsWeaveModeTest()
     {
-        super( "[3.0-beta-1,)" );
+        super( "[3.0-beta-2,)" );
     }
 
     /**
