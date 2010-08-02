@@ -3,8 +3,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -48,11 +46,9 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-T" );
-        cliOptions.add( "2W" );
-        verifier.setCliOptions(cliOptions);
-        verifier.executeGoal("install");
+        verifier.getCliOptions().add( "-T" );
+        verifier.getCliOptions().add( "2W" );
+        verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
