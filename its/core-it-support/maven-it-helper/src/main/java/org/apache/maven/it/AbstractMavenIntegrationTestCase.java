@@ -378,4 +378,51 @@ public abstract class AbstractMavenIntegrationTestCase
         }
         return version;
     }
+
+    protected Verifier newVerifier( File basedir )
+        throws VerificationException
+    {
+        return newVerifier( basedir.getAbsolutePath() );
+    }
+
+    protected Verifier newVerifier( String basedir )
+        throws VerificationException
+    {
+        return newVerifier( basedir, false );
+    }
+
+    protected Verifier newVerifier( String basedir, boolean debug )
+        throws VerificationException
+    {
+        Verifier verifier = new Verifier( basedir, debug );
+
+        verifier.setAutoclean( false );
+
+        String globalSettings = System.getProperty( "maven.test.global-settings", "" );
+        if ( globalSettings.length() > 0 )
+        {
+            globalSettings = new File( globalSettings ).getAbsolutePath();
+
+            // dedicated CLI option only available since MNG-3914
+            if ( matchesVersionRange( "[2.1.0,)" ) )
+            {
+                verifier.getCliOptions().add( "--global-settings" );
+                if ( globalSettings.indexOf( ' ' ) < 0 )
+                {
+                    verifier.getCliOptions().add( globalSettings );
+                }
+                else
+                {
+                    verifier.getCliOptions().add( '"' + globalSettings + '"' );
+                }
+            }
+            else
+            {
+                verifier.getSystemProperties().put( "org.apache.maven.global-settings", globalSettings );
+            }
+        }
+
+        return verifier;
+    }
+
 }
