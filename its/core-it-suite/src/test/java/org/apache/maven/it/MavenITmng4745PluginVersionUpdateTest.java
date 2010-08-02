@@ -50,6 +50,7 @@ public class MavenITmng4745PluginVersionUpdateTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
@@ -82,6 +83,7 @@ public class MavenITmng4745PluginVersionUpdateTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
         verifier.getCliOptions().add( "-s" );
         verifier.getCliOptions().add( "settings.xml" );
@@ -114,6 +116,7 @@ public class MavenITmng4745PluginVersionUpdateTest
 
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
+        verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
         verifier.getCliOptions().add( "-U" );
         verifier.getCliOptions().add( "-s" );
