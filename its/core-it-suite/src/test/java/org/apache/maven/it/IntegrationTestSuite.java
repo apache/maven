@@ -270,7 +270,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3927PluginDefaultExecutionConfigTest.class );
         suite.addTestSuite( MavenITmng3925MergedPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng3924XmlMarkupInterpolationTest.class );
-        suite.addTestSuite( MavenITmng3920PlexusComponentApiTest.class );
         suite.addTestSuite( MavenITmng3916PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng3906MergedPluginClassPathOrderingTest.class );
         suite.addTestSuite( MavenITmng3904NestedBuildDirInterpolationTest.class );
