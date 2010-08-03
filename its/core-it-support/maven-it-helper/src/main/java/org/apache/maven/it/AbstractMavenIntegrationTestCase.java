@@ -354,7 +354,7 @@ public abstract class AbstractMavenIntegrationTestCase
     protected File setupLocalRepo()
         throws IOException
     {
-        String tempDirPath = System.getProperty( "maven.test.tmpdir", System.getProperty( "java.io.tmpdir" ) );
+        String tempDirPath = System.getProperty( "maven.it.tmpdir", System.getProperty( "java.io.tmpdir" ) );
         File localRepo = new File( tempDirPath, "local-repository/" + getITName() );
         if ( localRepo.isDirectory() )
         {
@@ -398,7 +398,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
         verifier.setAutoclean( false );
 
-        String globalSettings = System.getProperty( "maven.test.global-settings", "" );
+        String globalSettings = System.getProperty( "maven.it.global-settings", "" );
         if ( globalSettings.length() > 0 )
         {
             globalSettings = new File( globalSettings ).getAbsolutePath();

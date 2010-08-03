@@ -150,7 +150,7 @@ under the License.
               <value>${preparedMavenHome}</value>
             </property>
             <property>
-              <name>maven.test.global-settings</name>
+              <name>maven.it.global-settings</name>
               <value>${project.build.testOutputDirectory}/settings.xml</value>
             </property>
           </systemProperties>
