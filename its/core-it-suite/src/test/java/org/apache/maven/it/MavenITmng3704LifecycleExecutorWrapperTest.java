@@ -49,14 +49,14 @@ public class MavenITmng3704LifecycleExecutorWrapperTest
         File projectDir = new File( testDir, "project" );
 
         Verifier verifier;
-        verifier = newVerifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "package" );
 

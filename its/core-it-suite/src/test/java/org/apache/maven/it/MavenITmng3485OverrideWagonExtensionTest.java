@@ -39,7 +39,7 @@ public class MavenITmng3485OverrideWagonExtensionTest
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "deploy" );
 

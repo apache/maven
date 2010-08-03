@@ -50,7 +50,7 @@ public class MavenITmng3746POMPropertyOverrideTest
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -72,7 +72,7 @@ public class MavenITmng3746POMPropertyOverrideTest
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

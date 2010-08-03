@@ -63,7 +63,7 @@ under the License.
 
   <mirrors>
     <mirror>
-      <id>central</id>
+      <id>test-a</id>
       <url>@baseurl@/repo-3</url>
       <!-- should not match anything but maven-core-it-ext -->
       <mirrorOf>external:*</mirrorOf>

@@ -42,5 +42,11 @@ under the License.
         <!-- NOTE: Intentionally no version here, Maven should automatically pick one -->
       </extension>
     </extensions>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>0.1-stub-SNAPSHOT</version>
+      </plugin>
+    </plugins>
   </build>
 </project>

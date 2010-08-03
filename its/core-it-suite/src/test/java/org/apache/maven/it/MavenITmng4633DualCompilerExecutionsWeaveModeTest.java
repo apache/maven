@@ -44,7 +44,7 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4633" );
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "-T" );
         verifier.getCliOptions().add( "2W" );

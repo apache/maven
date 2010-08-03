@@ -19,19 +19,13 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<!--
+These settings are meant for ITs that don't download artifacts from remote servers, i.e. ITs that either use their
+own test repos or can employ the local repository (after bootstrapping). This configuration uses a file: URL to
+"central" to avoid needless network access for files knowingly not present externally.
+-->
+
 <settings>
-  <proxies>
-    <proxy>
-      <id>it-proxy</id>
-      <active>${proxy.active}</active>
-      <protocol>${proxy.type}</protocol>
-      <host>${proxy.host}</host>
-      <port>${proxy.port}</port>
-      <username>${proxy.user}</username>
-      <password>${proxy.pass}</password>
-      <nonProxyHosts>localhost</nonProxyHosts>
-    </proxy>
-  </proxies>
   <profiles>
     <profile>
       <id>it-defaults</id>
@@ -39,7 +33,7 @@ under the License.
         <repository>
           <id>central</id>
           <name>Apache Maven Integration Testing Repository</name>
-          <url>http://repo1.maven.org/maven2</url>
+          <url>file:target/null</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -52,7 +46,7 @@ under the License.
         <pluginRepository>
           <id>central</id>
           <name>Apache Maven Integration Testing Repository</name>
-          <url>http://repo1.maven.org/maven2</url>
+          <url>file:target/null</url>
           <releases>
             <enabled>true</enabled>
           </releases>

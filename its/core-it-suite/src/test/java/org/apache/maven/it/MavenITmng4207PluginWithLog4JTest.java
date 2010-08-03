@@ -46,7 +46,7 @@ public class MavenITmng4207PluginWithLog4JTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4207" );
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();

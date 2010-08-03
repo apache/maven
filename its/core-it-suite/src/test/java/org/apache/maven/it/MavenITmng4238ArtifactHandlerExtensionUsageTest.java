@@ -50,7 +50,7 @@ public class MavenITmng4238ArtifactHandlerExtensionUsageTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4238" );
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         
         verifier.deleteArtifacts( GID );
         

@@ -44,7 +44,7 @@ public class MavenITmng3221InfiniteForkingTest
 
         try
         {
-            verifier = newVerifier( reportDir.getAbsolutePath() );
+            verifier = newVerifier( reportDir.getAbsolutePath(), "remote" );
 
             verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-report-plugin", "1", "jar" );
 
@@ -53,7 +53,7 @@ public class MavenITmng3221InfiniteForkingTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            verifier = newVerifier( projectDir.getAbsolutePath() );
+            verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
             verifier.getCliOptions().add( "-Psite" );
 
@@ -82,7 +82,7 @@ public class MavenITmng3221InfiniteForkingTest
 
         try
         {
-            verifier = newVerifier( pluginDir.getAbsolutePath() );
+            verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
             verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-test-plugin", "1", "jar" );
 
@@ -91,7 +91,7 @@ public class MavenITmng3221InfiniteForkingTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            verifier = newVerifier( projectDir.getAbsolutePath() );
+            verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
             verifier.getCliOptions().add( "-Pplugin" );
 

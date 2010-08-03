@@ -41,7 +41,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.setLogFileName( "log-no-settings.txt" );
         verifier.executeGoal( "deploy" );
@@ -63,7 +63,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings-server-defaults.xml" );
@@ -87,7 +87,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings-modes-set.xml" );

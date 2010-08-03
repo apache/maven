@@ -51,7 +51,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
@@ -84,7 +84,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginsDir.getAbsolutePath() );
+        verifier = newVerifier( pluginsDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();

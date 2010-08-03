@@ -48,7 +48,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 
@@ -73,7 +73,7 @@ public class MavenITmng3703ExecutionProjectWithRelativePathsTest
 
         Verifier verifier;
 
-        verifier = newVerifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 

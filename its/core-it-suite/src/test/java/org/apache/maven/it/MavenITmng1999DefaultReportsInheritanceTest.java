@@ -69,7 +69,7 @@ public class MavenITmng1999DefaultReportsInheritanceTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1999" );
 
-        Verifier verifier = newVerifier( new File( testDir, "child2" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "child2" ).getAbsolutePath(), "remote" );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );

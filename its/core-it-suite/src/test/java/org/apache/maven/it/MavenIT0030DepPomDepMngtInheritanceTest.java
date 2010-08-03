@@ -40,7 +40,7 @@ public class MavenIT0030DepPomDepMngtInheritanceTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0030" );
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0030", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0030-child-hierarchy", "1.0-SNAPSHOT", "jar" );
         verifier.deleteArtifact( "org.apache.maven.it", "maven-it-it0030-child-project1", "1.0-SNAPSHOT", "jar" );

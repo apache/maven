@@ -45,13 +45,13 @@ public class MavenITmng3684BuildPluginParameterTest
         File pluginDir = new File( testDir, "maven-mng3684-plugin" );
         File projectDir = new File( testDir, "project" );
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
         verifier.setLogFileName( "log-validate.txt" );
         verifier.executeGoal( "validate" );
 

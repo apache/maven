@@ -57,7 +57,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         File project = new File( testBaseDir, "project" );
         File settingsFile = new File( testBaseDir, "settings.xml" );
 
-        Verifier verifier = newVerifier( plugin.getAbsolutePath() );
+        Verifier verifier = newVerifier( plugin.getAbsolutePath(), "remote" );
 
         verifier.deleteArtifacts( "org.apache.maven.its.mng3372" );
 
@@ -84,7 +84,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         // file.
         File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372/dependency-tree" );
 
-        Verifier verifier = newVerifier( testBaseDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testBaseDir.getAbsolutePath(), "remote" );
 
         verifier.getCliOptions().add( "-U" );
 

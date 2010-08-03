@@ -49,7 +49,7 @@ public class MavenITmng3693PomFileBasedirChangeTest
         File pluginDir = new File( testDir, "maven-mng3693-plugin" );
         File projectsDir = new File( testDir, "projects" );
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         
         verifier.executeGoal( "install" );
 

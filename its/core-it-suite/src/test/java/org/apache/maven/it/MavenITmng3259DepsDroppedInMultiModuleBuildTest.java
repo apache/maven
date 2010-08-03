@@ -49,7 +49,7 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
 
         Verifier verifier;
 
-        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 
@@ -57,7 +57,7 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
 
         verifier.resetStreams();
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 

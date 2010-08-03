@@ -53,7 +53,8 @@ under the License.
   Maven dependencies are added to the test class path.
   
   If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the
-  required proxy setup for the ITs.
+  required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
+  repository manager that proxies the required artifacts.
   -->
 
   <scm>
@@ -69,6 +70,7 @@ under the License.
     <!-- The (possibly instrumented copy of the) Maven distribution we actually use for the tests. -->
     <preparedMavenHome>${mavenHome}</preparedMavenHome>
     <!-- default properties used to filter the global settings -->
+    <maven.it.central>http://repository.sonatype.org/content/repositories/public</maven.it.central>
     <proxy.active>false</proxy.active>
     <proxy.host>localhost</proxy.host>
     <proxy.port>80</proxy.port>
@@ -150,8 +152,8 @@ under the License.
               <value>${preparedMavenHome}</value>
             </property>
             <property>
-              <name>maven.it.global-settings</name>
-              <value>${project.build.testOutputDirectory}/settings.xml</value>
+              <name>maven.it.global-settings.dir</name>
+              <value>${project.build.testOutputDirectory}</value>
             </property>
           </systemProperties>
         </configuration>
@@ -233,7 +235,6 @@ under the License.
           <plugin>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <skip>false</skip>
               <forkMode>once</forkMode>
               <argLine>${surefireMemory}</argLine>
               <systemProperties combine.children="append">

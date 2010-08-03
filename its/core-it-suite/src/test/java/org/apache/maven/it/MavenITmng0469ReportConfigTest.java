@@ -87,7 +87,7 @@ public class MavenITmng0469ReportConfigTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0469/test2" );
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         if ( matchesVersionRange( "(,3.0-alpha-1)" ) )

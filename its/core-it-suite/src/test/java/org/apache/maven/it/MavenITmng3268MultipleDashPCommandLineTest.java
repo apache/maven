@@ -40,7 +40,7 @@ public class MavenITmng3268MultipleDashPCommandLineTest
 
         Verifier verifier;
 
-        verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
         verifier.getCliOptions().add( "-Pprofile1,profile2" );
         verifier.getCliOptions().add( "-Pprofile3" );

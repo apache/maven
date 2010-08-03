@@ -101,12 +101,12 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
         verifier.getCliOptions().add( "-DtestPort=" + port );
         verifier.getCliOptions().add( "-X" );
@@ -145,12 +145,12 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
         // test webdav
         verifier.getCliOptions().add( "-DtestPort=" + port );
@@ -191,12 +191,12 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
         // test settings with no config
 
@@ -239,12 +239,12 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
         // test settings with config
 

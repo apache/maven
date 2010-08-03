@@ -379,46 +379,70 @@ public abstract class AbstractMavenIntegrationTestCase
         return version;
     }
 
-    protected Verifier newVerifier( File basedir )
-        throws VerificationException
-    {
-        return newVerifier( basedir.getAbsolutePath() );
-    }
-
     protected Verifier newVerifier( String basedir )
         throws VerificationException
     {
         return newVerifier( basedir, false );
     }
 
+    protected Verifier newVerifier( String basedir, String settings )
+        throws VerificationException
+    {
+        return newVerifier( basedir, settings, false );
+    }
+
     protected Verifier newVerifier( String basedir, boolean debug )
+        throws VerificationException
+    {
+        return newVerifier( basedir, "", debug );
+    }
+
+    protected Verifier newVerifier( String basedir, String settings, boolean debug )
         throws VerificationException
     {
         Verifier verifier = new Verifier( basedir, debug );
 
         verifier.setAutoclean( false );
 
-        String globalSettings = System.getProperty( "maven.it.global-settings", "" );
-        if ( globalSettings.length() > 0 )
+        if ( settings != null )
         {
-            globalSettings = new File( globalSettings ).getAbsolutePath();
+            File settingsFile;
+            if ( settings.length() > 0 )
+            {
+                settingsFile = new File( "settings-" + settings + ".xml" );
+            }
+            else
+            {
+                settingsFile = new File( "settings.xml" );
+            }
+
+            if ( !settingsFile.isAbsolute() )
+            {
+                String settingsDir = System.getProperty( "maven.it.global-settings.dir", "" );
+                if ( settingsDir.length() > 0 )
+                {
+                    settingsFile = new File( settingsDir, settingsFile.getPath() );
+                }
+            }
+
+            String path = settingsFile.getAbsolutePath();
 
             // dedicated CLI option only available since MNG-3914
             if ( matchesVersionRange( "[2.1.0,)" ) )
             {
                 verifier.getCliOptions().add( "--global-settings" );
-                if ( globalSettings.indexOf( ' ' ) < 0 )
+                if ( path.indexOf( ' ' ) < 0 )
                 {
-                    verifier.getCliOptions().add( globalSettings );
+                    verifier.getCliOptions().add( path );
                 }
                 else
                 {
-                    verifier.getCliOptions().add( '"' + globalSettings + '"' );
+                    verifier.getCliOptions().add( '"' + path + '"' );
                 }
             }
             else
             {
-                verifier.getSystemProperties().put( "org.apache.maven.global-settings", globalSettings );
+                verifier.getSystemProperties().put( "org.apache.maven.global-settings", path );
             }
         }
 

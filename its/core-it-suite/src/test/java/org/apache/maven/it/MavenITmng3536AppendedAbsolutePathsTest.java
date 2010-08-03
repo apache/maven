@@ -39,7 +39,7 @@ public class MavenITmng3536AppendedAbsolutePathsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(),
                                                                  "/mng-3536" );
         File pluginDir = new File( testDir, "plugin" );
-        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
 
         verifier.executeGoal( "install" );
 
