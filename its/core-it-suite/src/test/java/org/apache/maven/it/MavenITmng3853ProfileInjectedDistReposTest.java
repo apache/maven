@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -53,10 +52,10 @@ public class MavenITmng3853ProfileInjectedDistReposTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3853" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setCliOptions( Collections.singletonList( "-Pcoreit" ) );
+        verifier.getCliOptions().add( "-Pcoreit" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

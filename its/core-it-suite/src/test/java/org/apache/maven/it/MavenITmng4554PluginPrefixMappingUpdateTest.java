@@ -88,7 +88,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         server.setHandler( handlerList );
         server.start();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
             verifier.setAutoclean( false );
@@ -165,7 +165,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         server.setHandler( handlerList );
         server.start();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
             verifier.setAutoclean( false );
@@ -245,7 +245,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
         server.setHandler( handlerList );
         server.start();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
             verifier.setAutoclean( false );

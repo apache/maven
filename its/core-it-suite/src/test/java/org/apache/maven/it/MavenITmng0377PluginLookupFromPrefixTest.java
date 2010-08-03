@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-377">MNG-377</a>.
@@ -48,16 +47,14 @@ public class MavenITmng0377PluginLookupFromPrefixTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0377" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0377" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
-        Properties systemProperties = new Properties();
-        systemProperties.put( "touch.outputFile", "target/file.txt" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "touch.outputFile", "target/file.txt" );
         verifier.executeGoal( "itprefix:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

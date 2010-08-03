@@ -20,8 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -52,21 +50,16 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dprofile1.on=true" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dprofile1.on=true" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
         verifier.assertFilePresent( "target/profile1/touch.txt" );
         verifier.assertFilePresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
-
     }
 
 }

@@ -47,7 +47,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4429" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

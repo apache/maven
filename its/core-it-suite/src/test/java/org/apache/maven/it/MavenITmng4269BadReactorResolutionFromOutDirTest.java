@@ -50,7 +50,7 @@ public class MavenITmng4269BadReactorResolutionFromOutDirTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4269" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         // NOTE: It's a crucial prerequisite to create the output directory, i.e. the bad choice
         new File( testDir, "target/classes" ).mkdirs();

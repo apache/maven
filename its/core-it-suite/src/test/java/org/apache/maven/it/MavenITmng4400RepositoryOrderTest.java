@@ -47,7 +47,7 @@ public class MavenITmng4400RepositoryOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4400" );
 
-        Verifier verifier = new Verifier( new File( testDir, "settings" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "settings" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
@@ -69,7 +69,7 @@ public class MavenITmng4400RepositoryOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4400" );
 
-        Verifier verifier = new Verifier( new File( testDir, "pom" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "pom" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4400" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );

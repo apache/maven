@@ -47,7 +47,7 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3477" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3477" );
         verifier.getCliOptions().add( "--settings" );

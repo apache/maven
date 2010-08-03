@@ -20,8 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -52,12 +50,12 @@ public class MavenITmng3746POMPropertyOverrideTest
 
         Verifier verifier;
 
-        verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -74,19 +72,16 @@ public class MavenITmng3746POMPropertyOverrideTest
 
         Verifier verifier;
 
-        verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
         
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dtest.verification=cli" );
-        cliOptions.add( "-Dtest.usingCliValue=true" );
-        cliOptions.add( "-Djava.version=cli" );
-        
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dtest.verification=cli" );
+        verifier.getCliOptions().add( "-Dtest.usingCliValue=true" );
+        verifier.getCliOptions().add( "-Djava.version=cli" );
         
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

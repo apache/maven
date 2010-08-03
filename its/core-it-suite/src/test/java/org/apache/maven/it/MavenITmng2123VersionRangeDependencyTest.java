@@ -42,7 +42,7 @@ public class MavenITmng2123VersionRangeDependencyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2123" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2123" );

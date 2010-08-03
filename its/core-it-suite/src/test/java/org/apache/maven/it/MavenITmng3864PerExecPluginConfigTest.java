@@ -48,7 +48,7 @@ public class MavenITmng3864PerExecPluginConfigTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3864" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

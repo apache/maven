@@ -47,7 +47,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -81,7 +81,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -108,7 +108,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );

@@ -46,7 +46,7 @@ public class MavenIT0135EjbLifecycleTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0135" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "deploy" );

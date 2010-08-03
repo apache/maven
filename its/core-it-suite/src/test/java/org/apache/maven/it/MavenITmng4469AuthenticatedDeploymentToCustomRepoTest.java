@@ -135,7 +135,7 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4469" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );

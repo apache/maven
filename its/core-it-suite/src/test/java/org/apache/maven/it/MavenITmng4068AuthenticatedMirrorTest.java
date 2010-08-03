@@ -115,7 +115,7 @@ public class MavenITmng4068AuthenticatedMirrorTest
         Properties filterProps = new Properties();
         filterProps.setProperty( "@mirrorPort@", Integer.toString( port ) );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4068" );

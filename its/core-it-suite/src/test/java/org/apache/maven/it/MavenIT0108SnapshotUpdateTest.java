@@ -58,7 +58,7 @@ public class MavenIT0108SnapshotUpdateTest
         super.setUp();
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0108" );
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         localRepoFile = getLocalRepoFile( verifier );
         deleteLocalArtifact( verifier, localRepoFile );
 

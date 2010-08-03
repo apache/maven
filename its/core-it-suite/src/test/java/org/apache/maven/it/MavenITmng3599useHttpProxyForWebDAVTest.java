@@ -21,8 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -144,7 +142,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
          * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -155,14 +153,11 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
         
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings.xml" );
-        cliOptions.add( "-X" );
-        
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
@@ -193,7 +188,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
          * repo before the actual test installs Jetty as a mirror for everything. Otherwise, we will get garbage
          * for the JAR/POM of the extension and its dependencies when run against a vanilla repo.
          */
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -204,14 +199,11 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         
         FileUtils.fileWrite( new File( testDir, "settings.xml" ).getAbsolutePath(), newSettings );
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings.xml" );
-        cliOptions.add( "-X" );
-        
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );

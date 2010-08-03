@@ -53,7 +53,7 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4262" );
 
-        Verifier verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -75,7 +75,7 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4262" );
 
-        Verifier verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );

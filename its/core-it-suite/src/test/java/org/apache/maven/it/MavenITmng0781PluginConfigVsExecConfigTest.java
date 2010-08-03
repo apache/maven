@@ -47,7 +47,7 @@ public class MavenITmng0781PluginConfigVsExecConfigTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0781" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );

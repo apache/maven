@@ -52,7 +52,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/noclassdef-mojo" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         try
@@ -84,7 +84,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/noclassdef-param" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         try
@@ -116,7 +116,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/mojo-complookup" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         try
@@ -148,7 +148,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2690/requirement-complookup" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         try

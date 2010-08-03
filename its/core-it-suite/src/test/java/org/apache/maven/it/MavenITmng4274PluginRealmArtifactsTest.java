@@ -49,7 +49,7 @@ public class MavenITmng4274PluginRealmArtifactsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4274" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven", "maven-core", "2.0.4274", "jar" );

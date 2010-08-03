@@ -49,7 +49,7 @@ public class MavenITmng4193UniqueRepoIdTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4193" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try

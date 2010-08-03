@@ -44,7 +44,7 @@ public class MavenIT0090EnvVarInterpolationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0090" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath(), true );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         Map envVars = new HashMap();
         envVars.put( "MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE" );
         verifier.setAutoclean( false );

@@ -44,7 +44,7 @@ public class MavenIT0085TransitiveSystemScopeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0085" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0085" );

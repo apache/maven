@@ -49,7 +49,7 @@ public class MavenITmng2174PluginDepsManagedByParentProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2174" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2174" );

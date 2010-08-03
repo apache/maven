@@ -23,7 +23,7 @@ under the License.
   <!-- if this profile is used, the import-scoped POM will be resolvable. -->
   <profiles>
     <profile>
-      <id>central-override</id>
+      <id>it-defaults</id>
       <repositories>
         <repository>
           <id>central</id>
@@ -36,9 +36,21 @@ under the License.
           </snapshots>
         </repository>
       </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>@baseurl@/remote-repository</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
   <activeProfiles>
-    <activeProfile>central-override</activeProfile>
+    <activeProfile>it-defaults</activeProfile>
   </activeProfiles>
 </settings>

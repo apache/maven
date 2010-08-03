@@ -49,7 +49,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3885" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-f.txt" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-f" );
@@ -71,7 +71,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3885" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setLogFileName( "log-f.txt" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-f" );
@@ -93,7 +93,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3885" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setLogFileName( "log-t.txt" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-t" );
@@ -116,7 +116,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3885" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setLogFileName( "log-t.txt" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-t" );

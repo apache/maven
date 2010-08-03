@@ -50,7 +50,7 @@ public class MavenITmng3183LoggingToFileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3183" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "-l" );
         verifier.getCliOptions().add( "maven.log" );

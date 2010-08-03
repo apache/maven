@@ -47,7 +47,7 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2140" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

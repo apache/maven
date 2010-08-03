@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -55,7 +53,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
         new File( javaHome, "bin/javac").createNewFile();
         new File( javaHome, "bin/javac.exe").createNewFile();
         
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         Properties properties = verifier.newDefaultFilterProperties();
         properties.setProperty( "@javaHome@", javaHome.getAbsolutePath() );
 
@@ -63,9 +61,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
 
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--toolchains toolchains.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--toolchains toolchains.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

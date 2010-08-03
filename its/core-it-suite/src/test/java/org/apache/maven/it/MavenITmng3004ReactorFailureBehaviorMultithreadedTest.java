@@ -48,7 +48,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -56,9 +56,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-fast" );
         verifier.setLogFileName( "log-ff-mt1.txt" );
-        Properties systemProperties = new Properties();
-        systemProperties.setProperty( "maven.threads.experimental", "1" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "maven.threads.experimental", "1" );
 
         try
         {
@@ -86,7 +84,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -94,9 +92,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-never" );
         verifier.setLogFileName( "log-fn-mt1.txt" );
-        Properties systemProperties = new Properties();
-        systemProperties.setProperty( "maven.threads.experimental", "1" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "maven.threads.experimental", "1" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.resetStreams();
 
@@ -116,7 +112,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -124,9 +120,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-at-end" );
         verifier.setLogFileName( "log-fae-mt1.txt" );
-        Properties systemProperties = new Properties();
-        systemProperties.setProperty( "maven.threads.experimental", "1" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "maven.threads.experimental", "1" );
         try
         {
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
@@ -153,7 +147,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -161,9 +155,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-never" );
         verifier.setLogFileName( "log-fn-mt2.txt" );
-        Properties systemProperties = new Properties();
-        systemProperties.setProperty( "maven.threads.experimental", "2" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "maven.threads.experimental", "2" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.resetStreams();
 
@@ -183,7 +175,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0095" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "subproject1/target" );
@@ -191,9 +183,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject3/target" );
         verifier.getCliOptions().add( "--fail-at-end" );
         verifier.setLogFileName( "log-fae-mt2.txt" );
-        Properties systemProperties = new Properties();
-        systemProperties.setProperty( "maven.threads.experimental", "2" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "maven.threads.experimental", "2" );
         try
         {
             verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );

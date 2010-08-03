@@ -81,7 +81,7 @@ public class MavenITmng2865MirrorWildcardTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2865" );
 
-        Verifier verifier = new Verifier( new File( testDir, project ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
         Properties filterProps = verifier.newDefaultFilterProperties();

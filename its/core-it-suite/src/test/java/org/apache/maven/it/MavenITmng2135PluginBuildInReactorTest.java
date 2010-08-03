@@ -46,7 +46,7 @@ public class MavenITmng2135PluginBuildInReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2135" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "plugin/target" );
         verifier.deleteDirectory( "project/target" );

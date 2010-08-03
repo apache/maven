@@ -43,7 +43,7 @@ under the License.
 
   <mirrors>
     <mirror>
-      <id>test-a</id>
+      <id>central</id>
       <url>@baseurl@/null0</url>
       <mirrorOf>*</mirrorOf>
     </mirror>

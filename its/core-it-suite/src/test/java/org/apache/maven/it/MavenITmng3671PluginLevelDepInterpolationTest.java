@@ -50,7 +50,7 @@ public class MavenITmng3671PluginLevelDepInterpolationTest
         // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3671" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         verifier.executeGoal( "compile" );
 

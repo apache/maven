@@ -50,7 +50,7 @@ public class MavenITmng3979ElementJoinTest
 
         testDir = new File( testDir, "sub" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

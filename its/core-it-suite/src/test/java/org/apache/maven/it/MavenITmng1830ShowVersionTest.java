@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -51,10 +50,9 @@ public class MavenITmng1830ShowVersionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1830" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        List cliOptions = Collections.singletonList( "-X" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-X" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -50,7 +50,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3970/test-1" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3970" );
         verifier.filterFile( "profiles.xml", "profiles.xml", "UTF-8", verifier.newDefaultFilterProperties() );
@@ -72,7 +72,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3970/test-2" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3970" );
         verifier.filterFile( "pom.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
@@ -91,7 +91,7 @@ public class MavenITmng3970DepResolutionFromProfileReposTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3970/test-3" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3970" );
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );

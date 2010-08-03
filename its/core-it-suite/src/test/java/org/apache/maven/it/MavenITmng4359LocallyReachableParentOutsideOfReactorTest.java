@@ -49,7 +49,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4359" );
         testDir = new File( testDir, "reactor-parent" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "mod-c/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4359" );

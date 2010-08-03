@@ -50,7 +50,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3139" );
 
@@ -64,7 +64,7 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
 
         // phase 2: trigger blacklisting of repo (by invalid URL) and check previously downloaded metadata is stil used
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 

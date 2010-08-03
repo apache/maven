@@ -47,7 +47,7 @@ public class MavenITmng4314DirectInvocationOfAggregatorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4314" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "consumer/target" );

@@ -53,7 +53,7 @@ public class MavenITmng3331ModulePathNormalizationTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
         verifier.executeGoal( "initialize" );
 
@@ -83,7 +83,7 @@ public class MavenITmng3331ModulePathNormalizationTest
 
         Verifier verifier;
 
-        verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
 
         verifier.executeGoal( "initialize" );
 

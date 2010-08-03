@@ -49,7 +49,7 @@ public class MavenITmng0866EvaluateDefaultValueTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0866" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

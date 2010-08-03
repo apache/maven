@@ -48,7 +48,7 @@ public class MavenITmng3821EqualPluginExecIdsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3821" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

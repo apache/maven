@@ -48,7 +48,7 @@ public class MavenITmng4464PlatformIndependentFileSeparatorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4464" );
 
-        Verifier verifier = new Verifier( new File( testDir, "aggregator" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "aggregator" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "../sub/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4464" );

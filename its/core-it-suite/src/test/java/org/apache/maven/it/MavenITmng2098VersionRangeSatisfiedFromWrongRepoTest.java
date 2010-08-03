@@ -49,7 +49,7 @@ public class MavenITmng2098VersionRangeSatisfiedFromWrongRepoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2098" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2098" );
         verifier.getCliOptions().add( "-s" );

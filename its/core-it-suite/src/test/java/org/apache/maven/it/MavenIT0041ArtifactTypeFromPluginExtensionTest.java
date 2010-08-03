@@ -46,9 +46,11 @@ public class MavenIT0041ArtifactTypeFromPluginExtensionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0041" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.2", "coreit-artifact" );
+        verifier.deleteArtifacts( "org.apache.maven", "maven-core-it-support", "1.2" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -48,7 +48,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1803" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         try
         {

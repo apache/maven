@@ -46,7 +46,7 @@ public class MavenIT0136RarLifecycleTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0136" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "deploy" );

@@ -52,7 +52,7 @@ public class MavenITmng4270ArtifactHandlersFromPluginDepsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/" + AID );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
         verifier.deleteArtifacts( GID );
         

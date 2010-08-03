@@ -51,7 +51,7 @@ public class MavenITmng4528ExcludeWagonsFromMavenCoreArtifactsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4528" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

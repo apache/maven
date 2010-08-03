@@ -48,7 +48,7 @@ public class MavenITmng4116UndecodedUrlsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4116" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

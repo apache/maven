@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-786">MNG-786</a>.
@@ -48,14 +47,12 @@ public class MavenITmng0786ProfileAwareReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0786" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub1/target" );
         verifier.deleteDirectory( "sub2/target" );
-        Properties systemProperties = new Properties();
-        systemProperties.put( "expression.outputFile", "target/expression.properties" );
-        systemProperties.put( "activate", "anything" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "expression.outputFile", "target/expression.properties" );
+        verifier.setSystemProperty( "activate", "anything" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.assertFilePresent( "sub1/target/expression.properties" );
         verifier.assertFilePresent( "sub2/target/expression.properties" );

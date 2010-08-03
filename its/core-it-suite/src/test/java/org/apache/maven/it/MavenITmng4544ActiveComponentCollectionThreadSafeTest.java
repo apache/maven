@@ -47,7 +47,7 @@ public class MavenITmng4544ActiveComponentCollectionThreadSafeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4544" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

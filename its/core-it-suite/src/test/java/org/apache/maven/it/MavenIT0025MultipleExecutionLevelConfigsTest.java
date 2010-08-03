@@ -46,7 +46,7 @@ public class MavenIT0025MultipleExecutionLevelConfigsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0025" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

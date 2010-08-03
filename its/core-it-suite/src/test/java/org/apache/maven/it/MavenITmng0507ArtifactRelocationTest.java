@@ -47,13 +47,13 @@ public class MavenITmng0507ArtifactRelocationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0507" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support", "1.1", "pom" );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar" );
-        verifier.deleteArtifact( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
+        verifier.deleteArtifacts( "org.apache.maven", "maven-core-it-support", "1.1" );
+        verifier.deleteArtifacts( "org.apache.maven", "maven-core-it-support-old-location", "1.1" );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

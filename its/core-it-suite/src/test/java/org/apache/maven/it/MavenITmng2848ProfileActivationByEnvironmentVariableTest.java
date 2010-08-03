@@ -47,7 +47,7 @@ public class MavenITmng2848ProfileActivationByEnvironmentVariableTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2848" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setEnvironmentVariable( "MNG2848", "GO" );

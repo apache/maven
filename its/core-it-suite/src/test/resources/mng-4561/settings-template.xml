@@ -33,7 +33,7 @@ under the License.
       <url>http://mng4561.bad.host/repo-b</url>
     </mirror>
     <mirror>
-      <id>central-mirror</id>
+      <id>central</id>
       <mirrorOf>central</mirrorOf>
       <url>@baseurl@/target/null</url>
     </mirror>

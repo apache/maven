@@ -66,7 +66,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3886" );
 
-        Verifier verifier = new Verifier( new File( testDir, project ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, project ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

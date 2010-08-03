@@ -56,7 +56,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         aPom.setLastModified( System.currentTimeMillis() );
         bPom.setLastModified( aPom.lastModified() - 1000 * 60 );
 
-        Verifier verifier = new Verifier( aDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( aDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4368" );
@@ -74,7 +74,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         assertTrue( aPom.lastModified() > bPom.lastModified() );
         assertTrue( installedPom.lastModified() > bPom.lastModified() );
 
-        verifier = new Verifier( bDir.getAbsolutePath() );
+        verifier = newVerifier( bDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
@@ -107,7 +107,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         FileUtils.fileWrite( bArtifact.getPath(), "UTF-8", "from Branch-B" );
         bArtifact.setLastModified( aArtifact.lastModified() - 1000 * 60 );
 
-        Verifier verifier = new Verifier( aDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( aDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4368" );
@@ -125,7 +125,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         assertTrue( aArtifact.lastModified() > bArtifact.lastModified() );
         assertTrue( installedArtifact.lastModified() > bArtifact.lastModified() );
 
-        verifier = new Verifier( bDir.getAbsolutePath() );
+        verifier = newVerifier( bDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );
@@ -140,7 +140,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         FileUtils.fileWrite( installedArtifact.getPath(), "UTF-8", "from Branch-C" );
         installedArtifact.setLastModified( lastModified );
 
-        verifier = new Verifier( bDir.getAbsolutePath() );
+        verifier = newVerifier( bDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-b.txt" );

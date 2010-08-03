@@ -39,7 +39,7 @@ public class MavenIT0012PomInterpolationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0012" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "child-project/target" );

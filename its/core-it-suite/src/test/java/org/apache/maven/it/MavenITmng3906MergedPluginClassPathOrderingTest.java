@@ -48,7 +48,7 @@ public class MavenITmng3906MergedPluginClassPathOrderingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3906" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3906" );

@@ -49,7 +49,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3379" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.a" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3379.b" );

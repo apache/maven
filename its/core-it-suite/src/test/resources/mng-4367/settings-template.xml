@@ -24,7 +24,7 @@ under the License.
     <mirror>
       <id>test</id>
       <url>@mirrorurl@</url>
-      <mirrorOf>*</mirrorOf>
+      <mirrorOf>*,!central</mirrorOf>
       <mirrorOfLayouts>@layouts@</mirrorOfLayouts>
     </mirror>
   </mirrors>

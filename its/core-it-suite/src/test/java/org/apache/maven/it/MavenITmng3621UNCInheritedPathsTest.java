@@ -48,7 +48,7 @@ public class MavenITmng3621UNCInheritedPathsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3621" );
 
-        Verifier verifier = new Verifier( new File( testDir, "child" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "child" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

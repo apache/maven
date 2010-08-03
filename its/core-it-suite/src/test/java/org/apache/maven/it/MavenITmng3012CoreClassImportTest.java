@@ -47,7 +47,7 @@ public class MavenITmng3012CoreClassImportTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3012" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng3012", "jar" );

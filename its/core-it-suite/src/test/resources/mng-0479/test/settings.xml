@@ -25,7 +25,7 @@ under the License.
       <!--
       Make sure we also override the repo definition in case a repo manager is setup.
       -->
-      <id>it0043</id>
+      <id>it-defaults</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>

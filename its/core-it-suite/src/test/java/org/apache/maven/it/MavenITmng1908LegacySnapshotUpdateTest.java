@@ -48,7 +48,7 @@ public class MavenITmng1908LegacySnapshotUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1908" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1908" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );

@@ -43,7 +43,7 @@ under the License.
 
   <mirrors>
     <mirror>
-      <id>test-a</id>
+      <id>central</id>
       <url>http://maven.apache.org/null</url>
       <!--
       The explicit mismatch with maven-core-it should be dominant over the wildcard, even if the wildcard

@@ -47,7 +47,7 @@ public class MavenITmng2972OverridePluginDependencyTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972/test1" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar" );
@@ -76,7 +76,7 @@ public class MavenITmng2972OverridePluginDependencyTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2972/test2" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar" );

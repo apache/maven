@@ -47,7 +47,7 @@ public class MavenITmng1233WarDepWithProvidedScopeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1233" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0083" );

@@ -38,7 +38,7 @@ public class MavenITmng2668UsePluginDependenciesForSortingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2668" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2668" );
         verifier.executeGoal( "validate" );

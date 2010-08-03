@@ -49,7 +49,7 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0145" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
@@ -73,7 +73,7 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0145" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
@@ -98,7 +98,7 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0145" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );

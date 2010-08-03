@@ -46,7 +46,7 @@ public class MavenITmng3838EqualPluginDepsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3838" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

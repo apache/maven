@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-294">MNG-294</a>.
@@ -61,9 +60,7 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         }
         else
         {
-            Properties systemProperties = new Properties();
-            systemProperties.put( "org.apache.maven.global-settings", "global-settings.xml" );
-            verifier.setSystemProperties( systemProperties );
+            verifier.setSystemProperty( "org.apache.maven.global-settings", "global-settings.xml" );
         }
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();

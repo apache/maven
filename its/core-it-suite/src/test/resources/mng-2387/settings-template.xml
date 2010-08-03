@@ -20,6 +20,14 @@ under the License.
 -->
 
 <settings>
+  <mirrors>
+    <mirror>
+      <!-- disable remote trips to speed things up -->
+      <id>central</id>
+      <url>@baseurl@/repo-null</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
   <proxies>
     <proxy>
       <!-- NOTE: Set as inactive so should not be used, even if the one and only proxy configured -->
@@ -38,7 +46,7 @@ under the License.
       </activation>
       <repositories>
         <repository>
-          <id>central</id>
+          <id>maven-core-it</id>
           <url>http://@host@:@port@/</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>

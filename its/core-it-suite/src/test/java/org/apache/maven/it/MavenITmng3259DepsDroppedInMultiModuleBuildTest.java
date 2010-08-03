@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3259">MNG-3259</a>.
@@ -51,11 +49,7 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
 
         Verifier verifier;
 
-        verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
-
-        List cliOptions = new ArrayList();
-
-        verifier.setCliOptions( cliOptions );
+        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
 
         verifier.executeGoal( "install" );
 
@@ -63,7 +57,7 @@ public class MavenITmng3259DepsDroppedInMultiModuleBuildTest
 
         verifier.resetStreams();
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
         verifier.executeGoal( "install" );
 

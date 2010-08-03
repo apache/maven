@@ -47,7 +47,7 @@ public class MavenITmng3814BogusProjectCycleTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3814" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3814" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );

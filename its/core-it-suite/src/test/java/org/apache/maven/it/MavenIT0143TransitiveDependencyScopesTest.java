@@ -232,7 +232,7 @@ public class MavenIT0143TransitiveDependencyScopesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0143" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target-" + scope );
         verifier.deleteArtifacts( "org.apache.maven.its.it0143" );

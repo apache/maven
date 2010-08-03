@@ -51,7 +51,7 @@ public class MavenITmng3498ForkToOtherMojoTest
         File pluginDir = new File( testDir, "maven-mng3498-plugin" );
         File projectDir = new File( testDir, "mng-3498-project" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.mng3498", "maven-mng3498-plugin", "1", "pom" );
 
         verifier.executeGoal( "install" );
@@ -59,7 +59,7 @@ public class MavenITmng3498ForkToOtherMojoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );
 

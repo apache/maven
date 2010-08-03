@@ -43,7 +43,7 @@ public class MavenIT0010DependencyClosureResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0010" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0010" );

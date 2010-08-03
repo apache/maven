@@ -49,7 +49,7 @@ public class MavenITmng3766ToolchainsFromExtensionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3766" );
        
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "--toolchains" );

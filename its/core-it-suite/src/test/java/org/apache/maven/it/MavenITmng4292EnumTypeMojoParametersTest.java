@@ -47,7 +47,7 @@ public class MavenITmng4292EnumTypeMojoParametersTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4292" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

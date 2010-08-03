@@ -25,7 +25,7 @@ under the License.
   </pluginGroups>
   <mirrors>
     <mirror>
-      <id>mng4554</id>
+      <id>central</id>
       <mirrorOf>central</mirrorOf>
       <url>http://localhost:@port@/@repo@</url>
     </mirror>

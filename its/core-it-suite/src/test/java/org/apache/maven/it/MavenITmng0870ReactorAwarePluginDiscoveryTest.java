@@ -48,7 +48,7 @@ public class MavenITmng0870ReactorAwarePluginDiscoveryTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0870" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "project/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0870" );

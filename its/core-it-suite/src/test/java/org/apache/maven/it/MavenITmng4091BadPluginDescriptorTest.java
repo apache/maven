@@ -43,7 +43,7 @@ public class MavenITmng4091BadPluginDescriptorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4091/invalid" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         try
@@ -85,7 +85,7 @@ public class MavenITmng4091BadPluginDescriptorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4091/plugin-dependency" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         verifier.executeGoal( "validate" );

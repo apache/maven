@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -48,12 +46,10 @@ public class MavenITmng1415QuotedSystemPropertiesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1415" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dtest.property=\"Test Property\"" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dtest.property=\"Test Property\"" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

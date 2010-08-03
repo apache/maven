@@ -43,7 +43,7 @@ public class MavenITmng3920PlexusComponentApiTest
 
         Verifier verifier;
 
-        verifier = new Verifier( dir.getAbsolutePath() );
+        verifier = newVerifier( dir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );
 

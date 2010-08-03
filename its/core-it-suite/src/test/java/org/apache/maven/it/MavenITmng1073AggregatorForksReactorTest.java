@@ -49,7 +49,7 @@ public class MavenITmng1073AggregatorForksReactorTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1073" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub-1/target" );
@@ -72,7 +72,7 @@ public class MavenITmng1073AggregatorForksReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1073" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub-1/target" );

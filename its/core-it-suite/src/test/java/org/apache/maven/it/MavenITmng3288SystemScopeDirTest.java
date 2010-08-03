@@ -44,7 +44,7 @@ public class MavenITmng3288SystemScopeDirTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3288" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         try
         {

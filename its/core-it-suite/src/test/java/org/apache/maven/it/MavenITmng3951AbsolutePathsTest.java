@@ -49,7 +49,7 @@ public class MavenITmng3951AbsolutePathsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3951" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         /*
          * Cut off anything before the first file separator from the local repo path. This is harmless on a Unix-like

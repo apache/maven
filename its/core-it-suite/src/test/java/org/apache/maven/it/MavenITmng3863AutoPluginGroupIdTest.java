@@ -48,7 +48,7 @@ public class MavenITmng3863AutoPluginGroupIdTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3863" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try

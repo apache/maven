@@ -41,7 +41,7 @@ public class MavenIT0009GoalConfigurationTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0009" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

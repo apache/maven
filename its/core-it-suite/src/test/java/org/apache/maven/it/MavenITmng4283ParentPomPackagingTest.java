@@ -47,7 +47,7 @@ public class MavenITmng4283ParentPomPackagingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4283" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         try
         {

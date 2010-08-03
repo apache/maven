@@ -48,7 +48,7 @@ public class MavenITmng2254PomEncodingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2254" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "utf-8/target" );
         verifier.deleteDirectory( "latin-1/target" );

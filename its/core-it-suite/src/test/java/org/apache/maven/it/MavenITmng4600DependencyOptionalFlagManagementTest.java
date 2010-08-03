@@ -49,7 +49,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4600/model" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
@@ -70,7 +70,7 @@ public class MavenITmng4600DependencyOptionalFlagManagementTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4600/resolution" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4600" );

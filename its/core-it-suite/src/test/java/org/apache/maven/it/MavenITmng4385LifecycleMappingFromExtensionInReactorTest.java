@@ -48,7 +48,7 @@ public class MavenITmng4385LifecycleMappingFromExtensionInReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4385" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         try
         {

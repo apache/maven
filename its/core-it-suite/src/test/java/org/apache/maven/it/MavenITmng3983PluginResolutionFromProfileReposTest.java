@@ -50,7 +50,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-1" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );
@@ -73,7 +73,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-2" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );
@@ -93,7 +93,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-3" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );

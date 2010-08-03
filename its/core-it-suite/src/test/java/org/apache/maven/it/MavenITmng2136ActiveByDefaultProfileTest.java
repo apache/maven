@@ -42,14 +42,12 @@ public class MavenITmng2136ActiveByDefaultProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2136" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        Properties systemProperties = new Properties();
-        systemProperties.put( "expression.outputFile", new File( testDir, "target/expression.properties" ).getPath() );
-        systemProperties.put( "expression.expressions", "project/properties" );
-        verifier.setSystemProperties( systemProperties );
+        verifier.setSystemProperty( "expression.outputFile", new File( testDir, "target/expression.properties" ).getPath() );
+        verifier.setSystemProperty( "expression.expressions", "project/properties" );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );

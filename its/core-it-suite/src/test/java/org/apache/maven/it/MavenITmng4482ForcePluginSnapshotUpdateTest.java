@@ -47,7 +47,7 @@ public class MavenITmng4482ForcePluginSnapshotUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4482" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4482" );
         verifier.getCliOptions().add( "-s" );

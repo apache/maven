@@ -20,12 +20,19 @@ under the License.
 -->
 
 <settings>
+  <mirrors>
+    <mirror>
+      <id>central</id>
+      <url>http://localhost:54312/repo</url>
+      <mirrorOf>central</mirrorOf>
+    </mirror>
+  </mirrors>
   <profiles>
     <profile>
       <id>maven-core-it-repo</id>
       <repositories>
         <repository>
-          <id>central</id>
+          <id>maven-core-it</id>
           <url>http://localhost:54312/repo</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>

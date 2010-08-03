@@ -48,7 +48,7 @@ public class MavenITmng0680ParentBasedirTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0680" );
         File subDir = new File( testDir, "subproject" );
 
-        Verifier verifier = new Verifier( subDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( subDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

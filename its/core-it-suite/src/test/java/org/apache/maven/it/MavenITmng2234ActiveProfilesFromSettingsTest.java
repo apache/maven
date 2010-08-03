@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2234">MNG-2234</a>.
@@ -47,14 +45,12 @@ public class MavenITmng2234ActiveProfilesFromSettingsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2234" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-s" );
-        cliOptions.add( "settings.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

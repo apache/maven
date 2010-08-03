@@ -47,7 +47,7 @@ public class MavenITmng4072InactiveProfileReposTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4072" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4072" );
         Properties filterProps = verifier.newDefaultFilterProperties();

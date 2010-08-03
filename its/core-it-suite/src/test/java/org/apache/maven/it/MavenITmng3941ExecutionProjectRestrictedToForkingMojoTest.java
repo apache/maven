@@ -49,7 +49,7 @@ public class MavenITmng3941ExecutionProjectRestrictedToForkingMojoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3941" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );

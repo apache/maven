@@ -51,7 +51,7 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
 
         Verifier verifier;
 
-        verifier = new Verifier( new File( testDir, "dep-a" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir, "dep-a" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2486" );
@@ -59,21 +59,21 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( new File( testDir, "parent" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( new File( testDir, "dep-b" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir, "dep-b" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( new File( testDir, "test" ).getAbsolutePath() );
+        verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         // enforce remote resolution

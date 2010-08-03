@@ -47,7 +47,7 @@ public class MavenITmng0249ResolveDepsFromReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0249" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

@@ -47,7 +47,7 @@ public class MavenIT0040PackagingFromPluginExtensionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0040" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );

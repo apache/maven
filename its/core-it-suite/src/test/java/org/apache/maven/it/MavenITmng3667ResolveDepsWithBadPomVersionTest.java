@@ -60,7 +60,7 @@ public class MavenITmng3667ResolveDepsWithBadPomVersionTest
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
         
         File localRepoDir = new File( verifier.localRepo );
         FileUtils.copyDirectoryStructure( repoDir, localRepoDir );

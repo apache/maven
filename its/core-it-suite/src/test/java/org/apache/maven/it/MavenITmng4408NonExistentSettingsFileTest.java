@@ -47,7 +47,7 @@ public class MavenITmng4408NonExistentSettingsFileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4408" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-user.txt" );
         verifier.getCliOptions().add( "--settings" );

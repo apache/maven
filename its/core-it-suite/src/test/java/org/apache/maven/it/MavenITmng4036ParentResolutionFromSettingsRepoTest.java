@@ -46,7 +46,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4036/default" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );
@@ -70,7 +70,7 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4036/legacy" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );

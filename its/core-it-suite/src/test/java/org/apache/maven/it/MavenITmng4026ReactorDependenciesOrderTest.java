@@ -50,7 +50,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4026" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
         verifier.executeGoal( "validate" );

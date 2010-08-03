@@ -49,7 +49,7 @@ public class MavenITmng3693PomFileBasedirChangeTest
         File pluginDir = new File( testDir, "maven-mng3693-plugin" );
         File projectsDir = new File( testDir, "projects" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
         
         verifier.executeGoal( "install" );
 
@@ -64,7 +64,7 @@ public class MavenITmng3693PomFileBasedirChangeTest
         // remove the dependency from the local repository.
         FileUtils.deleteDirectory( dep );
 
-        verifier = new Verifier( projectsDir.getAbsolutePath() );
+        verifier = newVerifier( projectsDir.getAbsolutePath() );
         
         verifier.executeGoal( "package" );
 

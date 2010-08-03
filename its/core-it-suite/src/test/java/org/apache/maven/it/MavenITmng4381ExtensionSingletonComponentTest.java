@@ -48,7 +48,7 @@ public class MavenITmng4381ExtensionSingletonComponentTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4381" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-a/target" );
         verifier.deleteDirectory( "sub-b/target" );

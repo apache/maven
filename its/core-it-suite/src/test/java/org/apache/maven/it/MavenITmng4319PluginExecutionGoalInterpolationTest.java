@@ -46,7 +46,7 @@ public class MavenITmng4319PluginExecutionGoalInterpolationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4319" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

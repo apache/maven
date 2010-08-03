@@ -48,7 +48,7 @@ public class MavenITmng2309ProfileInjectionOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2309" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );

@@ -66,7 +66,7 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3925" );
 
-        Verifier verifier = new Verifier( new File( new File( testDir, project ), "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( new File( testDir, project ), "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

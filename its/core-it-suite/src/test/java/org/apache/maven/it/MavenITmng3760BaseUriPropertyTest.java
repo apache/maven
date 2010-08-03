@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -47,7 +46,7 @@ public class MavenITmng3760BaseUriPropertyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3760" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-basic.txt" );
@@ -68,11 +67,10 @@ public class MavenITmng3760BaseUriPropertyTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3760" );
 
         // check that setting baseUri doesn't override project value
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List cliOptions = Collections.singletonList( "-DbaseUri=myBaseUri" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-DbaseUri=myBaseUri" );
         verifier.setLogFileName( "log-sysprop.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

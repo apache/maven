@@ -50,7 +50,7 @@ public class MavenITmng3038TransitiveDepManVersionTest
 
         File testProjectDir = new File( testDirBase, "test-project" );
         
-        Verifier verifier = new Verifier( testProjectDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testProjectDir.getAbsolutePath() );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "A", "1.0", "pom" );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "A", "1.0", "jar" );
         verifier.deleteArtifact( "org.apache.maven.its.it0121", "B", "1.0", "pom" );
@@ -66,7 +66,7 @@ public class MavenITmng3038TransitiveDepManVersionTest
         throws VerificationException, IOException
     {
         File testOtherDepDir = new File( testDirBase, "test-other-deps/" + projectDDepDir );
-        Verifier verifierOtherDep = new Verifier( testOtherDepDir.getAbsolutePath() );
+        Verifier verifierOtherDep = newVerifier( testOtherDepDir.getAbsolutePath() );
         verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "jar" );
         verifierOtherDep.deleteArtifact( "org.apache.maven.its.it0121", "D", version, "pom" );
         verifierOtherDep.executeGoal( "install" );

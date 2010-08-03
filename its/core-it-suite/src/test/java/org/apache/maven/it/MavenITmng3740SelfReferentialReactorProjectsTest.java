@@ -52,12 +52,12 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest
 
         Verifier verifier;
 
-        verifier = new Verifier( v1.getAbsolutePath() );
+        verifier = newVerifier( v1.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        verifier = new Verifier( v2.getAbsolutePath() );
+        verifier = newVerifier( v2.getAbsolutePath() );
         verifier.executeGoal( "package" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

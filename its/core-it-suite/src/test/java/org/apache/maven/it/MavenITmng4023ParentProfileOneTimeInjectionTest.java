@@ -50,7 +50,7 @@ public class MavenITmng4023ParentProfileOneTimeInjectionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4023" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub/target" );
         verifier.executeGoal( "validate" );

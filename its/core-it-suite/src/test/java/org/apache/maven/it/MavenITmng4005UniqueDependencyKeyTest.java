@@ -81,7 +81,7 @@ public class MavenITmng4005UniqueDependencyKeyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4005/" + project );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

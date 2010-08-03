@@ -47,7 +47,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2045" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "test-user/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2045" );

@@ -48,7 +48,7 @@ public class MavenITmng3701ImplicitProfileIdTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3701" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );

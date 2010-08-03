@@ -50,7 +50,7 @@ public class MavenITmng4000MultiPluginExecutionsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4000/test-1" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
@@ -71,7 +71,7 @@ public class MavenITmng4000MultiPluginExecutionsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4000/test-2" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

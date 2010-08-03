@@ -49,7 +49,7 @@ public class MavenITmng3831PomInterpolationTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3831" );
         File child = new File( testDir, "child" );
 
-        Verifier verifier = new Verifier( child.getAbsolutePath() );
+        Verifier verifier = newVerifier( child.getAbsolutePath() );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

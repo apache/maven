@@ -47,7 +47,7 @@ public class MavenIT0024MultipleGoalExecutionsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0024" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );

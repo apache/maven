@@ -45,7 +45,7 @@ public class MavenITmng2124PomInterpolationWithParentValuesTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2124" );
         File child = new File( testDir, "parent/child" );
 
-        Verifier verifier = new Verifier( child.getAbsolutePath() );
+        Verifier verifier = newVerifier( child.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );

@@ -48,7 +48,7 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3208" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-Pmng3208" );

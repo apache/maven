@@ -47,7 +47,7 @@ public class MavenITmng4461ArtifactUploadMonitorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4461" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

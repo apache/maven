@@ -56,7 +56,7 @@ public class MavenITmng3052DepRepoAggregationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3052" ).getCanonicalFile();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3052" );

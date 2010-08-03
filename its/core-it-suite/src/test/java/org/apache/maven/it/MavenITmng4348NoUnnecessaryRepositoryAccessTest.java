@@ -62,7 +62,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4348" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         final List requestedUris = Collections.synchronizedList( new ArrayList() );
 

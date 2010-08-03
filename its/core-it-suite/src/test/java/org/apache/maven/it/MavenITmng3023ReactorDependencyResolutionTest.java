@@ -53,7 +53,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
 
         // First pass. Make sure the dependency cannot be resolved.
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-a.txt" );
         
@@ -88,7 +88,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-b.txt" );
         // The IT doesn't actually run the compiler but merely mimics its effect, i.e. the creation of the output dir
@@ -122,7 +122,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3023" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         
         verifier.deleteArtifacts( "org.apache.maven.its.mng3023" );

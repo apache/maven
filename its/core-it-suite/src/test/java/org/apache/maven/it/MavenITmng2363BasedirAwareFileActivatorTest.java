@@ -50,7 +50,7 @@ public class MavenITmng2363BasedirAwareFileActivatorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2363" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub-a/target" );

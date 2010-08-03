@@ -25,8 +25,13 @@ under the License.
       <!-- NOTE: The id of the mirror should be used to lookup the credentials, not the id of the original repository. -->
       <id>maven-core-it-mng-4068</id>
       <name>Test Mirror</name>
-      <mirrorOf>central</mirrorOf>
+      <mirrorOf>mng-4068</mirrorOf>
       <url>http://localhost:@mirrorPort@/</url>
+    </mirror>
+    <mirror>
+      <id>central</id>
+      <mirrorOf>central</mirrorOf>
+      <url>@baseurl@/target/null</url>
     </mirror>
   </mirrors>
   <servers>
@@ -41,7 +46,7 @@ under the License.
       <id>mng-4068</id>
       <repositories>
         <repository>
-          <id>central</id>
+          <id>mng-4068</id>
           <url>file://null</url>
           <releases>
             <checksumPolicy>ignore</checksumPolicy>

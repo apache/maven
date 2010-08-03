@@ -45,7 +45,7 @@ public class MavenITBootstrapTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/bootstrap" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );

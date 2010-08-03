@@ -42,7 +42,7 @@ public class MavenITmng3428PluginDescriptorArtifactsIncompleteTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3428" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         // First, build the plugin we'll use to test the PluginDescriptor artifact collection.
         verifier.executeGoal( "install" );

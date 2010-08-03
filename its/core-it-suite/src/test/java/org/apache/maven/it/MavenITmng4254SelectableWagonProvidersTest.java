@@ -23,8 +23,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -48,15 +46,12 @@ public class MavenITmng4254SelectableWagonProvidersTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dmaven.wagon.provider.http=coreit" );
-        cliOptions.add( "-V" );
-        
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dmaven.wagon.provider.http=coreit" );
+        verifier.getCliOptions().add( "-V" );
 
         verifier.setLogFileName( "log-cli.txt" );
         verifier.executeGoal( "validate" );
@@ -73,16 +68,13 @@ public class MavenITmng4254SelectableWagonProvidersTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings.xml" );
-        cliOptions.add( "-V" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.getCliOptions().add( "-V" );
         
         verifier.setLogFileName( "log-settings.txt" );
         verifier.executeGoal( "validate" );
@@ -99,14 +91,11 @@ public class MavenITmng4254SelectableWagonProvidersTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-V" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-V" );
         
         verifier.setLogFileName( "log-default-http.txt" );
         verifier.executeGoal( "validate" );
@@ -123,15 +112,12 @@ public class MavenITmng4254SelectableWagonProvidersTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4254" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-V" );
-        cliOptions.add( "-DwagonProtocol=https" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-V" );
+        verifier.getCliOptions().add( "-DwagonProtocol=https" );
         
         verifier.setLogFileName( "log-default-https.txt" );
         verifier.executeGoal( "validate" );

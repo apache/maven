@@ -48,7 +48,7 @@ public class MavenITmng3899ExtensionInheritanceTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3899" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3899" );

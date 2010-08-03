@@ -48,7 +48,7 @@ public class MavenITmng3877BasedirAlignedModelTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3877" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

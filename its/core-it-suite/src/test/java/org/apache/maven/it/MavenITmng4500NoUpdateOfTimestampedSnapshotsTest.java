@@ -88,7 +88,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
         server.setHandler( handlerList );
         server.start();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         try
         {
             verifier.setAutoclean( false );

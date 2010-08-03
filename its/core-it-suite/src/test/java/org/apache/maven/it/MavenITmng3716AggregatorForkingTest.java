@@ -50,13 +50,13 @@ public class MavenITmng3716AggregatorForkingTest
 
         Verifier verifier;
 
-        verifier = new Verifier( pluginDir.getAbsolutePath() );
+        verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        verifier = new Verifier( projectsDir.getAbsolutePath() );
+        verifier = newVerifier( projectsDir.getAbsolutePath() );
         verifier.executeGoal( "org.apache.maven.its.mng3716:maven-mng3716-plugin:1:run" );
 
         verifier.verifyErrorFreeLog();

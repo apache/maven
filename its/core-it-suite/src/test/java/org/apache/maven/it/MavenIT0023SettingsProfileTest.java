@@ -41,7 +41,7 @@ public class MavenIT0023SettingsProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0023" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "--settings" );

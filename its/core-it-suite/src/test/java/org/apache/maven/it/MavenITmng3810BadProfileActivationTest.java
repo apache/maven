@@ -45,7 +45,7 @@ public class MavenITmng3810BadProfileActivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3810/property" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try

@@ -49,7 +49,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2222" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );

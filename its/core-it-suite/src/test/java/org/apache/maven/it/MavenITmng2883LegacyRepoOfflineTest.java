@@ -58,20 +58,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
         File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
                                              verifier.newDefaultFilterProperties() );
-        List cliOptions = new ArrayList();
 
         // used to inject the remote repository
-        cliOptions.add( "-s" );
-        cliOptions.add( settings.getName() );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( settings.getName() );
 
         // execute once just to make sure this test works at all!
         try
@@ -86,9 +83,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
 
         // the centerpiece of these tests!
-        cliOptions.add( "-o" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-o" );
 
         // re-run in offline mode, should still succeed by using local repo
         verifier.setLogFileName( "log-parent-b.txt" );
@@ -157,21 +152,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
-
-        List cliOptions = new ArrayList();
 
         File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
                                              verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
-        cliOptions.add( "-s" );
-        cliOptions.add( settings.getName() );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( settings.getName() );
 
         // execute once just to make sure this test works at all!
         try
@@ -186,9 +177,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
 
         // the centerpiece of these tests!
-        cliOptions.add( "-o" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-o" );
 
         // re-run in offline mode, should still succeed by using local repo
         verifier.setLogFileName( "log-dep-b.txt" );
@@ -259,7 +248,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
@@ -270,18 +259,14 @@ public class MavenITmng2883LegacyRepoOfflineTest
                                              verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
-        cliOptions.add( "-s" );
-        cliOptions.add( settings.getName() );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( settings.getName() );
 
         verifier.setLogFileName( "log-plugin-a.txt" );
         verifier.executeGoal( "org.apache.maven.its.mng2883:plugin:1.0-SNAPSHOT:run" );
 
         // the centerpiece of these tests!
-        cliOptions.add( "-o" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-o" );
 
         // re-run in offline mode, should still succeed by using local repo
         verifier.setLogFileName( "log-plugin-b.txt" );

@@ -51,7 +51,7 @@ public class MavenITmng3284UsingCachedPluginsTest
          * reloading of the plugin container by the DefaultPluginManager in Maven 2.x, thereby hiding the bug we want
          * to expose here.
          */
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3284" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
@@ -64,7 +64,7 @@ public class MavenITmng3284UsingCachedPluginsTest
         /*
          * Phase 2: Now that the plugin versions have been downloaded to the local repo, run the actual test.
          */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );

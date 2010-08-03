@@ -22,7 +22,7 @@ under the License.
 <settings>
   <mirrors>
     <mirror>
-      <id>central-mirror</id>
+      <id>central</id>
       <mirrorOf>central</mirrorOf>
       <url>@baseurl@/target/null</url>
     </mirror>

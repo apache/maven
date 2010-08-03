@@ -51,7 +51,7 @@ public class MavenITmng2926PluginPrefixOrderTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2926" );
         verifier.deleteArtifacts( "org.apache.maven.plugins", "mng-2926", "0.1" );
         verifier.deleteArtifacts( "org.apache.maven.plugins", "mng-2926", "0.1" );
@@ -63,7 +63,7 @@ public class MavenITmng2926PluginPrefixOrderTest
         new File( verifier.localRepo, "org/codehaus/mojo/resolver-status.properties" ).delete();
         verifier.resetStreams();
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-default.txt" );
         verifier.filterFile( "settings-default-template.xml", "settings-default.xml", "UTF-8", 
@@ -74,7 +74,7 @@ public class MavenITmng2926PluginPrefixOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-custom.txt" );
         verifier.filterFile( "settings-custom-template.xml", "settings-custom.xml", "UTF-8", 

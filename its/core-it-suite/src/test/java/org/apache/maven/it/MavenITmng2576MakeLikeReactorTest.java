@@ -56,7 +56,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -81,7 +81,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -107,7 +107,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -133,7 +133,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -160,7 +160,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.assertFileNotPresent( "sub-d/pom.xml" );
@@ -186,7 +186,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -214,7 +214,7 @@ public class MavenITmng2576MakeLikeReactorTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-pl" );
@@ -239,7 +239,7 @@ public class MavenITmng2576MakeLikeReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.getCliOptions().add( "-rf" );

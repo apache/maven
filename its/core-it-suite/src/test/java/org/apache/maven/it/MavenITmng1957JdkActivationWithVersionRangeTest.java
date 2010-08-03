@@ -48,7 +48,7 @@ public class MavenITmng1957JdkActivationWithVersionRangeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1957" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

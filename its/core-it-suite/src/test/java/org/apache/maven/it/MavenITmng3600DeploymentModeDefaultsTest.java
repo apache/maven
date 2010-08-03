@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 public class MavenITmng3600DeploymentModeDefaultsTest
@@ -43,10 +41,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        verifier.setCliOptions( cliOptions );
         verifier.setLogFileName( "log-no-settings.txt" );
         verifier.executeGoal( "deploy" );
 
@@ -67,12 +63,10 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings-server-defaults.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings-server-defaults.xml" );
         verifier.setLogFileName( "log-server-defaults.txt" );
         verifier.executeGoal( "deploy" );
 
@@ -93,12 +87,10 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings-modes-set.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings-modes-set.xml" );
         verifier.setLogFileName( "log-modes-set.txt" );
         verifier.executeGoal( "deploy" );
 

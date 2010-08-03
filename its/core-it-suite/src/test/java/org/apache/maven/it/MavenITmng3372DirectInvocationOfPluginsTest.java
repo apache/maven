@@ -23,9 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * This is a sample integration test. The IT tests typically
@@ -59,7 +57,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         File project = new File( testBaseDir, "project" );
         File settingsFile = new File( testBaseDir, "settings.xml" );
 
-        Verifier verifier = new Verifier( plugin.getAbsolutePath() );
+        Verifier verifier = newVerifier( plugin.getAbsolutePath() );
 
         verifier.deleteArtifacts( "org.apache.maven.its.mng3372" );
 
@@ -67,13 +65,11 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
         verifier.executeGoals( Arrays.asList( new String[]{ "clean", "install" } ) );
 
-        verifier = new Verifier( project.getAbsolutePath() );
+        verifier = newVerifier( project.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-s" );
-        cliOptions.add( "\"" + settingsFile.getAbsolutePath() + "\"" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "\"" + settingsFile.getAbsolutePath() + "\"" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "mng3372:test" );
 
         verifier.verifyErrorFreeLog();
@@ -88,12 +84,10 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
         // file.
         File testBaseDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3372/dependency-tree" );
 
-        Verifier verifier = new Verifier( testBaseDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testBaseDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-U" );
+        verifier.getCliOptions().add( "-U" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "dependency:tree" );
 
         verifier.verifyErrorFreeLog();

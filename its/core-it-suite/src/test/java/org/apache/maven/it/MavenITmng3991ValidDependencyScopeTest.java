@@ -50,7 +50,7 @@ public class MavenITmng3991ValidDependencyScopeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3991" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try

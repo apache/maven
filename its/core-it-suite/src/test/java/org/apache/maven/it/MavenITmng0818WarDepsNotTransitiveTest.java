@@ -48,7 +48,7 @@ public class MavenITmng0818WarDepsNotTransitiveTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0818" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0080" );

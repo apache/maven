@@ -47,7 +47,7 @@ public class MavenITmng2054PluginExecutionInheritanceTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2054" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "project/project-level2/project-level3/project-jar/target" );
         verifier.executeGoal( "validate" );

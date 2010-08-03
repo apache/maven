@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng3355TranslatedPathInterpolationTest
     extends AbstractMavenIntegrationTestCase
@@ -37,16 +35,13 @@ public class MavenITmng3355TranslatedPathInterpolationTest
     public void testitMNG3355()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(),
-                                                                 "/mng-3355" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3355" );
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dversion=foo" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dversion=foo" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();

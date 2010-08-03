@@ -48,7 +48,7 @@ public class MavenITmng4459InMemorySettingsKeptEncryptedTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4459" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getSystemProperties().setProperty( "settings.security", 

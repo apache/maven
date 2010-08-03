@@ -49,7 +49,7 @@ public class MavenITmng3719PomExecutionOrderingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3719" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

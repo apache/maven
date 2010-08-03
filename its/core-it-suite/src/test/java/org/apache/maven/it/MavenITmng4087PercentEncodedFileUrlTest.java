@@ -48,7 +48,7 @@ public class MavenITmng4087PercentEncodedFileUrlTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4087" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4087" );

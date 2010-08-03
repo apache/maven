@@ -46,13 +46,13 @@ public class MavenITmng3694ReactorProjectsDynamismTest
         File pluginDir = new File( testDir, "maven-mng3694-plugin" );
         File projectDir = new File( testDir, "projects" );
         
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
 
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
 
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

@@ -56,7 +56,7 @@ public class MavenITmng2790LastUpdatedMetadataTest
         /*
          * Phase 1: Install initial snapshot into local repo.
          */
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         File metadataArtifactVersionFile =
             new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng2790", "project", "1.0-SNAPSHOT" ) );
         File metadataArtifactFile =
@@ -82,7 +82,7 @@ public class MavenITmng2790LastUpdatedMetadataTest
         /*
          * Phase 2: Re-install snapshot and check for proper timestamp update in local metadata.
          */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

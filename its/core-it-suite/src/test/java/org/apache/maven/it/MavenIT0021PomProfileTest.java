@@ -41,7 +41,7 @@ public class MavenIT0021PomProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0021" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.it0021" );
         verifier.getSystemProperties().setProperty( "includeProfile", "true" );

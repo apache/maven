@@ -52,7 +52,7 @@ public class MavenIT0142DirectDependencyScopesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0142" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0142" );

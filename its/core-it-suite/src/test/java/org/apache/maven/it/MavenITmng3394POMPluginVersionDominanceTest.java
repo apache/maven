@@ -51,7 +51,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         //testShouldUsePluginVersionFromPluginMgmtForLifecycleMojoWhenNotInBuildPlugins 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "lifecycleMojoVersionInPluginMgmt" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );
@@ -67,7 +67,7 @@ public class MavenITmng3394POMPluginVersionDominanceTest
         //testShouldPreferPluginVersionFromBuildPluginsOverThatInPluginMgmt
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), BASEDIR_PREFIX + "preferBuildPluginOverPluginMgmt" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );

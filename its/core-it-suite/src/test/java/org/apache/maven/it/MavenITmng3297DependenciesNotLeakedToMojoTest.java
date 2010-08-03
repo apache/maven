@@ -49,7 +49,7 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3297" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "initialize" );

@@ -47,7 +47,7 @@ public class MavenITmng4433ForceParentSnapshotUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4433" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4433" );
         verifier.getCliOptions().add( "-s" );

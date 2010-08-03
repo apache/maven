@@ -49,7 +49,7 @@ public class MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4312" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

@@ -63,7 +63,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4326" );
 
         // setup: install a local snapshot
-        Verifier verifier = new Verifier( new File( testDir, "dependency" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "dependency" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4326" );
         verifier.deleteDirectory( "target" );
@@ -139,7 +139,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         try
         {
             // test 1: resolve snapshot, just built local copy should suppress daily remote update check
-            verifier = new Verifier( new File( testDir, "test" ).getAbsolutePath() );
+            verifier = newVerifier( new File( testDir, "test" ).getAbsolutePath() );
             verifier.setAutoclean( false );
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );

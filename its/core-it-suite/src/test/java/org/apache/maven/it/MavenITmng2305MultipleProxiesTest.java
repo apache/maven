@@ -61,7 +61,7 @@ public class MavenITmng2305MultipleProxiesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2305" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         // NOTE: trust store cannot be reliably configured for the current JVM
         verifier.setForkJvm( true );

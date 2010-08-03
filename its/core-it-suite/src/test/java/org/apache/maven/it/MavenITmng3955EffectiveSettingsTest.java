@@ -49,7 +49,7 @@ public class MavenITmng3955EffectiveSettingsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3955" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );

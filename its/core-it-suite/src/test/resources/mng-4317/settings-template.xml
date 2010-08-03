@@ -22,7 +22,7 @@ under the License.
 <settings>
   <mirrors>
     <mirror>
-      <id>central-blocker</id>
+      <id>central</id>
       <mirrorOf>central</mirrorOf>
       <url>@baseurl@/void</url>
     </mirror>

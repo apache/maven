@@ -29,8 +29,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     extends AbstractMavenIntegrationTestCase
@@ -52,12 +50,10 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-s" );
-        cliOptions.add( "settings.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "deploy" );
 
         verifier.verifyErrorFreeLog();

@@ -40,7 +40,7 @@ public class MavenIT0011DefaultVersionByDependencyManagementTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0011" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0011" );

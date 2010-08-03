@@ -52,7 +52,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4465" );
@@ -68,7 +68,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest
 
         // phase 2: re-try with the remote repo being inaccessible (due to bad URL)
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 

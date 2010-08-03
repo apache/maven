@@ -41,7 +41,7 @@ public class MavenIT0064MojoConfigViaSettersTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0064" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-setter:setter-touch" );

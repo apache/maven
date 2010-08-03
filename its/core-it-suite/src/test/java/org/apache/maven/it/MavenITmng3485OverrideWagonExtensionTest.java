@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng3485OverrideWagonExtensionTest
     extends AbstractMavenIntegrationTestCase
@@ -41,10 +39,8 @@ public class MavenITmng3485OverrideWagonExtensionTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "deploy" );
 
         verifier.assertFilePresent( "target/wagon-data" );

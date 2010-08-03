@@ -22,8 +22,8 @@ under the License.
 <settings>
   <mirrors>
     <mirror>
-      <!-- make sure central isn't touched -->
-      <id>test-mirror</id>
+      <!-- disable remote trips to speed things up -->
+      <id>central</id>
       <url>@baseurl@/repo-null</url>
       <mirrorOf>central</mirrorOf>
     </mirror>

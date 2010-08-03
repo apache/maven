@@ -46,7 +46,6 @@ public class MavenITmng3057VersionExprTransformationsTest
 
     public MavenITmng3057VersionExprTransformationsTest()
     {
-        // TODO: port to 3.x
         super( "[2.1.0,2.1.1)" ); // only test in 2.1.0
     }
 
@@ -59,7 +58,7 @@ public class MavenITmng3057VersionExprTransformationsTest
         
         File remoteRepo = new File( testDir, "target/deployment" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "level2/target" );
@@ -71,17 +70,10 @@ public class MavenITmng3057VersionExprTransformationsTest
 
         verifier.filterFile( "pom.xml", "pom-filtered.xml", "UTF-8", properties );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-V" );
-        cliOptions.add( "-DtestVersion=1" );
-        cliOptions.add( "-f pom-filtered.xml" );
+        verifier.getCliOptions().add( "-V" );
+        verifier.getCliOptions().add( "-DtestVersion=1" );
+        verifier.getCliOptions().add( "-f pom-filtered.xml" );
 
-        verifier.setCliOptions( cliOptions );
-        
-//        Map envars = new HashMap();
-//        envars.put( "MAVEN_OPTS", "-Xdebug -Xnoagent -Xrunjdwp:transport=dt_socket,server=y,address=5005 -Djava.compiler=NONE" );
-//        verifier.executeGoal( "deploy", envars );
-        
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

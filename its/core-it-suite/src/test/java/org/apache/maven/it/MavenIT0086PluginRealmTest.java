@@ -48,7 +48,7 @@ public class MavenIT0086PluginRealmTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0086" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

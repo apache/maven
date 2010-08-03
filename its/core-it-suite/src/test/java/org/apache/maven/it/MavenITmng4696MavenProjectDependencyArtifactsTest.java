@@ -50,7 +50,7 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4696" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4696" );
         verifier.getCliOptions().add( "-s" );

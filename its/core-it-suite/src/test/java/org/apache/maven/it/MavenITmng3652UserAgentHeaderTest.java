@@ -21,7 +21,6 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -102,17 +101,15 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-DtestPort=" + port );
-        cliOptions.add( "-X" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-DtestPort=" + port );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.setLogFileName( "log-unConfiguredHttp.txt" );
         verifier.executeGoal( "validate" );
@@ -148,19 +145,17 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
 
         // test webdav
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-DtestPort=" + port );
-        cliOptions.add( "-DtestProtocol=dav:http" );
-        cliOptions.add( "-X" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-DtestPort=" + port );
+        verifier.getCliOptions().add( "-DtestProtocol=dav:http" );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.setLogFileName( "log-unConfiguredDAV.txt" );
         verifier.executeGoal( "validate" );
@@ -196,21 +191,19 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
 
         // test settings with no config
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-DtestPort=" + port );
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings-no-config.xml" );
-        cliOptions.add( "-X" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-DtestPort=" + port );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings-no-config.xml" );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.setLogFileName( "log-configWithoutUserAgent.txt" );
         verifier.executeGoal( "validate" );
@@ -246,21 +239,19 @@ public class MavenITmng3652UserAgentHeaderTest
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
 
-        Verifier verifier = new Verifier( pluginDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath() );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( projectDir.getAbsolutePath() );
+        verifier = newVerifier( projectDir.getAbsolutePath() );
 
         // test settings with config
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-DtestPort=" + port );
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings.xml" );
-        cliOptions.add( "-X" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-DtestPort=" + port );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
         verifier.executeGoal( "validate" );
@@ -270,7 +261,7 @@ public class MavenITmng3652UserAgentHeaderTest
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
 
-//        System.out.println( "Comparing User-Agent: '" + userAgent + "' to 'Maven Fu'" );
         assertEquals( "Maven Fu", userAgent );
     }
+
 }

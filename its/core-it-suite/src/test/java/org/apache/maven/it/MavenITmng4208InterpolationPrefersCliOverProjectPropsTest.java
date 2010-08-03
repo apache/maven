@@ -47,7 +47,7 @@ public class MavenITmng4208InterpolationPrefersCliOverProjectPropsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4208" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-DtestProperty=PASSED" );

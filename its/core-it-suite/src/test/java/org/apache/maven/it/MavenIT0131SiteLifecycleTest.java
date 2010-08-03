@@ -46,7 +46,7 @@ public class MavenIT0131SiteLifecycleTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0131" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "site-deploy" );

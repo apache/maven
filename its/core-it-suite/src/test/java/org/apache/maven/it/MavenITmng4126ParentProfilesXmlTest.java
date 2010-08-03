@@ -51,7 +51,7 @@ public class MavenITmng4126ParentProfilesXmlTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4126" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub/target" );
         verifier.executeGoal( "validate" );
@@ -72,7 +72,7 @@ public class MavenITmng4126ParentProfilesXmlTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4126" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

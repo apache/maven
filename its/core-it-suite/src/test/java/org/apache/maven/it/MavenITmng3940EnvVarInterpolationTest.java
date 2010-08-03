@@ -66,7 +66,7 @@ public class MavenITmng3940EnvVarInterpolationTest
             envVars.put( "MAVEN_MNG_3940", "PASSED" );
         }
         
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate", envVars );

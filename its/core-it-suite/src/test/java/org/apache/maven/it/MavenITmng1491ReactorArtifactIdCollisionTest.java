@@ -39,7 +39,7 @@ public class MavenITmng1491ReactorArtifactIdCollisionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1491" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         try

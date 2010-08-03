@@ -49,7 +49,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
         testDir = new File( testDir, "lifecycle" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try
@@ -91,7 +91,7 @@ public class MavenITmng0449PluginVersionResolutionTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0449" );
         testDir = new File( testDir, "direct" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         try

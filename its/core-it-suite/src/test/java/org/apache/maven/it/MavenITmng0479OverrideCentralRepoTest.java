@@ -49,7 +49,7 @@ public class MavenITmng0479OverrideCentralRepoTest
 
         // Phase 1: Ensure the test plugin is downloaded before the test cuts off access to central
         File child1 = new File( testDir, "setup" );
-        Verifier verifier = new Verifier( child1.getAbsolutePath() );
+        Verifier verifier = newVerifier( child1.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
@@ -59,7 +59,7 @@ public class MavenITmng0479OverrideCentralRepoTest
 
         // Phase 2: Now run the test
         File child2 = new File( testDir, "test" );
-        verifier = new Verifier( child2.getAbsolutePath() );
+        verifier = newVerifier( child2.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 

@@ -46,7 +46,7 @@ public class MavenIT0038AlternatePomFileDifferentDirTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0038" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "project/target" );
         verifier.getCliOptions().add( "-f" );

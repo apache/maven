@@ -48,7 +48,7 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3872" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3872" );

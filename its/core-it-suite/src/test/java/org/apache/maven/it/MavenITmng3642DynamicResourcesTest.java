@@ -57,7 +57,7 @@ public class MavenITmng3642DynamicResourcesTest
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
         /*
          * The Command Line Options (CLI) are passed to the

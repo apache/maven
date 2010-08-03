@@ -53,7 +53,7 @@ public class MavenITmng3122ActiveProfilesNoDuplicatesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3122" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "--settings" );

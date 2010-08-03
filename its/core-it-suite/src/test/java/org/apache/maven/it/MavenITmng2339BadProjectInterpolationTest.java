@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng2339BadProjectInterpolationTest
     extends AbstractMavenIntegrationTestCase
@@ -41,12 +39,10 @@ public class MavenITmng2339BadProjectInterpolationTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dversion=foo" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dversion=foo" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
@@ -61,7 +57,7 @@ public class MavenITmng2339BadProjectInterpolationTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
@@ -74,13 +70,11 @@ public class MavenITmng2339BadProjectInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Dversion=2" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Dversion=2" );
         verifier.setLogFileName( "log-cli-specified.txt" );
         verifier.executeGoal( "initialize" );
 

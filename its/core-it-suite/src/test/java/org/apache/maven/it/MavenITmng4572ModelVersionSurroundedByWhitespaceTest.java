@@ -46,7 +46,7 @@ public class MavenITmng4572ModelVersionSurroundedByWhitespaceTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4572" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

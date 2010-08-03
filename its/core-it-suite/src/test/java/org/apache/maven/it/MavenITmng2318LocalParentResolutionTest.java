@@ -46,7 +46,7 @@ public class MavenITmng2318LocalParentResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2318" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

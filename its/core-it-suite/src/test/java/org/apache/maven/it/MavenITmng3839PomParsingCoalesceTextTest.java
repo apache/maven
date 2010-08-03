@@ -48,7 +48,7 @@ public class MavenITmng3839PomParsingCoalesceTextTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3839" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

@@ -59,7 +59,7 @@ public class MavenITmng3482DependencyPomInterpolationTest
          * unstable test results. Fortunately, the verifier
          * makes it easy to do this.
          */
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
         File settings = verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
                                              verifier.newDefaultFilterProperties() );
@@ -74,12 +74,8 @@ public class MavenITmng3482DependencyPomInterpolationTest
          * recurse. We are only installing the parent pom to
          * the local repo here.
          */
-        List cliOptions = new ArrayList();
-
-        cliOptions.add( "-s" );
-        cliOptions.add( "\"" + settings.getAbsolutePath() + "\"" );
-
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "\"" + settings.getAbsolutePath() + "\"" );
 
         verifier.executeGoal( "compile" );
 

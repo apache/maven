@@ -52,7 +52,7 @@ public class MavenITmng4415InheritedPluginOrderTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4415" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

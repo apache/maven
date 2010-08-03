@@ -48,7 +48,7 @@ under the License.
     from central fail, too.
     -->
     <mirror>
-      <id>central-mirror</id>
+      <id>central</id>
       <url>@baseurl@/null</url>
       <mirrorOf>central</mirrorOf>
     </mirror>

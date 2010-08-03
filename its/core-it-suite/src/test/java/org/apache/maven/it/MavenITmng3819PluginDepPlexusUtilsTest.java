@@ -50,7 +50,7 @@ public class MavenITmng3819PluginDepPlexusUtilsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3819" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

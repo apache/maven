@@ -49,7 +49,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3043" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer-a/target" );
         verifier.deleteDirectory( "consumer-b/target" );
@@ -103,7 +103,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3043" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer-a/target" );
         verifier.deleteDirectory( "consumer-b/target" );

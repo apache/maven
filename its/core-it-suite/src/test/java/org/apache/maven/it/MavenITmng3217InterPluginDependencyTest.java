@@ -48,7 +48,7 @@ public class MavenITmng3217InterPluginDependencyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3217" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-1/target" );
         verifier.deleteDirectory( "sub-2/target" );

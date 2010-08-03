@@ -49,7 +49,7 @@ public class MavenITmng3271DefaultReportsSuppressionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3271" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );

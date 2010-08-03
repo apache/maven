@@ -25,7 +25,7 @@ under the License.
   </pluginGroups>
   <profiles>
     <profile>
-      <id>maven-core-it-repo</id>
+      <id>it-defaults</id>
       <repositories>
         <repository>
           <id>central</id>
@@ -53,6 +53,6 @@ under the License.
     </profile>
   </profiles>
   <activeProfiles>
-    <activeProfile>maven-core-it-repo</activeProfile>
+    <activeProfile>it-defaults</activeProfile>
   </activeProfiles>
 </settings>

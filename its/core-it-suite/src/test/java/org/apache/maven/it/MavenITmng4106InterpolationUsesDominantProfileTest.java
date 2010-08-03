@@ -50,7 +50,7 @@ public class MavenITmng4106InterpolationUsesDominantProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4106" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );

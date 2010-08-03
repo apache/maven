@@ -23,31 +23,28 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng3268MultipleDashPCommandLineTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3268MultipleDashPCommandLineTest()
     {
         super( "(2.0.9,)" );
     }
 
-    public void testMultipleProfileParams ()
+    public void testMultipleProfileParams()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3268" );
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List cliOptions = new ArrayList();
-        cliOptions.add( "-Pprofile1,profile2" );
-        cliOptions.add( "-Pprofile3" );
-        cliOptions.add( "-P profile4" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "-Pprofile1,profile2" );
+        verifier.getCliOptions().add( "-Pprofile3" );
+        verifier.getCliOptions().add( "-P profile4" );
         verifier.executeGoal( "package" );
 
         verifier.verifyErrorFreeLog();
@@ -57,4 +54,5 @@ public class MavenITmng3268MultipleDashPCommandLineTest
         verifier.assertFilePresent( "target/profile4/touch.txt" );
         verifier.resetStreams();
     }
+
 }

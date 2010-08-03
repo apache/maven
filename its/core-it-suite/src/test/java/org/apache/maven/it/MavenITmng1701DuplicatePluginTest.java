@@ -47,7 +47,7 @@ public class MavenITmng1701DuplicatePluginTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-1701" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

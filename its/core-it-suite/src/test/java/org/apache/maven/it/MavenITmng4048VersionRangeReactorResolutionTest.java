@@ -47,7 +47,7 @@ public class MavenITmng4048VersionRangeReactorResolutionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4048" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-2/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4048" );

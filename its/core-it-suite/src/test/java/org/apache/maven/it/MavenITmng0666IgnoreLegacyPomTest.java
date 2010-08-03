@@ -48,7 +48,7 @@ public class MavenITmng0666IgnoreLegacyPomTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0666" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.it0059" );

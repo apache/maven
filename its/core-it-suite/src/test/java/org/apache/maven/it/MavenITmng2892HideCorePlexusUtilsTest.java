@@ -48,7 +48,7 @@ public class MavenITmng2892HideCorePlexusUtilsTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2892" );
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "0.1-mng2892", "jar" );

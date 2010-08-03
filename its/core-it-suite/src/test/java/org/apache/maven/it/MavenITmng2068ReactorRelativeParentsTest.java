@@ -52,7 +52,7 @@ public class MavenITmng2068ReactorRelativeParentsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-1" );
         File projectDir = new File( testDir, "parent" );
 
-        Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );
@@ -69,7 +69,7 @@ public class MavenITmng2068ReactorRelativeParentsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-2" );
         File projectDir = new File( testDir, "parent" );
 
-        Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );
@@ -86,7 +86,7 @@ public class MavenITmng2068ReactorRelativeParentsTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2068/test-3" );
         File projectDir = testDir;
 
-        Verifier verifier = new Verifier( projectDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( projectDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2068" );
         verifier.executeGoal( "validate" );

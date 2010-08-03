@@ -50,7 +50,7 @@ public class MavenITmng4387QuietLoggingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4387" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.getCliOptions().add( "-q" );
         verifier.setLogFileName( "log.txt" );

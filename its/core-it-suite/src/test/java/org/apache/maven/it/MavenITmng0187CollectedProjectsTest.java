@@ -53,7 +53,7 @@ public class MavenITmng0187CollectedProjectsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0187" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub-1/target" );

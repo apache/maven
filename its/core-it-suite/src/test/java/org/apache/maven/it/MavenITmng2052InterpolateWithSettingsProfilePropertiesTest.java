@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest
     extends AbstractMavenIntegrationTestCase
@@ -44,12 +42,10 @@ public class MavenITmng2052InterpolateWithSettingsProfilePropertiesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2052" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        List cliOptions = new ArrayList();
-        cliOptions.add( "--settings" );
-        cliOptions.add( "settings.xml" );
-        verifier.setCliOptions( cliOptions );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

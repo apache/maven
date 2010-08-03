@@ -79,7 +79,7 @@ public class MavenITmng4360WebDavSupportTest
 
         testDir = new File( testDir, project );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         Handler repoHandler = new AbstractHandler()
         {

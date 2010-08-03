@@ -49,7 +49,7 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4347" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
         String localRepo = verifier.localRepo;
         File dest = new File( localRepo );

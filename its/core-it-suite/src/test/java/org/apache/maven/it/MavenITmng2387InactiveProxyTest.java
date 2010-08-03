@@ -107,7 +107,7 @@ public class MavenITmng2387InactiveProxyTest
     public void testit()
         throws Exception
     {
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
         Properties properties = verifier.newDefaultFilterProperties();        
         properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );

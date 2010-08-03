@@ -47,7 +47,7 @@ public class MavenITmng4318ProjectExecutionRootTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4318" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "sub-1/target" );

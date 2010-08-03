@@ -48,12 +48,10 @@ public class MavenITmng0848SystemPropOverridesDefaultValueTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0848" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        Properties sysProps = new Properties();
-        sysProps.setProperty( "config.aliasDefaultExpressionParam", "PASSED" );
-        verifier.setSystemProperties( sysProps );
+        verifier.setSystemProperty( "config.aliasDefaultExpressionParam", "PASSED" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

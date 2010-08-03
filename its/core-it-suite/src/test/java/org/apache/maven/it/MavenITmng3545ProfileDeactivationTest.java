@@ -20,8 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
@@ -48,14 +46,11 @@ public class MavenITmng3545ProfileDeactivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log1.txt" );
 
-        List cliOptions = new ArrayList();
-
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
@@ -77,18 +72,15 @@ public class MavenITmng3545ProfileDeactivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log2.txt" );
 
-        List cliOptions = new ArrayList();
-
         // Deactivate active by default profiles
-        cliOptions.add( "-P-profile1" );
-        cliOptions.add( "-P -profile2" );
+        verifier.getCliOptions().add( "-P-profile1" );
+        verifier.getCliOptions().add( "-P -profile2" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
@@ -102,18 +94,15 @@ public class MavenITmng3545ProfileDeactivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log3.txt" );
 
-        List cliOptions = new ArrayList();
-
         // Deactivate active by default profiles
-        cliOptions.add( "-P!profile1" );
-        cliOptions.add( "-P !profile2" );
+        verifier.getCliOptions().add( "-P!profile1" );
+        verifier.getCliOptions().add( "-P !profile2" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
@@ -132,18 +121,15 @@ public class MavenITmng3545ProfileDeactivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log4.txt" );
 
-        List cliOptions = new ArrayList();
-
         // Activate with a prop, then deactivate
-        cliOptions.add( "-Dprofile3-active-by-property=true" );
-        cliOptions.add( "-P-profile3" );
+        verifier.getCliOptions().add( "-Dprofile3-active-by-property=true" );
+        verifier.getCliOptions().add( "-P-profile3" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
@@ -165,18 +151,15 @@ public class MavenITmng3545ProfileDeactivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log5.txt" );
 
-        List cliOptions = new ArrayList();
-
         // Activate then deactivate
-        cliOptions.add( "-Pprofile4" );
-        cliOptions.add( "-P-profile4" );
+        verifier.getCliOptions().add( "-Pprofile4" );
+        verifier.getCliOptions().add( "-P-profile4" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();
@@ -198,17 +181,14 @@ public class MavenITmng3545ProfileDeactivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3545" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log6.txt" );
 
-        List cliOptions = new ArrayList();
-
         // Activate
-        cliOptions.add( "-Pprofile4" );
+        verifier.getCliOptions().add( "-Pprofile4" );
 
-        verifier.setCliOptions( cliOptions );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();

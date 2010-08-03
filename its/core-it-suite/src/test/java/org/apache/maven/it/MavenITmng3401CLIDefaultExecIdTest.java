@@ -64,7 +64,7 @@ public class MavenITmng3401CLIDefaultExecIdTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3401/" + project );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-configuration:2.1-SNAPSHOT:config" );

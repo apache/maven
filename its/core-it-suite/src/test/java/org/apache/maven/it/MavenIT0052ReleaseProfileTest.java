@@ -41,7 +41,7 @@ public class MavenIT0052ReleaseProfileTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0052" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "package" );

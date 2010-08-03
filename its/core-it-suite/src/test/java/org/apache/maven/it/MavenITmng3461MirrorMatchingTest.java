@@ -59,7 +59,7 @@ public class MavenITmng3461MirrorMatchingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-1" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
         Properties filterProps = verifier.newDefaultFilterProperties();
@@ -82,7 +82,7 @@ public class MavenITmng3461MirrorMatchingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-2" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         Handler repoHandler = new AbstractHandler()
         {
@@ -153,7 +153,7 @@ public class MavenITmng3461MirrorMatchingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3461/test-3" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3461" );
         Properties filterProps = verifier.newDefaultFilterProperties();

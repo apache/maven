@@ -46,7 +46,7 @@ public class MavenITmng0522InheritedPluginMgmtConfigTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0522" );
 
-        Verifier verifier = new Verifier( new File( testDir, "child-project" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "child-project" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "process-resources" );

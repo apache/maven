@@ -52,7 +52,7 @@ public class MavenITmng3732ActiveProfilesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3732" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "--settings" );
@@ -71,10 +71,12 @@ public class MavenITmng3732ActiveProfilesTest
             ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
             ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
             ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
+            ids.add( props.getProperty( "project.activeProfiles.3.id", "" ) );
+            ids.remove( "it-defaults" );
             Collections.sort( ids );
 
             assertEquals( Arrays.asList( new String[] { "pom", "profiles", "settings" } ), ids );
-            assertEquals( "3", props.getProperty( "project.activeProfiles" ) );
+            assertEquals( "4", props.getProperty( "project.activeProfiles" ) );
 
             assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
             assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );
@@ -84,10 +86,12 @@ public class MavenITmng3732ActiveProfilesTest
         {
             ids.add( props.getProperty( "project.activeProfiles.0.id", "" ) );
             ids.add( props.getProperty( "project.activeProfiles.1.id", "" ) );
+            ids.add( props.getProperty( "project.activeProfiles.2.id", "" ) );
+            ids.remove( "it-defaults" );
             Collections.sort( ids );
 
             assertEquals( Arrays.asList( new String[] { "pom", "settings" } ), ids );
-            assertEquals( "2", props.getProperty( "project.activeProfiles" ) );
+            assertEquals( "3", props.getProperty( "project.activeProfiles" ) );
     
             assertEquals( "PASSED-1", props.getProperty( "project.properties.pomProperty" ) );
             assertEquals( "PASSED-2", props.getProperty( "project.properties.settingsProperty" ) );

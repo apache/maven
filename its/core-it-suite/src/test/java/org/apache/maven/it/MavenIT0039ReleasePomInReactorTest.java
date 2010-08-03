@@ -48,7 +48,7 @@ public class MavenIT0039ReleasePomInReactorTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0039" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "project/target" );
         verifier.deleteDirectory( "project2/target" );

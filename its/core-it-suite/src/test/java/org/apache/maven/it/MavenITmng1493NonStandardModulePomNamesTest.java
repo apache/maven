@@ -39,7 +39,7 @@ public class MavenITmng1493NonStandardModulePomNamesTest
 
         Verifier verifier;
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
 
         verifier.executeGoal( "initialize" );

@@ -48,7 +48,7 @@ public class MavenITmng4148DepPomInterpWithSettingsProfilesTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4148" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.it.mng4148" );

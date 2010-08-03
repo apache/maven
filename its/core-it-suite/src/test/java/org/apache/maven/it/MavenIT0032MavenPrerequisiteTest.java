@@ -40,7 +40,7 @@ public class MavenIT0032MavenPrerequisiteTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0032" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();

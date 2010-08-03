@@ -81,7 +81,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
         server.setHandler( repoHandler );
         server.start();
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4555" );

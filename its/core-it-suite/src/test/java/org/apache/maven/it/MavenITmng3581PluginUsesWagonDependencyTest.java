@@ -42,7 +42,7 @@ public class MavenITmng3581PluginUsesWagonDependencyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3581" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();

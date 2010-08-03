@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng3535SelfReferentialPropertiesTest
     extends AbstractMavenIntegrationTestCase
@@ -41,11 +39,9 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535/success" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List opts = new ArrayList();
-        opts.add( "-X" );
-        verifier.setCliOptions( opts );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.setAutoclean( false );
         verifier.executeGoal( "verify" );
@@ -60,11 +56,9 @@ public class MavenITmng3535SelfReferentialPropertiesTest
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-3535/failure" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        List opts = new ArrayList();
-        opts.add( "-X" );
-        verifier.setCliOptions( opts );
+        verifier.getCliOptions().add( "-X" );
 
         verifier.setAutoclean( false );
 

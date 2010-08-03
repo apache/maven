@@ -51,7 +51,7 @@ public class MavenITmng4034ManagedProfileDependencyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4034" );
 
-        Verifier verifier = new Verifier( new File( testDir, "sub" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

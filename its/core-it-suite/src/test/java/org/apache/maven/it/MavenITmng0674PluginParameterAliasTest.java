@@ -48,7 +48,7 @@ public class MavenITmng0674PluginParameterAliasTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-lifecycle.txt" );
@@ -69,7 +69,7 @@ public class MavenITmng0674PluginParameterAliasTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0674" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setLogFileName( "log-cli.txt" );

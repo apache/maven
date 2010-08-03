@@ -48,7 +48,7 @@ public class MavenITmng4745PluginVersionUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4745" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
@@ -81,7 +81,7 @@ public class MavenITmng4745PluginVersionUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4745" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
@@ -114,7 +114,7 @@ public class MavenITmng4745PluginVersionUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4745" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );

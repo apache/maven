@@ -52,7 +52,7 @@ public class MavenITmng3203DefaultLifecycleExecIdTest
         // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3203" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();

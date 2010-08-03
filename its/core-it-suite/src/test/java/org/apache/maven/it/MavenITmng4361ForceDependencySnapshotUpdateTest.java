@@ -48,7 +48,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4361" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4361" );
         verifier.getCliOptions().add( "-s" );

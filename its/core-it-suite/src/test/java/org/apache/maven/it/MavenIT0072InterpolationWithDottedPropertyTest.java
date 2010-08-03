@@ -48,7 +48,7 @@ public class MavenIT0072InterpolationWithDottedPropertyTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0072" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

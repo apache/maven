@@ -119,7 +119,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         Properties filterProps = new Properties();
         filterProps.setProperty( "@port@", Integer.toString( port ) );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
@@ -149,7 +149,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         String secUrl = "FILE://" + new File( testDir, "relocated-settings-security.xml" ).toURI().getRawPath();
         filterProps.setProperty( "@relocation@", secUrl );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0553" );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
@@ -180,7 +180,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
         testDir = new File( testDir, "test-3" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
         verifier.getCliOptions().add( "--encrypt-master-password" );
@@ -193,7 +193,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         List log = verifier.loadLines( verifier.getLogFileName(), null );
         assertNotNull( findPassword( log ) );
 
-        verifier = new Verifier( testDir.getAbsolutePath() );
+        verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
         verifier.getCliOptions().add( "--encrypt-password" );

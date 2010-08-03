@@ -48,7 +48,7 @@ public class MavenITmng4386DebugLoggingTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4386" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-X" );

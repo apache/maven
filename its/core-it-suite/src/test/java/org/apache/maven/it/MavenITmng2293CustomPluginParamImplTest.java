@@ -47,7 +47,7 @@ public class MavenITmng2293CustomPluginParamImplTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2293" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );

@@ -26,10 +26,15 @@ under the License.
       <mirrorOf>central</mirrorOf>
       <url>@baseurl@/repo-2</url>
     </mirror>
+    <mirror>
+      <id>central</id>
+      <mirrorOf>maven.it</mirrorOf>
+      <url>http://repository.sonatype.org/content/repositories/public</url>
+    </mirror>
   </mirrors>
   <profiles>
     <profile>
-      <id>maven-core-it-repo</id>
+      <id>it-defaults</id>
       <repositories>
         <!-- repo-1 has the right parent POM, repo-2 the unwanted one -->
         <repository>
@@ -53,9 +58,22 @@ under the License.
           </snapshots>
         </repository>
       </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>maven.it</id>
+          <name>Apache Maven Integration Testing Repository</name>
+          <url>http://localhost</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
     </profile>
   </profiles>
   <activeProfiles>
-    <activeProfile>maven-core-it-repo</activeProfile>
+    <activeProfile>it-defaults</activeProfile>
   </activeProfiles>
 </settings>

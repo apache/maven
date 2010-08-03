@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MavenITmng3221InfiniteForkingTest
     extends AbstractMavenIntegrationTestCase
@@ -46,7 +44,7 @@ public class MavenITmng3221InfiniteForkingTest
 
         try
         {
-            verifier = new Verifier( reportDir.getAbsolutePath() );
+            verifier = newVerifier( reportDir.getAbsolutePath() );
 
             verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-report-plugin", "1", "jar" );
 
@@ -55,11 +53,9 @@ public class MavenITmng3221InfiniteForkingTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            verifier = new Verifier( projectDir.getAbsolutePath() );
+            verifier = newVerifier( projectDir.getAbsolutePath() );
 
-            List cliOptions = new ArrayList();
-            cliOptions.add( "-Psite" );
-            verifier.setCliOptions( cliOptions );
+            verifier.getCliOptions().add( "-Psite" );
 
             verifier.setLogFileName( "mng-3221-a-log.txt" );
             verifier.executeGoal( "site" );
@@ -86,7 +82,7 @@ public class MavenITmng3221InfiniteForkingTest
 
         try
         {
-            verifier = new Verifier( pluginDir.getAbsolutePath() );
+            verifier = newVerifier( pluginDir.getAbsolutePath() );
 
             verifier.deleteArtifact( "org.apache.maven.its.mng3221", "maven-forking-test-plugin", "1", "jar" );
 
@@ -95,11 +91,9 @@ public class MavenITmng3221InfiniteForkingTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            verifier = new Verifier( projectDir.getAbsolutePath() );
+            verifier = newVerifier( projectDir.getAbsolutePath() );
 
-            List cliOptions = new ArrayList();
-            cliOptions.add( "-Pplugin" );
-            verifier.setCliOptions( cliOptions );
+            verifier.getCliOptions().add( "-Pplugin" );
 
             verifier.setLogFileName( "mng-3221-b-log.txt" );
             verifier.executeGoal( "package" );

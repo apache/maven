@@ -52,7 +52,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2720" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "child2/target" );
         verifier.deleteDirectory( "child3/target" );

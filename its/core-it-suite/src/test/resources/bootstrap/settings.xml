@@ -22,24 +22,12 @@ under the License.
 <settings>
   <profiles>
     <profile>
-      <id>maven-core-it-repo</id>
-      <!-- TODO: Remove once IT support plugins/artifacts have been released -->
+      <id>it-defaults</id>
       <repositories>
         <repository>
-          <id>maven.it</id>
-          <name>Apache Maven Integration Testing Snapshot Repository</name>
-          <url>http://repository.sonatype.org/content/repositories/maven.snapshots</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </repository>
-        <repository>
-          <id>apache.snapshots</id>
-          <name>Apache Snapshot Repository</name>
-          <url>http://repository.apache.org/snapshots</url>
+          <id>central</id>
+          <name>Apache Maven Integration Testing Repository</name>
+          <url>http://repository.sonatype.org/content/repositories/public</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -50,20 +38,9 @@ under the License.
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>maven.it</id>
-          <name>Apache Maven Integration Testing Snapshot Repository</name>
-          <url>http://repository.sonatype.org/content/repositories/maven.snapshots</url>
-          <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>true</enabled>
-          </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-          <id>apache.snapshots</id>
-          <name>Apache Snapshot Repository</name>
-          <url>http://repository.apache.org/snapshots</url>
+          <id>central</id>
+          <name>Apache Maven Integration Testing Repository</name>
+          <url>http://repository.sonatype.org/content/repositories/public</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -75,6 +52,6 @@ under the License.
     </profile>
   </profiles>
   <activeProfiles>
-    <activeProfile>maven-core-it-repo</activeProfile>
+    <activeProfile>it-defaults</activeProfile>
   </activeProfiles>
 </settings>

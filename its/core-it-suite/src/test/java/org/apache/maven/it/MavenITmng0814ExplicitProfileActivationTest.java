@@ -47,7 +47,7 @@ public class MavenITmng0814ExplicitProfileActivationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0814" );
 
-        Verifier verifier = new Verifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.getCliOptions().add( "-P" );
