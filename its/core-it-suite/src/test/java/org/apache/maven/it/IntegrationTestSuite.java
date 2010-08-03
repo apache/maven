@@ -92,7 +92,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4666CoreRealmImportTest.class );
         suite.addTestSuite( MavenITmng4654ArtifactHandlerForMainArtifactTest.class );
         suite.addTestSuite( MavenITmng4644StrictPomParsingRejectsMisplacedTextTest.class );
-        suite.addTestSuite( MavenITmng4633DualCompilerExecutionsWeaveModeTest.class );
+        // suite.addTestSuite( MavenITmng4633DualCompilerExecutionsWeaveModeTest.class );
         suite.addTestSuite( MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest.class );
         suite.addTestSuite( MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest.class );
         suite.addTestSuite( MavenITmng4618AggregatorBuiltAfterModulesTest.class );
