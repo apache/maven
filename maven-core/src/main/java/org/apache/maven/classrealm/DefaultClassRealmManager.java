@@ -62,9 +62,53 @@ public class DefaultClassRealmManager
     @Requirement
     protected PlexusContainer container;
 
+    private ClassRealm mavenRealm;
+
     private ClassWorld getClassWorld()
     {
         return ( (MutablePlexusContainer) container ).getClassWorld();
+    }
+
+    private ClassRealm newRealm( String id )
+    {
+        ClassWorld world = getClassWorld();
+
+        synchronized ( world )
+        {
+            String realmId = id;
+
+            Random random = new Random();
+
+            while ( true )
+            {
+                try
+                {
+                    ClassRealm classRealm = world.newRealm( realmId, null );
+
+                    if ( logger.isDebugEnabled() )
+                    {
+                        logger.debug( "Created new class realm " + realmId );
+                    }
+
+                    return classRealm;
+                }
+                catch ( DuplicateRealmException e )
+                {
+                    realmId = id + '-' + random.nextInt();
+                }
+            }
+        }
+    }
+
+    private synchronized ClassRealm getMavenRealm()
+    {
+        if ( mavenRealm == null )
+        {
+            mavenRealm = newRealm( "maven.api" );
+            importMavenApi( mavenRealm );
+            mavenRealm.setParentClassLoader( ClassLoader.getSystemClassLoader() );
+        }
+        return mavenRealm;
     }
 
     /**
@@ -108,35 +152,7 @@ public class DefaultClassRealmManager
 
         ClassRealmRequest request = new DefaultClassRealmRequest( type, parent, imports, constituents );
 
-        ClassRealm classRealm;
-
-        ClassWorld world = getClassWorld();
-
-        synchronized ( world )
-        {
-            String realmId = baseRealmId;
-
-            Random random = new Random();
-
-            while ( true )
-            {
-                try
-                {
-                    classRealm = world.newRealm( realmId, null );
-
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.debug( "Created new class realm " + realmId );
-                    }
-
-                    break;
-                }
-                catch ( DuplicateRealmException e )
-                {
-                    realmId = baseRealmId + '-' + random.nextInt();
-                }
-            }
-        }
+        ClassRealm classRealm = newRealm( baseRealmId );
 
         if ( parent != null )
         {
@@ -144,8 +160,7 @@ public class DefaultClassRealmManager
         }
         else
         {
-            classRealm.setParentRealm( getCoreRealm() );
-            importMavenApi( classRealm );
+            classRealm.setParentRealm( getMavenRealm() );
         }
 
         for ( ClassRealmManagerDelegate delegate : getDelegates() )
@@ -240,33 +255,35 @@ public class DefaultClassRealmManager
      */
     private void importMavenApi( ClassRealm importingRealm )
     {
+        ClassRealm coreRealm = getCoreRealm();
+
         // maven-*
-        importingRealm.importFromParent( "org.apache.maven" );
+        importingRealm.importFrom( coreRealm, "org.apache.maven" );
 
         // plexus-classworlds
-        importingRealm.importFromParent( "org.codehaus.plexus.classworlds" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.classworlds" );
 
         // classworlds (for legacy code)
-        importingRealm.importFromParent( "org.codehaus.classworlds" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.classworlds" );
 
         // plexus-container, plexus-component-annotations
-        importingRealm.importFromParent( "org.codehaus.plexus.component" );
-        importingRealm.importFromParent( "org.codehaus.plexus.configuration" );
-        importingRealm.importFromParent( "org.codehaus.plexus.container" );
-        importingRealm.importFromParent( "org.codehaus.plexus.context" );
-        importingRealm.importFromParent( "org.codehaus.plexus.lifecycle" );
-        importingRealm.importFromParent( "org.codehaus.plexus.logging" );
-        importingRealm.importFromParent( "org.codehaus.plexus.personality" );
-        importingRealm.importFromParent( "org.codehaus.plexus.ComponentRegistry" );
-        importingRealm.importFromParent( "org.codehaus.plexus.ContainerConfiguration" );
-        importingRealm.importFromParent( "org.codehaus.plexus.DefaultComponentRegistry" );
-        importingRealm.importFromParent( "org.codehaus.plexus.DefaultContainerConfiguration" );
-        importingRealm.importFromParent( "org.codehaus.plexus.DefaultPlexusContainer" );
-        importingRealm.importFromParent( "org.codehaus.plexus.DuplicateChildContainerException" );
-        importingRealm.importFromParent( "org.codehaus.plexus.MutablePlexusContainer" );
-        importingRealm.importFromParent( "org.codehaus.plexus.PlexusConstants" );
-        importingRealm.importFromParent( "org.codehaus.plexus.PlexusContainer" );
-        importingRealm.importFromParent( "org.codehaus.plexus.PlexusContainerException" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.component" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.configuration" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.container" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.context" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.lifecycle" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.logging" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.personality" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.ComponentRegistry" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.ContainerConfiguration" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DefaultComponentRegistry" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DefaultContainerConfiguration" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DefaultPlexusContainer" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DuplicateChildContainerException" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.MutablePlexusContainer" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.PlexusConstants" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.PlexusContainer" );
+        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.PlexusContainerException" );
     }
 
     public ClassRealm getCoreRealm()
