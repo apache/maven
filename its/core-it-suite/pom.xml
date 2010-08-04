@@ -238,6 +238,8 @@ under the License.
               <skip>false</skip>
               <forkMode>once</forkMode>
               <argLine>${surefireMemory}</argLine>
+              <!-- NOTE: Maven plugins have access to the system class path so keep it clean -->
+              <useSystemClassLoader>false</useSystemClassLoader>
               <systemProperties combine.children="append">
                 <property>
                   <name>verifier.forkMode</name>
