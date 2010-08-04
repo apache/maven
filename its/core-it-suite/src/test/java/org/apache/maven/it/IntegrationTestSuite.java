@@ -81,6 +81,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4747JavaAgentUsedByPluginTest.class );
         suite.addTestSuite( MavenITmng4745PluginVersionUpdateTest.class );
         suite.addTestSuite( MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest.class );
         suite.addTestSuite( MavenITmng4721OptionalPluginDependencyTest.class );
