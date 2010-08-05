@@ -1,0 +1,8 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng4750</groupId>
+  <artifactId>a</artifactId>
+  <version>0.1</version>
+  <packaging>jar</packaging>
+</project>
