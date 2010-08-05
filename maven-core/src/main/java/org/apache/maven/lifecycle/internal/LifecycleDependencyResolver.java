@@ -122,12 +122,6 @@ public class LifecycleDependencyResolver
                                               boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
-        Set<Artifact> artifacts =
-            getProjectDependencies( project, scopesToCollect, scopesToResolve, session, aggregating,
-                                    projectArtifacts );
-
-        project.setResolvedArtifacts( artifacts );
-
         if ( project.getDependencyArtifacts() == null )
         {
             try
@@ -139,6 +133,12 @@ public class LifecycleDependencyResolver
                 throw new LifecycleExecutionException( e );
             }
         }
+
+        Set<Artifact> artifacts =
+            getProjectDependencies( project, scopesToCollect, scopesToResolve, session, aggregating,
+                                    projectArtifacts );
+
+        project.setResolvedArtifacts( artifacts );
     }
 
     private Set<Artifact> getProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
