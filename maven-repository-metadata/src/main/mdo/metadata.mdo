@@ -79,18 +79,16 @@ under the License.
     {
         boolean changed = false;
 
-        for ( java.util.Iterator i = sourceMetadata.getPlugins().iterator(); i.hasNext(); )
+        for ( Plugin plugin : sourceMetadata.getPlugins() )
         {
-            Plugin plugin = (Plugin) i.next();
             boolean found = false;
 
-            for ( java.util.Iterator it = getPlugins().iterator(); it.hasNext() && !found; )
+            for ( Plugin preExisting : getPlugins() )
             {
-                Plugin preExisting = (Plugin) it.next();
-
                 if ( preExisting.getPrefix().equals( plugin.getPrefix() ) )
                 {
                     found = true;
+                    break;
                 }
             }
 
@@ -121,9 +119,8 @@ under the License.
                 changed = true;
             }
 
-            for ( java.util.Iterator i = versioning.getVersions().iterator(); i.hasNext(); )
+            for ( String version : versioning.getVersions() )
             {
-                String version = (String) i.next();
                 if ( !v.getVersions().contains( version ) )
                 {
                     changed = true;
