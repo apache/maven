@@ -98,6 +98,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4629NoPomValidationErrorUponMissingSystemDepTest.class );
         suite.addTestSuite( MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest.class );
         suite.addTestSuite( MavenITmng4618AggregatorBuiltAfterModulesTest.class );
+        suite.addTestSuite( MavenITmng4615ValidateRequiredPluginParameterTest.class );
         suite.addTestSuite( MavenITmng4600DependencyOptionalFlagManagementTest.class );
         suite.addTestSuite( MavenITmng4590ImportedPomUsesSystemPropertiesTest.class );
         suite.addTestSuite( MavenITmng4586PluginPrefixResolutionFromVersionlessPluginMngtTest.class );
