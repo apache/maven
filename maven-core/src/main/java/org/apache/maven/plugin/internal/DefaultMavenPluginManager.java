@@ -29,6 +29,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
@@ -55,10 +56,12 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
@@ -70,6 +73,7 @@ import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphEx
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
+import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -496,12 +500,32 @@ public class DefaultMavenPluginManager
 
             ConfigurationListener listener = new DebugConfigurationListener( logger );
 
+            ValidatingConfigurationListener validator =
+                new ValidatingConfigurationListener( mojo, mojoDescriptor, listener );
+
             logger.debug( "Configuring mojo '" + mojoDescriptor.getId() + "' with " + configuratorId
                 + " configurator -->" );
 
-            configurator.configureComponent( mojo, configuration, expressionEvaluator, pluginRealm, listener );
+            configurator.configureComponent( mojo, configuration, expressionEvaluator, pluginRealm, validator );
 
             logger.debug( "-- end configuration --" );
+
+            Collection<Parameter> missingParameters = validator.getMissingParameters();
+            if ( !missingParameters.isEmpty() )
+            {
+                if ( "basic".equals( configuratorId ) )
+                {
+                    throw new PluginParameterException( mojoDescriptor, new ArrayList<Parameter>( missingParameters ) );
+                }
+                else
+                {
+                    /*
+                     * NOTE: Other configurators like the map-oriented one don't call into the listener, so do it the
+                     * hard way.
+                     */
+                    validateParameters( mojoDescriptor, configuration, expressionEvaluator );
+                }
+            }
         }
         catch ( ComponentConfigurationException e )
         {
@@ -553,6 +577,61 @@ public class DefaultMavenPluginManager
                     logger.debug( "Failed to release mojo configurator - ignoring." );
                 }
             }
+        }
+    }
+
+    private void validateParameters( MojoDescriptor mojoDescriptor, PlexusConfiguration configuration,
+                                     ExpressionEvaluator expressionEvaluator )
+        throws ComponentConfigurationException, PluginParameterException
+    {
+        if ( mojoDescriptor.getParameters() == null )
+        {
+            return;
+        }
+
+        List<Parameter> invalidParameters = new ArrayList<Parameter>();
+
+        for ( Parameter parameter : mojoDescriptor.getParameters() )
+        {
+            if ( !parameter.isRequired() )
+            {
+                continue;
+            }
+
+            Object value = null;
+
+            PlexusConfiguration config = configuration.getChild( parameter.getName(), false );
+            if ( config != null )
+            {
+                String expression = config.getValue( null );
+
+                try
+                {
+                    value = expressionEvaluator.evaluate( expression );
+
+                    if ( value == null )
+                    {
+                        value = config.getAttribute( "default-value", null );
+                    }
+                }
+                catch ( ExpressionEvaluationException e )
+                {
+                    String msg =
+                        "Error evaluating the expression '" + expression + "' for configuration value '"
+                            + configuration.getName() + "'";
+                    throw new ComponentConfigurationException( configuration, msg, e );
+                }
+            }
+
+            if ( value == null && ( config == null || config.getChildCount() <= 0 ) )
+            {
+                invalidParameters.add( parameter );
+            }
+        }
+
+        if ( !invalidParameters.isEmpty() )
+        {
+            throw new PluginParameterException( mojoDescriptor, invalidParameters );
         }
     }
 

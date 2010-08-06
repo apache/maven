@@ -30,18 +30,35 @@ public class PluginParameterException
     extends PluginConfigurationException
 {
 
-    private final List parameters;
+    private final List<Parameter> parameters;
 
     private final MojoDescriptor mojo;
 
-    public PluginParameterException( MojoDescriptor mojo, List parameters )
+    public PluginParameterException( MojoDescriptor mojo, List<Parameter> parameters )
     {
-        super( mojo.getPluginDescriptor(),
-               "Invalid or missing parameters: " + parameters + " for mojo: " + mojo.getRoleHint() );
+        super( mojo.getPluginDescriptor(), "The parameters " + format( parameters ) + " for goal "
+            + mojo.getRoleHint() + " are missing or invalid" );
 
         this.mojo = mojo;
 
         this.parameters = parameters;
+    }
+
+    private static String format( List<Parameter> parameters )
+    {
+        StringBuilder buffer = new StringBuilder( 128 );
+        if ( parameters != null )
+        {
+            for ( Parameter parameter : parameters )
+            {
+                if ( buffer.length() > 0 )
+                {
+                    buffer.append( ", " );
+                }
+                buffer.append( '\'' ).append( parameter.getName() ).append( '\'' );
+            }
+        }
+        return buffer.toString();
     }
 
     public MojoDescriptor getMojoDescriptor()
@@ -49,7 +66,7 @@ public class PluginParameterException
         return mojo;
     }
 
-    public List getParameters()
+    public List<Parameter> getParameters()
     {
         return parameters;
     }
@@ -92,7 +109,7 @@ public class PluginParameterException
     {
         StringBuilder messageBuffer = new StringBuilder( 256 );
 
-        List params = getParameters();
+        List<Parameter> params = getParameters();
         MojoDescriptor mojo = getMojoDescriptor();
 
         messageBuffer.append( "One or more required plugin parameters are invalid/missing for \'" )
@@ -100,9 +117,9 @@ public class PluginParameterException
             .append( "\'\n" );
 
         int idx = 0;
-        for ( Iterator it = params.iterator(); it.hasNext(); idx++ )
+        for ( Iterator<Parameter> it = params.iterator(); it.hasNext(); idx++ )
         {
-            Parameter param = (Parameter) it.next();
+            Parameter param = it.next();
 
             messageBuffer.append( "\n[" ).append( idx ).append( "] " );
 
