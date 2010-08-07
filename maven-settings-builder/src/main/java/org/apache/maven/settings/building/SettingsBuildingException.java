@@ -40,7 +40,6 @@ public class SettingsBuildingException
     /**
      * Creates a new exception with the specified problems.
      * 
-     * @param modelId The identifier of the model that could not be built, may be {@code null}.
      * @param problems The problems that causes this exception, may be {@code null}.
      */
     public SettingsBuildingException( List<SettingsProblem> problems )

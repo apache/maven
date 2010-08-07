@@ -103,7 +103,7 @@ public class DefaultProfileActivationContext
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
-     * @param executionProperties The execution properties, may be {@code null}.
+     * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
     @SuppressWarnings( "unchecked" )
@@ -125,7 +125,7 @@ public class DefaultProfileActivationContext
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
      * 
-     * @param executionProperties The execution properties, may be {@code null}.
+     * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setSystemProperties( Map<String, String> systemProperties )

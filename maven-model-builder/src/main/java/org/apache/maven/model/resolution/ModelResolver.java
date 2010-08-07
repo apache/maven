@@ -23,9 +23,9 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelSource;
 
 /**
- * Resolves a POM from its coordinates. During the build process, the {@link ModelBuilder} will add any relevant
- * repositories to the model resolver. In other words, the model resolver is stateful and should not be reused across
- * multiple model building requests.
+ * Resolves a POM from its coordinates. During the build process, the
+ * {@link org.apache.maven.model.building.ModelBuilder} will add any relevant repositories to the model resolver. In
+ * other words, the model resolver is stateful and should not be reused across multiple model building requests.
  *
  * @author Benjamin Bentmann
  */
