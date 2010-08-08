@@ -208,6 +208,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4254SelectableWagonProvidersTest.class );
         suite.addTestSuite( MavenITmng4238ArtifactHandlerExtensionUsageTest.class );
         suite.addTestSuite( MavenITmng4235HttpAuthDeploymentChecksumsTest.class );
+        suite.addTestSuite( MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest.class );
         suite.addTestSuite( MavenITmng4231SnapshotUpdatePolicyTest.class );
         suite.addTestSuite( MavenITmng4214MirroredParentSearchReposTest.class );
         suite.addTestSuite( MavenITmng4208InterpolationPrefersCliOverProjectPropsTest.class );
