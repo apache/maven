@@ -51,12 +51,18 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "initialize" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4363" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
-        assertTrue( classpath.toString(), classpath.contains( "maven-core-it-support-1.0.jar" ) );
+        assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );
+        assertTrue( classpath.toString(), classpath.contains( "b-0.1.jar" ) );
+        assertTrue( classpath.toString(), classpath.contains( "c-0.1.jar" ) );
     }
 
 }

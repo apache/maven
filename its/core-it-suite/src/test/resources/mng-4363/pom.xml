@@ -32,6 +32,16 @@ under the License.
     be resolved and added to the affected class paths for later goal executions.
   </description>
 
+  <dependencies>
+    <!-- static dependency (with transitive dependency) -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng4363</groupId>
+      <artifactId>b</artifactId>
+      <version>0.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
@@ -40,20 +50,31 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>cobertura</id>
+            <id>compile</id>
             <phase>validate</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <compileClassPath>target/classpath-orig.txt</compileClassPath>
+              <significantPathLevels>1</significantPathLevels>
+            </configuration>
+          </execution>
+          <execution>
+            <id>cobertura</id>
+            <phase>initialize</phase>
             <goals>
               <goal>inject</goal>
             </goals>
             <configuration>
               <artifacts>
-                <artifact>org.apache.maven.its:maven-core-it-support</artifact>
+                <artifact>org.apache.maven.its.mng4363:c</artifact>
               </artifacts>
             </configuration>
           </execution>
           <execution>
             <id>surefire</id>
-            <phase>initialize</phase>
+            <phase>generate-sources</phase>
             <goals>
               <goal>compile</goal>
             </goals>
@@ -64,10 +85,11 @@ under the License.
           </execution>
         </executions>
         <dependencies>
+          <!-- dynamic dependency injected by plugin -->
           <dependency>
-            <groupId>org.apache.maven.its</groupId>
-            <artifactId>maven-core-it-support</artifactId>
-            <version>1.0</version>
+            <groupId>org.apache.maven.its.mng4363</groupId>
+            <artifactId>c</artifactId>
+            <version>0.1</version>
           </dependency>
         </dependencies>
       </plugin>
