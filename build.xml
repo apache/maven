@@ -124,7 +124,7 @@ Do you want to continue?</input>
     </path>
 
     <echo>Using plexus version ${pom.properties.plexusVersion}</echo>
-    <java fork="fork" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
+    <java fork="true" classname="org.codehaus.plexus.metadata.PlexusMetadataGeneratorCli" failonerror="true">
       <classpath refid="pmdg.classpath" />
       <!-- We need to generate component descriptors from the maven-artifact sources which use javadoc annotations. -->
       <arg value="--source" />
@@ -150,7 +150,7 @@ Do you want to continue?</input>
       <attribute name="mode" />
       <attribute name="version" />
       <sequential>
-        <java fork="fork" classname="org.codehaus.modello.ModelloCli" failonerror="true">
+        <java fork="true" classname="org.codehaus.modello.ModelloCli" failonerror="true">
           <classpath refid="modello.pathid" />
           <arg file="@{file}" />
           <!-- model file -->
