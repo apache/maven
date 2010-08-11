@@ -41,6 +41,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.monitor.event.MavenEvents;
@@ -380,6 +381,14 @@ public class DefaultPluginManager
             {
                 projectPlugin = plugin;
             }
+
+						for( Dependency dependency: projectPlugin.getDependencies() )
+						{
+			          if ( !Artifact.SCOPE_SYSTEM.equals( dependency.getScope() ) )
+			          {
+			              dependency.setScope( Artifact.SCOPE_RUNTIME );
+			          }
+						}
 
             Set artifacts = MavenMetadataSource.createArtifacts( artifactFactory, projectPlugin.getDependencies(), null,
                                                                  null, project );
