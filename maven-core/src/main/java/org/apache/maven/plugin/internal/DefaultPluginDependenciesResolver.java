@@ -98,7 +98,10 @@ public class DefaultPluginDependenciesResolver
         Set<Artifact> overrideArtifacts = new LinkedHashSet<Artifact>();
         for ( Dependency dependency : plugin.getDependencies() )
         {
-            dependency.setScope( Artifact.SCOPE_RUNTIME );
+	          if ( !Artifact.SCOPE_SYSTEM.equals( dependency.getScope() ) )
+	          {
+	              dependency.setScope( Artifact.SCOPE_RUNTIME );
+	          }
             overrideArtifacts.add( repositorySystem.createDependencyArtifact( dependency ) );
         }
 
