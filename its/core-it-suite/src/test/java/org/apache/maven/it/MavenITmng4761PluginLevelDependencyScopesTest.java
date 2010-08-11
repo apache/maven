@@ -34,7 +34,7 @@ public class MavenITmng4761PluginLevelDependencyScopesTest
 
     public MavenITmng4761PluginLevelDependencyScopesTest()
     {
-        super( "(3.0-beta-2,)" );
+        super( "(2.2.1,2.99)(3.0-beta-2,)" );
     }
 
     /**
