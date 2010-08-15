@@ -133,11 +133,33 @@ public abstract class AbstractMavenIntegrationTestCase
     {
         if ( mavenVersion == null )
         {
-            String v = System.getProperty( "maven.version" );
-            // NOTE: If the version looks like "${...}" it has been configured from an undefined expression
-            if ( v != null && v.length() > 0 && !v.startsWith( "${" ) )
+            String version = System.getProperty( "maven.version", "" );
+
+            if ( version.length() <= 0 || version.startsWith( "${" ) )
             {
-                mavenVersion = new DefaultArtifactVersion( v );
+                try
+                {
+                    Verifier verifier = new Verifier( "" );
+                    try
+                    {
+                        version = verifier.getMavenVersion();
+                        System.setProperty( "maven.version", version );
+                    }
+                    finally
+                    {
+                        verifier.resetStreams();
+                    }
+                }
+                catch ( VerificationException e )
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            // NOTE: If the version looks like "${...}" it has been configured from an undefined expression
+            if ( version != null && version.length() > 0 && !version.startsWith( "${" ) )
+            {
+                mavenVersion = new DefaultArtifactVersion( version );
             }
         }
         return mavenVersion;
