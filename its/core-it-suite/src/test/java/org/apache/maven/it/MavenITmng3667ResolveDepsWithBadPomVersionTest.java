@@ -20,15 +20,13 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3667">MNG-3667</a>.
- *
- * @todo Fill in a better description of what this test verifies!
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
@@ -37,51 +35,34 @@ import org.apache.maven.it.util.ResourceExtractor;
 public class MavenITmng3667ResolveDepsWithBadPomVersionTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3667ResolveDepsWithBadPomVersionTest()
     {
-        super( "(2.0.9,)" ); // only test in 2.0.9+
+        super( "[2.0.3,)" );
     }
 
-    public void testitMNG3667 ()
+    /**
+     * Verify that dependency resolution gracefully ignores dependency POMs that have coordinates which don't
+     * match the deployed artifact.
+     */
+    public void testit()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3667" );
-        File repoDir = new File( testDir, "repo" );
-        File projectDir = new File( testDir, "project" );
 
-        Verifier verifier;
-
-        /*
-         * We must first make sure that any artifact created
-         * by this test has been removed from the local
-         * repository. Failing to do this could cause
-         * unstable test results. Fortunately, the verifier
-         * makes it easy to do this.
-         */
-        verifier = newVerifier( projectDir.getAbsolutePath() );
-        
-        File localRepoDir = new File( verifier.localRepo );
-        FileUtils.copyDirectoryStructure( repoDir, localRepoDir );
-
-        verifier.executeGoal( "compile" );
-
-        /*
-         * This is the simplest way to check a build
-         * succeeded. It is also the simplest way to create
-         * an IT test: make the build pass when the test
-         * should pass, and make the build fail when the
-         * test should fail. There are other methods
-         * supported by the verifier. They can be seen here:
-         * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
-         */
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3667" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
         verifier.resetStreams();
+
+        List cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        assertTrue( cp.toString(), cp.contains( "dep-0.1.jar" ) );
     }
+
 }
