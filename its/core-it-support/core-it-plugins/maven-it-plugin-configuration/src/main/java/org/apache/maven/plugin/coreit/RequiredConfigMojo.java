@@ -53,7 +53,7 @@ public class RequiredConfigMojo
     private File propertiesFile;
 
     /**
-     * A required parameter.
+     * A required parameter to be set via plugin configuration in POM or system property from CLI.
      * 
      * @parameter expression="${config.requiredParam}"
      * @required
@@ -61,9 +61,9 @@ public class RequiredConfigMojo
     private String requiredParam;
 
     /**
-     * A required parameter that is actually backed by default value from the POM.
+     * A required parameter that defaults to a non-mandatory value from the POM.
      * 
-     * @parameter default-value="${project.artifactId}"
+     * @parameter default-value="${project.url}"
      * @required
      */
     private String requiredParamWithDefault;
