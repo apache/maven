@@ -238,8 +238,8 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4070WhitespaceTrimmingTest.class );
         suite.addTestSuite( MavenITmng4068AuthenticatedMirrorTest.class );
         suite.addTestSuite( MavenITmng4056ClassifierBasedDepResolutionFromReactorTest.class );
-        suite.addTestSuite( MavenITmng4052ReactorAwareImportScopeTest.class );
         suite.addTestSuite( MavenITmng4053PluginConfigAttributesTest.class );
+        suite.addTestSuite( MavenITmng4052ReactorAwareImportScopeTest.class );
         suite.addTestSuite( MavenITmng4048VersionRangeReactorResolutionTest.class );
         suite.addTestSuite( MavenITmng4040ProfileInjectedModulesTest.class );
         suite.addTestSuite( MavenITmng4036ParentResolutionFromSettingsRepoTest.class );
