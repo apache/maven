@@ -28,11 +28,6 @@ under the License.
       <mirrorOf>mng-4068</mirrorOf>
       <url>http://localhost:@mirrorPort@/</url>
     </mirror>
-    <mirror>
-      <id>central</id>
-      <mirrorOf>central</mirrorOf>
-      <url>@baseurl@/target/null</url>
-    </mirror>
   </mirrors>
   <servers>
     <server>
