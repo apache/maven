@@ -30,6 +30,7 @@ under the License.
   <name>Maven Integration Test :: MNG-4615</name>
   <description>
     Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+    This scenario checks the case of a parameter missing its backing system property.
   </description>
 
   <build>
@@ -40,6 +41,8 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <configuration>
           <propertiesFile>target/config.properties</propertiesFile>
+          <!-- missing <requiredParam>one</requiredParam> -->
+          <requiredParamWithDefault>two</requiredParamWithDefault>
         </configuration>
         <executions>
           <execution>
@@ -53,21 +56,4 @@ under the License.
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>mng4615</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.its.plugins</groupId>
-            <artifactId>maven-it-plugin-configuration</artifactId>
-            <configuration>
-              <requiredParam>PROFILE</requiredParam>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

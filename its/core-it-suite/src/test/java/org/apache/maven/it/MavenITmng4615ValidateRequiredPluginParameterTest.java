@@ -41,11 +41,86 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
 
     /**
      * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+     * This scenario checks the case of all required parameters being set via plugin configuration.
      */
-    public void testit()
+    public void testitAllSet()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-0" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "one", props.get( "requiredParam" ) );
+        assertEquals( "two", props.get( "requiredParamWithDefault" ) );
+    }
+
+    /**
+     * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+     * This scenario checks the case of a parameter missing its backing system property.
+     */
+    public void testitExprMissing()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-1" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.setLogFileName( "log-a.txt" );
+        try
+        {
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            fail( "Build did not fail despite required plugin parameter missing" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+
+        verifier.resetStreams();
+    }
+
+    /**
+     * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+     * This scenario checks the case of a parameter having its backing system property set.
+     */
+    public void testitExprSet()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-1" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.setSystemProperty( "config.requiredParam", "CLI" );
+        verifier.setLogFileName( "log-b.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "CLI", props.get( "requiredParam" ) );
+        assertEquals( "two", props.get( "requiredParamWithDefault" ) );
+    }
+
+    /**
+     * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+     * This scenario checks the case of a parameter missing its backing POM value.
+     */
+    public void testitPomValMissing()
+        throws Exception
+    {
+        // cf. MNG-4764
+        requiresMavenVersion( "[3.0-beta-2,)" );
+
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-2a" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -61,26 +136,28 @@ public class MavenITmng4615ValidateRequiredPluginParameterTest
             // expected
         }
 
-        // sanity check that adding the param makes it work
-
-        verifier.setLogFileName( "log-2.txt" );
-        verifier.getCliOptions().add( "-Pmng4615" );
-        verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "PROFILE", props.get( "requiredParam" ) );
-
-        verifier.setLogFileName( "log-3.txt" );
-        verifier.getCliOptions().remove( "-Pmng4615" );
-        verifier.setSystemProperty( "config.requiredParam", "CLI" );
-        verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "CLI", props.get( "requiredParam" ) );
-
         verifier.resetStreams();
+    }
+
+    /**
+     * Verify that Maven validates required mojo parameters (and doesn't just have the plugins die with NPEs).
+     * This scenario checks the case of a parameter having its backing POM value set.
+     */
+    public void testitPomValSet()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4615/test-2b" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        Properties props = verifier.loadProperties( "target/config.properties" );
+        assertEquals( "one", props.get( "requiredParam" ) );
+        assertEquals( "http://foo.bar/", props.get( "requiredParamWithDefault" ) );
     }
 
 }
