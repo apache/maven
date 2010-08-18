@@ -31,7 +31,8 @@ import org.apache.maven.plugin.PluginResolutionException;
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
  * that is only public for technical reasons, it is not part of the public API. In particular, this interface can be
  * changed or deleted without prior notice.
- *
+ * 
+ * @since 3.0-alpha-7
  * @author Benjamin Bentmann
  */
 public interface PluginDependenciesResolver

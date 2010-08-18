@@ -37,6 +37,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * intended as dependencies and more importantly screw up artifact resolution because they would get preferred over the
  * core wagon versions. This is a hack to provide backward-compat with Maven 2 (MNG-4528, MNG-4561).
  * 
+ * @since 3.0-alpha-7
  * @author Benjamin Bentmann
  */
 class PluginDependencyResolutionListener

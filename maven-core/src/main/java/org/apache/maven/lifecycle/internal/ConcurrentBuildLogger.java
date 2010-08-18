@@ -36,7 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * delta required to analyze a concurrent build is located here.
  * <p/>
  * NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
- *
+ * 
+ * @since 3.0-beta-1
  * @author Kristian Rosenvold
  */
 public class ConcurrentBuildLogger

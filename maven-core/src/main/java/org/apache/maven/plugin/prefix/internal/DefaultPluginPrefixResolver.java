@@ -47,7 +47,8 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * Resolves a plugin prefix.
- *
+ * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 @Component( role = PluginPrefixResolver.class )

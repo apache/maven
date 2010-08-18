@@ -23,6 +23,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 /**
+ * @since 3.0-beta-1
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  *         <p/>

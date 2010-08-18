@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * @since 3.0-beta-1
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (Extract class)
  *         <p/>

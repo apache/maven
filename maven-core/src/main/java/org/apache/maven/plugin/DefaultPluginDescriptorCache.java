@@ -42,6 +42,7 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
  * prior notice.
  * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 @Component( role = PluginDescriptorCache.class )

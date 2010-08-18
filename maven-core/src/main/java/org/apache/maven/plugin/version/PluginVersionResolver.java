@@ -22,6 +22,7 @@ package org.apache.maven.plugin.version;
 /**
  * Resolves a version for a plugin.
  * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 public interface PluginVersionResolver

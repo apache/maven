@@ -39,7 +39,8 @@ import java.util.*;
 
 /**
  * Resolves dependencies for the artifacts in context of the lifecycle build
- *
+ * 
+ * @since 3.0-beta-1
  * @author Benjamin Bentmann
  * @author Jason van Zyl
  * @author Kristian Rosenvold (extracted class)

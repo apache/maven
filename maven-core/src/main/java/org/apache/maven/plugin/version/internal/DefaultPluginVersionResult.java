@@ -25,6 +25,7 @@ import org.apache.maven.plugin.version.PluginVersionResult;
 /**
  * Describes the result of a plugin version resolution request.
  * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 class DefaultPluginVersionResult

@@ -24,6 +24,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 /**
  * Describes the result of a plugin version resolution request.
  * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 public interface PluginVersionResult

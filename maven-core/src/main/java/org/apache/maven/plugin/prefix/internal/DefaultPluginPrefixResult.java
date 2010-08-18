@@ -26,6 +26,7 @@ import org.apache.maven.plugin.prefix.PluginPrefixResult;
 /**
  * Describes the result of a plugin prefix resolution request.
  * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 class DefaultPluginPrefixResult

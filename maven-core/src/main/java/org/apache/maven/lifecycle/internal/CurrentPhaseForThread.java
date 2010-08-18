@@ -23,7 +23,8 @@ package org.apache.maven.lifecycle.internal;
  * Knows the phase the current thread is executing.
  * <p/>
  * This class is used in weave-mode only , there may be better ways of doing this once the dust settles.
- *
+ * 
+ * @since 3.0-beta-2
  * @author Kristian Rosenvold
  */
 class CurrentPhaseForThread

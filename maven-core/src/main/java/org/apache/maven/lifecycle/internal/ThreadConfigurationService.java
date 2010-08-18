@@ -26,6 +26,9 @@ import org.codehaus.plexus.logging.Logger;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * @since 3.0-beta-1
+ */
 @Component( role = ThreadConfigurationService.class )
 public class ThreadConfigurationService
 {

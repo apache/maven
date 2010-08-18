@@ -44,7 +44,8 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Resolves a version for a plugin.
- *
+ * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 @Component( role = PluginVersionResolver.class )

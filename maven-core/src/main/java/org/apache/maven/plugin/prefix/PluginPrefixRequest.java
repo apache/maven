@@ -30,6 +30,7 @@ import org.apache.maven.repository.ArtifactTransferListener;
 /**
  * Collects settings required to resolve a plugin prefix.
  * 
+ * @since 3.0-alpha-3
  * @author Benjamin Bentmann
  */
 public interface PluginPrefixRequest

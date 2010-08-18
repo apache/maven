@@ -27,7 +27,8 @@ import java.util.Collection;
 
 /**
  * Context of dependency artifacts for the entire build.
- *
+ * 
+ * @since 3.0-beta-1
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (class extract only)
  *         <p/>

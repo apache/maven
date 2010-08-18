@@ -28,7 +28,8 @@ import java.util.HashSet;
 
 /**
  * Contains status information that is global to an entire reactor build.
- *
+ * 
+ * @since 3.0-beta-1
  * @author <a href="mailto:kristian.rosenvold@gmail.com">Kristian Rosenvold</a>
  */
 public class ReactorBuildStatus

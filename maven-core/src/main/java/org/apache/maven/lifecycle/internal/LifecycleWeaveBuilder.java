@@ -61,7 +61,8 @@ import java.util.concurrent.Future;
  * DefaultLifeCycles.getScheduling() and all its use
  * ReactorArtifactRepository has a reference to isWeave too.
  * This class and its usage
- *
+ * 
+ * @since 3.0-beta-1
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
  *         <p/>

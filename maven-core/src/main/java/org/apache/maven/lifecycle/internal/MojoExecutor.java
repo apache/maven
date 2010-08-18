@@ -44,7 +44,8 @@ import java.util.Map;
 
 /**
  * Executes an individual mojo
- *
+ * 
+ * @since 3.0-beta-1
  * @author Jason van Zyl
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold

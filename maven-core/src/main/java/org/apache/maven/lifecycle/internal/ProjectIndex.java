@@ -27,7 +27,8 @@ import java.util.Map;
 
 /**
  * Provides the positional index of the project
- *
+ * 
+ * @since 3.0-beta-1
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (extracted class only)
  *         <p/>

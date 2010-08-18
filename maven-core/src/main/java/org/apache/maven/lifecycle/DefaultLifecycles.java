@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * @since 3.0-beta-1
  * @author Jason van Zyl
  * @author Kristian Rosenvold
  */

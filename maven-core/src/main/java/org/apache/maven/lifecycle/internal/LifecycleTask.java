@@ -23,7 +23,8 @@ package org.apache.maven.lifecycle.internal;
  * A task that is a lifecycle
  * <p/>
  * NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
- *
+ * 
+ * @since 3.0-beta-1
  * @author Benjamin Bentmann
  */
 public final class LifecycleTask

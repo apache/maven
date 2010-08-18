@@ -1,4 +1,5 @@
 package org.apache.maven.lifecycle.internal;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,7 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -35,6 +35,8 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * An artifact that conditionally suspends on getFile for anything but the thread it is locked to.
+ * 
+ * @since 3.0-beta-2
  */
 class ThreadLockedArtifact
     implements Artifact

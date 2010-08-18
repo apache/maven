@@ -22,8 +22,8 @@ package org.apache.maven.lifecycle;
 import java.util.Set;
 import org.apache.maven.model.Plugin;
 
-
 /**
+ * @since 3.0-beta-1
  * @author Kristian Rosenvold
  */
 public interface LifeCyclePluginAnalyzer
