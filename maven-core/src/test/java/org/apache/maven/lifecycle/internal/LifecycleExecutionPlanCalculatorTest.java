@@ -28,7 +28,6 @@ import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 /**
  * @author Kristian Rosenvold>
  */
-
 public class LifecycleExecutionPlanCalculatorTest
     extends TestCase
 {
@@ -65,10 +64,10 @@ public class LifecycleExecutionPlanCalculatorTest
     {
         LifecyclePluginResolver lifecyclePluginResolver =
             new LifecyclePluginResolver( new PluginVersionResolverStub() );
-        return new LifecycleExecutionPlanCalculatorImpl( new BuildPluginManagerStub(),
-                                                         DefaultLifecyclesStub.createDefaultLifecycles(),
-                                                         mojoDescriptorCreator, lifecyclePluginResolver,
-                                                         DefaultSchedulesStub.createDefaultSchedules());
+        return new DefaultLifecycleExecutionPlanCalculator( new BuildPluginManagerStub(),
+                                                            DefaultLifecyclesStub.createDefaultLifecycles(),
+                                                            mojoDescriptorCreator, lifecyclePluginResolver,
+                                                            DefaultSchedulesStub.createDefaultSchedules() );
     }
 
     public static MojoDescriptorCreator createMojoDescriptorCreator()

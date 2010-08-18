@@ -71,7 +71,7 @@ import java.util.TreeSet;
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Component( role = LifecycleExecutionPlanCalculator.class )
-public class LifecycleExecutionPlanCalculatorImpl
+public class DefaultLifecycleExecutionPlanCalculator
     implements LifecycleExecutionPlanCalculator
 {
     @Requirement
@@ -93,14 +93,15 @@ public class LifecycleExecutionPlanCalculatorImpl
     private LifecyclePluginResolver lifecyclePluginResolver;
 
     @SuppressWarnings( { "UnusedDeclaration" } )
-    public LifecycleExecutionPlanCalculatorImpl()
+    public DefaultLifecycleExecutionPlanCalculator()
     {
     }
 
-    public LifecycleExecutionPlanCalculatorImpl( BuildPluginManager pluginManager, DefaultLifecycles defaultLifeCycles,
-                                                 MojoDescriptorCreator mojoDescriptorCreator,
-                                                 LifecyclePluginResolver lifecyclePluginResolver,
-                                                 DefaultSchedules defaultSchedules )
+    public DefaultLifecycleExecutionPlanCalculator( BuildPluginManager pluginManager,
+                                                    DefaultLifecycles defaultLifeCycles,
+                                                    MojoDescriptorCreator mojoDescriptorCreator,
+                                                    LifecyclePluginResolver lifecyclePluginResolver,
+                                                    DefaultSchedules defaultSchedules )
     {
         this.pluginManager = pluginManager;
         this.defaultLifeCycles = defaultLifeCycles;

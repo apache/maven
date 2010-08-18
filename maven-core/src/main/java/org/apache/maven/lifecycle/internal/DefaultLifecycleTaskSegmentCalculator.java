@@ -52,7 +52,7 @@ import java.util.List;
  */
 
 @Component( role = LifecycleTaskSegmentCalculator.class )
-public class LifecycleTaskSegmentCalculatorImpl
+public class DefaultLifecycleTaskSegmentCalculator
     implements LifecycleTaskSegmentCalculator
 {
     @Requirement
@@ -61,7 +61,7 @@ public class LifecycleTaskSegmentCalculatorImpl
     @Requirement
     private LifecyclePluginResolver lifecyclePluginResolver;
 
-    public LifecycleTaskSegmentCalculatorImpl()
+    public DefaultLifecycleTaskSegmentCalculator()
     {
     }
 

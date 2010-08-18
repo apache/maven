@@ -22,7 +22,7 @@ package org.apache.maven.lifecycle;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
-import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculatorImpl;
+import org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
@@ -169,7 +169,7 @@ public class DefaultLifecycleExecutor
         Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
         Set<String> requiredDependencyCollectionScopes = new TreeSet<String>();
                                              // Ok, so this method could probably have a better location.
-        LifecycleExecutionPlanCalculatorImpl.collectDependencyRequirements( requiredDependencyResolutionScopes,
+        DefaultLifecycleExecutionPlanCalculator.collectDependencyRequirements( requiredDependencyResolutionScopes,
                                                                             requiredDependencyCollectionScopes,
                                                                             mojoExecution );
 

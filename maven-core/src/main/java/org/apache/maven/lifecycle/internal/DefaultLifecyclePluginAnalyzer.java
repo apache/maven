@@ -44,7 +44,7 @@ import java.util.Set;
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Component( role = LifeCyclePluginAnalyzer.class )
-public class LifecyclePluginAnalyzerImpl
+public class DefaultLifecyclePluginAnalyzer
     implements LifeCyclePluginAnalyzer
 {
 
@@ -57,7 +57,7 @@ public class LifecyclePluginAnalyzerImpl
     @Requirement
     private Logger logger;
 
-    public LifecyclePluginAnalyzerImpl()
+    public DefaultLifecyclePluginAnalyzer()
     {
     }
 

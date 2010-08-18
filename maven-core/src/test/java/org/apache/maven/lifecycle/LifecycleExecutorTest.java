@@ -1,3 +1,5 @@
+package org.apache.maven.lifecycle;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional information regarding
@@ -13,9 +15,6 @@
  * the License.
  */
 
-
-package org.apache.maven.lifecycle;
-
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.exception.ExceptionHandler;
@@ -23,8 +22,9 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
-import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculatorImpl;
+import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
+import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
@@ -51,7 +51,7 @@ public class LifecycleExecutorTest
     private DefaultLifecycleExecutor lifecycleExecutor;
 
     @Requirement
-    private LifecycleTaskSegmentCalculatorImpl lifeCycleTaskSegmentCalculator;
+    private DefaultLifecycleTaskSegmentCalculator lifeCycleTaskSegmentCalculator;
 
     @Requirement
     private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
@@ -66,7 +66,7 @@ public class LifecycleExecutorTest
         super.setUp();
         lifecycleExecutor = (DefaultLifecycleExecutor) lookup( LifecycleExecutor.class );
         lifeCycleTaskSegmentCalculator =
-            (LifecycleTaskSegmentCalculatorImpl) lookup( LifecycleTaskSegmentCalculator.class );
+            (DefaultLifecycleTaskSegmentCalculator) lookup( LifecycleTaskSegmentCalculator.class );
         lifeCycleExecutionPlanCalculator = lookup( LifecycleExecutionPlanCalculator.class );
         mojoDescriptorCreator = lookup( MojoDescriptorCreator.class );
         lookup( ExceptionHandler.class );
@@ -311,13 +311,12 @@ public class LifecycleExecutorTest
         PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
         PluginVersionResolutionException
     {
-        List<org.apache.maven.lifecycle.internal.TaskSegment> taskSegments =
+        List<TaskSegment> taskSegments =
             lifeCycleTaskSegmentCalculator.calculateTaskSegments( session, Arrays.asList( tasks ) );
 
-        org.apache.maven.lifecycle.internal.TaskSegment mergedSegment =
-            new org.apache.maven.lifecycle.internal.TaskSegment( false );
+        TaskSegment mergedSegment = new TaskSegment( false );
 
-        for ( org.apache.maven.lifecycle.internal.TaskSegment taskSegment : taskSegments )
+        for ( TaskSegment taskSegment : taskSegments )
         {
             mergedSegment.getTasks().addAll( taskSegment.getTasks() );
         }
