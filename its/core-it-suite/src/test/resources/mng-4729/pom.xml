@@ -37,14 +37,14 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-artifact</artifactId>
+        <artifactId>maven-it-plugin-project</artifactId>
         <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
             <id>test</id>
             <phase>validate</phase>
             <goals>
-              <goal>build-pom</goal>
+              <goal>remote-pom</goal>
             </goals>
             <configuration>
               <dependencies>

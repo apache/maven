@@ -23,28 +23,23 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectBuilder;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * Builds the remote POMs of user-specified artifacts. This mimics in part the Maven Remote Resources Plugin.
  * 
- * @goal build-pom
+ * @goal remote-pom
  * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
-public class BuildPomMojo
-    extends AbstractMojo
+public class BuildRemotePomMojo
+    extends AbstractPomMojo
 {
 
     /**
@@ -73,13 +68,6 @@ public class BuildPomMojo
     private List remoteRepositories;
 
     /**
-     * The artifact resolver.
-     * 
-     * @component
-     */
-    private MavenProjectBuilder builder;
-
-    /**
      * The artifact factory.
      * 
      * @component
@@ -99,7 +87,7 @@ public class BuildPomMojo
      * @throws MojoFailureException If the artifact file has not been set.
      */
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+        throws MojoExecutionException
     {
         Properties props = new Properties();
 
@@ -122,20 +110,7 @@ public class BuildPomMojo
                 {
                     MavenProject project = builder.buildFromRepository( artifact, remoteRepositories, localRepository );
 
-                    String key = artifact.getId() + ".";
-                    props.setProperty( key + "project.id", project.getId() );
-                    if ( project.getName() != null )
-                    {
-                        props.setProperty( key + "project.name", project.getName() );
-                    }
-                    if ( project.getDescription() != null )
-                    {
-                        props.setProperty( key + "project.description", project.getDescription() );
-                    }
-                    if ( project.getArtifact() != null )
-                    {
-                        props.setProperty( key + "artifact.id", project.getArtifact().getId() );
-                    }
+                    dump( props, artifact.getId() + ".", project );
                 }
                 catch ( Exception e )
                 {
@@ -144,24 +119,7 @@ public class BuildPomMojo
             }
         }
 
-        try
-        {
-            propertiesFile.getParentFile().mkdirs();
-
-            FileOutputStream os = new FileOutputStream( propertiesFile );
-            try
-            {
-                props.store( os, "[MAVEN-CORE-IT-LOG]" );
-            }
-            finally
-            {
-                os.close();
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to dump POMs: " + e.getMessage(), e );
-        }
+        store( props, propertiesFile );
     }
 
 }
