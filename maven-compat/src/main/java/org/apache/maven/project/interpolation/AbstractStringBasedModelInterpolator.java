@@ -261,12 +261,12 @@ public abstract class AbstractStringBasedModelInterpolator
         valueSources.add( modelValueSource1 );
         valueSources.add( new MapBasedValueSource( config.getUserProperties() ) );
         valueSources.add( new MapBasedValueSource( modelProperties ) );
-        valueSources.add( new MapBasedValueSource( config.getSystemProperties() ) );
+        valueSources.add( new MapBasedValueSource( config.getExecutionProperties() ) );
         valueSources.add( new AbstractValueSource( false )
         {
             public Object getValue( String expression )
             {
-                return config.getSystemProperties().getProperty( "env." + expression );
+                return config.getExecutionProperties().getProperty( "env." + expression );
             }
         } );
         valueSources.add( modelValueSource2 );

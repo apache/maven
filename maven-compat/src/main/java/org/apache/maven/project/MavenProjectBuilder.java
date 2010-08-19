@@ -33,11 +33,11 @@ import org.apache.maven.wagon.events.TransferListener;
 public interface MavenProjectBuilder
 {
 
-    MavenProject build( File projectFile, ProjectBuilderConfiguration configuration )
+    MavenProject build( File pom, ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException;
 
     //TODO maven-site-plugin -- Vincent, Dennis and Lukas are checking but this doesn't appear to be required anymore.
-    MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
+    MavenProject build( File pom, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
 
     //TODO remote-resources-plugin
@@ -62,11 +62,11 @@ public interface MavenProjectBuilder
     MavenProject buildStandaloneSuperProject( ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException;
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+    MavenProject buildWithDependencies( File pom, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager, TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
 
-    MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+    MavenProject buildWithDependencies( File pom, ArtifactRepository localRepository,
                                         ProfileManager globalProfileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException;
 

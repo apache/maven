@@ -19,51 +19,88 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.util.List;
+import java.util.Date;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.profiles.ProfileManager;
 
 @Deprecated
 public class DefaultProjectBuilderConfiguration
-    extends DefaultProjectBuildingRequest
     implements ProjectBuilderConfiguration
 {
 
+    private ProfileManager globalProfileManager;
+
+    private ArtifactRepository localRepository;
+
+    private Properties userProperties;
+
+    private Properties executionProperties = System.getProperties();
+
+    private Date buildStartTime;
+
     public DefaultProjectBuilderConfiguration()
     {
-        setProcessPlugins( false );
-        setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
+    }
+
+    public ProjectBuilderConfiguration setGlobalProfileManager( ProfileManager globalProfileManager )
+    {
+        this.globalProfileManager = globalProfileManager;
+        return this;
+    }
+
+    public ProfileManager getGlobalProfileManager()
+    {
+        return globalProfileManager;
     }
 
     public ProjectBuilderConfiguration setLocalRepository( ArtifactRepository localRepository )
     {
-        super.setLocalRepository( localRepository );
+        this.localRepository = localRepository;
         return this;
     }
 
-    public ProjectBuilderConfiguration setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
+    public ArtifactRepository getLocalRepository()
     {
-        super.setRemoteRepositories( remoteRepositories );
+        return localRepository;
+    }
+
+    public ProjectBuilderConfiguration setUserProperties( Properties userProperties )
+    {
+        this.userProperties = userProperties;
         return this;
+    }
+
+    public Properties getUserProperties()
+    {
+        if ( userProperties == null )
+        {
+            userProperties = new Properties();
+        }
+
+        return userProperties;
+    }
+
+    public Properties getExecutionProperties()
+    {
+        return executionProperties;
     }
 
     public ProjectBuilderConfiguration setExecutionProperties( Properties executionProperties )
     {
-        super.setSystemProperties( executionProperties );
+        this.executionProperties = executionProperties;
         return this;
     }
 
-    public ProjectBuilderConfiguration setProcessPlugins( boolean processPlugins )
+    public Date getBuildStartTime()
     {
-        super.setProcessPlugins( processPlugins );
-        return this;
+        return buildStartTime;
     }
 
-    public ProjectBuilderConfiguration setValidationLevel( int validationLevel )
+    public ProjectBuilderConfiguration setBuildStartTime( Date buildStartTime )
     {
-        super.setValidationLevel( validationLevel );
+        this.buildStartTime = buildStartTime;
         return this;
     }
 

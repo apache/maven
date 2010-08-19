@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -38,6 +39,7 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.profiles.ProfileManager;
+import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.component.annotations.Component;
@@ -65,29 +67,71 @@ public class DefaultMavenProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public MavenProject build( File pomFile, ProjectBuilderConfiguration configuration )
-        throws ProjectBuildingException
+    private ProjectBuildingRequest toRequest( ProjectBuilderConfiguration configuration )
     {
-        return projectBuilder.build( pomFile, configuration ).getProject();
+        DefaultProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+
+        request.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 );
+        request.setResolveDependencies( false );
+
+        request.setLocalRepository( configuration.getLocalRepository() );
+        request.setBuildStartTime( configuration.getBuildStartTime() );
+        request.setUserProperties( configuration.getUserProperties() );
+        request.setSystemProperties( configuration.getExecutionProperties() );
+
+        ProfileManager profileManager = configuration.getGlobalProfileManager();
+        if ( profileManager != null )
+        {
+            request.setActiveProfileIds( profileManager.getExplicitlyActivatedIds() );
+            request.setInactiveProfileIds( profileManager.getExplicitlyDeactivatedIds() );
+        }
+
+        return request;
     }
 
-    public MavenProject buildFromRepository( Artifact artifact, ProjectBuilderConfiguration configuration, boolean allowStubModel )
-        throws ProjectBuildingException
+    private ProjectBuildingRequest injectSession( ProjectBuildingRequest request )
     {
-        normalizeToArtifactRepositories( configuration );
+        MavenSession session = legacySupport.getSession();
+        if ( session != null )
+        {
+            request.setOffline( session.isOffline() );
+            request.setSystemProperties( session.getSystemProperties() );
+            if ( request.getUserProperties().isEmpty() )
+            {
+                request.setUserProperties( session.getUserProperties() );
+            }
 
-        return projectBuilder.build( artifact, allowStubModel, configuration ).getProject();
+            MavenExecutionRequest req = session.getRequest();
+            if ( req != null )
+            {
+                request.setServers( req.getServers() );
+                request.setMirrors( req.getMirrors() );
+                request.setProxies( req.getProxies() );
+                request.setRemoteRepositories( req.getRemoteRepositories() );
+                request.setTransferListener( req.getTransferListener() );
+                request.setForceUpdate( req.isUpdateSnapshots() );
+            }
+        }
+        else
+        {
+            Properties props = new Properties();
+            EnvironmentUtils.addEnvVars( props );
+            props.putAll( System.getProperties() );
+            request.setSystemProperties( props );
+        }
+
+        return request;
     }
 
-    private void normalizeToArtifactRepositories( ProjectBuilderConfiguration configuration )
+    @SuppressWarnings( "unchecked" )
+    private List<ArtifactRepository> normalizeToArtifactRepositories( List<?> repositories,
+                                                                      ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
         /*
          * This provides backward-compat with 2.x that allowed plugins like the maven-remote-resources-plugin:1.0 to
          * populate the builder configuration with model repositories instead of artifact repositories.
          */
-
-        List<?> repositories = configuration.getRemoteRepositories();
 
         if ( repositories != null )
         {
@@ -102,9 +146,9 @@ public class DefaultMavenProjectBuilder
                     try
                     {
                         ArtifactRepository repo = repositorySystem.buildArtifactRepository( (Repository) repository );
-                        repositorySystem.injectMirror( Arrays.asList( repo ), configuration.getMirrors() );
-                        repositorySystem.injectProxy( Arrays.asList( repo ), configuration.getProxies() );
-                        repositorySystem.injectAuthentication( Arrays.asList( repo ), configuration.getServers() );
+                        repositorySystem.injectMirror( Arrays.asList( repo ), request.getMirrors() );
+                        repositorySystem.injectProxy( Arrays.asList( repo ), request.getProxies() );
+                        repositorySystem.injectAuthentication( Arrays.asList( repo ), request.getServers() );
                         repos.add( repo );
                     }
                     catch ( InvalidRepositoryException e )
@@ -121,19 +165,66 @@ public class DefaultMavenProjectBuilder
 
             if ( normalized )
             {
-                configuration.setRemoteRepositories( repos );
+                return repos;
             }
+        }
+
+        return (List<ArtifactRepository>) repositories;
+    }
+
+    private ProjectBuildingException transformError( ProjectBuildingException e )
+    {
+        if ( e.getCause() instanceof ModelBuildingException )
+        {
+            return new InvalidProjectModelException( e.getProjectId(), e.getMessage(), e.getPomFile() );
+        }
+
+        return e;
+    }
+
+    public MavenProject build( File pom, ProjectBuilderConfiguration configuration )
+        throws ProjectBuildingException
+    {
+        ProjectBuildingRequest request = injectSession( toRequest( configuration ) );
+
+        try
+        {
+            return projectBuilder.build( pom, request ).getProject();
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw transformError( e );
         }
     }
 
     // This is used by the SITE plugin.
-    public MavenProject build( File project, ArtifactRepository localRepository, ProfileManager profileManager )
+    public MavenProject build( File pom, ArtifactRepository localRepository, ProfileManager profileManager )
         throws ProjectBuildingException
     {
-        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration()
-            .setLocalRepository( localRepository );
+        ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
+        configuration.setLocalRepository( localRepository );
+        configuration.setGlobalProfileManager( profileManager );
 
-        return build( project, configuration );
+        return build( pom, configuration );
+    }
+
+    public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories,
+                                             ProjectBuilderConfiguration configuration, boolean allowStubModel )
+        throws ProjectBuildingException
+    {
+        ProjectBuildingRequest request = injectSession( toRequest( configuration ) );
+        request.setRemoteRepositories( normalizeToArtifactRepositories( remoteRepositories, request ) );
+        request.setProcessPlugins( false );
+        request.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+
+        try
+        {
+            return projectBuilder.build( artifact, allowStubModel, request ).getProject();
+        }
+        catch ( ProjectBuildingException e )
+        {
+            throw transformError( e );
+        }
     }
 
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories,
@@ -142,44 +233,8 @@ public class DefaultMavenProjectBuilder
     {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
         configuration.setLocalRepository( localRepository );
-        configuration.setRemoteRepositories( remoteRepositories );
-        configuration.setProcessPlugins( false );
-        configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
 
-        MavenSession session = legacySupport.getSession();
-        if ( session != null )
-        {
-            MavenExecutionRequest request = session.getRequest();
-            if ( request != null )
-            {
-                configuration.setServers( request.getServers() );
-                configuration.setMirrors( request.getMirrors() );
-                configuration.setProxies( request.getProxies() );
-                configuration.setTransferListener( request.getTransferListener() );
-                configuration.setForceUpdate( request.isUpdateSnapshots() );
-            }
-            configuration.setOffline( session.isOffline() );
-            configuration.setSystemProperties( session.getSystemProperties() );
-            configuration.setUserProperties( session.getUserProperties() );
-        }
-        else
-        {
-            configuration.setSystemProperties( System.getProperties() );
-        }
-
-        try
-        {
-            return buildFromRepository( artifact, configuration, allowStubModel );
-        }
-        catch ( ProjectBuildingException e )
-        {
-            if ( e.getCause() instanceof ModelBuildingException )
-            {
-                throw new InvalidProjectModelException( e.getProjectId(), e.getMessage(), e.getPomFile() );
-            }
-
-            throw e;
-        }
+        return buildFromRepository( artifact, remoteRepositories, configuration, allowStubModel );
     }
 
     public MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteRepositories,
@@ -190,16 +245,19 @@ public class DefaultMavenProjectBuilder
     }
 
     /**
-     * This is used for pom-less execution like running archetype:generate.
-     *
-     * I am taking out the profile handling and the interpolation of the base directory until we
-     * spec this out properly.
+     * This is used for pom-less execution like running archetype:generate. I am taking out the profile handling and the
+     * interpolation of the base directory until we spec this out properly.
      */
-    public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration config )
+    public MavenProject buildStandaloneSuperProject( ProjectBuilderConfiguration configuration )
         throws ProjectBuildingException
     {
+        ProjectBuildingRequest request = injectSession( toRequest( configuration ) );
+        request.setProcessPlugins( false );
+        request.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+
         ModelSource modelSource = new UrlModelSource( getClass().getResource( "standalone.xml" ) );
-        MavenProject project = projectBuilder.build( modelSource, config ).getProject();
+
+        MavenProject project = projectBuilder.build( modelSource, request ).getProject();
         project.setExecutionRoot( true );
         return project;
     }
@@ -215,42 +273,38 @@ public class DefaultMavenProjectBuilder
     {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
         configuration.setLocalRepository( localRepository );
-        configuration.setProcessPlugins( false );
-        configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-
-        if ( profileManager != null )
-        {
-            configuration.setActiveProfileIds( profileManager.getExplicitlyActivatedIds() );
-            configuration.setInactiveProfileIds( profileManager.getExplicitlyDeactivatedIds() );
-        }
+        configuration.setGlobalProfileManager( profileManager );
 
         return buildStandaloneSuperProject( configuration );
     }
 
-    public MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+    public MavenProject buildWithDependencies( File pom, ArtifactRepository localRepository,
                                                ProfileManager profileManager, TransferListener transferListener )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
         ProjectBuilderConfiguration configuration = new DefaultProjectBuilderConfiguration();
-
         configuration.setLocalRepository( localRepository );
+        configuration.setGlobalProfileManager( profileManager );
 
-        if ( profileManager != null )
+        ProjectBuildingRequest request = injectSession( toRequest( configuration ) );
+
+        request.setResolveDependencies( true );
+
+        try
         {
-            configuration.setActiveProfileIds( profileManager.getExplicitlyActivatedIds() );
-            configuration.setInactiveProfileIds( profileManager.getExplicitlyDeactivatedIds() );
+            return projectBuilder.build( pom, request ).getProject();
         }
-
-        configuration.setResolveDependencies( true );
-
-        return build( project, configuration );
+        catch ( ProjectBuildingException e )
+        {
+            throw transformError( e );
+        }
     }
 
-    public MavenProject buildWithDependencies( File project, ArtifactRepository localRepository,
+    public MavenProject buildWithDependencies( File pom, ArtifactRepository localRepository,
                                                ProfileManager profileManager )
         throws ProjectBuildingException, ArtifactResolutionException, ArtifactNotFoundException
     {
-        return buildWithDependencies( project, localRepository, profileManager, null );
+        return buildWithDependencies( pom, localRepository, profileManager, null );
     }
 
 }
