@@ -112,6 +112,12 @@ public class DefaultPluginVersionResolver
         // TODO: we should cycle through the repositories but take the repository which actually satisfied the prefix.
         for ( ArtifactRepository repository : request.getRemoteRepositories() )
         {
+            if ( !isEnabled( repository ) )
+            {
+                logger.debug( "Skipped plugin version lookup from disabled repository " + repository.getId() );
+                continue;
+            }
+
             String localPath = getLocalMetadataPath( request, repository );
 
             File artifactMetadataFile = new File( localRepository.getBasedir(), localPath );
@@ -194,6 +200,11 @@ public class DefaultPluginVersionResolver
         }
 
         return result;
+    }
+
+    private boolean isEnabled( ArtifactRepository repository )
+    {
+        return repository.getReleases().isEnabled() || repository.getSnapshots().isEnabled();
     }
 
     private String getLocalMetadataPath( PluginVersionRequest request, ArtifactRepository repository )
