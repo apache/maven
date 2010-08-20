@@ -49,6 +49,7 @@ import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -59,6 +60,9 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
+
+    @Requirement
+    private Logger logger;
 
     @Requirement
     private ModelBuilder modelBuilder;
@@ -106,7 +110,7 @@ public class DefaultProjectBuilder
             {
                 ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
 
-                project = new MavenProject( repositorySystem, this, configuration );
+                project = new MavenProject( repositorySystem, this, configuration, logger );
 
                 DefaultModelBuildingListener listener =
                     new DefaultModelBuildingListener( project, projectBuildingHelper, configuration );
@@ -313,7 +317,7 @@ public class DefaultProjectBuilder
         {
             ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
 
-            MavenProject project = new MavenProject( repositorySystem, this, config );
+            MavenProject project = new MavenProject( repositorySystem, this, config, logger );
 
             request.setPomFile( pomFile );
             request.setTwoPhaseBuilding( true );

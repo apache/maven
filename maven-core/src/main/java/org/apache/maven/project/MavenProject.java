@@ -72,6 +72,7 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.MavenMetadataSource;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -181,6 +182,8 @@ public class MavenProject
 
     private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
 
+    private Logger logger;
+
     public MavenProject()
     {
         Model model = new Model();
@@ -232,7 +235,7 @@ public class MavenProject
      * @throws InvalidRepositoryException
      */
     MavenProject( RepositorySystem repositorySystem, ProjectBuilder mavenProjectBuilder,
-                  ProjectBuildingRequest projectBuilderConfiguration )
+                  ProjectBuildingRequest projectBuilderConfiguration, Logger logger )
     {
         if ( repositorySystem == null )
         {
@@ -242,6 +245,7 @@ public class MavenProject
         this.mavenProjectBuilder = mavenProjectBuilder;
         this.projectBuilderConfiguration = projectBuilderConfiguration;
         this.repositorySystem = repositorySystem;
+        this.logger = logger;
     }
 
     @Deprecated
@@ -345,8 +349,10 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    //TODO: awful
-                    e.printStackTrace();
+                    if ( logger != null )
+                    {
+                        logger.debug( "Failed to build parent project for " + getId(), e );
+                    }
                 }
             }
             else if ( model.getParent() != null )
@@ -357,8 +363,10 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    // TODO: awful
-                    e.printStackTrace();
+                    if ( logger != null )
+                    {
+                        logger.debug( "Failed to build parent project for " + getId(), e );
+                    }
                 }
             }
         }
@@ -1423,8 +1431,10 @@ public class MavenProject
 
         if ( attachedArtifacts.contains( artifact ) )
         {
-            //should add logger to this class:
-            System.out.println( "[Warning] Duplicate artifact: " + artifact.toString() );
+            if ( logger != null )
+            {
+                logger.warn( "Artifact " + artifact + " already attached to project, ignoring duplicate" );
+            }
             return;
             //throw new DuplicateArtifactAttachmentException( this, artifact );
         }
