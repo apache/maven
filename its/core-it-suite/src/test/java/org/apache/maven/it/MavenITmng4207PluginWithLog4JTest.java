@@ -48,6 +48,7 @@ public class MavenITmng4207PluginWithLog4JTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng4207" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
