@@ -113,7 +113,11 @@ public class DefaultRepositoryMetadataManager
 
         if ( !request.isOffline() )
         {
-            Date localCopyLastModified = getLocalCopyLastModified( localRepository, metadata );
+            Date localCopyLastModified = null;
+            if ( metadata.getBaseVersion() != null )
+            {
+                localCopyLastModified = getLocalCopyLastModified( localRepository, metadata );
+            }
 
             for ( ArtifactRepository repository : remoteRepositories )
             {
