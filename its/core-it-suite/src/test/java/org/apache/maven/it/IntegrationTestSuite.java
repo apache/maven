@@ -83,6 +83,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng4768NearestMatchConflictResolutionTest.class );
         suite.addTestSuite( MavenITmng4765LocalPomProjectBuilderTest.class );
+        suite.addTestSuite( MavenITmng4755FetchRemoteMetadataForVersionRangeTest.class );
         suite.addTestSuite( MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest.class );
         suite.addTestSuite( MavenITmng4747JavaAgentUsedByPluginTest.class );
         // suite.addTestSuite( MavenITmng4745PluginVersionUpdateTest.class );
