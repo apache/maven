@@ -180,6 +180,12 @@ public class DefaultPluginPrefixResolver
         {
             for ( ArtifactRepository repository : request.getRemoteRepositories() )
             {
+                if ( !isEnabled( repository ) )
+                {
+                    logger.debug( "Skipped plugin prefix lookup from disabled repository " + repository.getId() );
+                    continue;
+                }
+
                 String localPath = getLocalMetadataPath( pluginGroup, repository );
 
                 File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
@@ -284,6 +290,11 @@ public class DefaultPluginPrefixResolver
         }
 
         return null;
+    }
+
+    private boolean isEnabled( ArtifactRepository repository )
+    {
+        return repository.getReleases().isEnabled() || repository.getSnapshots().isEnabled();
     }
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request, String pluginGroup,
