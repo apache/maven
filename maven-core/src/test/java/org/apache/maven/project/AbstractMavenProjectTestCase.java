@@ -27,6 +27,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -129,6 +130,7 @@ public abstract class AbstractMavenProjectTestCase
         configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[] {} ) );
         configuration.setProcessPlugins( false );
         configuration.setResolveDependencies( true );
+        initRepoSession( configuration );
 
         try
         {
@@ -157,8 +159,17 @@ public abstract class AbstractMavenProjectTestCase
     {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
+        initRepoSession( configuration );
 
         return projectBuilder.build( pom, configuration ).getProject();
+    }
+
+    protected void initRepoSession( ProjectBuildingRequest request )
+    {
+        File localRepo = new File( request.getLocalRepository().getBasedir() );
+        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
+        repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
+        request.setRepositorySession( repoSession );
     }
 
 }

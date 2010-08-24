@@ -21,29 +21,21 @@ package org.apache.maven.plugin.prefix;
 
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.RemoteRepository;
 
 public class NoPluginFoundForPrefixException
     extends Exception
 {
-    private String prefix;
-    
-    private ArtifactRepository localRepository;
-    
-    private List<ArtifactRepository> remoteRepositories;
-    
-    public NoPluginFoundForPrefixException( String prefix, List<String> pluginGroups,
-                                            ArtifactRepository localRepository,
-                                            List<ArtifactRepository> remoteRepositories )
+
+    public NoPluginFoundForPrefixException( String prefix, List<String> pluginGroups, LocalRepository localRepository,
+                                            List<RemoteRepository> remoteRepositories )
     {
         super( "No plugin found for prefix '" + prefix + "' in the current project and in the plugin groups "
             + pluginGroups + " available from the repositories " + format( localRepository, remoteRepositories ) );
-        this.prefix = prefix;
-        this.localRepository = localRepository;
-        this.remoteRepositories = remoteRepositories;
     }
 
-    private static String format( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private static String format( LocalRepository localRepository, List<RemoteRepository> remoteRepositories )
     {
         String repos = "[";
 
@@ -54,7 +46,7 @@ public class NoPluginFoundForPrefixException
 
         if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
         {
-            for ( ArtifactRepository repository : remoteRepositories )
+            for ( RemoteRepository repository : remoteRepositories )
             {
                 repos += ", ";
 

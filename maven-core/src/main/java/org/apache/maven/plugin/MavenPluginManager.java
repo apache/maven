@@ -21,12 +21,13 @@ package org.apache.maven.plugin;
 
 import java.util.List;
 
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
@@ -43,11 +44,12 @@ public interface MavenPluginManager
      * Retrieves the descriptor for the specified plugin from its main artifact.
      * 
      * @param plugin The plugin whose descriptor should be retrieved, must not be {@code null}.
-     * @param repositoryRequest The repository request to use for resolving the plugin's main artifact, must not be
-     *            {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin's main artifact, must not be {@code
+     *            null}.
+     * @param session The repository session to use for resolving the plugin's main artifact, must not be {@code null}.
      * @return The plugin descriptor, never {@code null}.
      */
-    PluginDescriptor getPluginDescriptor( Plugin plugin, RepositoryRequest repositoryRequest )
+    PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
 
     /**
@@ -55,11 +57,13 @@ public interface MavenPluginManager
      * 
      * @param plugin The plugin whose mojo descriptor should be retrieved, must not be {@code null}.
      * @param goal The simple name of the mojo whose descriptor should be retrieved, must not be {@code null}.
-     * @param repositoryRequest The repository request to use for resolving the plugin's main artifact, must not be
-     *            {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin's main artifact, must not be {@code
+     *            null}.
+     * @param session The repository session to use for resolving the plugin's main artifact, must not be {@code null}.
      * @return The mojo descriptor, never {@code null}.
      */
-    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
+    MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, List<RemoteRepository> repositories,
+                                      RepositorySystemSession session )
         throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         InvalidPluginDescriptorException;
 
@@ -76,7 +80,7 @@ public interface MavenPluginManager
      * @param filter The filter used to exclude certain plugin dependencies, may be {@code null}.
      */
     void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                           List<String> imports, ArtifactFilter filter )
+                           List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException;
 
     /**

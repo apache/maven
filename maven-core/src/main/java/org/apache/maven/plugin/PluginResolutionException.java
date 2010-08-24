@@ -19,8 +19,6 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.model.Plugin;
 
 /**
@@ -30,15 +28,15 @@ import org.apache.maven.model.Plugin;
  * @version $Id$
  */
 public class PluginResolutionException
-    extends AbstractArtifactResolutionException
+    extends Exception
 {
+
     private final Plugin plugin;
 
-    public PluginResolutionException( Plugin plugin, ArtifactResolutionException e )
+    public PluginResolutionException( Plugin plugin, Throwable cause )
     {
-        super( "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved: " + e.getMessage(),
-               e.getGroupId(), e.getArtifactId(), e.getVersion(), e.getType(), null, e.getRemoteRepositories(), null,
-               e );
+        super( "Plugin " + plugin.getId() + " or one of its dependencies could not be resolved: " + cause.getMessage(),
+               cause );
         this.plugin = plugin;
     }
 
@@ -46,4 +44,5 @@ public class PluginResolutionException
     {
         return plugin;
     }
+
 }

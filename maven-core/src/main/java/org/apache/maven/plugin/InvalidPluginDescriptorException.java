@@ -24,12 +24,10 @@ import java.util.List;
 public class InvalidPluginDescriptorException
     extends Exception
 {
-    private List<String> errors;
     
     public InvalidPluginDescriptorException( String message, List<String> errors )
     {
         super( toMessage( message, errors ) );
-        this.errors = errors;
     }
 
     private static String toMessage( String message, List<String> errors )

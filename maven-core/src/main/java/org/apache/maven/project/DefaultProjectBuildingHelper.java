@@ -22,20 +22,16 @@ package org.apache.maven.project;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
@@ -56,10 +52,16 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.util.filter.ExclusionsDependencyFilter;
+import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
- * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
+ * technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
  * prior notice.
  * 
  * @author Benjamin Bentmann
@@ -104,10 +106,12 @@ public class DefaultProjectBuildingHelper
         throws InvalidRepositoryException
     {
         List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
+        Collection<String> repoIds = new HashSet<String>();
 
         for ( Repository repository : pomRepositories )
         {
             artifactRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
+            repoIds.add( repository.getId() );
         }
 
         repositorySystem.injectMirror( artifactRepositories, request.getMirrors() );
@@ -118,7 +122,13 @@ public class DefaultProjectBuildingHelper
 
         if ( externalRepositories != null )
         {
-            artifactRepositories.addAll( externalRepositories );
+            for ( ArtifactRepository repository : externalRepositories )
+            {
+                if ( repoIds.add( repository.getId() ) )
+                {
+                    artifactRepositories.add( repository );
+                }
+            }
         }
 
         artifactRepositories = repositorySystem.getEffectiveRepositories( artifactRepositories );
@@ -174,26 +184,23 @@ public class DefaultProjectBuildingHelper
 
         List<Artifact> publicArtifacts = new ArrayList<Artifact>();
 
-        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setCache( request.getRepositoryCache() );
-        repositoryRequest.setLocalRepository( request.getLocalRepository() );
-        repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
-        repositoryRequest.setOffline( request.isOffline() );
-        repositoryRequest.setForceUpdate( request.isForceUpdate() );
-        repositoryRequest.setTransferListener( request.getTransferListener() );
-
         for ( Plugin plugin : extensionPlugins )
         {
             if ( plugin.getVersion() == null )
             {
-                PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, repositoryRequest );
+                PluginVersionRequest versionRequest =
+                    new DefaultPluginVersionRequest( plugin, request.getRepositorySession(),
+                                                     project.getRemotePluginRepositories() );
                 plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
             }
 
             List<Artifact> artifacts;
 
-            PluginArtifactsCache.CacheRecord recordArtifacts =
-                pluginArtifactsCache.get( plugin, repositoryRequest, null );
+            PluginArtifactsCache.Key cacheKey =
+                pluginArtifactsCache.createKey( plugin, null, project.getRemotePluginRepositories(),
+                                                request.getRepositorySession() );
+
+            PluginArtifactsCache.CacheRecord recordArtifacts = pluginArtifactsCache.get( cacheKey );
 
             if ( recordArtifacts != null )
             {
@@ -201,9 +208,9 @@ public class DefaultProjectBuildingHelper
             }
             else
             {
-                artifacts = resolveExtensionArtifacts( plugin, repositoryRequest, request );
+                artifacts = resolveExtensionArtifacts( plugin, project.getRemotePluginRepositories(), request );
 
-                recordArtifacts = pluginArtifactsCache.put( plugin, repositoryRequest, null, artifacts );
+                recordArtifacts = pluginArtifactsCache.put( cacheKey, artifacts );
             }
 
             pluginArtifactsCache.register( project, recordArtifacts );
@@ -314,10 +321,10 @@ public class DefaultProjectBuildingHelper
                 }
             }
 
-            ArtifactFilter extensionArtifactFilter = null;
+            DependencyFilter extensionArtifactFilter = null;
             if ( !exclusions.isEmpty() )
             {
-                extensionArtifactFilter = new ExclusionSetFilter( exclusions );
+                extensionArtifactFilter = new ExclusionsDependencyFilter( exclusions );
             }
 
             record = projectRealmCache.put( extensionRealms, projectRealm, extensionArtifactFilter );
@@ -328,16 +335,17 @@ public class DefaultProjectBuildingHelper
         return record;
     }
 
-    private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, RepositoryRequest repositoryRequest,
+    private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, List<RemoteRepository> repositories,
                                                       ProjectBuildingRequest request )
         throws PluginResolutionException
     {
-        ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest( repositoryRequest );
-        artifactRequest.setServers( request.getServers() );
-        artifactRequest.setMirrors( request.getMirrors() );
-        artifactRequest.setProxies( request.getProxies() );
+        DependencyNode root =
+            pluginDependenciesResolver.resolve( extensionPlugin, null, null, repositories,
+                                                request.getRepositorySession() );
 
-        return pluginDependenciesResolver.resolve( extensionPlugin, null, artifactRequest, null );
+        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+        root.accept( nlg );
+        return nlg.getArtifacts( false );
     }
 
     public void selectProjectRealm( MavenProject project )

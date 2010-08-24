@@ -15,11 +15,11 @@
 
 package org.apache.maven.lifecycle.internal.stub;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
+import org.sonatype.aether.repository.ArtifactRepository;
 
 /**
  * @author Kristian Rosenvold

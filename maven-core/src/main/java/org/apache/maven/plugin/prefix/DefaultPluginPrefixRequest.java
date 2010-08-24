@@ -19,17 +19,14 @@ package org.apache.maven.plugin.prefix;
  * under the License.
  */
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryCache;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.ArtifactTransferListener;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve a plugin prefix.
@@ -43,34 +40,25 @@ public class DefaultPluginPrefixRequest
 
     private String prefix;
 
-    private List<String> pluginGroups;
+    private List<String> pluginGroups = Collections.emptyList();
 
     private Model pom;
 
-    private RepositoryRequest repositoryRequest;
+    private List<RemoteRepository> repositories = Collections.emptyList();
+
+    private RepositorySystemSession session;
 
     /**
      * Creates an empty request.
      */
     public DefaultPluginPrefixRequest()
     {
-        repositoryRequest = new DefaultRepositoryRequest();
-    }
-
-    /**
-     * Creates a request by copying settings from the specified repository request.
-     * 
-     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
-     */
-    public DefaultPluginPrefixRequest( RepositoryRequest repositoryRequest )
-    {
-        this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
     }
 
     /**
      * Creates a request for the specified plugin prefix and build session. The provided build session will be used to
-     * configure repository settings. If the session has a current project, its plugin artifact repositories and model
-     * will be used as well.
+     * configure repository settings. If the session has a current project, its plugin repositories and model will be
+     * used as well.
      * 
      * @param prefix The plugin prefix to resolve, must not be {@code null}.
      * @param session The build session from which to derive further settings, must not be {@code null}.
@@ -79,18 +67,12 @@ public class DefaultPluginPrefixRequest
     {
         setPrefix( prefix );
 
-        this.repositoryRequest = new DefaultRepositoryRequest();
-
-        setCache( session.getRepositoryCache() );
-        setLocalRepository( session.getLocalRepository() );
-        setOffline( session.isOffline() );
-        setForceUpdate( session.getRequest().isUpdateSnapshots() );
-        setTransferListener( session.getRequest().getTransferListener() );
+        setRepositorySession( session.getRepositorySession() );
 
         MavenProject project = session.getCurrentProject();
         if ( project != null )
         {
-            setRemoteRepositories( project.getPluginArtifactRepositories() );
+            setRepositories( project.getRemotePluginRepositories() );
             setPom( project.getModel() );
         }
 
@@ -111,17 +93,19 @@ public class DefaultPluginPrefixRequest
 
     public List<String> getPluginGroups()
     {
-        if ( pluginGroups == null )
-        {
-            pluginGroups = new ArrayList<String>();
-        }
-
         return pluginGroups;
     }
 
     public DefaultPluginPrefixRequest setPluginGroups( List<String> pluginGroups )
     {
-        this.pluginGroups = pluginGroups;
+        if ( pluginGroups != null )
+        {
+            this.pluginGroups = pluginGroups;
+        }
+        else
+        {
+            this.pluginGroups = Collections.emptyList();
+        }
 
         return this;
     }
@@ -138,74 +122,33 @@ public class DefaultPluginPrefixRequest
         return this;
     }
 
-    public RepositoryCache getCache()
+    public List<RemoteRepository> getRepositories()
     {
-        return repositoryRequest.getCache();
+        return repositories;
     }
 
-    public DefaultPluginPrefixRequest setCache( RepositoryCache cache )
+    public DefaultPluginPrefixRequest setRepositories( List<RemoteRepository> repositories )
     {
-        repositoryRequest.setCache( cache );
+        if ( repositories != null )
+        {
+            this.repositories = repositories;
+        }
+        else
+        {
+            this.repositories = Collections.emptyList();
+        }
 
         return this;
     }
 
-    public ArtifactRepository getLocalRepository()
+    public RepositorySystemSession getRepositorySession()
     {
-        return repositoryRequest.getLocalRepository();
+        return session;
     }
 
-    public DefaultPluginPrefixRequest setLocalRepository( ArtifactRepository localRepository )
+    public DefaultPluginPrefixRequest setRepositorySession( RepositorySystemSession session )
     {
-        repositoryRequest.setLocalRepository( localRepository );
-
-        return this;
-    }
-
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
-        return repositoryRequest.getRemoteRepositories();
-    }
-
-    public DefaultPluginPrefixRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
-    {
-        repositoryRequest.setRemoteRepositories( remoteRepositories );
-
-        return this;
-    }
-
-    public boolean isOffline()
-    {
-        return repositoryRequest.isOffline();
-    }
-
-    public DefaultPluginPrefixRequest setOffline( boolean offline )
-    {
-        repositoryRequest.setOffline( offline );
-
-        return this;
-    }
-
-    public boolean isForceUpdate()
-    {
-        return repositoryRequest.isForceUpdate();
-    }
-
-    public DefaultPluginPrefixRequest setForceUpdate( boolean forceUpdate )
-    {
-        repositoryRequest.setForceUpdate( forceUpdate );
-
-        return this;
-    }
-
-    public ArtifactTransferListener getTransferListener()
-    {
-        return repositoryRequest.getTransferListener();
-    }
-
-    public DefaultPluginPrefixRequest setTransferListener( ArtifactTransferListener transferListener )
-    {
-        repositoryRequest.setTransferListener( transferListener );
+        this.session = session;
 
         return this;
     }

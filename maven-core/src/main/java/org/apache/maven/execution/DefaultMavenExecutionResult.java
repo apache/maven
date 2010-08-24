@@ -25,7 +25,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 
 /** @author Jason van Zyl */
@@ -36,7 +36,7 @@ public class DefaultMavenExecutionResult
 
     private List<MavenProject> topologicallySortedProjects;
 
-    private ArtifactResolutionResult artifactResolutionResult;
+    private DependencyResolutionResult dependencyResolutionResult;
 
     private List<Throwable> exceptions;
 
@@ -66,14 +66,14 @@ public class DefaultMavenExecutionResult
         return topologicallySortedProjects;
     }
 
-    public ArtifactResolutionResult getArtifactResolutionResult()
+    public DependencyResolutionResult getDependencyResolutionResult()
     {
-        return artifactResolutionResult;
+        return dependencyResolutionResult;
     }
 
-    public MavenExecutionResult setArtifactResolutionResult( ArtifactResolutionResult artifactResolutionResult )
+    public MavenExecutionResult setDependencyResolutionResult( DependencyResolutionResult dependencyResolutionResult )
     {
-        this.artifactResolutionResult = artifactResolutionResult;
+        this.dependencyResolutionResult = dependencyResolutionResult;
 
         return this;
     }

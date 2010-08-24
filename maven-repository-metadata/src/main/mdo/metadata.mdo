@@ -19,7 +19,7 @@ under the License.
 
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/METADATA/${version}"
+  xsd.namespace="http://maven.apache.org/METADATA/${version}"
   xml.schemaLocation="http://maven.apache.org/xsd/metadata-${version}.xsd">
   <id>repository-metadata</id>
   <name>Metadata</name>
@@ -33,29 +33,35 @@ under the License.
   <classes>
     <class rootElement="true" java.clone="deep">
       <name>Metadata</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <fields>
+        <field xml.attribute="true">
+          <name>modelVersion</name>
+          <version>1.1.0+</version>
+          <type>String</type>
+          <description>The version of the underlying metadata model.</description>
+        </field>
         <field>
           <name>groupId</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The groupId that is directory represents, if any.</description>
         </field>
         <field>
           <name>artifactId</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The artifactId that is directory represents, if any.</description>
         </field>
         <field>
           <name>version</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>The version that is directory represents, if any.</description>
         </field>
         <field>
           <name>versioning</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <association>
             <type>Versioning</type>
           </association>
@@ -63,7 +69,7 @@ under the License.
         </field>
         <field>
           <name>plugins</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The set of plugin mappings for the group</description>
           <association>
             <type>Plugin</type>
@@ -73,7 +79,7 @@ under the License.
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <code><![CDATA[
     public boolean merge( Metadata sourceMetadata )
     {
@@ -200,24 +206,24 @@ under the License.
     </class>
     <class java.clone="deep">
       <name>Versioning</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>Versioning information for an artifact</description>
       <fields>
         <field>
           <name>latest</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>What the latest version in the directory is, including snapshots</description>
         </field>
         <field>
           <name>release</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>What the latest version in the directory is, of the releases</description>
         </field>
         <field>
           <name>snapshot</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <association>
             <type>Snapshot</type>
           </association>
@@ -225,7 +231,7 @@ under the License.
         </field>
         <field>
           <name>versions</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>Versions available for the artifact</description>
           <association>
             <type>String</type>
@@ -234,51 +240,60 @@ under the License.
         </field>
         <field>
           <name>lastUpdated</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <type>String</type>
           <description>When the metadata was last updated</description>
+        </field>
+        <field>
+          <name>snapshotVersions</name>
+          <version>1.1.0+</version>
+          <description>The snapshot versions available for the artifact.</description>
+          <association>
+            <type>SnapshotVersion</type>
+            <multiplicity>*</multiplicity>
+          </association>
         </field>
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>1.0.0</version>
-          <code>
-            public void updateTimestamp()
-            {
-                setLastUpdatedTimestamp( new java.util.Date() );
-            }
+          <version>1.0.0+</version>
+          <code><![CDATA[
+    public void updateTimestamp()
+    {
+        setLastUpdatedTimestamp( new java.util.Date() );
+    }
 
-            public void setLastUpdatedTimestamp( java.util.Date date )
-            {
-                java.util.TimeZone timezone = java.util.TimeZone.getTimeZone( "UTC" );
-                java.text.DateFormat fmt = new java.text.SimpleDateFormat( "yyyyMMddHHmmss" );
-                fmt.setTimeZone( timezone );
-                setLastUpdated( fmt.format( date ) );
-            }
-          </code>
+    public void setLastUpdatedTimestamp( java.util.Date date )
+    {
+        java.util.TimeZone timezone = java.util.TimeZone.getTimeZone( "UTC" );
+        java.text.DateFormat fmt = new java.text.SimpleDateFormat( "yyyyMMddHHmmss" );
+        fmt.setTimeZone( timezone );
+        setLastUpdated( fmt.format( date ) );
+    }
+          ]]></code>
         </codeSegment>
       </codeSegments>
     </class>
     <class java.clone="deep">
       <name>Snapshot</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>Snapshot data for the current version</description>
       <fields>
         <field>
           <name>timestamp</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The time it was deployed</description>
           <type>String</type>
         </field>
         <field>
           <name>buildNumber</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The incremental build number</description>
           <type>int</type>
         </field>
         <field>
           <name>localCopy</name>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>Whether to use a local copy instead (with filename that includes the base version)</description>
           <type>boolean</type>
           <defaultValue>false</defaultValue>
@@ -286,8 +301,34 @@ under the License.
       </fields>
     </class>
     <class java.clone="deep">
+      <name>SnapshotVersion</name>
+      <version>1.1.0+</version>
+      <description>Versioning information for a snapshot artifact.</description>
+      <fields>
+        <field>
+          <name>classifier</name>
+          <version>1.1.0+</version>
+          <type>String</type>
+          <description>The classifier of the snapshot artifact this version information belongs to.</description>
+          <defaultValue></defaultValue>
+        </field>
+        <field xml.tagName="value">
+          <name>version</name>
+          <version>1.1.0+</version>
+          <type>String</type>
+          <description>The resolved snapshot version of the artifact.</description>
+        </field>
+        <field>
+          <name>updated</name>
+          <version>1.1.0+</version>
+          <type>String</type>
+          <description>The timestamp when this version information was last updated. The timestamp is expressed using UTC in the format yyyyMMddHHmmss.</description>
+        </field>
+      </fields>
+    </class>
+    <class java.clone="deep">
       <name>Plugin</name>
-      <version>1.0.0</version>
+      <version>1.0.0+</version>
       <description>Mapping information for a single plugin within this group</description>
       <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm.</comment>
       <fields>
@@ -295,21 +336,21 @@ under the License.
           <name>name</name>
           <type>String</type>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>Display name for the plugin.</description>
         </field>
         <field>
           <name>prefix</name>
           <type>String</type>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The plugin invocation prefix (i.e. eclipse for eclipse:eclipse)</description>
         </field>
         <field>
           <name>artifactId</name>
           <type>String</type>
           <required>true</required>
-          <version>1.0.0</version>
+          <version>1.0.0+</version>
           <description>The plugin artifactId</description>
         </field>
       </fields>

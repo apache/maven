@@ -21,10 +21,10 @@ package org.apache.maven.plugin;
 
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.sonatype.aether.artifact.Artifact;
 
 /**
  * Caches extension class realms. <strong>Warning:</strong> This is an internal utility interface that is only public

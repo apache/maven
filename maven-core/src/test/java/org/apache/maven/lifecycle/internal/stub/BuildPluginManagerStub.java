@@ -1,3 +1,5 @@
+package org.apache.maven.lifecycle.internal.stub;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional information regarding
@@ -13,25 +15,17 @@
  * the License.
  */
 
-package org.apache.maven.lifecycle.internal.stub;
+import java.util.List;
 
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.BuildPluginManager;
-import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.MojoNotFoundException;
-import org.apache.maven.plugin.PluginConfigurationException;
-import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginManagerException;
-import org.apache.maven.plugin.PluginNotFoundException;
-import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * @author Kristian Rosenvold
@@ -40,28 +34,23 @@ public class BuildPluginManagerStub
     implements BuildPluginManager
 {
 
-    public PluginDescriptor loadPlugin( Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        InvalidPluginDescriptorException
+    public PluginDescriptor loadPlugin( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
     {
         return null;
     }
 
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-        MojoNotFoundException, InvalidPluginDescriptorException
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, List<RemoteRepository> repositories,
+                                             RepositorySystemSession session )
     {
         return MojoExecutorStub.createMojoDescriptor( plugin.getKey() );
     }
 
     public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )
-        throws PluginResolutionException, PluginManagerException
     {
         return null;
     }
 
     public void executeMojo( MavenSession session, MojoExecution execution )
-        throws MojoFailureException, MojoExecutionException, PluginConfigurationException, PluginManagerException
     {
     }
 }

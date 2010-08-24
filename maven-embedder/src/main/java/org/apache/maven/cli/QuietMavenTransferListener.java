@@ -19,26 +19,13 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.PrintStream;
-
-import org.apache.maven.repository.ArtifactTransferEvent;
+import org.sonatype.aether.util.listener.AbstractTransferListener;
 
 /**
  * @author Benjamin Bentmann
  */
 class QuietMavenTransferListener
-    extends AbstractMavenTransferListener
+    extends AbstractTransferListener
 {
-
-    public QuietMavenTransferListener( PrintStream out )
-    {
-        super( out );
-    }
-
-    @Override
-    protected boolean showEvent( ArtifactTransferEvent event )
-    {
-        return false;
-    }
 
 }

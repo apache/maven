@@ -19,8 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -202,17 +200,16 @@ public class MojoDescriptorCreator
 
         injectPluginDeclarationFromProject( plugin, project );
 
-        RepositoryRequest repositoryRequest = DefaultRepositoryRequest.getRepositoryRequest( session, project );
-
         // If there is no version to be found then we need to look in the repository metadata for
         // this plugin and see what's specified as the latest release.
         //
         if ( plugin.getVersion() == null )
         {
-            resolvePluginVersion( plugin, repositoryRequest );
+            resolvePluginVersion( plugin, session, project );
         }
 
-        return pluginManager.getMojoDescriptor( plugin, goal, repositoryRequest );
+        return pluginManager.getMojoDescriptor( plugin, goal, project.getRemotePluginRepositories(),
+                                                session.getRepositorySession() );
     }
 
     // TODO: take repo mans into account as one may be aggregating prefixes of many
@@ -234,10 +231,12 @@ public class MojoDescriptorCreator
         return plugin;
     }
 
-    private void resolvePluginVersion( Plugin plugin, RepositoryRequest repositoryRequest )
+    private void resolvePluginVersion( Plugin plugin, MavenSession session, MavenProject project )
         throws PluginVersionResolutionException
     {
-        PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, repositoryRequest );
+        PluginVersionRequest versionRequest =
+            new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
+                                             project.getRemotePluginRepositories() );
         plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
     }
 

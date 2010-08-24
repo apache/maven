@@ -125,7 +125,7 @@ public class DelegatingLocalArtifactRepository
     @Override
     public String getBasedir()
     {
-        return userLocalArtifactRepository.getBasedir();
+        return ( userLocalArtifactRepository != null ) ? userLocalArtifactRepository.getBasedir() : null;
     }
 
     @Override

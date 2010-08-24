@@ -23,11 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
 import org.apache.maven.model.Build;
@@ -38,12 +36,18 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
-import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.ArtifactDoesNotExistException;
-import org.apache.maven.repository.ArtifactTransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.repository.ArtifactRepository;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.repository.RepositoryPolicy;
+import org.sonatype.aether.resolution.MetadataRequest;
+import org.sonatype.aether.resolution.MetadataResult;
+import org.sonatype.aether.transfer.MetadataNotFoundException;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.metadata.DefaultMetadata;
 
 /**
  * Resolves a plugin prefix.
@@ -55,6 +59,8 @@ import org.codehaus.plexus.logging.Logger;
 public class DefaultPluginPrefixResolver
     implements PluginPrefixResolver
 {
+
+    private static final String REPOSITORY_CONTEXT = "plugin";
 
     @Requirement
     private Logger logger;
@@ -82,8 +88,8 @@ public class DefaultPluginPrefixResolver
             if ( result == null )
             {
                 throw new NoPluginFoundForPrefixException( request.getPrefix(), request.getPluginGroups(),
-                                                           request.getLocalRepository(),
-                                                           request.getRemoteRepositories() );
+                                                           request.getRepositorySession().getLocalRepository(),
+                                                           request.getRepositories() );
             }
             else if ( logger.isDebugEnabled() )
             {
@@ -126,7 +132,8 @@ public class DefaultPluginPrefixResolver
         {
             try
             {
-                PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, request );
+                PluginDescriptor pluginDescriptor =
+                    pluginManager.loadPlugin( plugin, request.getRepositories(), request.getRepositorySession() );
 
                 if ( request.getPrefix().equals( pluginDescriptor.getGoalPrefix() ) )
                 {
@@ -152,155 +159,105 @@ public class DefaultPluginPrefixResolver
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request )
     {
-        ArtifactRepository localRepository = request.getLocalRepository();
+        List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
 
-        // Process all plugin groups in the local repository first to see if we get a hit. A developer may have been
-        // developing a plugin locally and installing.
-        //
         for ( String pluginGroup : request.getPluginGroups() )
         {
-            String localPath = getLocalMetadataPath( pluginGroup, localRepository );
+            org.sonatype.aether.metadata.Metadata metadata =
+                new DefaultMetadata( pluginGroup, "maven-metadata.xml", DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT );
 
-            File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
+            requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ) );
 
-            PluginPrefixResult result =
-                resolveFromRepository( request, pluginGroup, groupMetadataFile, localRepository );
-
-            if ( result != null )
+            for ( RemoteRepository repository : request.getRepositories() )
             {
-                return result;
+                requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ) );
             }
         }
 
-        Map<String, List<ArtifactRepository>> recheck = new HashMap<String, List<ArtifactRepository>>();
+        // initial try, use locally cached metadata
 
-        // Process all the remote repositories.
-        //
-        for ( String pluginGroup : request.getPluginGroups() )
+        List<MetadataResult> results = repositorySystem.resolveMetadata( request.getRepositorySession(), requests );
+        requests.clear();
+
+        PluginPrefixResult result = processResults( request, results, requests );
+
+        if ( result != null )
         {
-            for ( ArtifactRepository repository : request.getRemoteRepositories() )
+            return result;
+        }
+
+        // second try, refetch all (possibly outdated) metadata that wasn't updated in the first attempt
+
+        if ( !request.getRepositorySession().isOffline() && !requests.isEmpty() )
+        {
+            DefaultRepositorySystemSession session =
+                new DefaultRepositorySystemSession( request.getRepositorySession() );
+            session.setUpdatePolicy( RepositoryPolicy.UPDATE_POLICY_ALWAYS );
+
+            results = repositorySystem.resolveMetadata( session, requests );
+
+            return processResults( request, results, null );
+        }
+
+        return null;
+    }
+
+    private PluginPrefixResult processResults( PluginPrefixRequest request, List<MetadataResult> results,
+                                               List<MetadataRequest> requests )
+    {
+        for ( MetadataResult res : results )
+        {
+            if ( res.getException() != null )
             {
-                if ( !isEnabled( repository ) )
+                if ( res.getException() instanceof MetadataNotFoundException )
                 {
-                    logger.debug( "Skipped plugin prefix lookup from disabled repository " + repository.getId() );
-                    continue;
+                    logger.debug( "Could not find " + res.getRequest().getMetadata() + " in "
+                        + res.getRequest().getRepository() );
+                }
+                else if ( logger.isDebugEnabled() )
+                {
+                    logger.warn( "Could not retrieve " + res.getRequest().getMetadata() + " from "
+                        + res.getRequest().getRepository() + ": " + res.getException().getMessage(), res.getException() );
+                }
+                else
+                {
+                    logger.warn( "Could not retrieve " + res.getRequest().getMetadata() + " from "
+                        + res.getRequest().getRepository() + ": " + res.getException().getMessage() );
+                }
+            }
+
+            org.sonatype.aether.metadata.Metadata metadata = res.getMetadata();
+
+            if ( metadata != null )
+            {
+                ArtifactRepository repository = res.getRequest().getRepository();
+                if ( repository == null )
+                {
+                    repository = request.getRepositorySession().getLocalRepository();
                 }
 
-                String localPath = getLocalMetadataPath( pluginGroup, repository );
-
-                File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
-
-                if ( !request.isOffline() && ( !groupMetadataFile.exists() || request.isForceUpdate() ) )
-                {
-                    String remotePath = getRemoteMetadataPath( pluginGroup, repository );
-
-                    try
-                    {
-                        repositorySystem.retrieve( repository, groupMetadataFile, remotePath,
-                                                   request.getTransferListener() );
-                    }
-                    catch ( ArtifactTransferFailedException e )
-                    {
-                        if ( logger.isDebugEnabled() )
-                        {
-                            logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
-                                + e.getMessage(), e );
-                        }
-                        else
-                        {
-                            logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
-                                + e.getMessage() );
-                        }
-                    }
-                    catch ( ArtifactDoesNotExistException e )
-                    {
-                        continue;
-                    }
-                }
-                else if ( !request.isOffline() && !request.isForceUpdate() )
-                {
-                    List<ArtifactRepository> repos = recheck.get( pluginGroup );
-                    if ( repos == null )
-                    {
-                        repos = new ArrayList<ArtifactRepository>();
-                        recheck.put( pluginGroup, repos );
-                    }
-                    repos.add( repository );
-                }
-
-                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile,
-                                                                   repository );
+                PluginPrefixResult result =
+                    resolveFromRepository( request, metadata.getGroupId(), metadata.getFile(), repository );
 
                 if ( result != null )
                 {
                     return result;
                 }
             }
-        }
 
-        // Retry the remote repositories for which we previously only consulted the possibly outdated local cache.
-        //
-        for ( String pluginGroup : request.getPluginGroups() )
-        {
-            List<ArtifactRepository> repos = recheck.get( pluginGroup );
-            if ( repos == null )
+            if ( requests != null && !res.isUpdated() )
             {
-                continue;
-            }
-
-            for ( ArtifactRepository repository : repos )
-            {
-                String localPath = getLocalMetadataPath( pluginGroup, repository );
-
-                File groupMetadataFile = new File( localRepository.getBasedir(), localPath );
-
-                String remotePath = getRemoteMetadataPath( pluginGroup, repository );
-
-                try
-                {
-                    repositorySystem.retrieve( repository, groupMetadataFile, remotePath,
-                                               request.getTransferListener() );
-                }
-                catch ( ArtifactTransferFailedException e )
-                {
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
-                            + e.getMessage(), e );
-                    }
-                    else
-                    {
-                        logger.warn( "Failed to retrieve " + remotePath + " from " + repository.getId() + ": "
-                            + e.getMessage() );
-                    }
-                }
-                catch ( ArtifactDoesNotExistException e )
-                {
-                    continue;
-                }
-
-                PluginPrefixResult result = resolveFromRepository( request, pluginGroup, groupMetadataFile,
-                                                                   repository );
-
-                if ( result != null )
-                {
-                    return result;
-                }
+                requests.add( res.getRequest() );
             }
         }
 
         return null;
     }
 
-    private boolean isEnabled( ArtifactRepository repository )
-    {
-        return repository.getReleases().isEnabled() || repository.getSnapshots().isEnabled();
-    }
-
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request, String pluginGroup,
                                                       File metadataFile, ArtifactRepository repository )
     {
-        if ( metadataFile.isFile() )
+        if ( metadataFile != null && metadataFile.isFile() )
         {
             try
             {
@@ -335,16 +292,6 @@ public class DefaultPluginPrefixResolver
         }
 
         return null;
-    }
-
-    private String getLocalMetadataPath( String groupId, ArtifactRepository repository )
-    {
-        return groupId.replace( '.', '/' ) + "/" + "maven-metadata-" + repository.getId() + ".xml";
-    }
-
-    private String getRemoteMetadataPath( String groupId, ArtifactRepository repository )
-    {
-        return groupId.replace( '.', '/' ) + "/" + "maven-metadata.xml";
     }
 
 }

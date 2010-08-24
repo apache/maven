@@ -42,7 +42,7 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component( role = ProjectDependenciesResolver.class )
+@Component(role = ProjectDependenciesResolver.class)
 public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
@@ -97,15 +97,15 @@ public class DefaultProjectDependenciesResolver
             return resolved;
         }
 
-        if ( ( scopesToCollect == null || scopesToCollect.isEmpty() )
-            && ( scopesToResolve == null || scopesToResolve.isEmpty() ) )
+        if ( ( scopesToCollect == null || scopesToCollect.isEmpty() ) &&
+            ( scopesToResolve == null || scopesToResolve.isEmpty() ) )
         {
             return resolved;
         }
 
         /*
 
-        Logic for transitive global exclusions
+        Logic for transitve global exclusions
 
         List<String> exclusions = new ArrayList<String>();
 
@@ -126,8 +126,7 @@ public class DefaultProjectDependenciesResolver
 
         if ( ! exclusions.isEmpty() )
         {
-            filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ExcludesArtifactFilter( exclusions ),
-                                                                                 scopeFilter } ) );
+            filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ExcludesArtifactFilter( exclusions ), scopeFilter } ) );
         }
         else
         {
@@ -141,11 +140,10 @@ public class DefaultProjectDependenciesResolver
         collectionScopeFilter = new CumulativeScopeArtifactFilter( collectionScopeFilter, resolutionScopeFilter );
 
         ArtifactResolutionRequest request =
-            new ArtifactResolutionRequest().setResolveRoot( false ).setResolveTransitively( true )
-                .setCollectionFilter( collectionScopeFilter ).setResolutionFilter( resolutionScopeFilter )
-                .setLocalRepository( session.getLocalRepository() ).setOffline( session.isOffline() )
-                .setForceUpdate( session.getRequest().isUpdateSnapshots() ).setCache( session.getRepositoryCache() );
-        request.setTransferListener( session.getRequest().getTransferListener() );
+            new ArtifactResolutionRequest().setResolveRoot( false ).setResolveTransitively( true ).setCollectionFilter(
+                collectionScopeFilter ).setResolutionFilter( resolutionScopeFilter ).setLocalRepository(
+                session.getLocalRepository() ).setOffline( session.isOffline() ).setForceUpdate(
+                session.getRequest().isUpdateSnapshots() );
         request.setServers( session.getRequest().getServers() );
         request.setMirrors( session.getRequest().getMirrors() );
         request.setProxies( session.getRequest().getProxies() );

@@ -1,35 +1,30 @@
 package org.apache.maven.project;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -45,18 +40,23 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
-import org.apache.maven.project.artifact.ProjectArtifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.impl.ArtifactResolver;
+import org.sonatype.aether.impl.RemoteRepositoryManager;
+import org.sonatype.aether.repository.WorkspaceRepository;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.util.artifact.SubArtifact;
 
 /**
  * @version $Id$
  */
-@Component( role = ProjectBuilder.class )
+@Component(role = ProjectBuilder.class)
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
@@ -77,7 +77,13 @@ public class DefaultProjectBuilder
     private RepositorySystem repositorySystem;
 
     @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;
+    private ArtifactResolver artifactResolver;
+
+    @Requirement
+    private RemoteRepositoryManager repositoryManager;
+
+    @Requirement
+    private ProjectDependenciesResolver dependencyResolver;
 
     // ----------------------------------------------------------------------
     // MavenProjectBuilder Implementation
@@ -115,11 +121,11 @@ public class DefaultProjectBuilder
                 DefaultModelBuildingListener listener =
                     new DefaultModelBuildingListener( project, projectBuildingHelper, configuration );
                 request.setModelBuildingListener( listener );
-
+    
                 request.setPomFile( pomFile );
                 request.setModelSource( modelSource );
                 request.setLocationTracking( pomFile != null );
-
+    
                 ModelBuildingResult result;
                 try
                 {
@@ -139,34 +145,32 @@ public class DefaultProjectBuilder
                 projectBuildingHelper.selectProjectRealm( project );
             }
 
-            ArtifactResolutionResult artifactResult = null;
+            DependencyResolutionResult resolutionResult = null;
 
             if ( configuration.isResolveDependencies() )
             {
-                Artifact artifact = new ProjectArtifact( project );
+                try
+                {
+                    DefaultDependencyResolutionRequest resolution =
+                        new DefaultDependencyResolutionRequest( project, configuration.getRepositorySession() );
+                    resolutionResult = dependencyResolver.resolve( resolution );
+                }
+                catch ( DependencyResolutionException e )
+                {
+                    resolutionResult = e.getResult();
+                }
 
-                ArtifactResolutionRequest artifactRequest = new ArtifactResolutionRequest()
-                    .setArtifact( artifact )
-                    .setResolveRoot( false )
-                    .setResolveTransitively( true )
-                    .setCache( configuration.getRepositoryCache() )
-                    .setLocalRepository( configuration.getLocalRepository() )
-                    .setRemoteRepositories( project.getRemoteArtifactRepositories() )
-                    .setServers( configuration.getServers() )
-                    .setMirrors( configuration.getMirrors() )
-                    .setProxies( configuration.getProxies() )
-                    .setOffline( configuration.isOffline() )
-                    .setForceUpdate( configuration.isForceUpdate() )
-                    .setManagedVersionMap( project.getManagedVersionMap() );
-                artifactRequest.setTransferListener( configuration.getTransferListener() );
-
-                artifactResult = repositorySystem.resolve( artifactRequest );
-
-                project.setResolvedArtifacts( artifactResult.getArtifacts() );
-                project.setArtifacts( artifactResult.getArtifacts() );
+                Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+                if ( resolutionResult.getDependencyGraph() != null )
+                {
+                    RepositoryUtils.toArtifacts( artifacts, resolutionResult.getDependencyGraph().getChildren(),
+                                                 Collections.singletonList( project.getArtifact().getId() ), null );
+                }
+                project.setResolvedArtifacts( artifacts );
+                project.setArtifacts( artifacts );
             }
 
-            return new DefaultProjectBuildingResult( project, modelProblems, artifactResult );
+            return new DefaultProjectBuildingResult( project, modelProblems, resolutionResult );
         }
         finally
         {
@@ -187,10 +191,12 @@ public class DefaultProjectBuilder
     }
 
     private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration,
-                                                          ReactorModelPool reactorModelPool )
+                                                          ReactorModelPool modelPool )
     {
         ModelResolver resolver =
-            new RepositoryModelResolver( repositorySystem, resolutionErrorHandler, configuration, reactorModelPool );
+            new ReactorModelResolver( configuration.getRepositorySession(), artifactResolver,
+                                      repositoryManager,
+                                      RepositoryUtils.toRepos( configuration.getRemoteRepositories() ), modelPool );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 
@@ -216,42 +222,34 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( Artifact artifact, boolean allowStubModel, ProjectBuildingRequest configuration )
         throws ProjectBuildingException
     {
-        if ( !artifact.getType().equals( "pom" ) )
+        org.sonatype.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
+        if ( !pomArtifact.getExtension().equals( "pom" ) )
         {
-            artifact =
-                repositorySystem.createProjectArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                                                        artifact.getVersion() );
+            pomArtifact = new SubArtifact( pomArtifact, "", "pom" );
         }
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest()
-            .setArtifact( artifact )
-            .setCache( configuration.getRepositoryCache() )
-            .setLocalRepository( configuration.getLocalRepository() )
-            .setRemoteRepositories( configuration.getRemoteRepositories() )
-            .setOffline( configuration.isOffline() )
-            .setForceUpdate( configuration.isForceUpdate() );
-        request.setTransferListener( configuration.getTransferListener() );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-
-        if ( result.hasMissingArtifacts() && allowStubModel )
-        {
-            return build( null, createStubModelSource( artifact ), configuration );
-        }
-
+        ArtifactResult result;
         try
         {
-            resolutionErrorHandler.throwErrors( request, result );
+            ArtifactRequest request = new ArtifactRequest();
+            request.setArtifact( pomArtifact );
+            request.setRepositories( RepositoryUtils.toRepos( configuration.getRemoteRepositories() ) );
+            result = artifactResolver.resolveArtifact( configuration.getRepositorySession(), request );
+            pomArtifact = result.getArtifact();
         }
-        catch ( ArtifactResolutionException e )
+        catch ( org.sonatype.aether.resolution.ArtifactResolutionException e )
         {
+            if ( e.getResults().get( 0 ).isMissing() && allowStubModel )
+            {
+                return build( null, createStubModelSource( artifact ), configuration );
+            }
             throw new ProjectBuildingException( artifact.getId(),
                                                 "Error resolving project artifact: " + e.getMessage(), e );
         }
 
-        boolean localProject = artifact.getRepository() != null && artifact.getRepository().isProjectAware();
+        boolean localProject = result.getRepository() instanceof WorkspaceRepository;
 
-        File pomFile = artifact.getFile();
+        File pomFile = pomArtifact.getFile();
 
         return build( localProject ? pomFile : null, new FileModelSource( pomFile ), configuration );
     }
@@ -279,14 +277,14 @@ public class DefaultProjectBuilder
 
         List<InterimResult> interimResults = new ArrayList<InterimResult>();
 
-        ReactorModelPool reactorModelPool = new ReactorModelPool();
+        ReactorModelPool modelPool = new ReactorModelPool();
 
         ReactorModelCache modelCache = new ReactorModelCache();
 
         boolean noErrors =
-            build( results, interimResults, pomFiles, true, recursive, config, reactorModelPool, modelCache );
+            build( results, interimResults, pomFiles, true, recursive, config, modelPool, modelCache );
 
-        populateReactorModelPool( reactorModelPool, interimResults );
+        populateReactorModelPool( modelPool, interimResults );
 
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 

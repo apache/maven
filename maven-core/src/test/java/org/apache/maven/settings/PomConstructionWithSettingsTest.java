@@ -31,11 +31,13 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
 
 public class PomConstructionWithSettingsTest
     extends PlexusTestCase
@@ -111,6 +113,11 @@ public class PomConstructionWithSettingsTest
         config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl,
                                                                               new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
+        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
+        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManager(
+                                                                                 new File(
+                                                                                           config.getLocalRepository().getBasedir() ) ) );
+        config.setRepositorySession( repoSession );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }

@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.aether.graph.DependencyFilter;
 
 /**
  * Default project realm cache implementation. Assumes cached data does not change.
@@ -84,7 +84,7 @@ public class DefaultProjectRealmCache
     }
 
     public CacheRecord put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
-                            ArtifactFilter extensionArtifactFilter )
+                            DependencyFilter extensionArtifactFilter )
     {
         if ( projectRealm == null )
         {

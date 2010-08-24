@@ -28,18 +28,16 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -86,6 +84,12 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.util.filter.AndDependencyFilter;
+import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
@@ -120,17 +124,17 @@ public class DefaultMavenPluginManager
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
-    public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, RepositoryRequest repositoryRequest )
+    public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
-        PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey( plugin, repositoryRequest );
+        PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey( plugin, repositories, session );
 
         PluginDescriptor pluginDescriptor = pluginDescriptorCache.get( cacheKey );
 
         if ( pluginDescriptor == null )
         {
             Artifact pluginArtifact =
-                pluginDependenciesResolver.resolve( plugin, new ArtifactResolutionRequest( repositoryRequest ) );
+                RepositoryUtils.toArtifact( pluginDependenciesResolver.resolve( plugin, repositories, session ) );
 
             pluginDescriptor = extractPluginDescriptor( pluginArtifact, plugin );
 
@@ -239,11 +243,12 @@ public class DefaultMavenPluginManager
         }
     }
 
-    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, RepositoryRequest repositoryRequest )
+    public MojoDescriptor getMojoDescriptor( Plugin plugin, String goal, List<RemoteRepository> repositories,
+                                             RepositorySystemSession session )
         throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         InvalidPluginDescriptorException
     {
-        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin, repositoryRequest );
+        PluginDescriptor pluginDescriptor = getPluginDescriptor( plugin, repositories, session );
 
         MojoDescriptor mojoDescriptor = pluginDescriptor.getMojo( goal );
 
@@ -256,16 +261,18 @@ public class DefaultMavenPluginManager
     }
 
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,
-                                               ClassLoader parent, List<String> imports, ArtifactFilter filter )
+                                               ClassLoader parent, List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
 
         MavenProject project = session.getCurrentProject();
 
-        PluginRealmCache.CacheRecord cacheRecord =
-            pluginRealmCache.get( plugin, parent, imports, filter, session.getLocalRepository(),
-                                  project.getPluginArtifactRepositories() );
+        PluginRealmCache.Key cacheKey =
+            pluginRealmCache.createKey( plugin, parent, imports, filter, project.getRemotePluginRepositories(),
+                                        session.getRepositorySession() );
+
+        PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
 
         if ( cacheRecord != null )
         {
@@ -277,16 +284,14 @@ public class DefaultMavenPluginManager
             createPluginRealm( pluginDescriptor, session, parent, imports, filter );
 
             cacheRecord =
-                pluginRealmCache.put( plugin, parent, imports, filter, session.getLocalRepository(),
-                                      project.getPluginArtifactRepositories(), pluginDescriptor.getClassRealm(),
-                                      pluginDescriptor.getArtifacts() );
+                pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
         }
 
         pluginRealmCache.register( project, cacheRecord );
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                                    List<String> imports, ArtifactFilter filter )
+                                    List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
@@ -305,41 +310,31 @@ public class DefaultMavenPluginManager
 
         MavenProject project = session.getCurrentProject();
 
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest();
-        request.setLocalRepository( session.getLocalRepository() );
-        request.setRemoteRepositories( project.getPluginArtifactRepositories() );
-        request.setCache( session.getRepositoryCache() );
-        request.setOffline( session.isOffline() );
-        request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
-        request.setServers( session.getRequest().getServers() );
-        request.setMirrors( session.getRequest().getMirrors() );
-        request.setProxies( session.getRequest().getProxies() );
-        request.setTransferListener( session.getRequest().getTransferListener() );
+        DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
+        dependencyFilter = AndDependencyFilter.newInstance( dependencyFilter, filter );
 
-        ArtifactFilter dependencyFilter = project.getExtensionArtifactFilter();
-        if ( dependencyFilter == null )
+        DependencyNode root =
+            pluginDependenciesResolver.resolve( plugin, RepositoryUtils.toArtifact( pluginArtifact ), dependencyFilter,
+                                                project.getRemotePluginRepositories(), session.getRepositorySession() );
+
+        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+        root.accept( nlg );
+
+        List<Artifact> exposedPluginArtifacts = new ArrayList<Artifact>( nlg.getNodes().size() );
+        RepositoryUtils.toArtifacts( exposedPluginArtifacts, Collections.singleton( root ),
+                                     Collections.<String> emptyList(), null );
+        for ( Iterator<Artifact> it = exposedPluginArtifacts.iterator(); it.hasNext(); )
         {
-            dependencyFilter = filter;
-        }
-        else if ( filter != null )
-        {
-            dependencyFilter = new AndArtifactFilter( Arrays.asList( dependencyFilter, filter ) );
-        }
-
-        List<Artifact> pluginArtifacts =
-            pluginDependenciesResolver.resolve( plugin, pluginArtifact, request, dependencyFilter );
-
-        ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports, pluginArtifacts );
-
-        List<Artifact> exposedPluginArtifacts = new ArrayList<Artifact>();
-
-        for ( Artifact artifact : pluginArtifacts )
-        {
-            if ( artifact.getFile() != null )
+            Artifact artifact = it.next();
+            if ( artifact.getFile() == null )
             {
-                exposedPluginArtifacts.add( artifact );
+                it.remove();
             }
         }
+
+        List<org.sonatype.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
+
+        ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports, pluginArtifacts );
 
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( exposedPluginArtifacts );

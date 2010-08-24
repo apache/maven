@@ -25,6 +25,7 @@ package org.apache.maven.artifact.repository;
  * 
  * @author Benjamin Bentmann
  */
+@Deprecated
 public interface RepositoryCache
 {
 

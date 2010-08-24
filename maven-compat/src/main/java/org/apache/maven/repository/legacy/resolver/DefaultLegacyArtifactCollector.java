@@ -83,7 +83,6 @@ public class DefaultLegacyArtifactCollector
             request.setServers( session.getRequest().getServers() );
             request.setMirrors( session.getRequest().getMirrors() );
             request.setProxies( session.getRequest().getProxies() );
-            request.setTransferListener( session.getRequest().getTransferListener() );
         }
     }
 

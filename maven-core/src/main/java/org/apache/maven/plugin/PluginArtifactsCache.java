@@ -21,11 +21,12 @@ package org.apache.maven.plugin;
 
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Caches plugin artifacts. <strong>Warning:</strong> This is an internal utility interface that is only public for
@@ -37,6 +38,14 @@ import org.apache.maven.project.MavenProject;
  */
 public interface PluginArtifactsCache
 {
+
+    /**
+     * A cache key.
+     */
+    interface Key
+    {
+        // marker interface for cache keys
+    }
 
     public static class CacheRecord
     {
@@ -50,10 +59,12 @@ public interface PluginArtifactsCache
 
     }
 
-    CacheRecord get( Plugin plugin, RepositoryRequest repositoryRequest, ArtifactFilter extensionArtifactFilter );
+    Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
+                   RepositorySystemSession session );
 
-    CacheRecord put( Plugin plugin, RepositoryRequest repositoryRequest, ArtifactFilter extensionArtifactFilter,
-                     List<Artifact> pluginArtifacts );
+    CacheRecord get( Key key );
+
+    CacheRecord put( Key key, List<Artifact> pluginArtifacts );
 
     void flush();
 

@@ -229,6 +229,10 @@ public class PluginParameterExpressionEvaluator
                                                          e );
             }
         }
+        else if ( expression.equals( "repositorySystemSession" ) )
+        {
+            value = session.getRepositorySession();
+        }
         else if ( expression.equals( "mojo" ) )
         {
             value = mojoExecution;

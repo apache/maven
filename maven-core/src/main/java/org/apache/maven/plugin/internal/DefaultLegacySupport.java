@@ -22,6 +22,7 @@ package org.apache.maven.plugin.internal;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * Helps to provide backward-compatibility with plugins that use legacy components. <strong>Warning:</strong> This is an
@@ -53,6 +54,12 @@ public class DefaultLegacySupport
     public MavenSession getSession()
     {
         return session.get();
+    }
+
+    public RepositorySystemSession getRepositorySession()
+    {
+        MavenSession session = getSession();
+        return ( session != null ) ? session.getRepositorySession() : null;
     }
 
 }

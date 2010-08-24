@@ -19,28 +19,37 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.ArtifactFilterManager;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
-import org.apache.maven.artifact.resolver.ResolutionErrorHandler;
-import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.collection.CollectRequest;
+import org.sonatype.aether.collection.DependencyCollectionException;
+import org.sonatype.aether.collection.DependencyGraphTransformer;
+import org.sonatype.aether.collection.DependencySelector;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.graph.DependencyVisitor;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.util.artifact.JavaScopes;
+import org.sonatype.aether.util.filter.AndDependencyFilter;
+import org.sonatype.aether.util.filter.ExclusionsDependencyFilter;
+import org.sonatype.aether.util.filter.ScopeDependencyFilter;
+import org.sonatype.aether.util.graph.selector.AndDependencySelector;
+import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility class that
@@ -55,29 +64,32 @@ public class DefaultPluginDependenciesResolver
     implements PluginDependenciesResolver
 {
 
-    @Requirement
-    protected RepositorySystem repositorySystem;
+    private static final String REPOSITORY_CONTEXT = "plugin";
 
     @Requirement
-    private ResolutionErrorHandler resolutionErrorHandler;
+    private Logger logger;
 
     @Requirement
     private ArtifactFilterManager artifactFilterManager;
 
-    public Artifact resolve( Plugin plugin, ArtifactResolutionRequest request )
+    @Requirement
+    private RepositorySystem repoSystem;
+
+    private Artifact toArtifact( Plugin plugin, RepositorySystemSession session )
+    {
+        return new DefaultArtifact( plugin.getGroupId(), plugin.getArtifactId(), null, "jar", plugin.getVersion(),
+                                    session.getArtifactTypeRegistry().get( "maven-plugin" ) );
+    }
+
+    public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        Artifact pluginArtifact = repositorySystem.createPluginArtifact( plugin );
-
-        request.setArtifact( pluginArtifact );
-        request.setResolveRoot( true );
-        request.setResolveTransitively( false );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        Artifact pluginArtifact = toArtifact( plugin, session );
 
         try
         {
-            resolutionErrorHandler.throwErrors( request, result );
+            ArtifactRequest request = new ArtifactRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+            pluginArtifact = repoSystem.resolveArtifact( session, request ).getArtifact();
         }
         catch ( ArtifactResolutionException e )
         {
@@ -87,96 +99,113 @@ public class DefaultPluginDependenciesResolver
         return pluginArtifact;
     }
 
-    public List<Artifact> resolve( Plugin plugin, Artifact pluginArtifact, ArtifactResolutionRequest request,
-                                   ArtifactFilter dependencyFilter )
+    public DependencyNode resolve( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
+                                   List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
         if ( pluginArtifact == null )
         {
-            pluginArtifact = repositorySystem.createPluginArtifact( plugin );
+            pluginArtifact = toArtifact( plugin, session );
         }
 
-        Set<Artifact> overrideArtifacts = new LinkedHashSet<Artifact>();
-        for ( Dependency dependency : plugin.getDependencies() )
-        {
-	          if ( !Artifact.SCOPE_SYSTEM.equals( dependency.getScope() ) )
-	          {
-	              dependency.setScope( Artifact.SCOPE_RUNTIME );
-	          }
-            overrideArtifacts.add( repositorySystem.createDependencyArtifact( dependency ) );
-        }
+        DependencyFilter collectionFilter = new ScopeDependencyFilter( "provided", "test" );
 
-        ArtifactFilter collectionFilter = new ScopeArtifactFilter( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM );
+        DependencyFilter resolutionFilter =
+            new ExclusionsDependencyFilter( artifactFilterManager.getCoreArtifactExcludes() );
+        resolutionFilter = AndDependencyFilter.newInstance( resolutionFilter, dependencyFilter );
+        resolutionFilter = new AndDependencyFilter( collectionFilter, resolutionFilter );
 
-        ArtifactFilter resolutionFilter = artifactFilterManager.getCoreArtifactFilter();
-
-        PluginDependencyResolutionListener listener = new PluginDependencyResolutionListener( resolutionFilter );
-
-        if ( dependencyFilter != null )
-        {
-            resolutionFilter = new AndArtifactFilter( Arrays.asList( resolutionFilter, dependencyFilter ) );
-        }
-
-        request.setArtifact( pluginArtifact );
-        request.setArtifactDependencies( overrideArtifacts );
-        request.setCollectionFilter( collectionFilter );
-        request.setResolutionFilter( resolutionFilter );
-        request.setResolveRoot( true );
-        request.setResolveTransitively( true );
-        request.addListener( listener );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
+        DependencyNode node;
 
         try
         {
-            resolutionErrorHandler.throwErrors( request, result );
+            DependencySelector selector =
+                AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
+
+            DependencyGraphTransformer transformer =
+                ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(),
+                                                               new PlexusUtilsInjector() );
+
+            DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
+            pluginSession.setDependencySelector( selector );
+            pluginSession.setDependencyGraphTransformer( transformer );
+
+            CollectRequest request = new CollectRequest();
+            request.setRequestContext( REPOSITORY_CONTEXT );
+            request.setRepositories( repositories );
+            request.setRoot( new org.sonatype.aether.graph.Dependency( pluginArtifact, null ) );
+            for ( Dependency dependency : plugin.getDependencies() )
+            {
+                org.sonatype.aether.graph.Dependency pluginDep =
+                    RepositoryUtils.toDependency( dependency, session.getArtifactTypeRegistry() );
+                if ( !JavaScopes.SYSTEM.equals( pluginDep.getScope() ) )
+                {
+                    pluginDep = pluginDep.setScope( JavaScopes.RUNTIME );
+                }
+                request.addDependency( pluginDep );
+            }
+
+            node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
+
+            if ( logger.isDebugEnabled() )
+            {
+                node.accept( new GraphLogger() );
+            }
+
+            repoSystem.resolveDependencies( session, node, resolutionFilter );
+        }
+        catch ( DependencyCollectionException e )
+        {
+            throw new PluginResolutionException( plugin, e );
         }
         catch ( ArtifactResolutionException e )
         {
             throw new PluginResolutionException( plugin, e );
         }
 
-        List<Artifact> pluginArtifacts = new ArrayList<Artifact>( result.getArtifacts() );
-
-        listener.removeBannedDependencies( pluginArtifacts );
-
-        addPlexusUtils( pluginArtifacts, plugin, request );
-
-        return pluginArtifacts;
+        return node;
     }
 
-    // backward-compatibility with Maven 2.x
-    private void addPlexusUtils( List<Artifact> pluginArtifacts, Plugin plugin, RepositoryRequest repositoryRequest )
-        throws PluginResolutionException
+    class GraphLogger
+        implements DependencyVisitor
     {
-        for ( Artifact artifact : pluginArtifacts )
+
+        private String indent = "";
+
+        public boolean visitEnter( DependencyNode node )
         {
-            if ( "org.codehaus.plexus:plexus-utils:jar".equals( artifact.getDependencyConflictId() ) )
+            StringBuilder buffer = new StringBuilder( 128 );
+            buffer.append( indent );
+            org.sonatype.aether.graph.Dependency dep = node.getDependency();
+            if ( dep != null )
             {
-                return;
+                org.sonatype.aether.artifact.Artifact art = dep.getArtifact();
+
+                buffer.append( art );
+                buffer.append( ':' ).append( dep.getScope() );
+
+                if ( node.getPremanagedScope() != null && !node.getPremanagedScope().equals( dep.getScope() ) )
+                {
+                    buffer.append( " (scope managed from " ).append( node.getPremanagedScope() ).append( ")" );
+                }
+
+                if ( node.getPremanagedVersion() != null && !node.getPremanagedVersion().equals( art.getVersion() ) )
+                {
+                    buffer.append( " (version managed from " ).append( node.getPremanagedVersion() ).append( ")" );
+                }
             }
+
+            logger.debug( buffer.toString() );
+            indent += "   ";
+            return true;
         }
 
-        Artifact plexusUtils =
-            repositorySystem.createArtifact( "org.codehaus.plexus", "plexus-utils", "1.1", Artifact.SCOPE_RUNTIME,
-                                             "jar" );
-
-        ArtifactResolutionRequest request = new ArtifactResolutionRequest( repositoryRequest );
-        request.setArtifact( plexusUtils );
-        request.setResolveRoot( true );
-        request.setResolveTransitively( false );
-
-        ArtifactResolutionResult result = repositorySystem.resolve( request );
-        try
+        public boolean visitLeave( DependencyNode node )
         {
-            resolutionErrorHandler.throwErrors( request, result );
-        }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new PluginResolutionException( plugin, e );
+            indent = indent.substring( 0, indent.length() - 3 );
+            return true;
         }
 
-        pluginArtifacts.add( plexusUtils );
     }
 
 }

@@ -59,6 +59,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "plexus:plexus-container-default" );
         artifacts.add( "org.sonatype.spice:spice-inject-plexus" );
         artifacts.add( "org.apache.maven:maven-artifact" );
+        artifacts.add( "org.apache.maven:maven-aether-provider" );
         artifacts.add( "org.apache.maven:maven-artifact-manager" );
         artifacts.add( "org.apache.maven:maven-compat" );
         artifacts.add( "org.apache.maven:maven-core" );
@@ -78,6 +79,8 @@ public class DefaultArtifactFilterManager
         artifacts.add( "org.apache.maven:maven-settings-builder" );
         artifacts.add( "org.apache.maven:maven-toolchain" );
         artifacts.add( "org.apache.maven.wagon:wagon-provider-api" );
+        artifacts.add( "org.sonatype.aether:aether-api" );
+        artifacts.add( "org.sonatype.aether:aether-spi" );
 
         /*
          * NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise
@@ -120,18 +123,11 @@ public class DefaultArtifactFilterManager
     /**
      * Returns the artifact filter for the standard core artifacts.
      *
-     * @see org.apache.maven.ArtifactFilterManager#getExtensionArtifactFilter()
+     * @see org.apache.maven.ArtifactFilterManager#getExtensionDependencyFilter()
      */
     public ArtifactFilter getCoreArtifactFilter()
     {
-        Set<String> excludes = new LinkedHashSet<String>( DEFAULT_EXCLUSIONS );
-
-        for ( ArtifactFilterManagerDelegate delegate : getDelegates() )
-        {
-            delegate.addCoreExcludes( excludes );
-        }
-
-        return new ExclusionSetFilter( excludes );
+        return new ExclusionSetFilter( getCoreArtifactExcludes() );
     }
 
     private List<ArtifactFilterManagerDelegate> getDelegates()
@@ -152,6 +148,18 @@ public class DefaultArtifactFilterManager
     public void excludeArtifact( String artifactId )
     {
         excludedArtifacts.add( artifactId );
+    }
+
+    public Set<String> getCoreArtifactExcludes()
+    {
+        Set<String> excludes = new LinkedHashSet<String>( DEFAULT_EXCLUSIONS );
+
+        for ( ArtifactFilterManagerDelegate delegate : getDelegates() )
+        {
+            delegate.addCoreExcludes( excludes );
+        }
+
+        return excludes;
     }
 
 }

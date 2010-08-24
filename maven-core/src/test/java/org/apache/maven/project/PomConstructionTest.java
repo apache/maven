@@ -32,7 +32,9 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -1816,6 +1818,11 @@ public class PomConstructionTest
         config.setUserProperties( executionProperties );
         config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
+        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
+        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManager(
+                                                                                 new File(
+                                                                                           config.getLocalRepository().getBasedir() ) ) );
+        config.setRepositorySession( repoSession );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
     }

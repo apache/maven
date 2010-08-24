@@ -66,7 +66,9 @@ public class LifecyclePluginResolver
         {
             if ( plugin.getVersion() == null )
             {
-                PluginVersionRequest request = new DefaultPluginVersionRequest( plugin, session );
+                PluginVersionRequest request =
+                    new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
+                                                     project.getRemotePluginRepositories() );
                 plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
             }
             versions.put( plugin.getKey(), plugin.getVersion() );
@@ -82,7 +84,9 @@ public class LifecyclePluginResolver
                     plugin.setVersion( versions.get( plugin.getKey() ) );
                     if ( plugin.getVersion() == null )
                     {
-                        PluginVersionRequest request = new DefaultPluginVersionRequest( plugin, session );
+                        PluginVersionRequest request =
+                            new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
+                                                             project.getRemotePluginRepositories() );
                         plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
                     }
                 }

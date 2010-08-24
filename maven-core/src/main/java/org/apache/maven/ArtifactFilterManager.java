@@ -19,6 +19,8 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.util.Set;
+
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 
 public interface ArtifactFilterManager
@@ -39,4 +41,7 @@ public interface ArtifactFilterManager
      * @param artifactId
      */
     void excludeArtifact( String artifactId );
+
+    Set<String> getCoreArtifactExcludes();
+
 }

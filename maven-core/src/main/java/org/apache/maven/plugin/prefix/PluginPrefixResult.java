@@ -1,5 +1,7 @@
 package org.apache.maven.plugin.prefix;
 
+import org.sonatype.aether.repository.ArtifactRepository;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,8 +20,6 @@ package org.apache.maven.plugin.prefix;
  * specific language governing permissions and limitations
  * under the License.
  */
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin prefix resolution request.

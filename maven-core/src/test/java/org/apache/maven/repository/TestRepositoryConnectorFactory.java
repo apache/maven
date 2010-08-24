@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.repository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,31 +19,30 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.maven.artifact.repository.RepositoryCache;
-import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.spi.connector.RepositoryConnector;
+import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
+import org.sonatype.aether.transfer.NoRepositoryConnectorException;
 
 /**
- * Provides a simple repository cache whose lifetime is scoped to a single Maven session.
- * 
  * @author Benjamin Bentmann
  */
-class SessionRepositoryCache
-    implements RepositoryCache
+@Component( role = RepositoryConnectorFactory.class, hint = "test" )
+public class TestRepositoryConnectorFactory
+    implements RepositoryConnectorFactory
 {
 
-    private Map<Object, Object> cache = new ConcurrentHashMap<Object, Object>( 256 );
-
-    public Object get( RepositoryRequest request, Object key )
+    public RepositoryConnector newInstance( RepositorySystemSession session, RemoteRepository repository )
+        throws NoRepositoryConnectorException
     {
-        return cache.get( key );
+        return new TestRepositoryConnector( repository );
     }
 
-    public void put( RepositoryRequest request, Object key, Object data )
+    public int getPriority()
     {
-        cache.put( key, data );
+        return 0;
     }
 
 }

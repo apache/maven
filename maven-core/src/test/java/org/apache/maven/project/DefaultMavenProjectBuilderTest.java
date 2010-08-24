@@ -83,6 +83,7 @@ public class DefaultMavenProjectBuilderTest
     {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
+        initRepoSession( configuration );
 
         return projectBuilder.build( pom, allowStub, configuration ).getProject();
     }

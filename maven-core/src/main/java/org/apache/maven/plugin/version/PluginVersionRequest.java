@@ -21,11 +21,9 @@ package org.apache.maven.plugin.version;
 
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryCache;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.model.Model;
-import org.apache.maven.repository.ArtifactTransferListener;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve the version for a plugin.
@@ -34,7 +32,6 @@ import org.apache.maven.repository.ArtifactTransferListener;
  * @author Benjamin Bentmann
  */
 public interface PluginVersionRequest
-    extends RepositoryRequest
 {
 
     /**
@@ -85,79 +82,34 @@ public interface PluginVersionRequest
     PluginVersionRequest setPom( Model pom );
 
     /**
-     * Indicates whether network access to remote repositories has been disabled.
-     * 
-     * @return {@code true} if remote access has been disabled, {@code false} otherwise.
-     */
-    boolean isOffline();
-
-    /**
-     * Enables/disables network access to remote repositories.
-     * 
-     * @param offline {@code true} to disable remote access, {@code false} to allow network access.
-     * @return This request, never {@code null}.
-     */
-    PluginVersionRequest setOffline( boolean offline );
-
-    /**
-     * Gets the local repository to use.
-     * 
-     * @return The local repository to use or {@code null} if not set.
-     */
-    ArtifactRepository getLocalRepository();
-
-    /**
-     * Sets the local repository to use.
-     * 
-     * @param localRepository The local repository to use.
-     * @return This request, never {@code null}.
-     */
-    PluginVersionRequest setLocalRepository( ArtifactRepository localRepository );
-
-    /**
      * Gets the remote repositories to use.
      * 
      * @return The remote repositories to use, never {@code null}.
      */
-    List<ArtifactRepository> getRemoteRepositories();
+    List<RemoteRepository> getRepositories();
 
     /**
      * Sets the remote repositories to use. <em>Note:</em> When creating a request from a project, be sure to use the
-     * plugin artifact repositories and not the regular artifact repositories.
+     * plugin repositories and not the regular project repositories.
      * 
-     * @param remoteRepositories The remote repositories to use.
+     * @param repositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
+    PluginVersionRequest setRepositories( List<RemoteRepository> repositories );
 
     /**
-     * Gets the repository cache to use.
+     * Gets the session to use for repository access.
      * 
-     * @return The repository cache to use or {@code null} if none.
+     * @return The repository session or {@code null} if not set.
      */
-    RepositoryCache getCache();
+    RepositorySystemSession getRepositorySession();
 
     /**
-     * Sets the repository cache to use.
+     * Sets the session to use for repository access.
      * 
-     * @param cache The repository cache to use, may be {@code null}.
+     * @param repositorySession The repository session to use.
      * @return This request, never {@code null}.
      */
-    PluginVersionRequest setCache( RepositoryCache cache );
-
-    /**
-     * Gets the listener to notify of transfer events.
-     * 
-     * @return The transfer listener or {@code null} if none.
-     */
-    ArtifactTransferListener getTransferListener();
-
-    /**
-     * Sets the listener to notify of transfer events.
-     * 
-     * @param transferListener The transfer listener to notify, may be {@code null}.
-     * @return This request, never {@code null}.
-     */
-    PluginVersionRequest setTransferListener( ArtifactTransferListener transferListener );
+    PluginVersionRequest setRepositorySession( RepositorySystemSession repositorySession );
 
 }

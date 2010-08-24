@@ -25,23 +25,23 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.sonatype.aether.RepositorySystemSession;
 
 public class DefaultProjectBuildingRequest
     implements ProjectBuildingRequest
 {
 
+    private RepositorySystemSession repositorySession;
+
     private boolean offline;
 
     private boolean forceUpdate;
-
-    private RepositoryCache repositoryCache;
 
     private ArtifactRepository localRepository;
 
@@ -124,18 +124,6 @@ public class DefaultProjectBuildingRequest
         this.forceUpdate = forceUpdate;
 
         return this;
-    }
-
-    public ProjectBuildingRequest setRepositoryCache( RepositoryCache repositoryCache )
-    {
-        this.repositoryCache = repositoryCache;
-
-        return this;
-    }
-
-    public RepositoryCache getRepositoryCache()
-    {
-        return repositoryCache;
     }
 
     public ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository )
@@ -391,6 +379,17 @@ public class DefaultProjectBuildingRequest
     public void setTransferListener( ArtifactTransferListener transferListener )
     {
         this.transferListener = transferListener;
+    }
+
+    public RepositorySystemSession getRepositorySession()
+    {
+        return repositorySession;
+    }
+
+    public DefaultProjectBuildingRequest setRepositorySession( RepositorySystemSession repositorySession )
+    {
+        this.repositorySession = repositorySession;
+        return this;
     }
 
 }

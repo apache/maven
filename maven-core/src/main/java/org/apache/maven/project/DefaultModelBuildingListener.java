@@ -107,7 +107,7 @@ class DefaultModelBuildingListener
                     projectBuildingHelper.createProjectRealm( project, model, projectBuildingRequest );
 
                 project.setClassRealm( record.realm );
-                project.setExtensionArtifactFilter( record.extensionArtifactFilter );
+                project.setExtensionDependencyFilter( record.extensionArtifactFilter );
             }
             catch ( PluginResolutionException e )
             {

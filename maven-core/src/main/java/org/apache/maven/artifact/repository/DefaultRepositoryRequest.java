@@ -24,11 +24,10 @@ import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.ArtifactTransferListener;
 
 /**
  * Collects basic settings to access the repository system.
- *
+ * 
  * @author Benjamin Bentmann
  */
 public class DefaultRepositoryRequest
@@ -43,10 +42,6 @@ public class DefaultRepositoryRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
-    private RepositoryCache cache;
-
-    private ArtifactTransferListener transferListener;
-
     /**
      * Creates an empty repository request.
      */
@@ -57,7 +52,7 @@ public class DefaultRepositoryRequest
 
     /**
      * Creates a shallow copy of the specified repository request.
-     *
+     * 
      * @param repositoryRequest The repository request to copy from, must not be {@code null}.
      */
     public DefaultRepositoryRequest( RepositoryRequest repositoryRequest )
@@ -65,16 +60,13 @@ public class DefaultRepositoryRequest
         setLocalRepository( repositoryRequest.getLocalRepository() );
         setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
         setOffline( repositoryRequest.isOffline() );
-        setCache( repositoryRequest.getCache() );
         setForceUpdate( repositoryRequest.isForceUpdate() );
-        setTransferListener( repositoryRequest.getTransferListener() );
     }
 
     public static RepositoryRequest getRepositoryRequest( MavenSession session, MavenProject project )
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
 
-        request.setCache( session.getRepositoryCache() );
         request.setLocalRepository( session.getLocalRepository() );
         if ( project != null )
         {
@@ -82,7 +74,6 @@ public class DefaultRepositoryRequest
         }
         request.setOffline( session.isOffline() );
         request.setForceUpdate( session.getRequest().isUpdateSnapshots() );
-        request.setTransferListener( session.getRequest().getTransferListener() );
 
         return request;
     }
@@ -136,30 +127,6 @@ public class DefaultRepositoryRequest
     public DefaultRepositoryRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
     {
         this.remoteRepositories = remoteRepositories;
-
-        return this;
-    }
-
-    public RepositoryCache getCache()
-    {
-        return cache;
-    }
-
-    public DefaultRepositoryRequest setCache( RepositoryCache cache )
-    {
-        this.cache = cache;
-
-        return this;
-    }
-
-    public ArtifactTransferListener getTransferListener()
-    {
-        return transferListener;
-    }
-
-    public DefaultRepositoryRequest setTransferListener( ArtifactTransferListener transferListener )
-    {
-        this.transferListener = transferListener;
 
         return this;
     }

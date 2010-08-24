@@ -1,22 +1,18 @@
 package org.apache.maven.project;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
@@ -35,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -75,6 +72,8 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * The concern of the project is provide runtime values based on the model.
@@ -118,6 +117,10 @@ public class MavenProject
     private List<ArtifactRepository> remoteArtifactRepositories;
 
     private List<ArtifactRepository> pluginArtifactRepositories;
+
+    private List<RemoteRepository> remoteProjectRepositories;
+
+    private List<RemoteRepository> remotePluginRepositories;
 
     private List<Artifact> attachedArtifacts;
 
@@ -171,14 +174,14 @@ public class MavenProject
     private ProjectBuildingRequest projectBuilderConfiguration;
 
     private RepositorySystem repositorySystem;
-
+    
     private File parentFile;
 
     private Map<String, Object> context;
 
     private ClassRealm classRealm;
 
-    private ArtifactFilter extensionArtifactFilter;
+    private DependencyFilter extensionDependencyFilter;
 
     private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
 
@@ -208,10 +211,10 @@ public class MavenProject
     {
         deepCopy( project );
     }
-
+    
     @Deprecated
     public MavenProject( Model model, RepositorySystem repositorySystem )
-    {
+    {        
         this.repositorySystem = repositorySystem;
         setModel( model );
     }
@@ -228,7 +231,7 @@ public class MavenProject
 
     /**
      * Constructor
-     *
+     * 
      * @param repositorySystem - may not be null
      * @param mavenProjectBuilder
      * @param projectBuilderConfiguration
@@ -377,7 +380,7 @@ public class MavenProject
     {
         this.parent = parent;
     }
-
+    
     public boolean hasParent()
     {
         return getParent() != null;
@@ -498,12 +501,11 @@ public class MavenProject
         list.add( getBuild().getOutputDirectory() );
 
         for ( Artifact a : getArtifacts() )
-        {
+        {                        
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                    || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     addArtifactPath( a, list );
                 }
@@ -524,8 +526,7 @@ public class MavenProject
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                    || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
                 {
                     list.add( a );
                 }
@@ -549,8 +550,7 @@ public class MavenProject
         for ( Artifact a : getArtifacts()  )
         {
             // TODO: let the scope handler deal with this
-            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+            if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -577,11 +577,11 @@ public class MavenProject
         list.add( getBuild().getTestOutputDirectory() );
 
         list.add( getBuild().getOutputDirectory() );
-
+        
         for ( Artifact a : getArtifacts() )
-        {
+        {            
             if ( a.getArtifactHandler().isAddedToClasspath() )
-            {
+            {                
                 addArtifactPath( a, list );
             }
         }
@@ -1069,7 +1069,7 @@ public class MavenProject
      * All dependencies that this project has, including transitive ones. Contents are lazily
      * populated, so depending on what phases have run dependencies in some scopes won't be
      * included. eg. if only compile phase has run, dependencies with scope test won't be included.
-     *
+     * 
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
@@ -1243,8 +1243,7 @@ public class MavenProject
                     version = ext.getVersion();
                 }
 
-                Artifact artifact =
-                    repositorySystem.createArtifact( ext.getGroupId(), ext.getArtifactId(), version, null, "jar" );
+                Artifact artifact = repositorySystem.createArtifact( ext.getGroupId(), ext.getArtifactId(), version, null, "jar" );
 
                 if ( artifact != null )
                 {
@@ -1345,6 +1344,7 @@ public class MavenProject
     public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
     {
         this.remoteArtifactRepositories = remoteArtifactRepositories;
+        this.remoteProjectRepositories = RepositoryUtils.toRepos( getRemoteArtifactRepositories() );
     }
 
     public List<ArtifactRepository> getRemoteArtifactRepositories()
@@ -1360,6 +1360,7 @@ public class MavenProject
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
+        this.remotePluginRepositories = RepositoryUtils.toRepos( getPluginArtifactRepositories() );
     }
 
     /**
@@ -1378,13 +1379,22 @@ public class MavenProject
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null ) ? getSnapshotArtifactRepository()
-                        : getReleaseArtifactRepository();
+        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null ) ? getSnapshotArtifactRepository() : getReleaseArtifactRepository();
     }
 
     public List<Repository> getPluginRepositories()
     {
         return getModel().getRepositories();
+    }
+
+    public List<RemoteRepository> getRemoteProjectRepositories()
+    {
+        return remoteProjectRepositories;
+    }
+
+    public List<RemoteRepository> getRemotePluginRepositories()
+    {
+        return remotePluginRepositories;
     }
 
     public void setActiveProfiles( List<Profile> activeProfiles )
@@ -1415,7 +1425,7 @@ public class MavenProject
      * settings.xml}. The profile identifiers are grouped by the identifier of their source, e.g. {@code
      * <groupId>:<artifactId>:<version>} for a POM profile or {@code external} for profiles from the {@code
      * settings.xml}.
-     *
+     * 
      * @return The identifiers of all injected profiles, indexed by the source from which the profiles originated, never
      *         {@code null}.
      */
@@ -1557,7 +1567,7 @@ public class MavenProject
 
     /**
      * Direct dependencies that this project has.
-     *
+     * 
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getArtifacts() to get all transitive dependencies
      */
@@ -1609,8 +1619,7 @@ public class MavenProject
 
             List<Dependency> deps;
             DependencyManagement dependencyManagement = getDependencyManagement();
-            if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null )
-                && ( deps.size() > 0 ) )
+            if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) && ( deps.size() > 0 ) )
             {
                 map = new HashMap<String, Artifact>();
                 for ( Iterator<Dependency> i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
@@ -1685,8 +1694,7 @@ public class MavenProject
 
     public void addProjectReference( MavenProject project )
     {
-        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId(),
-                                                      project.getVersion() ), project );
+        projectReferences.put( getProjectReferenceId( project.getGroupId(), project.getArtifactId(), project.getVersion() ), project );
     }
 
     /**
@@ -1844,7 +1852,7 @@ public class MavenProject
             {
             }
         }
-
+        
         return releaseArtifactRepository;
     }
 
@@ -1864,7 +1872,7 @@ public class MavenProject
             {
             }
         }
-
+        
         return snapshotArtifactRepository;
     }
 
@@ -1992,9 +2000,9 @@ public class MavenProject
      * Sets the value of the context value of this project identified
      * by the given key. If the supplied value is <code>null</code>,
      * the context value is removed from this project.
-     *
+     * 
      * Context values are intended to allow core extensions to associate
-     * derived state with project instances.
+     * derived state with project instances. 
      */
     public void setContextValue( String key, Object value )
     {
@@ -2013,8 +2021,8 @@ public class MavenProject
     }
 
     /**
-     * Returns context value of this project associated with the given key
-     * or null if this project has no such value.
+     * Returns context value of this project associated with the given key 
+     * or null if this project has no such value. 
      */
     public Object getContextValue( String key )
     {
@@ -2029,7 +2037,7 @@ public class MavenProject
      * Sets the project's class realm. <strong>Warning:</strong> This is an internal utility method that is only public
      * for technical reasons, it is not part of the public API. In particular, this method can be changed or deleted
      * without prior notice and must not be used by plugins.
-     *
+     * 
      * @param classRealm The class realm hosting the build extensions of this project, may be {@code null}.
      */
     public void setClassRealm( ClassRealm classRealm )
@@ -2042,7 +2050,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     *
+     * 
      * @return The project's class realm or {@code null}.
      */
     public ClassRealm getClassRealm()
@@ -2054,24 +2062,25 @@ public class MavenProject
      * Sets the artifact filter used to exclude shared extension artifacts from plugin realms. <strong>Warning:</strong>
      * This is an internal utility method that is only public for technical reasons, it is not part of the public API.
      * In particular, this method can be changed or deleted without prior notice and must not be used by plugins.
-     *
-     * @param extensionArtifactFilter The artifact filter to apply to plugins, may be {@code null}.
+     * 
+     * @param extensionDependencyFilter The dependency filter to apply to plugins, may be {@code null}.
      */
-    public void setExtensionArtifactFilter( ArtifactFilter extensionArtifactFilter )
+    public void setExtensionDependencyFilter( DependencyFilter extensionDependencyFilter )
     {
-        this.extensionArtifactFilter = extensionArtifactFilter;
+        this.extensionDependencyFilter = extensionDependencyFilter;
     }
 
     /**
-     * Gets the artifact filter used to exclude shared extension artifacts from plugin realms. <strong>Warning:</strong>
-     * This is an internal utility method that is only public for technical reasons, it is not part of the public API.
-     * In particular, this method can be changed or deleted without prior notice and must not be used by plugins.
-     *
-     * @return The artifact filter or {@code null}.
+     * Gets the dependency filter used to exclude shared extension artifacts from plugin realms.
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     * 
+     * @return The dependency filter or {@code null}.
      */
-    public ArtifactFilter getExtensionArtifactFilter()
+    public DependencyFilter getExtensionDependencyFilter()
     {
-        return extensionArtifactFilter;
+        return extensionDependencyFilter;
     }
 
     /**
@@ -2079,7 +2088,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     *
+     * 
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
@@ -2094,7 +2103,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     *
+     * 
      * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
      */
     public void setArtifactFilter( ArtifactFilter artifactFilter )
@@ -2120,7 +2129,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     *
+     * 
      * @param lifecyclePhase The lifecycle phase to add, must not be {@code null}.
      */
     public void addLifecyclePhase( String lifecyclePhase )

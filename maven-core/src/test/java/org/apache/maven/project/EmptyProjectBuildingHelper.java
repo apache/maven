@@ -49,8 +49,8 @@ public class EmptyProjectBuildingHelper
         }
     }
 
-    public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject proejct, Model model,
-                                                             ProjectBuildingRequest request )
+    public ProjectRealmCache.CacheRecord createProjectRealm( MavenProject proejct,
+                                                             Model model, ProjectBuildingRequest request )
     {
         return new ProjectRealmCache.CacheRecord( null, null );
     }

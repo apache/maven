@@ -94,6 +94,7 @@ public class DefaultMavenProjectBuilder
         MavenSession session = legacySupport.getSession();
         if ( session != null )
         {
+            request.setRepositorySession( session.getRepositorySession() );
             request.setOffline( session.isOffline() );
             request.setSystemProperties( session.getSystemProperties() );
             if ( request.getUserProperties().isEmpty() )
@@ -108,7 +109,6 @@ public class DefaultMavenProjectBuilder
                 request.setMirrors( req.getMirrors() );
                 request.setProxies( req.getProxies() );
                 request.setRemoteRepositories( req.getRemoteRepositories() );
-                request.setTransferListener( req.getTransferListener() );
                 request.setForceUpdate( req.isUpdateSnapshots() );
             }
         }

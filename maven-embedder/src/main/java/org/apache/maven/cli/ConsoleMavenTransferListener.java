@@ -23,8 +23,9 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.repository.ArtifactTransferEvent;
-import org.apache.maven.repository.ArtifactTransferResource;
+import org.sonatype.aether.transfer.TransferCancelledException;
+import org.sonatype.aether.transfer.TransferEvent;
+import org.sonatype.aether.transfer.TransferResource;
 
 /**
  * Console download progress meter.
@@ -35,7 +36,7 @@ class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
 
-    private Map<ArtifactTransferResource, Long> downloads = new ConcurrentHashMap<ArtifactTransferResource, Long>();
+    private Map<TransferResource, Long> downloads = new ConcurrentHashMap<TransferResource, Long>();
 
     private int lastLength;
 
@@ -45,14 +46,15 @@ class ConsoleMavenTransferListener
     }
 
     @Override
-    protected void doProgress( ArtifactTransferEvent transferEvent )
+    public void transferProgressed( TransferEvent event )
+        throws TransferCancelledException
     {
-        ArtifactTransferResource resource = transferEvent.getResource();
-        downloads.put( resource, Long.valueOf( transferEvent.getTransferredBytes() ) );
+        TransferResource resource = event.getResource();
+        downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
 
         StringBuilder buffer = new StringBuilder( 64 );
 
-        for ( Map.Entry<ArtifactTransferResource, Long> entry : downloads.entrySet() )
+        for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
         {
             long total = entry.getKey().getContentLength();
             long complete = entry.getValue().longValue();
@@ -100,16 +102,29 @@ class ConsoleMavenTransferListener
     }
 
     @Override
-    public void transferCompleted( ArtifactTransferEvent transferEvent )
+    public void transferSucceeded( TransferEvent event )
     {
-        downloads.remove( transferEvent.getResource() );
+        transferCompleted( event );
+
+        super.transferSucceeded( event );
+    }
+
+    @Override
+    public void transferFailed( TransferEvent event )
+    {
+        transferCompleted( event );
+
+        super.transferFailed( event );
+    }
+
+    private void transferCompleted( TransferEvent event )
+    {
+        downloads.remove( event.getResource() );
 
         StringBuilder buffer = new StringBuilder( 64 );
         pad( buffer, lastLength );
         buffer.append( '\r' );
         out.print( buffer );
-
-        super.transferCompleted( transferEvent );
     }
 
 }

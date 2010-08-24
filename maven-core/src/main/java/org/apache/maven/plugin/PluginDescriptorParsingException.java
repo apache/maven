@@ -28,12 +28,9 @@ public class PluginDescriptorParsingException
     extends Exception
 {
 
-    private Plugin plugin;
-
     public PluginDescriptorParsingException( Plugin plugin, String descriptorLocation, Throwable e )
     {
         super( createMessage( plugin, descriptorLocation, e ), e );
-        this.plugin = plugin;
     }
 
     private static String createMessage( Plugin plugin, String descriptorLocation, Throwable e )

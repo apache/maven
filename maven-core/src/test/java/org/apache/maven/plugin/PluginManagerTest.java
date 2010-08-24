@@ -1,5 +1,24 @@
 package org.apache.maven.plugin;
 
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -39,16 +58,6 @@ public class PluginManagerTest
         return "src/test/projects/plugin-manager";
     }
 
-    private RepositoryRequest getRepositoryRequest( MavenSession session )
-    {
-        RepositoryRequest request = new DefaultRepositoryRequest();
-
-        request.setLocalRepository( session.getLocalRepository() );
-        request.setRemoteRepositories( session.getCurrentProject().getPluginArtifactRepositories() );
-
-        return request;
-    }
-
     public void testPluginLoading()
         throws Exception
     {
@@ -57,7 +66,9 @@ public class PluginManagerTest
         plugin.setGroupId( "org.apache.maven.its.plugins" );
         plugin.setArtifactId( "maven-it-plugin" );
         plugin.setVersion( "0.1" );
-        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, getRepositoryRequest( session ) );
+        PluginDescriptor pluginDescriptor =
+            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
+                                      session.getRepositorySession() );
         assertNotNull( pluginDescriptor );
     }
     
@@ -71,7 +82,9 @@ public class PluginManagerTest
         plugin.setArtifactId( "maven-it-plugin" );
         plugin.setVersion( "0.1" );
         
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, getRepositoryRequest( session ) );        
+        MojoDescriptor mojoDescriptor =
+            pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject().getRemotePluginRepositories(),
+                                             session.getRepositorySession() );
         assertNotNull( mojoDescriptor );
         assertEquals( goal, mojoDescriptor.getGoal() );
         // igorf: plugin realm comes later
@@ -229,7 +242,9 @@ public class PluginManagerTest
         repositoryRequest.setLocalRepository( getLocalRepository() );
         repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
 
-        PluginDescriptor pluginDescriptor = pluginManager.loadPlugin( plugin, getRepositoryRequest( session ) );
+        PluginDescriptor pluginDescriptor =
+            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
+                                      session.getRepositorySession() );
         pluginManager.getPluginRealm( session, pluginDescriptor );
         List<Artifact> artifacts = pluginDescriptor.getArtifacts();
 

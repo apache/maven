@@ -21,11 +21,13 @@ package org.apache.maven.plugin.internal;
 
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
@@ -40,29 +42,30 @@ public interface PluginDependenciesResolver
 
     /**
      * Resolves the main artifact of the specified plugin.
-     *
+     * 
      * @param plugin The plugin for which to resolve the main artifact, must not be {@code null}.
-     * @param request A prepopulated resolution request that will be completed and used for the resolution, must not be
-     *            {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin's main artifact, must not be {@code
+     *            null}.
+     * @param session The repository session to use for resolving the plugin's main artifact, must not be {@code null}.
      * @return The resolved plugin artifact, never {@code null}.
      * @throws PluginResolutionException If the plugin artifact could not be resolved.
      */
-    Artifact resolve( Plugin plugin, ArtifactResolutionRequest request )
+    public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException;
 
     /**
      * Resolves the runtime dependencies of the specified plugin.
-     *
+     * 
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param pluginArtifact The plugin's main artifact, may be {@code null}.
-     * @param request A prepopulated resolution request that will be completed and used for the resolution, must not be
-     *            {@code null}.
-     * @param dependencyFilter A filter to exclude artifacts from resolution, may be {@code null}.
-     * @return The list of artifacts denoting the resolved plugin class path, never {@code null}.
+     * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
+     * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
+     * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
      */
-    List<Artifact> resolve( Plugin plugin, Artifact pluginArtifact, ArtifactResolutionRequest request,
-                            ArtifactFilter dependencyFilter )
+    DependencyNode resolve( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
+                            List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException;
 
 }

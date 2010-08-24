@@ -51,6 +51,11 @@ public class ProjectArtifactMetadata
         this.file = file;
     }
 
+    public File getFile()
+    {
+        return file;
+    }
+
     public String getRemoteFilename()
     {
         return getFilename();

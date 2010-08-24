@@ -22,7 +22,6 @@ package org.apache.maven.project;
 import java.io.File;
 import java.util.List;
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.model.building.ModelProblem;
 
 /**
@@ -70,6 +69,6 @@ public interface ProjectBuildingResult
      * @return The result of the dependency resolution for the project or {@code null} if the project dependencies were
      *         not requested.
      */
-    ArtifactResolutionResult getArtifactResolutionResult();
+    DependencyResolutionResult getDependencyResolutionResult();
 
 }

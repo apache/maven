@@ -29,11 +29,33 @@ import java.util.List;
 
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.collection.DependencyGraphTransformer;
+import org.sonatype.aether.collection.DependencyManager;
+import org.sonatype.aether.collection.DependencySelector;
+import org.sonatype.aether.collection.DependencyTraverser;
+import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.graph.manager.ClassicDependencyManager;
+import org.sonatype.aether.util.graph.selector.AndDependencySelector;
+import org.sonatype.aether.util.graph.selector.ExclusionDependencySelector;
+import org.sonatype.aether.util.graph.selector.OptionalDependencySelector;
+import org.sonatype.aether.util.graph.selector.ScopeDependencySelector;
+import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
+import org.sonatype.aether.util.graph.transformer.ConflictMarker;
+import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
+import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -53,6 +75,14 @@ public abstract class AbstractArtifactComponentTestCase
         super.setUp();
         artifactFactory = lookup( ArtifactFactory.class);        
         artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
+
+        RepositorySystemSession repoSession = initRepoSession();
+        MavenSession session =
+            new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
+                              new DefaultMavenExecutionResult() );
+
+        LegacySupport legacySupport = lookup(LegacySupport.class);
+        legacySupport.setSession( session );
     }
     
     @Override
@@ -297,4 +327,33 @@ public abstract class AbstractArtifactComponentTestCase
             }
         }
     }
+
+    protected RepositorySystemSession initRepoSession()
+        throws Exception
+    {
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        session.setIgnoreMissingArtifactDescriptor( true );
+        session.setIgnoreInvalidArtifactDescriptor( true );
+        DependencyTraverser depTraverser = new FatArtifactTraverser();
+        session.setDependencyTraverser( depTraverser );
+
+        DependencyManager depManager = new ClassicDependencyManager();
+        session.setDependencyManager( depManager );
+
+        DependencySelector depFilter =
+            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
+                                       new OptionalDependencySelector(), new ExclusionDependencySelector() );
+        session.setDependencySelector( depFilter );
+
+        DependencyGraphTransformer transformer =
+            new ChainedDependencyGraphTransformer( new ConflictMarker(), new JavaEffectiveScopeCalculator(),
+                                                   new NearestVersionConflictResolver(),
+                                                   new JavaDependencyContextRefiner() );
+        session.setDependencyGraphTransformer( transformer );
+
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepository().getBasedir() ) );
+
+        return session;
+    }
+
 }

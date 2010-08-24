@@ -21,8 +21,8 @@ package org.apache.maven.project;
 
 import java.util.List;
 
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.sonatype.aether.graph.DependencyFilter;
 
 /**
  * Caches project class realms. <strong>Warning:</strong> This is an internal utility interface that is only public for
@@ -40,9 +40,9 @@ public interface ProjectRealmCache
 
         public final ClassRealm realm;
 
-        public final ArtifactFilter extensionArtifactFilter;
+        public final DependencyFilter extensionArtifactFilter;
 
-        public CacheRecord( ClassRealm realm, ArtifactFilter extensionArtifactFilter )
+        public CacheRecord( ClassRealm realm, DependencyFilter extensionArtifactFilter )
         {
             this.realm = realm;
             this.extensionArtifactFilter = extensionArtifactFilter;
@@ -53,7 +53,7 @@ public interface ProjectRealmCache
     CacheRecord get( List<? extends ClassRealm> extensionRealms );
 
     CacheRecord put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
-                     ArtifactFilter extensionArtifactFilter );
+                     DependencyFilter extensionArtifactFilter );
 
     void flush();
 

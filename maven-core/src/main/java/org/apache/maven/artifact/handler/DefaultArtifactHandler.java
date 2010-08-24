@@ -64,6 +64,11 @@ public class DefaultArtifactHandler
         return extension;
     }
 
+    public void setExtension( String extension )
+    {
+        this.extension = extension;
+    }
+
     public String getType()
     {
         return type;
@@ -97,6 +102,11 @@ public class DefaultArtifactHandler
         return includesDependencies;
     }
 
+    public void setIncludesDependencies( boolean includesDependencies )
+    {
+        this.includesDependencies = includesDependencies;
+    }
+
     public String getLanguage()
     {
         if ( language == null )
@@ -107,8 +117,19 @@ public class DefaultArtifactHandler
         return language;
     }
 
+    public void setLanguage( String language )
+    {
+        this.language = language;
+    }
+
     public boolean isAddedToClasspath()
     {
         return addedToClasspath;
     }
+
+    public void setAddedToClasspath( boolean addedToClasspath )
+    {
+        this.addedToClasspath = addedToClasspath;
+    }
+
 }

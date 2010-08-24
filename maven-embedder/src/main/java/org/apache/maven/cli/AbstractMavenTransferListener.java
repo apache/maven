@@ -24,111 +24,35 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.apache.maven.repository.ArtifactTransferEvent;
-import org.apache.maven.repository.ArtifactTransferListener;
-import org.apache.maven.repository.ArtifactTransferResource;
+import org.sonatype.aether.transfer.TransferEvent;
+import org.sonatype.aether.transfer.TransferResource;
+import org.sonatype.aether.util.listener.AbstractTransferListener;
 
-public abstract class AbstractMavenTransferListener
-    implements ArtifactTransferListener
+abstract class AbstractMavenTransferListener
+    extends AbstractTransferListener
 {
 
     protected PrintStream out;
-
-    private boolean showChecksumEvents;
 
     protected AbstractMavenTransferListener( PrintStream out )
     {
         this.out = ( out != null ) ? out : System.out;
     }
 
-    protected boolean showEvent( ArtifactTransferEvent event )
+    public void transferInitiated( TransferEvent event )
     {
-        if ( event.getResource() == null )
-        {
-            return true;
-        }
+        String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-        String resource = event.getResource().getName();
-
-        if ( resource == null || resource.trim().length() == 0 )
-        {
-            return true;
-        }
-
-        if ( resource.endsWith( ".sha1" ) || resource.endsWith( ".md5" ) )
-        {
-            return showChecksumEvents;
-        }
-
-        return true;
+        out.println( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
     }
 
-    public void transferInitiated( ArtifactTransferEvent transferEvent )
+    public void transferSucceeded( TransferEvent event )
     {
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
-
-        doInitiated( transferEvent );
-    }
-
-    protected void doInitiated( ArtifactTransferEvent transferEvent )
-    {
-        String message =
-            transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploading" : "Downloading";
-
-        out.println( message + ": " + transferEvent.getResource().getUrl() );
-    }
-
-    public void transferStarted( ArtifactTransferEvent transferEvent )
-    {
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
-
-        doStarted( transferEvent );
-    }
-
-    protected void doStarted( ArtifactTransferEvent transferEvent )
-    {
-        // to be overriden by sub classes
-    }
-
-    public void transferProgress( ArtifactTransferEvent transferEvent )
-    {
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
-
-        doProgress( transferEvent );
-    }
-
-    protected void doProgress( ArtifactTransferEvent transferEvent )
-    {
-        // to be overriden by sub classes
-    }
-
-    public void transferCompleted( ArtifactTransferEvent transferEvent )
-    {
-        if ( !showEvent( transferEvent ) )
-        {
-            return;
-        }
-
-        doCompleted( transferEvent );
-    }
-
-    protected void doCompleted( ArtifactTransferEvent transferEvent )
-    {
-        ArtifactTransferResource artifact = transferEvent.getResource();
-        long contentLength = transferEvent.getTransferredBytes();
+        TransferResource artifact = event.getResource();
+        long contentLength = event.getTransferredBytes();
         if ( contentLength >= 0 )
         {
-            String type =
-                ( transferEvent.getRequestType() == ArtifactTransferEvent.REQUEST_PUT ? "Uploaded" : "Downloaded" );
+            String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
             String len = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
 
             String throughput = "";
@@ -140,23 +64,14 @@ public abstract class AbstractMavenTransferListener
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            out.println( type + ": " + artifact.getUrl() + " (" + len + throughput + ")" );
+            out.println( type + ": " + artifact.getRepositoryUrl() + artifact.getResourceName() + " (" + len
+                + throughput + ")" );
         }
     }
 
     protected long toKB( long bytes )
     {
         return ( bytes + 1023 ) / 1024;
-    }
-
-    public boolean isShowChecksumEvents()
-    {
-        return showChecksumEvents;
-    }
-
-    public void setShowChecksumEvents( boolean showChecksumEvents )
-    {
-        this.showChecksumEvents = showChecksumEvents;
     }
 
 }

@@ -6,9 +6,9 @@ package org.apache.maven.artifact.repository.metadata;
  * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
  * copy of the License at
- *
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software distributed under the License
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
@@ -22,7 +22,6 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
@@ -49,7 +47,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * @author Jason van Zyl
  */
-@Component( role = RepositoryMetadataManager.class )
+@Component(role=RepositoryMetadataManager.class)
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager
@@ -60,8 +58,7 @@ public class DefaultRepositoryMetadataManager
     @Requirement
     private UpdateCheckManager updateCheckManager;
 
-    public void resolve( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories,
-                         ArtifactRepository localRepository )
+    public void resolve( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
         RepositoryRequest request = new DefaultRepositoryRequest();
@@ -73,41 +70,6 @@ public class DefaultRepositoryMetadataManager
     public void resolve( RepositoryMetadata metadata, RepositoryRequest request )
         throws RepositoryMetadataResolutionException
     {
-        RepositoryCache cache = request.getCache();
-
-        CacheKey cacheKey = null;
-
-        if ( cache != null )
-        {
-            cacheKey = new CacheKey( metadata, request );
-
-            CacheRecord cacheRecord = (CacheRecord) cache.get( request, cacheKey );
-
-            if ( cacheRecord != null )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Resolved metadata from cache: " + metadata + " @ " + cacheRecord.repository );
-                }
-
-                metadata.setMetadata( MetadataUtils.cloneMetadata( cacheRecord.metadata ) );
-
-                if ( cacheRecord.repository != null )
-                {
-                    for ( ArtifactRepository repository : request.getRemoteRepositories() )
-                    {
-                        if ( cacheRecord.repository.equals( repository.getId() ) )
-                        {
-                            metadata.setRepository( repository );
-                            break;
-                        }
-                    }
-                }
-
-                return;
-            }
-        }
-
         ArtifactRepository localRepository = request.getLocalRepository();
         List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
 
@@ -209,13 +171,7 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( RepositoryMetadataStoreException e )
         {
-            throw new RepositoryMetadataResolutionException( "Unable to store local copy of metadata: "
-                + e.getMessage(), e );
-        }
-
-        if ( cache != null )
-        {
-            cache.put( request, cacheKey, new CacheRecord( metadata ) );
+            throw new RepositoryMetadataResolutionException( "Unable to store local copy of metadata: " + e.getMessage(), e );
         }
     }
 
@@ -226,130 +182,7 @@ public class DefaultRepositoryMetadataManager
         return metadataFile.isFile() ? new Date( metadataFile.lastModified() ) : null;
     }
 
-    private static final class CacheKey
-    {
-
-        final Object metadataKey;
-
-        final ArtifactRepository localRepository;
-
-        final List<ArtifactRepository> remoteRepositories;
-
-        final int hashCode;
-
-        CacheKey( RepositoryMetadata metadata, RepositoryRequest request )
-        {
-            metadataKey = metadata.getKey();
-            localRepository = request.getLocalRepository();
-            remoteRepositories = request.getRemoteRepositories();
-
-            int hash = 17;
-            hash = hash * 31 + metadata.getKey().hashCode();
-            hash = hash * 31 + repoHashCode( localRepository );
-            for ( ArtifactRepository remoteRepository : remoteRepositories )
-            {
-                hash = hash * 31 + repoHashCode( remoteRepository );
-            }
-            hashCode = hash;
-        }
-
-        int repoHashCode( ArtifactRepository repository )
-        {
-            return ( repository != null && repository.getUrl() != null ) ? repository.getUrl().hashCode() : 0;
-        }
-
-        boolean repoEquals( ArtifactRepository repo1, ArtifactRepository repo2 )
-        {
-            if ( repo1 == repo2 )
-            {
-                return true;
-            }
-
-            if ( repo1 == null || repo2 == null )
-            {
-                return false;
-            }
-
-            return equal( repo1.getUrl(), repo2.getUrl() ) && repo1.getClass() == repo2.getClass();
-        }
-
-        private static <T> boolean equal( T s1, T s2 )
-        {
-            return s1 != null ? s1.equals( s2 ) : s2 == null;
-        }
-
-        @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-            {
-                return true;
-            }
-
-            if ( !( obj instanceof CacheKey ) )
-            {
-                return false;
-            }
-
-            CacheKey that = (CacheKey) obj;
-
-            if ( !this.metadataKey.equals( that.metadataKey ) )
-            {
-                return false;
-            }
-
-            if ( !repoEquals( this.localRepository, that.localRepository ) )
-            {
-                return false;
-            }
-
-            for ( Iterator<ArtifactRepository> it1 = this.remoteRepositories.iterator(), it2 =
-                that.remoteRepositories.iterator();; )
-            {
-                if ( !it1.hasNext() || !it2.hasNext() )
-                {
-                    if ( it1.hasNext() != it2.hasNext() )
-                    {
-                        return false;
-                    }
-                    break;
-                }
-                ArtifactRepository repo1 = it1.next();
-                ArtifactRepository repo2 = it2.next();
-                if ( !repoEquals( repo1, repo2 ) )
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return hashCode;
-        }
-
-    }
-
-    private static final class CacheRecord
-    {
-
-        final Metadata metadata;
-
-        final String repository;
-
-        CacheRecord( RepositoryMetadata metadata )
-        {
-            this.metadata = MetadataUtils.cloneMetadata( metadata.getMetadata() );
-            this.repository = ( metadata.getRepository() != null ) ? metadata.getRepository().getId() : null;
-        }
-
-    }
-
-    private void mergeMetadata( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories,
-                                ArtifactRepository localRepository )
+    private void mergeMetadata( RepositoryMetadata metadata, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException
     {
         // TODO: currently this is first wins, but really we should take the latest by comparing either the
@@ -378,9 +211,7 @@ public class DefaultRepositoryMetadataManager
         updateSnapshotMetadata( metadata, previousMetadata, selected, localRepository );
     }
 
-    private void updateSnapshotMetadata( RepositoryMetadata metadata,
-                                         Map<ArtifactRepository, Metadata> previousMetadata,
-                                         ArtifactRepository selected, ArtifactRepository localRepository )
+    private void updateSnapshotMetadata( RepositoryMetadata metadata, Map<ArtifactRepository, Metadata> previousMetadata, ArtifactRepository selected, ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException
     {
         // TODO: this could be a lot nicer... should really be in the snapshot transformation?
@@ -405,8 +236,7 @@ public class DefaultRepositoryMetadataManager
                 }
                 else
                 {
-                    if ( ( m.getVersioning() != null ) && ( m.getVersioning().getSnapshot() != null )
-                        && m.getVersioning().getSnapshot().isLocalCopy() )
+                    if ( ( m.getVersioning() != null ) && ( m.getVersioning().getSnapshot() != null ) && m.getVersioning().getSnapshot().isLocalCopy() )
                     {
                         m.getVersioning().getSnapshot().setLocalCopy( false );
                         metadata.setMetadata( m );
@@ -419,14 +249,11 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private boolean loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
-                                  ArtifactRepository localRepository, Map<ArtifactRepository, Metadata> previousMetadata )
+    private boolean loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository, ArtifactRepository localRepository, Map<ArtifactRepository, Metadata> previousMetadata )
     {
         boolean setRepository = false;
 
-        File metadataFile =
-            new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( repoMetadata,
-                                                                                                   remoteRepository ) );
+        File metadataFile = new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
 
         if ( metadataFile.exists() )
         {
@@ -488,13 +315,11 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( IOException e )
         {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
         }
         catch ( XmlPullParserException e )
         {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
+            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
         }
         finally
         {
@@ -505,8 +330,8 @@ public class DefaultRepositoryMetadataManager
     }
 
     /**
-     * Ensures the last updated timestamp of the specified metadata does not refer to the future and fixes the local
-     * metadata if necessary to allow proper merging/updating of metadata during deployment.
+     * Ensures the last updated timestamp of the specified metadata does not refer to the future and fixes the local metadata if necessary to allow
+     * proper merging/updating of metadata during deployment.
      */
     private void fixTimestamp( File metadataFile, Metadata metadata, Metadata reference )
     {
@@ -562,8 +387,7 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    public void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
-                               ArtifactRepository remoteRepository )
+    public void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException
     {
         File file;
@@ -573,8 +397,7 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( TransferFailedException e )
         {
-            throw new RepositoryMetadataResolutionException( metadata + " could not be retrieved from repository: "
-                + remoteRepository.getId() + " due to an error: " + e.getMessage(), e );
+            throw new RepositoryMetadataResolutionException( metadata + " could not be retrieved from repository: " + remoteRepository.getId() + " due to an error: " + e.getMessage(), e );
         }
 
         try
@@ -591,24 +414,18 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private File getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata,
-                                                              ArtifactRepository localRepository,
-                                                              ArtifactRepository remoteRepository )
+    private File getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws TransferFailedException
     {
-        File file =
-            new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata,
-                                                                                                   remoteRepository ) );
+        File file = new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
         try
         {
-            wagonManager.getArtifactMetadataFromDeploymentRepository( metadata, remoteRepository, file,
-                                                                      ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
         }
         catch ( ResourceDoesNotExistException e )
         {
-            getLogger().info( metadata + " could not be found on repository: " + remoteRepository.getId()
-                                  + ", so will be created" );
+            getLogger().info( metadata + " could not be found on repository: " + remoteRepository.getId() + ", so will be created" );
 
             // delete the local copy so the old details aren't used.
             if ( file.exists() )
@@ -626,8 +443,7 @@ public class DefaultRepositoryMetadataManager
         return file;
     }
 
-    public void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
-                        ArtifactRepository deploymentRepository )
+    public void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository, ArtifactRepository deploymentRepository )
         throws RepositoryMetadataDeploymentException
     {
         File file;
@@ -640,8 +456,7 @@ public class DefaultRepositoryMetadataManager
             }
             catch ( TransferFailedException e )
             {
-                throw new RepositoryMetadataDeploymentException( metadata + " could not be retrieved from repository: "
-                    + deploymentRepository.getId() + " due to an error: " + e.getMessage(), e );
+                throw new RepositoryMetadataDeploymentException( metadata + " could not be retrieved from repository: " + deploymentRepository.getId() + " due to an error: " + e.getMessage(), e );
             }
 
             if ( file.isFile() )
@@ -659,9 +474,7 @@ public class DefaultRepositoryMetadataManager
         else
         {
             // It's a POM - we don't need to retrieve it first
-            file =
-                new File( localRepository.getBasedir(),
-                          localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
+            file = new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
         }
 
         try

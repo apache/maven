@@ -99,7 +99,7 @@ public class MavenLifecycleParticipantTest
         request.setGoals( Arrays.asList( "validate" ) );
         MavenExecutionResult result = maven.execute( request );
 
-        assertFalse( result.hasExceptions() );
+        assertFalse( result.getExceptions().toString(), result.hasExceptions() );
 
         MavenProject project = result.getProject();
         

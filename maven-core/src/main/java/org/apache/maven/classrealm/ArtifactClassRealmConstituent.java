@@ -21,7 +21,7 @@ package org.apache.maven.classrealm;
 
 import java.io.File;
 
-import org.apache.maven.artifact.Artifact;
+import org.sonatype.aether.artifact.Artifact;
 
 /**
  * @author Benjamin Bentmann
@@ -49,12 +49,12 @@ class ArtifactClassRealmConstituent
 
     public String getType()
     {
-        return artifact.getType();
+        return artifact.getExtension();
     }
 
     public String getClassifier()
     {
-        return artifact.hasClassifier() ? artifact.getClassifier() : "";
+        return artifact.getClassifier();
     }
 
     public String getVersion()
@@ -70,7 +70,7 @@ class ArtifactClassRealmConstituent
     @Override
     public String toString()
     {
-        return artifact.getId();
+        return artifact.toString();
     }
 
 }

@@ -21,7 +21,8 @@ package org.apache.maven.plugin.version;
 
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.RemoteRepository;
 
 public class PluginVersionResolutionException
     extends Exception
@@ -50,8 +51,8 @@ public class PluginVersionResolutionException
         this.baseMessage = baseMessage;
     }
 
-    public PluginVersionResolutionException( String groupId, String artifactId, ArtifactRepository localRepository,
-                                             List<ArtifactRepository> remoteRepositories, String baseMessage )
+    public PluginVersionResolutionException( String groupId, String artifactId, LocalRepository localRepository,
+                                             List<RemoteRepository> remoteRepositories, String baseMessage )
     {
         super( "Error resolving version for plugin \'" + groupId + ":" + artifactId + "\' from the repositories "
             + format( localRepository, remoteRepositories ) + ": " + baseMessage );
@@ -76,7 +77,7 @@ public class PluginVersionResolutionException
         return baseMessage;
     }
 
-    private static String format( ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+    private static String format( LocalRepository localRepository, List<RemoteRepository> remoteRepositories )
     {
         String repos = "[";
 
@@ -87,7 +88,7 @@ public class PluginVersionResolutionException
 
         if ( remoteRepositories != null && !remoteRepositories.isEmpty() )
         {
-            for ( ArtifactRepository repository : remoteRepositories )
+            for ( RemoteRepository repository : remoteRepositories )
             {
                 repos += ", ";
 

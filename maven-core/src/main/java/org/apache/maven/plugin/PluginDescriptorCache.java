@@ -19,9 +19,12 @@ package org.apache.maven.plugin;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.RepositoryRequest;
+import java.util.List;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Caches raw plugin descriptors. A raw plugin descriptor is a descriptor that has just been extracted from the plugin
@@ -44,11 +47,11 @@ public interface PluginDescriptorCache
         // marker interface for cache keys
     }
 
-    Key createKey( Plugin plugin, RepositoryRequest repositoryRequest );
+    Key createKey( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session );
 
-    void put( Key cacheKey, PluginDescriptor pluginDescriptor );
+    void put( Key key, PluginDescriptor pluginDescriptor );
 
-    PluginDescriptor get( Key cacheKey );
+    PluginDescriptor get( Key key );
 
     void flush();
 

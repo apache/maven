@@ -20,49 +20,45 @@ package org.apache.maven.artifact.deployer;
  */
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.MetadataBridge;
+import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.legacy.TransferListenerAdapter;
-import org.apache.maven.repository.legacy.WagonManager;
-import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
-import org.apache.maven.wagon.TransferFailedException;
-import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.deployment.DeployRequest;
+import org.sonatype.aether.deployment.DeployResult;
+import org.sonatype.aether.deployment.DeploymentException;
+import org.sonatype.aether.metadata.MergeableMetadata;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.artifact.SubArtifact;
 
-@Component( role = ArtifactDeployer.class )
+@Component( role = ArtifactDeployer.class, instantiationStrategy = "per-lookup" )
 public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
 {
-    @Requirement
-    private WagonManager wagonManager;
 
     @Requirement
-    private ArtifactTransformationManager transformationManager;
-
-    @Requirement
-    private RepositoryMetadataManager repositoryMetadataManager;
-
-    @Requirement
-    private RepositorySystem repositorySystem;
+    private RepositorySystem repoSystem;
 
     @Requirement
     private LegacySupport legacySupport;
+
+    private Map<Object, MergeableMetadata> snapshots = new ConcurrentHashMap<Object, MergeableMetadata>();
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set
@@ -82,79 +78,78 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        deploymentRepository = injectSession( deploymentRepository );
+        DefaultRepositorySystemSession session =
+            new DefaultRepositorySystemSession( legacySupport.getRepositorySession() );
+        LocalRepository localRepo = new LocalRepository( localRepository.getBasedir() );
+        session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
 
-        try
+        DeployRequest request = new DeployRequest();
+
+        org.sonatype.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
+        mainArtifact = mainArtifact.setFile( source );
+        request.addArtifact( mainArtifact );
+
+        String snapshotKey = null;
+        if ( artifact.isSnapshot() )
         {
-            transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
+            snapshotKey = artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getBaseVersion();
+            request.addMetadata( snapshots.get( snapshotKey ) );
+        }
 
-            // Copy the original file to the new one if it was transformed
-            File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-            if ( !artifactFile.equals( source ) )
+        for ( ArtifactMetadata metadata : artifact.getMetadataList() )
+        {
+            if ( metadata instanceof ProjectArtifactMetadata )
             {
-                FileUtils.copyFile( source, artifactFile );
+                org.sonatype.aether.artifact.Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
+                pomArtifact = pomArtifact.setFile( ( (ProjectArtifactMetadata) metadata ).getFile() );
+                request.addArtifact( pomArtifact );
             }
-
-            wagonManager.putArtifact( source, artifact, deploymentRepository, getTransferListener() );
-
-            // must be after the artifact is installed
-            for ( ArtifactMetadata metadata : artifact.getMetadataList() )
+            else if ( metadata instanceof SnapshotArtifactRepositoryMetadata
+                || metadata instanceof ArtifactRepositoryMetadata )
             {
-                repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
+                // eaten, handled by repo system
+            }
+            else
+            {
+                request.addMetadata( new MetadataBridge( metadata ) );
             }
         }
-        catch ( TransferFailedException e )
-        {
-            throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
-        }
-        catch ( IOException e )
-        {
-            throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
-        }
-        catch ( RepositoryMetadataDeploymentException e )
-        {
-            throw new ArtifactDeploymentException( "Error installing artifact's metadata: " + e.getMessage(), e );
-        }
-    }
 
-    private TransferListener getTransferListener()
-    {
-        MavenSession session = legacySupport.getSession();
-
-        if ( session == null )
-        {
-            return null;
-        }
-
-        return TransferListenerAdapter.newAdapter( session.getRequest().getTransferListener() );
-    }
-
-    private ArtifactRepository injectSession( ArtifactRepository repository )
-    {
+        RemoteRepository remoteRepo = RepositoryUtils.toRepo( deploymentRepository );
         /*
          * NOTE: This provides backward-compat with maven-deploy-plugin:2.4 which bypasses the repository factory when
          * using an alternative deployment location.
          */
-        if ( repository instanceof DefaultArtifactRepository && repository.getAuthentication() == null )
+        if ( deploymentRepository instanceof DefaultArtifactRepository
+            && deploymentRepository.getAuthentication() == null )
         {
-            MavenSession session = legacySupport.getSession();
+            remoteRepo.setAuthentication( session.getAuthenticationSelector().getAuthentication( remoteRepo ) );
+            remoteRepo.setProxy( session.getProxySelector().getProxy( remoteRepo ) );
+        }
+        request.setRepository( remoteRepo );
 
-            if ( session != null )
+        DeployResult result;
+        try
+        {
+            result = repoSystem.deploy( session, request );
+        }
+        catch ( DeploymentException e )
+        {
+            throw new ArtifactDeploymentException( e.getMessage(), e );
+        }
+
+        if ( snapshotKey != null )
+        {
+            for ( Object metadata : result.getMetadata() )
             {
-                MavenExecutionRequest request = session.getRequest();
-
-                if ( request != null )
+                if ( metadata.getClass().getName().endsWith( ".internal.RemoteSnapshotMetadata" ) )
                 {
-                    List<ArtifactRepository> repositories = Arrays.asList( repository );
-
-                    repositorySystem.injectProxy( repositories, request.getProxies() );
-
-                    repositorySystem.injectAuthentication( repositories, request.getServers() );
+                    snapshots.put( snapshotKey, (MergeableMetadata) metadata );
                 }
             }
         }
 
-        return repository;
+        artifact.setResolvedVersion( result.getArtifacts().iterator().next().getVersion() );
     }
 
 }

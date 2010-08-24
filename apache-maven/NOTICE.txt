@@ -13,7 +13,7 @@ The Apache Software Foundation (http://www.apache.org/).
 This product includes software (Plexus and Classworlds) developed by
 The Codehaus Foundation (http://www.codehaus.org/).
 
-This product includes software (Spice, Plexus Ciper and Sec Dispatcher) developed by
+This product includes software (Aether, Spice, Plexus Ciper and Sec Dispatcher) developed by
 Sonatype Inc. (http://www.sonatype.org/).
 
 This product includes software (NekoHTML) developed by

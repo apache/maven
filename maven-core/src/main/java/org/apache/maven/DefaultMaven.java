@@ -1,22 +1,18 @@
 package org.apache.maven;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.io.File;
@@ -33,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -47,6 +44,7 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -56,6 +54,13 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
+import org.apache.maven.settings.crypto.SettingsDecrypter;
+import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -63,11 +68,39 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.sonatype.aether.RepositoryEvent;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.collection.DependencyGraphTransformer;
+import org.sonatype.aether.collection.DependencyManager;
+import org.sonatype.aether.collection.DependencySelector;
+import org.sonatype.aether.collection.DependencyTraverser;
+import org.sonatype.aether.repository.Authentication;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.RepositoryPolicy;
+import org.sonatype.aether.repository.WorkspaceReader;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.graph.manager.ClassicDependencyManager;
+import org.sonatype.aether.util.graph.selector.AndDependencySelector;
+import org.sonatype.aether.util.graph.selector.ExclusionDependencySelector;
+import org.sonatype.aether.util.graph.selector.OptionalDependencySelector;
+import org.sonatype.aether.util.graph.selector.ScopeDependencySelector;
+import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
+import org.sonatype.aether.util.graph.transformer.ConflictMarker;
+import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
+import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
+import org.sonatype.aether.util.listener.AbstractRepositoryListener;
+import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
+import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
+import org.sonatype.aether.util.repository.DefaultMirrorSelector;
+import org.sonatype.aether.util.repository.DefaultProxySelector;
 
 /**
  * @author Jason van Zyl
  */
-@Component( role = Maven.class )
+@Component(role = Maven.class)
 public class DefaultMaven
     implements Maven
 {
@@ -77,7 +110,6 @@ public class DefaultMaven
 
     @Requirement
     protected ProjectBuilder projectBuilder;
-
 
     @Requirement
     private LifecycleStarter lifecycleStarter;
@@ -90,6 +122,21 @@ public class DefaultMaven
 
     @Requirement
     private ExecutionEventCatapult eventCatapult;
+
+    @Requirement
+    private ArtifactHandlerManager artifactHandlerManager;
+
+    @Requirement( optional = true, hint = "ide" )
+    private WorkspaceReader workspaceRepository;
+
+    @Requirement
+    private RepositorySystem repoSystem;
+
+    @Requirement
+    private SettingsDecrypter settingsDecrypter;
+
+    @Requirement
+    private LegacySupport legacySupport;
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
@@ -113,22 +160,25 @@ public class DefaultMaven
                 processResult( new DefaultMavenExecutionResult(),
                                new InternalErrorException( "Internal error: " + e, e ) );
         }
+        finally
+        {
+            legacySupport.setSession( null );
+        }
 
         return result;
     }
 
-    @SuppressWarnings( { "ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored" } )
+    @SuppressWarnings({"ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored"})
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
         //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
-            request.getSystemProperties().put( "${build.timestamp}",
-                                               new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
-        }
-
+            request.getSystemProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
+        }        
+        
         request.setStartTime( new Date() );
-
+        
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try
@@ -142,10 +192,13 @@ public class DefaultMaven
 
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
             new DelegatingLocalArtifactRepository( request.getLocalRepository() );
+        
+        request.setLocalRepository( delegatingLocalArtifactRepository );        
 
-        request.setLocalRepository( delegatingLocalArtifactRepository );
+        DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
 
-        MavenSession session = new MavenSession( container, request, result );
+        MavenSession session = new MavenSession( container, repoSession, request, result );
+        legacySupport.setSession( session );
 
         try
         {
@@ -161,12 +214,14 @@ public class DefaultMaven
 
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
-        //TODO: optimize for the single project or no project
+        request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
+        //TODO: optimize for the single project or no project
+        
         List<MavenProject> projects;
         try
         {
-            projects = getProjectsForMavenReactor( request );
+            projects = getProjectsForMavenReactor( request );                                                
         }
         catch ( ProjectBuildingException e )
         {
@@ -176,20 +231,23 @@ public class DefaultMaven
         session.setProjects( projects );
 
         result.setTopologicallySortedProjects( session.getProjects() );
-
+        
         result.setProject( session.getTopLevelProject() );
 
         try
         {
             Map<String, MavenProject> projectMap;
             projectMap = getProjectMap( session.getProjects() );
-
+    
             // Desired order of precedence for local artifact repositories
             //
             // Reactor
             // Workspace
             // User Local Repository
-            delegatingLocalArtifactRepository.setBuildReactor( new ReactorArtifactRepository( projectMap ) );
+            ReactorReader reactorRepository = new ReactorReader( projectMap );
+
+            repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorRepository,
+                                                                                repoSession.getWorkspaceReader() ) );
         }
         catch ( org.apache.maven.DuplicateProjectException e )
         {
@@ -226,7 +284,7 @@ public class DefaultMaven
             session.setProjectDependencyGraph( projectDependencyGraph );
         }
         catch ( CycleDetectedException e )
-        {
+        {            
             String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
 
             ProjectCycleException error = new ProjectCycleException( message, e );
@@ -261,7 +319,133 @@ public class DefaultMaven
         return result;
     }
 
-    @SuppressWarnings( { "ResultOfMethodCallIgnored" } )
+    public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
+    {
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+
+        session.setCache( request.getRepositoryCache() );
+
+        session.setIgnoreInvalidArtifactDescriptor( true ).setIgnoreMissingArtifactDescriptor( true );
+
+        session.setUserProps( request.getUserProperties() );
+        session.setSystemProps( request.getSystemProperties() );
+        session.setConfigProps( request.getSystemProperties() );
+
+        session.setOffline( request.isOffline() );
+        session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
+        session.setUpdatePolicy( request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null );
+
+        session.setNotFoundCachingEnabled( !request.isUpdateSnapshots() );
+        session.setTransferErrorCachingEnabled( !request.isUpdateSnapshots() );
+
+        session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
+
+        LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
+        session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+
+        session.setWorkspaceReader( workspaceRepository );
+
+        DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
+        decrypt.setProxies( request.getProxies() );
+        decrypt.setServers( request.getServers() );
+        SettingsDecryptionResult decrypted = settingsDecrypter.decrypt( decrypt );
+
+        if ( logger.isDebugEnabled() )
+        {
+            for ( SettingsProblem problem : decrypted.getProblems() )
+            {
+                logger.debug( problem.getMessage(), problem.getException() );
+            }
+        }
+
+        DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
+        for ( Mirror mirror : request.getMirrors() )
+        {
+            mirrorSelector.add( mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),
+                                mirror.getMirrorOfLayouts() );
+        }
+        session.setMirrorSelector( mirrorSelector );
+
+        DefaultProxySelector proxySelector = new DefaultProxySelector();
+        for ( Proxy proxy : decrypted.getProxies() )
+        {
+            Authentication proxyAuth = new Authentication( proxy.getUsername(), proxy.getPassword() );
+            proxySelector.add( new org.sonatype.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
+                                                                proxyAuth ), proxy.getNonProxyHosts() );
+        }
+        session.setProxySelector( proxySelector );
+
+        DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
+        for ( Server server : decrypted.getServers() )
+        {
+            Authentication auth =
+                new Authentication( server.getUsername(), server.getPassword(), server.getPrivateKey(),
+                                    server.getPassphrase() );
+            authSelector.add( server.getId(), auth );
+        }
+        session.setAuthenticationSelector( authSelector );
+
+        DependencyTraverser depTraverser = new FatArtifactTraverser();
+        session.setDependencyTraverser( depTraverser );
+
+        DependencyManager depManager = new ClassicDependencyManager();
+        session.setDependencyManager( depManager );
+
+        DependencySelector depFilter =
+            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ), new OptionalDependencySelector(),
+                                     new ExclusionDependencySelector() );
+        session.setDependencySelector( depFilter );
+
+        DependencyGraphTransformer transformer =
+            new ChainedDependencyGraphTransformer( new ConflictMarker(), new JavaEffectiveScopeCalculator(),
+                                                   new NearestVersionConflictResolver(),
+                                                   new JavaDependencyContextRefiner() );
+        session.setDependencyGraphTransformer( transformer );
+
+        session.setTransferListener( request.getTransferListener() );
+
+        session.setRepositoryListener( new AbstractRepositoryListener()
+        {
+            @Override
+            public void artifactInstalling( RepositoryEvent event )
+            {
+                logger.info( "Installing " + event.getArtifact().getFile() + " to " + event.getFile() );
+            }
+
+            @Override
+            public void metadataInstalling( RepositoryEvent event )
+            {
+                logger.debug( "Installing " + event.getMetadata() + " to " + event.getFile() );
+            }
+
+            @Override
+            public void artifactDescriptorInvalid( RepositoryEvent event )
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.warn( "The POM for " + event.getArtifact() + " is invalid"
+                        + ", transitive dependencies (if any) will not be available: "
+                        + event.getException().getMessage() );
+                }
+                else
+                {
+                    logger.warn( "The POM for " + event.getArtifact() + " is invalid"
+                        + ", transitive dependencies (if any) will not be available"
+                        + ", enable debug logging for more details" );
+                }
+            }
+
+            @Override
+            public void artifactDescriptorMissing( RepositoryEvent event )
+            {
+                logger.warn( "The POM for " + event.getArtifact() + " is missing, no dependency information available" );
+            }
+        } );
+
+        return session;
+    }
+
+    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     private void validateLocalRepository( MavenExecutionRequest request )
         throws LocalRepositoryNotAccessibleException
     {
@@ -334,7 +518,7 @@ public class DefaultMaven
 
         return result;
     }
-
+    
     private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
         throws ProjectBuildingException
     {
@@ -352,8 +536,8 @@ public class DefaultMaven
             request.setProjectPresent( false );
             return projects;
         }
-
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
+        
+        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );        
         collectProjects( projects, files, request );
         return projects;
     }
@@ -405,8 +589,7 @@ public class DefaultMaven
     {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        List<ProjectBuildingResult> results =
-            projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
+        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
 
         boolean problems = false;
 
@@ -423,8 +606,7 @@ public class DefaultMaven
                 for ( ModelProblem problem : result.getProblems() )
                 {
                     String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage()
-                                 + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
+                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
                 }
 
                 problems = true;

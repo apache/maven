@@ -22,8 +22,6 @@ package org.apache.maven.plugin.internal;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -100,10 +98,9 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor;
         try
         {
-            RepositoryRequest repositoryRequest =
-                DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
-
-            pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
+            pluginDescriptor =
+                pluginManager.getPluginDescriptor( plugin, session.getCurrentProject().getRemotePluginRepositories(),
+                                                   session.getRepositorySession() );
 
             pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
         }
@@ -133,10 +130,9 @@ public class DefaultPluginManager
         PluginDescriptor pluginDescriptor;
         try
         {
-            RepositoryRequest repositoryRequest =
-                DefaultRepositoryRequest.getRepositoryRequest( session, session.getCurrentProject() );
-
-            pluginDescriptor = pluginManager.getPluginDescriptor( plugin, repositoryRequest );
+            pluginDescriptor =
+                pluginManager.getPluginDescriptor( plugin, session.getCurrentProject().getRemotePluginRepositories(),
+                                                   session.getRepositorySession() );
 
             pluginManager.setupPluginRealm( pluginDescriptor, session, null, null, null );
         }
@@ -234,24 +230,24 @@ public class DefaultPluginManager
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException
     {
-        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
-        repositoryRequest.setLocalRepository( localRepository );
-        repositoryRequest.setRemoteRepositories( project.getPluginArtifactRepositories() );
-        repositoryRequest.setOffline( settings.isOffline() );
+        MavenSession session = legacySupport.getSession();
 
         if ( plugin.getVersion() == null )
         {
-            PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, repositoryRequest );
+            PluginVersionRequest versionRequest =
+                new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
+                                                 project.getRemotePluginRepositories() );
             plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
         }
 
         try
         {
-            return pluginManager.getPluginDescriptor( plugin, repositoryRequest );
+            return pluginManager.getPluginDescriptor( plugin, project.getRemotePluginRepositories(),
+                                                      session.getRepositorySession() );
         }
         catch ( PluginResolutionException e )
         {
-            throw new PluginNotFoundException( plugin, repositoryRequest.getRemoteRepositories() );
+            throw new PluginNotFoundException( plugin, project.getPluginArtifactRepositories() );
         }
         catch ( PluginDescriptorParsingException e )
         {

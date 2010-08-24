@@ -20,21 +20,27 @@ package org.apache.maven.artifact.installer;
  */
 
 import java.io.File;
-import java.io.IOException;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataInstallationException;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
-import org.apache.maven.repository.DefaultLocalRepositoryMaintainerEvent;
-import org.apache.maven.repository.LocalRepositoryMaintainer;
-import org.apache.maven.repository.LocalRepositoryMaintainerEvent;
-import org.apache.maven.repository.legacy.resolver.transform.ArtifactTransformationManager;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.MetadataBridge;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.installation.InstallRequest;
+import org.sonatype.aether.installation.InstallationException;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.artifact.SubArtifact;
 
 /**
  * @author Jason van Zyl
@@ -44,15 +50,13 @@ public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller
 {
-    @Requirement
-    private ArtifactTransformationManager transformationManager;
 
     @Requirement
-    private RepositoryMetadataManager repositoryMetadataManager;
-
-    @Requirement( optional = true )
-    private LocalRepositoryMaintainer localRepositoryMaintainer;
-
+    private RepositorySystem repoSystem;
+    
+    @Requirement
+    private LegacySupport legacySupport;
+    
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
@@ -67,59 +71,64 @@ public class DefaultArtifactInstaller
     public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        try
+        DefaultRepositorySystemSession session =
+            new DefaultRepositorySystemSession( legacySupport.getRepositorySession() );
+        LocalRepository localRepo = new LocalRepository( localRepository.getBasedir() );
+        session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+
+        InstallRequest request = new InstallRequest();
+
+        org.sonatype.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
+        mainArtifact = mainArtifact.setFile( source );
+        request.addArtifact( mainArtifact );
+
+        for ( ArtifactMetadata metadata : artifact.getMetadataList() )
         {
-            transformationManager.transformForInstall( artifact, localRepository );
-
-            String localPath = localRepository.pathOf( artifact );
-
-            // TODO: use a file: wagon and the wagon manager?
-            File destination = new File( localRepository.getBasedir(), localPath );
-            if ( !destination.getParentFile().exists() )
+            if ( metadata instanceof ProjectArtifactMetadata )
             {
-                destination.getParentFile().mkdirs();
+                org.sonatype.aether.artifact.Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
+                pomArtifact = pomArtifact.setFile( ( (ProjectArtifactMetadata) metadata ).getFile() );
+                request.addArtifact( pomArtifact );
             }
-
-            boolean copy =
-                !destination.exists() || "pom".equals( artifact.getType() )
-                    || source.lastModified() != destination.lastModified() || source.length() != destination.length();
-
-            if ( copy )
+            else if ( metadata instanceof SnapshotArtifactRepositoryMetadata
+                || metadata instanceof ArtifactRepositoryMetadata )
             {
-                getLogger().info( "Installing " + source + " to " + destination );
-
-                FileUtils.copyFile( source, destination );
-                destination.setLastModified( source.lastModified() );
+                // eaten, handled by repo system
             }
             else
             {
-                getLogger().info( "Skipped re-installing " + source + " to " + destination + ", seems unchanged" );
+                request.addMetadata( new MetadataBridge( metadata ) );
             }
+        }
 
-            // must be after the artifact is installed
-            for ( ArtifactMetadata metadata : artifact.getMetadataList() )
-            {
-                repositoryMetadataManager.install( metadata, localRepository );
-            }
-            // TODO: would like to flush this, but the plugin metadata is added in advance, not as an install/deploy
-            // transformation
-            // This would avoid the need to merge and clear out the state during deployment
-            // artifact.getMetadataList().clear();
+        try
+        {
+            repoSystem.install( session, request );
+        }
+        catch ( InstallationException e )
+        {
+            throw new ArtifactInstallationException( e.getMessage(), e );
+        }
 
-            if ( localRepositoryMaintainer != null )
-            {
-                LocalRepositoryMaintainerEvent event =
-                    new DefaultLocalRepositoryMaintainerEvent( localRepository, artifact, destination );
-                localRepositoryMaintainer.artifactInstalled( event );
-            }
-        }
-        catch ( IOException e )
+        /*
+         * NOTE: Not used by Maven core, only here to provide backward-compat with plugins like the Install Plugin.
+         */
+
+        if ( artifact.isSnapshot() )
         {
-            throw new ArtifactInstallationException( "Error installing artifact: " + e.getMessage(), e );
+            Snapshot snapshot = new Snapshot();
+            snapshot.setLocalCopy( true );
+            artifact.addMetadata( new SnapshotArtifactRepositoryMetadata( artifact, snapshot ) );
         }
-        catch ( RepositoryMetadataInstallationException e )
+
+        Versioning versioning = new Versioning();
+        versioning.updateTimestamp();
+        versioning.addVersion( artifact.getBaseVersion() );
+        if ( artifact.isRelease() )
         {
-            throw new ArtifactInstallationException( "Error installing artifact's metadata: " + e.getMessage(), e );
+            versioning.setRelease( artifact.getBaseVersion() );
         }
+        artifact.addMetadata( new ArtifactRepositoryMetadata( artifact, versioning ) );
     }
+
 }

@@ -76,6 +76,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.transfer.ArtifactNotFoundException;
 
 /**
  * @author Jason van Zyl
@@ -116,7 +117,6 @@ public class MavenMetadataSource
             request.setServers( session.getRequest().getServers() );
             request.setMirrors( session.getRequest().getMirrors() );
             request.setProxies( session.getRequest().getProxies() );
-            request.setTransferListener( session.getRequest().getTransferListener() );
         }
     }
 
@@ -569,7 +569,6 @@ public class MavenMetadataSource
                 try
                 {
                     ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-                    configuration.setRepositoryCache( repositoryRequest.getCache() );
                     configuration.setLocalRepository( repositoryRequest.getLocalRepository() );
                     configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
                     configuration.setOffline( repositoryRequest.isOffline() );
@@ -577,10 +576,10 @@ public class MavenMetadataSource
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( getSystemProperties() );
-                    configuration.setTransferListener( repositoryRequest.getTransferListener() );
                     configuration.setServers( repositoryRequest.getServers() );
                     configuration.setMirrors( repositoryRequest.getMirrors() );
                     configuration.setProxies( repositoryRequest.getProxies() );
+                    configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
                     project = getProjectBuilder().build( pomArtifact, configuration ).getProject();
                 }
@@ -597,11 +596,11 @@ public class MavenMetadataSource
 
                     String message;
 
-                    if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
+                    if ( isMissingPom( e ) )
                     {
                         message = "Missing POM for " + artifact.getId();
                     }
-                    else if ( e.getCause() instanceof ArtifactResolutionException )
+                    else if ( isNonTransferrablePom( e ) )
                     {
                         throw new ArtifactMetadataRetrievalException( "Failed to retrieve POM for "
                             + artifact.getId() + ": " + e.getCause().getMessage(), e.getCause(),
@@ -733,6 +732,34 @@ public class MavenMetadataSource
 
         }
         return null;
+    }
+
+    private boolean isMissingPom( Exception e )
+    {
+        if ( e.getCause() instanceof MultipleArtifactsNotFoundException )
+        {
+            return true;
+        }
+        if ( e.getCause() instanceof org.sonatype.aether.resolution.ArtifactResolutionException
+            && e.getCause().getCause() instanceof ArtifactNotFoundException )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isNonTransferrablePom( Exception e )
+    {
+        if ( e.getCause() instanceof ArtifactResolutionException )
+        {
+            return true;
+        }
+        if ( e.getCause() instanceof org.sonatype.aether.resolution.ArtifactResolutionException
+            && !( e.getCause().getCause() instanceof ArtifactNotFoundException ) )
+        {
+            return true;
+        }
+        return false;
     }
 
     private Properties getSystemProperties()

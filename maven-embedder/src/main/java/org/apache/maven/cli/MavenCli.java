@@ -59,6 +59,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -760,11 +761,11 @@ public class MavenCli
             }
         }
 
-        ArtifactTransferListener transferListener;
+        TransferListener transferListener;
 
         if ( quiet )
         {
-            transferListener = new QuietMavenTransferListener( cliRequest.stdout );
+            transferListener = new QuietMavenTransferListener();
         }
         else if ( request.isInteractiveMode() )
         {
@@ -774,8 +775,6 @@ public class MavenCli
         {
             transferListener = new BatchModeMavenTransferListener( cliRequest.stdout );
         }
-
-        transferListener.setShowChecksumEvents( false );
 
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )

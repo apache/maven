@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -54,7 +54,7 @@ public class DefaultLifecycleBindingsInjector
     private LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
 
     @Requirement
-    private LifecycleExecutor lifecycle;
+    private LifeCyclePluginAnalyzer lifecycle;
 
     public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {

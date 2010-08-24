@@ -36,6 +36,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * @author Jason van Zyl
@@ -49,6 +50,8 @@ public class MavenSession
     private MavenExecutionRequest request;
 
     private MavenExecutionResult result;
+
+    private RepositorySystemSession repositorySession;
 
     private final Settings settings;
 
@@ -115,12 +118,14 @@ public class MavenSession
         setProjects( projects );
     }
 
-    public MavenSession( PlexusContainer container, MavenExecutionRequest request, MavenExecutionResult result )
+    public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession, MavenExecutionRequest request,
+                         MavenExecutionResult result )
     {
         this.container = container;
         this.request = request;
         this.result = result;
         this.settings = new SettingsAdapter( request );
+        this.repositorySession = repositorySession;
     }
 
     public void setProjects( List<MavenProject> projects )
@@ -180,9 +185,10 @@ public class MavenSession
         return container.lookupMap( role );
     }
 
+    @Deprecated
     public RepositoryCache getRepositoryCache()
     {
-        return request.getRepositoryCache();
+        return null;
     }
 
     public ArtifactRepository getLocalRepository()
@@ -277,7 +283,7 @@ public class MavenSession
 
     public ProjectBuildingRequest getProjectBuildingRequest()
     {
-        return request.getProjectBuildingRequest();
+        return request.getProjectBuildingRequest().setRepositorySession( getRepositorySession() );
     }
 
     public List<String> getPluginGroups()
@@ -382,4 +388,10 @@ public class MavenSession
     {
         this.parallel = parallel;
     }
+
+    public RepositorySystemSession getRepositorySession()
+    {
+        return repositorySession;
+    }
+
 }

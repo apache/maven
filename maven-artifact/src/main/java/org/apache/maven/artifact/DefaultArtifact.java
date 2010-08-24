@@ -493,7 +493,6 @@ public class DefaultArtifact
     public void setVersionRange( VersionRange versionRange )
     {
         this.versionRange = versionRange;
-
         selectVersionFromNewRangeIfAvailable();
     }
 

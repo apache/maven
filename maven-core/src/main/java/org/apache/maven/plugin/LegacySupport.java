@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
+import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * Helps to provide backward-compatibility with plugins that use legacy components. <strong>Warning:</strong> This is an
@@ -47,5 +48,12 @@ public interface LegacySupport
      * @return The currently active session or {@code null} if none.
      */
     MavenSession getSession();
+
+    /**
+     * Gets the currently active repository session.
+     * 
+     * @return The currently active repository session or {@code null} if none.
+     */
+    RepositorySystemSession getRepositorySession();
 
 }

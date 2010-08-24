@@ -19,8 +19,8 @@ package org.apache.maven.plugin.version.internal;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.version.PluginVersionResult;
+import org.sonatype.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin version resolution request.

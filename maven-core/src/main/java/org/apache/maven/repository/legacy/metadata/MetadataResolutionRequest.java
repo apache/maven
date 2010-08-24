@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -97,21 +96,6 @@ public interface MetadataResolutionRequest
      * @return This request, never {@code null}.
      */
     MetadataResolutionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories );
-
-    /**
-     * Gets the repository cache to use.
-     * 
-     * @return The repository cache to use or {@code null} if none.
-     */
-    RepositoryCache getCache();
-
-    /**
-     * Sets the repository cache to use.
-     * 
-     * @param cache The repository cache to use, may be {@code null}.
-     * @return This request, never {@code null}.
-     */
-    MetadataResolutionRequest setCache( RepositoryCache cache );
 
     /**
      * Determines whether the managed version information should be retrieved.

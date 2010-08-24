@@ -19,9 +19,9 @@ package org.apache.maven.plugin.prefix.internal;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
+import org.sonatype.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin prefix resolution request.

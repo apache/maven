@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.model.Model;
@@ -43,11 +42,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.artifact.Artifact;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
- * public for technical reasons, it is not part of the public API. In particular, this interface can be changed or
- * deleted without prior notice.
+ * public for technical reasons, it is not part of the public API. In particular, this class can be changed or deleted
+ * without prior notice.
  * 
  * @author Benjamin Bentmann
  */
@@ -133,7 +133,7 @@ public class DefaultClassRealmManager
         {
             for ( Artifact artifact : artifacts )
             {
-                artifactIds.add( artifact.getId() );
+                artifactIds.add( getId( artifact ) );
                 if ( artifact.getFile() != null )
                 {
                     constituents.add( new ArtifactClassRealmConstituent( artifact ) );
@@ -260,6 +260,9 @@ public class DefaultClassRealmManager
         // maven-*
         importingRealm.importFrom( coreRealm, "org.apache.maven" );
 
+        // aether
+        importingRealm.importFrom( coreRealm, "org.sonatype.aether" );
+
         // plexus-classworlds
         importingRealm.importFrom( coreRealm, "org.codehaus.plexus.classworlds" );
 
@@ -334,11 +337,21 @@ public class DefaultClassRealmManager
             + version;
     }
 
+    private static String getId( Artifact artifact )
+    {
+        return getId( artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(), artifact.getClassifier(),
+                      artifact.getBaseVersion() );
+    }
+
     private static String getId( ClassRealmConstituent constituent )
     {
-        return constituent.getGroupId() + ':' + constituent.getArtifactId() + ':' + constituent.getType()
-            + ( StringUtils.isNotEmpty( constituent.getClassifier() ) ? ':' + constituent.getClassifier() : "" ) + ':'
-            + constituent.getVersion();
+        return getId( constituent.getGroupId(), constituent.getArtifactId(), constituent.getType(),
+                      constituent.getClassifier(), constituent.getVersion() );
+    }
+
+    private static String getId( String gid, String aid, String type, String cls, String ver )
+    {
+        return gid + ':' + aid + ':' + type + ( StringUtils.isNotEmpty( cls ) ? ':' + cls : "" ) + ':' + ver;
     }
 
     private List<ClassRealmManagerDelegate> getDelegates()

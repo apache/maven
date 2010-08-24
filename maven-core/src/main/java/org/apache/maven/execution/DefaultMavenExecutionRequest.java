@@ -26,14 +26,15 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.sonatype.aether.RepositoryCache;
+import org.sonatype.aether.transfer.TransferListener;
+import org.sonatype.aether.util.DefaultRepositoryCache;
 
 /**
  * @author Jason van Zyl
@@ -42,7 +43,7 @@ public class DefaultMavenExecutionRequest
     implements MavenExecutionRequest
 {
 
-    private RepositoryCache repositoryCache = new SessionRepositoryCache();
+    private RepositoryCache repositoryCache = new DefaultRepositoryCache();
 
     private ArtifactRepository localRepository;
 
@@ -110,7 +111,7 @@ public class DefaultMavenExecutionRequest
 
     private List<String> inactiveProfiles;
 
-    private ArtifactTransferListener transferListener;
+    private TransferListener transferListener;
 
     private int loggingLevel = LOGGING_LEVEL_INFO;
 
@@ -350,7 +351,7 @@ public class DefaultMavenExecutionRequest
         return inactiveProfiles;
     }
 
-    public ArtifactTransferListener getTransferListener()
+    public TransferListener getTransferListener()
     {
         return transferListener;
     }
@@ -592,7 +593,7 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public MavenExecutionRequest setTransferListener( ArtifactTransferListener transferListener )
+    public MavenExecutionRequest setTransferListener( TransferListener transferListener )
     {
         this.transferListener = transferListener;
 
@@ -953,7 +954,6 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setUserProperties( getUserProperties() );
             projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
-            projectBuildingRequest.setRepositoryCache( getRepositoryCache() );
             projectBuildingRequest.setOffline( isOffline() );
             projectBuildingRequest.setForceUpdate( isUpdateSnapshots() );
             projectBuildingRequest.setServers( getServers() );
@@ -964,7 +964,6 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setProfiles( getProfiles() );
             projectBuildingRequest.setProcessPlugins( true );
             projectBuildingRequest.setBuildStartTime( getStartTime() );
-            projectBuildingRequest.setTransferListener( getTransferListener() );
         }
 
         return projectBuildingRequest;

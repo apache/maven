@@ -29,7 +29,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -55,8 +54,6 @@ public class ArtifactResolutionRequest
 
     private List<ArtifactRepository> remoteRepositories;
 
-    private RepositoryCache cache;
-
     private ArtifactFilter collectionFilter;
 
     private ArtifactFilter resolutionFilter;
@@ -66,8 +63,6 @@ public class ArtifactResolutionRequest
 
     // This is like a filter but overrides all transitive versions 
     private Map managedVersionMap;
-
-    private ArtifactTransferListener transferListener;
     
     private boolean resolveRoot = true;
 
@@ -92,10 +87,8 @@ public class ArtifactResolutionRequest
     {
         setLocalRepository( request.getLocalRepository() );
         setRemoteRepositories( request.getRemoteRepositories() );
-        setCache( request.getCache() );
         setOffline( request.isOffline() );
         setForceUpdate( request.isForceUpdate() );
-        setTransferListener( request.getTransferListener() );
     }
 
     public Artifact getArtifact()
@@ -237,17 +230,6 @@ public class ArtifactResolutionRequest
     {
         return resolveTransitively;
     }        
-    
-    public ArtifactTransferListener getTransferListener()
-    {
-        return transferListener;
-    }
-
-    public ArtifactResolutionRequest setTransferListener( ArtifactTransferListener transferListener )
-    {
-        this.transferListener = transferListener;
-        return this;
-    }
 
     public String toString()
     {
@@ -263,13 +245,11 @@ public class ArtifactResolutionRequest
 
     public RepositoryCache getCache()
     {
-        return cache;
+        return null;
     }
 
     public ArtifactResolutionRequest setCache( RepositoryCache cache )
     {
-        this.cache = cache;
-
         return this;
     }
 

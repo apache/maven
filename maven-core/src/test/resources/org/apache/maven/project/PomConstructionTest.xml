@@ -2,8 +2,8 @@
 <plexus>
   <components>
     <component>
-      <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
-      <implementation>org.apache.maven.project.EmptyLifecycleExecutor</implementation>
+      <role>org.apache.maven.lifecycle.LifeCyclePluginAnalyzer</role>
+      <implementation>org.apache.maven.lifecycle.EmptyLifecyclePluginAnalyzer</implementation>
     </component>
     <component>
       <role>org.apache.maven.project.ProjectBuildingHelper</role>

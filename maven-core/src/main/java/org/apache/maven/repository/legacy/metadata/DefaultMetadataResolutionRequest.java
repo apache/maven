@@ -25,10 +25,8 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.repository.ArtifactTransferListener;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -120,18 +118,6 @@ public class DefaultMetadataResolutionRequest
         return this;
     }
 
-    public RepositoryCache getCache()
-    {
-        return repositoryRequest.getCache();
-    }
-
-    public DefaultMetadataResolutionRequest setCache( RepositoryCache cache )
-    {
-        repositoryRequest.setCache( cache );
-
-        return this;
-    }
-
     public boolean isOffline()
     {
         return repositoryRequest.isOffline();
@@ -152,18 +138,6 @@ public class DefaultMetadataResolutionRequest
     public DefaultMetadataResolutionRequest setForceUpdate( boolean forceUpdate )
     {
         repositoryRequest.setForceUpdate( forceUpdate );
-
-        return this;
-    }
-
-    public ArtifactTransferListener getTransferListener()
-    {
-        return repositoryRequest.getTransferListener();
-    }
-
-    public DefaultMetadataResolutionRequest setTransferListener( ArtifactTransferListener transferListener )
-    {
-        repositoryRequest.setTransferListener( transferListener );
 
         return this;
     }

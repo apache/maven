@@ -19,17 +19,15 @@ package org.apache.maven.plugin.version;
  * under the License.
  */
 
+import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
-import org.apache.maven.artifact.repository.RepositoryCache;
-import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.repository.ArtifactTransferListener;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve the version for a plugin.
@@ -47,63 +45,53 @@ public class DefaultPluginVersionRequest
 
     private Model pom;
 
-    private RepositoryRequest repositoryRequest;
+    private List<RemoteRepository> repositories = Collections.emptyList();
+
+    private RepositorySystemSession session;
 
     /**
      * Creates an empty request.
      */
     public DefaultPluginVersionRequest()
     {
-        repositoryRequest = new DefaultRepositoryRequest();
-    }
-
-    /**
-     * Creates a request by copying settings from the specified repository request.
-     * 
-     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
-     */
-    public DefaultPluginVersionRequest( RepositoryRequest repositoryRequest )
-    {
-        this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
-    }
-
-    /**
-     * Creates a request for the specified plugin by copying settings from the specified repository request.
-     * 
-     * @param The plugin for which to resolve a version, must not be {@code null}.
-     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
-     */
-    public DefaultPluginVersionRequest( Plugin plugin, RepositoryRequest repositoryRequest )
-    {
-        this.groupId = plugin.getGroupId();
-        this.artifactId = plugin.getArtifactId();
-        this.repositoryRequest = new DefaultRepositoryRequest( repositoryRequest );
     }
 
     /**
      * Creates a request for the specified plugin by copying settings from the specified build session. If the session
-     * has a current project, its plugin artifact repositories will be used as well.
+     * has a current project, its plugin repositories will be used as well.
      * 
-     * @param The plugin for which to resolve a version, must not be {@code null}.
+     * @param plugin The plugin for which to resolve a version, must not be {@code null}.
      * @param repositoryRequest The repository request to copy from, must not be {@code null}.
      */
     public DefaultPluginVersionRequest( Plugin plugin, MavenSession session )
     {
-        this.groupId = plugin.getGroupId();
-        this.artifactId = plugin.getArtifactId();
-        this.repositoryRequest = new DefaultRepositoryRequest();
+        setGroupId( plugin.getGroupId() );
+        setArtifactId( plugin.getArtifactId() );
 
-        setCache( session.getRepositoryCache() );
-        setLocalRepository( session.getLocalRepository() );
-        setOffline( session.isOffline() );
-        setForceUpdate( session.getRequest().isUpdateSnapshots() );
-        setTransferListener( session.getRequest().getTransferListener() );
+        setRepositorySession( session.getRepositorySession() );
 
         MavenProject project = session.getCurrentProject();
         if ( project != null )
         {
-            setRemoteRepositories( project.getPluginArtifactRepositories() );
+            setRepositories( project.getRemotePluginRepositories() );
         }
+    }
+
+    /**
+     * Creates a request for the specified plugin using the given repository session and plugin repositories.
+     * 
+     * @param plugin The plugin for which to resolve a version, must not be {@code null}.
+     * @param session The repository session to use, must not be {@code null}.
+     * @param repositories The plugin repositories to query, may be {@code null}.
+     */
+    public DefaultPluginVersionRequest( Plugin plugin, RepositorySystemSession session, List<RemoteRepository> repositories )
+    {
+        setGroupId( plugin.getGroupId() );
+        setArtifactId( plugin.getArtifactId() );
+
+        setRepositorySession( session );
+
+        setRepositories( repositories );
     }
 
     public String getGroupId()
@@ -142,74 +130,33 @@ public class DefaultPluginVersionRequest
         return this;
     }
 
-    public RepositoryCache getCache()
+    public List<RemoteRepository> getRepositories()
     {
-        return repositoryRequest.getCache();
+        return repositories;
     }
 
-    public DefaultPluginVersionRequest setCache( RepositoryCache cache )
+    public DefaultPluginVersionRequest setRepositories( List<RemoteRepository> repositories )
     {
-        repositoryRequest.setCache( cache );
+        if ( repositories != null )
+        {
+            this.repositories = repositories;
+        }
+        else
+        {
+            this.repositories = Collections.emptyList();
+        }
 
         return this;
     }
 
-    public ArtifactRepository getLocalRepository()
+    public RepositorySystemSession getRepositorySession()
     {
-        return repositoryRequest.getLocalRepository();
+        return session;
     }
 
-    public DefaultPluginVersionRequest setLocalRepository( ArtifactRepository localRepository )
+    public DefaultPluginVersionRequest setRepositorySession( RepositorySystemSession session )
     {
-        repositoryRequest.setLocalRepository( localRepository );
-
-        return this;
-    }
-
-    public List<ArtifactRepository> getRemoteRepositories()
-    {
-        return repositoryRequest.getRemoteRepositories();
-    }
-
-    public DefaultPluginVersionRequest setRemoteRepositories( List<ArtifactRepository> remoteRepositories )
-    {
-        repositoryRequest.setRemoteRepositories( remoteRepositories );
-
-        return this;
-    }
-
-    public boolean isOffline()
-    {
-        return repositoryRequest.isOffline();
-    }
-
-    public DefaultPluginVersionRequest setOffline( boolean offline )
-    {
-        repositoryRequest.setOffline( offline );
-
-        return this;
-    }
-
-    public boolean isForceUpdate()
-    {
-        return repositoryRequest.isForceUpdate();
-    }
-
-    public DefaultPluginVersionRequest setForceUpdate( boolean forceUpdate )
-    {
-        repositoryRequest.setForceUpdate( forceUpdate );
-
-        return this;
-    }
-
-    public ArtifactTransferListener getTransferListener()
-    {
-        return repositoryRequest.getTransferListener();
-    }
-
-    public DefaultPluginVersionRequest setTransferListener( ArtifactTransferListener transferListener )
-    {
-        repositoryRequest.setTransferListener( transferListener );
+        this.session = session;
 
         return this;
     }
