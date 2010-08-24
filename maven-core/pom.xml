@@ -55,8 +55,8 @@
     </dependency>
     <!-- Plexus -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
