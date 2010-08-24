@@ -19,30 +19,25 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<settings>
-  <profiles>
-    <profile>
-      <!--
-      Make sure we also override the repo definition in case a repo manager is setup.
-      -->
-      <id>it-defaults</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <name>it0043</name>
-          <url>@baseurl@/target/maven-core-it0043-repo</url>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <name>it0043</name>
-          <url>@baseurl@/target/maven-core-it0043-repo</url>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-</settings>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng0479</groupId>
+  <artifactId>test</artifactId>
+  <version>0.1-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-479</name> 
+  <description>
+    Verify that using the same repo id allows to override "central". This project checks that releases can be
+    disabled and this policy is effective during resolution of transitive dependencies.
+  </description>
+
+  <dependencies>
+    <dependency>
+      <!-- snapshot dependency which has a transitive release dependency -->
+      <groupId>org.apache.maven.its.mng0479</groupId>
+      <artifactId>a</artifactId>
+      <version>0.2-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -36,13 +36,13 @@ public class MavenITmng0479OverrideCentralRepoTest
 {
     public MavenITmng0479OverrideCentralRepoTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.3,3.0-alpha-1),[3.0-beta-3,)" );
     }
 
     /**
-     * Test for repository inheritance - ensure using the same id overrides the defaults
+     *  Verify that using the same repo id allows to override "central". This test checks the effective model.
      */
-    public void testitMNG479()
+    public void testitModel()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0479" );
@@ -63,7 +63,7 @@ public class MavenITmng0479OverrideCentralRepoTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
@@ -80,8 +80,16 @@ public class MavenITmng0479OverrideCentralRepoTest
             String key = "project.repositories." + i;
             if ( "central".equals( props.getProperty( key + ".id" ) ) )
             {
-                assertEquals( "it0043", props.getProperty( key + ".name" ) );
-                assertTrue( props.getProperty( key + ".url" ).endsWith( "/target/maven-core-it0043-repo" ) );
+                assertEquals( "mng-0479", props.getProperty( key + ".name" ) );
+                assertTrue( props.getProperty( key + ".url" ).endsWith( "/target/mng-0479" ) );
+
+                assertEquals( "false", props.getProperty( key + ".releases.enabled" ) );
+                assertEquals( "ignore", props.getProperty( key + ".releases.checksumPolicy" ) );
+                assertEquals( "always", props.getProperty( key + ".releases.updatePolicy" ) );
+
+                assertEquals( "true", props.getProperty( key + ".snapshots.enabled" ) );
+                assertEquals( "fail", props.getProperty( key + ".snapshots.checksumPolicy" ) );
+                assertEquals( "never", props.getProperty( key + ".snapshots.updatePolicy" ) );
             }
         }
 
@@ -91,10 +99,108 @@ public class MavenITmng0479OverrideCentralRepoTest
             String key = "project.pluginRepositories." + i;
             if ( "central".equals( props.getProperty( key + ".id" ) ) )
             {
-                assertEquals( "it0043", props.getProperty( key + ".name" ) );
-                assertTrue( props.getProperty( key + ".url" ).endsWith( "/target/maven-core-it0043-repo" ) );
+                assertEquals( "mng-0479", props.getProperty( key + ".name" ) );
+                assertTrue( props.getProperty( key + ".url" ).endsWith( "/target/mng-0479" ) );
+
+                assertEquals( "false", props.getProperty( key + ".releases.enabled" ) );
+                assertEquals( "ignore", props.getProperty( key + ".releases.checksumPolicy" ) );
+                assertEquals( "always", props.getProperty( key + ".releases.updatePolicy" ) );
+
+                assertEquals( "true", props.getProperty( key + ".snapshots.enabled" ) );
+                assertEquals( "fail", props.getProperty( key + ".snapshots.checksumPolicy" ) );
+                assertEquals( "never", props.getProperty( key + ".snapshots.updatePolicy" ) );
             }
         }
+    }
+
+    /**
+     *  Verify that using the same repo id allows to override "central". This test checks the actual repo access.
+     */
+    public void testitResolution()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0479" );
+
+        Verifier verifier = newVerifier( new File( testDir, "test-1" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng0479" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng0479", "parent", "0.1-SNAPSHOT", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng0479", "a", "0.1-SNAPSHOT", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng0479", "a", "0.1-SNAPSHOT", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng0479", "a-parent", "0.1-SNAPSHOT", "pom" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng0479", "b", "0.1-SNAPSHOT", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng0479", "b", "0.1-SNAPSHOT", "pom" );
+
+        verifier = newVerifier( new File( testDir, "test-2" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        try
+        {
+            verifier.executeGoal( "validate" );
+            verifier.verifyErrorFreeLog();
+            fail( "Build should have failed to resolve parent POM" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+        verifier.resetStreams();
+
+        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0479", "parent", "0.1", "pom" );
+
+        verifier = newVerifier( new File( testDir, "test-3" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        try
+        {
+            verifier.executeGoal( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
+            verifier.verifyErrorFreeLog();
+            fail( "Build should have failed to resolve direct dependency" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+        verifier.resetStreams();
+
+        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0479", "a", "0.1", "jar" );
+        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0479", "a", "0.1", "pom" );
+
+        verifier = newVerifier( new File( testDir, "test-4" ).getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        try
+        {
+            verifier.executeGoal( "org.apache.maven.its.mng0479:maven-mng0479-plugin:0.1-SNAPSHOT:touch" );
+            verifier.verifyErrorFreeLog();
+            fail( "Build should have failed to resolve transitive dependency" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected
+        }
+        verifier.resetStreams();
+
+        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0479", "b", "0.1", "jar" );
+        verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0479", "b", "0.1", "pom" );
     }
 
 }
