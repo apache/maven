@@ -132,7 +132,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         }
     }
 
-    public void testmng3599useHttpProxyForHttp()
+    public void testitUseHttpProxyForHttp()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
@@ -175,11 +175,10 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
     /**
      * Test that HTTP proxy is used for HTTP and for WebDAV.
      */
-    public void testmng3599useHttpProxyForWebDAV()
+    public void testitUseHttpProxyForWebDAV()
         throws Exception
     {
-        // TODO: implement equivalent test for 3.0 once supported
-        requiresMavenVersion( "[2.1.0-M1,3.0-alpha-1)" );
+        requiresMavenVersion( "[2.1.0-M1,3.0-alpha-1),[3.0-beta-3,)" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3599" );
 

@@ -88,7 +88,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4755FetchRemoteMetadataForVersionRangeTest.class );
         suite.addTestSuite( MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest.class );
         suite.addTestSuite( MavenITmng4747JavaAgentUsedByPluginTest.class );
-        // suite.addTestSuite( MavenITmng4745PluginVersionUpdateTest.class );
+        suite.addTestSuite( MavenITmng4745PluginVersionUpdateTest.class );
         suite.addTestSuite( MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest.class );
         suite.addTestSuite( MavenITmng4721OptionalPluginDependencyTest.class );
         suite.addTestSuite( MavenITmng4720DependencyManagementExclusionMergeTest.class );

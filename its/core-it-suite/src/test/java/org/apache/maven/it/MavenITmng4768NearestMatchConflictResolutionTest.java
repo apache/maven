@@ -50,7 +50,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest
     public void testitADB()
         throws Exception
     {
-        requiresMavenVersion( "[4.0,)" );
+        requiresMavenVersion( "[3.0-beta-3,)" );
         testit( "test-adb" );
     }
 
@@ -69,7 +69,7 @@ public class MavenITmng4768NearestMatchConflictResolutionTest
     public void testitDAB()
         throws Exception
     {
-        requiresMavenVersion( "[4.0,)" );
+        requiresMavenVersion( "[3.0-beta-3,)" );
         testit( "test-dab" );
     }
 
