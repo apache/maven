@@ -93,6 +93,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4721OptionalPluginDependencyTest.class );
         suite.addTestSuite( MavenITmng4720DependencyManagementExclusionMergeTest.class );
         suite.addTestSuite( MavenITmng4696MavenProjectDependencyArtifactsTest.class );
+        suite.addTestSuite( MavenITmng4690InterdependentConflictResolutionTest.class );
         suite.addTestSuite( MavenITmng4684DistMngtOverridenByProfileTest.class );
         suite.addTestSuite( MavenITmng4679SnapshotUpdateInPluginTest.class );
         suite.addTestSuite( MavenITmng4677DisabledPluginConfigInheritanceTest.class );
