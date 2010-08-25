@@ -45,12 +45,12 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
     public void testitFromPom()
         throws Exception
     {
-        // TODO: fate of POM repositories in 3.x is unclear, disabled for now
-        requiresMavenVersion( "[2.0,3.0-alpha-1)" );
+        requiresMavenVersion( "[2.0,3.0-alpha-1),[3.0-alpha-3,)" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-1" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setForkJvm( true ); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );
@@ -74,6 +74,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-2" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setForkJvm( true ); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );
@@ -94,6 +95,7 @@ public class MavenITmng3983PluginResolutionFromProfileReposTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3983/test-3" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setForkJvm( true ); // Don't lock up plugin files in class loader within current JVM
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3983" );
