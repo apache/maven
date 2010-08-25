@@ -23,21 +23,18 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3482">MNG-3482</a>.
  *
- * @todo Fill in a better description of what this test verifies!
- *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- *
  */
 public class MavenITmng3482DependencyPomInterpolationTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3482DependencyPomInterpolationTest()
     {
         super( ALL_MAVEN_VERSIONS );
@@ -46,55 +43,21 @@ public class MavenITmng3482DependencyPomInterpolationTest
     public void testitMNG3482()
         throws Exception
     {
-        // The testdir is computed from the location of this
-        // file.
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3482" );
 
-        Verifier verifier;
-
-        /*
-         * We must first make sure that any artifact created
-         * by this test has been removed from the local
-         * repository. Failing to do this could cause
-         * unstable test results. Fortunately, the verifier
-         * makes it easy to do this.
-         */
-        verifier = newVerifier( testDir.getAbsolutePath() );
-
-        File settings = verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
-                                             verifier.newDefaultFilterProperties() );
-
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3482" );
-
-        /*
-         * The Command Line Options (CLI) are passed to the
-         * verifier as a list. This is handy for things like
-         * redefining the local repository if needed. In
-         * this case, we use the -N flag so that Maven won't
-         * recurse. We are only installing the parent pom to
-         * the local repo here.
-         */
         verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "\"" + settings.getAbsolutePath() + "\"" );
-
-        verifier.executeGoal( "compile" );
-
-        /*
-         * This is the simplest way to check a build
-         * succeeded. It is also the simplest way to create
-         * an IT test: make the build pass when the test
-         * should pass, and make the build fail when the
-         * test should fail. There are other methods
-         * supported by the verifier. They can be seen here:
-         * http://maven.apache.org/shared/maven-verifier/apidocs/index.html
-         */
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
-        /*
-         * Reset the streams before executing the verifier
-         * again.
-         */
         verifier.resetStreams();
+
+        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        assertTrue( classpath.toString(), classpath.contains( "dep2-1.jar" ) );
     }
 
 }

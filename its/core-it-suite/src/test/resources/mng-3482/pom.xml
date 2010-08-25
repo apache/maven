@@ -20,4 +20,27 @@
       <type>pom</type>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-dependency-resolution</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <compileClassPath>target/classpath.txt</compileClassPath>
+          <significantPathLevels>1</significantPathLevels>
+        </configuration>
+        <executions>
+          <execution>
+            <id>resolve</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
