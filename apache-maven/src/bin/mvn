@@ -33,14 +33,6 @@
 #       set MAVEN_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
 # ----------------------------------------------------------------------------
 
-QUOTED_ARGS=""
-while [ "$1" != "" ] ; do
-
-  QUOTED_ARGS="$QUOTED_ARGS \"$1\""
-  shift
-
-done
-
 if [ -f /etc/mavenrc ] ; then
   . /etc/mavenrc
 fi
@@ -154,11 +146,9 @@ if $cygwin; then
     HOME=`cygpath --path --windows "$HOME"`
 fi
 
-maven_exec_cmd="\"$JAVACMD\" \
+exec "$JAVACMD" \
   $MAVEN_OPTS \
-  -classpath \"${M2_HOME}\"/boot/plexus-classworlds-*.jar \
-  \"-Dclassworlds.conf=${M2_HOME}/bin/m2.conf\" \
-  \"-Dmaven.home=${M2_HOME}\"  \
-  ${CLASSWORLDS_LAUNCHER}"
-
-eval $maven_exec_cmd "$QUOTED_ARGS"
+  -classpath "${M2_HOME}"/boot/plexus-classworlds-*.jar \
+  "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
+  "-Dmaven.home=${M2_HOME}"  \
+  ${CLASSWORLDS_LAUNCHER} "$@"
