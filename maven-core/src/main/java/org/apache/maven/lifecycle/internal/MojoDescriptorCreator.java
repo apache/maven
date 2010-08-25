@@ -42,6 +42,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.util.ArrayList;
@@ -63,6 +64,10 @@ import java.util.StringTokenizer;
 @Component( role = MojoDescriptorCreator.class )
 public class MojoDescriptorCreator
 {
+
+    @Requirement
+    private Logger logger;
+
     @Requirement
     private PluginVersionResolver pluginVersionResolver;
 
@@ -72,17 +77,22 @@ public class MojoDescriptorCreator
     @Requirement
     private PluginPrefixResolver pluginPrefixResolver;
 
+    @Requirement
+    private LifecyclePluginResolver lifecyclePluginResolver;
+
     @SuppressWarnings( { "UnusedDeclaration" } )
     public MojoDescriptorCreator()
     {
     }
 
     public MojoDescriptorCreator( PluginVersionResolver pluginVersionResolver, BuildPluginManager pluginManager,
-                                  PluginPrefixResolver pluginPrefixResolver )
+                                  PluginPrefixResolver pluginPrefixResolver,
+                                  LifecyclePluginResolver lifecyclePluginResolver )
     {
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
         this.pluginPrefixResolver = pluginPrefixResolver;
+        this.lifecyclePluginResolver = lifecyclePluginResolver;
     }
 
     private Plugin findPlugin( String groupId, String artifactId, Collection<Plugin> plugins )
@@ -220,6 +230,19 @@ public class MojoDescriptorCreator
         throws NoPluginFoundForPrefixException
     {
         // [prefix]:[goal]
+
+        if ( session.getCurrentProject() != null )
+        {
+            try
+            {
+                lifecyclePluginResolver.resolveMissingPluginVersions( session.getCurrentProject(), session );
+            }
+            catch ( PluginVersionResolutionException e )
+            {
+                // not critical here
+                logger.debug( e.getMessage(), e );
+            }
+        }
 
         PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest( prefix, session );
         PluginPrefixResult prefixResult = pluginPrefixResolver.resolve( prefixRequest );

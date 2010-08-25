@@ -60,7 +60,7 @@ public class LifecyclePluginResolver
     public void resolveMissingPluginVersions( MavenProject project, MavenSession session )
         throws PluginVersionResolutionException
     {
-        Map<String, String> versions = new HashMap<String, String>();
+        Map<String, String> versions = new HashMap<String, String>( 64 );
 
         for ( Plugin plugin : project.getBuildPlugins() )
         {
