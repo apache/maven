@@ -336,6 +336,7 @@ public class DefaultMaven
         session.setSystemProps( request.getSystemProperties() );
         Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
+        configProps.put( ConfigurationProperties.INTERACTIVE, Boolean.valueOf( request.isInteractiveMode() ) );
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
         session.setConfigProps( configProps );
