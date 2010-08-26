@@ -16,6 +16,8 @@ package org.apache.maven;
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -66,8 +69,10 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
@@ -329,7 +334,11 @@ public class DefaultMaven
 
         session.setUserProps( request.getUserProperties() );
         session.setSystemProps( request.getSystemProperties() );
-        session.setConfigProps( request.getSystemProperties() );
+        Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
+        configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
+        configProps.putAll( request.getSystemProperties() );
+        configProps.putAll( request.getUserProperties() );
+        session.setConfigProps( configProps );
 
         session.setOffline( request.isOffline() );
         session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
@@ -443,6 +452,41 @@ public class DefaultMaven
         } );
 
         return session;
+    }
+
+    private String getUserAgent()
+    {
+        StringBuilder buffer = new StringBuilder( 128 );
+
+        buffer.append( "Apache-Maven/" ).append( getMavenVersion() );
+        buffer.append( " (" );
+        buffer.append( "Java " ).append( System.getProperty( "java.version" ) );
+        buffer.append( "; " );
+        buffer.append( System.getProperty( "os.name" ) ).append( " " ).append( System.getProperty( "os.version" ) );
+        buffer.append( ")" );
+
+        return buffer.toString();
+    }
+
+    private String getMavenVersion()
+    {
+        Properties props = new Properties();
+
+        InputStream is = getClass().getResourceAsStream( "/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+        if ( is != null )
+        {
+            try
+            {
+                props.load( is );
+            }
+            catch ( IOException e )
+            {
+                logger.debug( "Failed to read Maven version", e );
+            }
+            IOUtil.close( is );
+        }
+
+        return props.getProperty( "version", "unknown-version" );
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
