@@ -52,7 +52,7 @@ public class MavenITmng4469AuthenticatedDeploymentToCustomRepoTest
 
     private int port;
 
-    private boolean deployed;
+    private volatile boolean deployed;
 
     public MavenITmng4469AuthenticatedDeploymentToCustomRepoTest()
     {

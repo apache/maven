@@ -54,7 +54,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
     private int port;
 
-    private boolean deployed;
+    private volatile boolean deployed;
 
     public MavenITmng4470AuthenticatedDeploymentToProxyTest()
     {

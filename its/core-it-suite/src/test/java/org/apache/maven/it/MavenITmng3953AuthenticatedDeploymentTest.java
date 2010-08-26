@@ -52,7 +52,7 @@ public class MavenITmng3953AuthenticatedDeploymentTest
 
     private int port;
 
-    private boolean deployed;
+    private volatile boolean deployed;
 
     public MavenITmng3953AuthenticatedDeploymentTest()
     {
