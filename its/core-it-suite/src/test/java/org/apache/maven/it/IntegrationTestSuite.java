@@ -81,6 +81,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4781DeploymentToNexusStagingRepoTest.class );
         suite.addTestSuite( MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest.class );
         suite.addTestSuite( MavenITmng4776ForkedReactorPluginVersionResolutionTest.class );
         suite.addTestSuite( MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest.class );
