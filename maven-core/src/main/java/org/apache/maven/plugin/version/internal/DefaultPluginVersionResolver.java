@@ -39,7 +39,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.impl.MetadataResolver;
+import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.repository.ArtifactRepository;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -65,7 +65,7 @@ public class DefaultPluginVersionResolver
     private Logger logger;
 
     @Requirement
-    private MetadataResolver metadataResolver;
+    private RepositorySystem repositorySystem;
 
     @Requirement
     private MetadataReader metadataReader;
@@ -114,7 +114,7 @@ public class DefaultPluginVersionResolver
             requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ) );
         }
 
-        List<MetadataResult> results = metadataResolver.resolveMetadata( request.getRepositorySession(), requests );
+        List<MetadataResult> results = repositorySystem.resolveMetadata( request.getRepositorySession(), requests );
 
         LocalRepository localRepo = request.getRepositorySession().getLocalRepository();
 
