@@ -76,7 +76,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
 
                 if ( "PUT".equalsIgnoreCase( request.getMethod() ) )
                 {
-                    response.setStatus( HttpServletResponse.SC_OK );
+                    response.setStatus( HttpServletResponse.SC_CREATED );
                     deployedUris.add( request.getRequestURI() );
                     putSeen = true;
                 }
