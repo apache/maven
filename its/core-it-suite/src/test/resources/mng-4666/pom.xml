@@ -111,6 +111,21 @@ under the License.
             <artifactId>spice-inject-plexus</artifactId>
             <version>0.1-stub</version>
           </dependency>
+          <dependency>
+            <groupId>org.sonatype.aether</groupId>
+            <artifactId>aether-api</artifactId>
+            <version>0.1-stub</version>
+          </dependency>
+          <dependency>
+            <groupId>org.sonatype.aether</groupId>
+            <artifactId>aether-spi</artifactId>
+            <version>0.1-stub</version>
+          </dependency>
+          <dependency>
+            <groupId>org.sonatype.aether</groupId>
+            <artifactId>aether-impl</artifactId>
+            <version>0.1-stub</version>
+          </dependency>
         </dependencies>
         <executions>
           <execution>
@@ -131,6 +146,9 @@ under the License.
                 <className>org.codehaus.plexus.classworlds.realm.ClassRealm</className>
                 <className>org.codehaus.classworlds.ClassRealm</className>
                 <className>org.codehaus.plexus.util.xml.Xpp3Dom</className>
+                <className>org.sonatype.aether.RepositorySystem</className>
+                <className>org.sonatype.aether.spi.connector.RepositoryConnectorFactory</className>
+                <className>org.sonatype.aether.impl.ArtifactDescriptorReader</className>
               </classNames>
             </configuration>
             <goals>

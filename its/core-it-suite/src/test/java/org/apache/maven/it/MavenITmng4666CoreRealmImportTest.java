@@ -67,6 +67,10 @@ public class MavenITmng4666CoreRealmImportTest
         verifier.deleteArtifacts( "org.codehaus.plexus", "plexus-component-api", "0.1-stub" );
         verifier.deleteArtifacts( "org.codehaus.plexus", "plexus-utils", "0.1-stub" );
         verifier.deleteArtifacts( "org.codehaus.plexus", "plexus-classworlds", "0.1-stub" );
+        verifier.deleteArtifacts( "org.sonatype.aether", "aether-api", "0.1-stub" );
+        verifier.deleteArtifacts( "org.sonatype.aether", "aether-spi", "0.1-stub" );
+        verifier.deleteArtifacts( "org.sonatype.aether", "aether-impl", "0.1-stub" );
+        verifier.deleteArtifacts( "org.sonatype.spice", "spice-inject-plexus", "0.1-stub" );
         verifier.deleteArtifacts( "classworlds", "classworlds", "0.1-stub" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.getCliOptions().add( "-s" );
