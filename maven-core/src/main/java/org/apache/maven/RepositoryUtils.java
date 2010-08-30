@@ -142,7 +142,8 @@ public class RepositoryUtils
         Map<String, String> props = null;
         if ( org.apache.maven.artifact.Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
         {
-            props = Collections.singletonMap( ArtifactProperties.LACKS_DESCRIPTOR, Boolean.TRUE.toString() );
+            String localPath = ( artifact.getFile() != null ) ? artifact.getFile().getPath() : "";
+            props = Collections.singletonMap( ArtifactProperties.LOCAL_PATH, localPath );
         }
 
         Artifact result =
@@ -270,17 +271,12 @@ public class RepositoryUtils
         Map<String, String> props = null;
         if ( system )
         {
-            props = Collections.singletonMap( ArtifactProperties.LACKS_DESCRIPTOR, Boolean.TRUE.toString() );
+            props = Collections.singletonMap( ArtifactProperties.LOCAL_PATH, dependency.getSystemPath() );
         }
 
         Artifact artifact =
             new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), null,
                                  dependency.getVersion(), props, stereotype );
-
-        if ( system )
-        {
-            artifact = artifact.setFile( new File( dependency.getSystemPath() ) );
-        }
 
         List<Exclusion> exclusions = new ArrayList<Exclusion>( dependency.getExclusions().size() );
         for ( org.apache.maven.model.Exclusion exclusion : dependency.getExclusions() )
