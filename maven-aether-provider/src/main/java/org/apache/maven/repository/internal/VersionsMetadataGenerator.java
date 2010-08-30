@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -40,6 +41,8 @@ class VersionsMetadataGenerator
 
     private Map<Object, VersionsMetadata> versions;
 
+    private Map<Object, VersionsMetadata> processedVersions;
+
     public VersionsMetadataGenerator( RepositorySystemSession session, InstallRequest request )
     {
         this( session, request.getMetadata() );
@@ -53,19 +56,22 @@ class VersionsMetadataGenerator
     private VersionsMetadataGenerator( RepositorySystemSession session, Collection<? extends Metadata> metadatas )
     {
         versions = new LinkedHashMap<Object, VersionsMetadata>();
+        processedVersions = new LinkedHashMap<Object, VersionsMetadata>();
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which
          * processes one artifact at a time and hence cannot associate the artifacts from the same project to use the
-         * same timestamp+buildno for the snapshot versions. Allowing the caller to pass in metadata from a previous
-         * deployment allows to re-establish the association between the artifacts of the same project.
+         * same version index. Allowing the caller to pass in metadata from a previous deployment allows to re-establish
+         * the association between the artifacts of the same project.
          */
-        for ( Metadata metadata : metadatas )
+        for ( Iterator<? extends Metadata> it = metadatas.iterator(); it.hasNext(); )
         {
+            Metadata metadata = it.next();
             if ( metadata instanceof VersionsMetadata )
             {
+                it.remove();
                 VersionsMetadata versionsMetadata = (VersionsMetadata) metadata;
-                versions.put( versionsMetadata.getKey(), versionsMetadata );
+                processedVersions.put( versionsMetadata.getKey(), versionsMetadata );
             }
         }
     }
@@ -85,11 +91,14 @@ class VersionsMetadataGenerator
         for ( Artifact artifact : artifacts )
         {
             Object key = VersionsMetadata.getKey( artifact );
-            VersionsMetadata versionsMetadata = versions.get( key );
-            if ( versionsMetadata == null )
+            if ( processedVersions.get( key ) == null )
             {
-                versionsMetadata = new VersionsMetadata( artifact );
-                versions.put( key, versionsMetadata );
+                VersionsMetadata versionsMetadata = versions.get( key );
+                if ( versionsMetadata == null )
+                {
+                    versionsMetadata = new VersionsMetadata( artifact );
+                    versions.put( key, versionsMetadata );
+                }
             }
         }
 

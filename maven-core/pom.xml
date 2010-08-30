@@ -56,10 +56,21 @@
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-aether-provider</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
+      <version>${aetherVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>${aetherVersion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
       <version>${aetherVersion}</version>
     </dependency>
     <!-- Plexus -->
@@ -132,7 +143,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>1.0-beta-1</version>
+            <version>1.0-beta-4</version>
             <executions>
               <execution>
                 <phase>generate-resources</phase>
@@ -144,6 +155,9 @@
             <configuration>
               <doCheck>false</doCheck>
               <doUpdate>false</doUpdate>
+              <providerImplementations>
+                <svn>javasvn</svn>
+              </providerImplementations> 
             </configuration>
           </plugin>
         </plugins>

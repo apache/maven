@@ -33,5 +33,6 @@ public interface ArtifactHandlerManager
 
     ArtifactHandler getArtifactHandler( String type );
 
+    @Deprecated
     void addHandlers( Map<String, ArtifactHandler> handlers );
 }

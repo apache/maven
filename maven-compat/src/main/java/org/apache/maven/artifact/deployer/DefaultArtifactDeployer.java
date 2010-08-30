@@ -58,7 +58,7 @@ public class DefaultArtifactDeployer
     @Requirement
     private LegacySupport legacySupport;
 
-    private Map<Object, MergeableMetadata> snapshots = new ConcurrentHashMap<Object, MergeableMetadata>();
+    private Map<Object, MergeableMetadata> relatedMetadata = new ConcurrentHashMap<Object, MergeableMetadata>();
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set
@@ -89,12 +89,14 @@ public class DefaultArtifactDeployer
         mainArtifact = mainArtifact.setFile( source );
         request.addArtifact( mainArtifact );
 
+        String versionKey = artifact.getGroupId() + ':' + artifact.getArtifactId();
         String snapshotKey = null;
         if ( artifact.isSnapshot() )
         {
-            snapshotKey = artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getBaseVersion();
-            request.addMetadata( snapshots.get( snapshotKey ) );
+            snapshotKey = versionKey + ':' + artifact.getBaseVersion();
+            request.addMetadata( relatedMetadata.get( snapshotKey ) );
         }
+        request.addMetadata( relatedMetadata.get( versionKey ) );
 
         for ( ArtifactMetadata metadata : artifact.getMetadataList() )
         {
@@ -138,14 +140,15 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( e.getMessage(), e );
         }
 
-        if ( snapshotKey != null )
+        for ( Object metadata : result.getMetadata() )
         {
-            for ( Object metadata : result.getMetadata() )
+            if ( metadata.getClass().getName().endsWith( ".internal.VersionsMetadata" ) )
             {
-                if ( metadata.getClass().getName().endsWith( ".internal.RemoteSnapshotMetadata" ) )
-                {
-                    snapshots.put( snapshotKey, (MergeableMetadata) metadata );
-                }
+                relatedMetadata.put( versionKey, (MergeableMetadata) metadata );
+            }
+            if ( snapshotKey != null && metadata.getClass().getName().endsWith( ".internal.RemoteSnapshotMetadata" ) )
+            {
+                relatedMetadata.put( snapshotKey, (MergeableMetadata) metadata );
             }
         }
 

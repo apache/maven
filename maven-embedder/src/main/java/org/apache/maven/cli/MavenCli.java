@@ -33,6 +33,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -539,7 +540,7 @@ public class MavenCli
             }
         }
 
-        if ( showErrors )
+        if ( showErrors || ( summary.getException() instanceof InternalErrorException ) )
         {
             logger.error( msg, summary.getException() );
         }

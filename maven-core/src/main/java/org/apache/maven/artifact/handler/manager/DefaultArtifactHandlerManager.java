@@ -21,6 +21,7 @@ package org.apache.maven.artifact.handler.manager;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
@@ -35,16 +36,24 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
+
     @Requirement( role = ArtifactHandler.class )
     private Map<String, ArtifactHandler> artifactHandlers;
 
+    private Map<String, ArtifactHandler> unmanagedHandlers = new ConcurrentHashMap<String, ArtifactHandler>();
+
     public ArtifactHandler getArtifactHandler( String type )
     {
-        ArtifactHandler handler = artifactHandlers.get( type );
+        ArtifactHandler handler = unmanagedHandlers.get( type );
 
         if ( handler == null )
         {
-            handler = new DefaultArtifactHandler( type );
+            handler = artifactHandlers.get( type );
+
+            if ( handler == null )
+            {
+                handler = new DefaultArtifactHandler( type );
+            }
         }
 
         return handler;
@@ -52,11 +61,14 @@ public class DefaultArtifactHandlerManager
 
     public void addHandlers( Map<String, ArtifactHandler> handlers )
     {
-        artifactHandlers.putAll( handlers );
+        // legacy support for maven-gpg-plugin:1.0
+        unmanagedHandlers.putAll( handlers );
     }
 
+    @Deprecated
     public Set<String> getHandlerTypes()
     {
         return artifactHandlers.keySet();
     }
+
 }
