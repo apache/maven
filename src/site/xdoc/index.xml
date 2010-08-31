@@ -41,26 +41,28 @@
       <p>
         <img src="images/maven-deps.png" width="704" height="399" border="0" usemap="#Maven_dependencies" />
         <map name="Maven_dependencies">
-          <area shape="rect" coords="212,0,336,33" href="apache-maven/" />
-          <area shape="rect" coords="212,53,336,86" href="maven-embedder/" />
-          <area shape="rect" coords="212,106,336,138" href="maven-compat/" />
-          <area shape="rect" coords="212,155,336,188" href="maven-core/" />
-          <area shape="rect" coords="3,155,183,188" href="maven-repository-metadata/" />
-          <area shape="rect" coords="0,216,125,248" href="maven-settings/" />
-          <area shape="rect" coords="140,238,264,271" href="maven-plugin-api/" />
-          <area shape="rect" coords="283,216,407,248" href="maven-model-builder/" />
-          <area shape="rect" coords="66,291,190,324" href="maven-artifact/" />
-          <area shape="rect" coords="215,291,339,324" href="maven-model/" />
-          <area shape="rect" coords="445,53,591,86" href="http://commons.apache.org/cli/" />
-          <area shape="rect" coords="445,106,621,138" href="http://maven.apache.org/wagon/wagon-provider-api/" />
-          <area shape="rect" coords="445,197,591,229" href="http://plexus.codehaus.org/plexus-components/plexus-interpolation/" />
-          <area shape="rect" coords="445,155,591,188" href="http://plexus.codehaus.org/plexus-components/plexus-sec-dispatcher/project-reports.html" />
-          <area shape="rect" coords="623,155,696,188" href="http://plexus.codehaus.org/plexus-components/plexus-cipher/project-reports.html" />
-          <area shape="rect" coords="445,238,655,271" href="http://plexus.codehaus.org/plexus-containers/plexus-component-annotations/" />
-          <area shape="rect" coords="445,280,606,312" href="http://plexus.codehaus.org/plexus-containers/plexus-container-default/" />
-          <area shape="rect" coords="463,333,588,366" href="http://plexus.codehaus.org/plexus-classworlds/" />
-          <area shape="rect" coords="608,355,693,388" href="http://plexus.codehaus.org/plexus-utils/" />
-          <area shape="rect" coords="438,148,704,399" href="http://plexus.codehaus.org/" />
+          <area shape="rect" coords="213,0,338,32" alt="apache-maven"  href="apache-maven/" />
+          <area shape="rect" coords="213,52,338,85" alt="maven-embedder" href="maven-embedder/" />
+          <area shape="rect" coords="212,105,338,138" alt="maven-compat" href="maven-compat/" />
+          <area shape="rect" coords="213,158,338,191" alt="maven-core" href="maven-core/" />
+          <area shape="rect" coords="110,207,258,240" alt="maven-aether-provider" href="maven-aether-provider/" />
+          <area shape="rect" coords="0,256,180,289" alt="maven-repository-metadata" href="maven-repository-metadata/" />
+          <area shape="rect" coords="230,309,321,342" alt="maven-plugin-api" href="maven-plugin-api/" />
+          <area shape="rect" coords="237,358,314,391" alt="maven-artifact" href="maven-artifact/" />
+          <area shape="rect" coords="357,158,494,191" alt="maven-setting-builder" href="maven-setting-builder/" />
+          <area shape="rect" coords="382,207,468,240" alt="maven-settings" href="maven-settings/" />
+          <area shape="rect" coords="363,256,487,289" alt="maven-model-builder" href="maven-model-builder/" />
+          <area shape="rect" coords="383,310,468,342" alt="maven-model" href="maven-model/" />
+          <area shape="rect" coords="514,52,660,85" alt="commons-cli" href="http://commons.apache.org/cli/" />
+          <area shape="rect" coords="514,105,690,138" alt="wagon-provider-api" href="http://maven.apache.org/wagon/wagon-provider-api/" />
+          <area shape="rect" coords="514,158,645,191" alt="plexus-sec-dispatcher" href="http://plexus.codehaus.org/plexus-components/plexus-sec-dispatcher/project-reports.html" />
+          <area shape="rect" coords="543,207,617,240" alt="plexus-cipher" href="http://plexus.codehaus.org/plexus-components/plexus-cipher/project-reports.html" />
+          <area shape="rect" coords="514,257,660,289" alt="plexus-interpolation" href="http://plexus.codehaus.org/plexus-components/plexus-interpolation/" />
+          <area shape="rect" coords="514,324,724,357" alt="plexus-component-annotations" href="http://plexus.codehaus.org/plexus-containers/plexus-component-annotations/" />
+          <area shape="rect" coords="514,362,637,395" alt="plexus-classworlds" href="http://plexus.codehaus.org/plexus-classworlds/" />
+          <area shape="rect" coords="639,411,724,444" alt="plexus-utils" href="http://plexus.codehaus.org/plexus-utils/" />
+          <area shape="rect" coords="507,150,731,455" alt="plexus" href="http://plexus.codehaus.org/" />
+          <area shape="rect" coords="65,306,225,436" alt="aether" href="https://docs.sonatype.org/display/AETHER/Home" />
         </map>
       </p>
 
