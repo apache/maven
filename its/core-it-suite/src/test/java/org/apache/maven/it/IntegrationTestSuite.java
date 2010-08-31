@@ -81,6 +81,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4786AntBased21xMojoSupportTest.class );
         suite.addTestSuite( MavenITmng4781DeploymentToNexusStagingRepoTest.class );
         suite.addTestSuite( MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest.class );
         suite.addTestSuite( MavenITmng4776ForkedReactorPluginVersionResolutionTest.class );
@@ -158,7 +159,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4402DuplicateChildModuleTest.class );
         suite.addTestSuite( MavenITmng4401RepositoryOrderForParentPomTest.class );
         suite.addTestSuite( MavenITmng4400RepositoryOrderTest.class );
-        suite.addTestSuite( MavenITmng4396AntBasedMojoSupportTest.class );
+        suite.addTestSuite( MavenITmng4396AntBased20xMojoSupportTest.class );
         suite.addTestSuite( MavenITmng4393ParseExternalParenPomLenientTest.class );
         suite.addTestSuite( MavenITmng4387QuietLoggingTest.class );
         suite.addTestSuite( MavenITmng4386DebugLoggingTest.class );

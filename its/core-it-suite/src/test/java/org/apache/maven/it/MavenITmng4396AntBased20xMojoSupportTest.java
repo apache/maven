@@ -29,17 +29,18 @@ import java.io.File;
  * 
  * @author Benjamin Bentmann
  */
-public class MavenITmng4396AntBasedMojoSupportTest
+public class MavenITmng4396AntBased20xMojoSupportTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng4396AntBasedMojoSupportTest()
+    public MavenITmng4396AntBased20xMojoSupportTest()
     {
         super( ALL_MAVEN_VERSIONS );
     }
 
     /**
-     * Verify that plugins whose mojos are implemented as Ant scripts can be invoked.
+     * Verify that plugins whose mojos are implemented as Ant scripts and use the Maven 2.0.x Ant support can be
+     * invoked.
      */
     public void testit()
         throws Exception
