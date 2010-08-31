@@ -105,8 +105,26 @@ public class DefaultClassRealmManager
         if ( mavenRealm == null )
         {
             mavenRealm = newRealm( "maven.api" );
+
             importMavenApi( mavenRealm );
+
             mavenRealm.setParentClassLoader( ClassLoader.getSystemClassLoader() );
+
+            List<ClassRealmManagerDelegate> delegates = getDelegates();
+            if ( !delegates.isEmpty() )
+            {
+                List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
+
+                ClassRealmRequest request =
+                    new DefaultClassRealmRequest( RealmType.Core, null, new ArrayList<String>(), constituents );
+
+                for ( ClassRealmManagerDelegate delegate : delegates )
+                {
+                    delegate.setupRealm( mavenRealm, request );
+                }
+
+                populateRealm( mavenRealm, constituents );
+            }
         }
         return mavenRealm;
     }
@@ -150,8 +168,6 @@ public class DefaultClassRealmManager
             imports = new ArrayList<String>();
         }
 
-        ClassRealmRequest request = new DefaultClassRealmRequest( type, parent, imports, constituents );
-
         ClassRealm classRealm = newRealm( baseRealmId );
 
         if ( parent != null )
@@ -163,9 +179,15 @@ public class DefaultClassRealmManager
             classRealm.setParentRealm( getMavenRealm() );
         }
 
-        for ( ClassRealmManagerDelegate delegate : getDelegates() )
+        List<ClassRealmManagerDelegate> delegates = getDelegates();
+        if ( !delegates.isEmpty() )
         {
-            delegate.setupRealm( classRealm, request );
+            ClassRealmRequest request = new DefaultClassRealmRequest( type, parent, imports, constituents );
+
+            for ( ClassRealmManagerDelegate delegate : delegates )
+            {
+                delegate.setupRealm( classRealm, request );
+            }
         }
 
         if ( importXpp3Dom )
@@ -193,35 +215,12 @@ public class DefaultClassRealmManager
             }
         }
 
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Populating class realm " + classRealm.getId() );
-        }
-
-        for ( ClassRealmConstituent constituent : constituents )
-        {
-            File file = constituent.getFile();
-
-            String id = getId( constituent );
-            artifactIds.remove( id );
-
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "  Included: " + id );
-            }
-
-            try
-            {
-                classRealm.addURL( file.toURI().toURL() );
-            }
-            catch ( MalformedURLException e )
-            {
-                // Not going to happen
-            }
-        }
+        Set<String> includedIds = populateRealm( classRealm, constituents );
 
         if ( logger.isDebugEnabled() )
         {
+            artifactIds.removeAll( includedIds );
+
             for ( String id : artifactIds )
             {
                 logger.debug( "  Excluded: " + id );
@@ -362,8 +361,45 @@ public class DefaultClassRealmManager
         }
         catch ( ComponentLookupException e )
         {
+            logger.error( "Failed to lookup class realm delegates: " + e.getMessage(), e );
+
             return Collections.emptyList();
         }
+    }
+
+    private Set<String> populateRealm( ClassRealm classRealm, List<ClassRealmConstituent> constituents )
+    {
+        Set<String> includedIds = new LinkedHashSet<String>();
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Populating class realm " + classRealm.getId() );
+        }
+
+        for ( ClassRealmConstituent constituent : constituents )
+        {
+            File file = constituent.getFile();
+
+            String id = getId( constituent );
+            includedIds.add( id );
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "  Included: " + id );
+            }
+
+            try
+            {
+                classRealm.addURL( file.toURI().toURL() );
+            }
+            catch ( MalformedURLException e )
+            {
+                // Not going to happen
+                logger.error( e.getMessage(), e );
+            }
+        }
+
+        return includedIds;
     }
 
 }

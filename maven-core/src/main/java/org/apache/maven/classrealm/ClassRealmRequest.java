@@ -29,9 +29,30 @@ import java.util.List;
 public interface ClassRealmRequest
 {
 
+    /**
+     * The type of a class realm.
+     */
     enum RealmType
     {
-        Project, Extension, Plugin,
+        /**
+         * The class realm for the public API of the Maven core.
+         */
+        Core,
+
+        /**
+         * A class realm for a project to aggregates its build extensions.
+         */
+        Project,
+
+        /**
+         * A class realm for a build extension.
+         */
+        Extension,
+
+        /**
+         * A class realm for a plugin.
+         */
+        Plugin,
     }
 
     /**
@@ -49,7 +70,7 @@ public interface ClassRealmRequest
     ClassLoader getParent();
 
     /**
-     * Gets the packages/types to import from the parent realm
+     * Gets the packages/types to import from the parent realm.
      * 
      * @return The modifiable list of packages/types to import from the parent realm, never {@code null}.
      */
