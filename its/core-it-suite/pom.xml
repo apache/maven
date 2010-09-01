@@ -403,6 +403,10 @@ under the License.
               <includes>
                 <include>org.apache.maven.*</include>
               </includes>
+              <excludes>
+                <exclude>*.io.xpp3.*</exclude>
+                <exclude>*Exception</exclude>
+              </excludes>
             </configuration>
             <executions>
               <execution>
