@@ -162,13 +162,15 @@ public class DefaultProjectDependenciesResolver
     {
         for ( ArtifactResult ar : results )
         {
+            DependencyNode node = ar.getRequest().getDependencyNode();
             if ( ar.isResolved() )
             {
-                result.addResolvedDependency( ar.getRequest().getDependencyNode().getDependency() );
+                node.setArtifact( ar.getArtifact() );
+                result.addResolvedDependency( node.getDependency() );
             }
             else
             {
-                result.setResolutionErrors( ar.getRequest().getDependencyNode().getDependency(), ar.getExceptions() );
+                result.setResolutionErrors( node.getDependency(), ar.getExceptions() );
             }
         }
     }
