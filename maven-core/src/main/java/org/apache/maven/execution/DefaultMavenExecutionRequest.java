@@ -33,6 +33,7 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.sonatype.aether.RepositoryCache;
+import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.aether.util.DefaultRepositoryCache;
 
@@ -44,6 +45,8 @@ public class DefaultMavenExecutionRequest
 {
 
     private RepositoryCache repositoryCache = new DefaultRepositoryCache();
+
+    private WorkspaceReader workspaceReader;
 
     private ArtifactRepository localRepository;
 
@@ -173,6 +176,7 @@ public class DefaultMavenExecutionRequest
         copy.setRemoteRepositories( original.getRemoteRepositories() );
         copy.setPluginArtifactRepositories( original.getPluginArtifactRepositories() );
         copy.setRepositoryCache( original.getRepositoryCache() );
+        copy.setWorkspaceReader( original.getWorkspaceReader() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
         return copy;
@@ -1036,6 +1040,17 @@ public class DefaultMavenExecutionRequest
     public void setPerCoreThreadCount( boolean perCoreThreadCount )
     {
         this.perCoreThreadCount = perCoreThreadCount;
+    }
+
+    public WorkspaceReader getWorkspaceReader()
+    {
+        return workspaceReader;
+    }
+
+    public MavenExecutionRequest setWorkspaceReader( WorkspaceReader workspaceReader )
+    {
+        this.workspaceReader = workspaceReader;
+        return this;
     }
 
 }

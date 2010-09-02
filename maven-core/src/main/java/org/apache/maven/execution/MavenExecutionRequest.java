@@ -33,6 +33,7 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositoryCache;
+import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.transfer.TransferListener;
 
 /**
@@ -265,6 +266,9 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setRepositoryCache( RepositoryCache repositoryCache );
     RepositoryCache getRepositoryCache();
+
+    WorkspaceReader getWorkspaceReader();
+    MavenExecutionRequest setWorkspaceReader( WorkspaceReader workspaceReader );
 
     File getUserToolchainsFile();
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );

@@ -353,7 +353,14 @@ public class DefaultMaven
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
         session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
 
-        session.setWorkspaceReader( workspaceRepository );
+        if ( request.getWorkspaceReader() != null )
+        {
+            session.setWorkspaceReader( request.getWorkspaceReader() );
+        }
+        else
+        {
+            session.setWorkspaceReader( workspaceRepository );
+        }
 
         DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies( request.getProxies() );

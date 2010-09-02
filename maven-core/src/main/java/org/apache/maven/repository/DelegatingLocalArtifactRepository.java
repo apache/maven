@@ -36,6 +36,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
  * Delegating local artifact repository chains the reactor, IDE workspace
  * and user local repository.
  */
+@Deprecated
 public class DelegatingLocalArtifactRepository
     extends MavenArtifactRepository
 {
