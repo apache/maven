@@ -45,18 +45,20 @@ public abstract class AbstractPomMojo
 
     protected void dump( Properties props, String key, MavenProject project )
     {
-        props.setProperty( key + "project.id", project.getId() );
-        if ( project.getName() != null )
-        {
-            props.setProperty( key + "project.name", project.getName() );
-        }
-        if ( project.getDescription() != null )
-        {
-            props.setProperty( key + "project.description", project.getDescription() );
-        }
+        put( props, key + "project.id", project.getId() );
+        put( props, key + "project.name", project.getName() );
+        put( props, key + "project.description", project.getDescription() );
         if ( project.getArtifact() != null )
         {
-            props.setProperty( key + "artifact.id", project.getArtifact().getId() );
+            put( props, key + "artifact.id", project.getArtifact().getId() );
+        }
+    }
+
+    protected void put( Properties props, String key, Object value )
+    {
+        if ( value != null )
+        {
+            props.setProperty( key, value.toString() );
         }
     }
 

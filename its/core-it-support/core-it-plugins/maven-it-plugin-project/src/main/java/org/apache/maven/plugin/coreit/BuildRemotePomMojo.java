@@ -104,18 +104,23 @@ public class BuildRemotePomMojo
                                                           dependency.getVersion(), dependency.getType(),
                                                           dependency.getClassifier() );
 
-                getLog().info( "[MAVEN-CORE-IT-LOG] Building " + artifact.getId() );
+                String id = artifact.getId();
+
+                getLog().info( "[MAVEN-CORE-IT-LOG] Building " + id );
 
                 try
                 {
                     MavenProject project = builder.buildFromRepository( artifact, remoteRepositories, localRepository );
 
-                    dump( props, artifact.getId() + ".", project );
+                    dump( props, id + ".", project );
                 }
                 catch ( Exception e )
                 {
                     getLog().warn( "Failed to build remote POM for " + artifact.getId(), e );
                 }
+
+                put( props, id + ".file", artifact.getFile() );
+                put( props, id + ".version", artifact.getVersion() );
             }
         }
 
