@@ -251,6 +251,13 @@ public class DefaultProjectBuilder
 
         File pomFile = pomArtifact.getFile();
 
+        if ( "pom".equals( artifact.getType() ) )
+        {
+            artifact.selectVersion( pomArtifact.getVersion() );
+            artifact.setFile( pomFile );
+            artifact.setResolved( true );
+        }
+
         return build( localProject ? pomFile : null, new FileModelSource( pomFile ), configuration );
     }
 
