@@ -36,7 +36,7 @@ public class MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest
 
     public MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest()
     {
-        super( "[2.0.3,3.0-alpha-1),[3.0-beta-1,)" );
+        super( "[2.0.3,3.0-alpha-1),[3.0-beta-4,)" );
     }
 
     /**
