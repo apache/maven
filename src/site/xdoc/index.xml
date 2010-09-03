@@ -39,7 +39,7 @@
     process.</p>
 
       <p>
-        <img src="images/maven-deps.png" width="704" height="399" border="0" usemap="#Maven_dependencies" />
+        <img src="images/maven-deps.png" width="732" height="538" border="0" usemap="#Maven_dependencies" />
         <map name="Maven_dependencies">
           <area shape="rect" coords="213,0,338,32" alt="apache-maven"  href="apache-maven/" />
           <area shape="rect" coords="213,52,338,85" alt="maven-embedder" href="maven-embedder/" />
