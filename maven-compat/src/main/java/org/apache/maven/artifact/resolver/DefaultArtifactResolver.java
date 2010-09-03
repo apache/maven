@@ -55,6 +55,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
@@ -216,6 +217,12 @@ public class DefaultArtifactResolver
                 ArtifactRequest artifactRequest = new ArtifactRequest();
                 artifactRequest.setArtifact( RepositoryUtils.toArtifact( artifact ) );
                 artifactRequest.setRepositories( RepositoryUtils.toRepos( remoteRepositories ) );
+
+                // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not
+                LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+                String path = lrm.getPathForLocalArtifact( artifactRequest.getArtifact() );
+                artifact.setFile( new File( lrm.getRepository().getBasedir(), path ) );
+
                 result = repoSystem.resolveArtifact( session, artifactRequest );
             }
             catch ( org.sonatype.aether.resolution.ArtifactResolutionException e )
