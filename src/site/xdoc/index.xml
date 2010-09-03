@@ -63,6 +63,7 @@
           <area shape="rect" coords="639,411,724,444" alt="plexus-utils" href="http://plexus.codehaus.org/plexus-utils/" />
           <area shape="rect" coords="507,150,731,455" alt="plexus" href="http://plexus.codehaus.org/" />
           <area shape="rect" coords="65,306,225,436" alt="aether" href="https://docs.sonatype.org/display/AETHER/Home" />
+          <area shape="rect" coords="333,355,490,537" alt="spice-inject" href="http://www.sonatype.com/people/2010/01/from-plexus-to-guice-2-the-guiceplexus-bridge-and-custom-bean-injection/" />
         </map>
       </p>
 
