@@ -81,6 +81,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest.class );
         suite.addTestSuite( MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest.class );
         suite.addTestSuite( MavenITmng4789ScopeInheritanceMeetsConflictTest.class );
         suite.addTestSuite( MavenITmng4786AntBased21xMojoSupportTest.class );
