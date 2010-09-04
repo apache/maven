@@ -33,7 +33,7 @@ import org.sonatype.aether.repository.RemoteRepository;
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
  * prior notice.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 public interface PluginDescriptorCache

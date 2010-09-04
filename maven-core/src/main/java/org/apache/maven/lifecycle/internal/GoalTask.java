@@ -24,7 +24,7 @@ package org.apache.maven.lifecycle.internal;
  * <p/>
  * TODO: From a concurrecy perspective, this class is not good. The combination of mutable/immutable state is not nice
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 public final class GoalTask

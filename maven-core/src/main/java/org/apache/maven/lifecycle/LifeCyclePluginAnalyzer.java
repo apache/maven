@@ -23,7 +23,7 @@ import java.util.Set;
 import org.apache.maven.model.Plugin;
 
 /**
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  */
 public interface LifeCyclePluginAnalyzer

@@ -51,7 +51,7 @@ import org.sonatype.aether.util.metadata.DefaultMetadata;
 /**
  * Resolves a version for a plugin.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 @Component( role = PluginVersionResolver.class )

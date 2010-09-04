@@ -62,7 +62,7 @@ import java.util.concurrent.Future;
  * ReactorArtifactRepository has a reference to isWeave too.
  * This class and its usage
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
  *         <p/>

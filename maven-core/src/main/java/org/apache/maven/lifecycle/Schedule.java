@@ -22,7 +22,7 @@ package org.apache.maven.lifecycle;
 import org.apache.maven.plugin.MojoExecution;
 
 /**
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  */
 @SuppressWarnings( { "UnusedDeclaration" } )

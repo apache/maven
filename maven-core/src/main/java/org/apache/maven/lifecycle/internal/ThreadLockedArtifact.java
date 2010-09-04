@@ -36,7 +36,7 @@ import java.util.concurrent.CountDownLatch;
 /**
  * An artifact that conditionally suspends on getFile for anything but the thread it is locked to.
  * 
- * @since 3.0-beta-2
+ * @since 3.0
  */
 class ThreadLockedArtifact
     implements Artifact

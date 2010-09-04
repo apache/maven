@@ -27,7 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * @since 3.0-beta-1
+ * @since 3.0
  */
 @Component( role = ThreadConfigurationService.class )
 public class ThreadConfigurationService

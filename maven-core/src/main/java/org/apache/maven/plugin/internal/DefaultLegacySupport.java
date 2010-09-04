@@ -29,7 +29,7 @@ import org.sonatype.aether.RepositorySystemSession;
  * internal utility component that is only public for technical reasons, it is not part of the public API. In
  * particular, this component can be changed or deleted without prior notice.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 @Component( role = LegacySupport.class )

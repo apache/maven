@@ -48,7 +48,7 @@ import java.util.Set;
 /**
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.

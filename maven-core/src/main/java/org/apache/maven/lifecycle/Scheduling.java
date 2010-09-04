@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Class Scheduling.
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  */
 public class Scheduling
 {

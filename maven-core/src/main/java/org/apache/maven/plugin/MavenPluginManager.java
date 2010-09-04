@@ -34,7 +34,7 @@ import org.sonatype.aether.repository.RemoteRepository;
  * that the plugins/mojos can be used in arbitrary contexts. In particular, the mojos can be used for ordinary build
  * plugins as well as special purpose plugins like reports.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 public interface MavenPluginManager

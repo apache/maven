@@ -24,7 +24,7 @@ import org.sonatype.aether.repository.ArtifactRepository;
 /**
  * Describes the result of a plugin prefix resolution request.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 public interface PluginPrefixResult

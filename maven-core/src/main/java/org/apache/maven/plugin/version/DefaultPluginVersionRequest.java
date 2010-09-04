@@ -32,7 +32,7 @@ import org.sonatype.aether.repository.RemoteRepository;
 /**
  * Collects settings required to resolve the version for a plugin.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 public class DefaultPluginVersionRequest

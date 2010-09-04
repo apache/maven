@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.Os;
  * technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
  * prior notice.
  * 
- * @since 3.0-alpha-7
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 public class EnvironmentUtils

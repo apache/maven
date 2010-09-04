@@ -25,7 +25,7 @@ import org.sonatype.aether.repository.ArtifactRepository;
 /**
  * Describes the result of a plugin version resolution request.
  * 
- * @since 3.0-alpha-3
+ * @since 3.0
  * @author Benjamin Bentmann
  */
 class DefaultPluginVersionResult

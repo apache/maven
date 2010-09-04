@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  *         This class is not part of any public api and can be changed or deleted without prior notice.
  */

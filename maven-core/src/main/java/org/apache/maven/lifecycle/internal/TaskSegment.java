@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Describes the required task segment as provided on the maven command line; i.e. "clean jetty:run install"
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (extracted class only)
  *         <p/>

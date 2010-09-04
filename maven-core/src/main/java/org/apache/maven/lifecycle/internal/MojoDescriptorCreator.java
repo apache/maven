@@ -52,7 +52,7 @@ import java.util.StringTokenizer;
 /**
  * Resolves dependencies for the artifacts in context of the lifecycle build
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
  * @author jdcasey

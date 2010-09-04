@@ -35,7 +35,7 @@ import java.util.concurrent.Future;
 /**
  * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project)
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
  *         <p/>

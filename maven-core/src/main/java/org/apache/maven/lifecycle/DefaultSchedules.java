@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * Defines scheduling information needed by weave mode.
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  */
 public class DefaultSchedules

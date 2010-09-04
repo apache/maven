@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p/>
  * NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  * 
- * @since 3.0-beta-1
+ * @since 3.0
  * @author Kristian Rosenvold
  */
 public class ConcurrentBuildLogger
