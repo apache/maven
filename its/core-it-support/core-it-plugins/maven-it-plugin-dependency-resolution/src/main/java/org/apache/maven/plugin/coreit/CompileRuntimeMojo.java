@@ -24,7 +24,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Creates text files that list the dependencies with scope compile and runtime in the order returned from the Maven
- * core.
+ * core. The path parameters of this mojo support the token <code>&#64;idx&#64;</code> to dynamically insert a running
+ * index in order to distinguish multiple executions of the same mojo.
  * 
  * @goal compile-runtime
  * @requiresDependencyResolution compile+runtime

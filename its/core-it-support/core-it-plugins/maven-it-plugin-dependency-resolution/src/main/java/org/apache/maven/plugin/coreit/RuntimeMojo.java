@@ -23,7 +23,9 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
- * Creates text files that list the dependencies with scope runtime in the order returned from the Maven core.
+ * Creates text files that list the dependencies with scope runtime in the order returned from the Maven core. The path
+ * parameters of this mojo support the token <code>&#64;idx&#64;</code> to dynamically insert a running index in order
+ * to distinguish multiple executions of the same mojo.
  * 
  * @goal runtime
  * @requiresDependencyResolution runtime

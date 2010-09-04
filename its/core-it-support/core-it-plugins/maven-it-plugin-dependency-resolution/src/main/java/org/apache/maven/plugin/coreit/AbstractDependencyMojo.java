@@ -333,6 +333,12 @@ public abstract class AbstractDependencyMojo
 
         if ( pathname != null )
         {
+            if ( pathname.indexOf( "@idx@" ) >= 0 )
+            {
+                // helps to distinguished forked executions of the same mojo
+                pathname = pathname.replaceAll( "@idx@", String.valueOf( nextCounter() ) );
+            }
+
             file = new File( pathname );
 
             if ( !file.isAbsolute() )
@@ -342,6 +348,21 @@ public abstract class AbstractDependencyMojo
         }
 
         return file;
+    }
+
+    private int nextCounter()
+    {
+        int counter = 0;
+
+        String key = getClass().getName();
+
+        synchronized ( System.class )
+        {
+            counter = Integer.getInteger( key, 0 ).intValue();
+            System.setProperty( key, Integer.toString( counter + 1 ) );
+        }
+
+        return counter;
     }
 
 }
