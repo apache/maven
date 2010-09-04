@@ -49,7 +49,7 @@
           <area shape="rect" coords="0,256,180,289" alt="maven-repository-metadata" href="maven-repository-metadata/" />
           <area shape="rect" coords="230,309,321,342" alt="maven-plugin-api" href="maven-plugin-api/" />
           <area shape="rect" coords="237,358,314,391" alt="maven-artifact" href="maven-artifact/" />
-          <area shape="rect" coords="357,158,494,191" alt="maven-setting-builder" href="maven-setting-builder/" />
+          <area shape="rect" coords="357,158,494,191" alt="maven-settings-builder" href="maven-settings-builder/" />
           <area shape="rect" coords="382,207,468,240" alt="maven-settings" href="maven-settings/" />
           <area shape="rect" coords="363,256,487,289" alt="maven-model-builder" href="maven-model-builder/" />
           <area shape="rect" coords="383,310,468,342" alt="maven-model" href="maven-model/" />
