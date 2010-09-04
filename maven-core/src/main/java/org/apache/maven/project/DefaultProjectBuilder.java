@@ -19,8 +19,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
@@ -139,7 +141,7 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, result );
+                initProject( project, result, new HashMap<File, Boolean>() );
             }
             else if ( configuration.isResolveDependencies() )
             {
@@ -309,7 +311,9 @@ public class DefaultProjectBuilder
 
         try
         {
-            noErrors = build( results, new ArrayList<MavenProject>(), interimResults, config ) && noErrors;
+            noErrors =
+                build( results, new ArrayList<MavenProject>(), interimResults, config, new HashMap<File, Boolean>() )
+                    && noErrors;
         }
         finally
         {
@@ -467,7 +471,7 @@ public class DefaultProjectBuilder
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
-                           List<InterimResult> interimResults, ProjectBuildingRequest config )
+                           List<InterimResult> interimResults, ProjectBuildingRequest config, Map<File, Boolean> profilesXmls )
     {
         boolean noErrors = true;
 
@@ -478,10 +482,10 @@ public class DefaultProjectBuilder
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                 MavenProject project = interimResult.listener.getProject();
-                initProject( project, result );
+                initProject( project, result, profilesXmls );
 
                 List<MavenProject> modules = new ArrayList<MavenProject>();
-                noErrors = build( results, modules, interimResult.modules, config ) && noErrors;
+                noErrors = build( results, modules, interimResult.modules, config, profilesXmls ) && noErrors;
 
                 projects.addAll( modules );
                 projects.add( project );
@@ -502,7 +506,7 @@ public class DefaultProjectBuilder
         return noErrors;
     }
 
-    private void initProject( MavenProject project, ModelBuildingResult result )
+    private void initProject( MavenProject project, ModelBuildingResult result, Map<File, Boolean> profilesXmls )
     {
         Model model = result.getEffectiveModel();
 
@@ -537,6 +541,43 @@ public class DefaultProjectBuilder
         {
             project.setInjectedProfileIds( modelId, getProfileIds( result.getActivePomProfiles( modelId ) ) );
         }
+
+        String modelId = findProfilesXml( result, profilesXmls );
+        if ( modelId != null )
+        {
+            ModelProblem problem =
+                new DefaultModelProblem( "Detected profiles.xml alongside " + modelId
+                    + ", this file is no longer supported and was ignored" + ", please use the settings.xml instead",
+                                         ModelProblem.Severity.WARNING, model, -1, -1, null );
+            result.getProblems().add( problem );
+        }
+    }
+
+    private String findProfilesXml( ModelBuildingResult result, Map<File, Boolean> profilesXmls )
+    {
+        for ( String modelId : result.getModelIds() )
+        {
+            Model model = result.getRawModel( modelId );
+
+            File basedir = model.getProjectDirectory();
+            if ( basedir == null )
+            {
+                break;
+            }
+
+            Boolean profilesXml = profilesXmls.get( basedir );
+            if ( profilesXml == null )
+            {
+                profilesXml = Boolean.valueOf( new File( basedir, "profiles.xml" ).exists() );
+                profilesXmls.put( basedir, profilesXml );
+            }
+            if ( profilesXml.booleanValue() )
+            {
+                return modelId;
+            }
+        }
+
+        return null;
     }
 
 }
