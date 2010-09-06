@@ -159,9 +159,8 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.getCliOptions().add( "settings.xml" );
         verifier.getCliOptions().add( "-X" );
 
-        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
-        
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3599" );
+
         verifier.setLogFileName( "logHttp.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
@@ -204,9 +203,8 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.getCliOptions().add( "settings.xml" );
         verifier.getCliOptions().add( "-X" );
 
-        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "jar" );
-        verifier.deleteArtifact( "org.apache.maven.its.mng3599", "test-dependency", "1.0", "pom" );
-        
+        verifier.deleteArtifacts( "org.apache.maven.its.mng3599" );
+
         verifier.setLogFileName( "logDAV.txt" );
         verifier.executeGoal( "compile" );
         verifier.verifyErrorFreeLog();
