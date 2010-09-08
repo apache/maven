@@ -85,6 +85,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest.class );
         suite.addTestSuite( MavenITmng4791ProjectBuilderResolvesRemotePomArtifactTest.class );
         suite.addTestSuite( MavenITmng4789ScopeInheritanceMeetsConflictTest.class );
+        suite.addTestSuite( MavenITmng4788InstallationToCustomLocalRepoTest.class );
         suite.addTestSuite( MavenITmng4786AntBased21xMojoSupportTest.class );
         suite.addTestSuite( MavenITmng4781DeploymentToNexusStagingRepoTest.class );
         suite.addTestSuite( MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest.class );

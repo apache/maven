@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 import java.util.Iterator;
 
@@ -62,7 +61,7 @@ public class DeployMojo
      * @throws MojoExecutionException If any artifact could not be installed.
      */
     public void execute()
-        throws MojoExecutionException, MojoFailureException
+        throws MojoExecutionException
     {
         getLog().info( "[MAVEN-CORE-IT-LOG] Deploying project artifacts" );
 
