@@ -141,6 +141,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4461ArtifactUploadMonitorTest.class );
         suite.addTestSuite( MavenITmng4459InMemorySettingsKeptEncryptedTest.class );
         suite.addTestSuite( MavenITmng4453PluginVersionFromLifecycleMappingTest.class );
+        suite.addTestSuite( MavenITmng4452ResolutionOfSnapshotWithClassifierTest.class );
         suite.addTestSuite( MavenITmng4450StubModelForMissingDependencyPomTest.class );
         suite.addTestSuite( MavenITmng4436SingletonComponentLookupTest.class );
         suite.addTestSuite( MavenITmng4433ForceParentSnapshotUpdateTest.class );
