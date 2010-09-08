@@ -91,7 +91,8 @@ final class RemoteSnapshotMetadata
 
     public String getExpandedVersion( Artifact artifact )
     {
-        return versions.get( artifact.getClassifier() ).getVersion();
+        String key = getKey( artifact.getClassifier(), artifact.getExtension() );
+        return versions.get( key ).getVersion();
     }
 
     @Override
@@ -134,9 +135,10 @@ final class RemoteSnapshotMetadata
 
             SnapshotVersion sv = new SnapshotVersion();
             sv.setClassifier( artifact.getClassifier() );
+            sv.setExtension( artifact.getExtension() );
             sv.setVersion( version );
             sv.setUpdated( lastUpdated );
-            versions.put( sv.getClassifier(), sv );
+            versions.put( getKey( sv.getClassifier(), sv.getExtension() ), sv );
         }
 
         artifacts.clear();
@@ -146,14 +148,20 @@ final class RemoteSnapshotMetadata
         {
             for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
             {
-                if ( !versions.containsKey( sv.getClassifier() ) )
+                String key = getKey( sv.getClassifier(), sv.getExtension() );
+                if ( !versions.containsKey( key ) )
                 {
-                    versions.put( sv.getClassifier(), sv );
+                    versions.put( key, sv );
                 }
             }
         }
 
         metadata.getVersioning().setSnapshotVersions( new ArrayList<SnapshotVersion>( versions.values() ) );
+    }
+
+    private String getKey( String classifier, String extension )
+    {
+        return classifier + ':' + extension;
     }
 
     private static int getBuildNumber( Metadata metadata )

@@ -235,7 +235,7 @@ public class DefaultVersionResolver
             }
             else
             {
-                if ( !resolve( result, infos, SNAPSHOT + artifact.getClassifier() )
+                if ( !resolve( result, infos, SNAPSHOT + getKey( artifact.getClassifier(), artifact.getExtension() ) )
                     && !resolve( result, infos, SNAPSHOT ) )
                 {
                     result.setVersion( version );
@@ -322,18 +322,17 @@ public class DefaultVersionResolver
             merge( LATEST, infos, versioning.getLastUpdated(), versioning.getLatest(), repository );
         }
 
-        boolean mainSnapshot = false;
         for ( SnapshotVersion sv : versioning.getSnapshotVersions() )
         {
             if ( StringUtils.isNotEmpty( sv.getVersion() ) )
             {
-                mainSnapshot |= sv.getClassifier().length() <= 0;
-                merge( SNAPSHOT + sv.getClassifier(), infos, sv.getUpdated(), sv.getVersion(), repository );
+                String key = getKey( sv.getClassifier(), sv.getExtension() );
+                merge( SNAPSHOT + key, infos, sv.getUpdated(), sv.getVersion(), repository );
             }
         }
 
         Snapshot snapshot = versioning.getSnapshot();
-        if ( !mainSnapshot && snapshot != null )
+        if ( snapshot != null )
         {
             String version = artifact.getVersion();
             if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
@@ -359,6 +358,11 @@ public class DefaultVersionResolver
             info.version = version;
             info.repository = repository;
         }
+    }
+
+    private String getKey( String classifier, String extension )
+    {
+        return StringUtils.clean( classifier ) + ':' + StringUtils.clean( extension );
     }
 
     private static class VersionInfo
@@ -391,6 +395,10 @@ public class DefaultVersionResolver
 
         private final String artifactId;
 
+        private final String classifier;
+
+        private final String extension;
+
         private final String version;
 
         private final String context;
@@ -405,9 +413,12 @@ public class DefaultVersionResolver
 
         public Key( RepositorySystemSession session, VersionRequest request )
         {
-            groupId = request.getArtifact().getGroupId();
-            artifactId = request.getArtifact().getArtifactId();
-            version = request.getArtifact().getVersion();
+            Artifact artifact = request.getArtifact();
+            groupId = artifact.getGroupId();
+            artifactId = artifact.getArtifactId();
+            classifier = artifact.getClassifier();
+            extension = artifact.getExtension();
+            version = artifact.getVersion();
             context = request.getRequestContext();
             localRepo = session.getLocalRepository().getBasedir();
             workspace = CacheUtils.getWorkspace( session );
@@ -427,6 +438,8 @@ public class DefaultVersionResolver
             int hash = 17;
             hash = hash * 31 + groupId.hashCode();
             hash = hash * 31 + artifactId.hashCode();
+            hash = hash * 31 + classifier.hashCode();
+            hash = hash * 31 + extension.hashCode();
             hash = hash * 31 + version.hashCode();
             hash = hash * 31 + localRepo.hashCode();
             hash = hash * 31 + CacheUtils.repositoriesHashCode( repositories );
@@ -447,6 +460,7 @@ public class DefaultVersionResolver
 
             Key that = (Key) obj;
             return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
+                && classifier.equals( that.classifier ) && extension.equals( that.extension )
                 && version.equals( that.version ) && context.equals( that.context )
                 && localRepo.equals( that.localRepo ) && CacheUtils.eq( workspace, that.workspace )
                 && CacheUtils.repositoriesEquals( repositories, that.repositories );

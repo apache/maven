@@ -312,6 +312,12 @@ under the License.
           <description>The classifier of the snapshot artifact this version information belongs to.</description>
           <defaultValue></defaultValue>
         </field>
+        <field>
+          <name>extension</name>
+          <version>1.1.0+</version>
+          <type>String</type>
+          <description>The file extension of the snapshot artifact this version information belongs to.</description>
+        </field>
         <field xml.tagName="value">
           <name>version</name>
           <version>1.1.0+</version>
