@@ -19,7 +19,6 @@ package org.apache.maven;
  * under the License.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

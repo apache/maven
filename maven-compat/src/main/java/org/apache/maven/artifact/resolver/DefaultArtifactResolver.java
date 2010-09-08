@@ -39,6 +39,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
@@ -137,8 +138,7 @@ public class DefaultArtifactResolver
         }
         if ( localRepository != null && localRepository.getBasedir() != null )
         {
-            LocalRepository localRepo = new LocalRepository( localRepository.getBasedir() );
-            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+            session.setLocalRepositoryManager( LegacyLocalRepositoryManager.wrap( localRepository, repoSystem ) );
         }
         return session;
     }

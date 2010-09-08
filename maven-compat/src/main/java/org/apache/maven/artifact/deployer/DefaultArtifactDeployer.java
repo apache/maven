@@ -28,6 +28,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.MetadataBridge;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
@@ -80,8 +81,7 @@ public class DefaultArtifactDeployer
     {
         DefaultRepositorySystemSession session =
             new DefaultRepositorySystemSession( legacySupport.getRepositorySession() );
-        LocalRepository localRepo = new LocalRepository( localRepository.getBasedir() );
-        session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+        session.setLocalRepositoryManager( LegacyLocalRepositoryManager.wrap( localRepository, repoSystem ) );
 
         DeployRequest request = new DeployRequest();
 

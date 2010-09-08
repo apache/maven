@@ -1,0 +1,357 @@
+package org.apache.maven.artifact.repository;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
+import org.apache.maven.repository.Proxy;
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.metadata.Metadata;
+import org.sonatype.aether.repository.LocalArtifactRegistration;
+import org.sonatype.aether.repository.LocalArtifactRequest;
+import org.sonatype.aether.repository.LocalArtifactResult;
+import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.LocalRepositoryManager;
+import org.sonatype.aether.repository.RemoteRepository;
+
+/**
+ * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
+ * of the public API. In particular, this class can be changed or deleted without prior notice.
+ * 
+ * @author Benjamin Bentmann
+ */
+public class LegacyLocalRepositoryManager
+    implements LocalRepositoryManager
+{
+
+    private final ArtifactRepository delegate;
+
+    private final LocalRepository repo;
+
+    public static LocalRepositoryManager wrap( ArtifactRepository repository, RepositorySystem system )
+    {
+        ArtifactRepositoryLayout layout = repository.getLayout();
+        if ( layout != null && layout.getClass().equals( DefaultRepositoryLayout.class ) )
+        {
+            // map the default layout to the default impl of the repo system
+            return system.newLocalRepositoryManager( new LocalRepository( repository.getBasedir() ) );
+        }
+
+        return new LegacyLocalRepositoryManager( repository );
+    }
+
+    private LegacyLocalRepositoryManager( ArtifactRepository delegate )
+    {
+        if ( delegate == null )
+        {
+            throw new IllegalArgumentException( "local repository delegate missing" );
+        }
+        this.delegate = delegate;
+
+        ArtifactRepositoryLayout layout = delegate.getLayout();
+        repo =
+            new LocalRepository( new File( delegate.getBasedir() ),
+                                 ( layout != null ) ? layout.getClass().getSimpleName() : "legacy" );
+    }
+
+    public LocalRepository getRepository()
+    {
+        return repo;
+    }
+
+    public String getPathForLocalArtifact( Artifact artifact )
+    {
+        return delegate.pathOf( RepositoryUtils.toArtifact( artifact ) );
+    }
+
+    public String getPathForRemoteArtifact( Artifact artifact, RemoteRepository repository, String context )
+    {
+        return getPathForLocalArtifact( artifact );
+    }
+
+    public String getPathForLocalMetadata( Metadata metadata )
+    {
+        return delegate.pathOfLocalRepositoryMetadata( new ArtifactMetadataAdapter( metadata ), delegate );
+    }
+
+    public String getPathForRemoteMetadata( Metadata metadata, RemoteRepository repository, String context )
+    {
+        return delegate.pathOfLocalRepositoryMetadata( new ArtifactMetadataAdapter( metadata ),
+                                                       new ArtifactRepositoryAdapter( repository ) );
+    }
+
+    public LocalArtifactResult find( RepositorySystemSession session, LocalArtifactRequest request )
+    {
+        String path = getPathForLocalArtifact( request.getArtifact() );
+        File file = new File( getRepository().getBasedir(), path );
+
+        LocalArtifactResult result = new LocalArtifactResult( request );
+        if ( file.isFile() )
+        {
+            result.setFile( file );
+            result.setAvailable( true );
+        }
+
+        return result;
+    }
+
+    public void add( RepositorySystemSession session, LocalArtifactRegistration request )
+    {
+        // noop
+    }
+
+    static class ArtifactMetadataAdapter
+        implements ArtifactMetadata
+    {
+
+        private final Metadata metadata;
+
+        public ArtifactMetadataAdapter( Metadata metadata )
+        {
+            this.metadata = metadata;
+        }
+
+        public boolean storedInArtifactVersionDirectory()
+        {
+            return metadata.getVersion().length() > 0;
+        }
+
+        public boolean storedInGroupDirectory()
+        {
+            return metadata.getArtifactId().length() <= 0;
+        }
+
+        public String getGroupId()
+        {
+            return nullify( metadata.getGroupId() );
+        }
+
+        public String getArtifactId()
+        {
+            return nullify( metadata.getArtifactId() );
+        }
+
+        public String getBaseVersion()
+        {
+            return nullify( metadata.getVersion() );
+        }
+
+        private String nullify( String str )
+        {
+            return ( str == null || str.length() <= 0 ) ? null : str;
+        }
+
+        public Object getKey()
+        {
+            return metadata.toString();
+        }
+
+        public String getRemoteFilename()
+        {
+            return metadata.getType();
+        }
+
+        public String getLocalFilename( ArtifactRepository repository )
+        {
+            return insertRepositoryKey( getRemoteFilename(), repository.getKey() );
+        }
+
+        private String insertRepositoryKey( String filename, String repositoryKey )
+        {
+            String result;
+            int idx = filename.indexOf( '.' );
+            if ( idx < 0 )
+            {
+                result = filename + '-' + repositoryKey;
+            }
+            else
+            {
+                result = filename.substring( 0, idx ) + '-' + repositoryKey + filename.substring( idx );
+            }
+            return result;
+        }
+
+        public void merge( org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata )
+        {
+            // not used
+        }
+
+        public void merge( ArtifactMetadata metadata )
+        {
+            // not used
+        }
+
+        public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+            throws RepositoryMetadataStoreException
+        {
+            // not used
+        }
+
+        public String extendedToString()
+        {
+            return metadata.toString();
+        }
+
+    }
+
+    static class ArtifactRepositoryAdapter
+        implements ArtifactRepository
+    {
+
+        private final RemoteRepository repository;
+
+        public ArtifactRepositoryAdapter( RemoteRepository repository )
+        {
+            this.repository = repository;
+        }
+
+        public String pathOf( org.apache.maven.artifact.Artifact artifact )
+        {
+            return null;
+        }
+
+        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata )
+        {
+            return null;
+        }
+
+        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+        {
+            return null;
+        }
+
+        public String getUrl()
+        {
+            return repository.getUrl();
+        }
+
+        public void setUrl( String url )
+        {
+        }
+
+        public String getBasedir()
+        {
+            return null;
+        }
+
+        public String getProtocol()
+        {
+            return repository.getProtocol();
+        }
+
+        public String getId()
+        {
+            return repository.getId();
+        }
+
+        public void setId( String id )
+        {
+        }
+
+        public ArtifactRepositoryPolicy getSnapshots()
+        {
+            return null;
+        }
+
+        public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
+        {
+        }
+
+        public ArtifactRepositoryPolicy getReleases()
+        {
+            return null;
+        }
+
+        public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
+        {
+        }
+
+        public ArtifactRepositoryLayout getLayout()
+        {
+            return null;
+        }
+
+        public void setLayout( ArtifactRepositoryLayout layout )
+        {
+        }
+
+        public String getKey()
+        {
+            return getId();
+        }
+
+        public boolean isUniqueVersion()
+        {
+            return true;
+        }
+
+        public boolean isBlacklisted()
+        {
+            return false;
+        }
+
+        public void setBlacklisted( boolean blackListed )
+        {
+        }
+
+        public org.apache.maven.artifact.Artifact find( org.apache.maven.artifact.Artifact artifact )
+        {
+            return null;
+        }
+
+        public List<String> findVersions( org.apache.maven.artifact.Artifact artifact )
+        {
+            return Collections.emptyList();
+        }
+
+        public boolean isProjectAware()
+        {
+            return false;
+        }
+
+        public void setAuthentication( Authentication authentication )
+        {
+        }
+
+        public Authentication getAuthentication()
+        {
+            return null;
+        }
+
+        public void setProxy( Proxy proxy )
+        {
+        }
+
+        public Proxy getProxy()
+        {
+            return null;
+        }
+    }
+
+}
