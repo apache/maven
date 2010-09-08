@@ -56,7 +56,6 @@ final class VersionsMetadata
         }
 
         Metadata metadata = new Metadata();
-        metadata.setModelVersion( "1.0.0" );
         metadata.setVersioning( versioning );
         metadata.setGroupId( artifact.getGroupId() );
         metadata.setArtifactId( artifact.getArtifactId() );

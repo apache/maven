@@ -48,20 +48,27 @@ final class RemoteSnapshotMetadata
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<String, SnapshotVersion>();
 
-    public RemoteSnapshotMetadata( Artifact artifact )
+    private final boolean legacyFormat;
+
+    public RemoteSnapshotMetadata( Artifact artifact, boolean legacyFormat )
     {
-        super( createMetadata( artifact ), null );
+        super( createMetadata( artifact, legacyFormat ), null );
+        this.legacyFormat = legacyFormat;
     }
 
-    private RemoteSnapshotMetadata( Metadata metadata, File file )
+    private RemoteSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat )
     {
         super( metadata, file );
+        this.legacyFormat = legacyFormat;
     }
 
-    private static Metadata createMetadata( Artifact artifact )
+    private static Metadata createMetadata( Artifact artifact, boolean legacy )
     {
         Metadata metadata = new Metadata();
-        metadata.setModelVersion( "1.1.0" );
+        if ( !legacy )
+        {
+            metadata.setModelVersion( "1.1.0" );
+        }
         metadata.setGroupId( artifact.getGroupId() );
         metadata.setArtifactId( artifact.getArtifactId() );
         metadata.setVersion( artifact.getBaseVersion() );
@@ -76,7 +83,7 @@ final class RemoteSnapshotMetadata
 
     public MavenMetadata setFile( File file )
     {
-        return new RemoteSnapshotMetadata( metadata, file );
+        return new RemoteSnapshotMetadata( metadata, file, legacyFormat );
     }
 
     public Object getKey()
@@ -156,7 +163,10 @@ final class RemoteSnapshotMetadata
             }
         }
 
-        metadata.getVersioning().setSnapshotVersions( new ArrayList<SnapshotVersion>( versions.values() ) );
+        if ( !legacyFormat )
+        {
+            metadata.getVersioning().setSnapshotVersions( new ArrayList<SnapshotVersion>( versions.values() ) );
+        }
     }
 
     private String getKey( String classifier, String extension )
