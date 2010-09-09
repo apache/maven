@@ -46,7 +46,7 @@ public class InstallCustomMojo
      * 
      * @parameter expression="${install.localRepoDir}"
      */
-    private String localRepoDir;
+    private File localRepoDir;
 
     /**
      * Runs this mojo.
@@ -58,7 +58,7 @@ public class InstallCustomMojo
     {
         try
         {
-            String url = "file://" + new File( localRepoDir ).toURL().getPath();
+            String url = "file://" + localRepoDir.toURL().getPath();
 
             localRepository =
                 repositoryFactory.createArtifactRepository( localRepository.getId(), url, new CustomRepositoryLayout(),
