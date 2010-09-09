@@ -24,9 +24,6 @@ import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryRequest;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 
 /**
  * Forms a request to retrieve artifact metadata.
@@ -112,17 +109,5 @@ public interface MetadataResolutionRequest
      * @return This request, never {@code null}.
      */
     MetadataResolutionRequest setResolveManagedVersions( boolean resolveManagedVersions );
-
-    MetadataResolutionRequest setServers( List<Server> servers );
-
-    List<Server> getServers();
-
-    MetadataResolutionRequest setMirrors( List<Mirror> mirrors );
-
-    List<Mirror> getMirrors();
-
-    MetadataResolutionRequest setProxies( List<Proxy> proxies );
-
-    List<Proxy> getProxies();
 
 }

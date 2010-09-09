@@ -95,7 +95,6 @@ public class DefaultMavenProjectBuilder
         if ( session != null )
         {
             request.setRepositorySession( session.getRepositorySession() );
-            request.setOffline( session.isOffline() );
             request.setSystemProperties( session.getSystemProperties() );
             if ( request.getUserProperties().isEmpty() )
             {
@@ -105,11 +104,7 @@ public class DefaultMavenProjectBuilder
             MavenExecutionRequest req = session.getRequest();
             if ( req != null )
             {
-                request.setServers( req.getServers() );
-                request.setMirrors( req.getMirrors() );
-                request.setProxies( req.getProxies() );
                 request.setRemoteRepositories( req.getRemoteRepositories() );
-                request.setForceUpdate( req.isUpdateSnapshots() );
             }
         }
         else

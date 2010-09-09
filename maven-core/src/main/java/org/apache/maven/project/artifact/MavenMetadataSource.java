@@ -76,6 +76,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.transfer.ArtifactNotFoundException;
 
 /**
@@ -109,14 +111,12 @@ public class MavenMetadataSource
 
     private void injectSession( MetadataResolutionRequest request )
     {
-        MavenSession session = legacySupport.getSession();
+        RepositorySystemSession session = legacySupport.getRepositorySession();
 
         if ( session != null )
         {
             request.setOffline( session.isOffline() );
-            request.setServers( session.getRequest().getServers() );
-            request.setMirrors( session.getRequest().getMirrors() );
-            request.setProxies( session.getRequest().getProxies() );
+            request.setForceUpdate( RepositoryPolicy.UPDATE_POLICY_ALWAYS.equals( session.getUpdatePolicy() ) );
         }
     }
 
@@ -571,14 +571,9 @@ public class MavenMetadataSource
                     ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
                     configuration.setLocalRepository( repositoryRequest.getLocalRepository() );
                     configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
-                    configuration.setOffline( repositoryRequest.isOffline() );
-                    configuration.setForceUpdate( repositoryRequest.isForceUpdate() );
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
                     configuration.setSystemProperties( getSystemProperties() );
-                    configuration.setServers( repositoryRequest.getServers() );
-                    configuration.setMirrors( repositoryRequest.getMirrors() );
-                    configuration.setProxies( repositoryRequest.getProxies() );
                     configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
                     project = getProjectBuilder().build( pomArtifact, configuration ).getProject();

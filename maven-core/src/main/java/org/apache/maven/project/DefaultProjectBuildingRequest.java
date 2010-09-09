@@ -28,9 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.repository.ArtifactTransferListener;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 import org.sonatype.aether.RepositorySystemSession;
 
 public class DefaultProjectBuildingRequest
@@ -39,21 +36,11 @@ public class DefaultProjectBuildingRequest
 
     private RepositorySystemSession repositorySession;
 
-    private boolean offline;
-
-    private boolean forceUpdate;
-
     private ArtifactRepository localRepository;
 
     private List<ArtifactRepository> remoteRepositories;
 
     private List<ArtifactRepository> pluginArtifactRepositories;
-
-    private List<Server> servers;
-
-    private List<Mirror> mirrors;
-
-    private List<Proxy> proxies;
 
     private MavenProject project;
 
@@ -87,9 +74,6 @@ public class DefaultProjectBuildingRequest
         userProperties = new Properties();
         remoteRepositories = new ArrayList<ArtifactRepository>();
         pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
-        servers = new ArrayList<Server>();
-        mirrors = new ArrayList<Mirror>();
-        proxies = new ArrayList<Proxy>();
     }
 
     public MavenProject getProject()
@@ -100,30 +84,6 @@ public class DefaultProjectBuildingRequest
     public void setProject( MavenProject mavenProject )
     {
         this.project = mavenProject;
-    }
-
-    public DefaultProjectBuildingRequest setOffline( boolean offline )
-    {
-        this.offline = offline;
-
-        return this;
-    }
-
-    public boolean isOffline()
-    {
-        return offline;
-    }
-
-    public boolean isForceUpdate()
-    {
-        return forceUpdate;
-    }
-
-    public ProjectBuildingRequest setForceUpdate( boolean forceUpdate )
-    {
-        this.forceUpdate = forceUpdate;
-
-        return this;
     }
 
     public ProjectBuildingRequest setLocalRepository( ArtifactRepository localRepository )
@@ -173,63 +133,6 @@ public class DefaultProjectBuildingRequest
         }
 
         return this;
-    }
-
-    public ProjectBuildingRequest setServers( List<Server> servers )
-    {
-        if ( servers != null )
-        {
-            this.servers = new ArrayList<Server>( servers );
-        }
-        else
-        {
-            this.servers.clear();
-        }
-
-        return this;
-    }
-
-    public List<Server> getServers()
-    {
-        return servers;
-    }
-
-    public ProjectBuildingRequest setMirrors( List<Mirror> mirrors )
-    {
-        if ( mirrors != null )
-        {
-            this.mirrors = new ArrayList<Mirror>( mirrors );
-        }
-        else
-        {
-            this.mirrors.clear();
-        }
-
-        return this;
-    }
-
-    public List<Mirror> getMirrors()
-    {
-        return mirrors;
-    }
-
-    public ProjectBuildingRequest setProxies( List<Proxy> proxies )
-    {
-        if ( proxies != null )
-        {
-            this.proxies = new ArrayList<Proxy>( proxies );
-        }
-        else
-        {
-            this.proxies.clear();
-        }
-
-        return this;
-    }
-
-    public List<Proxy> getProxies()
-    {
-        return proxies;
     }
 
     public Properties getSystemProperties()

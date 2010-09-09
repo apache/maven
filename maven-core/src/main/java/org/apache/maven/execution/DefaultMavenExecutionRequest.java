@@ -958,11 +958,6 @@ public class DefaultMavenExecutionRequest
             projectBuildingRequest.setUserProperties( getUserProperties() );
             projectBuildingRequest.setRemoteRepositories( getRemoteRepositories() );
             projectBuildingRequest.setPluginArtifactRepositories( getPluginArtifactRepositories() );
-            projectBuildingRequest.setOffline( isOffline() );
-            projectBuildingRequest.setForceUpdate( isUpdateSnapshots() );
-            projectBuildingRequest.setServers( getServers() );
-            projectBuildingRequest.setMirrors( getMirrors() );
-            projectBuildingRequest.setProxies( getProxies() );
             projectBuildingRequest.setActiveProfileIds( getActiveProfiles() );
             projectBuildingRequest.setInactiveProfileIds( getInactiveProfiles() );
             projectBuildingRequest.setProfiles( getProfiles() );

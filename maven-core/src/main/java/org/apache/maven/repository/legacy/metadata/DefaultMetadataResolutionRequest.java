@@ -19,7 +19,6 @@ package org.apache.maven.repository.legacy.metadata;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -27,9 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
 
 /**
  * Forms a request to retrieve artifact metadata.
@@ -46,12 +42,6 @@ public class DefaultMetadataResolutionRequest
 
     private RepositoryRequest repositoryRequest;
 
-    private List<Server> servers;
-
-    private List<Mirror> mirrors;
-
-    private List<Proxy> proxies;
-
     public DefaultMetadataResolutionRequest()
     {
         repositoryRequest = new DefaultRepositoryRequest();
@@ -65,9 +55,6 @@ public class DefaultMetadataResolutionRequest
     public DefaultMetadataResolutionRequest( ArtifactResolutionRequest resolutionRequest )
     {
         this.repositoryRequest = new DefaultRepositoryRequest( resolutionRequest );
-        setServers( resolutionRequest.getServers() );
-        setMirrors( resolutionRequest.getMirrors() );
-        setProxies( resolutionRequest.getProxies() );
     }
 
     public Artifact getArtifact()
@@ -140,57 +127,6 @@ public class DefaultMetadataResolutionRequest
         repositoryRequest.setForceUpdate( forceUpdate );
 
         return this;
-    }
-
-    public MetadataResolutionRequest setServers( List<Server> servers )
-    {
-        this.servers = servers;
-
-        return this;
-    }
-
-    public List<Server> getServers()
-    {
-        if ( servers == null )
-        {
-            servers = new ArrayList<Server>();
-        }
-
-        return servers;
-    }
-
-    public MetadataResolutionRequest setMirrors( List<Mirror> mirrors )
-    {
-        this.mirrors = mirrors;
-
-        return this;
-    }
-
-    public List<Mirror> getMirrors()
-    {
-        if ( mirrors == null )
-        {
-            mirrors = new ArrayList<Mirror>();
-        }
-
-        return mirrors;
-    }
-
-    public MetadataResolutionRequest setProxies( List<Proxy> proxies )
-    {
-        this.proxies = proxies;
-
-        return this;
-    }
-
-    public List<Proxy> getProxies()
-    {
-        if ( proxies == null )
-        {
-            proxies = new ArrayList<Proxy>();
-        }
-
-        return proxies;
     }
 
 }
