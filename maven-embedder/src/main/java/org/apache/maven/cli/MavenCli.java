@@ -904,6 +904,9 @@ public class MavenCli
             request.setThreadCount( threadConfiguration.replace( "C", "" ).replace( "W", "" ).replace( "auto", "" ) );
         }
 
+        request.setCacheNotFound( true );
+        request.setCacheTransferError( false );
+
         return request;
     }
 

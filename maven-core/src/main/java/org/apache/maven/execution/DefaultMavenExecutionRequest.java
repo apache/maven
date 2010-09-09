@@ -56,9 +56,9 @@ public class DefaultMavenExecutionRequest
 
     private boolean interactiveMode = true;
 
-    private boolean cacheTransferError = true;
+    private boolean cacheTransferError;
 
-    private boolean cacheNotFound = true;
+    private boolean cacheNotFound;
 
     private List<Proxy> proxies;
 
