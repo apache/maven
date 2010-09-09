@@ -87,6 +87,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4789ScopeInheritanceMeetsConflictTest.class );
         suite.addTestSuite( MavenITmng4788InstallationToCustomLocalRepoTest.class );
         suite.addTestSuite( MavenITmng4786AntBased21xMojoSupportTest.class );
+        suite.addTestSuite( MavenITmng4785TransitiveResolutionInForkedThreadTest.class );
         suite.addTestSuite( MavenITmng4781DeploymentToNexusStagingRepoTest.class );
         suite.addTestSuite( MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest.class );
         suite.addTestSuite( MavenITmng4776ForkedReactorPluginVersionResolutionTest.class );

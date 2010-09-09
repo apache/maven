@@ -21,6 +21,7 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.model.Dependency;
@@ -30,18 +31,21 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 /**
- * Resolves user-specified artifacts. This mimics in part the Maven Dependency Plugin and the Maven Surefire Plugin.
+ * Resolves user-specified artifacts transitively. As an additional exercise, the resolution happens in a forked thread
+ * to test access to any shared session state.
  * 
- * @goal resolve
+ * @goal resolve-transitive
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
-public class ResolveMojo
+public class ResolveTransitiveMojo
     extends AbstractMojo
 {
 
@@ -78,6 +82,13 @@ public class ResolveMojo
     private ArtifactFactory factory;
 
     /**
+     * The metadata source.
+     * 
+     * @component
+     */
+    private ArtifactMetadataSource metadataSource;
+
+    /**
      * The dependencies to resolve.
      * 
      * @parameter
@@ -94,44 +105,30 @@ public class ResolveMojo
     /**
      * Runs this mojo.
      * 
-     * @throws MojoFailureException If the artifact could not be resolved
+     * @throws MojoExecutionException If the artifacts couldn't be resolved.
      */
     public void execute()
         throws MojoExecutionException
     {
         getLog().info( "[MAVEN-CORE-IT-LOG] Resolving artifacts" );
 
-        Properties props = new Properties();
-
-        try
+        ResolverThread thread = new ResolverThread();
+        thread.start();
+        while ( thread.isAlive() )
         {
-            if ( dependencies != null )
+            try
             {
-                for ( int i = 0; i < dependencies.length; i++ )
-                {
-                    Dependency dependency = dependencies[i];
-
-                    Artifact artifact =
-                        factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
-                                                              dependency.getVersion(), dependency.getType(),
-                                                              dependency.getClassifier() );
-
-                    getLog().info( "[MAVEN-CORE-IT-LOG] Resolving " + getId( artifact ) );
-
-                    resolver.resolve( artifact, remoteRepositories, localRepository );
-
-                    if ( artifact.getFile() != null )
-                    {
-                        props.setProperty( getId( artifact ), artifact.getFile().getPath() );
-                    }
-
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + artifact.getFile() );
-                }
+                thread.join();
+            }
+            catch ( InterruptedException e )
+            {
+                e.printStackTrace();
             }
         }
-        catch ( Exception e )
+
+        if ( thread.error != null )
         {
-            throw new MojoExecutionException( "Failed to resolve artifacts: " + e.getMessage(), e );
+            throw new MojoExecutionException( "Failed to resolve artifacts: " + thread.error.getMessage(), thread.error );
         }
 
         if ( propertiesFile != null )
@@ -145,7 +142,7 @@ public class ResolveMojo
                 FileOutputStream fos = new FileOutputStream( propertiesFile );
                 try
                 {
-                    props.store( fos, "MAVEN-CORE-IT" );
+                    thread.props.store( fos, "MAVEN-CORE-IT" );
                 }
                 finally
                 {
@@ -163,6 +160,62 @@ public class ResolveMojo
     {
         artifact.isSnapshot(); // decouple from MNG-2961
         return artifact.getId();
+    }
+
+    class ResolverThread
+        extends Thread
+    {
+
+        Properties props = new Properties();
+
+        Exception error;
+
+        public void run()
+        {
+            if ( dependencies != null )
+            {
+                try
+                {
+                    Set artifacts = new LinkedHashSet();
+
+                    for ( int i = 0; i < dependencies.length; i++ )
+                    {
+                        Dependency dependency = dependencies[i];
+
+                        Artifact artifact =
+                            factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
+                                                                  dependency.getVersion(), dependency.getType(),
+                                                                  dependency.getClassifier() );
+
+                        getLog().info( "[MAVEN-CORE-IT-LOG] Resolving " + getId( artifact ) );
+
+                        artifacts.add( artifact );
+                    }
+
+                    Artifact origin = factory.createArtifact( "it", "it", "0.1", null, "pom" );
+
+                    artifacts =
+                        resolver.resolveTransitively( artifacts, origin, remoteRepositories, localRepository,
+                                                      metadataSource ).getArtifacts();
+
+                    for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+                    {
+                        Artifact artifact = (Artifact) it.next();
+
+                        if ( artifact.getFile() != null )
+                        {
+                            props.setProperty( getId( artifact ), artifact.getFile().getPath() );
+                        }
+
+                        getLog().info( "[MAVEN-CORE-IT-LOG]   " + artifact.getFile() );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    error = e;
+                }
+            }
+        }
     }
 
 }
