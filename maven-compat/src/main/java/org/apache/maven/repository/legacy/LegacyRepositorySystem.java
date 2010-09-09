@@ -28,9 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -50,8 +52,6 @@ import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalArtifactRepository;
 import org.apache.maven.repository.ArtifactTransferListener;
-import org.apache.maven.repository.MetadataResolutionRequest;
-import org.apache.maven.repository.MetadataResolutionResult;
 import org.apache.maven.repository.MirrorSelector;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
@@ -70,6 +70,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.repository.AuthenticationSelector;
+import org.sonatype.aether.repository.ProxySelector;
+import org.sonatype.aether.repository.RemoteRepository;
 
 /**
  * @author Jason van Zyl
@@ -458,10 +462,52 @@ public class LegacyRepositorySystem
                     repository.setId( mirror.getId() );
                     repository.setUrl( mirror.getUrl() );
 
-                    ArtifactRepositoryLayout layout = layouts.get( mirror.getLayout() );
-                    if ( layout != null )
+                    if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
                     {
-                        repository.setLayout( layout );
+                        repository.setLayout( getLayout( mirror.getLayout() ) );
+                    }
+                }
+            }
+        }
+    }
+
+    private Mirror getMirror( RepositorySystemSession session, ArtifactRepository repository )
+    {
+        if ( session != null )
+        {
+            org.sonatype.aether.repository.MirrorSelector selector = session.getMirrorSelector();
+            if ( selector != null )
+            {
+                RemoteRepository repo = selector.getMirror( RepositoryUtils.toRepo( repository ) );
+                if ( repo != null )
+                {
+                    Mirror mirror = new Mirror();
+                    mirror.setId( repo.getId() );
+                    mirror.setUrl( repo.getUrl() );
+                    mirror.setLayout( repo.getContentType() );
+                    return mirror;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void injectMirror( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    {
+        if ( repositories != null && session != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                Mirror mirror = getMirror( session, repository );
+
+                if ( mirror != null )
+                {
+                    repository.setId( mirror.getId() );
+                    repository.setUrl( mirror.getUrl() );
+
+                    if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
+                    {
+                        repository.setLayout( getLayout( mirror.getLayout() ) );
                     }
                 }
             }
@@ -511,6 +557,35 @@ public class LegacyRepositorySystem
                 {
                     repository.setAuthentication( null );
                 }
+            }
+        }
+    }
+
+    private Authentication getAuthentication( RepositorySystemSession session, ArtifactRepository repository )
+    {
+        if ( session != null )
+        {
+            AuthenticationSelector selector = session.getAuthenticationSelector();
+            if ( selector != null )
+            {
+                org.sonatype.aether.repository.Authentication auth =
+                    selector.getAuthentication( RepositoryUtils.toRepo( repository ) );
+                if ( auth != null )
+                {
+                    return new Authentication( auth.getUsername(), auth.getPassword() );
+                }
+            }
+        }
+        return null;
+    }
+
+    public void injectAuthentication( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    {
+        if ( repositories != null && session != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                repository.setAuthentication( getAuthentication( session, repository ) );
             }
         }
     }
@@ -572,21 +647,41 @@ public class LegacyRepositorySystem
         }
     }
 
-    public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
+    private Proxy getProxy( RepositorySystemSession session, ArtifactRepository repository )
     {
-
-        //      ArtifactResolutionResult collect( Set<Artifact> artifacts,
-        //      Artifact originatingArtifact,
-        //      Map managedVersions,
-        //      ArtifactRepository localRepository,
-        //      List<ArtifactRepository> remoteRepositories,
-        //      ArtifactMetadataSource source,
-        //      ArtifactFilter filter,
-        //      List<ResolutionListener> listeners,
-        //      List<ConflictResolver> conflictResolvers )
-        //      ArtifactResolutionResult result = artifactCollector.
-
+        if ( session != null )
+        {
+            ProxySelector selector = session.getProxySelector();
+            if ( selector != null )
+            {
+                org.sonatype.aether.repository.Proxy proxy = selector.getProxy( RepositoryUtils.toRepo( repository ) );
+                if ( proxy != null )
+                {
+                    Proxy p = new Proxy();
+                    p.setHost( proxy.getHost() );
+                    p.setProtocol( proxy.getType() );
+                    p.setPort( proxy.getPort() );
+                    if ( proxy.getAuthentication() != null )
+                    {
+                        p.setUserName( proxy.getAuthentication().getUsername() );
+                        p.setPassword( proxy.getAuthentication().getPassword() );
+                    }
+                    return p;
+                }
+            }
+        }
         return null;
+    }
+
+    public void injectProxy( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    {
+        if ( repositories != null && session != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                repository.setProxy( getProxy( session, repository ) );
+            }
+        }
     }
 
     public void retrieve( ArtifactRepository repository, File destination, String remotePath,
@@ -650,7 +745,7 @@ public class LegacyRepositorySystem
 
             ArtifactRepositoryPolicy releases = buildArtifactRepositoryPolicy( repo.getReleases() );
 
-            return createArtifactRepository( id, url, layouts.get( repo.getLayout() ), snapshots, releases );
+            return createArtifactRepository( id, url, getLayout( repo.getLayout() ), snapshots, releases );
         }
         else
         {
@@ -700,6 +795,60 @@ public class LegacyRepositorySystem
             return msg;
         }
         return getMessage( error.getCause(), def );
+    }
+
+    private ArtifactRepositoryLayout getLayout( String id )
+    {
+        ArtifactRepositoryLayout layout = layouts.get( id );
+
+        if ( layout == null )
+        {
+            layout = new UnknownRepositoryLayout( id, layouts.get( "default" ) );
+        }
+
+        return layout;
+    }
+
+    /**
+     * In the future, the legacy system might encounter repository types for which no layout components exists because
+     * the actual communication with the repository happens via a repository connector. As a minimum, the legacy system
+     * needs to retain the id of this layout so that the content type of the remote repository can still be accurately
+     * described.
+     */
+    static class UnknownRepositoryLayout
+        implements ArtifactRepositoryLayout
+    {
+
+        private final String id;
+
+        private final ArtifactRepositoryLayout fallback;
+
+        public UnknownRepositoryLayout( String id, ArtifactRepositoryLayout fallback )
+        {
+            this.id = id;
+            this.fallback = fallback;
+        }
+
+        public String getId()
+        {
+            return id;
+        }
+
+        public String pathOf( Artifact artifact )
+        {
+            return fallback.pathOf( artifact );
+        }
+
+        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+        {
+            return fallback.pathOfLocalRepositoryMetadata( metadata, repository );
+        }
+
+        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
+        {
+            return fallback.pathOfRemoteRepositoryMetadata( metadata );
+        }
+
     }
 
 }

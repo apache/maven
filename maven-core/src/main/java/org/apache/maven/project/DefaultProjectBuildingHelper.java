@@ -114,11 +114,11 @@ public class DefaultProjectBuildingHelper
             repoIds.add( repository.getId() );
         }
 
-        repositorySystem.injectMirror( artifactRepositories, request.getMirrors() );
+        repositorySystem.injectMirror( request.getRepositorySession(), artifactRepositories );
 
-        repositorySystem.injectProxy( artifactRepositories, request.getProxies() );
+        repositorySystem.injectProxy( request.getRepositorySession(), artifactRepositories );
 
-        repositorySystem.injectAuthentication( artifactRepositories, request.getServers() );
+        repositorySystem.injectAuthentication( request.getRepositorySession(), artifactRepositories );
 
         if ( externalRepositories != null )
         {

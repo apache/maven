@@ -146,9 +146,9 @@ public class DefaultMavenProjectBuilder
                     try
                     {
                         ArtifactRepository repo = repositorySystem.buildArtifactRepository( (Repository) repository );
-                        repositorySystem.injectMirror( Arrays.asList( repo ), request.getMirrors() );
-                        repositorySystem.injectProxy( Arrays.asList( repo ), request.getProxies() );
-                        repositorySystem.injectAuthentication( Arrays.asList( repo ), request.getServers() );
+                        repositorySystem.injectMirror( request.getRepositorySession(), Arrays.asList( repo ) );
+                        repositorySystem.injectProxy( request.getRepositorySession(), Arrays.asList( repo ) );
+                        repositorySystem.injectAuthentication( request.getRepositorySession(), Arrays.asList( repo ) );
                         repos.add( repo );
                     }
                     catch ( InvalidRepositoryException e )

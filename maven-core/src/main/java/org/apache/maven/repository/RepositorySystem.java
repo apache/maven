@@ -34,6 +34,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
+import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * @author Jason van Zyl
@@ -133,6 +134,12 @@ public interface RepositorySystem
      */
     void injectAuthentication( List<ArtifactRepository> repositories, List<Server> servers );
 
+    void injectMirror( RepositorySystemSession session, List<ArtifactRepository> repositories );
+
+    void injectProxy( RepositorySystemSession session, List<ArtifactRepository> repositories );
+
+    void injectAuthentication( RepositorySystemSession session, List<ArtifactRepository> repositories );
+    
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // Install

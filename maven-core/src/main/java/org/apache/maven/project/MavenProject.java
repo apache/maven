@@ -1844,8 +1844,9 @@ public class MavenProject
             {
                 ArtifactRepository repo =
                     repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
-                repositorySystem.injectProxy( Arrays.asList( repo ), projectBuilderConfiguration.getProxies() );
-                repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuilderConfiguration.getServers() );
+                repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(), Arrays.asList( repo ) );
+                repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
+                                                       Arrays.asList( repo ) );
                 setReleaseArtifactRepository( repo );
             }
             catch ( InvalidRepositoryException e )
@@ -1864,8 +1865,9 @@ public class MavenProject
             {
                 ArtifactRepository repo =
                     repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
-                repositorySystem.injectProxy( Arrays.asList( repo ), projectBuilderConfiguration.getProxies() );
-                repositorySystem.injectAuthentication( Arrays.asList( repo ), projectBuilderConfiguration.getServers() );
+                repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(), Arrays.asList( repo ) );
+                repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
+                                                       Arrays.asList( repo ) );
                 setSnapshotArtifactRepository( repo );
             }
             catch ( InvalidRepositoryException e )

@@ -48,6 +48,7 @@ import org.apache.maven.settings.Server;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * @author Benjamin Bentmann
@@ -290,6 +291,18 @@ public class TestRepositorySystem
     {
         // TODO Auto-generated method stub
 
+    }
+
+    public void injectMirror( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    {
+    }
+
+    public void injectProxy( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    {
+    }
+
+    public void injectAuthentication( RepositorySystemSession session, List<ArtifactRepository> repositories )
+    {
     }
 
 }
