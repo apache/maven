@@ -187,7 +187,7 @@ public class ResolveTransitiveMojo
                                                                   dependency.getVersion(), dependency.getType(),
                                                                   dependency.getClassifier() );
 
-                        getLog().info( "[MAVEN-CORE-IT-LOG] Resolving " + getId( artifact ) );
+                        getLog().info( "[MAVEN-CORE-IT-LOG] Resolving " + ResolveTransitiveMojo.this.getId( artifact ) );
 
                         artifacts.add( artifact );
                     }
@@ -204,7 +204,8 @@ public class ResolveTransitiveMojo
 
                         if ( artifact.getFile() != null )
                         {
-                            props.setProperty( getId( artifact ), artifact.getFile().getPath() );
+                            props.setProperty( ResolveTransitiveMojo.this.getId( artifact ),
+                                               artifact.getFile().getPath() );
                         }
 
                         getLog().info( "[MAVEN-CORE-IT-LOG]   " + artifact.getFile() );
