@@ -56,6 +56,10 @@ public class DefaultMavenExecutionRequest
 
     private boolean interactiveMode = true;
 
+    private boolean cacheTransferError = true;
+
+    private boolean cacheNotFound = true;
+
     private List<Proxy> proxies;
 
     private List<Server> servers;
@@ -150,6 +154,8 @@ public class DefaultMavenExecutionRequest
         copy.setLocalRepositoryPath( original.getLocalRepositoryPath() );
         copy.setOffline( original.isOffline() );
         copy.setInteractiveMode( original.isInteractiveMode() );
+        copy.setCacheNotFound( original.isCacheNotFound() );
+        copy.setCacheTransferError( original.isCacheTransferError() );
         copy.setProxies( original.getProxies() );
         copy.setServers( original.getServers() );
         copy.setMirrors( original.getMirrors() );
@@ -1045,6 +1051,28 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setWorkspaceReader( WorkspaceReader workspaceReader )
     {
         this.workspaceReader = workspaceReader;
+        return this;
+    }
+
+    public boolean isCacheTransferError()
+    {
+        return cacheTransferError;
+    }
+
+    public MavenExecutionRequest setCacheTransferError( boolean cacheTransferError )
+    {
+        this.cacheTransferError = cacheTransferError;
+        return this;
+    }
+
+    public boolean isCacheNotFound()
+    {
+        return cacheNotFound;
+    }
+
+    public MavenExecutionRequest setCacheNotFound( boolean cacheNotFound )
+    {
+        this.cacheNotFound = cacheNotFound;
         return this;
     }
 

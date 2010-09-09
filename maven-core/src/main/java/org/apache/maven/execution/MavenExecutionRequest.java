@@ -204,6 +204,12 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setOffline( boolean offline );
     boolean isOffline();
 
+    boolean isCacheTransferError();
+    MavenExecutionRequest setCacheTransferError( boolean cacheTransferError );
+
+    boolean isCacheNotFound();
+    MavenExecutionRequest setCacheNotFound( boolean cacheNotFound );
+
     // Profiles
     List<Profile> getProfiles();
     MavenExecutionRequest addProfile( Profile profile );

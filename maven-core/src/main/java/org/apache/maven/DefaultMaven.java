@@ -345,8 +345,8 @@ public class DefaultMaven
         session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
         session.setUpdatePolicy( request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null );
 
-        session.setNotFoundCachingEnabled( !request.isUpdateSnapshots() );
-        session.setTransferErrorCachingEnabled( !request.isUpdateSnapshots() );
+        session.setNotFoundCachingEnabled( request.isCacheNotFound() );
+        session.setTransferErrorCachingEnabled( request.isCacheTransferError() );
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
