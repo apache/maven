@@ -37,7 +37,7 @@ public class DefaultLegacySupport
     implements LegacySupport
 {
 
-    private ThreadLocal<MavenSession> session = new ThreadLocal<MavenSession>();
+    private ThreadLocal<MavenSession> session = new InheritableThreadLocal<MavenSession>();
 
     public void setSession( MavenSession session )
     {
