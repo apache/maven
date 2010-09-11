@@ -21,7 +21,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
-import org.apache.maven.lifecycle.internal.stub.ProjectDependenciesResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 
 import java.util.HashSet;
@@ -68,9 +67,7 @@ public class BuilderCommonTest
     public static BuilderCommon getBuilderCommon()
     {
         final LifecycleDebugLogger logger = new LifecycleDebugLogger( new LoggerStub() );
-        final LifecycleDependencyResolver lifecycleDependencyResolver =
-            new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), new LoggerStub() );
-        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver,
+        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(),
                                   new LoggerStub() );
     }
 

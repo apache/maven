@@ -47,8 +47,7 @@ public class MojoExecutorStub
     }
 
     @Override
-    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex,
-                         DependencyContext dependencyContext )
+    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
         throws LifecycleExecutionException
     {
         for ( MojoExecution mojoExecution : mojoExecutions )

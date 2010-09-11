@@ -23,14 +23,18 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Logs debug output from the various lifecycle phases.
@@ -76,6 +80,7 @@ public class LifecycleDebugLogger
         {
             return;
         }
+
         logger.debug( "=== REACTOR BUILD PLAN ================================================" );
 
         for ( Iterator<ProjectSegment> it = projectBuilds.iterator(); it.hasNext(); )
@@ -98,10 +103,15 @@ public class LifecycleDebugLogger
 
     public void debugProjectPlan( MavenProject currentProject, MavenExecutionPlan executionPlan )
     {
+        if ( !logger.isDebugEnabled() )
+        {
+            return;
+        }
+
         logger.debug( "=== PROJECT BUILD PLAN ================================================" );
         logger.debug( "Project:       " + BuilderCommon.getKey( currentProject ) );
-        logger.debug( "Dependencies (collect): " + executionPlan.getRequiredCollectionScopes() );
-        logger.debug( "Dependencies (resolve): " + executionPlan.getRequiredResolutionScopes() );
+
+        debugDependencyRequirements( executionPlan.getMojoExecutions() );
 
         for ( ExecutionPlanItem mojoExecution : executionPlan )
         {
@@ -124,6 +134,8 @@ public class LifecycleDebugLogger
             {
                 logger.debug( "--- init fork of " + fork.getKey() + " for " + mojoExecId + " ---" );
 
+                debugDependencyRequirements( fork.getValue() );
+
                 for ( MojoExecution forkedExecution : fork.getValue() )
                 {
                     debugMojoExecution( forkedExecution );
@@ -138,6 +150,32 @@ public class LifecycleDebugLogger
         logger.debug(
             "Style:         " + ( mojoExecution.getMojoDescriptor().isAggregator() ? "Aggregating" : "Regular" ) );
         logger.debug( "Configuration: " + mojoExecution.getConfiguration() );
+    }
+
+    private void debugDependencyRequirements( List<MojoExecution> mojoExecutions )
+    {
+        Set<String> scopesToCollect = new TreeSet<String>();
+        Set<String> scopesToResolve = new TreeSet<String>();
+
+        for ( MojoExecution mojoExecution : mojoExecutions )
+        {
+            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+            String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
+            if ( StringUtils.isNotEmpty( scopeToCollect ) )
+            {
+                scopesToCollect.add( scopeToCollect );
+            }
+
+            String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
+            if ( StringUtils.isNotEmpty( scopeToResolve ) )
+            {
+                scopesToResolve.add( scopeToResolve );
+            }
+        }
+
+        logger.debug( "Dependencies (collect): " + scopesToCollect );
+        logger.debug( "Dependencies (resolve): " + scopesToResolve );
     }
 
     public void logWeavePlan( MavenSession session )

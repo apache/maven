@@ -19,6 +19,7 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
 import org.apache.maven.execution.ExecutionEvent;
@@ -38,9 +39,13 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Executes an individual mojo
@@ -69,12 +74,67 @@ public class MojoExecutor
     {
     }
 
-    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex,
-                         DependencyContext dependencyContext )
+    public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
+    {
+        Set<String> scopesToCollect = new TreeSet<String>();
+        Set<String> scopesToResolve = new TreeSet<String>();
+
+        collectDependencyRequirements( scopesToResolve, scopesToCollect, mojoExecutions );
+
+        return new DependencyContext( session.getCurrentProject(), scopesToCollect, scopesToResolve );
+    }
+
+    private void collectDependencyRequirements( Set<String> scopesToResolve, Set<String> scopesToCollect,
+                                                Collection<MojoExecution> mojoExecutions )
+    {
+        for ( MojoExecution mojoExecution : mojoExecutions )
+        {
+            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+            scopesToResolve.addAll( toScopes( mojoDescriptor.getDependencyResolutionRequired() ) );
+
+            scopesToCollect.addAll( toScopes( mojoDescriptor.getDependencyCollectionRequired() ) );
+        }
+    }
+
+    private Collection<String> toScopes( String classpath )
+    {
+        if ( StringUtils.isNotEmpty( classpath ) )
+        {
+            if ( Artifact.SCOPE_COMPILE.equals( classpath ) )
+            {
+                return Arrays.asList( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED );
+            }
+            else if ( Artifact.SCOPE_RUNTIME.equals( classpath ) )
+            {
+                return Arrays.asList( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME );
+            }
+            else if ( Artifact.SCOPE_COMPILE_PLUS_RUNTIME.equals( classpath ) )
+            {
+                return Arrays.asList( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED,
+                                      Artifact.SCOPE_RUNTIME );
+            }
+            else if ( Artifact.SCOPE_RUNTIME_PLUS_SYSTEM.equals( classpath ) )
+            {
+                return Arrays.asList( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_RUNTIME );
+            }
+            else if ( Artifact.SCOPE_TEST.equals( classpath ) )
+            {
+                return Arrays.asList( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED,
+                                      Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST );
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    public void execute( MavenSession session, List<MojoExecution> mojoExecutions, ProjectIndex projectIndex )
         throws LifecycleExecutionException
 
     {
+        DependencyContext dependencyContext = newDependencyContext( session, mojoExecutions );
+
         PhaseRecorder phaseRecorder = new PhaseRecorder( session.getCurrentProject() );
+
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
             execute( session, mojoExecution, projectIndex, dependencyContext, phaseRecorder );
@@ -122,21 +182,11 @@ public class MojoExecutor
             }
         }
 
-        lifeCycleDependencyResolver.checkForUpdate( session, dependencyContext );
+        List<MavenProject> forkedProjects = executeForkedExecutions( mojoExecution, session, projectIndex );
 
-        List<MavenProject> forkedProjects =
-            executeForkedExecutions( mojoExecution, session, projectIndex, dependencyContext );
+        ensureDependenciesAreResolved( mojoDescriptor, session, dependencyContext );
 
         eventCatapult.fire( ExecutionEvent.Type.MojoStarted, session, mojoExecution );
-
-        ArtifactFilter artifactFilter = getArtifactFilter( mojoDescriptor );
-        List<MavenProject> resolvedProjects =
-            LifecycleDependencyResolver.getProjects( session.getCurrentProject(), session,
-                                                     mojoDescriptor.isAggregator() );
-        for ( MavenProject project : resolvedProjects )
-        {
-            project.setArtifactFilter( artifactFilter );
-        }
 
         try
         {
@@ -178,6 +228,54 @@ public class MojoExecutor
         }
     }
 
+    private void ensureDependenciesAreResolved( MojoDescriptor mojoDescriptor, MavenSession session,
+                                                DependencyContext dependencyContext )
+        throws LifecycleExecutionException
+
+    {
+        MavenProject project = dependencyContext.getProject();
+        boolean aggregating = mojoDescriptor.isAggregator();
+
+        if ( dependencyContext.isResolutionRequiredForCurrentProject() )
+        {
+            Collection<String> scopesToCollect = dependencyContext.getScopesToCollectForCurrentProject();
+            Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
+
+            lifeCycleDependencyResolver.resolveProjectDependencies( project, scopesToCollect, scopesToResolve, session,
+                                                                    aggregating, Collections.<Artifact> emptySet() );
+
+            dependencyContext.synchronizeWithProjectState();
+        }
+
+        if ( aggregating )
+        {
+            Collection<String> scopesToCollect = toScopes( mojoDescriptor.getDependencyCollectionRequired() );
+            Collection<String> scopesToResolve = toScopes( mojoDescriptor.getDependencyResolutionRequired() );
+
+            if ( dependencyContext.isResolutionRequiredForAggregatedProjects( scopesToCollect, scopesToResolve ) )
+            {
+                for ( MavenProject aggregatedProject : session.getProjects() )
+                {
+                    if ( aggregatedProject != project )
+                    {
+                        lifeCycleDependencyResolver.resolveProjectDependencies( aggregatedProject, scopesToCollect,
+                                                                                scopesToResolve, session, aggregating,
+                                                                                Collections.<Artifact> emptySet() );
+                    }
+                }
+            }
+        }
+
+        ArtifactFilter artifactFilter = getArtifactFilter( mojoDescriptor );
+        List<MavenProject> projectsToResolve =
+            LifecycleDependencyResolver.getProjects( session.getCurrentProject(), session,
+                                                     mojoDescriptor.isAggregator() );
+        for ( MavenProject projectToResolve : projectsToResolve )
+        {
+            projectToResolve.setArtifactFilter( artifactFilter );
+        }
+    }
+
     private ArtifactFilter getArtifactFilter( MojoDescriptor mojoDescriptor )
     {
         String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
@@ -204,7 +302,7 @@ public class MojoExecutor
     }
 
     public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session,
-                                                        ProjectIndex projectIndex, DependencyContext dependencyContext )
+                                                       ProjectIndex projectIndex )
         throws LifecycleExecutionException
     {
         List<MavenProject> forkedProjects = Collections.emptyList();
@@ -218,8 +316,6 @@ public class MojoExecutor
             MavenProject project = session.getCurrentProject();
 
             forkedProjects = new ArrayList<MavenProject>( forkedExecutions.size() );
-
-            dependencyContext = dependencyContext.clone();
 
             try
             {
@@ -252,7 +348,7 @@ public class MojoExecutor
 
                         eventCatapult.fire( ExecutionEvent.Type.ForkedProjectStarted, session, mojoExecution );
 
-                        execute( session, mojoExecutions, projectIndex, dependencyContext );
+                        execute( session, mojoExecutions, projectIndex );
 
                         eventCatapult.fire( ExecutionEvent.Type.ForkedProjectSucceeded, session, mojoExecution );
                     }

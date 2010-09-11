@@ -63,14 +63,10 @@ public class BuilderCommon
     private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
 
     @Requirement
-    private LifecycleDependencyResolver lifecycleDependencyResolver;
-
-    @Requirement
     private ExecutionEventCatapult eventCatapult;
 
     @Requirement
     private Logger logger;
-
 
 
     @SuppressWarnings( { "UnusedDeclaration" } )
@@ -79,12 +75,10 @@ public class BuilderCommon
     }
 
     public BuilderCommon( LifecycleDebugLogger lifecycleDebugLogger,
-                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator,
-                          LifecycleDependencyResolver lifecycleDependencyResolver, Logger logger )
+                          LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator, Logger logger )
     {
         this.lifecycleDebugLogger = lifecycleDebugLogger;
         this.lifeCycleExecutionPlanCalculator = lifeCycleExecutionPlanCalculator;
-        this.lifecycleDependencyResolver = lifecycleDependencyResolver;
         this.logger = logger;
     }
 
@@ -97,6 +91,7 @@ public class BuilderCommon
     {
         MavenExecutionPlan executionPlan =
             lifeCycleExecutionPlanCalculator.calculateExecutionPlan( session, project, taskSegment.getTasks() );
+
         lifecycleDebugLogger.debugProjectPlan( project, executionPlan );
 
         if ( session.getRequest().isThreadConfigurationPresent() )
@@ -122,16 +117,8 @@ public class BuilderCommon
             }
         }
 
-        // TODO: once we have calculated the build plan then we should accurately be able to download
-        // the project dependencies. Having it happen in the plugin manager is a tangled mess. We can optimize
-        // this later by looking at the build plan. Would be better to just batch download everything required
-        // by the reactor.
-
-        lifecycleDependencyResolver.resolveDependencies( taskSegment.isAggregating(), project, session, executionPlan,
-                                                         projectArtifacts );
         return executionPlan;
     }
-
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
                                   final MavenProject mavenProject, Exception e, final long buildStartTime )

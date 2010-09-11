@@ -25,7 +25,6 @@ import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculator
 import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
 import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
-import org.apache.maven.lifecycle.internal.stub.ProjectDependenciesResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -131,9 +130,7 @@ public class LifecycleWeaveBuilderTest
     private BuilderCommon getBuilderCommon()
     {
         final LifecycleDebugLogger logger = new LifecycleDebugLogger( new LoggerStub() );
-        final LifecycleDependencyResolver lifecycleDependencyResolver =
-            new LifecycleDependencyResolver( new ProjectDependenciesResolverStub(), new LoggerStub() );
-        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(), lifecycleDependencyResolver,
+        return new BuilderCommon( logger, new LifecycleExecutionPlanCalculatorStub(),
                                   new LoggerStub() );
     }
 }

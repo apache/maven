@@ -195,10 +195,6 @@ public class LifecycleExecutorTest
 
         MavenExecutionPlan plan = calculateExecutionPlan( session, "clean", "install" );
 
-        assertTrue( plan.getRequiredResolutionScopes().contains( Artifact.SCOPE_COMPILE ) );
-        assertTrue( plan.getRequiredResolutionScopes().contains( Artifact.SCOPE_RUNTIME ) );
-        assertTrue( plan.getRequiredResolutionScopes().contains( Artifact.SCOPE_TEST ) );
-
         List<MojoExecution> executions = getExecutions( plan );
 
         //[01] clean:clean

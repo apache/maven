@@ -151,8 +151,9 @@ public class LifecycleWeaveBuilder
                     try
                     {
                         final MavenExecutionPlan executionPlan = plans.get( projectBuild ).get();
+
                         DependencyContext dependencyContext =
-                            new DependencyContext( executionPlan, projectBuild.getTaskSegment().isAggregating() );
+                            mojoExecutor.newDependencyContext( session, executionPlan.getMojoExecutions() );
 
                         final Callable<ProjectSegment> projectBuilder =
                             createCallableForBuildingOneFullModule( buildContext, session, reactorBuildStatus,

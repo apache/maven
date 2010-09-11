@@ -20,9 +20,7 @@ package org.apache.maven.lifecycle;
  */
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.DependencyContext;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
-import org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
@@ -44,11 +42,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A facade that provides lifecycle services to components outside maven core.
@@ -166,20 +162,7 @@ public class DefaultLifecycleExecutor
     public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
         throws LifecycleExecutionException
     {
-        Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
-        Set<String> requiredDependencyCollectionScopes = new TreeSet<String>();
-                                             // Ok, so this method could probably have a better location.
-        DefaultLifecycleExecutionPlanCalculator.collectDependencyRequirements( requiredDependencyResolutionScopes,
-                                                                            requiredDependencyCollectionScopes,
-                                                                            mojoExecution );
-
-        final DependencyContext context =
-            new DependencyContext( requiredDependencyCollectionScopes, requiredDependencyResolutionScopes,
-                                   mojoExecution.getMojoDescriptor().isAggregator() );
-        mojoExecutor.executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ),
-                                              context );
-        return Collections.emptyList();
+        return mojoExecutor.executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ) );
     }
-
 
 }

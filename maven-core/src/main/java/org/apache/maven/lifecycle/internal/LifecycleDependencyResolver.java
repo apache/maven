@@ -21,7 +21,6 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
 import org.apache.maven.project.DependencyResolutionResult;
@@ -73,15 +72,6 @@ public class LifecycleDependencyResolver
         this.logger = logger;
     }
 
-    public void resolveDependencies( boolean aggregating, MavenProject currentProject,
-                                     MavenSession sessionForThisModule, MavenExecutionPlan executionPlan,
-                                     Set<Artifact> projectArtifacts )
-        throws LifecycleExecutionException
-    {
-        List<MavenProject> projectsToResolve = getProjects( currentProject, sessionForThisModule, aggregating );
-        resolveDependencies( aggregating, sessionForThisModule, executionPlan, projectsToResolve, projectArtifacts );
-    }
-
     public static List<MavenProject> getProjects( MavenProject project, MavenSession session, boolean aggregator )
     {
         if ( aggregator )
@@ -94,36 +84,9 @@ public class LifecycleDependencyResolver
         }
     }
 
-    public void checkForUpdate( MavenSession session, DependencyContext dependenctContext )
-        throws LifecycleExecutionException
-    {
-
-        if ( dependenctContext.isSameButUpdatedProject( session ) )
-        {
-            resolveProjectDependencies( dependenctContext.getLastProject(), dependenctContext.getScopesToCollect(),
-                                         dependenctContext.getScopesToResolve(), session,
-                                         dependenctContext.isAggregating(), new HashSet<Artifact>() );
-        }
-
-        dependenctContext.setLastProject( session.getCurrentProject() );
-        dependenctContext.setLastDependencyArtifacts( session.getCurrentProject().getDependencyArtifacts() );
-    }
-
-    private void resolveDependencies( boolean aggregating, MavenSession session, MavenExecutionPlan executionPlan,
-                                       List<MavenProject> projectsToResolve, Set<Artifact> projectArtifacts )
-        throws LifecycleExecutionException
-    {
-        for ( MavenProject project : projectsToResolve )
-        {
-            resolveProjectDependencies( project, executionPlan.getRequiredCollectionScopes(),
-                                         executionPlan.getRequiredResolutionScopes(), session, aggregating,
-                                         projectArtifacts );
-        }
-    }
-
-    private void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
-                                              Collection<String> scopesToResolve, MavenSession session,
-                                              boolean aggregating, Set<Artifact> projectArtifacts )
+    public void resolveProjectDependencies( MavenProject project, Collection<String> scopesToCollect,
+                                            Collection<String> scopesToResolve, MavenSession session,
+                                            boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
         if ( project.getDependencyArtifacts() == null )

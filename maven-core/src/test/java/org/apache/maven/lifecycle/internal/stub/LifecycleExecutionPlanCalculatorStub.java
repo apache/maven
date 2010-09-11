@@ -171,8 +171,7 @@ public class LifecycleExecutionPlanCalculatorStub
     {
         final List<ExecutionPlanItem> planItemList =
             DefaultSchedulesStub.createDefaultSchedules().createExecutionPlanItem( project, mojoExecutions );
-        return new MavenExecutionPlan( getScopes(), getScopes(), planItemList,
-                                       DefaultLifecyclesStub.createDefaultLifecycles() );
+        return new MavenExecutionPlan( planItemList, DefaultLifecyclesStub.createDefaultLifecycles() );
     }
 
     private static MojoExecution createMojoExecution( String goal, String executionId, MojoDescriptor mojoDescriptor )

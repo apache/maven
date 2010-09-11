@@ -54,16 +54,6 @@ public class MavenExecutionPlan
 
      */
 
-    /**
-     * For project dependency resolution, the scopes of resolution required if any.
-     */
-    private final Set<String> requiredDependencyResolutionScopes;
-
-    /**
-     * For project dependency collection, the scopes of collection required if any.
-     */
-    private final Set<String> requiredDependencyCollectionScopes;
-
     private final List<ExecutionPlanItem> planItem;
 
     private final Map<String, ExecutionPlanItem> lastMojoExecutionForAllPhases;
@@ -71,13 +61,10 @@ public class MavenExecutionPlan
 
     final List<String> phasesInExecutionPlan;
 
-    public MavenExecutionPlan( Set<String> requiredDependencyResolutionScopes,
-                               Set<String> requiredDependencyCollectionScopes, List<ExecutionPlanItem> planItem,
-                               DefaultLifecycles defaultLifecycles )
+    public MavenExecutionPlan( List<ExecutionPlanItem> planItem, DefaultLifecycles defaultLifecycles )
     {
-        this.requiredDependencyResolutionScopes = requiredDependencyResolutionScopes;
-        this.requiredDependencyCollectionScopes = requiredDependencyCollectionScopes;
         this.planItem = planItem;
+
         lastMojoExecutionForAllPhases = new LinkedHashMap<String, ExecutionPlanItem>();
 
         LinkedHashSet<String> totalPhaseSet = new LinkedHashSet<String>();
@@ -114,7 +101,6 @@ public class MavenExecutionPlan
 
         }
     }
-
 
     public Iterator<ExecutionPlanItem> iterator()
     {
@@ -175,16 +161,6 @@ public class MavenExecutionPlan
     public boolean containsPhase( String phase )
     {
         return phasesInExecutionPlan.contains( phase );
-    }
-
-    public Set<String> getRequiredResolutionScopes()
-    {
-        return requiredDependencyResolutionScopes;
-    }
-
-    public Set<String> getRequiredCollectionScopes()
-    {
-        return requiredDependencyCollectionScopes;
     }
 
     public List<MojoExecution> getMojoExecutions()

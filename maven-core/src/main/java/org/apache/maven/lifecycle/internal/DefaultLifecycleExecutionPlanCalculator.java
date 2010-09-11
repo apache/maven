@@ -109,28 +109,18 @@ public class DefaultLifecycleExecutionPlanCalculator
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
-        Set<String> requiredDependencyResolutionScopes = new TreeSet<String>();
-        Set<String> requiredDependencyCollectionScopes = new TreeSet<String>();
-
         lifecyclePluginResolver.resolveMissingPluginVersions( project, session );
 
         final List<MojoExecution> executions = calculateMojoExecutions( session, project, tasks );
 
-        setupMojoExections( session, project, requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
-                            executions );
+        setupMojoExections( session, project, executions );
 
         final List<ExecutionPlanItem> planItem = defaultSchedules.createExecutionPlanItem( project, executions );
 
-        return new MavenExecutionPlan( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes, planItem,
-                                       defaultLifeCycles );
-
-
+        return new MavenExecutionPlan( planItem, defaultLifeCycles );
     }
 
-    private void setupMojoExections( MavenSession session, MavenProject project,
-                                     Set<String> requiredDependencyResolutionScopes,
-                                     Set<String> requiredDependencyCollectionScopes,
-                                     List<MojoExecution> mojoExecutions )
+    private void setupMojoExections( MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
@@ -155,9 +145,6 @@ public class DefaultLifecycleExecutionPlanCalculator
             finalizeMojoConfiguration( mojoExecution );
 
             calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
-
-            collectDependencyRequirements( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
-                                           mojoExecution );
         }
     }
 
@@ -201,37 +188,6 @@ public class DefaultLifecycleExecutionPlanCalculator
         }
         return mojoExecutions;
     }
-
-    public static void collectDependencyRequirements( Collection<String> requiredDependencyResolutionScopes,
-                                                       Collection<String> requiredDependencyCollectionScopes,
-                                                       MojoExecution mojoExecution )
-    {
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-        String requiredDependencyResolutionScope = mojoDescriptor.getDependencyResolutionRequired();
-
-        if ( StringUtils.isNotEmpty( requiredDependencyResolutionScope ) )
-        {
-            requiredDependencyResolutionScopes.add( requiredDependencyResolutionScope );
-        }
-
-        String requiredDependencyCollectionScope = mojoDescriptor.getDependencyCollectionRequired();
-
-        if ( StringUtils.isNotEmpty( requiredDependencyCollectionScope ) )
-        {
-            requiredDependencyCollectionScopes.add( requiredDependencyCollectionScope );
-        }
-
-        for ( List<MojoExecution> forkedExecutions : mojoExecution.getForkedExecutions().values() )
-        {
-            for ( MojoExecution forkedExecution : forkedExecutions )
-            {
-                collectDependencyRequirements( requiredDependencyResolutionScopes, requiredDependencyCollectionScopes,
-                                               forkedExecution );
-            }
-        }
-    }
-
 
     private Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
                                                                          String lifecyclePhase )

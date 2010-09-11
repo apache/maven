@@ -19,14 +19,15 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.project.MavenProject;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.TreeSet;
 
 /**
- * Context of dependency artifacts for the entire build.
+ * Context of dependency artifacts for a particular project.
  * 
  * @since 3.0
  * @author Benjamin Bentmann
@@ -38,84 +39,81 @@ import java.util.Collection;
 public class DependencyContext
 {
 
-    private final Collection<String> scopesToCollect;
+    private static final Collection<?> UNRESOLVED = Arrays.asList();
 
-    private final Collection<String> scopesToResolve;
+    private final MavenProject project;
 
-    private final boolean aggregating;
+    private final Collection<String> scopesToCollectForCurrentProject;
 
-    private volatile MavenProject lastProject;
+    private final Collection<String> scopesToResolveForCurrentProject;
 
-    private volatile Collection<?> lastDependencyArtifacts;
+    private final Collection<String> scopesToCollectForAggregatedProjects;
 
-    private volatile int lastDependencyArtifactCount;
+    private final Collection<String> scopesToResolveForAggregatedProjects;
 
-    public DependencyContext( Collection<String> scopesToCollect, Collection<String> scopesToResolve,
-                              boolean aggregating )
+    private volatile Collection<?> lastDependencyArtifacts = UNRESOLVED;
+
+    private volatile int lastDependencyArtifactCount = -1;
+
+    public DependencyContext( MavenProject project, Collection<String> scopesToCollect,
+                              Collection<String> scopesToResolve )
     {
-        this.scopesToCollect = scopesToCollect;
-        this.scopesToResolve = scopesToResolve;
-        this.aggregating = aggregating;
+        this.project = project;
+        scopesToCollectForCurrentProject = scopesToCollect;
+        scopesToResolveForCurrentProject = scopesToResolve;
+        scopesToCollectForAggregatedProjects = Collections.synchronizedSet( new TreeSet<String>() );
+        scopesToResolveForAggregatedProjects = Collections.synchronizedSet( new TreeSet<String>() );
     }
 
-    public DependencyContext( MavenExecutionPlan executionPlan, boolean aggregating )
+    public MavenProject getProject()
     {
-        this( executionPlan.getRequiredCollectionScopes(), executionPlan.getRequiredResolutionScopes(), aggregating );
+        return project;
     }
 
-    public void setLastDependencyArtifacts( Collection<?> lastDependencyArtifacts )
+    public Collection<String> getScopesToCollectForCurrentProject()
     {
-        this.lastDependencyArtifacts = lastDependencyArtifacts;
-        lastDependencyArtifactCount = ( lastDependencyArtifacts != null ) ? lastDependencyArtifacts.size() : 0;
+        return scopesToCollectForCurrentProject;
     }
 
-    public MavenProject getLastProject()
+    public Collection<String> getScopesToResolveForCurrentProject()
     {
-        return lastProject;
+        return scopesToResolveForCurrentProject;
     }
 
-    public void setLastProject( MavenProject lastProject )
+    public Collection<String> getScopesToCollectForAggregatedProjects()
     {
-        this.lastProject = lastProject;
+        return scopesToCollectForAggregatedProjects;
     }
 
-    public Collection<String> getScopesToCollect()
+    public Collection<String> getScopesToResolveForAggregatedProjects()
     {
-        return scopesToCollect;
+        return scopesToResolveForAggregatedProjects;
     }
 
-    public Collection<String> getScopesToResolve()
+    public boolean isResolutionRequiredForCurrentProject()
     {
-        return scopesToResolve;
-    }
-
-    public boolean isAggregating()
-    {
-        return aggregating;
-    }
-
-    public DependencyContext clone()
-    {
-        return new DependencyContext( scopesToCollect, scopesToResolve, aggregating );
-    }
-
-    public boolean isSameProject( MavenSession session )
-    {
-        return ( lastProject == session.getCurrentProject() );
-    }
-
-    public boolean isSameButUpdatedProject( MavenSession session )
-    {
-        if ( isSameProject( session ) )
+        if ( lastDependencyArtifacts != project.getDependencyArtifacts()
+            || ( lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size() ) )
         {
-            if ( lastDependencyArtifacts != lastProject.getDependencyArtifacts()
-                || ( lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size() ) )
-            {
-                return true;
+            return true;
 
-            }
         }
         return false;
+    }
+
+    public boolean isResolutionRequiredForAggregatedProjects( Collection<String> scopesToCollect,
+                                                              Collection<String> scopesToResolve )
+    {
+        boolean required =
+            scopesToCollectForAggregatedProjects.addAll( scopesToCollect )
+                || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
+        return required;
+    }
+
+    public void synchronizeWithProjectState()
+    {
+        lastDependencyArtifacts = project.getDependencyArtifacts();
+        lastDependencyArtifactCount = ( lastDependencyArtifacts != null ) ? lastDependencyArtifacts.size() : 0;
     }
 
 }

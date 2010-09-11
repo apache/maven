@@ -62,8 +62,6 @@ public class LifecycleModuleBuilder
     public void buildProject( MavenSession session, MavenSession rootSession, ReactorContext reactorContext,
                               MavenProject currentProject, TaskSegment taskSegment )
     {
-        boolean isAggregating = taskSegment.isAggregating();
-
         session.setCurrentProject( currentProject );
 
         long buildStartTime = System.currentTimeMillis();
@@ -83,9 +81,7 @@ public class LifecycleModuleBuilder
             MavenExecutionPlan executionPlan =
                 builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<Artifact>() );
 
-            DependencyContext dependencyContext = new DependencyContext( executionPlan, isAggregating );
-            mojoExecutor.execute( session, executionPlan.getMojoExecutions(), reactorContext.getProjectIndex(),
-                                  dependencyContext );
+            mojoExecutor.execute( session, executionPlan.getMojoExecutions(), reactorContext.getProjectIndex() );
 
             long buildEndTime = System.currentTimeMillis();
 
