@@ -58,6 +58,7 @@ public class DefaultArtifactFilterManager
         artifacts.add( "org.codehaus.plexus:plexus-container-default" );
         artifacts.add( "plexus:plexus-container-default" );
         artifacts.add( "org.sonatype.spice:spice-inject-plexus" );
+        artifacts.add( "org.sonatype.sisu:sisu-inject-plexus" );
         artifacts.add( "org.apache.maven:maven-artifact" );
         artifacts.add( "org.apache.maven:maven-aether-provider" );
         artifacts.add( "org.apache.maven:maven-artifact-manager" );
