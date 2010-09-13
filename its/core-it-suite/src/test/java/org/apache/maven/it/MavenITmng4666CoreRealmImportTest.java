@@ -70,6 +70,7 @@ public class MavenITmng4666CoreRealmImportTest
         verifier.deleteArtifacts( "org.sonatype.aether", "aether-api", "0.1-stub" );
         verifier.deleteArtifacts( "org.sonatype.aether", "aether-spi", "0.1-stub" );
         verifier.deleteArtifacts( "org.sonatype.aether", "aether-impl", "0.1-stub" );
+        verifier.deleteArtifacts( "org.sonatype.sisu", "sisu-inject-plexus", "0.1-stub" );
         verifier.deleteArtifacts( "org.sonatype.spice", "spice-inject-plexus", "0.1-stub" );
         verifier.deleteArtifacts( "classworlds", "classworlds", "0.1-stub" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
@@ -81,9 +82,11 @@ public class MavenITmng4666CoreRealmImportTest
 
         Properties props = verifier.loadProperties( "target/type.properties" );
         List types = getTypes( props );
-        if ( !matchesVersionRange( "[3.0-beta-2,)" ) )
+        if ( !matchesVersionRange( "[3.0-beta-4,)" ) )
         {
+            // MNG-4725, MNG-4807
             types.remove( "org.codehaus.plexus.configuration.PlexusConfiguration" );
+            types.remove( "org.codehaus.plexus.logging.Logger" );
         }
         assertFalse( types.isEmpty() );
         for ( Iterator it = types.iterator(); it.hasNext(); )

@@ -112,6 +112,11 @@ under the License.
             <version>0.1-stub</version>
           </dependency>
           <dependency>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
+            <version>0.1-stub</version>
+          </dependency>
+          <dependency>
             <groupId>org.sonatype.aether</groupId>
             <artifactId>aether-api</artifactId>
             <version>0.1-stub</version>
@@ -142,6 +147,7 @@ under the License.
                 <className>org.apache.maven.model.Model</className>
                 <className>org.apache.maven.settings.Settings</className>
                 <className>org.codehaus.plexus.logging.LogEnabled</className>
+                <className>org.codehaus.plexus.logging.Logger</className>
                 <className>org.codehaus.plexus.configuration.PlexusConfiguration</className>
                 <className>org.codehaus.plexus.classworlds.realm.ClassRealm</className>
                 <className>org.codehaus.classworlds.ClassRealm</className>
