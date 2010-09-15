@@ -43,8 +43,8 @@
       <artifactId>maven-compat</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
     <!-- CLI -->
     <dependency>

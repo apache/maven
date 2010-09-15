@@ -48,8 +48,8 @@ under the License.
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
   </dependencies>
 
