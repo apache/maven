@@ -19,8 +19,6 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-
 /**
  * Describes a restriction in versioning.
  *
@@ -70,16 +68,9 @@ public class Restriction
 
     public boolean containsVersion( ArtifactVersion version )
     {
-        boolean snapshot = isSnapshot( version );
-
         if ( lowerBound != null )
         {
             int comparison = lowerBound.compareTo( version );
-
-            if ( snapshot && comparison == 0 )
-            {
-                return true;
-            }
 
             if ( ( comparison == 0 ) && !lowerBoundInclusive )
             {
@@ -94,11 +85,6 @@ public class Restriction
         {
             int comparison = upperBound.compareTo( version );
 
-            if ( snapshot && comparison == 0 )
-            {
-                return true;
-            }
-
             if ( ( comparison == 0 ) && !upperBoundInclusive )
             {
                 return false;
@@ -109,17 +95,7 @@ public class Restriction
             }
         }
 
-        if ( lowerBound != null || upperBound != null )
-        {
-            return !snapshot;
-        }
-
         return true;
-    }
-
-    private boolean isSnapshot( ArtifactVersion version )
-    {
-        return Artifact.SNAPSHOT_VERSION.equals( version.getQualifier() );
     }
 
     @Override

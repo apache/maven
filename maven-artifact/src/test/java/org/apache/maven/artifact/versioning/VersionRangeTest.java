@@ -655,13 +655,13 @@ public class VersionRangeTest
         assertEquals( CHECK_NUM_RESTRICTIONS, 0, restrictions.size() );
     }
 
-    public void testReleaseRangeBoundsCannotContainSnapshots()
+    public void testReleaseRangeBoundsContainsSnapshots()
         throws InvalidVersionSpecificationException
     {
         VersionRange range = VersionRange.createFromVersionSpec( "[1.0,1.2]" );
 
-        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
-        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.2-SNAPSHOT" ) ) );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.2-SNAPSHOT" ) ) );
     }
 
     public void testSnapshotRangeBoundsCanContainSnapshots()
@@ -669,13 +669,13 @@ public class VersionRangeTest
     {
         VersionRange range = VersionRange.createFromVersionSpec( "[1.0,1.2-SNAPSHOT]" );
 
-        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.2-SNAPSHOT" ) ) );
 
         range = VersionRange.createFromVersionSpec( "[1.0-SNAPSHOT,1.2]" );
 
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
-        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
     }
 
     public void testSnapshotSoftVersionCanContainSnapshot()

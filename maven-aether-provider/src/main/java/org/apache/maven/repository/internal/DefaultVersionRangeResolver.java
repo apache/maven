@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +41,6 @@ import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionConstraint;
-import org.sonatype.aether.version.VersionRange;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.aether.impl.MetadataResolver;
 import org.sonatype.aether.impl.VersionRangeResolver;
@@ -125,8 +123,7 @@ public class DefaultVersionRangeResolver
         }
         else
         {
-            Map<String, ArtifactRepository> versionIndex =
-                getVersions( session, result, request, getNature( session, versionConstraint.getRanges() ) );
+            Map<String, ArtifactRepository> versionIndex = getVersions( session, result, request );
 
             List<Version> versions = new ArrayList<Version>();
             for ( Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet() )
@@ -154,13 +151,13 @@ public class DefaultVersionRangeResolver
     }
 
     private Map<String, ArtifactRepository> getVersions( RepositorySystemSession session, VersionRangeResult result,
-                                                         VersionRangeRequest request, Metadata.Nature nature )
+                                                         VersionRangeRequest request )
     {
         Map<String, ArtifactRepository> versionIndex = new HashMap<String, ArtifactRepository>();
 
         Metadata metadata =
             new DefaultMetadata( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
-                                 MAVEN_METADATA_XML, nature );
+                                 MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
 
         List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
         for ( RemoteRepository repository : request.getRepositories() )
@@ -210,18 +207,6 @@ public class DefaultVersionRangeResolver
         }
 
         return versionIndex;
-    }
-
-    private Metadata.Nature getNature( RepositorySystemSession session, Collection<VersionRange> ranges )
-    {
-        for ( VersionRange range : ranges )
-        {
-            if ( range.acceptsSnapshots() )
-            {
-                return Metadata.Nature.RELEASE_OR_SNAPSHOT;
-            }
-        }
-        return Metadata.Nature.RELEASE;
     }
 
     private Versioning readVersions( RepositorySystemSession session, Metadata metadata, VersionRangeResult result )
