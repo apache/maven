@@ -36,9 +36,11 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryCache;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 import org.sonatype.aether.artifact.Artifact;
@@ -116,7 +118,7 @@ public class DefaultVersionResolver
 
         Key cacheKey = null;
         RepositoryCache cache = session.getCache();
-        if ( cache != null )
+        if ( cache != null && !ConfigurationProperties.get( session, "aether.versionResolver.noCache", false ) )
         {
             cacheKey = new Key( session, request );
 
@@ -248,7 +250,7 @@ public class DefaultVersionResolver
             }
         }
 
-        if ( cacheKey != null && metadata != null )
+        if ( cacheKey != null && metadata != null && isSafelyCacheable( session, artifact ) )
         {
             cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
         }
@@ -363,6 +365,28 @@ public class DefaultVersionResolver
     private String getKey( String classifier, String extension )
     {
         return StringUtils.clean( classifier ) + ':' + StringUtils.clean( extension );
+    }
+
+    private boolean isSafelyCacheable( RepositorySystemSession session, Artifact artifact )
+    {
+        /*
+         * The workspace/reactor is in flux so we better not assume definitive information for any of its
+         * artifacts/projects.
+         */
+
+        WorkspaceReader workspace = session.getWorkspaceReader();
+        if ( workspace == null )
+        {
+            return true;
+        }
+
+        Artifact pomArtifact = artifact;
+        if ( pomArtifact.getClassifier().length() > 0 || !"pom".equals( pomArtifact.getExtension() ) )
+        {
+            pomArtifact = new SubArtifact( artifact, "", "pom" );
+        }
+
+        return workspace.findArtifact( pomArtifact ) == null;
     }
 
     private static class VersionInfo

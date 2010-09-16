@@ -96,7 +96,9 @@ public class DefaultProjectDependenciesResolver
                 if ( !JavaScopes.SYSTEM.equals( dep.getScope() ) && dep.getArtifact().getFile() != null )
                 {
                     // enable re-resolution
-                    dep = dep.setArtifact( dep.getArtifact().setFile( null ) );
+                    org.sonatype.aether.artifact.Artifact art = dep.getArtifact();
+                    art = art.setFile( null ).setVersion( art.getBaseVersion() );
+                    dep = dep.setArtifact( art );
                 }
                 collect.addDependency( dep );
             }
