@@ -208,6 +208,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4317PluginVersionResolutionFromMultiReposTest.class );
         suite.addTestSuite( MavenITmng4314DirectInvocationOfAggregatorTest.class );
         suite.addTestSuite( MavenITmng4312TypeAwarePluginParameterExpressionInjectionTest.class );
+        suite.addTestSuite( MavenITmng4309StrictChecksumValidationForMetadataTest.class );
         suite.addTestSuite( MavenITmng4305LocalRepoBasedirTest.class );
         suite.addTestSuite( MavenITmng4304ProjectDependencyArtifactsTest.class );
         suite.addTestSuite( MavenITmng4293RequiresCompilePlusRuntimeScopeTest.class );
