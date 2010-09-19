@@ -96,7 +96,6 @@ import org.sonatype.aether.util.graph.transformer.ConflictMarker;
 import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
-import org.sonatype.aether.util.listener.AbstractRepositoryListener;
 import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
 import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
 import org.sonatype.aether.util.repository.DefaultMirrorSelector;
@@ -421,43 +420,7 @@ public class DefaultMaven
 
         session.setTransferListener( request.getTransferListener() );
 
-        session.setRepositoryListener( new AbstractRepositoryListener()
-        {
-            @Override
-            public void artifactInstalling( RepositoryEvent event )
-            {
-                logger.info( "Installing " + event.getArtifact().getFile() + " to " + event.getFile() );
-            }
-
-            @Override
-            public void metadataInstalling( RepositoryEvent event )
-            {
-                logger.debug( "Installing " + event.getMetadata() + " to " + event.getFile() );
-            }
-
-            @Override
-            public void artifactDescriptorInvalid( RepositoryEvent event )
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( "The POM for " + event.getArtifact() + " is invalid"
-                        + ", transitive dependencies (if any) will not be available: "
-                        + event.getException().getMessage() );
-                }
-                else
-                {
-                    logger.warn( "The POM for " + event.getArtifact() + " is invalid"
-                        + ", transitive dependencies (if any) will not be available"
-                        + ", enable debug logging for more details" );
-                }
-            }
-
-            @Override
-            public void artifactDescriptorMissing( RepositoryEvent event )
-            {
-                logger.warn( "The POM for " + event.getArtifact() + " is missing, no dependency information available" );
-            }
-        } );
+        session.setRepositoryListener( new LoggingRepositoryListener( logger ) );
 
         return session;
     }

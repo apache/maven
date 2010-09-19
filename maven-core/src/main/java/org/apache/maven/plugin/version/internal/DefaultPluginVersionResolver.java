@@ -19,7 +19,6 @@ package org.apache.maven.plugin.version.internal;
  * under the License.
  */
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,13 +38,15 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.ArtifactRepository;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.MetadataRequest;
 import org.sonatype.aether.resolution.MetadataResult;
-import org.sonatype.aether.transfer.MetadataNotFoundException;
+import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 
 /**
@@ -122,29 +123,13 @@ public class DefaultPluginVersionResolver
 
         for ( MetadataResult res : results )
         {
-            if ( res.getException() != null )
+            ArtifactRepository repository = res.getRequest().getRepository();
+            if ( repository == null )
             {
-                if ( res.getException() instanceof MetadataNotFoundException )
-                {
-                    logger.debug( "Could not find " + res.getRequest().getMetadata() + " in "
-                        + res.getRequest().getRepository() );
-                }
-                else if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( "Could not retrieve " + res.getRequest().getMetadata() + " from "
-                        + res.getRequest().getRepository() + ": " + res.getException().getMessage(), res.getException() );
-                }
-                else
-                {
-                    logger.warn( "Could not retrieve " + res.getRequest().getMetadata() + " from "
-                        + res.getRequest().getRepository() + ": " + res.getException().getMessage() );
-                }
+                repository = request.getRepositorySession().getLocalRepository();
             }
 
-            if ( res.getMetadata() != null )
-            {
-                mergeMetadata( versions, res.getMetadata().getFile(), res.getRequest().getRepository() );
-            }
+            mergeMetadata( request.getRepositorySession(), versions, res.getMetadata(), repository );
         }
 
         if ( StringUtils.isNotEmpty( versions.releaseVersion ) )
@@ -167,29 +152,36 @@ public class DefaultPluginVersionResolver
         return result;
     }
 
-    private void mergeMetadata( Versions versions, File metadataFile, ArtifactRepository repository )
+    private void mergeMetadata( RepositorySystemSession session, Versions versions,
+                                org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository )
     {
-        if ( metadataFile != null && metadataFile.isFile() )
+        if ( metadata != null && metadata.getFile() != null && metadata.getFile().isFile() )
         {
             try
             {
                 Map<String, ?> options = Collections.singletonMap( MetadataReader.IS_STRICT, Boolean.FALSE );
 
-                Metadata repoMetadata = metadataReader.read( metadataFile, options );
+                Metadata repoMetadata = metadataReader.read( metadata.getFile(), options );
 
                 mergeMetadata( versions, repoMetadata, repository );
             }
             catch ( IOException e )
             {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( "Failed to read metadata " + metadataFile + ": " + e.getMessage(), e );
-                }
-                else
-                {
-                    logger.warn( "Failed to read metadata " + metadataFile + ": " + e.getMessage() );
-                }
+                invalidMetadata( session, metadata, repository, e );
             }
+        }
+    }
+
+    private void invalidMetadata( RepositorySystemSession session, org.sonatype.aether.metadata.Metadata metadata,
+                                  ArtifactRepository repository, Exception exception )
+    {
+        RepositoryListener listener = session.getRepositoryListener();
+        if ( listener != null )
+        {
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, metadata );
+            event.setException( exception );
+            event.setRepository( repository );
+            listener.metadataInvalid( event );
         }
     }
 

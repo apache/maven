@@ -49,7 +49,6 @@ import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.impl.internal.CacheUtils;
 import org.sonatype.aether.metadata.Metadata;
 import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.repository.WorkspaceRepository;
@@ -174,6 +173,9 @@ public class DefaultVersionResolver
         else
         {
             List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
+
+            metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+
             for ( RemoteRepository repository : request.getRepositories() )
             {
                 MetadataRequest metadataRequest =
@@ -182,25 +184,23 @@ public class DefaultVersionResolver
                 metadataRequest.setFavorLocalRepository( true );
                 metadataRequests.add( metadataRequest );
             }
+
             List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
 
-            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
-            File localMetadataFile =
-                new File( lrm.getRepository().getBasedir(), lrm.getPathForLocalMetadata( metadata ) );
-            if ( localMetadataFile.isFile() )
-            {
-                metadata = metadata.setFile( localMetadataFile );
-            }
-
             Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
-            merge( artifact, infos, readVersions( session, metadata, result ),
-                   session.getLocalRepositoryManager().getRepository() );
 
             for ( MetadataResult metadataResult : metadataResults )
             {
                 result.addException( metadataResult.getException() );
-                merge( artifact, infos, readVersions( session, metadataResult.getMetadata(), result ),
-                       metadataResult.getRequest().getRepository() );
+
+                ArtifactRepository repository = metadataResult.getRequest().getRepository();
+                if ( repository == null )
+                {
+                    repository = session.getLocalRepository();
+                }
+
+                Versioning versioning = readVersions( session, metadataResult.getMetadata(), repository, result );
+                merge( artifact, infos, versioning, repository );
             }
 
             if ( RELEASE.equals( version ) )
@@ -269,7 +269,8 @@ public class DefaultVersionResolver
         return info != null;
     }
 
-    private Versioning readVersions( RepositorySystemSession session, Metadata metadata, VersionResult result )
+    private Versioning readVersions( RepositorySystemSession session, Metadata metadata, ArtifactRepository repository,
+                                     VersionResult result )
     {
         Versioning versioning = null;
 
@@ -289,7 +290,7 @@ public class DefaultVersionResolver
         }
         catch ( Exception e )
         {
-            invalidMetadata( session, metadata, e );
+            invalidMetadata( session, metadata, repository, e );
             result.addException( e );
         }
         finally
@@ -300,13 +301,15 @@ public class DefaultVersionResolver
         return ( versioning != null ) ? versioning : new Versioning();
     }
 
-    private void invalidMetadata( RepositorySystemSession session, Metadata metadata, Exception exception )
+    private void invalidMetadata( RepositorySystemSession session, Metadata metadata, ArtifactRepository repository,
+                                  Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
             DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, metadata );
             event.setException( exception );
+            event.setRepository( repository );
             listener.metadataInvalid( event );
         }
     }

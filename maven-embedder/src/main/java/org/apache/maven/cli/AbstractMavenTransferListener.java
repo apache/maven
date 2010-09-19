@@ -48,7 +48,7 @@ abstract class AbstractMavenTransferListener
 
     public void transferSucceeded( TransferEvent event )
     {
-        TransferResource artifact = event.getResource();
+        TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
         if ( contentLength >= 0 )
         {
@@ -56,7 +56,7 @@ abstract class AbstractMavenTransferListener
             String len = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
 
             String throughput = "";
-            long duration = System.currentTimeMillis() - artifact.getTransferStartTime();
+            long duration = System.currentTimeMillis() - resource.getTransferStartTime();
             if ( duration > 0 )
             {
                 DecimalFormat format = new DecimalFormat( "0.0", new DecimalFormatSymbols( Locale.ENGLISH ) );
@@ -64,7 +64,7 @@ abstract class AbstractMavenTransferListener
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            out.println( type + ": " + artifact.getRepositoryUrl() + artifact.getResourceName() + " (" + len
+            out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
                 + throughput + ")" );
         }
     }

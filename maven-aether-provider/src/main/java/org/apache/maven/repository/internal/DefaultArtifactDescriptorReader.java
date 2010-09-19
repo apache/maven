@@ -73,6 +73,7 @@ import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.VersionRequest;
 import org.sonatype.aether.resolution.VersionResolutionException;
+import org.sonatype.aether.resolution.VersionResult;
 import org.sonatype.aether.spi.locator.Service;
 import org.sonatype.aether.spi.locator.ServiceLocator;
 import org.sonatype.aether.spi.log.Logger;
@@ -221,7 +222,9 @@ public class DefaultArtifactDescriptorReader
             {
                 VersionRequest versionRequest =
                     new VersionRequest( artifact, request.getRepositories(), request.getRequestContext() );
-                versionResolver.resolveVersion( session, versionRequest );
+                VersionResult versionResult = versionResolver.resolveVersion( session, versionRequest );
+
+                artifact = artifact.setVersion( versionResult.getVersion() );
             }
             catch ( VersionResolutionException e )
             {

@@ -19,7 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -46,7 +45,6 @@ import org.sonatype.aether.impl.MetadataResolver;
 import org.sonatype.aether.impl.VersionRangeResolver;
 import org.sonatype.aether.metadata.Metadata;
 import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.resolution.MetadataRequest;
@@ -160,12 +158,16 @@ public class DefaultVersionRangeResolver
                                  MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
 
         List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
+
+        metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+
         for ( RemoteRepository repository : request.getRepositories() )
         {
             MetadataRequest metadataRequest = new MetadataRequest( metadata, repository, request.getRequestContext() );
             metadataRequest.setDeleteLocalCopyIfMissing( true );
             metadataRequests.add( metadataRequest );
         }
+
         List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
 
         WorkspaceReader workspace = session.getWorkspaceReader();
@@ -178,30 +180,22 @@ public class DefaultVersionRangeResolver
             }
         }
 
-        LocalRepositoryManager lrm = session.getLocalRepositoryManager();
-        File localMetadataFile = new File( lrm.getRepository().getBasedir(), lrm.getPathForLocalMetadata( metadata ) );
-        if ( localMetadataFile.isFile() )
-        {
-            metadata = metadata.setFile( localMetadataFile );
-            Versioning versioning = readVersions( session, metadata, result );
-            for ( String version : versioning.getVersions() )
-            {
-                if ( !versionIndex.containsKey( version ) )
-                {
-                    versionIndex.put( version, lrm.getRepository() );
-                }
-            }
-        }
-
         for ( MetadataResult metadataResult : metadataResults )
         {
             result.addException( metadataResult.getException() );
-            Versioning versioning = readVersions( session, metadataResult.getMetadata(), result );
+
+            ArtifactRepository repository = metadataResult.getRequest().getRepository();
+            if ( repository == null )
+            {
+                repository = session.getLocalRepository();
+            }
+
+            Versioning versioning = readVersions( session, metadataResult.getMetadata(), repository, result );
             for ( String version : versioning.getVersions() )
             {
                 if ( !versionIndex.containsKey( version ) )
                 {
-                    versionIndex.put( version, metadataResult.getRequest().getRepository() );
+                    versionIndex.put( version, repository );
                 }
             }
         }
@@ -209,7 +203,8 @@ public class DefaultVersionRangeResolver
         return versionIndex;
     }
 
-    private Versioning readVersions( RepositorySystemSession session, Metadata metadata, VersionRangeResult result )
+    private Versioning readVersions( RepositorySystemSession session, Metadata metadata, ArtifactRepository repository,
+                                     VersionRangeResult result )
     {
         Versioning versioning = null;
 
@@ -229,7 +224,7 @@ public class DefaultVersionRangeResolver
         }
         catch ( Exception e )
         {
-            invalidMetadata( session, metadata, e );
+            invalidMetadata( session, metadata, repository, e );
             result.addException( e );
         }
         finally
@@ -240,13 +235,15 @@ public class DefaultVersionRangeResolver
         return ( versioning != null ) ? versioning : new Versioning();
     }
 
-    private void invalidMetadata( RepositorySystemSession session, Metadata metadata, Exception exception )
+    private void invalidMetadata( RepositorySystemSession session, Metadata metadata, ArtifactRepository repository,
+                                  Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
             DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, metadata );
             event.setException( exception );
+            event.setRepository( repository );
             listener.metadataInvalid( event );
         }
     }
