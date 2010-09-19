@@ -161,7 +161,7 @@ problem.
                 org.apache.maven.plugins:maven-surefire-plugin:2.5:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-ejb-plugin:2.2.1:ejb
+                org.apache.maven.plugins:maven-ejb-plugin:2.3:ejb
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:2.3.1:install
