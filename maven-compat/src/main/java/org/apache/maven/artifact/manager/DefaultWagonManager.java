@@ -48,8 +48,9 @@ public class DefaultWagonManager
     implements WagonManager
 {
 
+    // NOTE: This must use a different field name than in the super class or IoC has no chance to inject the loggers
     @Requirement
-    private Logger logger;
+    private Logger log;
 
     @Requirement
     private LegacySupport legacySupport;
@@ -169,7 +170,7 @@ public class DefaultWagonManager
                 id = repository.getId();
             }
 
-            logger.debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
+            log.debug( "Using mirror: " + mirror.getUrl() + " (id: " + id + ")" );
 
             repository = artifactRepositoryFactory.createArtifactRepository( id, mirror.getUrl(),
                                                                      repository.getLayout(), repository.getSnapshots(),
