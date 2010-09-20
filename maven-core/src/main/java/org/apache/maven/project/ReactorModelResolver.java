@@ -169,8 +169,7 @@ class ReactorModelResolver
             }
             catch ( ArtifactResolutionException e )
             {
-                throw new UnresolvableModelException( "Failed to resolve POM for " + groupId + ":" + artifactId + ":"
-                    + version + " due to " + e.getMessage(), groupId, artifactId, version, e );
+                throw new UnresolvableModelException( e.getMessage(), groupId, artifactId, version, e );
             }
 
             pomFile = pomArtifact.getFile();

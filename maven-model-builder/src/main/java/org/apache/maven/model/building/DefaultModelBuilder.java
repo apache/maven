@@ -740,11 +740,18 @@ public class DefaultModelBuilder
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
             || !artifactId.equals( parent.getArtifactId() ) )
         {
+            StringBuilder buffer = new StringBuilder( 256 );
+            buffer.append( "'parent.relativePath'" );
+            if ( childModel != problems.getRootModel() )
+            {
+                buffer.append( " of POM " ).append( ModelProblemUtils.toSourceHint( childModel ) );
+            }
+            buffer.append( " points at " ).append( groupId ).append( ":" ).append( artifactId );
+            buffer.append( " instead of " ).append( parent.getGroupId() ).append( ":" ).append( parent.getArtifactId() );
+            buffer.append( ", please verify your project structure" );
+
             problems.setSource( childModel );
-            problems.add( Severity.WARNING, "'parent.relativePath' of POM "
-                + ModelProblemUtils.toSourceHint( childModel ) + " points at " + groupId + ":" + artifactId
-                + " instead of " + parent.getGroupId() + ":" + parent.getArtifactId()
-                + ", please verify your project structure", childModel.getLocation( "parent" ), null );
+            problems.add( Severity.WARNING, buffer.toString(), parent.getLocation( "" ), null );
             return null;
         }
         if ( version == null || !version.equals( parent.getVersion() ) )
@@ -813,9 +820,20 @@ public class DefaultModelBuilder
         }
         catch ( UnresolvableModelException e )
         {
-            problems.add( Severity.FATAL, "Non-resolvable parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + " for "
-                + ModelProblemUtils.toId( childModel ) + ": " + e.getMessage(), childModel.getLocation( "parent" ), e );
+            StringBuilder buffer = new StringBuilder( 256 );
+            buffer.append( "Non-resolvable parent POM" );
+            if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
+            {
+                buffer.append( " " ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+            }
+            if ( childModel != problems.getRootModel() )
+            {
+                buffer.append( " for " ).append( ModelProblemUtils.toId( childModel ) );
+            }
+            buffer.append( ": " ).append( e.getMessage() );
+            buffer.append( " and 'parent.relativePath' points at wrong local POM" );
+
+            problems.add( Severity.FATAL, buffer.toString(), parent.getLocation( "" ), e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
                                               problems.getProblems() );
         }
@@ -915,9 +933,15 @@ public class DefaultModelBuilder
                 }
                 catch ( UnresolvableModelException e )
                 {
-                    problems.add( Severity.ERROR, "Non-resolvable import POM "
-                        + ModelProblemUtils.toId( groupId, artifactId, version ) + ": " + e.getMessage(),
-                                  dependency.getLocation( "" ), e );
+                    StringBuilder buffer = new StringBuilder( 256 );
+                    buffer.append( "Non-resolvable import POM" );
+                    if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
+                    {
+                        buffer.append( " " ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+                    }
+                    buffer.append( ": " ).append( e.getMessage() );
+
+                    problems.add( Severity.ERROR, buffer.toString(), dependency.getLocation( "" ), e );
                     continue;
                 }
 
@@ -1006,6 +1030,12 @@ public class DefaultModelBuilder
 
             catapult.fire( listener, event );
         }
+    }
+
+    private boolean containsCoordinates( String message, String groupId, String artifactId, String version )
+    {
+        return message != null && message.contains( groupId ) && message.contains( artifactId )
+            && message.contains( version );
     }
 
 }
