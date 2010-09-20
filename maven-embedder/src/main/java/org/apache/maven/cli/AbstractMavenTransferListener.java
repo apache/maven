@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferResource;
 import org.sonatype.aether.util.listener.AbstractTransferListener;
@@ -39,6 +40,7 @@ abstract class AbstractMavenTransferListener
         this.out = ( out != null ) ? out : System.out;
     }
 
+    @Override
     public void transferInitiated( TransferEvent event )
     {
         String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
@@ -46,6 +48,17 @@ abstract class AbstractMavenTransferListener
         out.println( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
     }
 
+    @Override
+    public void transferCorrupted( TransferEvent event )
+        throws TransferCancelledException
+    {
+        TransferResource resource = event.getResource();
+
+        out.println( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
+            + resource.getResourceName() );
+    }
+
+    @Override
     public void transferSucceeded( TransferEvent event )
     {
         TransferResource resource = event.getResource();
