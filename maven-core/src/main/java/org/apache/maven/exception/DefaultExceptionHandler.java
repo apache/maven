@@ -139,8 +139,8 @@ public class DefaultExceptionHandler
         }
 
         String message =
-            "The project " + result.getProjectId() + " (" + result.getPomFile() + ") has " + children.size() + " error"
-                + ( children.size() == 1 ? "" : "s" );
+            "\nThe project " + result.getProjectId() + " (" + result.getPomFile() + ") has "
+                + children.size() + " error" + ( children.size() == 1 ? "" : "s" );
 
         return new ExceptionSummary( null, message, null, children );
     }

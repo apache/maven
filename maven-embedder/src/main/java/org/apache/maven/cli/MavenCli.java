@@ -526,7 +526,7 @@ public class MavenCli
             }
         }
 
-        String msg = indent + summary.getMessage();
+        String msg = summary.getMessage();
 
         if ( StringUtils.isNotEmpty( referenceKey ) )
         {
@@ -536,17 +536,24 @@ public class MavenCli
             }
             else
             {
-                msg += '\n' + indent + "-> " + referenceKey;
+                msg += "\n-> " + referenceKey;
             }
         }
 
-        if ( showErrors || ( summary.getException() instanceof InternalErrorException ) )
+        String[] lines = msg.split( "(\r\n)|(\r)|(\n)" );
+
+        for ( int i = 0; i < lines.length; i++ )
         {
-            logger.error( msg, summary.getException() );
-        }
-        else
-        {
-            logger.error( msg );
+            String line = indent + lines[i].trim();
+
+            if ( i == lines.length - 1 && ( showErrors || ( summary.getException() instanceof InternalErrorException ) ) )
+            {
+                logger.error( line, summary.getException() );
+            }
+            else
+            {
+                logger.error( line );
+            }
         }
 
         indent += "  ";
