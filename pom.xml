@@ -42,7 +42,7 @@
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.4</plexusVersion>
-    <plexusInterpolationVersion>1.11</plexusInterpolationVersion>
+    <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.4</plexusUtilsVersion>
     <sisuInjectVersion>1.4.1</sisuInjectVersion>
     <wagonVersion>1.0-beta-6</wagonVersion>
