@@ -19,6 +19,8 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -482,4 +484,27 @@ public class StringSearchModelInterpolatorTest
     {
         public static final String CONSTANT = "${expression}";
     }
+
+    public void testLocationTrackerShouldBeExcludedFromInterpolation()
+    {
+        Properties props = new Properties();
+        props.setProperty( "expression", "value" );
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setUserProperties( props );
+
+        InputSource source = new InputSource();
+        source.setLocation( "${expression}" );
+        source.setModelId( "${expression}" );
+        Model model = new Model();
+        model.setLocation( "", new InputLocation( 1, 1, source ) );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        StringSearchModelInterpolator interpolator = new StringSearchModelInterpolator();
+        interpolator.interpolateObject( model, model, null, request, problems );
+
+        assertProblemFree( problems );
+        assertEquals( "${expression}", source.getLocation() );
+        assertEquals( "${expression}", source.getModelId() );
+    }
+
 }
