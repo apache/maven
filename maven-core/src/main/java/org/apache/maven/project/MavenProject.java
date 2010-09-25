@@ -346,9 +346,12 @@ public class MavenProject
              */
             if ( parentFile != null )
             {
+                ProjectBuildingRequest request = new DefaultProjectBuildingRequest( projectBuilderConfiguration );
+                request.setRemoteRepositories( getRemoteArtifactRepositories() );
+
                 try
                 {
-                    parent = mavenProjectBuilder.build( parentFile, projectBuilderConfiguration ).getProject();
+                    parent = mavenProjectBuilder.build( parentFile, request ).getProject();
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -360,9 +363,12 @@ public class MavenProject
             }
             else if ( model.getParent() != null )
             {
+                ProjectBuildingRequest request = new DefaultProjectBuildingRequest( projectBuilderConfiguration );
+                request.setRemoteRepositories( getRemoteArtifactRepositories() );
+
                 try
                 {
-                    parent = mavenProjectBuilder.build( getParentArtifact(), projectBuilderConfiguration ).getProject();
+                    parent = mavenProjectBuilder.build( getParentArtifact(), request ).getProject();
                 }
                 catch ( ProjectBuildingException e )
                 {

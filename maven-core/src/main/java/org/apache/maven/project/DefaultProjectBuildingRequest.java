@@ -27,7 +27,6 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.repository.ArtifactTransferListener;
 import org.sonatype.aether.RepositorySystemSession;
 
 public class DefaultProjectBuildingRequest
@@ -62,8 +61,6 @@ public class DefaultProjectBuildingRequest
 
     private boolean resolveDependencies;
 
-    private ArtifactTransferListener transferListener;
-
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
@@ -74,6 +71,25 @@ public class DefaultProjectBuildingRequest
         userProperties = new Properties();
         remoteRepositories = new ArrayList<ArtifactRepository>();
         pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+    }
+
+    public DefaultProjectBuildingRequest( ProjectBuildingRequest request )
+    {
+        this();
+        setProcessPlugins( request.isProcessPlugins() );
+        setProfiles( request.getProfiles() );
+        setActiveProfileIds( request.getActiveProfileIds() );
+        setInactiveProfileIds( request.getInactiveProfileIds() );
+        setSystemProperties( request.getSystemProperties() );
+        setUserProperties( request.getUserProperties() );
+        setRemoteRepositories( request.getRemoteRepositories() );
+        setPluginArtifactRepositories( request.getPluginArtifactRepositories() );
+        setRepositorySession( request.getRepositorySession() );
+        setLocalRepository( request.getLocalRepository() );
+        setBuildStartTime( request.getBuildStartTime() );
+        setProject( request.getProject() );
+        setResolveDependencies( request.isResolveDependencies() );
+        setValidationLevel( request.getValidationLevel() );
     }
 
     public MavenProject getProject()
@@ -272,16 +288,6 @@ public class DefaultProjectBuildingRequest
     public void setBuildStartTime( Date buildStartTime )
     {
         this.buildStartTime = buildStartTime;
-    }
-
-    public ArtifactTransferListener getTransferListener()
-    {
-        return transferListener;
-    }
-
-    public void setTransferListener( ArtifactTransferListener transferListener )
-    {
-        this.transferListener = transferListener;
     }
 
     public RepositorySystemSession getRepositorySession()
