@@ -36,8 +36,8 @@ TODO:
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <target name="initTaskDefs" unless="taskdefs.inited">
-    <xmlproperty file="pom.xml" prefix="pom.xml" />
-    <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.0.8.jar"/>
+    <xmlproperty file="pom.xml" prefix="xmlPom" />
+    <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.1.1.jar"/>
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath"/>
     <property name="taskdefs.inited" value="true"/>
   </target>
@@ -80,11 +80,9 @@ TODO:
   </target>
 
   <target name="init" depends="isMavenHomeSet,initLocalRepo">
-    <xmlproperty prefix="pom" file="pom.xml"/>
     <basename file="${maven.home}" property="maven.home.basename"/>
     <dirname file="${maven.home}" property="maven.home.dirname"/>
-    <!-- Initialize properties -->
-    <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}"/>
+    <property name="maven.home.basename.expected" value="apache-maven-${xmlPom.project.version}"/>
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip"/>
     <property name="surefire.useFile" value="true"/>
     <echo>maven.home = ${maven.home}</echo>
@@ -103,15 +101,14 @@ TODO:
   </target>
 
   <target name="pull" depends="init, read-poms" unless="skip.pull">
-    <property name="verbose" value="false"/>
     <!-- Pull the dependencies that Maven needs to build -->
-    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" verbose="${verbose}" useScope="compile">
+    <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" useScope="compile">
        <localRepository path="${maven.repo.local}"/>
        <pom refid="pom"/>
     </artifact:dependencies>
 
     <!-- Pull the dependencies for Modello -->
-    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset" verbose="${verbose}">
+    <artifact:dependencies pathId="modello.pathid" filesetId="modello.fileset">
        <localRepository path="${maven.repo.local}"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-maven-plugin" version="1.0"/>
        <dependency groupId="org.codehaus.modello" artifactId="modello-core" version="1.0"/>
@@ -173,14 +170,14 @@ TODO:
     </path>
 
     <mkdir dir="bootstrap/target/classes"/>
-    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true">
+    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true" includeAntRuntime="false">
       <src refid="sources"/>
       <classpath refid="pom.pathid"/>
     </javac>
 
     <!-- DGF generating a fake pom.properties so Maven thinks it has a version number -->
     <mkdir dir="bootstrap/target/classes/META-INF/maven/org.apache.maven/maven-core"/>
-    <echo message="version=${pom.project.version}"
+    <echo message="version=${xmlPom.project.version}"
           file="bootstrap/target/classes/META-INF/maven/org.apache.maven/maven-core/pom.properties"/>
 
     <path id="maven.classpath">
@@ -324,8 +321,8 @@ TODO:
 
   <target name="with-its" depends="all,run-its"/>
 
-  <target name="set-temp-maven-home" depends="read-poms">
-    <property name="maven.home" location="${java.io.tmpdir}/apache-maven-${pom.version}"/>
+  <target name="set-temp-maven-home" depends="initTaskDefs">
+    <property name="maven.home" location="${java.io.tmpdir}/apache-maven-${xmlPom.project.version}"/>
     <echo>Using temporary maven install directory: ${maven.home}</echo>
   </target>
 
