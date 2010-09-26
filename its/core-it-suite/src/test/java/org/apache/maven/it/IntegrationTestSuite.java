@@ -71,6 +71,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // Tests that currently don't pass for any Maven version, i.e. the corresponding issue hasn't been resolved yet
         // -------------------------------------------------------------------------------------------------------------
+        // suite.addTestSuite( MavenITmng4148DepPomInterpWithSettingsProfilesTest.class );
         // suite.addTestSuite( MavenITmng3890TransitiveDependencyScopeUpdateTest.class );
         // suite.addTestSuite( MavenITmng3092SnapshotsExcludedFromVersionRangeTest.class );
         // suite.addTestSuite( MavenITmng3038TransitiveDepManVersionTest.class );
@@ -247,7 +248,6 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4166HideCoreCommonsCliTest.class );
         suite.addTestSuite( MavenITmng4162ReportingMigrationTest.class );
         suite.addTestSuite( MavenITmng4150VersionRangeTest.class );
-        suite.addTestSuite( MavenITmng4148DepPomInterpWithSettingsProfilesTest.class );
         suite.addTestSuite( MavenITmng4129PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng4126ParentProfilesXmlTest.class );
         suite.addTestSuite( MavenITmng4116UndecodedUrlsTest.class );
