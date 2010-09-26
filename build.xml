@@ -34,7 +34,7 @@ END SNIPPET: ant-bootstrap -->
   <property name="it.workdir.version" value="3.0.x" />
 
   <target name="initTaskDefs">
-    <xmlproperty file="pom.xml" prefix="pom.xml" />
+    <xmlproperty file="pom.xml" prefix="xmlPom" />
     <path id="maven-ant-tasks.classpath" path="maven-ant-tasks-2.1.1.jar" />
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant" classpathref="maven-ant-tasks.classpath" />
   </target>
@@ -71,9 +71,8 @@ Do you want to continue?</input>
   </target>
 
   <target name="init" depends="isMavenHomeSet">
-    <xmlproperty prefix="pom" file="pom.xml" />
     <!-- Initialize properties -->
-    <property name="maven.home.basename.expected" value="apache-maven-${pom.project.version}" />
+    <property name="maven.home.basename.expected" value="apache-maven-${xmlPom.project.version}" />
     <property name="maven.assembly" location="apache-maven/target/${maven.home.basename.expected}-bin.zip" />
     <property name="maven.repo.local" value="${user.home}/.m2/repository" />
     <property name="maven.debug" value="-e" />
@@ -210,7 +209,7 @@ Do you want to continue?</input>
     </path>
 
     <mkdir dir="bootstrap/target/classes" />
-    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true">
+    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.5" target="1.5" debug="true" includeAntRuntime="false">
       <src refid="sources" />
       <classpath refid="pom.pathid" />
     </javac>
