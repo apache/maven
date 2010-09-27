@@ -2122,18 +2122,19 @@ public class MavenProject
     }
 
     /**
-     * Indicates if the project has completed the specified lifecycle phase.
-     *
-     * @param phase The phase to check for completion
-     * @return true if the phase has been completed
+     * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
+     * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
+     * used by plugins.
+     * 
+     * @param phase The phase to check for, must not be {@code null}.
+     * @return {@code true} if the phase has been seen.
      */
-    public boolean hasCompletedPhase( String phase )
+    public boolean hasLifecyclePhase( String phase )
     {
         return lifecyclePhases.contains( phase );
     }
 
     /**
-     * Adds the specified lifecycle phase to the phases this project has successfully completed.
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.

@@ -35,8 +35,8 @@ public class PhaseRecorderTest extends TestCase
         final MojoExecution mojoExecution2 = executions.get( 1 );
         phaseRecorder.observeExecution( mojoExecution1 );
 
-        assertTrue( ProjectDependencyGraphStub.A.hasCompletedPhase( mojoExecution1.getLifecyclePhase() ));
-        assertFalse( ProjectDependencyGraphStub.A.hasCompletedPhase( mojoExecution2.getLifecyclePhase() ));
+        assertTrue( ProjectDependencyGraphStub.A.hasLifecyclePhase( mojoExecution1.getLifecyclePhase() ));
+        assertFalse( ProjectDependencyGraphStub.A.hasLifecyclePhase( mojoExecution2.getLifecyclePhase() ));
 
         assertFalse( phaseRecorder.isDifferentPhase( mojoExecution1));
         assertTrue( phaseRecorder.isDifferentPhase( mojoExecution2));

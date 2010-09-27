@@ -86,18 +86,20 @@ class ReactorReader
         {
             return projectArtifact.getFile();
         }
-        else if ( !project.hasCompletedPhase( "package" ) )
+        else if ( !hasBeenPackaged( project ) )
         {
+            // fallback to loose class files only if artifacts haven't been packaged yet
+
             if ( isTestArtifact( artifact ) )
             {
-                if ( project.hasCompletedPhase( "test-compile" ) )
+                if ( project.hasLifecyclePhase( "test-compile" ) )
                 {
                     return new File( project.getBuild().getTestOutputDirectory() );
                 }
             }
             else
             {
-                if ( project.hasCompletedPhase( "compile" ) )
+                if ( project.hasLifecyclePhase( "compile" ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
@@ -112,6 +114,12 @@ class ReactorReader
     private boolean hasArtifactFileFromPackagePhase( org.apache.maven.artifact.Artifact projectArtifact )
     {
         return projectArtifact != null && projectArtifact.getFile() != null && projectArtifact.getFile().exists();
+    }
+
+    private boolean hasBeenPackaged( MavenProject project )
+    {
+        return project.hasLifecyclePhase( "package" ) || project.hasLifecyclePhase( "install" )
+            || project.hasLifecyclePhase( "deploy" );
     }
 
     /**
