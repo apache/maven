@@ -831,7 +831,10 @@ public class DefaultModelBuilder
                 buffer.append( " for " ).append( ModelProblemUtils.toId( childModel ) );
             }
             buffer.append( ": " ).append( e.getMessage() );
-            buffer.append( " and 'parent.relativePath' points at wrong local POM" );
+            if ( childModel.getProjectDirectory() != null )
+            {
+                buffer.append( " and 'parent.relativePath' points at wrong local POM" );
+            }
 
             problems.add( Severity.FATAL, buffer.toString(), parent.getLocation( "" ), e );
             throw new ModelBuildingException( problems.getRootModel(), problems.getRootModelId(),
