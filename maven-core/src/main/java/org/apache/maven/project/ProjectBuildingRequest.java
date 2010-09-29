@@ -151,4 +151,39 @@ public interface ProjectBuildingRequest
 
     ProjectBuildingRequest setRepositorySession( RepositorySystemSession repositorySession );
 
+    /**
+     * Sets the merge mode used to combine repositories declared in the POM with the repositories specified in this
+     * request.
+     * 
+     * @param mode The repository merge mode, must not be {@code null}.
+     * @return This request for chaining, never {@code null}.
+     * @see #setRemoteRepositories(List)
+     */
+    ProjectBuildingRequest setRepositoryMerging( RepositoryMerging mode );
+
+    /**
+     * Gets the merge mode used to combine repositories declared in the POM with the repositories specified in this
+     * request
+     * 
+     * @return The merge mode, never {@code null}.
+     */
+    RepositoryMerging getRepositoryMerging();
+
+    /**
+     * The possible merge modes for combining remote repositories.
+     */
+    enum RepositoryMerging
+    {
+
+        /**
+         * The repositories declared in the POM have precedence over the repositories specified in the request.
+         */
+        POM_DOMINANT,
+
+        /**
+         * The repositories specified in the request have precedence over the repositories declared in the POM.
+         */
+        REQUEST_DOMINANT,
+    }
+
 }

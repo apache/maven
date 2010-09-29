@@ -48,7 +48,7 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
  * 
  * @author Benjamin Bentmann
  */
-class ReactorModelResolver
+class ProjectModelResolver
     implements ModelResolver
 {
 
@@ -60,7 +60,7 @@ class ReactorModelResolver
 
     private List<RemoteRepository> pomRepositories;
 
-    private final List<RemoteRepository> defaultRepositories;
+    private final List<RemoteRepository> externalRepositories;
 
     private final ArtifactResolver resolver;
 
@@ -70,28 +70,32 @@ class ReactorModelResolver
 
     private final ReactorModelPool modelPool;
 
-    public ReactorModelResolver( RepositorySystemSession session, ArtifactResolver resolver,
+    private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
+
+    public ProjectModelResolver( RepositorySystemSession session, ArtifactResolver resolver,
                                  RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories,
-                                 ReactorModelPool modelPool )
+                                 ProjectBuildingRequest.RepositoryMerging repositoryMerging, ReactorModelPool modelPool )
     {
         this.session = session;
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<RemoteRepository>();
-        this.defaultRepositories = repositories;
+        this.externalRepositories = repositories;
         this.repositories = repositories;
+        this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<String>();
         this.modelPool = modelPool;
     }
 
-    private ReactorModelResolver( ReactorModelResolver original )
+    private ProjectModelResolver( ProjectModelResolver original )
     {
         this.session = original.session;
         this.resolver = original.resolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
         this.pomRepositories = original.pomRepositories;
-        this.defaultRepositories = original.defaultRepositories;
+        this.externalRepositories = original.externalRepositories;
         this.repositories = original.repositories;
+        this.repositoryMerging = original.repositoryMerging;
         this.repositoryIds = new HashSet<String>( original.repositoryIds );
         this.modelPool = original.modelPool;
     }
@@ -106,10 +110,17 @@ class ReactorModelResolver
 
         List<RemoteRepository> newRepositories = Collections.singletonList( convert( repository ) );
 
-        pomRepositories =
-            remoteRepositoryManager.aggregateRepositories( session, pomRepositories, newRepositories, true );
-        repositories =
-            remoteRepositoryManager.aggregateRepositories( session, pomRepositories, defaultRepositories, false );
+        if ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( repositoryMerging ) )
+        {
+            repositories = remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
+        }
+        else
+        {
+            pomRepositories =
+                remoteRepositoryManager.aggregateRepositories( session, pomRepositories, newRepositories, true );
+            repositories =
+                remoteRepositoryManager.aggregateRepositories( session, pomRepositories, externalRepositories, false );
+        }
     }
 
     private static RemoteRepository convert( Repository repository )
@@ -145,7 +156,7 @@ class ReactorModelResolver
 
     public ModelResolver newCopy()
     {
-        return new ReactorModelResolver( this );
+        return new ProjectModelResolver( this );
     }
 
     public ModelSource resolveModel( String groupId, String artifactId, String version )

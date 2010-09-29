@@ -208,9 +208,9 @@ public class DefaultProjectBuilder
                                                           ReactorModelPool modelPool )
     {
         ModelResolver resolver =
-            new ReactorModelResolver( configuration.getRepositorySession(), artifactResolver,
-                                      repositoryManager,
-                                      RepositoryUtils.toRepos( configuration.getRemoteRepositories() ), modelPool );
+            new ProjectModelResolver( configuration.getRepositorySession(), artifactResolver, repositoryManager,
+                                      RepositoryUtils.toRepos( configuration.getRemoteRepositories() ),
+                                      configuration.getRepositoryMerging(), modelPool );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 

@@ -61,6 +61,8 @@ public class DefaultProjectBuildingRequest
 
     private boolean resolveDependencies;
 
+    private RepositoryMerging repositoryMerging = RepositoryMerging.POM_DOMINANT;
+
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
@@ -299,6 +301,21 @@ public class DefaultProjectBuildingRequest
     {
         this.repositorySession = repositorySession;
         return this;
+    }
+
+    public DefaultProjectBuildingRequest setRepositoryMerging( RepositoryMerging repositoryMerging )
+    {
+        if ( repositoryMerging == null )
+        {
+            throw new IllegalArgumentException( "repository merge mode not specified" );
+        }
+        this.repositoryMerging = repositoryMerging;
+        return this;
+    }
+
+    public RepositoryMerging getRepositoryMerging()
+    {
+        return repositoryMerging;
     }
 
 }

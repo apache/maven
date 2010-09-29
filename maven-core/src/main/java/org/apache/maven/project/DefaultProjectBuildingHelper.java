@@ -105,24 +105,48 @@ public class DefaultProjectBuildingHelper
                                                                 ProjectBuildingRequest request )
         throws InvalidRepositoryException
     {
-        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
-        Collection<String> repoIds = new HashSet<String>();
+        List<ArtifactRepository> internalRepositories = new ArrayList<ArtifactRepository>();
 
         for ( Repository repository : pomRepositories )
         {
-            artifactRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
-            repoIds.add( repository.getId() );
+            internalRepositories.add( repositorySystem.buildArtifactRepository( repository ) );
         }
 
-        repositorySystem.injectMirror( request.getRepositorySession(), artifactRepositories );
+        repositorySystem.injectMirror( request.getRepositorySession(), internalRepositories );
 
-        repositorySystem.injectProxy( request.getRepositorySession(), artifactRepositories );
+        repositorySystem.injectProxy( request.getRepositorySession(), internalRepositories );
 
-        repositorySystem.injectAuthentication( request.getRepositorySession(), artifactRepositories );
+        repositorySystem.injectAuthentication( request.getRepositorySession(), internalRepositories );
 
-        if ( externalRepositories != null )
+        List<ArtifactRepository> dominantRepositories;
+        List<ArtifactRepository> recessiveRepositories;
+
+        if ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( request.getRepositoryMerging() ) )
         {
-            for ( ArtifactRepository repository : externalRepositories )
+            dominantRepositories = externalRepositories;
+            recessiveRepositories = internalRepositories;
+        }
+        else
+        {
+            dominantRepositories = internalRepositories;
+            recessiveRepositories = externalRepositories;
+        }
+
+        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
+        Collection<String> repoIds = new HashSet<String>();
+
+        if ( dominantRepositories != null )
+        {
+            for ( ArtifactRepository repository : dominantRepositories )
+            {
+                repoIds.add( repository.getId() );
+                artifactRepositories.add( repository );
+            }
+        }
+
+        if ( recessiveRepositories != null )
+        {
+            for ( ArtifactRepository repository : recessiveRepositories )
             {
                 if ( repoIds.add( repository.getId() ) )
                 {

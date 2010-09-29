@@ -573,6 +573,7 @@ public class MavenMetadataSource
                     configuration.setRemoteRepositories( repositoryRequest.getRemoteRepositories() );
                     configuration.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                     configuration.setProcessPlugins( false );
+                    configuration.setRepositoryMerging( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT );
                     configuration.setSystemProperties( getSystemProperties() );
                     configuration.setRepositorySession( legacySupport.getRepositorySession() );
 
