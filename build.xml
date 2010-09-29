@@ -93,7 +93,9 @@ Do you want to continue?</input>
     <copy file="pom.xml" tofile="dependencies.xml" />
     <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-start-comment--&gt;" value="&lt;!--" />
     <replace file="${basedir}/dependencies.xml" token="&lt;!--bootstrap-end-comment--&gt;" value="--&gt;" />
-    <artifact:pom file="${basedir}/dependencies.xml" id="pom" />
+    <artifact:pom file="${basedir}/dependencies.xml" id="pom">
+      <localRepository path="${maven.repo.local}" />
+    </artifact:pom>
     <artifact:dependencies pathId="pom.pathid" filesetId="pom.fileset" useScope="compile">
       <localRepository path="${maven.repo.local}" />
       <pom refid="pom" />
