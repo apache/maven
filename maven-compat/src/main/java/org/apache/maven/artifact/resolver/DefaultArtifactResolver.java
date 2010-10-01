@@ -31,6 +31,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -41,6 +42,8 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
@@ -240,6 +243,25 @@ public class DefaultArtifactResolver
             artifact.selectVersion( result.getArtifact().getVersion() );
             artifact.setFile( result.getArtifact().getFile() );
             artifact.setResolved( true );
+
+            if ( artifact.isSnapshot() )
+            {
+                Matcher matcher = Artifact.VERSION_FILE_PATTERN.matcher( artifact.getVersion() );
+                if ( matcher.matches() )
+                {
+                    Snapshot snapshot = new Snapshot();
+                    snapshot.setTimestamp( matcher.group( 2 ) );
+                    try
+                    {
+                        snapshot.setBuildNumber( Integer.parseInt( matcher.group( 3 ) ) );
+                        artifact.addMetadata( new SnapshotArtifactRepositoryMetadata( artifact, snapshot ) );
+                    }
+                    catch ( NumberFormatException e )
+                    {
+                        logger.warn( "Invalid artifact version " + artifact.getVersion() + ": " + e.getMessage() );
+                    }
+                }
+            }
         }
     }
 
