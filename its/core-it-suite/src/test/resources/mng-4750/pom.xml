@@ -37,7 +37,8 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.its.mng4750</groupId>
       <artifactId>a</artifactId>
-      <version>0.1</version>
+      <!-- NOTE: This intentionally uses a version range -->
+      <version>(,0.1]</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>
@@ -71,6 +72,7 @@ under the License.
           <expressions>
             <expression>project/dependencyArtifacts/size</expression>
             <expression>project/dependencyArtifacts/*/file</expression>
+            <expression>project/dependencyArtifacts/*/version</expression>
           </expressions>
         </configuration>
         <executions>

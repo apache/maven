@@ -26,7 +26,8 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4750">MNG-4750</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4750">MNG-4750</a> and
+ * <a href="http://jira.codehaus.org/browse/MNG-4845">MNG-4845</a>.
  * 
  * @author Benjamin Bentmann
  */
@@ -36,7 +37,7 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest
 
     public MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest()
     {
-        super( "[2.0.3,3.0-alpha-1),[3.0-alpha-3,)" );
+        super( "[2.0.3,3.0-alpha-1),[3.0,)" );
     }
 
     /**
@@ -64,6 +65,9 @@ public class MavenITmng4750ResolvedMavenProjectDependencyArtifactsTest
         String path = props.getProperty( "project.dependencyArtifacts.0.file" );
         assertNotNull( path );
         assertTrue( path, new File( path ).isFile() );
+
+        String version = props.getProperty( "project.dependencyArtifacts.0.version" );
+        assertEquals( "0.1", version );
     }
 
 }
