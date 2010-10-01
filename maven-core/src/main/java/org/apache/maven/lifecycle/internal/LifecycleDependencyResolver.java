@@ -109,13 +109,13 @@ public class LifecycleDependencyResolver
         Map<String, Artifact> map = new HashMap<String, Artifact>();
         for ( Artifact artifact : artifacts )
         {
-            map.put( artifact.getId(), artifact );
+            map.put( artifact.getDependencyConflictId(), artifact );
         }
         for ( Artifact artifact : project.getDependencyArtifacts() )
         {
             if ( artifact.getFile() == null )
             {
-                Artifact resolved = map.get( artifact.getId() );
+                Artifact resolved = map.get( artifact.getDependencyConflictId() );
                 if ( resolved != null )
                 {
                     artifact.setFile( resolved.getFile() );
