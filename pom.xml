@@ -24,7 +24,7 @@
   <version>3.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Apache Maven 3.x</name>
+  <name>Apache Maven</name>
   <description>Maven is a project development management and
     comprehension tool. Based on the concept of a project object model:
     builds, dependency management, documentation creation, site
