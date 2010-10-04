@@ -113,6 +113,9 @@ public class LifecycleDebugLogger
 
         debugDependencyRequirements( executionPlan.getMojoExecutions() );
 
+        logger.debug( "Repositories (dependencies): " + currentProject.getRemoteProjectRepositories() );
+        logger.debug( "Repositories (plugins)     : " + currentProject.getRemotePluginRepositories() );
+
         for ( ExecutionPlanItem mojoExecution : executionPlan )
         {
             debugMojoExecution( mojoExecution.getMojoExecution() );
