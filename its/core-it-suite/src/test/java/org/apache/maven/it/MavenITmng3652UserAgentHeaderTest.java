@@ -45,8 +45,7 @@ public class MavenITmng3652UserAgentHeaderTest
 
     public MavenITmng3652UserAgentHeaderTest()
     {
-        // TODO: re-instate feature in 3.0
-        super( "[2.1.0-M1,3.0-alpha-1)" ); // 2.1.0-M1+
+        super( "[2.1.0-M1,3.0-alpha-1),[3.0-beta-3,)" ); // 2.1.0-M1+
     }
 
     public void setUp()
@@ -127,15 +126,21 @@ public class MavenITmng3652UserAgentHeaderTest
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = ( (String) lines.get( 0 ) ).substring( 0, 3 );
+        String mavenVersion = getMavenUAVersion( (String) lines.get( 0 ) );
         String javaVersion = (String) lines.get( 1 );
         String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
         String artifactVersion = (String) lines.get( 4 );
 
-//        System.out.println( "Comparing User-Agent '" + userAgent + "' to 'Apache-Maven/" + mavenVersion + " (Java "
-//            + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion + "'" );
-        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
-            + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
+        if ( matchesVersionRange( "(,3.0-beta-3)" ) )
+        {
+            assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
+                + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
+        }
+        else
+        {
+            assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
+                + javaVersion + "; " + os + ")", userAgent );
+        }
     }
 
     public void testmng3652_UnConfiguredDAV()
@@ -170,7 +175,7 @@ public class MavenITmng3652UserAgentHeaderTest
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = ( (String) lines.get( 0 ) ).substring( 0, 3 );
+        String mavenVersion = getMavenUAVersion( (String) lines.get( 0 ) );
         String javaVersion = (String) lines.get( 1 );
         String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
         String artifactVersion = (String) lines.get( 4 );
@@ -178,10 +183,16 @@ public class MavenITmng3652UserAgentHeaderTest
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
 
-//        System.out.println( "Comparing User-Agent '" + userAgent + "' to 'Apache-Maven/" + mavenVersion + " (Java "
-//            + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion + "'" );
-        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
-            + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
+        if ( matchesVersionRange( "(,3.0-beta-3)" ) )
+        {
+            assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
+                + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
+        }
+        else
+        {
+            assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
+                + javaVersion + "; " + os + ")", userAgent );
+        }
     }
 
     public void testmng3652_ConfigurationInSettingsWithoutUserAgent()
@@ -218,7 +229,7 @@ public class MavenITmng3652UserAgentHeaderTest
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
         // the maven version into the check file.
-        String mavenVersion = ( (String) lines.get( 0 ) ).substring( 0, 3 );
+        String mavenVersion = getMavenUAVersion( (String) lines.get( 0 ) );
         String javaVersion = (String) lines.get( 1 );
         String os = (String) lines.get( 2 ) + " " + (String) lines.get( 3 );
         String artifactVersion = (String) lines.get( 4 );
@@ -226,15 +237,24 @@ public class MavenITmng3652UserAgentHeaderTest
         String userAgent = this.userAgent;
         assertNotNull( userAgent );
 
-//        System.out.println( "Comparing User-Agent '" + userAgent + "' to 'Apache-Maven/" + mavenVersion + " (Java "
-//            + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion + "'" );
-        assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
-            + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
+        if ( matchesVersionRange( "(,3.0-beta-3)" ) )
+        {
+            assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
+                + javaVersion + "; " + os + ")" + " maven-artifact/" + artifactVersion, userAgent );
+        }
+        else
+        {
+            assertEquals( "Comparing User-Agent '" + userAgent + "'", "Apache-Maven/" + mavenVersion + " (Java "
+                + javaVersion + "; " + os + ")", userAgent );
+        }
     }
 
     public void testmng3652_UserAgentConfiguredInSettings()
         throws Exception
     {
+        // customizing version not supported in Maven 3
+        requiresMavenVersion( "(,3.0-beta-3)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3652" );
         File pluginDir = new File( testDir, "test-plugin" );
         File projectDir = new File( testDir, "test-project" );
@@ -264,4 +284,16 @@ public class MavenITmng3652UserAgentHeaderTest
         assertEquals( "Maven Fu", userAgent );
     }
 
+    private String getMavenUAVersion( String mavenVersion )
+    {
+        if ( matchesVersionRange( "(,3.0-beta-3)" ) )
+        {
+            return mavenVersion.substring( 0, 3 );
+        }
+        else
+        {
+            // Maven 3 returns the whole version
+            return mavenVersion;
+        }
+    }
 }

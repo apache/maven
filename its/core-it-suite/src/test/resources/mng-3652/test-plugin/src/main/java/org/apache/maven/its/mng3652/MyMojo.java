@@ -4,20 +4,22 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
 /**
@@ -44,7 +46,7 @@ public class MyMojo
     /**
      * @component
      */
-    private WagonManager wagonManager;
+    private ArtifactResolver resolver;
     
     /**
      * @component
@@ -78,51 +80,66 @@ public class MyMojo
      */
     private String testPort;
     
+    /**
+     * @parameter default-value="${project.build.directory}/local-repo"
+     * @required
+     * @readonly
+     */
+    private File localRepoDir;
+    
     public void execute()
         throws MojoExecutionException
     {
+        ArtifactRepositoryPolicy policy = new ArtifactRepositoryPolicy();
+        policy.setChecksumPolicy( ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+        policy.setUpdatePolicy( ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS );
+        policy.setEnabled( true );
+
         ArtifactRepository remote =
             repositoryFactory.createArtifactRepository( "test", testProtocol + "://127.0.0.1:" + testPort, layout,
-                                                        new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
+                                                        policy, policy );
         
         Artifact artifact = artifactFactory.createArtifact( "bad.group", "missing-artifact", "1", null, "jar" );
-        
-        File tempArtifactFile;
+
         try
         {
-            tempArtifactFile = File.createTempFile( "artifact-temp.", ".jar" );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Failed to create temp file for artifact transfer attempt.", e );
-        }
+            FileUtils.deleteDirectory( localRepoDir );
+
+            ArtifactRepository local =
+                repositoryFactory.createArtifactRepository( "local", localRepoDir.toURL().toExternalForm(), layout,
+                                                            null, null );
         
-        tempArtifactFile.deleteOnExit();
-        
-        artifact.setFile( tempArtifactFile );
-        
-        try
-        {
-            wagonManager.getArtifact( artifact, remote );
+            getLog().info( "Retrieving " + artifact + " from " + remote + " to " + local );
+
+            resolver.resolveAlways( artifact, Collections.singletonList( remote ), local );
         }
-        catch ( TransferFailedException e )
-        {
-            // ignore on purpose - it doesn't actually send any content
-        }
-        catch ( ResourceDoesNotExistException e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
+        try
+        {
+            String content = FileUtils.fileRead( artifact.getFile() );
+            if ( !content.equals( "some content\n\n" ) )
+            {
+                throw new MojoExecutionException( "Expected 'some content\n\n' but was '" + content + "'" );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( e.getMessage(), e );
+        }
+        
         String artifactVersion;
         InputStream resourceAsStream = null;
         try
         {
             Properties properties = new Properties();
-            resourceAsStream = getClass().getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven/maven-artifact/pom.properties" );
+            resourceAsStream = Artifact.class.getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven/maven-artifact/pom.properties" );
             if ( resourceAsStream == null )
             {
-                resourceAsStream = getClass().getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties" );
+                resourceAsStream = Artifact.class.getClassLoader().getResourceAsStream( "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties" );
             }
             properties.load( resourceAsStream );
 
