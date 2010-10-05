@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.project;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -32,9 +32,6 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
-import org.apache.maven.project.DuplicateProjectException;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectSorter;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
