@@ -120,8 +120,9 @@ public class MyMojo
 
         try
         {
+            String LS = System.getProperty( "line.separator" );
             String content = FileUtils.fileRead( artifact.getFile() );
-            if ( !content.equals( "some content\n\n" ) )
+            if ( !content.equals( "some content" + LS + LS ) )
             {
                 throw new MojoExecutionException( "Expected 'some content\n\n' but was '" + content + "'" );
             }
