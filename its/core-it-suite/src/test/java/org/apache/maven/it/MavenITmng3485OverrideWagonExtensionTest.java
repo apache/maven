@@ -43,7 +43,7 @@ public class MavenITmng3485OverrideWagonExtensionTest
 
         verifier.executeGoal( "deploy" );
 
-        verifier.assertFilePresent( "target/wagon-data" );
+        verifier.assertFilePresent( "target/wagon.properties" );
         verifier.verifyErrorFreeLog();
 
         verifier.resetStreams();

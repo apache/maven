@@ -90,6 +90,8 @@ public class ScpExternalWagon
 
         outputData.setResource( resource );
 
+        writeTestProperties( source.getParentFile() );
+
         fillOutputData( outputData );
 
         OutputStream os = outputData.getOutputStream();
@@ -106,15 +108,6 @@ public class ScpExternalWagon
     public void closeConnection()
         throws ConnectionException
     {
-        File f = new File( "target/wagon-data" );
-        try
-        {
-            f.createNewFile();
-        }
-        catch ( IOException e )
-        {
-            throw new ConnectionException( e.getMessage(), e );
-        }
     }
 
     public void fillInputData( InputData inputData )
@@ -130,7 +123,7 @@ public class ScpExternalWagon
         }
     }
 
-    public void fillOutputData( OutputData outputData )
+    public void writeTestProperties( File dir )
         throws TransferFailedException
     {
         Properties props = new Properties();
@@ -152,7 +145,7 @@ public class ScpExternalWagon
 
         try
         {
-            OutputStream os = new FileOutputStream( "target/wagon.properties" );
+            OutputStream os = new FileOutputStream( new File( dir, "wagon.properties" ) );
             try
             {
                 props.store( os, "MAVEN-CORE-IT-WAGON" );
@@ -166,14 +159,16 @@ public class ScpExternalWagon
         {
             throw new TransferFailedException( e.getMessage(), e );
         }
+    }
 
+    public void fillOutputData( OutputData outputData )
+        throws TransferFailedException
+    {
         outputData.setOutputStream( new ByteArrayOutputStream() );
     }
 
     public void openConnection()
         throws ConnectionException, AuthenticationException
     {
-        // TODO Auto-generated method stub
-
     }
 }
