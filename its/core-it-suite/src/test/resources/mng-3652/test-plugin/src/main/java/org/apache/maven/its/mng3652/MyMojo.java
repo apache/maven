@@ -118,13 +118,14 @@ public class MyMojo
             throw new MojoExecutionException( e.getMessage(), e );
         }
 
+        // consistency check to see that we actually spoke to the test server, helpful for debugging if
+        // the test fails
         try
         {
-            String LS = System.getProperty( "line.separator" );
-            String content = FileUtils.fileRead( artifact.getFile() );
-            if ( !content.equals( "some content" + LS + LS ) )
+            String content = FileUtils.fileRead( artifact.getFile() ).trim();
+            if ( !content.equals( "some content" ) )
             {
-                throw new MojoExecutionException( "Expected 'some content\n\n' but was '" + content + "'" );
+                throw new MojoExecutionException( "Expected 'some content' but was '" + content + "'" );
             }
         }
         catch ( IOException e )
