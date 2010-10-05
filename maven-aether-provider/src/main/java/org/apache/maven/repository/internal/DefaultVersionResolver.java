@@ -446,14 +446,15 @@ public class DefaultVersionResolver
             classifier = artifact.getClassifier();
             extension = artifact.getExtension();
             version = artifact.getVersion();
-            context = request.getRequestContext();
             localRepo = session.getLocalRepository().getBasedir();
             workspace = CacheUtils.getWorkspace( session );
             repositories = new ArrayList<RemoteRepository>( request.getRepositories().size() );
+            boolean repoMan = false;
             for ( RemoteRepository repository : request.getRepositories() )
             {
                 if ( repository.isRepositoryManager() )
                 {
+                    repoMan = true;
                     repositories.addAll( repository.getMirroredRepositories() );
                 }
                 else
@@ -461,6 +462,7 @@ public class DefaultVersionResolver
                     repositories.add( repository );
                 }
             }
+            context = repoMan ? request.getRequestContext() : "";
 
             int hash = 17;
             hash = hash * 31 + groupId.hashCode();
