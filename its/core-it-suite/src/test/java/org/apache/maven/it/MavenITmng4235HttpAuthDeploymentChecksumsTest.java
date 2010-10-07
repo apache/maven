@@ -82,7 +82,13 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
                 if ( HttpMethods.PUT.equals( request.getMethod() ) )
                 {
                     Resource resource = getResource( request );
-                    resource.getFile().getParentFile().mkdirs();
+
+                    // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
+                    File dir = resource.getFile().getParentFile();
+                    for ( int i = 0; i < 10 && !dir.exists(); i++ )
+                    {
+                        dir.mkdirs();
+                    }
 
                     OutputStream os = resource.getOutputStream();
                     try
