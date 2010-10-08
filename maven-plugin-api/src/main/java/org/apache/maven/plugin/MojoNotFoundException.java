@@ -54,7 +54,7 @@ public class MojoNotFoundException
     {
         StringBuilder buffer = new StringBuilder( 256 );
 
-        buffer.append( "Could not find goal " ).append( goal );
+        buffer.append( "Could not find goal '" ).append( goal ).append( "'" );
 
         if ( pluginDescriptor != null )
         {

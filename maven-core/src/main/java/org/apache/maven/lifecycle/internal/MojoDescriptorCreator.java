@@ -153,7 +153,7 @@ public class MojoDescriptorCreator
 
         int numTokens = tok.countTokens();
 
-        if ( numTokens == 4 )
+        if ( numTokens >= 4 )
         {
             // We have everything that we need
             //
@@ -170,6 +170,11 @@ public class MojoDescriptorCreator
             plugin.setVersion( tok.nextToken() );
             goal = tok.nextToken();
 
+            // This won't be valid, but it constructs something easy to read in the error message
+            while ( tok.hasMoreTokens() )
+            {
+                goal += ":" + tok.nextToken();
+            }
         }
         else if ( numTokens == 3 )
         {
@@ -187,14 +192,23 @@ public class MojoDescriptorCreator
             plugin.setArtifactId( tok.nextToken() );
             goal = tok.nextToken();
         }
-        else if ( numTokens == 2 )
+        else if ( numTokens <= 2 )
         {
             // We have a prefix and goal
             //
             // idea:idea
             //
             String prefix = tok.nextToken();
-            goal = tok.nextToken();
+
+            if ( numTokens == 2 )
+            {
+                goal = tok.nextToken();
+            }
+            else
+            {
+                // goal was missing - pass through to MojoNotFoundException
+                goal = "";
+            }
 
             // This is the case where someone has executed a single goal from the command line
             // of the form:

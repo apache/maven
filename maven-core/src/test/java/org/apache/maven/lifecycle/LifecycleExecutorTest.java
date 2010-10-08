@@ -27,6 +27,7 @@ import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -308,6 +309,32 @@ public class LifecycleExecutorTest
 
         return lifeCycleExecutionPlanCalculator.calculateExecutionPlan( session, session.getCurrentProject(),
                                                                         mergedSegment.getTasks() );
+    }
+
+    public void testInvalidGoalName()
+        throws Exception
+    {
+        File pom = getProject( "project-basic" );
+        MavenSession session = createMavenSession( pom );
+        try
+        {
+            getExecutions( calculateExecutionPlan( session, "resources:" ) );
+            fail( "expected a MojoNotFoundException" );
+        }
+        catch ( MojoNotFoundException e )
+        {
+            assertEquals( "", e.getGoal() );
+        }
+
+        try
+        {
+            getExecutions( calculateExecutionPlan( session, "org.apache.maven.plugins:maven-resources-plugin:0.1:resources:toomany" ) );
+            fail( "expected a MojoNotFoundException" );
+        }
+        catch ( MojoNotFoundException e )
+        {
+            assertEquals( "resources:toomany", e.getGoal() );
+        }
     }
 
 
