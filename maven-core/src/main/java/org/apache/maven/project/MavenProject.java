@@ -2146,4 +2146,26 @@ public class MavenProject
         lifecyclePhases.add( lifecyclePhase );
     }
 
+    /**
+     * Gets the project building request from which this project instance was created. <strong>Warning:</strong> This is
+     * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
+     * 
+     * @return The project building request or {@code null}.
+     */
+    public ProjectBuildingRequest getProjectBuildingRequest()
+    {
+        return projectBuilderConfiguration;
+    }
+
+    /**
+     * Sets the project building request from which this project instance was created. <strong>Warning:</strong> This is
+     * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
+     * 
+     * @param projectBuildingRequest The project building request, may be {@code null}.
+     */
+    public void setProjectBuildingRequest( ProjectBuildingRequest projectBuildingRequest )
+    {
+        projectBuilderConfiguration = projectBuildingRequest;
+    }
+
 }
