@@ -1844,43 +1844,59 @@ public class MavenProject
 
     protected ArtifactRepository getReleaseArtifactRepository()
     {
-        if ( getDistributionManagement() != null && getDistributionManagement().getRepository() != null )
+        if ( releaseArtifactRepository == null )
         {
-            try
+            if ( getDistributionManagement() != null && getDistributionManagement().getRepository() != null )
             {
-                ArtifactRepository repo =
-                    repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
-                repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(), Arrays.asList( repo ) );
-                repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
-                                                       Arrays.asList( repo ) );
-                setReleaseArtifactRepository( repo );
-            }
-            catch ( InvalidRepositoryException e )
-            {
+                try
+                {
+                    ArtifactRepository repo =
+                        repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
+                    repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(),
+                                                  Arrays.asList( repo ) );
+                    repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
+                                                           Arrays.asList( repo ) );
+                    setReleaseArtifactRepository( repo );
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    if ( logger != null )
+                    {
+                        logger.debug( "Failed to create release distribution repository for " + getId(), e );
+                    }
+                }
             }
         }
-        
+
         return releaseArtifactRepository;
     }
 
     protected ArtifactRepository getSnapshotArtifactRepository()
     {
-        if ( getDistributionManagement() != null && getDistributionManagement().getSnapshotRepository() != null )
+        if ( snapshotArtifactRepository == null )
         {
-            try
+            if ( getDistributionManagement() != null && getDistributionManagement().getSnapshotRepository() != null )
             {
-                ArtifactRepository repo =
-                    repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
-                repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(), Arrays.asList( repo ) );
-                repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
-                                                       Arrays.asList( repo ) );
-                setSnapshotArtifactRepository( repo );
-            }
-            catch ( InvalidRepositoryException e )
-            {
+                try
+                {
+                    ArtifactRepository repo =
+                        repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
+                    repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(),
+                                                  Arrays.asList( repo ) );
+                    repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
+                                                           Arrays.asList( repo ) );
+                    setSnapshotArtifactRepository( repo );
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    if ( logger != null )
+                    {
+                        logger.debug( "Failed to create snapshot distribution repository for " + getId(), e );
+                    }
+                }
             }
         }
-        
+
         return snapshotArtifactRepository;
     }
 
