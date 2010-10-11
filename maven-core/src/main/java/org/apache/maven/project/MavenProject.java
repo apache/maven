@@ -346,6 +346,7 @@ public class MavenProject
              */
             if ( parentFile != null )
             {
+                checkProjectBuildingRequest();
                 ProjectBuildingRequest request = new DefaultProjectBuildingRequest( projectBuilderConfiguration );
                 request.setRemoteRepositories( getRemoteArtifactRepositories() );
 
@@ -363,6 +364,7 @@ public class MavenProject
             }
             else if ( model.getParent() != null )
             {
+                checkProjectBuildingRequest();
                 ProjectBuildingRequest request = new DefaultProjectBuildingRequest( projectBuilderConfiguration );
                 request.setRemoteRepositories( getRemoteArtifactRepositories() );
 
@@ -1848,6 +1850,7 @@ public class MavenProject
         {
             if ( getDistributionManagement() != null && getDistributionManagement().getRepository() != null )
             {
+                checkProjectBuildingRequest();
                 try
                 {
                     ArtifactRepository repo =
@@ -1877,6 +1880,7 @@ public class MavenProject
         {
             if ( getDistributionManagement() != null && getDistributionManagement().getSnapshotRepository() != null )
             {
+                checkProjectBuildingRequest();
                 try
                 {
                     ArtifactRepository repo =
@@ -2182,6 +2186,14 @@ public class MavenProject
     public void setProjectBuildingRequest( ProjectBuildingRequest projectBuildingRequest )
     {
         projectBuilderConfiguration = projectBuildingRequest;
+    }
+
+    private void checkProjectBuildingRequest()
+    {
+        if ( projectBuilderConfiguration == null )
+        {
+            throw new IllegalStateException( "project building request missing" );
+        }
     }
 
 }
