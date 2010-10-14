@@ -37,23 +37,29 @@ public class DefaultLegacySupport
     implements LegacySupport
 {
 
-    private ThreadLocal<MavenSession> session = new InheritableThreadLocal<MavenSession>();
+    private static final ThreadLocal<MavenSession[]> session = new InheritableThreadLocal<MavenSession[]>();
 
     public void setSession( MavenSession session )
     {
         if ( session == null )
         {
-            this.session.remove();
+            MavenSession[] oldSession = DefaultLegacySupport.session.get();
+            if ( oldSession != null )
+            {
+                oldSession[0] = null;
+                DefaultLegacySupport.session.remove();
+            }
         }
         else
         {
-            this.session.set( session );
+            DefaultLegacySupport.session.set( new MavenSession[] { session } );
         }
     }
 
     public MavenSession getSession()
     {
-        return session.get();
+        MavenSession[] currentSession = DefaultLegacySupport.session.get();
+        return currentSession != null ? currentSession[0] : null;
     }
 
     public RepositorySystemSession getRepositorySession()
