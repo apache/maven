@@ -57,9 +57,12 @@ class ConsoleMavenTransferListener
         for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
         {
             long total = entry.getKey().getContentLength();
-            long complete = entry.getValue().longValue();
-
-            buffer.append( getStatus( complete, total ) ).append( "  " );
+            Long complete = entry.getValue();
+            // NOTE: This null check guards against http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6312056
+            if ( complete != null )
+            {
+                buffer.append( getStatus( complete.longValue(), total ) ).append( "  " );
+            }
         }
 
         int pad = lastLength - buffer.length();
