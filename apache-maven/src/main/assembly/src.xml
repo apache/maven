@@ -30,6 +30,8 @@ under the License.
       <excludes>
         <exclude>%regex[(?!((?!target/)[^/]+/)*src/).*target.*]</exclude>
         <exclude>**/*.log</exclude>
+        <exclude>**/.gitignore</exclude>
+        <exclude>**/.gitattributes</exclude>
       </excludes>
     </fileSet>
     <fileSet>
