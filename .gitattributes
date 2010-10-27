@@ -1,3 +1,4 @@
+*.java                                 ident
 *.jar                                  -text -crlf
 *.graffle                              -text -crlf
 apache-maven/src/bin/mvn               eol=lf crlf=input
