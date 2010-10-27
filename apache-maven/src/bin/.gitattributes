@@ -1,0 +1,3 @@
+mvn                eol=lf crlf=input
+mvnDebug           eol=lf crlf=input
+mvnyjp             eol=lf crlf=input
