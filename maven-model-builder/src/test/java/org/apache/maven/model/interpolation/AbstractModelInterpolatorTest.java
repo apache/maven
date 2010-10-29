@@ -42,7 +42,7 @@ import java.util.Properties;
 
 /**
  * @author jdcasey
- * @version $Id: AbstractModelInterpolatorTest.java 813569 2009-09-10 20:04:14Z jdcasey $
+ * @version $Id$
  */
 public abstract class AbstractModelInterpolatorTest
     extends PlexusTestCase
