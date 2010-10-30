@@ -38,13 +38,29 @@ public interface SettingsBuildingRequest
     File getGlobalSettingsFile();
 
     /**
-     * Sets the global settings file. A non-existent settings file is equivalent to empty settings. If both a user
-     * settings file and a global settings file are given, the user settings take precedence.
+     * Sets the global settings file. A non-existent settings file is equivalent to empty settings. If both user
+     * settings and global settings are given, the user settings take precedence.
      * 
      * @param globalSettingsFile The global settings file, may be {@code null} to disable global settings.
      * @return This request, never {@code null}.
      */
     SettingsBuildingRequest setGlobalSettingsFile( File globalSettingsFile );
+
+    /**
+     * Gets the global settings source.
+     * 
+     * @return The global settings source or {@code null} if none.
+     */
+    SettingsSource getGlobalSettingsSource();
+
+    /**
+     * Sets the global settings source. If both user settings and a global settings are given, the user settings take
+     * precedence.
+     * 
+     * @param globalSettingsSource The global settings source, may be {@code null} to disable global settings.
+     * @return This request, never {@code null}.
+     */
+    SettingsBuildingRequest setGlobalSettingsSource( SettingsSource globalSettingsSource );
 
     /**
      * Gets the user settings file.
@@ -61,6 +77,22 @@ public interface SettingsBuildingRequest
      * @return This request, never {@code null}.
      */
     SettingsBuildingRequest setUserSettingsFile( File userSettingsFile );
+
+    /**
+     * Gets the user settings source.
+     * 
+     * @return The user settings source or {@code null} if none.
+     */
+    SettingsSource getUserSettingsSource();
+
+    /**
+     * Sets the user settings source. If both user settings and a global settings are given, the user settings take
+     * precedence.
+     * 
+     * @param userSettingsSource The user settings source, may be {@code null} to disable user settings.
+     * @return This request, never {@code null}.
+     */
+    SettingsBuildingRequest setUserSettingsSource( SettingsSource userSettingsSource );
 
     /**
      * Gets the system properties to use for interpolation. The system properties are collected from the runtime

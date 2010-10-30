@@ -86,9 +86,13 @@ public class DefaultSettingsBuilder
     {
         DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector( null );
 
-        Settings globalSettings = readSettings( request.getGlobalSettingsFile(), request, problems );
+        SettingsSource globalSettingsSource =
+            getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
+        Settings globalSettings = readSettings( globalSettingsSource, request, problems );
 
-        Settings userSettings = readSettings( request.getUserSettingsFile(), request, problems );
+        SettingsSource userSettingsSource =
+            getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
+        Settings userSettings = readSettings( userSettingsSource, request, problems );
 
         settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
 
@@ -131,15 +135,28 @@ public class DefaultSettingsBuilder
         return false;
     }
 
-    private Settings readSettings( File settingsFile, SettingsBuildingRequest request,
+    private SettingsSource getSettingsSource( File settingsFile, SettingsSource settingsSource )
+    {
+        if ( settingsSource != null )
+        {
+            return settingsSource;
+        }
+        else if ( settingsFile != null && settingsFile.exists() )
+        {
+            return new FileSettingsSource( settingsFile );
+        }
+        return null;
+    }
+
+    private Settings readSettings( SettingsSource settingsSource, SettingsBuildingRequest request,
                                    DefaultSettingsProblemCollector problems )
     {
-        if ( settingsFile == null || !settingsFile.exists() )
+        if ( settingsSource == null )
         {
             return new Settings();
         }
 
-        problems.setSource( settingsFile.getAbsolutePath() );
+        problems.setSource( settingsSource.getLocation() );
 
         Settings settings;
 
@@ -149,13 +166,13 @@ public class DefaultSettingsBuilder
 
             try
             {
-                settings = settingsReader.read( settingsFile, options );
+                settings = settingsReader.read( settingsSource.getInputStream(), options );
             }
             catch ( SettingsParseException e )
             {
                 options = Collections.singletonMap( SettingsReader.IS_STRICT, Boolean.FALSE );
 
-                settings = settingsReader.read( settingsFile, options );
+                settings = settingsReader.read( settingsSource.getInputStream(), options );
 
                 problems.add( SettingsProblem.Severity.WARNING, e.getMessage(), e.getLineNumber(), e.getColumnNumber(),
                               e );
@@ -163,13 +180,13 @@ public class DefaultSettingsBuilder
         }
         catch ( SettingsParseException e )
         {
-            problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsFile + ": "
+            problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsSource.getLocation() + ": "
                 + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
             return new Settings();
         }
         catch ( IOException e )
         {
-            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsFile + ": "
+            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsSource.getLocation() + ": "
                 + e.getMessage(), -1, -1, e );
             return new Settings();
         }

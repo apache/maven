@@ -35,6 +35,10 @@ public class DefaultSettingsBuildingRequest
 
     private File userSettingsFile;
 
+    private SettingsSource globalSettingsSource;
+
+    private SettingsSource userSettingsSource;
+
     private Properties systemProperties;
 
     private Properties userProperties;
@@ -51,6 +55,18 @@ public class DefaultSettingsBuildingRequest
         return this;
     }
 
+    public SettingsSource getGlobalSettingsSource()
+    {
+        return globalSettingsSource;
+    }
+
+    public DefaultSettingsBuildingRequest setGlobalSettingsSource( SettingsSource globalSettingsSource )
+    {
+        this.globalSettingsSource = globalSettingsSource;
+
+        return this;
+    }
+
     public File getUserSettingsFile()
     {
         return userSettingsFile;
@@ -59,6 +75,18 @@ public class DefaultSettingsBuildingRequest
     public DefaultSettingsBuildingRequest setUserSettingsFile( File userSettingsFile )
     {
         this.userSettingsFile = userSettingsFile;
+
+        return this;
+    }
+
+    public SettingsSource getUserSettingsSource()
+    {
+        return userSettingsSource;
+    }
+
+    public DefaultSettingsBuildingRequest setUserSettingsSource( SettingsSource userSettingsSource )
+    {
+        this.userSettingsSource = userSettingsSource;
 
         return this;
     }
