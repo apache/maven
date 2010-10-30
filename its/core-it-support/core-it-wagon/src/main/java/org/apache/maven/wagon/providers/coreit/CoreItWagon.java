@@ -35,6 +35,7 @@ import org.apache.maven.wagon.OutputData;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
 
@@ -120,6 +121,12 @@ public class CoreItWagon
     public void fillInputData( InputData inputData )
         throws TransferFailedException, ResourceDoesNotExistException
     {
+        String resName = inputData.getResource().getName();
+        if ( resName.endsWith( ".xml" ) ||resName.endsWith( ".md5" ) || resName.endsWith( ".sha1" ) )
+        {
+            throw new ResourceDoesNotExistException( resName );
+        }
+
         try
         {
             inputData.setInputStream( new ByteArrayInputStream( "<metadata />".getBytes( "UTF-8" ) ) );
@@ -134,27 +141,31 @@ public class CoreItWagon
         throws TransferFailedException
     {
         Properties props = new Properties();
+
         if ( getRepository().getPermissions() != null )
         {
             String dirPerms = getRepository().getPermissions().getDirectoryMode();
-
-            if ( dirPerms != null )
-            {
-                props.setProperty( "directory.mode", dirPerms );
-            }
+            put( props, "directory.mode", dirPerms );
 
             String filePerms = getRepository().getPermissions().getFileMode();
-            if ( filePerms != null )
-            {
-                props.setProperty( "file.mode", filePerms );
-            }
+            put( props, "file.mode", filePerms );
+        }
+
+        AuthenticationInfo auth = getAuthenticationInfo();
+        if ( auth != null )
+        {
+            put( props, "username", auth.getUserName() );
+            put( props, "password", auth.getPassword() );
+            put( props, "privateKey", auth.getPrivateKey() );
+            put( props, "passphrase", auth.getPassphrase() );
         }
 
         try
         {
-            new File( "target" ).mkdirs();
+            File file = new File( "target/wagon.properties" ).getAbsoluteFile();
+            file.getParentFile().mkdirs();
     
-            OutputStream os = new FileOutputStream( "target/wagon.properties" );
+            OutputStream os = new FileOutputStream( file );
             try
             {
                 props.store( os, "MAVEN-CORE-IT-WAGON" );
@@ -178,4 +189,13 @@ public class CoreItWagon
         // TODO Auto-generated method stub
 
     }
+
+    private void put( Properties props, String key, String value )
+    {
+        if ( value != null )
+        {
+            props.setProperty( key, value );
+        }
+    }
+
 }
