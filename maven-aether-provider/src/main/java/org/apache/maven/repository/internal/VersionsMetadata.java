@@ -24,6 +24,7 @@ import java.io.File;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.util.artifact.ArtifactProperties;
 
 /**
  * @author Benjamin Bentmann
@@ -52,7 +53,11 @@ final class VersionsMetadata
         versioning.addVersion( artifact.getBaseVersion() );
         if ( !artifact.isSnapshot() )
         {
-            versioning.setRelease( artifact.getVersion() );
+            versioning.setRelease( artifact.getBaseVersion() );
+        }
+        if ( "maven-plugin".equals( artifact.getProperty( ArtifactProperties.TYPE, "" ) ) )
+        {
+            versioning.setLatest( artifact.getBaseVersion() );
         }
 
         Metadata metadata = new Metadata();
