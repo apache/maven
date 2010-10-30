@@ -20,7 +20,12 @@ package org.apache.maven.artifact.repository;
  */
 
 public class Authentication
-{    
+{
+
+    private String privateKey;
+
+    private String passphrase;
+
     public Authentication( String userName, String password )
     {
         this.username = userName;
@@ -76,4 +81,46 @@ public class Authentication
     {
         this.username = userName;
     }
+
+    /**
+     * Get the passphrase of the private key file. The passphrase is used only when host/protocol supports
+     * authentication via exchange of private/public keys and private key was used for authentication.
+     * 
+     * @return passphrase of the private key file
+     */
+    public String getPassphrase()
+    {
+        return passphrase;
+    }
+
+    /**
+     * Set the passphrase of the private key file.
+     * 
+     * @param passphrase passphrase of the private key file
+     */
+    public void setPassphrase( final String passphrase )
+    {
+        this.passphrase = passphrase;
+    }
+
+    /**
+     * Get the absolute path to the private key file.
+     * 
+     * @return absolute path to private key
+     */
+    public String getPrivateKey()
+    {
+        return privateKey;
+    }
+
+    /**
+     * Set the absolute path to private key file.
+     * 
+     * @param privateKey path to private key in local file system
+     */
+    public void setPrivateKey( final String privateKey )
+    {
+        this.privateKey = privateKey;
+    }
+
 }

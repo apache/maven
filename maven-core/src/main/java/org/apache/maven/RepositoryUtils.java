@@ -221,7 +221,8 @@ public class RepositoryUtils
         Authentication result = null;
         if ( auth != null )
         {
-            result = new Authentication( auth.getUsername(), auth.getPassword() );
+            result =
+                new Authentication( auth.getUsername(), auth.getPassword(), auth.getPrivateKey(), auth.getPassphrase() );
         }
         return result;
     }

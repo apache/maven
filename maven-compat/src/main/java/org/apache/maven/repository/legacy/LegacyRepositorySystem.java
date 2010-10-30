@@ -550,6 +550,8 @@ public class LegacyRepositorySystem
                     }
 
                     Authentication authentication = new Authentication( server.getUsername(), server.getPassword() );
+                    authentication.setPrivateKey( server.getPrivateKey() );
+                    authentication.setPassphrase( server.getPassphrase() );
 
                     repository.setAuthentication( authentication );
                 }
@@ -572,7 +574,10 @@ public class LegacyRepositorySystem
                     selector.getAuthentication( RepositoryUtils.toRepo( repository ) );
                 if ( auth != null )
                 {
-                    return new Authentication( auth.getUsername(), auth.getPassword() );
+                    Authentication result = new Authentication( auth.getUsername(), auth.getPassword() );
+                    result.setPrivateKey( auth.getPrivateKeyFile() );
+                    result.setPassphrase( auth.getPassphrase() );
+                    return result;
                 }
             }
         }
