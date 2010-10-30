@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4874UpdateLatestPluginVersionTest.class );
         suite.addTestSuite( MavenITmng4872ReactorResolutionAttachedWithExclusionsTest.class );
         suite.addTestSuite( MavenITmng4842ParentResolutionOfDependencyPomTest.class );
         suite.addTestSuite( MavenITmng4834ParentProjectResolvedFromRemoteReposTest.class );
