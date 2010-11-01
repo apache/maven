@@ -1194,7 +1194,13 @@
         <field>
           <name>timezone</name>
           <version>3.0.0+</version>
-          <description>The timezone the contributor is in. This is a number in the range -11 to 12.</description>
+          <description>
+            <![CDATA[
+              The timezone the contributor is in. Typically, this is a number in the range
+              <a href="http://en.wikipedia.org/wiki/UTC%E2%88%9212:00">-12</a> to <a href="http://en.wikipedia.org/wiki/UTC%2B14:00">+14</a>
+              or a valid time zone id like "America/Montreal" (UTC-05:00) or "Europe/Paris" (UTC+01:00).
+            ]]>
+          </description>
           <type>String</type>
         </field>
         <field>
