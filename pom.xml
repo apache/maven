@@ -279,6 +279,11 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-spi</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-impl</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
