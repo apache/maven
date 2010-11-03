@@ -33,11 +33,71 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2010-10-04</created>
+        <revision>3.0</revision>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-3.0-bin.zip</file-release>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-3.0-bin.tar.gz</file-release>
+        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-3.0-bin.tar.bz2</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 2.2.1</name>
+        <created>2009-08-06</created>
+        <revision>2.2.1</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.2.1-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.2.1-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.2.1-bin.tar.bz2</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 2.2.0</name>
+        <created>2009-07-01</created>
+        <revision>2.2.0</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.2.0-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.2.0-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.2.0-bin.tar.bz2</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 2.1.0</name>
+        <created>2009-03-18</created>
+        <revision>2.1.0</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.1.0-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.1.0-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.1.0-bin.tar.bz2</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 2.0.11</name>
+        <created>2010-02-26</created>
+        <revision>2.0.11</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.11-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.11-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.11-bin.tar.bz2</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 2.0.10</name>
+        <created>2009-02-18</created>
+        <revision>2.0.10</revision>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.10-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.10-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.10-bin.tar.bz2</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 2.0.9</name>
         <created>2008-04-10</created>
         <revision>2.0.9</revision>
-        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.zip</file-release>
-        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.tar.gz</file-release>
-        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.tar.bz2</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.9-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -45,9 +105,9 @@ under the License.
         <name>Apache Maven 2.0.8</name>
         <created>2007-11-27</created>
         <revision>2.0.8</revision>
-        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.zip</file-release>
-        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.tar.gz</file-release>
-        <file-release>http://www.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.tar.bz2</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-2.0.8-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
