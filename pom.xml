@@ -234,7 +234,7 @@ under the License.
 
   <properties>
     <mavenVersion>2.2.2-RC1-SNAPSHOT</mavenVersion>
-    <wagonVersion>1.0-beta-6</wagonVersion>
+    <wagonVersion>1.0-beta-7-SNAPSHOT</wagonVersion>
     <doxiaVersion>1.1</doxiaVersion>
   </properties>
 
