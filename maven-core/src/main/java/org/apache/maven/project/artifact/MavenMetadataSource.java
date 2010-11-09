@@ -202,9 +202,8 @@ public class MavenMetadataSource
 
             if ( rel.project == null )
             {
-                // When this happens we have a Maven 1.x POM, or some invalid POM. There is still a pile of
-                // shit in the Maven 2.x repository that should have never found its way into the repository
-                // but it did.
+                // When this happens we have a Maven 1.x POM, or some invalid POM. 
+                // It should have never found its way into Maven 2.x repository but it did.
                 dependencies = Collections.emptyList();
             }
             else
