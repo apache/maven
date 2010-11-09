@@ -39,6 +39,7 @@ import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -52,12 +53,14 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.settings.building.SettingsSource;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
@@ -94,7 +97,7 @@ public class MavenCli
     // Per-instance container supports fast embedded execution of core ITs
     private DefaultPlexusContainer container;
 
-    private PrintStreamLogger logger;
+    private Logger logger;
 
     private ModelProcessor modelProcessor;
 
@@ -141,12 +144,30 @@ public class MavenCli
     // This supports painless invocation by the Verifier during embedded execution of the core ITs
     public int doMain( String[] args, String workingDirectory, PrintStream stdout, PrintStream stderr )
     {
-        CliRequest cliRequest = new CliRequest( args, classWorld );
-        cliRequest.workingDirectory = workingDirectory;
-        cliRequest.stdout = stdout;
-        cliRequest.stderr = stderr;
+        PrintStream oldout = System.out;
+        PrintStream olderr = System.err;
 
-        return doMain( cliRequest );
+        try
+        {
+            if ( stdout != null )
+            {
+                System.setOut( stdout );
+            }
+            if ( stderr != null )
+            {
+                System.setErr( stderr );
+            }
+
+            CliRequest cliRequest = new CliRequest( args, classWorld );
+            cliRequest.workingDirectory = workingDirectory;
+
+            return doMain( cliRequest );
+        }
+        finally
+        {
+            System.setOut( oldout );
+            System.setErr( olderr );
+        }
     }
 
     // TODO: need to externalize CliRequest
@@ -158,9 +179,9 @@ public class MavenCli
             // Need to process cli options first to get possible logging options
             cli( cliRequest );
             logging( cliRequest );
-            commands( cliRequest );
             properties( cliRequest );
             container( cliRequest );
+            commands( cliRequest );
             settings( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
@@ -192,24 +213,6 @@ public class MavenCli
 
     private void initialize( CliRequest cliRequest )
     {
-        if ( cliRequest.stdout == null )
-        {
-            cliRequest.stdout = System.out;
-        }
-        if ( cliRequest.stderr == null )
-        {
-            cliRequest.stderr = System.err;
-        }
-
-        if ( logger == null )
-        {
-            logger = new PrintStreamLogger( cliRequest.stdout );
-        }
-        else
-        {
-            logger.setStream( cliRequest.stdout );
-        }
-
         if ( cliRequest.workingDirectory == null )
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
@@ -253,8 +256,6 @@ public class MavenCli
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
         }
 
-        logger.setThreshold( cliRequest.request.getLoggingLevel() );
-
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
@@ -263,20 +264,15 @@ public class MavenCli
             try
             {
                 cliRequest.fileStream = new PrintStream( logFile );
-                logger.setStream( cliRequest.fileStream );
+
+                System.setOut( cliRequest.fileStream );
+                System.setErr( cliRequest.fileStream );
             }
             catch ( FileNotFoundException e )
             {
-                cliRequest.stderr.println( e );
-                logger.setStream( cliRequest.stdout );
+                System.err.println( e );
             }
         }
-        else
-        {
-            logger.setStream( cliRequest.stdout );
-        }
-
-        cliRequest.request.setExecutionListener( new ExecutionEventLogger( logger ) );
     }
 
     //
@@ -293,8 +289,8 @@ public class MavenCli
         }
         catch ( ParseException e )
         {
-            cliRequest.stderr.println( "Unable to parse command line options: " + e.getMessage() );
-            cliManager.displayHelp( cliRequest.stdout );
+            System.err.println( "Unable to parse command line options: " + e.getMessage() );
+            cliManager.displayHelp( System.out );
             throw e;
         }
 
@@ -302,13 +298,13 @@ public class MavenCli
         //
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
-            cliManager.displayHelp( cliRequest.stdout );
+            cliManager.displayHelp( System.out );
             throw new ExitException( 0 );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            CLIReportingUtils.showVersion( cliRequest.stdout );
+            CLIReportingUtils.showVersion( System.out );
             throw new ExitException( 0 );
         }
     }
@@ -317,7 +313,7 @@ public class MavenCli
     {
         if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
-            CLIReportingUtils.showVersion( cliRequest.stdout );
+            CLIReportingUtils.showVersion( System.out );
         }
 
         if ( cliRequest.showErrors )
@@ -325,9 +321,6 @@ public class MavenCli
             logger.info( "Error stacktraces are turned on." );
         }
 
-        //
-        // TODO: move checksum policies to
-        //
         if ( MavenExecutionRequest.CHECKSUM_POLICY_WARN.equals( cliRequest.request.getGlobalChecksumPolicy() ) )
         {
             logger.info( "Disabling strict checksum verification on all artifact downloads." );
@@ -355,6 +348,8 @@ public class MavenCli
 
         if ( container == null )
         {
+            logger = setupLogger( cliRequest );
+
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld( cliRequest.classWorld )
                 .setName( "maven" );
@@ -363,8 +358,6 @@ public class MavenCli
 
             container.setLoggerManager( new MavenLoggerManager( logger ) );
 
-            container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
-
             customizeContainer( container );
 
             if ( cliRequest.classWorld == classWorld )
@@ -372,6 +365,8 @@ public class MavenCli
                 this.container = container;
             }
         }
+
+        container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
         maven = container.lookup( Maven.class );
 
@@ -382,6 +377,19 @@ public class MavenCli
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
+    }
+
+    private PrintStreamLogger setupLogger( CliRequest cliRequest )
+    {
+        PrintStreamLogger logger = new PrintStreamLogger( new PrintStreamLogger.Provider()
+        {
+            public PrintStream getStream()
+            {
+                return System.out;
+            }
+        } );
+
+        return logger;
     }
 
     protected void customizeContainer( PlexusContainer container )
@@ -400,8 +408,7 @@ public class MavenCli
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-            cliRequest.stdout.println( cipher.encryptAndDecorate( passwd,
-                                                                  DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+            System.out.println( cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
 
             throw new ExitException( 0 );
         }
@@ -433,7 +440,7 @@ public class MavenCli
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
             String masterPasswd = cipher.decryptDecorated( master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
-            cliRequest.stdout.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
+            System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
 
             throw new ExitException( 0 );
         }
@@ -590,8 +597,6 @@ public class MavenCli
             userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
         }
 
-        logger.debug( "Reading user settings from " + userSettingsFile );
-
         File globalSettingsFile;
 
         if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
@@ -611,8 +616,6 @@ public class MavenCli
             globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
         }
 
-        logger.debug( "Reading global settings from " + globalSettingsFile );
-
         cliRequest.request.setGlobalSettingsFile( globalSettingsFile );
         cliRequest.request.setUserSettingsFile( userSettingsFile );
 
@@ -621,6 +624,11 @@ public class MavenCli
         settingsRequest.setUserSettingsFile( userSettingsFile );
         settingsRequest.setSystemProperties( cliRequest.systemProperties );
         settingsRequest.setUserProperties( cliRequest.userProperties );
+
+        logger.debug( "Reading global settings from "
+            + getSettingsLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
+        logger.debug( "Reading user settings from "
+            + getSettingsLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -640,12 +648,20 @@ public class MavenCli
         }
     }
 
+    private Object getSettingsLocation( SettingsSource source, File file )
+    {
+        if ( source != null )
+        {
+            return source.getLocation();
+        }
+        return file;
+    }
+
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
         MavenExecutionRequest request = cliRequest.request;
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
-        boolean debug = cliRequest.debug;
         boolean quiet = cliRequest.quiet;
         boolean showErrors = cliRequest.showErrors;
 
@@ -654,7 +670,7 @@ public class MavenCli
         {
             if ( commandLine.hasOption( deprecatedOption ) )
             {
-                cliRequest.stdout.println( "[WARNING] Command line option -" + deprecatedOption
+                logger.warn( "Command line option -" + deprecatedOption
                     + " is deprecated and will be removed in future Maven versions." );
             }
         }
@@ -776,36 +792,19 @@ public class MavenCli
         }
         else if ( request.isInteractiveMode() )
         {
-            transferListener = new ConsoleMavenTransferListener( cliRequest.stdout );
+            transferListener = new ConsoleMavenTransferListener( System.out );
         }
         else
         {
-            transferListener = new BatchModeMavenTransferListener( cliRequest.stdout );
+            transferListener = new BatchModeMavenTransferListener( System.out );
         }
+
+        ExecutionListener executionListener = new ExecutionEventLogger( logger );
 
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
         {
             alternatePomFile = commandLine.getOptionValue( CLIManager.ALTERNATE_POM_FILE );
-        }
-
-        int loggingLevel;
-
-        if ( debug )
-        {
-            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
-        }
-        else if ( quiet )
-        {
-            // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
-            // Ideally, we could use Warn across the board
-            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_ERROR;
-            // TODO:Additionally, we can't change the mojo level because the component key includes the version and
-            // it isn't known ahead of time. This seems worth changing.
-        }
-        else
-        {
-            loggingLevel = MavenExecutionRequest.LOGGING_LEVEL_INFO;
         }
 
         File userToolchainsFile;
@@ -827,7 +826,7 @@ public class MavenCli
             .setShowErrors( showErrors ) // default: false
             .addActiveProfiles( activeProfiles ) // optional
             .addInactiveProfiles( inactiveProfiles ) // optional
-            .setLoggingLevel( loggingLevel ) // default: info
+            .setExecutionListener( executionListener )
             .setTransferListener( transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
@@ -1002,8 +1001,6 @@ public class MavenCli
     {
         String[] args;
         CommandLine commandLine;
-        PrintStream stdout;
-        PrintStream stderr;
         ClassWorld classWorld;
         String workingDirectory;
         boolean debug;

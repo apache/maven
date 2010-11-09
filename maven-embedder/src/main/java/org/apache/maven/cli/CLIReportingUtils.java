@@ -164,8 +164,7 @@ public final class CLIReportingUtils
         InputStream resourceAsStream = null;
         try
         {
-            resourceAsStream =
-                MavenCli.class.getClassLoader().getResourceAsStream( "org/apache/maven/messages/build.properties" );
+            resourceAsStream = MavenCli.class.getResourceAsStream( "/org/apache/maven/messages/build.properties" );
 
             if ( resourceAsStream != null )
             {
@@ -184,8 +183,13 @@ public final class CLIReportingUtils
         return properties;
     }
 
-    public static void showError( Logger logger, String message, Exception e, boolean showStackTrace )
+    public static void showError( Logger logger, String message, Throwable e, boolean showStackTrace )
     {
+        if ( logger == null )
+        {
+            logger = new PrintStreamLogger( System.out );
+        }
+
         if ( showStackTrace )
         {
             logger.error( message, e );

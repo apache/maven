@@ -34,7 +34,12 @@ public class PrintStreamLogger
     extends AbstractLogger
 {
 
-    private PrintStream out;
+    static interface Provider
+    {
+        PrintStream getStream();
+    }
+
+    private Provider provider;
 
     private static final String FATAL_ERROR = "[FATAL] ";
 
@@ -46,6 +51,17 @@ public class PrintStreamLogger
 
     private static final String DEBUG = "[DEBUG] ";
 
+    public PrintStreamLogger( Provider provider )
+    {
+        super( Logger.LEVEL_INFO, Maven.class.getName() );
+
+        if ( provider == null )
+        {
+            throw new IllegalArgumentException( "output stream provider missing" );
+        }
+        this.provider = provider;
+    }
+
     public PrintStreamLogger( PrintStream out )
     {
         super( Logger.LEVEL_INFO, Maven.class.getName() );
@@ -53,20 +69,28 @@ public class PrintStreamLogger
         setStream( out );
     }
 
-    public void setStream( PrintStream out )
+    public void setStream( final PrintStream out )
     {
         if ( out == null )
         {
             throw new IllegalArgumentException( "output stream missing" );
         }
 
-        this.out = out;
+        this.provider = new Provider()
+        {
+            public PrintStream getStream()
+            {
+                return out;
+            }
+        };
     }
 
     public void debug( String message, Throwable throwable )
     {
         if ( isDebugEnabled() )
         {
+            PrintStream out = provider.getStream();
+
             out.print( DEBUG );
             out.println( message );
 
@@ -81,6 +105,8 @@ public class PrintStreamLogger
     {
         if ( isInfoEnabled() )
         {
+            PrintStream out = provider.getStream();
+
             out.print( INFO );
             out.println( message );
 
@@ -95,6 +121,8 @@ public class PrintStreamLogger
     {
         if ( isWarnEnabled() )
         {
+            PrintStream out = provider.getStream();
+
             out.print( WARNING );
             out.println( message );
 
@@ -109,6 +137,8 @@ public class PrintStreamLogger
     {
         if ( isErrorEnabled() )
         {
+            PrintStream out = provider.getStream();
+
             out.print( ERROR );
             out.println( message );
 
@@ -123,6 +153,8 @@ public class PrintStreamLogger
     {
         if ( isFatalErrorEnabled() )
         {
+            PrintStream out = provider.getStream();
+
             out.print( FATAL_ERROR );
             out.println( message );
 
@@ -135,6 +167,8 @@ public class PrintStreamLogger
 
     public void close()
     {
+        PrintStream out = provider.getStream();
+
         if ( out == System.out || out == System.err )
         {
             out.flush();
