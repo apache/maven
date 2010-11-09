@@ -99,9 +99,10 @@ public abstract class AbstractDependencyMojo
                 for ( Iterator it = artifacts.iterator(); it.hasNext(); )
                 {
                     Artifact artifact = (Artifact) it.next();
-                    writer.write( artifact.getId() );
+                    String id = getId( artifact );
+                    writer.write( id );
                     writer.newLine();
-                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + artifact.getId() );
+                    getLog().info( "[MAVEN-CORE-IT-LOG]   " + id );
                 }
             }
         }
@@ -123,6 +124,12 @@ public abstract class AbstractDependencyMojo
                 }
             }
         }
+    }
+
+    private String getId( Artifact artifact )
+    {
+        artifact.isSnapshot(); // decouple from MNG-2961
+        return artifact.getId();
     }
 
     /**
