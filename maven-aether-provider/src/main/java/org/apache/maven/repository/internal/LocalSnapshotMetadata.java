@@ -78,6 +78,12 @@ final class LocalSnapshotMetadata
         return artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getBaseVersion();
     }
 
+    @Override
+    protected void merge( Metadata recessive )
+    {
+        metadata.getVersioning().updateTimestamp();
+    }
+
     public String getGroupId()
     {
         return artifact.getGroupId();

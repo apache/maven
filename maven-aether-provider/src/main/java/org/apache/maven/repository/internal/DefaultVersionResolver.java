@@ -22,6 +22,7 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.impl.internal.CacheUtils;
 import org.sonatype.aether.metadata.Metadata;
 import org.sonatype.aether.repository.ArtifactRepository;
+import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.repository.WorkspaceRepository;
@@ -282,6 +284,28 @@ public class DefaultVersionResolver
                 fis = new FileInputStream( metadata.getFile() );
                 org.apache.maven.artifact.repository.metadata.Metadata m = new MetadataXpp3Reader().read( fis, false );
                 versioning = m.getVersioning();
+
+                /*
+                 * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata of the
+                 * local repository. This is especially troublesome during snapshot resolution so we try to handle that
+                 * gracefully.
+                 */
+                if ( versioning != null && repository instanceof LocalRepository )
+                {
+                    if ( !versioning.getSnapshotVersions().isEmpty()
+                        || ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 ) )
+                    {
+                        Versioning repaired = new Versioning();
+                        repaired.setLastUpdated( versioning.getLastUpdated() );
+                        Snapshot snapshot = new Snapshot();
+                        snapshot.setLocalCopy( true );
+                        repaired.setSnapshot( snapshot );
+                        versioning = repaired;
+
+                        throw new IOException( "Snapshot information corrupted with remote repository data"
+                            + ", please verify that no remote repository uses the id '" + repository.getId() + "'" );
+                    }
+                }
             }
         }
         catch ( FileNotFoundException e )
