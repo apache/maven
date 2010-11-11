@@ -28,6 +28,7 @@ import java.util.Properties;
 public class MavenITmng3600DeploymentModeDefaultsTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng3600DeploymentModeDefaultsTest()
     {
         super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-7,)" );
@@ -38,19 +39,16 @@ public class MavenITmng3600DeploymentModeDefaultsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3600" );
 
-        Verifier verifier;
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-
+        new File( testDir, "wagon.properties" ).delete();
         verifier.setLogFileName( "log-no-settings.txt" );
-        verifier.executeGoal( "deploy" );
-
-        verifier.assertFilePresent( "target/wagon.properties" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
         verifier.resetStreams();
 
-        Properties props = verifier.loadProperties( "target/wagon.properties" );
+        verifier.assertFilePresent( "wagon.properties" );
+        Properties props = verifier.loadProperties( "wagon.properties" );
         assertNull( props.get( "directory.mode" ) );
         assertNull( props.get( "file.mode" ) );
     }
@@ -60,21 +58,18 @@ public class MavenITmng3600DeploymentModeDefaultsTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3600" );
 
-        Verifier verifier;
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-
+        new File( testDir, "wagon.properties" ).delete();
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings-server-defaults.xml" );
         verifier.setLogFileName( "log-server-defaults.txt" );
-        verifier.executeGoal( "deploy" );
-
-        verifier.assertFilePresent( "target/wagon.properties" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
         verifier.resetStreams();
 
-        Properties props = verifier.loadProperties( "target/wagon.properties" );
+        verifier.assertFilePresent( "wagon.properties" );
+        Properties props = verifier.loadProperties( "wagon.properties" );
         assertNull( props.get( "directory.mode" ) );
         assertNull( props.get( "file.mode" ) );
     }
@@ -86,22 +81,20 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3600" );
 
-        Verifier verifier;
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
-
+        new File( testDir, "wagon.properties" ).delete();
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings-modes-set.xml" );
         verifier.setLogFileName( "log-modes-set.txt" );
-        verifier.executeGoal( "deploy" );
-
-        verifier.assertFilePresent( "target/wagon.properties" );
+        verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
-
         verifier.resetStreams();
 
-        Properties props = verifier.loadProperties( "target/wagon.properties" );
+        verifier.assertFilePresent( "wagon.properties" );
+        Properties props = verifier.loadProperties( "wagon.properties" );
         assertEquals( "700", props.get( "directory.mode" ) );
         assertEquals( "600", props.get( "file.mode" ) );
     }
+
 }
