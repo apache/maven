@@ -41,7 +41,7 @@ import org.apache.maven.wagon.resource.Resource;
 /**
  * Shamelessly copied from ScpExternalWagon in this same project...
  *
- * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="http-coreit"
+ * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="http-coreit" instantiation-strategy="per-lookup"
  */
 public class CoreItHttpWagon
     extends AbstractWagon

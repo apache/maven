@@ -42,7 +42,7 @@ import org.apache.maven.wagon.resource.Resource;
  * NOTE: Plexus will only pick this correctly if the Class package and name are the same as that in core. This is
  * because the core component descriptor is read, but the class is read from the latter JAR.
  * 
- * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="scpexe"
+ * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="scpexe" instantiation-strategy="per-lookup"
  */
 public class ScpExternalWagon
     extends AbstractWagon
