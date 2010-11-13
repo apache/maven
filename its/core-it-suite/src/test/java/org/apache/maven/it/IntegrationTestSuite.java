@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4895PluginDepWithNonRelocatedMavenApiTest.class );
         suite.addTestSuite( MavenITmng4891RobustSnapshotResolutionTest.class );
         //suite.addTestSuite( MavenITmng4883FailUponOverconstrainedVersionRangesTest.class );
         suite.addTestSuite( MavenITmng4877DeployUsingPrivateKeyTest.class );
