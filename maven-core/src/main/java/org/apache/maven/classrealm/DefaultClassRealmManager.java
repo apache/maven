@@ -23,10 +23,13 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
@@ -100,33 +103,100 @@ public class DefaultClassRealmManager
         }
     }
 
-    private synchronized ClassRealm getMavenRealm()
+    public synchronized ClassRealm getMavenApiRealm()
     {
         if ( mavenRealm == null )
         {
             mavenRealm = newRealm( "maven.api" );
 
-            importMavenApi( mavenRealm );
+            List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
 
-            mavenRealm.setParentClassLoader( ClassLoader.getSystemClassLoader() );
+            List<String> parentImports = new ArrayList<String>();
 
-            List<ClassRealmManagerDelegate> delegates = getDelegates();
-            if ( !delegates.isEmpty() )
-            {
-                List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
+            Map<String, ClassLoader> foreignImports = new HashMap<String, ClassLoader>();
+            importMavenApi( foreignImports );
 
-                ClassRealmRequest request =
-                    new DefaultClassRealmRequest( RealmType.Core, null, new ArrayList<String>(), constituents );
+            callDelegates( mavenRealm, RealmType.Core, mavenRealm.getParentClassLoader(), parentImports,
+                           foreignImports, constituents );
 
-                for ( ClassRealmManagerDelegate delegate : delegates )
-                {
-                    delegate.setupRealm( mavenRealm, request );
-                }
+            wireRealm( mavenRealm, parentImports, foreignImports );
 
-                populateRealm( mavenRealm, constituents );
-            }
+            populateRealm( mavenRealm, constituents );
         }
+
         return mavenRealm;
+    }
+
+    private void importMavenApi( Map<String, ClassLoader> imports )
+    {
+        ClassRealm coreRealm = getCoreRealm();
+
+        // maven-*
+        imports.put( "org.apache.maven.*", coreRealm );
+        imports.put( "org.apache.maven.artifact", coreRealm );
+        imports.put( "org.apache.maven.classrealm", coreRealm );
+        imports.put( "org.apache.maven.cli", coreRealm );
+        imports.put( "org.apache.maven.configuration", coreRealm );
+        imports.put( "org.apache.maven.exception", coreRealm );
+        imports.put( "org.apache.maven.execution", coreRealm );
+        imports.put( "org.apache.maven.lifecycle", coreRealm );
+        imports.put( "org.apache.maven.model", coreRealm );
+        imports.put( "org.apache.maven.monitor", coreRealm );
+        imports.put( "org.apache.maven.plugin", coreRealm );
+        imports.put( "org.apache.maven.profiles", coreRealm );
+        imports.put( "org.apache.maven.project", coreRealm );
+        imports.put( "org.apache.maven.reporting", coreRealm );
+        imports.put( "org.apache.maven.repository", coreRealm );
+        imports.put( "org.apache.maven.settings", coreRealm );
+        imports.put( "org.apache.maven.toolchain", coreRealm );
+        imports.put( "org.apache.maven.usability", coreRealm );
+
+        // wagon-api
+        imports.put( "org.apache.maven.wagon.*", coreRealm );
+        imports.put( "org.apache.maven.wagon.authentication", coreRealm );
+        imports.put( "org.apache.maven.wagon.authorization", coreRealm );
+        imports.put( "org.apache.maven.wagon.events", coreRealm );
+        imports.put( "org.apache.maven.wagon.observers", coreRealm );
+        imports.put( "org.apache.maven.wagon.proxy", coreRealm );
+        imports.put( "org.apache.maven.wagon.repository", coreRealm );
+        imports.put( "org.apache.maven.wagon.resource", coreRealm );
+
+        // aether-api, aether-spi, aether-impl
+        imports.put( "org.sonatype.aether.*", coreRealm );
+        imports.put( "org.sonatype.aether.artifact", coreRealm );
+        imports.put( "org.sonatype.aether.collection", coreRealm );
+        imports.put( "org.sonatype.aether.deployment", coreRealm );
+        imports.put( "org.sonatype.aether.graph", coreRealm );
+        imports.put( "org.sonatype.aether.impl", coreRealm );
+        imports.put( "org.sonatype.aether.installation", coreRealm );
+        imports.put( "org.sonatype.aether.metadata", coreRealm );
+        imports.put( "org.sonatype.aether.repository", coreRealm );
+        imports.put( "org.sonatype.aether.resolution", coreRealm );
+        imports.put( "org.sonatype.aether.spi", coreRealm );
+        imports.put( "org.sonatype.aether.transfer", coreRealm );
+        imports.put( "org.sonatype.aether.version", coreRealm );
+
+        // plexus-classworlds
+        imports.put( "org.codehaus.plexus.classworlds", coreRealm );
+
+        // classworlds (for legacy code)
+        imports.put( "org.codehaus.classworlds", coreRealm );
+
+        // plexus-container, plexus-component-annotations
+        imports.put( "org.codehaus.plexus.*", coreRealm );
+        imports.put( "org.codehaus.plexus.component", coreRealm );
+        imports.put( "org.codehaus.plexus.configuration", coreRealm );
+        imports.put( "org.codehaus.plexus.container", coreRealm );
+        imports.put( "org.codehaus.plexus.context", coreRealm );
+        imports.put( "org.codehaus.plexus.lifecycle", coreRealm );
+        imports.put( "org.codehaus.plexus.logging", coreRealm );
+        imports.put( "org.codehaus.plexus.personality", coreRealm );
+
+        // plexus-utils (for maven-model)
+        imports.put( "org.codehaus.plexus.util.xml.Xpp3Dom", coreRealm );
+        imports.put( "org.codehaus.plexus.util.xml.pull.XmlPullParser", coreRealm );
+        imports.put( "org.codehaus.plexus.util.xml.pull.XmlPullParserException", coreRealm );
+        imports.put( "org.codehaus.plexus.util.xml.pull.XmlSerializer", coreRealm );
     }
 
     /**
@@ -134,14 +204,15 @@ public class DefaultClassRealmManager
      * 
      * @param baseRealmId The base id to use for the new realm, must not be {@code null}.
      * @param type The type of the class realm, must not be {@code null}.
-     * @param parent The parent realm for the new realm, may be {@code null} to use the Maven core realm.
-     * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     * @param parent The parent realm for the new realm, may be {@code null}.
+     * @param parentImports The packages/types to import from the parent realm, may be {@code null}.
+     * @param foreignImports The packages/types to import from foreign realms, may be {@code null}.
      * @param artifacts The artifacts to add to the realm, may be {@code null}. Unresolved artifacts (i.e. with a
      *            missing file) will automatically be excluded from the realm.
      * @return The created class realm, never {@code null}.
      */
-    private ClassRealm createRealm( String baseRealmId, RealmType type, ClassLoader parent, List<String> imports,
-                                    boolean importXpp3Dom, List<Artifact> artifacts )
+    private ClassRealm createRealm( String baseRealmId, RealmType type, ClassLoader parent, List<String> parentImports,
+                                    Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
     {
         Set<String> artifactIds = new LinkedHashSet<String>();
 
@@ -159,13 +230,22 @@ public class DefaultClassRealmManager
             }
         }
 
-        if ( imports != null )
+        if ( parentImports != null )
         {
-            imports = new ArrayList<String>( imports );
+            parentImports = new ArrayList<String>( parentImports );
         }
         else
         {
-            imports = new ArrayList<String>();
+            parentImports = new ArrayList<String>();
+        }
+
+        if ( foreignImports != null )
+        {
+            foreignImports = new TreeMap<String, ClassLoader>( foreignImports );
+        }
+        else
+        {
+            foreignImports = new TreeMap<String, ClassLoader>();
         }
 
         ClassRealm classRealm = newRealm( baseRealmId );
@@ -174,46 +254,10 @@ public class DefaultClassRealmManager
         {
             classRealm.setParentClassLoader( parent );
         }
-        else
-        {
-            classRealm.setParentRealm( getMavenRealm() );
-        }
 
-        List<ClassRealmManagerDelegate> delegates = getDelegates();
-        if ( !delegates.isEmpty() )
-        {
-            ClassRealmRequest request = new DefaultClassRealmRequest( type, parent, imports, constituents );
+        callDelegates( classRealm, type, parent, parentImports, foreignImports, constituents );
 
-            for ( ClassRealmManagerDelegate delegate : delegates )
-            {
-                delegate.setupRealm( classRealm, request );
-            }
-        }
-
-        if ( importXpp3Dom )
-        {
-            importXpp3Dom( classRealm );
-        }
-
-        if ( !imports.isEmpty() )
-        {
-            ClassLoader importedRealm = classRealm.getParentClassLoader();
-
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "Importing packages into class realm " + classRealm.getId() );
-            }
-
-            for ( String imp : imports )
-            {
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.debug( "  Imported: " + imp );
-                }
-
-                classRealm.importFrom( importedRealm, imp );
-            }
-        }
+        wireRealm( classRealm, parentImports, foreignImports );
 
         Set<String> includedIds = populateRealm( classRealm, constituents );
 
@@ -230,64 +274,6 @@ public class DefaultClassRealmManager
         return classRealm;
     }
 
-    /**
-     * Imports Xpp3Dom and associated types into the specified realm. Unlike the other archives that constitute the API
-     * realm, plexus-utils is not excluded from the plugin/project realm, yet we must ensure this class is loaded from
-     * the API realm and not from the plugin/project realm.
-     * 
-     * @param importingRealm The realm into which to import Xpp3Dom, must not be {@code null}.
-     */
-    private void importXpp3Dom( ClassRealm importingRealm )
-    {
-        ClassRealm coreRealm = getCoreRealm();
-
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.Xpp3Dom" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlPullParser" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlPullParserException" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.util.xml.pull.XmlSerializer" );
-    }
-
-    /**
-     * Imports the classes/resources constituting the Maven API into the specified realm.
-     * 
-     * @param importingRealm The realm into which to import the Maven API, must not be {@code null}.
-     */
-    private void importMavenApi( ClassRealm importingRealm )
-    {
-        ClassRealm coreRealm = getCoreRealm();
-
-        // maven-*
-        importingRealm.importFrom( coreRealm, "org.apache.maven" );
-
-        // aether
-        importingRealm.importFrom( coreRealm, "org.sonatype.aether" );
-
-        // plexus-classworlds
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.classworlds" );
-
-        // classworlds (for legacy code)
-        importingRealm.importFrom( coreRealm, "org.codehaus.classworlds" );
-
-        // plexus-container, plexus-component-annotations
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.component" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.configuration" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.container" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.context" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.lifecycle" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.logging" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.personality" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.ComponentRegistry" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.ContainerConfiguration" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DefaultComponentRegistry" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DefaultContainerConfiguration" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DefaultPlexusContainer" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.DuplicateChildContainerException" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.MutablePlexusContainer" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.PlexusConstants" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.PlexusContainer" );
-        importingRealm.importFrom( coreRealm, "org.codehaus.plexus.PlexusContainerException" );
-    }
-
     public ClassRealm getCoreRealm()
     {
         return container.getContainerRealm();
@@ -300,7 +286,9 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "model missing" );
         }
 
-        return createRealm( getKey( model ), RealmType.Project, null, null, false, artifacts );
+        ClassLoader parent = getMavenApiRealm();
+
+        return createRealm( getKey( model ), RealmType.Project, parent, null, null, artifacts );
     }
 
     private static String getKey( Model model )
@@ -315,18 +303,28 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "extension plugin missing" );
         }
 
-        return createRealm( getKey( plugin, true ), RealmType.Extension, null, null, true, artifacts );
+        ClassLoader parent = ClassLoader.getSystemClassLoader();
+
+        Map<String, ClassLoader> foreignImports =
+            Collections.<String, ClassLoader> singletonMap( "", getMavenApiRealm() );
+
+        return createRealm( getKey( plugin, true ), RealmType.Extension, parent, null, foreignImports, artifacts );
     }
 
-    public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports,
-                                         List<Artifact> artifacts )
+    public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,
+                                         Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
     {
         if ( plugin == null )
         {
             throw new IllegalArgumentException( "plugin missing" );
         }
 
-        return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, imports, true, artifacts );
+        if ( parent == null )
+        {
+            parent = ClassLoader.getSystemClassLoader();
+        }
+
+        return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, parentImports, foreignImports, artifacts );
     }
 
     private static String getKey( Plugin plugin, boolean extension )
@@ -338,8 +336,8 @@ public class DefaultClassRealmManager
 
     private static String getId( Artifact artifact )
     {
-        return getId( artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(), artifact.getClassifier(),
-                      artifact.getBaseVersion() );
+        return getId( artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(),
+                      artifact.getClassifier(), artifact.getBaseVersion() );
     }
 
     private static String getId( ClassRealmConstituent constituent )
@@ -364,6 +362,31 @@ public class DefaultClassRealmManager
             logger.error( "Failed to lookup class realm delegates: " + e.getMessage(), e );
 
             return Collections.emptyList();
+        }
+    }
+
+    private void callDelegates( ClassRealm classRealm, RealmType type, ClassLoader parent, List<String> parentImports,
+                                Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
+    {
+        List<ClassRealmManagerDelegate> delegates = getDelegates();
+
+        if ( !delegates.isEmpty() )
+        {
+            ClassRealmRequest request =
+                new DefaultClassRealmRequest( type, parent, parentImports, foreignImports, constituents );
+
+            for ( ClassRealmManagerDelegate delegate : delegates )
+            {
+                try
+                {
+                    delegate.setupRealm( classRealm, request );
+                }
+                catch ( Exception e )
+                {
+                    logger.error( delegate.getClass().getName() + " failed to setup class realm " + classRealm + ": "
+                        + e.getMessage(), e );
+                }
+            }
         }
     }
 
@@ -400,6 +423,57 @@ public class DefaultClassRealmManager
         }
 
         return includedIds;
+    }
+
+    private void wireRealm( ClassRealm classRealm, List<String> parentImports, Map<String, ClassLoader> foreignImports )
+    {
+        if ( foreignImports != null && !foreignImports.isEmpty() )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Importing foreign packages into class realm " + classRealm.getId() );
+            }
+
+            for ( Map.Entry<String, ClassLoader> entry : foreignImports.entrySet() )
+            {
+                ClassLoader importedRealm = entry.getValue();
+                String imp = entry.getKey();
+
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Imported: " + imp + " < " + getId( importedRealm ) );
+                }
+
+                classRealm.importFrom( importedRealm, imp );
+            }
+        }
+
+        if ( parentImports != null && !parentImports.isEmpty() )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Importing parent packages into class realm " + classRealm.getId() );
+            }
+
+            for ( String imp : parentImports )
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "  Imported: " + imp + " < " + getId( classRealm.getParentClassLoader() ) );
+                }
+
+                classRealm.importFromParent( imp );
+            }
+        }
+    }
+
+    private String getId( ClassLoader classLoader )
+    {
+        if ( classLoader instanceof ClassRealm )
+        {
+            return ( (ClassRealm) classLoader ).getId();
+        }
+        return String.valueOf( classLoader );
     }
 
 }

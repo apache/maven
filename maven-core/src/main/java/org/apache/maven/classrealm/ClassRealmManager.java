@@ -20,6 +20,7 @@ package org.apache.maven.classrealm;
  */
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -42,6 +43,13 @@ public interface ClassRealmManager
      * @return The class realm hosting the Maven core, never {@code null}.
      */
     ClassRealm getCoreRealm();
+
+    /**
+     * Gets the class realm exposing the Maven API. This is basically a restricted view on the Maven core realm.
+     * 
+     * @return The class realm exposing the Maven API, never {@code null}.
+     */
+    ClassRealm getMavenApiRealm();
 
     /**
      * Creates a new class realm for the specified project and its build extensions.
@@ -67,12 +75,14 @@ public interface ClassRealmManager
      * Creates a new class realm for the specified plugin.
      * 
      * @param plugin The plugin for which to create a realm, must not be {@code null}.
-     * @param parent The parent realm for the new realm, may be {@code null} to use the Maven core realm.
-     * @param imports The packages/types to import from the parent realm, may be {@code null}.
+     * @param parent The parent realm for the new realm, may be {@code null}.
+     * @param parentImports The packages/types to import from the parent realm, may be {@code null}.
+     * @param foreignImports The packages/types to import from foreign realms, may be {@code null}.
      * @param artifacts The artifacts to add to the class realm, may be {@code null}. Unresolved artifacts (i.e. with a
      *            missing file) will automatically be excluded from the realm.
      * @return The new plugin realm, never {@code null}.
      */
-    ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> imports, List<Artifact> artifacts );
+    ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,
+                                  Map<String, ClassLoader> foreignImports, List<Artifact> artifacts );
 
 }

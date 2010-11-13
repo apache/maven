@@ -20,6 +20,7 @@ package org.apache.maven.classrealm;
  */
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Describes the requirements for a new class realm.
@@ -65,16 +66,29 @@ public interface ClassRealmRequest
     /**
      * Gets the parent class realm (if any).
      * 
-     * @return The parent class realm or {@code null} if using the Maven core realm as parent.
+     * @return The parent class realm or {@code null} if using the default parent.
      */
     ClassLoader getParent();
+
+    /**
+     * @deprecated Use {@link #getParentImports()} instead.
+     */
+    @Deprecated
+    List<String> getImports();
 
     /**
      * Gets the packages/types to import from the parent realm.
      * 
      * @return The modifiable list of packages/types to import from the parent realm, never {@code null}.
      */
-    List<String> getImports();
+    List<String> getParentImports();
+
+    /**
+     * Gets the packages/types to import from foreign realms.
+     * 
+     * @return The modifiable map of packages/types to import from foreign realms, never {@code null}.
+     */
+    Map<String, ClassLoader> getForeignImports();
 
     /**
      * Gets the constituents for the class realm.

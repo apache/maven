@@ -20,6 +20,7 @@ package org.apache.maven.classrealm;
  */
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
@@ -32,16 +33,19 @@ class DefaultClassRealmRequest
 
     private final ClassLoader parent;
 
-    private final List<String> imports;
+    private final List<String> parentImports;
+
+    private final Map<String, ClassLoader> foreignImports;
 
     private final List<ClassRealmConstituent> constituents;
 
-    public DefaultClassRealmRequest( RealmType type, ClassLoader parent, List<String> imports,
-                                     List<ClassRealmConstituent> constituents )
+    public DefaultClassRealmRequest( RealmType type, ClassLoader parent, List<String> parentImports,
+                                     Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
     {
         this.type = type;
         this.parent = parent;
-        this.imports = imports;
+        this.parentImports = parentImports;
+        this.foreignImports = foreignImports;
         this.constituents = constituents;
     }
 
@@ -57,7 +61,17 @@ class DefaultClassRealmRequest
 
     public List<String> getImports()
     {
-        return imports;
+        return getParentImports();
+    }
+
+    public List<String> getParentImports()
+    {
+        return parentImports;
+    }
+
+    public Map<String, ClassLoader> getForeignImports()
+    {
+        return foreignImports;
     }
 
     public List<ClassRealmConstituent> getConstituents()

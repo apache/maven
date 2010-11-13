@@ -30,6 +30,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -334,7 +335,10 @@ public class DefaultMavenPluginManager
 
         List<org.sonatype.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
 
-        ClassRealm pluginRealm = classRealmManager.createPluginRealm( plugin, parent, imports, pluginArtifacts );
+        Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
+
+        ClassRealm pluginRealm =
+            classRealmManager.createPluginRealm( plugin, parent, null, foreignImports, pluginArtifacts );
 
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( exposedPluginArtifacts );
@@ -359,6 +363,31 @@ public class DefaultMavenPluginManager
             throw new PluginContainerException( plugin, pluginRealm, "Error in component graph of plugin "
                 + plugin.getId() + ": " + e.getMessage(), e );
         }
+    }
+
+    private Map<String, ClassLoader> calcImports( MavenProject project, ClassLoader parent, List<String> imports )
+    {
+        Map<String, ClassLoader> foreignImports = new HashMap<String, ClassLoader>();
+
+        ClassLoader projectRealm = project.getClassRealm();
+        if ( projectRealm != null )
+        {
+            foreignImports.put( "", projectRealm );
+        }
+        else
+        {
+            foreignImports.put( "", classRealmManager.getMavenApiRealm() );
+        }
+
+        if ( parent != null && imports != null )
+        {
+            for ( String parentImport : imports )
+            {
+                foreignImports.put( parentImport, parent );
+            }
+        }
+
+        return foreignImports;
     }
 
     public <T> T getConfiguredMojo( Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution )
