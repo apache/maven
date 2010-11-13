@@ -861,9 +861,14 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
         {
-            String projectList = commandLine.getOptionValue( CLIManager.PROJECT_LIST );
-            String[] projects = StringUtils.split( projectList, "," );
-            request.setSelectedProjects( Arrays.asList( projects ) );
+            String[] values = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
+            List<String> projects = new ArrayList<String>();
+            for ( int i = 0; i < values.length; i++ )
+            {
+                String[] tmp = StringUtils.split( values[i], "," );
+                projects.addAll( Arrays.asList( tmp ) );
+            }
+            request.setSelectedProjects( projects );
         }
 
         if ( commandLine.hasOption( CLIManager.ALSO_MAKE )
