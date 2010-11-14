@@ -40,9 +40,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
 
     /**
      * Verify that the make-like reactor mode considers actual project versions when calculating the inter-module
-     * dependencies and the modules which need to be build.
+     * dependencies and the modules which need to be build. This variant checks calculation of upstream modules.
      */
-    public void testit()
+    public void testitAM()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4890" );
@@ -51,16 +51,44 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
-        verifier.deleteDirectory( "mob-b/target" );
+        verifier.deleteDirectory( "mod-b/target" );
         verifier.getCliOptions().add( "--projects" );
         verifier.getCliOptions().add( "mod-b" );
         verifier.getCliOptions().add( "--also-make" );
+        verifier.setLogFileName( "log-am.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFilePresent( "mod-b/target/touch.txt" );
         verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "target/touch.txt" );
+    }
+
+    /**
+     * Verify that the make-like reactor mode considers actual project versions when calculating the inter-module
+     * dependencies and the modules which need to be build. This variant checks calculation of downstream modules.
+     */
+    public void testitAMD()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4890" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteDirectory( "mod-a/target" );
+        verifier.deleteDirectory( "mod-b/target" );
+        verifier.getCliOptions().add( "--projects" );
+        verifier.getCliOptions().add( "mod-a" );
+        verifier.getCliOptions().add( "--also-make-dependents" );
+        verifier.setLogFileName( "log-amd.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "mod-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
         verifier.assertFileNotPresent( "target/touch.txt" );
     }
 
