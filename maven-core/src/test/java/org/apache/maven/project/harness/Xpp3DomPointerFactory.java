@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * A node pointer factory for JXPath to support <code>Xpp3Dom</code>.
  * 
  * @author Benjamin Bentmann
- * @version $Id: Xpp3DomPointerFactory.java 737056 2009-01-23 15:35:43Z bentmann $
+ * @version $Id$
  */
 public class Xpp3DomPointerFactory
     implements NodePointerFactory

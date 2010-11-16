@@ -35,7 +35,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * A node iterator for JXPath to support <code>Xpp3Dom</code>.
  * 
  * @author Benjamin Bentmann
- * @version $Id: Xpp3DomNodeIterator.java 737056 2009-01-23 15:35:43Z bentmann $
+ * @version $Id$
  */
 class Xpp3DomNodeIterator
     implements NodeIterator
