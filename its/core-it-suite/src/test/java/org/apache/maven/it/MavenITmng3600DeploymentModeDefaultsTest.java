@@ -31,7 +31,7 @@ public class MavenITmng3600DeploymentModeDefaultsTest
 
     public MavenITmng3600DeploymentModeDefaultsTest()
     {
-        super( "(2.1.0-M1,3.0-alpha-1),[3.0-alpha-7,)" );
+        super( "(2.1.0-M1,3.0-alpha-1),[3.0.1,)" );
     }
 
     public void testitMNG3600NoSettings()
@@ -77,8 +77,6 @@ public class MavenITmng3600DeploymentModeDefaultsTest
     public void testitMNG3600ModesSet()
         throws Exception
     {
-        requiresMavenVersion( "(2.1.0-M1,3.0-alpha-1)" ); // due to MNG-4850
-
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3600" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
