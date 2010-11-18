@@ -38,6 +38,7 @@ import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
@@ -276,7 +277,8 @@ public class DefaultPluginPrefixResolver
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, metadata );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session );
+            event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );
             listener.metadataInvalid( event );

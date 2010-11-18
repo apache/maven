@@ -39,6 +39,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryCache;
+import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.util.artifact.SubArtifact;
@@ -331,7 +332,8 @@ public class DefaultVersionResolver
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, metadata );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session );
+            event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );
             listener.metadataInvalid( event );

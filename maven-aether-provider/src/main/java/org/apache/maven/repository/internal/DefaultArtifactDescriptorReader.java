@@ -44,6 +44,7 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryException;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
@@ -264,7 +265,7 @@ public class DefaultArtifactDescriptorReader
             {
                 if ( e.getCause() instanceof ArtifactNotFoundException )
                 {
-                    missingDescriptor( session, artifact );
+                    missingDescriptor( session, artifact, (Exception) e.getCause() );
                     if ( session.isIgnoreMissingArtifactDescriptor() )
                     {
                         return null;
@@ -422,12 +423,14 @@ public class DefaultArtifactDescriptorReader
         return new RepositoryPolicy( enabled, updates, checksums );
     }
 
-    private void missingDescriptor( RepositorySystemSession session, Artifact artifact )
+    private void missingDescriptor( RepositorySystemSession session, Artifact artifact, Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, artifact );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session );
+            event.setArtifact( artifact );
+            event.setException( exception );
             listener.artifactDescriptorMissing( event );
         }
     }
@@ -437,7 +440,8 @@ public class DefaultArtifactDescriptorReader
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( session, artifact );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session );
+            event.setArtifact( artifact );
             event.setException( exception );
             listener.artifactDescriptorInvalid( event );
         }
