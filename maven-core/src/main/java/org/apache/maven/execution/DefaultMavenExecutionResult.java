@@ -34,7 +34,7 @@ public class DefaultMavenExecutionResult
 {
     private MavenProject project;
 
-    private List<MavenProject> topologicallySortedProjects;
+    private List<MavenProject> topologicallySortedProjects = Collections.emptyList();
 
     private DependencyResolutionResult dependencyResolutionResult;
 
