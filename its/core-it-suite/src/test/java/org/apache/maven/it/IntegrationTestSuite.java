@@ -86,7 +86,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4895PluginDepWithNonRelocatedMavenApiTest.class );
         suite.addTestSuite( MavenITmng4891RobustSnapshotResolutionTest.class );
         suite.addTestSuite( MavenITmng4890MakeLikeReactorConsidersVersionsTest.class );
-        //suite.addTestSuite( MavenITmng4883FailUponOverconstrainedVersionRangesTest.class );
+        suite.addTestSuite( MavenITmng4883FailUponOverconstrainedVersionRangesTest.class );
         suite.addTestSuite( MavenITmng4877DeployUsingPrivateKeyTest.class );
         suite.addTestSuite( MavenITmng4874UpdateLatestPluginVersionTest.class );
         suite.addTestSuite( MavenITmng4872ReactorResolutionAttachedWithExclusionsTest.class );
