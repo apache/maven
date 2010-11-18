@@ -85,6 +85,26 @@ public class DefaultMavenProjectBuilder
             request.setActiveProfileIds( profileManager.getExplicitlyActivatedIds() );
             request.setInactiveProfileIds( profileManager.getExplicitlyDeactivatedIds() );
         }
+        else
+        {
+            /*
+             * MNG-4900: Hack to workaround deficiency of legacy API which makes it impossible for plugins to access the
+             * global profile manager which is required to build a POM like a CLI invocation does. Failure to consider
+             * the activated profiles can cause repo declarations to be lost which in turn will result in artifact
+             * resolution failures, in particular when using the enhanced local repo which guards access to local files
+             * based on the configured remote repos.
+             */
+            MavenSession session = legacySupport.getSession();
+            if ( session != null )
+            {
+                MavenExecutionRequest req = session.getRequest();
+                if ( req != null )
+                {
+                    request.setActiveProfileIds( req.getActiveProfiles() );
+                    request.setInactiveProfileIds( req.getInactiveProfiles() );
+                }
+            }
+        }
 
         return request;
     }
