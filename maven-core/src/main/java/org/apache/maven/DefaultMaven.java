@@ -68,10 +68,12 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.RepositorySystem;
@@ -331,14 +333,11 @@ public class DefaultMaven
 
         session.setIgnoreInvalidArtifactDescriptor( true ).setIgnoreMissingArtifactDescriptor( true );
 
-        session.setUserProps( request.getUserProperties() );
-        session.setSystemProps( request.getSystemProperties() );
         Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, Boolean.valueOf( request.isInteractiveMode() ) );
         configProps.putAll( request.getSystemProperties() );
         configProps.putAll( request.getUserProperties() );
-        session.setConfigProps( configProps );
 
         session.setOffline( request.isOffline() );
         session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
@@ -398,6 +397,25 @@ public class DefaultMaven
                 new Authentication( server.getUsername(), server.getPassword(), server.getPrivateKey(),
                                     server.getPassphrase() );
             authSelector.add( server.getId(), auth );
+
+            if ( server.getConfiguration() != null )
+            {
+                Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
+                for ( int i = dom.getChildCount() - 1; i >= 0; i-- )
+                {
+                    Xpp3Dom child = dom.getChild( i );
+                    if ( "wagonProvider".equals( child.getName() ) )
+                    {
+                        dom.removeChild( i );
+                    }
+                }
+
+                XmlPlexusConfiguration config = new XmlPlexusConfiguration( dom );
+                configProps.put( "aether.connector.wagon.config." + server.getId(), config );
+            }
+
+            configProps.put( "aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions() );
+            configProps.put( "aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions() );
         }
         session.setAuthenticationSelector( authSelector );
 
@@ -421,6 +439,10 @@ public class DefaultMaven
         session.setTransferListener( request.getTransferListener() );
 
         session.setRepositoryListener( new LoggingRepositoryListener( logger ) );
+
+        session.setUserProps( request.getUserProperties() );
+        session.setSystemProps( request.getSystemProperties() );
+        session.setConfigProps( configProps );
 
         return session;
     }
