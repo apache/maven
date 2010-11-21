@@ -92,9 +92,21 @@ public class DefaultModelValidator
             Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
             validateEnum( "modelVersion", problems, Severity.ERROR, model.getModelVersion(), null, model, "4.0.0" );
+
             validateStringNoExpression( "groupId", problems, Severity.WARNING, model.getGroupId(), model );
+            if ( parent == null )
+            {
+                validateStringNotEmpty( "groupId", problems, Severity.FATAL, model.getGroupId(), model );
+            }
+
             validateStringNoExpression( "artifactId", problems, Severity.WARNING, model.getArtifactId(), model );
+            validateStringNotEmpty( "artifactId", problems, Severity.FATAL, model.getArtifactId(), model );
+
             validateStringNoExpression( "version", problems, Severity.WARNING, model.getVersion(), model );
+            if ( parent == null )
+            {
+                validateStringNotEmpty( "version", problems, Severity.FATAL, model.getVersion(), model );
+            }
 
             validateRawDependencies( problems, model.getDependencies(), "dependencies.dependency", request );
 

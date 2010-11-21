@@ -833,7 +833,14 @@ public class DefaultModelBuilder
             buffer.append( ": " ).append( e.getMessage() );
             if ( childModel.getProjectDirectory() != null )
             {
-                buffer.append( " and 'parent.relativePath' points at wrong local POM" );
+                if ( parent.getRelativePath() == null || parent.getRelativePath().length() <= 0 )
+                {
+                    buffer.append( " and 'parent.relativePath' points at no local POM" );
+                }
+                else
+                {
+                    buffer.append( " and 'parent.relativePath' points at wrong local POM" );
+                }
             }
 
             problems.add( Severity.FATAL, buffer.toString(), parent.getLocation( "" ), e );
