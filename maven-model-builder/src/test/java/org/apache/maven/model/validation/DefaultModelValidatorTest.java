@@ -561,4 +561,26 @@ public class DefaultModelValidatorTest
                         "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar is missing" );
     }
 
+    public void testBadImportScopeType()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "bad-import-scope-type.xml" );
+
+        assertViolations( result, 0, 0, 1 );
+
+        assertContains( result.getWarnings().get( 0 ),
+                        "'dependencyManagement.dependencies.dependency.type' for test:a:jar must be 'pom'" );
+    }
+
+    public void testBadImportScopeClassifier()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "bad-import-scope-classifier.xml" );
+
+        assertViolations( result, 0, 1, 0 );
+
+        assertContains( result.getErrors().get( 0 ),
+                        "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls must be empty" );
+    }
+
 }

@@ -356,11 +356,18 @@ public class DefaultModelValidator
         {
             String key = dependency.getManagementKey();
 
-            if ( "pom".equals( dependency.getType() ) && "import".equals( dependency.getScope() )
-                && StringUtils.isNotEmpty( dependency.getClassifier() ) )
+            if ( "import".equals( dependency.getScope() ) )
             {
-                addViolation( problems, errOn30, prefix + ".classifier", key,
-                              "must be empty, imported POM cannot have a classifier.", dependency );
+                if ( !"pom".equals( dependency.getType() ) )
+                {
+                    addViolation( problems, Severity.WARNING, prefix + ".type", key,
+                                  "must be 'pom' to import the managed dependencies.", dependency );
+                }
+                else if ( StringUtils.isNotEmpty( dependency.getClassifier() ) )
+                {
+                    addViolation( problems, errOn30, prefix + ".classifier", key,
+                                  "must be empty, imported POM cannot have a classifier.", dependency );
+                }
             }
             else if ( "system".equals( dependency.getScope() ) )
             {
