@@ -39,6 +39,8 @@ public class DefaultBeanConfigurationRequest
 
     private Object configuration;
 
+    private String configurationElement;
+
     private ClassLoader classLoader;
 
     private BeanConfigurationValuePreprocessor valuePreprocessor;
@@ -61,9 +63,20 @@ public class DefaultBeanConfigurationRequest
         return configuration;
     }
 
+    public String getConfigurationElement()
+    {
+        return configurationElement;
+    }
+
     public DefaultBeanConfigurationRequest setConfiguration( Object configuration )
     {
+        return setConfiguration( configuration, null );
+    }
+
+    public DefaultBeanConfigurationRequest setConfiguration( Object configuration, String element )
+    {
         this.configuration = configuration;
+        this.configurationElement = element;
         return this;
     }
 

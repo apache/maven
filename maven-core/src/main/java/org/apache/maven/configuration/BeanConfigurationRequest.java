@@ -52,11 +52,33 @@ public interface BeanConfigurationRequest
     /**
      * Sets the configuration to unmarshal into the bean. The configuration should be taken from
      * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source.
+     * Fully equivalent to {@code setConfiguration(configuration, null)}.
      * 
      * @param configuration The configuration to unmarshal, may be {@code null}.
      * @return This request for chaining, never {@code null}.
      */
     BeanConfigurationRequest setConfiguration( Object configuration );
+
+    /**
+     * Sets the configuration to unmarshal into the bean. The configuration should be taken from
+     * {@link org.apache.maven.model.ConfigurationContainer#getConfiguration()} or a similar source.
+     * If {@code element} is not {@code null}, child configuration element with the specified name will 
+     * be unmarshaled.
+     * 
+     * @param configuration The configuration to unmarshal, may be {@code null}.
+     * @param element Configuration element name to unmarshal or {@code null} to unmarshal entire configuration.
+     * @return This request for chaining, never {@code null}.
+     */
+    BeanConfigurationRequest setConfiguration( Object configuration, String element );
+
+    /**
+     * Returns configuration element name or {@code null}. 
+     * 
+     * @see {@link #setConfiguration(Object, String)}
+     * 
+     * @return Configuration element name or {@code null}
+     */
+    String getConfigurationElement();
 
     /**
      * Gets the class loader from which to load any types referenced by the configuration. If unset, the class loader of

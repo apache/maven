@@ -84,6 +84,11 @@ public class DefaultBeanConfigurator
                 + configuration.getClass().getName() + ")" );
         }
 
+        if ( request.getConfigurationElement() != null )
+        {
+            plexusConfig = plexusConfig.getChild( request.getConfigurationElement() );
+        }
+
         ClassLoader classLoader = request.getClassLoader();
         if ( classLoader == null )
         {
