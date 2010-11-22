@@ -235,7 +235,7 @@
         <version>${sisuInjectVersion}</version>
         <exclusions>
           <exclusion>
-            <!-- Decouple build from MNG-3443 and ensure optional/unused dependency sisu-guice stays out -->
+            <!-- Decouple build from MNG-3443 and ensure optional/unused dependency from sisu-guice stays out -->
             <groupId>org.sonatype.sisu.inject</groupId>
             <artifactId>cglib</artifactId>
           </exclusion>
