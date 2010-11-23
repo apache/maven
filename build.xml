@@ -80,6 +80,7 @@ Do you want to continue?</input>
     <property name="skipTests" value="false" />
     <property name="surefire.useFile" value="true" />
     <property name="maven.test.redirectTestOutputToFile" value="${surefire.useFile}" />
+    <property name="maven.goal" value="install" />
     <echo>maven.home = ${maven.home}</echo>
     <echo>maven.repo.local = ${maven.repo.local}</echo>
   </target>
@@ -233,7 +234,7 @@ Do you want to continue?</input>
       <arg value="-B" />
       <arg value="-V" />
       <arg value="clean" />
-      <arg value="install" />
+      <arg value="${maven.goal}" />
       <arg value="-Dmaven.test.skip=${maven.test.skip}" />
       <arg value="-DskipTests=${skipTests}" />
       <arg value="-Dmaven.repo.local=${maven.repo.local}" />
