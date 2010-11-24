@@ -19,7 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.sonatype.aether.util.listener.AbstractTransferListener;
+import org.sonatype.aether.transfer.AbstractTransferListener;
 
 /**
  * @author Benjamin Bentmann

@@ -24,10 +24,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.sonatype.aether.transfer.AbstractTransferListener;
 import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferResource;
-import org.sonatype.aether.util.listener.AbstractTransferListener;
 
 abstract class AbstractMavenTransferListener
     extends AbstractTransferListener

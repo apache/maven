@@ -20,9 +20,9 @@ package org.apache.maven;
  */
 
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.aether.AbstractRepositoryListener;
 import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.transfer.MetadataNotFoundException;
-import org.sonatype.aether.util.listener.AbstractRepositoryListener;
 
 /**
  * @author Benjamin Bentmann
