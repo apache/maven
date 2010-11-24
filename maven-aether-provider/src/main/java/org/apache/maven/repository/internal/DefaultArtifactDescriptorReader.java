@@ -282,8 +282,8 @@ public class DefaultArtifactDescriptorReader
                 modelRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
                 modelRequest.setProcessPlugins( false );
                 modelRequest.setTwoPhaseBuilding( false );
-                modelRequest.setSystemProperties( toProperties( session.getSystemProperties() ) );
-                modelRequest.setUserProperties( toProperties( session.getUserProperties() ) );
+                modelRequest.setSystemProperties( toProperties( session.getUserProperties(),
+                                                                session.getSystemProperties() ) );
                 modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
                 modelRequest.setModelResolver( new DefaultModelResolver( session, request.getRequestContext(),
                                                                          artifactResolver, remoteRepositoryManager,
@@ -335,12 +335,16 @@ public class DefaultArtifactDescriptorReader
         }
     }
 
-    private Properties toProperties( Map<String, String> map )
+    private Properties toProperties( Map<String, String> dominant, Map<String, String> recessive )
     {
         Properties props = new Properties();
-        if ( map != null )
+        if ( recessive != null )
         {
-            props.putAll( map );
+            props.putAll( recessive );
+        }
+        if ( dominant != null )
+        {
+            props.putAll( dominant );
         }
         return props;
     }
