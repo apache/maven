@@ -349,9 +349,12 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-dependency-version.xml" );
 
-        assertViolations( result, 0, 1, 0 );
+        assertViolations( result, 0, 2, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains( "test:b" ) );
+        assertContains( result.getErrors().get( 0 ),
+                        "'dependencies.dependency.version' for test:b:jar must be a valid version" );
+        assertContains( result.getErrors().get( 1 ),
+                        "'dependencies.dependency.version' for test:c:jar must not contain any of these characters" );
     }
 
     public void testDuplicateModule()
@@ -379,11 +382,16 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "bad-plugin-version.xml" );
 
-        assertViolations( result, 0, 3, 0 );
+        assertViolations( result, 0, 4, 0 );
 
-        assertTrue( result.getErrors().get( 0 ).contains( "test:mip" ) );
-        assertTrue( result.getErrors().get( 1 ).contains( "test:rmv" ) );
-        assertTrue( result.getErrors().get( 2 ).contains( "test:lmv" ) );
+        assertContains( result.getErrors().get( 0 ),
+                        "'build.plugins.plugin.version' for test:mip must be a valid version" );
+        assertContains( result.getErrors().get( 1 ),
+                        "'build.plugins.plugin.version' for test:rmv must be a valid version" );
+        assertContains( result.getErrors().get( 2 ),
+                        "'build.plugins.plugin.version' for test:lmv must be a valid version" );
+        assertContains( result.getErrors().get( 3 ),
+                        "'build.plugins.plugin.version' for test:ifsc must not contain any of these characters" );
     }
 
     public void testDistributionManagementStatus()
