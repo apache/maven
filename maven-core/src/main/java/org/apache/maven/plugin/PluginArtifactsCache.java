@@ -52,19 +52,29 @@ public interface PluginArtifactsCache
 
         public final List<Artifact> artifacts;
 
+        public final PluginResolutionException exception; 
+
         public CacheRecord( List<Artifact> artifacts )
         {
             this.artifacts = artifacts;
+            this.exception = null;
         }
 
+        public CacheRecord( PluginResolutionException exception )
+        {
+            this.artifacts = null;
+            this.exception = exception;
+        }
     }
 
     Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
                    RepositorySystemSession session );
 
-    CacheRecord get( Key key );
+    CacheRecord get( Key key ) throws PluginResolutionException;
 
     CacheRecord put( Key key, List<Artifact> pluginArtifacts );
+
+    CacheRecord put( Key key, PluginResolutionException e );
 
     void flush();
 

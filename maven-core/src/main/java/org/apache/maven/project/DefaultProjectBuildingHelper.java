@@ -232,9 +232,20 @@ public class DefaultProjectBuildingHelper
             }
             else
             {
-                artifacts = resolveExtensionArtifacts( plugin, project.getRemotePluginRepositories(), request );
+                try
+                {
+                    artifacts = resolveExtensionArtifacts( plugin, project.getRemotePluginRepositories(), request );
 
-                recordArtifacts = pluginArtifactsCache.put( cacheKey, artifacts );
+                    recordArtifacts = pluginArtifactsCache.put( cacheKey, artifacts );
+                }
+                catch ( PluginResolutionException e )
+                {
+                    pluginArtifactsCache.put( cacheKey, e );
+
+                    pluginArtifactsCache.register( project, recordArtifacts );
+
+                    throw e;
+                }
             }
 
             pluginArtifactsCache.register( project, recordArtifacts );

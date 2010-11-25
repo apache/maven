@@ -142,8 +142,16 @@ public class DefaultPluginArtifactsCache
     }
 
     public CacheRecord get( Key key )
+        throws PluginResolutionException
     {
-        return cache.get( key );
+        CacheRecord cacheRecord = cache.get( key );
+
+        if ( cacheRecord != null && cacheRecord.exception != null )
+        {
+            throw cacheRecord.exception;
+        }
+
+        return cacheRecord;
     }
 
     public CacheRecord put( Key key, List<Artifact> pluginArtifacts )
@@ -153,13 +161,34 @@ public class DefaultPluginArtifactsCache
             throw new NullPointerException();
         }
 
+        assertUniqueKey( key );
+
+        CacheRecord record =
+            new CacheRecord( Collections.unmodifiableList( new ArrayList<Artifact>( pluginArtifacts ) ) );
+
+        cache.put( key, record );
+
+        return record;
+    }
+
+    protected void assertUniqueKey( Key key )
+    {
         if ( cache.containsKey( key ) )
         {
             throw new IllegalStateException( "Duplicate artifact resolution result for plugin " + key );
         }
+    }
 
-        CacheRecord record =
-            new CacheRecord( Collections.unmodifiableList( new ArrayList<Artifact>( pluginArtifacts ) ) );
+    public CacheRecord put( Key key, PluginResolutionException exception )
+    {
+        if ( exception == null )
+        {
+            throw new NullPointerException();
+        }
+
+        assertUniqueKey( key );
+
+        CacheRecord record = new CacheRecord( exception );
 
         cache.put( key, record );
 
