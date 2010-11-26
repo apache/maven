@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Profile;
 
 public class MavenProjectTest
     extends AbstractMavenProjectTestCase
@@ -151,5 +152,24 @@ public class MavenProjectTest
 
         MavenProject clonedProject = (MavenProject) projectToClone.clone();
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
+    }
+
+    public void testCloneWithActiveProfile() throws Exception
+    {
+
+        File f = getFileForClasspathResource( "withActiveByDefaultProfile-pom.xml" );
+        MavenProject projectToClone = getProject( f );
+        List<Profile> activeProfilesOrig = projectToClone.getActiveProfiles();
+
+        assertEquals( "Expecting 1 active profile", 1, activeProfilesOrig.size() );
+
+        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+
+        List<Profile> activeProfilesClone = clonedProject.getActiveProfiles();
+
+        assertEquals( "Expecting 1 active profile", 1, activeProfilesClone.size() );
+
+        assertNotSame( "The list of active profiles should have been cloned too but is same",
+                activeProfilesOrig, activeProfilesClone);
     }
 }
