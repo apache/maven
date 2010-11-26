@@ -66,13 +66,19 @@ public class DefaultArtifactVersion
             return false;
         }
 
-        return compareTo( other ) == 0;
+        return compareTo( (ArtifactVersion) other ) == 0;
     }
 
-    public int compareTo( Object o )
+    public int compareTo( ArtifactVersion otherVersion )
     {
-        DefaultArtifactVersion otherVersion = (DefaultArtifactVersion) o;
-        return this.comparable.compareTo( otherVersion.comparable );
+        if ( otherVersion instanceof DefaultArtifactVersion )
+        {
+            return this.comparable.compareTo( ( (DefaultArtifactVersion) otherVersion).comparable );
+        }
+        else
+        {
+            return compareTo( new DefaultArtifactVersion( otherVersion.toString() ) );
+        }
     }
 
     public int getMajorVersion()

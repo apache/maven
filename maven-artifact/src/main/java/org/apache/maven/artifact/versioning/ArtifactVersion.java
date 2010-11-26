@@ -27,7 +27,7 @@ package org.apache.maven.artifact.versioning;
  * @version $Id$
  */
 public interface ArtifactVersion
-    extends Comparable
+    extends Comparable<ArtifactVersion>
 {
     int getMajorVersion();
 

@@ -30,7 +30,7 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
- * @see ArtifactVersion#compareTo(Object)
+ * @see ArtifactVersion#compareTo
  * @since 3.0
  */
 @Component( role = ConflictResolver.class, hint = "oldest" )
