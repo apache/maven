@@ -492,7 +492,7 @@ public class DefaultModelBuilder
             if ( source != null )
             {
                 source.setModelId( ModelProblemUtils.toId( model ) );
-                source.setLocation( pomFile != null ? pomFile.getAbsolutePath() : null );
+                source.setLocation( modelSource.getLocation() );
             }
         }
         catch ( ModelParseException e )
