@@ -39,11 +39,17 @@ public class DefaultExecutionEventCatapult
 
     public void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution )
     {
+        fire( eventType, session, mojoExecution, null );
+    }
+
+    public void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution,
+                      Exception exception )
+    {
         ExecutionListener listener = session.getRequest().getExecutionListener();
 
         if ( listener != null )
         {
-            ExecutionEvent event = new DefaultExecutionEvent( eventType, session, mojoExecution );
+            ExecutionEvent event = new DefaultExecutionEvent( eventType, session, mojoExecution, exception );
 
             switch ( eventType )
             {

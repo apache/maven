@@ -215,8 +215,7 @@ public class MojoExecutor
         }
         catch ( LifecycleExecutionException e )
         {
-            mojoExecution.setException( new Exception( e.getCause() ) );
-            eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution );
+            eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution, e );
 
             throw e;
         }
@@ -355,7 +354,7 @@ public class MojoExecutor
                     }
                     catch ( LifecycleExecutionException e )
                     {
-                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectFailed, session, mojoExecution );
+                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectFailed, session, mojoExecution, e );
 
                         throw e;
                     }
@@ -371,7 +370,7 @@ public class MojoExecutor
             }
             catch ( LifecycleExecutionException e )
             {
-                eventCatapult.fire( ExecutionEvent.Type.ForkFailed, session, mojoExecution );
+                eventCatapult.fire( ExecutionEvent.Type.ForkFailed, session, mojoExecution, e );
 
                 throw e;
             }

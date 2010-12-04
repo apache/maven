@@ -39,11 +39,6 @@ public class MojoExecution
     private MojoDescriptor mojoDescriptor;
 
     private Xpp3Dom configuration;
-    
-    /**
-     * @since 3.0.2
-     */
-    private Exception exception;
 
     /**
      * Describes the source of an execution.
@@ -237,25 +232,6 @@ public class MojoExecution
     public void setForkedExecutions( String projectKey, List<MojoExecution> forkedExecutions )
     {
         this.forkedExecutions.put( projectKey, forkedExecutions );
-    }
-
-    /**
-     * @since 3.0.2
-     * @return {@link Exception} encountered during the execution
-     */
-    public Exception getException()
-    {
-        return exception;
-    }
-
-    /**
-     * @since 3.0.2
-     * @param exception
-     */
-    public MojoExecution setException( Exception exception )
-    {
-        this.exception = exception;
-        return this;
     }
 
 }

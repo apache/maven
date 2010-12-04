@@ -82,4 +82,11 @@ public interface ExecutionEvent
      */
     MojoExecution getMojoExecution();
 
+    /**
+     * Gets the exception that caused the event (if any).
+     * 
+     * @return The exception or {@code null} if none.
+     */
+    Exception getException();
+
 }

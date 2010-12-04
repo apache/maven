@@ -39,11 +39,14 @@ class DefaultExecutionEvent
 
     private final MojoExecution mojoExecution;
 
-    public DefaultExecutionEvent( Type type, MavenSession session, MojoExecution mojoExecution )
+    private final Exception exception;
+
+    public DefaultExecutionEvent( Type type, MavenSession session, MojoExecution mojoExecution, Exception exception )
     {
         this.type = type;
         this.session = session;
         this.mojoExecution = mojoExecution;
+        this.exception = exception;
     }
 
     public Type getType()
@@ -64,6 +67,11 @@ class DefaultExecutionEvent
     public MojoExecution getMojoExecution()
     {
         return mojoExecution;
+    }
+
+    public Exception getException()
+    {
+        return exception;
     }
 
 }

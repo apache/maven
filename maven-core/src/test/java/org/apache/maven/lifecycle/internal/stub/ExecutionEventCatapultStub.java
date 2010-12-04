@@ -35,4 +35,8 @@ public class ExecutionEventCatapultStub
     {
     }
 
+    public void fire( Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception )
+    {
+    }
+
 }

@@ -134,7 +134,7 @@ public class BuilderCommon
 
         buildContext.getResult().addBuildSummary( new BuildFailure( mavenProject, buildEndTime - buildStartTime, e ) );
 
-        eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, rootSession, null );
+        eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, rootSession, null, e );
 
         if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( rootSession.getReactorFailureBehavior() ) )
         {

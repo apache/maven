@@ -35,4 +35,6 @@ public interface ExecutionEventCatapult
 
     void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution );
 
+    void fire( ExecutionEvent.Type eventType, MavenSession session, MojoExecution mojoExecution, Exception exception );
+
 }
