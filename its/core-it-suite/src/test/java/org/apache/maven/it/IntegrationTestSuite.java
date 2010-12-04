@@ -513,6 +513,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng1323AntrunDependenciesTest.class );
         suite.addTestSuite( MavenITmng1233WarDepWithProvidedScopeTest.class );
         suite.addTestSuite( MavenITmng1144MultipleDefaultGoalsTest.class );
+        suite.addTestSuite( MavenITmng1142VersionRangeIntersectionTest.class );
         suite.addTestSuite( MavenITmng1088ReactorPluginResolutionTest.class );
         suite.addTestSuite( MavenITmng1073AggregatorForksReactorTest.class );
         suite.addTestSuite( MavenITmng1052PluginMngtConfigTest.class );
