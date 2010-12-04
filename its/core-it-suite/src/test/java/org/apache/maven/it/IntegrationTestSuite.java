@@ -451,6 +451,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng2744checksumVerificationTest.class );
         suite.addTestSuite( MavenITmng2741PluginMetadataResolutionErrorMessageTest.class );
         suite.addTestSuite( MavenITmng2739RequiredRepositoryElementsTest.class );
+        suite.addTestSuite( MavenITmng2738ProfileIdCollidesWithCliOptionTest.class );
         suite.addTestSuite( MavenITmng2720SiblingClasspathArtifactsTest.class );
         suite.addTestSuite( MavenITmng2695OfflinePluginSnapshotsTest.class );
         suite.addTestSuite( MavenITmng2693SitePluginRealmTest.class );
