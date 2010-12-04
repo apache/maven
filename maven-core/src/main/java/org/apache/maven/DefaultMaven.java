@@ -75,7 +75,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.aether.ConfigurationProperties;
-import org.sonatype.aether.RepositoryEvent;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.collection.DependencyGraphTransformer;

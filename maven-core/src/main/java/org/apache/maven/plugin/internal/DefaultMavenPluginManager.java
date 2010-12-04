@@ -408,7 +408,6 @@ public class DefaultMavenPluginManager
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
         ClassRealm oldLookupRealm = container.setLookupRealm( pluginRealm );
-        container.setLookupRealm( pluginRealm );
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader( pluginRealm );
