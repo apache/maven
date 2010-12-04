@@ -215,6 +215,7 @@ public class MojoExecutor
         }
         catch ( LifecycleExecutionException e )
         {
+            mojoExecution.setException( new Exception( e.getCause() ) );
             eventCatapult.fire( ExecutionEvent.Type.MojoFailed, session, mojoExecution );
 
             throw e;

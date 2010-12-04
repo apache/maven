@@ -1,5 +1,8 @@
 package org.apache.maven.execution;
 
+import org.apache.maven.plugin.MojoExecution;
+
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -49,6 +52,10 @@ public interface ExecutionListener
 
     void mojoSucceeded( ExecutionEvent event );
 
+    /**
+     * since 3.0.2 {@link Exception} is in {@link MojoExecution#getException()} returned
+     * by {@link ExecutionEvent#getMojoExecution()}
+     */
     void mojoFailed( ExecutionEvent event );
 
     void forkStarted( ExecutionEvent event );
