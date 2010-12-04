@@ -86,16 +86,16 @@ public class DefaultBuildPluginManager
             throw new PluginExecutionException( mojoExecution, project, e );
         }
 
-        ClassRealm oldLookupRealm = container.getLookupRealm();
+        ClassRealm oldLookupRealm = container.setLookupRealm( pluginRealm );
+
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader( pluginRealm );
 
         MavenSession oldSession = legacySupport.getSession();
 
         try
         {
             mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
-
-            Thread.currentThread().setContextClassLoader( pluginRealm );
 
             legacySupport.setSession( session );
 
@@ -158,12 +158,8 @@ public class DefaultBuildPluginManager
         {
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
 
-            if ( oldLookupRealm != null )
-            {
-                container.setLookupRealm( null );
-            }
-
             Thread.currentThread().setContextClassLoader( oldClassLoader );
+            container.setLookupRealm( oldLookupRealm );
 
             legacySupport.setSession( oldSession );
         }
