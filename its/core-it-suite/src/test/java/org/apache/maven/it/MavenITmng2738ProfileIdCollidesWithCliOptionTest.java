@@ -35,7 +35,7 @@ public class MavenITmng2738ProfileIdCollidesWithCliOptionTest
 
     public MavenITmng2738ProfileIdCollidesWithCliOptionTest()
     {
-        super( "[2.1.0,3.0-alpha-1),[3.0,)" );
+        super( "[2.2.0,3.0-alpha-1),[3.0,)" );
     }
 
     /**
