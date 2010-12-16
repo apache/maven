@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven.cli;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,14 +19,21 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.PrintStream;
-
-public class BatchModeMavenTransferListener
-    extends AbstractMavenTransferListener
+/**
+ * A special throwable used to signal a graceful abort of the build.
+ */
+public class BuildAbort
+    extends Error
 {
-    public BatchModeMavenTransferListener( PrintStream out )
+
+    public BuildAbort( String message )
     {
-        super( out );
+        super( message );
+    }
+
+    public BuildAbort( String message, Throwable cause )
+    {
+        super( message, cause );
     }
 
 }

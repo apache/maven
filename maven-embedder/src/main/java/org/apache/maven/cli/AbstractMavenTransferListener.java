@@ -29,7 +29,7 @@ import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferResource;
 
-abstract class AbstractMavenTransferListener
+public abstract class AbstractMavenTransferListener
     extends AbstractTransferListener
 {
 

@@ -33,8 +33,10 @@ import java.util.StringTokenizer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
@@ -59,6 +61,7 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -92,12 +95,16 @@ public class MavenCli
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
+    private static final String EXT_CLASS_PATH = "maven.ext.class.path";
+
     private ClassWorld classWorld;
 
     // Per-instance container supports fast embedded execution of core ITs
     private DefaultPlexusContainer container;
 
     private Logger logger;
+
+    private EventSpyDispatcher eventSpyDispatcher;
 
     private ModelProcessor modelProcessor;
 
@@ -195,6 +202,12 @@ public class MavenCli
         {
             // pure user error, suppress stack trace
             return 1;
+        }
+        catch ( BuildAbort e )
+        {
+            CLIReportingUtils.showError( logger, "ABORTED", e, cliRequest.showErrors );
+
+            return 2;
         }
         catch ( Exception e )
         {
@@ -352,6 +365,7 @@ public class MavenCli
 
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld( cliRequest.classWorld )
+                .setRealm( setupContainerRealm( cliRequest ) )
                 .setName( "maven" );
 
             container = new DefaultPlexusContainer( cc );
@@ -367,6 +381,22 @@ public class MavenCli
         }
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+
+        Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
+
+        eventSpyDispatcher = container.lookup( EventSpyDispatcher.class );
+
+        DefaultEventSpyContext eventSpyContext = new DefaultEventSpyContext();
+        Map<String, Object> data = eventSpyContext.getData();
+        data.put( "plexus", container );
+        data.put( "workingDirectory", cliRequest.workingDirectory );
+        data.put( "systemProperties", cliRequest.systemProperties );
+        data.put( "userProperties", cliRequest.userProperties );
+        data.put( "versionProperties", CLIReportingUtils.getBuildProperties() );
+        eventSpyDispatcher.init( eventSpyContext );
+
+        // refresh logger in case container got customized by spy
+        logger = container.getLoggerManager().getLoggerForComponent( MavenCli.class.getName(), null );
 
         maven = container.lookup( Maven.class );
 
@@ -389,7 +419,54 @@ public class MavenCli
             }
         } );
 
+        logger.setThreshold( cliRequest.request.getLoggingLevel() );
+
         return logger;
+    }
+
+    private ClassRealm setupContainerRealm( CliRequest cliRequest )
+        throws Exception
+    {
+        ClassRealm containerRealm = null;
+
+        String extClassPath = cliRequest.userProperties.getProperty( EXT_CLASS_PATH );
+        if ( extClassPath == null )
+        {
+            extClassPath = cliRequest.systemProperties.getProperty( EXT_CLASS_PATH );
+        }
+
+        if ( StringUtils.isNotEmpty( extClassPath ) )
+        {
+            String[] jars = StringUtils.split( extClassPath, File.pathSeparator );
+
+            if ( jars.length > 0 )
+            {
+                ClassRealm coreRealm = cliRequest.classWorld.getClassRealm( "plexus.core" );
+                if ( coreRealm == null )
+                {
+                    coreRealm = (ClassRealm) cliRequest.classWorld.getRealms().iterator().next();
+                }
+
+                ClassRealm extRealm = cliRequest.classWorld.newRealm( "maven.ext", null );
+
+                logger.debug( "Populating class realm " + extRealm.getId() );
+
+                for ( String jar : jars )
+                {
+                    File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
+
+                    logger.debug( "  Included " + file );
+
+                    extRealm.addURL( file.toURI().toURL() );
+                }
+
+                extRealm.setParentRealm( coreRealm );
+
+                containerRealm = extRealm;
+            }
+        }
+
+        return containerRealm;
     }
 
     protected void customizeContainer( PlexusContainer container )
@@ -448,7 +525,13 @@ public class MavenCli
 
     private int execute( CliRequest cliRequest )
     {
+        eventSpyDispatcher.onEvent( cliRequest.request );
+
         MavenExecutionResult result = maven.execute( cliRequest.request );
+
+        eventSpyDispatcher.onEvent( result );
+
+        eventSpyDispatcher.close();
 
         if ( result.hasExceptions() )
         {
@@ -625,12 +708,16 @@ public class MavenCli
         settingsRequest.setSystemProperties( cliRequest.systemProperties );
         settingsRequest.setUserProperties( cliRequest.userProperties );
 
+        eventSpyDispatcher.onEvent( settingsRequest );
+
         logger.debug( "Reading global settings from "
             + getSettingsLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
         logger.debug( "Reading user settings from "
             + getSettingsLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
+
+        eventSpyDispatcher.onEvent( settingsResult );
 
         executionRequestPopulator.populateFromSettings( cliRequest.request, settingsResult.getEffectiveSettings() );
 
@@ -800,6 +887,7 @@ public class MavenCli
         }
 
         ExecutionListener executionListener = new ExecutionEventLogger( logger );
+        executionListener = eventSpyDispatcher.chainListener( executionListener );
 
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )

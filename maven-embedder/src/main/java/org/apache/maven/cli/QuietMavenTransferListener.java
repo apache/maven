@@ -24,7 +24,7 @@ import org.sonatype.aether.transfer.AbstractTransferListener;
 /**
  * @author Benjamin Bentmann
  */
-class QuietMavenTransferListener
+public class QuietMavenTransferListener
     extends AbstractTransferListener
 {
 

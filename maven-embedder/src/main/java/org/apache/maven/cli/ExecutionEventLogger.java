@@ -40,7 +40,7 @@ import org.codehaus.plexus.logging.Logger;
  *
  * @author Benjamin Bentmann
  */
-class ExecutionEventLogger
+public class ExecutionEventLogger
     extends AbstractExecutionListener
 {
     private final Logger logger;

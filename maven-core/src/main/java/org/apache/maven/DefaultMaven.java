@@ -33,6 +33,7 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -142,6 +143,9 @@ public class DefaultMaven
 
     @Requirement
     private LegacySupport legacySupport;
+
+    @Requirement
+    private EventSpyDispatcher eventSpyDispatcher;
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
@@ -437,7 +441,7 @@ public class DefaultMaven
 
         session.setTransferListener( request.getTransferListener() );
 
-        session.setRepositoryListener( new LoggingRepositoryListener( logger ) );
+        session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
 
         session.setUserProps( request.getUserProperties() );
         session.setSystemProps( request.getSystemProperties() );
@@ -564,7 +568,7 @@ public class DefaultMaven
         //
         if ( request.getPom() == null )
         {
-            ModelSource modelSource = new UrlModelSource( getClass().getResource( "project/standalone.xml" ) );
+            ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
             MavenProject project =
                 projectBuilder.build( modelSource, request.getProjectBuildingRequest() ).getProject();
             project.setExecutionRoot( true );

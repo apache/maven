@@ -32,7 +32,7 @@ import org.sonatype.aether.transfer.TransferResource;
  * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
-class ConsoleMavenTransferListener
+public class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
 
