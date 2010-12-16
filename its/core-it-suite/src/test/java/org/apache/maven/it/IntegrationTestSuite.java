@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4936EventSpyTest.class );
         suite.addTestSuite( MavenITmng4925ContainerLookupRealmDuringMojoExecTest.class );
         suite.addTestSuite( MavenITmng4913UserPropertyVsDependencyPomPropertyTest.class );
         suite.addTestSuite( MavenITmng4895PluginDepWithNonRelocatedMavenApiTest.class );
