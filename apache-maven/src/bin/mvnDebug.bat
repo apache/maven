@@ -30,6 +30,7 @@
 @REM MAVEN_OPTS - parameters passed to the Java VM when running Maven
 @REM     e.g. to debug Maven itself, use
 @REM set MAVEN_OPTS=-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+@REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 @REM ----------------------------------------------------------------------------
 
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
@@ -43,7 +44,9 @@
 if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
 
 @REM Execute a user defined script before this one
+if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
 if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
+:skipRcPre
 
 set ERROR_CODE=0
 
@@ -183,7 +186,11 @@ goto postExec
 @endlocal & set ERROR_CODE=%ERROR_CODE%
 
 :postExec
+
+if not "%MAVEN_SKIP_RC%" == "" goto skipRcPost
 if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
+:skipRcPost
+
 @REM pause the batch file if MAVEN_BATCH_PAUSE is set to 'on'
 if "%MAVEN_BATCH_PAUSE%" == "on" pause
 
