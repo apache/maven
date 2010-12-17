@@ -255,6 +255,13 @@ public class PluginDescriptorBuilder
         }
 
         // ----------------------------------------------------------------------
+        // Configuration
+        // ----------------------------------------------------------------------
+
+        PlexusConfiguration mojoConfig = c.getChild( "configuration" );
+        mojo.setMojoConfiguration( mojoConfig );
+
+        // ----------------------------------------------------------------------
         // Parameters
         // ----------------------------------------------------------------------
 
@@ -292,21 +299,19 @@ public class PluginDescriptorBuilder
 
             parameter.setImplementation( d.getChild( "implementation" ).getValue() );
 
+            PlexusConfiguration paramConfig = mojoConfig.getChild( parameter.getName(), false );
+            if ( paramConfig != null )
+            {
+                parameter.setExpression( paramConfig.getValue( null ) );
+                parameter.setDefaultValue( paramConfig.getAttribute( "default-value" ) );
+            }
+
             parameters.add( parameter );
         }
 
         mojo.setParameters( parameters );
 
         // TODO: this should not need to be handed off...
-
-        // ----------------------------------------------------------------------
-        // Configuration
-        // ----------------------------------------------------------------------
-
-        mojo.setMojoConfiguration( c.getChild( "configuration" ) );
-
-        // TODO: Go back to this when we get the container ready to configure mojos...
-        //        mojo.setConfiguration( c.getChild( "configuration" ) );
 
         // ----------------------------------------------------------------------
         // Requirements

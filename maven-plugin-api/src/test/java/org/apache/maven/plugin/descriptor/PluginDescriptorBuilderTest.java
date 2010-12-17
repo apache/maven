@@ -105,6 +105,8 @@ public class PluginDescriptorBuilderTest
         assertEquals( false, mp.isRequired() );
         assertEquals( "parameter-description", mp.getDescription() );
         assertEquals( "deprecated-parameter", mp.getDeprecated() );
+        assertEquals( "${jar.finalName}", mp.getExpression() );
+        assertEquals( "${project.build.finalName}", mp.getDefaultValue() );
 
         ComponentRequirement cr = md.getRequirements().get( 0 );
 
