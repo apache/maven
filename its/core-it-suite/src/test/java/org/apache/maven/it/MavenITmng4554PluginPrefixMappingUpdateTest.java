@@ -100,7 +100,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             catch ( IOException e )
             {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse( new File( verifier.localRepo, "org/apache.maven.its.mng4554/maven-metadata-mng4554.xml" ).exists() );
+                assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
@@ -177,7 +177,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             catch ( IOException e )
             {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse( new File( verifier.localRepo, "org/apache.maven.its.mng4554/maven-metadata-mng4554.xml" ).exists() );
+                assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
@@ -257,7 +257,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             catch ( IOException e )
             {
                 // expected when running test on Windows using embedded Maven (JAR files locked by plugin class realm)
-                assertFalse( new File( verifier.localRepo, "org/apache.maven.its.mng4554/maven-metadata-mng4554.xml" ).exists() );
+                assertFalse( new File( verifier.getArtifactMetadataPath( "org.apache.maven.its.mng4554", null, null, "maven-metadata-mng4554.xml" ) ).exists() );
             }
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );

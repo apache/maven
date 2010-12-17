@@ -20,9 +20,7 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
@@ -126,7 +124,7 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
     private void assertArtifact( Verifier verifier, String gid, String aid, String ver, String cls, String ext, String sha1 )
         throws Exception
     {
-        File file = getFile( verifier, gid, aid, ver, cls, ext );
+        File file = new File( verifier.getArtifactPath( gid, aid, ver, ext, cls ) );
         assertTrue( file.getAbsolutePath(), file.isFile() );
         assertEquals( sha1, ItUtils.calcHash( file, "SHA-1" ) );
     }
@@ -134,8 +132,8 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
     private void assertMetadata( Verifier verifier, String gid, String aid, String ver, String sha1 )
         throws Exception
     {
-        File file = getFile( verifier, gid, aid, ver, "", "pom" );
-        file = new File( file.getParent(), "maven-metadata-maven-core-it.xml" );
+        String name = "maven-metadata-maven-core-it.xml";
+        File file = new File( verifier.getArtifactMetadataPath( gid, aid, ver, name ) );
         assertTrue( file.getAbsolutePath(), file.isFile() );
         assertEquals( sha1, ItUtils.calcHash( file, "SHA-1" ) );
     }
@@ -143,26 +141,10 @@ public class MavenITmng3379ParallelArtifactDownloadsTest
     private void assertMetadata( Verifier verifier, String gid, String aid, String sha1 )
         throws Exception
     {
-        File file = getFile( verifier, gid, aid, "0.2", "", "pom" );
-        file = new File( file.getParentFile().getParent(), "maven-metadata-maven-core-it.xml" );
+        String name = "maven-metadata-maven-core-it.xml";
+        File file = new File( verifier.getArtifactMetadataPath( gid, aid, null, name ) );
         assertTrue( file.getAbsolutePath(), file.isFile() );
         assertEquals( sha1, ItUtils.calcHash( file, "SHA-1" ) );
-    }
-
-    private File getFile( Verifier verifier, String gid, String aid, String ver, String cls, String ext )
-    {
-        StringBuffer buffer = new StringBuffer( 256 );
-        buffer.append( verifier.localRepo );
-        buffer.append( '/' ).append( gid.replace( '.', '/' ) );
-        buffer.append( '/' ).append( aid );
-        buffer.append( '/' ).append( ver );
-        buffer.append( '/' ).append( aid ).append( '-' ).append( ver );
-        if ( cls != null && cls.length() > 0 )
-        {
-            buffer.append( '-' ).append( cls );
-        }
-        buffer.append( '.' ).append( ext );
-        return new File( buffer.toString() );
     }
 
 }

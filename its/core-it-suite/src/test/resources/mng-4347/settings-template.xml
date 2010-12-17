@@ -30,9 +30,11 @@ under the License.
           <url>@baseurl@/remote-repository</url>
           <releases>
             <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
           </releases>
           <snapshots>
             <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
           </snapshots>
         </repository>
       </repositories>
@@ -42,9 +44,11 @@ under the License.
           <url>@baseurl@/remote-repository</url>
           <releases>
             <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
           </releases>
           <snapshots>
             <enabled>true</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
           </snapshots>
         </pluginRepository>
       </pluginRepositories>

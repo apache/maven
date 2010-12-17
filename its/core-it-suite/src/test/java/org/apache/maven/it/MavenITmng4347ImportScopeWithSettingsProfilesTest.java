@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -51,14 +50,8 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         
-        String localRepo = verifier.localRepo;
-        File dest = new File( localRepo );
-        File src = new File( testDir, "local-repository" );
-        
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.it.mng4347" );
-        
-        FileUtils.copyDirectoryStructure( src, dest );
         
         verifier.setAutoclean( false );
         
@@ -72,4 +65,5 @@ public class MavenITmng4347ImportScopeWithSettingsProfilesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
+
 }

@@ -27,7 +27,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -101,9 +100,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        File localRepo = new File( verifier.localRepo );
-
-        setupDummyDependency( testDir, localRepo, true );
+        setupDummyDependency( verifier, testDir, true );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.put( "@protocol@", "invalid" );
@@ -119,9 +116,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
         verifier.verifyErrorFreeLog();
 
-        assertMetadataMissing( localRepo );
+        assertMetadataMissing( verifier );
 
-        setupDummyDependency( testDir, localRepo, true );
+        setupDummyDependency( verifier, testDir, true );
 
         verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
         verifier.executeGoal( "validate" );
@@ -129,7 +126,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        assertMetadataMissing( localRepo );
+        assertMetadataMissing( verifier );
     }
 
     private String getMethodName()
@@ -173,8 +170,6 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        File localRepo = new File( verifier.localRepo );
-
         final List requestUris = new ArrayList();
 
         Handler repoHandler = new AbstractHandler()
@@ -208,7 +203,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             verifier.getCliOptions().add( "-s" );
             verifier.getCliOptions().add( settings.getName() );
 
-            setupDummyDependency( testDir, localRepo, true );
+            setupDummyDependency( verifier, testDir, true );
 
             verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
             verifier.executeGoal( "validate" );
@@ -220,10 +215,10 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
             requestUris.clear();
 
-            File updateCheckFile = getUpdateCheckFile( localRepo );
+            File updateCheckFile = getUpdateCheckFile( verifier );
             long firstLastMod = updateCheckFile.lastModified();
 
-            setupDummyDependency( testDir, localRepo, false );
+            setupDummyDependency( verifier, testDir, false );
 
             verifier.setLogFileName( "log-" + methodName + "-secondBuild.txt" );
             verifier.executeGoal( "validate" );
@@ -242,82 +237,68 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         }
     }
 
-    private void assertMetadataMissing( File localRepo )
+    private void assertMetadataMissing( Verifier verifier )
+        throws IOException
     {
-        File metadata = getMetadataFile( localRepo );
+        File metadata = getMetadataFile( verifier );
 
         assertFalse( "Metadata file should NOT be present in local repository: "
                      + metadata.getAbsolutePath(), metadata.exists() );
     }
 
-    private void setupDummyDependency( File testDir,
-                                       File localRepo,
-                                       boolean resetUpdateInterval )
+    private void setupDummyDependency( Verifier verifier, File testDir, boolean resetUpdateInterval )
         throws VerificationException, IOException
     {
-        File metadata = getMetadataFile( localRepo );
+        String gid = "org.apache.maven.its.mng3415";
+        String aid = "missing";
+        String version = "1.0-SNAPSHOT";
 
-        if ( resetUpdateInterval && metadata.exists() )
+        if ( resetUpdateInterval )
         {
-            System.out.println( "Deleting metadata file: " + metadata );
-            metadata.delete();
+            verifier.deleteArtifacts( gid );
         }
 
-        File resolverStatus = new File( metadata.getParentFile(), "resolver-status.properties" );
-
-        if ( resetUpdateInterval && resolverStatus.exists() )
-        {
-            System.out.println( "Deleting resolver-status.properties file related to: " + metadata );
-            resolverStatus.delete();
-        }
-
-        File dir = metadata.getParentFile();
-
-        System.out.println( "Setting up dependency POM in: " + dir );
-
-        File pom = new File( dir, "missing-1.0-SNAPSHOT.pom" );
-
-        if ( pom.exists() )
-        {
-            System.out.println( "Deleting pre-existing POM: " + pom );
-            pom.delete();
-        }
+        File pom = new File( verifier.getArtifactPath( gid, aid, version, "pom" ) );
 
         File pomSrc = new File( testDir, "dependency-pom.xml" );
 
         System.out.println( "Copying dependency POM\nfrom: " + pomSrc + "\nto: " + pom );
-
         FileUtils.copyFile( pomSrc, pom );
     }
 
-    private File getMetadataFile( File localRepo )
+    private File getMetadataFile( Verifier verifier )
+        throws IOException
     {
-        File dir = new File( localRepo, "org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT" );
+        String gid = "org.apache.maven.its.mng3415";
+        String aid = "missing";
+        String version = "1.0-SNAPSHOT";
+        String name = "maven-metadata-testing-repo.xml";
 
-        dir.mkdirs();
-
-        return new File( dir, "maven-metadata-testing-repo.xml" );
+        return new File( verifier.getArtifactMetadataPath( gid, aid, version, name ) );
     }
 
     /**
      * If the current maven version is < 3.0, we'll use the metadata file itself (old maven-artifact code)...
      * otherwise, use the new resolver-status.properties file (new artifact code).
      */
-    private File getUpdateCheckFile( File localRepo )
+    private File getUpdateCheckFile( Verifier verifier )
     {
-        File dir = new File( localRepo, "org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT" );
-
-        dir.mkdirs();
+        String gid = "org.apache.maven.its.mng3415";
+        String aid = "missing";
+        String version = "1.0-SNAPSHOT";
+        String name;
 
         // < 3.0 (including snapshots)
         if ( matchesVersionRange( "(2.0.8,3.0-alpha-1)" ) )
         {
-            return new File( dir, "maven-metadata-testing-repo.xml" );
+            name = "maven-metadata-testing-repo.xml";
         }
         else
         {
-            return new File( dir, "resolver-status.properties" );
+            name = "resolver-status.properties";
         }
+
+        return new File( verifier.getArtifactMetadataPath( gid, aid, version, name ) );
     }
 
 }

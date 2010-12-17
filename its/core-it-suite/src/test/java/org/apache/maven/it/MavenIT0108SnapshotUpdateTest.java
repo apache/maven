@@ -208,7 +208,7 @@ public class MavenIT0108SnapshotUpdateTest
 
     private File getMetadataFile( String groupId, String artifactId, String version )
     {
-        return new File( verifier.localRepo, groupId + "/" + artifactId + "/" + version + "/maven-metadata-local.xml" );
+        return new File( verifier.getArtifactMetadataPath( groupId, artifactId, version, "maven-metadata-local.xml" ) );
     }
 
     private void assertArtifactContents( String s )

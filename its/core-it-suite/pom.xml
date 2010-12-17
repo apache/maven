@@ -229,6 +229,30 @@ under the License.
       </build>
     </profile>
     <profile>
+      <id>maven-repo-local-layout</id>
+      <activation>
+        <property>
+          <name>maven.repo.local.layout</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <systemProperties combine.children="append">
+                <property>
+                  <!-- Pass this through to the tests (if set!) to have them pick the right repository layout -->
+                  <name>maven.repo.local.layout</name>
+                  <value>${maven.repo.local.layout}</value>
+                </property>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>embedded</id>
       <build>
         <plugins>
