@@ -73,15 +73,16 @@ public final class CLIReportingUtils
 
         stdout.println( msg );
 
-        stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) );
+        stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
+            + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) );
 
         stdout.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
 
         stdout.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
             + System.getProperty( "file.encoding", "<unknown encoding>" ) );
 
-        stdout.println( "OS name: \"" + Os.OS_NAME + "\" version: \"" + Os.OS_VERSION + "\" arch: \"" + Os.OS_ARCH
-            + "\" Family: \"" + Os.OS_FAMILY + "\"" );
+        stdout.println( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH
+            + "\", family: \"" + Os.OS_FAMILY + "\"" );
     }
 
     private static String reduce( String s )
