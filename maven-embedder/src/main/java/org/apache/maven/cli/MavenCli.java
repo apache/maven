@@ -186,6 +186,7 @@ public class MavenCli
             // Need to process cli options first to get possible logging options
             cli( cliRequest );
             logging( cliRequest );
+            version( cliRequest );
             properties( cliRequest );
             container( cliRequest );
             commands( cliRequest );
@@ -322,13 +323,16 @@ public class MavenCli
         }
     }
 
-    private void commands( CliRequest cliRequest )
+    private void version( CliRequest cliRequest )
     {
         if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
             CLIReportingUtils.showVersion( System.out );
         }
+    }
 
+    private void commands( CliRequest cliRequest )
+    {
         if ( cliRequest.showErrors )
         {
             logger.info( "Error stacktraces are turned on." );
