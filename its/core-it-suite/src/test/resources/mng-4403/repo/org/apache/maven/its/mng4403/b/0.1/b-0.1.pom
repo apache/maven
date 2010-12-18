@@ -131,6 +131,13 @@ under the License.
   </pluginRepositories>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <!-- internal field (MNG-4945) -->
+        <mergeId>bad</mergeId>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng4405</groupId>
