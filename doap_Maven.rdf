@@ -152,8 +152,8 @@ under the License.
     </release>
     <repository>
       <SVNRepository>
-        <location rdf:resource="http://svn.apache.org/repos/asf/maven/components/trunk"/>
-        <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/maven/components/trunk"/>
+        <location rdf:resource="http://svn.apache.org/repos/asf/maven/maven-3/trunk"/>
+        <browse rdf:resource="http://svn.apache.org/viewvc/maven/maven-3/trunk"/>
       </SVNRepository>
     </repository>
     <maintainer>
