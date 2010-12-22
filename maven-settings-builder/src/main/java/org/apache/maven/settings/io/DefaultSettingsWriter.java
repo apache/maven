@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.WriterFactory;
 
 /**
- * Handles serialization of settings into some kind of textual format like XML.
+ * Handles serialization of settings into the default textual format.
  * 
  * @author Benjamin Bentmann
  */

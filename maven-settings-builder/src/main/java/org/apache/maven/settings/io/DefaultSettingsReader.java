@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * Handles deserialization of settings from some kind of textual format like XML.
+ * Handles deserialization of settings from the default textual format.
  * 
  * @author Benjamin Bentmann
  */
