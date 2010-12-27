@@ -109,9 +109,9 @@ public class DefaultModelValidatorTest
 
     private void assertViolations( SimpleProblemCollector result, int fatals, int errors, int warnings )
     {
-        assertEquals( fatals, result.getFatals().size() );
-        assertEquals( errors, result.getErrors().size() );
-        assertEquals( warnings, result.getWarnings().size() );
+        assertEquals( String.valueOf( result.getFatals() ), fatals, result.getFatals().size() );
+        assertEquals( String.valueOf( result.getErrors() ), errors, result.getErrors().size() );
+        assertEquals( String.valueOf( result.getWarnings() ), warnings, result.getWarnings().size() );
     }
 
     public void testMissingModelVersion()
@@ -589,6 +589,19 @@ public class DefaultModelValidatorTest
 
         assertContains( result.getErrors().get( 0 ),
                         "'dependencyManagement.dependencies.dependency.classifier' for test:a:pom:cls must be empty" );
+    }
+
+    public void testSystemPathRefersToProjectBasedir()
+        throws Exception
+    {
+        SimpleProblemCollector result = validateRaw( "basedir-system-path.xml" );
+
+        assertViolations( result, 0, 0, 2 );
+
+        assertContains( result.getWarnings().get( 0 ), "'dependencies.dependency.systemPath' for test:a:jar "
+            + "should not point at files within the project directory" );
+        assertContains( result.getWarnings().get( 1 ), "'dependencies.dependency.systemPath' for test:b:jar "
+            + "should not point at files within the project directory" );
     }
 
 }

@@ -345,7 +345,7 @@ public class DefaultModelValidator
     }
 
     private void validateRawDependencies( ModelProblemCollector problems, List<Dependency> dependencies, String prefix,
-                                       ModelBuildingRequest request )
+                                          ModelBuildingRequest request )
     {
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
         Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
@@ -372,10 +372,19 @@ public class DefaultModelValidator
             else if ( "system".equals( dependency.getScope() ) )
             {
                 String sysPath = dependency.getSystemPath();
-                if ( StringUtils.isNotEmpty( sysPath ) && !hasExpression( sysPath ) )
+                if ( StringUtils.isNotEmpty( sysPath ) )
                 {
-                    addViolation( problems, Severity.WARNING, prefix + ".systemPath", key,
-                                  "should use a variable instead of a hard-coded path " + sysPath, dependency );
+                    if ( !hasExpression( sysPath ) )
+                    {
+                        addViolation( problems, Severity.WARNING, prefix + ".systemPath", key,
+                                      "should use a variable instead of a hard-coded path " + sysPath, dependency );
+                    }
+                    else if ( sysPath.contains( "${basedir}" ) || sysPath.contains( "${project.basedir}" ) )
+                    {
+                        addViolation( problems, Severity.WARNING, prefix + ".systemPath", key,
+                                      "should not point at files within the project directory, " + sysPath
+                                          + " will be unresolvable by dependent projects", dependency );
+                    }
                 }
             }
 
@@ -640,7 +649,7 @@ public class DefaultModelValidator
 
     private boolean hasExpression( String value )
     {
-        return value != null && value.indexOf( "${" ) >= 0;
+        return value != null && value.contains( "${" );
     }
 
     private boolean validateStringNotEmpty( String fieldName, ModelProblemCollector problems, Severity severity,

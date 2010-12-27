@@ -29,14 +29,14 @@ under the License.
       <artifactId>a</artifactId>
       <version>0.2</version>
       <scope>system</scope>
-      <systemPath>should-use-variables-and-not-hard-code-this-path</systemPath>
+      <systemPath>${basedir}/lib/a.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>test</groupId>
       <artifactId>b</artifactId>
       <version>0.1</version>
       <scope>system</scope>
-      <systemPath>${java.home}/lib/good.jar</systemPath>
+      <systemPath>${project.basedir}/lib/b.jar</systemPath>
     </dependency>
   </dependencies>
 </project>
