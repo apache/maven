@@ -526,6 +526,16 @@ public class DefaultModelValidatorTest
         assertContains( result.getWarnings().get( 0 ), "'version' must not contain any of these characters" );
     }
 
+    public void testBadSnapshotVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "bad-snapshot-version.xml" );
+
+        assertViolations( result, 0, 0, 1 );
+
+        assertContains( result.getWarnings().get( 0 ), "'version' uses an unsupported snapshot version format" );
+    }
+
     public void testBadRepositoryId()
         throws Exception
     {

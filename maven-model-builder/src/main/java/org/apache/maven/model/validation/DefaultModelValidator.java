@@ -273,6 +273,7 @@ public class DefaultModelValidator
 
             validateBannedCharacters( "version", problems, errOn31, model.getVersion(), null, model,
                                       ILLEGAL_VERSION_CHARS );
+            validateProperSnapshotVersion( "version", problems, errOn31, model.getVersion(), null, model );
 
             Build build = model.getBuild();
             if ( build != null )
@@ -783,6 +784,24 @@ public class DefaultModelValidator
         if ( !validateBannedCharacters( fieldName, problems, severity, string, sourceHint, tracker,
                                         ILLEGAL_VERSION_CHARS ) )
         {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validateProperSnapshotVersion( String fieldName, ModelProblemCollector problems, Severity severity,
+                                                   String string, String sourceHint, InputLocationTracker tracker )
+    {
+        if ( string == null || string.length() <= 0 )
+        {
+            return true;
+        }
+
+        if ( string.endsWith( "SNAPSHOT" ) && !string.endsWith( "-SNAPSHOT" ) )
+        {
+            addViolation( problems, severity, fieldName, sourceHint, "uses an unsupported snapshot version format"
+                + ", should be '*-SNAPSHOT' instead.", tracker );
             return false;
         }
 
