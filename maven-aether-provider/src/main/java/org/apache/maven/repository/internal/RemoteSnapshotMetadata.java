@@ -62,10 +62,10 @@ final class RemoteSnapshotMetadata
         this.legacyFormat = legacyFormat;
     }
 
-    private static Metadata createMetadata( Artifact artifact, boolean legacy )
+    private static Metadata createMetadata( Artifact artifact, boolean legacyFormat )
     {
         Metadata metadata = new Metadata();
-        if ( !legacy )
+        if ( !legacyFormat )
         {
             metadata.setModelVersion( "1.1.0" );
         }
