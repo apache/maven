@@ -1,3 +1,5 @@
+package org.apache.maven.project.path;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -17,12 +19,11 @@
  * under the License.
  */
 
-package org.apache.maven.project.path;
-
 import java.io.File;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings( "deprecation" )
 public class DefaultPathTranslatorTest
     extends TestCase
 {
@@ -43,6 +44,15 @@ public class DefaultPathTranslatorTest
         String aligned = new DefaultPathTranslator().alignToBaseDirectory( "${basedir}/dir", basedir );
 
         assertEquals( new File( basedir, "dir" ).getAbsolutePath(), aligned );
+    }
+
+    public void testUnalignToBasedirWherePathEqualsBasedir()
+    {
+        File basedir = new File( System.getProperty( "java.io.tmpdir" ), "test" ).getAbsoluteFile();
+
+        String unaligned = new DefaultPathTranslator().unalignFromBaseDirectory( basedir.getAbsolutePath(), basedir );
+
+        assertEquals( ".", unaligned );
     }
 
 }
