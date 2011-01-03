@@ -20,6 +20,9 @@ package org.apache.maven.repository.internal;
  */
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -66,6 +69,29 @@ final class VersionsMetadata
         metadata.setArtifactId( artifact.getArtifactId() );
 
         return metadata;
+    }
+
+    @Override
+    protected void merge( Metadata recessive )
+    {
+        Versioning versioning = metadata.getVersioning();
+        versioning.updateTimestamp();
+
+        if ( recessive.getVersioning() != null )
+        {
+            if ( versioning.getLatest() == null )
+            {
+                versioning.setLatest( recessive.getVersioning().getLatest() );
+            }
+            if ( versioning.getRelease() == null )
+            {
+                versioning.setRelease( recessive.getVersioning().getRelease() );
+            }
+
+            Collection<String> versions = new LinkedHashSet<String>( recessive.getVersioning().getVersions() );
+            versions.addAll( versioning.getVersions() );
+            versioning.setVersions( new ArrayList<String>( versions ) );
+        }
     }
 
     public Object getKey()

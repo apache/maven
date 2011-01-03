@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.util.IOUtil;
@@ -81,24 +80,7 @@ abstract class MavenMetadata
         return merged;
     }
 
-    protected void merge( Metadata recessive )
-    {
-        Versioning versioning = recessive.getVersioning();
-        if ( versioning != null )
-        {
-            versioning.setLastUpdated( null );
-        }
-
-        Metadata dominant = metadata;
-
-        versioning = dominant.getVersioning();
-        if ( versioning != null )
-        {
-            versioning.updateTimestamp();
-        }
-
-        dominant.merge( recessive );
-    }
+    protected abstract void merge( Metadata recessive );
 
     private Metadata read( File metadataFile )
         throws RepositoryException
