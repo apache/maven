@@ -192,7 +192,12 @@ public class LegacyRepositorySystem
         VersionRange versionRange;
         try
         {
-            versionRange = VersionRange.createFromVersionSpec( plugin.getVersion() );
+            String version = plugin.getVersion();
+            if ( StringUtils.isEmpty( version ) )
+            {
+                version = "RELEASE";
+            }
+            versionRange = VersionRange.createFromVersionSpec( version );
         }
         catch ( InvalidVersionSpecificationException e )
         {

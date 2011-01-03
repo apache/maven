@@ -209,6 +209,10 @@ public class MavenProject
     @Deprecated
     public MavenProject( MavenProject project )
     {
+        repositorySystem = project.repositorySystem;
+        logger = project.logger;
+        mavenProjectBuilder = project.mavenProjectBuilder;
+        projectBuilderConfiguration = project.projectBuilderConfiguration;
         deepCopy( project );
     }
     
@@ -1113,49 +1117,47 @@ public class MavenProject
         return artifactMap;
     }
 
+    public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
+    {
+        this.pluginArtifacts = pluginArtifacts;
+
+        this.pluginArtifactMap = null;
+    }
+
     public Set<Artifact> getPluginArtifacts()
     {
         if ( pluginArtifacts != null )
         {
             return pluginArtifacts;
         }
+
         pluginArtifacts = new HashSet<Artifact>();
+
         if ( repositorySystem != null )
         {
-            List<Plugin> plugins = getBuildPlugins();
-            for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext(); )
+            for ( Plugin p : getBuildPlugins() )
             {
-                Plugin p = (Plugin) i.next();
-
-                String version;
-                if ( StringUtils.isEmpty( p.getVersion() ) )
-                {
-                    version = "RELEASE";
-                }
-                else
-                {
-                    version = p.getVersion();
-                }
-
                 Artifact artifact = repositorySystem.createPluginArtifact( p );
 
-                if ( artifact == null )
-                {
-                    return pluginArtifacts;
-                }
-                else
+                if ( artifact != null )
                 {
                     pluginArtifacts.add( artifact );
                 }
             }
         }
+
         pluginArtifactMap = null;
+
         return pluginArtifacts;
     }
 
     public Map<String, Artifact> getPluginArtifactMap()
     {
-        pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getPluginArtifacts() );
+        if ( pluginArtifactMap == null )
+        {
+            pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId( getPluginArtifacts() );
+        }
+
         return pluginArtifactMap;
     }
 
@@ -1176,27 +1178,16 @@ public class MavenProject
         }
 
         reportArtifacts = new HashSet<Artifact>();
-        List<ReportPlugin> reports = getReportPlugins();
-        if ( reports != null )
+
+        if ( repositorySystem != null )
         {
-            for ( Iterator<ReportPlugin> i = reports.iterator(); i.hasNext(); )
+            for ( ReportPlugin p : getReportPlugins() )
             {
-                ReportPlugin p = (ReportPlugin) i.next();
-
-                String version;
-                if ( StringUtils.isEmpty( p.getVersion() ) )
-                {
-                    version = "RELEASE";
-                }
-                else
-                {
-                    version = p.getVersion();
-                }
-
                 Plugin pp = new Plugin();
                 pp.setGroupId( p.getGroupId() );
                 pp.setArtifactId( p.getArtifactId() );
-                pp.setVersion( version );
+                pp.setVersion( p.getVersion() );
+
                 Artifact artifact = repositorySystem.createPluginArtifact( pp );
 
                 if ( artifact != null )
@@ -1205,7 +1196,9 @@ public class MavenProject
                 }
             }
         }
+
         reportArtifactMap = null;
+
         return reportArtifacts;
     }
 
@@ -1932,6 +1925,11 @@ public class MavenProject
         if ( project.getParentFile() != null )
         {
             parentFile = new File( project.getParentFile().getAbsolutePath() );
+        }
+
+        if ( project.getPluginArtifacts() != null )
+        {
+            setPluginArtifacts( Collections.unmodifiableSet( project.getPluginArtifacts() ) );
         }
 
         if ( project.getReportArtifacts() != null )
