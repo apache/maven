@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.MetadataGenerator;
@@ -39,8 +40,12 @@ class LocalSnapshotMetadataGenerator
 
     private Map<Object, LocalSnapshotMetadata> snapshots;
 
+    private final boolean legacyFormat;
+
     public LocalSnapshotMetadataGenerator( RepositorySystemSession session, InstallRequest request )
     {
+        legacyFormat = ConfigurationProperties.get( session.getConfigProperties(), "maven.metadata.legacy", false );
+
         snapshots = new LinkedHashMap<Object, LocalSnapshotMetadata>();
     }
 
@@ -54,9 +59,10 @@ class LocalSnapshotMetadataGenerator
                 LocalSnapshotMetadata snapshotMetadata = snapshots.get( key );
                 if ( snapshotMetadata == null )
                 {
-                    snapshotMetadata = new LocalSnapshotMetadata( artifact );
+                    snapshotMetadata = new LocalSnapshotMetadata( artifact, legacyFormat );
                     snapshots.put( key, snapshotMetadata );
                 }
+                snapshotMetadata.bind( artifact );
             }
         }
 

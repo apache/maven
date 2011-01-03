@@ -240,8 +240,9 @@ public class DefaultVersionResolver
             }
             else
             {
-                if ( !resolve( result, infos, SNAPSHOT + getKey( artifact.getClassifier(), artifact.getExtension() ) )
-                    && !resolve( result, infos, SNAPSHOT ) )
+                String key = SNAPSHOT + getKey( artifact.getClassifier(), artifact.getExtension() );
+                merge( infos, SNAPSHOT, key );
+                if ( !resolve( result, infos, key ) )
                 {
                     result.setVersion( version );
                 }
@@ -363,7 +364,7 @@ public class DefaultVersionResolver
         }
 
         Snapshot snapshot = versioning.getSnapshot();
-        if ( snapshot != null )
+        if ( snapshot != null && versioning.getSnapshotVersions().isEmpty() )
         {
             String version = artifact.getVersion();
             if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
@@ -388,6 +389,18 @@ public class DefaultVersionResolver
         {
             info.version = version;
             info.repository = repository;
+        }
+    }
+
+    private void merge( Map<String, VersionInfo> infos, String srcKey, String dstKey )
+    {
+        VersionInfo srcInfo = infos.get( srcKey );
+        VersionInfo dstInfo = infos.get( dstKey );
+
+        if ( dstInfo == null
+            || ( srcInfo != null && dstInfo.isOutdated( srcInfo.timestamp ) && srcInfo.repository != dstInfo.repository ) )
+        {
+            infos.put( dstKey, srcInfo );
         }
     }
 
