@@ -27,10 +27,12 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.PluginConfigurationException;
+import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -63,6 +65,9 @@ public class MojoExecutor
 
     @Requirement
     private BuildPluginManager pluginManager;
+
+    @Requirement
+    private MavenPluginManager mavenPluginManager;
 
     @Requirement
     private LifecycleDependencyResolver lifeCycleDependencyResolver;
@@ -155,6 +160,15 @@ public class MojoExecutor
         throws LifecycleExecutionException
     {
         MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        try
+        {
+            mavenPluginManager.checkRequiredMavenVersion( mojoDescriptor.getPluginDescriptor() );
+        }
+        catch ( PluginIncompatibleException e )
+        {
+            throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
+        }
 
         if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
         {

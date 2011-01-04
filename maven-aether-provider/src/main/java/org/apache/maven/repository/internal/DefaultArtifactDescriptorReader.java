@@ -32,6 +32,7 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Relocation;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
@@ -88,6 +89,7 @@ public class DefaultArtifactDescriptorReader
     implements ArtifactDescriptorReader, Service
 {
 
+    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
@@ -194,6 +196,12 @@ public class DefaultArtifactDescriptorReader
             }
 
             Map<String, Object> properties = new LinkedHashMap<String, Object>();
+
+            Prerequisites prerequisites = model.getPrerequisites();
+            if ( prerequisites != null )
+            {
+                properties.put( "prerequisites.maven", prerequisites.getMaven() );
+            }
 
             List<License> licenses = model.getLicenses();
             properties.put( "license.count", Integer.valueOf( licenses.size() ) );

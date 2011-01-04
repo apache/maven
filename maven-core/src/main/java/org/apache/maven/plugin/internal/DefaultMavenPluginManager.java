@@ -55,6 +55,7 @@ import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginIncompatibleException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
@@ -64,6 +65,7 @@ import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -123,6 +125,9 @@ public class DefaultMavenPluginManager
     @Requirement
     private PluginDependenciesResolver pluginDependenciesResolver;
 
+    @Requirement
+    private RuntimeInformation runtimeInformation;
+
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
     public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
@@ -134,10 +139,14 @@ public class DefaultMavenPluginManager
 
         if ( pluginDescriptor == null )
         {
-            Artifact pluginArtifact =
-                RepositoryUtils.toArtifact( pluginDependenciesResolver.resolve( plugin, repositories, session ) );
+            org.sonatype.aether.artifact.Artifact artifact =
+                pluginDependenciesResolver.resolve( plugin, repositories, session );
+
+            Artifact pluginArtifact = RepositoryUtils.toArtifact( artifact );
 
             pluginDescriptor = extractPluginDescriptor( pluginArtifact, plugin );
+
+            pluginDescriptor.setRequiredMavenVersion( artifact.getProperty( "requiredMavenVersion", null ) );
 
             pluginDescriptorCache.put( cacheKey, pluginDescriptor );
         }
@@ -259,6 +268,27 @@ public class DefaultMavenPluginManager
         }
 
         return mojoDescriptor;
+    }
+
+    public void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
+        throws PluginIncompatibleException
+    {
+        String requiredMavenVersion = pluginDescriptor.getRequiredMavenVersion();
+        if ( StringUtils.isNotBlank( requiredMavenVersion ) )
+        {
+            try
+            {
+                if ( !runtimeInformation.isMavenVersion( requiredMavenVersion ) )
+                {
+                    throw new PluginIncompatibleException( pluginDescriptor.getPlugin(), "The plugin "
+                        + pluginDescriptor.getId() + " requires Maven version " + requiredMavenVersion );
+                }
+            }
+            catch ( RuntimeException e )
+            {
+                logger.warn( "Could not verify plugin's Maven prerequisite: " + e.getMessage() );
+            }
+        }
     }
 
     public synchronized void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session,

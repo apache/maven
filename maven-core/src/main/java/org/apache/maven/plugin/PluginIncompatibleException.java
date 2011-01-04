@@ -1,4 +1,4 @@
-package org.apache.maven.execution;
+package org.apache.maven.plugin;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,17 +19,18 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.model.Plugin;
 
 /**
- * Describes runtime information about the application.
- *
- * @deprecated Use {@link org.apache.maven.rtinfo.RuntimeInformation} instead.
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
+ * Signals a plugin which is not compatible with the current Maven runtime.
  */
-@Deprecated
-public interface RuntimeInformation
+public class PluginIncompatibleException
+    extends PluginManagerException
 {
-    ArtifactVersion getApplicationVersion();
+
+    public PluginIncompatibleException( Plugin plugin, String message )
+    {
+        super( plugin, message, (Throwable) null );
+    }
+
 }

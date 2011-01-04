@@ -22,14 +22,19 @@ package org.apache.maven.plugin.version.internal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.MetadataReader;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
@@ -43,12 +48,15 @@ import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.MetadataRequest;
 import org.sonatype.aether.resolution.MetadataResult;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionScheme;
 
 /**
  * Resolves a version for a plugin.
@@ -71,6 +79,9 @@ public class DefaultPluginVersionResolver
 
     @Requirement
     private MetadataReader metadataReader;
+
+    @Requirement
+    private MavenPluginManager pluginManager;
 
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException
@@ -118,8 +129,6 @@ public class DefaultPluginVersionResolver
 
         List<MetadataResult> results = repositorySystem.resolveMetadata( request.getRepositorySession(), requests );
 
-        LocalRepository localRepo = request.getRepositorySession().getLocalRepository();
-
         Versions versions = new Versions();
 
         for ( MetadataResult res : results )
@@ -133,24 +142,137 @@ public class DefaultPluginVersionResolver
             mergeMetadata( request.getRepositorySession(), versions, res.getMetadata(), repository );
         }
 
+        selectVersion( result, request, versions );
+
+        return result;
+    }
+
+    private void selectVersion( DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions )
+        throws PluginVersionResolutionException
+    {
+        String version = null;
+        ArtifactRepository repo = null;
+
         if ( StringUtils.isNotEmpty( versions.releaseVersion ) )
         {
-            result.setVersion( versions.releaseVersion );
-            result.setRepository( ( versions.releaseRepository == null ) ? localRepo : versions.releaseRepository );
+            version = versions.releaseVersion;
+            repo = versions.releaseRepository;
         }
         else if ( StringUtils.isNotEmpty( versions.latestVersion ) )
         {
-            result.setVersion( versions.latestVersion );
-            result.setRepository( ( versions.latestRepository == null ) ? localRepo : versions.latestRepository );
+            version = versions.latestVersion;
+            repo = versions.latestRepository;
+        }
+        if ( version != null && !isCompatible( request, version ) )
+        {
+            versions.versions.remove( version );
+            version = null;
+        }
+
+        if ( version == null )
+        {
+            VersionScheme versionScheme = new GenericVersionScheme();
+
+            TreeSet<Version> releases = new TreeSet<Version>( Collections.reverseOrder() );
+            TreeSet<Version> snapshots = new TreeSet<Version>( Collections.reverseOrder() );
+
+            for ( String ver : versions.versions.keySet() )
+            {
+                try
+                {
+                    Version v = versionScheme.parseVersion( ver );
+
+                    if ( ver.endsWith( "-SNAPSHOT" ) )
+                    {
+                        snapshots.add( v );
+                    }
+                    else
+                    {
+                        releases.add( v );
+                    }
+                }
+                catch ( InvalidVersionSpecificationException e )
+                {
+                    continue;
+                }
+            }
+
+            for ( Version v : releases )
+            {
+                String ver = v.toString();
+                if ( isCompatible( request, ver ) )
+                {
+                    version = ver;
+                    repo = versions.versions.get( version );
+                    break;
+                }
+            }
+
+            if ( version == null )
+            {
+                for ( Version v : snapshots )
+                {
+                    String ver = v.toString();
+                    if ( isCompatible( request, ver ) )
+                    {
+                        version = ver;
+                        repo = versions.versions.get( version );
+                        break;
+                    }
+                }
+            }
+        }
+
+        if ( version != null )
+        {
+            result.setVersion( version );
+            result.setRepository( repo );
         }
         else
         {
-            throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(), localRepo,
+            throw new PluginVersionResolutionException( request.getGroupId(), request.getArtifactId(),
+                                                        request.getRepositorySession().getLocalRepository(),
                                                         request.getRepositories(),
                                                         "Plugin not found in any plugin repository" );
         }
+    }
 
-        return result;
+    private boolean isCompatible( PluginVersionRequest request, String version )
+    {
+        Plugin plugin = new Plugin();
+        plugin.setGroupId( request.getGroupId() );
+        plugin.setArtifactId( request.getArtifactId() );
+        plugin.setVersion( version );
+
+        PluginDescriptor pluginDescriptor;
+
+        try
+        {
+            pluginDescriptor =
+                pluginManager.getPluginDescriptor( plugin, request.getRepositories(), request.getRepositorySession() );
+        }
+        catch ( PluginResolutionException e )
+        {
+            logger.debug( "Ignoring unresolvable plugin version " + version, e );
+            return false;
+        }
+        catch ( Exception e )
+        {
+            // ignore for now and delay failure to higher level processing
+            return true;
+        }
+
+        try
+        {
+            pluginManager.checkRequiredMavenVersion( pluginDescriptor );
+        }
+        catch ( Exception e )
+        {
+            logger.debug( "Ignoring incompatible plugin version " + version + ": " + e.getMessage() );
+            return false;
+        }
+
+        return true;
     }
 
     private void mergeMetadata( RepositorySystemSession session, Versions versions,
@@ -209,6 +331,14 @@ public class DefaultPluginVersionResolver
                 versions.latestTimestamp = timestamp;
                 versions.latestRepository = repository;
             }
+
+            for ( String version : versioning.getVersions() )
+            {
+                if ( !versions.versions.containsKey( version ) )
+                {
+                    versions.versions.put( version, repository );
+                }
+            }
         }
     }
 
@@ -265,6 +395,8 @@ public class DefaultPluginVersionResolver
         String latestTimestamp = "";
 
         ArtifactRepository latestRepository;
+
+        Map<String, ArtifactRepository> versions = new LinkedHashMap<String, ArtifactRepository>();
 
     }
 

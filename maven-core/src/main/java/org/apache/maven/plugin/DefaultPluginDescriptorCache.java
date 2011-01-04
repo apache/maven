@@ -72,7 +72,7 @@ public class DefaultPluginDescriptorCache
         descriptors.put( cacheKey, clone( pluginDescriptor ) );
     }
 
-    private static PluginDescriptor clone( PluginDescriptor original )
+    protected static PluginDescriptor clone( PluginDescriptor original )
     {
         PluginDescriptor clone = null;
 
@@ -88,6 +88,7 @@ public class DefaultPluginDescriptorCache
 
             clone.setName( original.getName() );
             clone.setDescription( original.getDescription() );
+            clone.setRequiredMavenVersion( original.getRequiredMavenVersion() );
 
             clone.setPluginArtifact( ArtifactUtils.copyArtifactSafe( original.getPluginArtifact() ) );
 

@@ -68,6 +68,14 @@ public interface MavenPluginManager
         InvalidPluginDescriptorException;
 
     /**
+     * Verifies the specified plugin is compatible with the current Maven runtime.
+     * 
+     * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
+     */
+    void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
+        throws PluginIncompatibleException;
+
+    /**
      * Sets up the class realm for the specified plugin. Both the class realm and the plugin artifacts that constitute
      * it will be stored in the plugin descriptor.
      * 

@@ -79,6 +79,8 @@ public class PluginDescriptor
 
     private String description;
 
+    private String requiredMavenVersion;
+
     private Plugin plugin;
 
     private Artifact pluginArtifact;
@@ -89,7 +91,7 @@ public class PluginDescriptor
     //
     // ----------------------------------------------------------------------
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings( { "unchecked", "rawtypes" } )
     public List<MojoDescriptor> getMojos()
     {
         return (List) getComponents();
@@ -330,6 +332,16 @@ public class PluginDescriptor
     public String getDescription()
     {
         return description;
+    }
+
+    public void setRequiredMavenVersion( String requiredMavenVersion )
+    {
+        this.requiredMavenVersion = requiredMavenVersion;
+    }
+
+    public String getRequiredMavenVersion()
+    {
+        return requiredMavenVersion;
     }
 
     public void setPlugin( Plugin plugin )

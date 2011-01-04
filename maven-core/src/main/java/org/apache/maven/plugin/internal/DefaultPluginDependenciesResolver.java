@@ -19,7 +19,9 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.RepositoryUtils;
@@ -40,9 +42,13 @@ import org.sonatype.aether.graph.DependencyFilter;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.graph.DependencyVisitor;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.resolution.ArtifactDescriptorException;
+import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
+import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.FilterRepositorySystemSession;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.JavaScopes;
 import org.sonatype.aether.util.filter.AndDependencyFilter;
@@ -85,6 +91,36 @@ public class DefaultPluginDependenciesResolver
         throws PluginResolutionException
     {
         Artifact pluginArtifact = toArtifact( plugin, session );
+
+        try
+        {
+            RepositorySystemSession pluginSession = new FilterRepositorySystemSession( session )
+            {
+                @Override
+                public boolean isIgnoreMissingArtifactDescriptor()
+                {
+                    return false;
+                }
+            };
+
+            ArtifactDescriptorRequest request =
+                new ArtifactDescriptorRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+            ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor( pluginSession, request );
+
+            pluginArtifact = result.getArtifact();
+
+            String requiredMavenVersion = (String) result.getProperties().get( "prerequisites.maven" );
+            if ( requiredMavenVersion != null )
+            {
+                Map<String, String> props = new LinkedHashMap<String, String>( pluginArtifact.getProperties() );
+                props.put( "requiredMavenVersion", requiredMavenVersion );
+                pluginArtifact = pluginArtifact.setProperties( props );
+            }
+        }
+        catch ( ArtifactDescriptorException e )
+        {
+            throw new PluginResolutionException( plugin, e );
+        }
 
         try
         {
