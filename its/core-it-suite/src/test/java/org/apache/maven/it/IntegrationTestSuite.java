@@ -96,6 +96,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4874UpdateLatestPluginVersionTest.class );
         suite.addTestSuite( MavenITmng4872ReactorResolutionAttachedWithExclusionsTest.class );
         suite.addTestSuite( MavenITmng4842ParentResolutionOfDependencyPomTest.class );
+        suite.addTestSuite( MavenITmng4840MavenPrerequisiteTest.class );
         suite.addTestSuite( MavenITmng4834ParentProjectResolvedFromRemoteReposTest.class );
         suite.addTestSuite( MavenITmng4829ChecksumFailureWarningTest.class );
         suite.addTestSuite( MavenITmng4814ReResolutionOfDependenciesDuringReactorTest.class );
