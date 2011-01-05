@@ -217,6 +217,18 @@ Do you want to continue?</input>
       <classpath refid="pom.pathid" />
     </javac>
 
+    <copy todir="bootstrap/target/classes" encoding="ISO-8859-1">
+      <fileset dir="maven-core/src/main/resources">
+        <include name="**/build.properties" />
+      </fileset>
+      <filterset begintoken="${" endtoken="}">
+        <filter token="project.version" value="${xmlPom.project.version}"/>
+      </filterset>
+    </copy>
+    <echo file="bootstrap/target/classes/META-INF/maven/org.apache.maven/maven-core/pom.properties" encoding="ISO-8859-1">
+      version = ${xmlPom.project.version}
+    </echo>
+
     <path id="maven.classpath">
       <pathelement location="bootstrap/target/classes" />
       <dirset dir=".">
