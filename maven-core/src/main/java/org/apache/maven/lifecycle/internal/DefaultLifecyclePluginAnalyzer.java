@@ -30,7 +30,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,7 +93,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         Map<Plugin, Plugin> plugins = new LinkedHashMap<Plugin, Plugin>();
 
-        for ( Lifecycle lifecycle : defaultLifeCycles.getLifeCycles() )
+        for ( Lifecycle lifecycle : getOrderedLifecycles() )
         {
             org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
                 lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
@@ -125,29 +130,44 @@ public class DefaultLifecyclePluginAnalyzer
         return plugins.keySet();
     }
 
+    private List<Lifecycle> getOrderedLifecycles()
+    {
+        // NOTE: The lifecycle order can affect implied execution ids so we better be deterministic.
+
+        List<Lifecycle> lifecycles = new ArrayList<Lifecycle>( defaultLifeCycles.getLifeCycles() );
+
+        Collections.sort( lifecycles, new Comparator<Lifecycle>()
+        {
+
+            public int compare( Lifecycle l1, Lifecycle l2 )
+            {
+                return l1.getId().compareTo( l2.getId() );
+            }
+
+        } );
+
+        return lifecycles;
+    }
+
     private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, String goals )
     {
         String[] mojos = StringUtils.split( goals, "," );
 
         for ( int i = 0; i < mojos.length; i++ )
         {
-            // either <groupId>:<artifactId>:<goal> or <groupId>:<artifactId>:<version>:<goal>
-            String goal = mojos[i].trim();
-            String[] p = StringUtils.split( goal, ":" );
+            GoalSpec gs = parseGoalSpec( mojos[i].trim() );
 
-            PluginExecution execution = new PluginExecution();
-            execution.setId( "default-" + p[p.length - 1] );
-            execution.setPhase( phase );
-            execution.setPriority( i - mojos.length );
-            execution.getGoals().add( p[p.length - 1] );
+            if ( gs == null )
+            {
+                logger.warn( "Ignored invalid goal specification '" + mojos[i] + "' from lifecycle mapping for phase "
+                    + phase );
+                continue;
+            }
 
             Plugin plugin = new Plugin();
-            plugin.setGroupId( p[0] );
-            plugin.setArtifactId( p[1] );
-            if ( p.length >= 4 )
-            {
-                plugin.setVersion( p[2] );
-            }
+            plugin.setGroupId( gs.groupId );
+            plugin.setArtifactId( gs.artifactId );
+            plugin.setVersion( gs.version );
 
             Plugin existing = plugins.get( plugin );
             if ( existing != null )
@@ -163,9 +183,76 @@ public class DefaultLifecyclePluginAnalyzer
                 plugins.put( plugin, plugin );
             }
 
+            PluginExecution execution = new PluginExecution();
+            execution.setId( getExecutionId( plugin, gs.goal ) );
+            execution.setPhase( phase );
+            execution.setPriority( i - mojos.length );
+            execution.getGoals().add( gs.goal );
+
             plugin.getExecutions().add( execution );
         }
     }
 
+    private GoalSpec parseGoalSpec( String goalSpec )
+    {
+        GoalSpec gs = new GoalSpec();
+
+        String[] p = StringUtils.split( goalSpec.trim(), ":" );
+
+        if ( p.length == 3 )
+        {
+            // <groupId>:<artifactId>:<goal>
+            gs.groupId = p[0];
+            gs.artifactId = p[1];
+            gs.goal = p[2];
+        }
+        else if ( p.length == 4 )
+        {
+            // <groupId>:<artifactId>:<version>:<goal>
+            gs.groupId = p[0];
+            gs.artifactId = p[1];
+            gs.version = p[2];
+            gs.goal = p[3];
+        }
+        else
+        {
+            // invalid
+            gs = null;
+        }
+
+        return gs;
+    }
+
+    private String getExecutionId( Plugin plugin, String goal )
+    {
+        Set<String> existingIds = new HashSet<String>();
+        for ( PluginExecution execution : plugin.getExecutions() )
+        {
+            existingIds.add( execution.getId() );
+        }
+
+        String base = "default-" + goal;
+        String id = base;
+
+        for ( int index = 1; existingIds.contains( id ); index++ )
+        {
+            id = base + '-' + index;
+        }
+
+        return id;
+    }
+
+    static class GoalSpec
+    {
+
+        String groupId;
+
+        String artifactId;
+
+        String version;
+
+        String goal;
+
+    }
 
 }
