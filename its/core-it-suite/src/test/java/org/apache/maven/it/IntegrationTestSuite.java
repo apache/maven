@@ -87,6 +87,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4952MetadataReleaseInfoUpdateTest.class );
         suite.addTestSuite( MavenITmng4936EventSpyTest.class );
         suite.addTestSuite( MavenITmng4925ContainerLookupRealmDuringMojoExecTest.class );
+        suite.addTestSuite( MavenITmng4919LifecycleMappingWithSameGoalTwiceTest.class );
         suite.addTestSuite( MavenITmng4913UserPropertyVsDependencyPomPropertyTest.class );
         suite.addTestSuite( MavenITmng4895PluginDepWithNonRelocatedMavenApiTest.class );
         suite.addTestSuite( MavenITmng4891RobustSnapshotResolutionTest.class );
