@@ -21,7 +21,7 @@
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.0.2-RC1</version>
+  <version>3.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -146,9 +146,9 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/maven-3/tags/maven-3.0.2-RC1</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-3/tags/maven-3.0.2-RC1</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/maven-3/tags/maven-3.0.2-RC1</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/maven-3/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-3/trunk</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/maven-3/trunk</url>
   </scm>
   <issueManagement>
     <system>jira</system>
