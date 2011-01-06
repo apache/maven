@@ -51,11 +51,13 @@ public class MavenITmng3746POMPropertyOverrideTest
         Verifier verifier;
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -73,11 +75,13 @@ public class MavenITmng3746POMPropertyOverrideTest
         Verifier verifier;
 
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.setLogFileName( "log-cli.txt" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
+        verifier.setLogFileName( "log-cli.txt" );
         
         verifier.getCliOptions().add( "-Dtest.verification=cli" );
         verifier.getCliOptions().add( "-Dtest.usingCliValue=true" );
