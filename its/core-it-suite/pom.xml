@@ -261,7 +261,7 @@ under the License.
             <configuration>
               <skip>false</skip>
               <forkMode>once</forkMode>
-              <argLine>${surefireMemory}</argLine>
+              <argLine>${surefireMemory} -Dcom.sun.management.jmxremote=true</argLine>
               <!-- NOTE: Maven plugins have access to the system class path so keep it clean -->
               <useSystemClassLoader>false</useSystemClassLoader>
               <systemProperties combine.children="append">
