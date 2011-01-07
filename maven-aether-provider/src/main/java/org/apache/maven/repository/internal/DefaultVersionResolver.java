@@ -294,8 +294,7 @@ public class DefaultVersionResolver
                  */
                 if ( versioning != null && repository instanceof LocalRepository )
                 {
-                    if ( !versioning.getSnapshotVersions().isEmpty()
-                        || ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 ) )
+                    if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
                     {
                         Versioning repaired = new Versioning();
                         repaired.setLastUpdated( versioning.getLastUpdated() );
