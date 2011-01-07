@@ -64,7 +64,7 @@ under the License.
   </scm>
 
   <properties>
-    <surefireMemory>-Xmx256m -XX:MaxPermSize=128m</surefireMemory>
+    <surefireMemory>-Xmx384m -XX:MaxPermSize=128m</surefireMemory>
     <!-- The original Maven distribution to test. -->
     <mavenHome>${maven.home}</mavenHome>
     <!-- The (possibly instrumented copy of the) Maven distribution we actually use for the tests. -->
