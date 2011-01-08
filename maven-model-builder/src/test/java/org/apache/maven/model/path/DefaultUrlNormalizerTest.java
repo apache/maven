@@ -69,13 +69,14 @@ public class DefaultUrlNormalizerTest
     {
         assertEquals( "http://server.org/child", normalize( "http://server.org/parent/../child" ) );
         assertEquals( "http://server.org/child", normalize( "http://server.org/grand/parent/../../child" ) );
+
+        assertEquals( "http://server.org//child", normalize( "http://server.org/parent/..//child" ) );
+        assertEquals( "http://server.org/child", normalize( "http://server.org/parent//../child" ) );
     }
 
-    public void testRemovalOfDoubleSlashes()
+    public void testPreservationOfDoubleSlashes()
     {
-        assertEquals( "http://server.org/dir/", normalize( "http://server.org/dir//" ) );
-        assertEquals( "http://server.org/parent/child", normalize( "http://server.org/parent//child" ) );
-
+        assertEquals( "scm:hg:ssh://localhost//home/user", normalize( "scm:hg:ssh://localhost//home/user" ) );
         assertEquals( "file:////UNC/server", normalize( "file:////UNC/server" ) );
         assertEquals( "[fetch=]http://server.org/[push=]ssh://server.org/",
                       normalize( "[fetch=]http://server.org/[push=]ssh://server.org/" ) );

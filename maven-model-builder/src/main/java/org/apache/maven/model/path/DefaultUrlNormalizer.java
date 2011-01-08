@@ -37,8 +37,6 @@ public class DefaultUrlNormalizer
 
         if ( result != null )
         {
-            result = result.replaceAll( "(?<![:/])/+", "/" );
-
             while ( true )
             {
                 int idx = result.indexOf( "/../" );
@@ -46,7 +44,12 @@ public class DefaultUrlNormalizer
                 {
                     break;
                 }
-                int parent = result.lastIndexOf( '/', idx - 1 );
+                int parent = idx - 1;
+                while ( parent >= 0 && result.charAt( parent ) == '/' )
+                {
+                    parent--;
+                }
+                parent = result.lastIndexOf( '/', parent );
                 if ( parent < 0 )
                 {
                     break;
