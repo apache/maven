@@ -84,6 +84,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
         suite.addTestSuite( MavenITmng4966AbnormalUrlPreservationTest.class );
+        suite.addTestSuite( MavenITmng4960MakeLikeReactorResumeTest.class );
         suite.addTestSuite( MavenITmng4955LocalVsRemoteSnapshotResolutionTest.class );
         suite.addTestSuite( MavenITmng4952MetadataReleaseInfoUpdateTest.class );
         suite.addTestSuite( MavenITmng4936EventSpyTest.class );
