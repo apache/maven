@@ -20,7 +20,6 @@ package org.apache.maven.repository.internal;
  */
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -212,16 +211,12 @@ public class DefaultVersionRangeResolver
         FileInputStream fis = null;
         try
         {
-            if ( metadata != null && metadata.getFile() != null )
+            if ( metadata != null && metadata.getFile() != null && metadata.getFile().exists() )
             {
                 fis = new FileInputStream( metadata.getFile() );
                 org.apache.maven.artifact.repository.metadata.Metadata m = new MetadataXpp3Reader().read( fis, false );
                 versioning = m.getVersioning();
             }
-        }
-        catch ( FileNotFoundException e )
-        {
-            // tolerable
         }
         catch ( Exception e )
         {

@@ -19,6 +19,8 @@ package org.apache.maven;
  * under the License.
  */
 
+import java.io.FileNotFoundException;
+
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.AbstractRepositoryListener;
 import org.sonatype.aether.RepositoryEvent;
@@ -74,6 +76,8 @@ class LoggingRepositoryListener
     @Override
     public void metadataInvalid( RepositoryEvent event )
     {
+        Exception exception = event.getException();
+
         StringBuilder buffer = new StringBuilder( 256 );
         buffer.append( "The metadata " );
         if ( event.getMetadata().getFile() != null )
@@ -84,16 +88,25 @@ class LoggingRepositoryListener
         {
             buffer.append( event.getMetadata() );
         }
-        buffer.append( " is invalid" );
-        if ( event.getException() != null )
+
+        if ( exception instanceof FileNotFoundException )
+        {
+            buffer.append( " is inaccessible" );
+        }
+        else
+        {
+            buffer.append( " is invalid" );
+        }
+
+        if ( exception != null )
         {
             buffer.append( ": " );
-            buffer.append( event.getException().getMessage() );
+            buffer.append( exception.getMessage() );
         }
 
         if ( logger.isDebugEnabled() )
         {
-            logger.warn( buffer.toString(), event.getException() );
+            logger.warn( buffer.toString(), exception );
         }
         else
         {
