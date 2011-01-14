@@ -1320,8 +1320,7 @@ public class ModelMerger
     protected void mergeReportPlugin( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
                                       Map<Object, Object> context )
     {
-        mergeReportPlugin_Inherited( target, source, sourceDominant, context );
-        mergeReportPlugin_Configuration( target, source, sourceDominant, context );
+        mergeConfigurationContainer( target, source, sourceDominant, context );
         mergeReportPlugin_GroupId( target, source, sourceDominant, context );
         mergeReportPlugin_ArtifactId( target, source, sourceDominant, context );
         mergeReportPlugin_Version( target, source, sourceDominant, context );
@@ -1370,39 +1369,6 @@ public class ModelMerger
         }
     }
 
-    protected void mergeReportPlugin_Inherited( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
-                                                Map<Object, Object> context )
-    {
-        String src = source.getInherited();
-        if ( src != null )
-        {
-            if ( sourceDominant || target.getInherited() == null )
-            {
-                target.setInherited( src );
-                target.setLocation( "inherited", source.getLocation( "inherited" ) );
-            }
-        }
-    }
-
-    protected void mergeReportPlugin_Configuration( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
-                                                    Map<Object, Object> context )
-    {
-        Xpp3Dom src = (Xpp3Dom) source.getConfiguration();
-        if ( src != null )
-        {
-            Xpp3Dom tgt = (Xpp3Dom) target.getConfiguration();
-            if ( sourceDominant || tgt == null )
-            {
-                tgt = Xpp3Dom.mergeXpp3Dom( new Xpp3Dom( src ), tgt );
-            }
-            else
-            {
-                tgt = Xpp3Dom.mergeXpp3Dom( tgt, src );
-            }
-            target.setConfiguration( tgt );
-        }
-    }
-
     protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
                                                  Map<Object, Object> context )
     {
@@ -1428,6 +1394,42 @@ public class ModelMerger
             }
 
             target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
+        }
+    }
+
+    protected void mergeReportSet( ReportSet target, ReportSet source, boolean sourceDominant,
+                                   Map<Object, Object> context )
+    {
+        mergeConfigurationContainer( target, source, sourceDominant, context );
+        mergeReportSet_Id( target, source, sourceDominant, context );
+        mergeReportSet_Reports( target, source, sourceDominant, context );
+    }
+
+    protected void mergeReportSet_Id( ReportSet target, ReportSet source, boolean sourceDominant,
+                                      Map<Object, Object> context )
+    {
+        String src = source.getId();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getId() == null )
+            {
+                target.setId( src );
+                target.setLocation( "id", source.getLocation( "id" ) );
+            }
+        }
+    }
+
+    protected void mergeReportSet_Reports( ReportSet target, ReportSet source, boolean sourceDominant,
+                                           Map<Object, Object> context )
+    {
+        List<String> src = source.getReports();
+        if ( !src.isEmpty() )
+        {
+            List<String> tgt = target.getReports();
+            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            merged.addAll( tgt );
+            merged.addAll( src );
+            target.setReports( merged );
         }
     }
 

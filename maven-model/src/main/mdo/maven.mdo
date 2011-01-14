@@ -3261,6 +3261,7 @@
     <class xml.tagName="plugin" java.clone="deep">
       <name>ReportPlugin</name>
       <version>4.0.0</version>
+      <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
         The <code>&lt;plugin&gt;</code> element contains informations required for a report plugin.
@@ -3287,25 +3288,6 @@
           <version>4.0.0</version>
           <description>The version of the reporting plugin to be used.</description>
           <type>String</type>
-        </field>
-        <field>
-          <name>inherited</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <description>
-            <![CDATA[
-            Whether the configuration in this plugin should be made available to projects
-            that inherit from this one. Note: While the type of this field is <code>String</code>
-            for technical reasons, the semantic type is actually <code>Boolean</code>.
-            Default value is <code>true</code>.
-            ]]>
-          </description>
-        </field>
-        <field>
-          <name>configuration</name>
-          <version>4.0.0</version>
-          <type>DOM</type>
-          <description>The configuration of the reporting plugin.</description>
         </field>
         <field>
           <name>reportSets</name>
@@ -3376,28 +3358,6 @@
     {
         return groupId + ":" + artifactId;
     }
-
-    public boolean isInherited()
-    {
-        return ( inherited != null ) ? Boolean.parseBoolean( inherited ) : true;
-    }
-
-    public void setInherited( boolean inherited )
-    {
-        this.inherited = String.valueOf( inherited );
-    }
-
-    private boolean inheritanceApplied = true;
-
-    public void unsetInheritanceApplied()
-    {
-        this.inheritanceApplied = false;
-    }
-
-    public boolean isInheritanceApplied()
-    {
-        return inheritanceApplied;
-    }
             ]]>
           </code>
         </codeSegment>
@@ -3406,6 +3366,7 @@
     <class java.clone="deep">
       <name>ReportSet</name>
       <version>4.0.0</version>
+      <superClass>ConfigurationContainer</superClass>
       <description>Represents a set of reports and configuration to be used to generate them.</description>
       <fields>
         <field>
@@ -3416,18 +3377,6 @@
             for merging of report sets.
           </description>
           <defaultValue>default</defaultValue>
-        </field>
-        <field>
-          <name>configuration</name>
-          <version>4.0.0</version>
-          <description>Configuration of the report to be used when generating this set.</description>
-          <type>DOM</type>
-        </field>
-        <field>
-          <name>inherited</name>
-          <version>4.0.0</version>
-          <type>String</type>
-          <description>Whether any configuration should be propagated to child POMs.</description>
         </field>
         <field>
           <name>reports</name>
@@ -3445,18 +3394,6 @@
           <version>4.0.0</version>
           <code>
             <![CDATA[
-    private boolean inheritanceApplied = true;
-
-    public void unsetInheritanceApplied()
-    {
-        this.inheritanceApplied = false;
-    }
-
-    public boolean isInheritanceApplied()
-    {
-        return inheritanceApplied;
-    }
-
     @Override
     public String toString()
     {
