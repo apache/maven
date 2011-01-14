@@ -31,8 +31,10 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -41,7 +43,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles profile injection into the model.
- *
+ * 
  * @author Benjamin Bentmann
  */
 @Component( role = ProfileInjector.class )
@@ -138,6 +140,41 @@ public class DefaultProfileInjector
         }
 
         @Override
+        protected void mergePlugin_Executions( Plugin target, Plugin source, boolean sourceDominant,
+                                               Map<Object, Object> context )
+        {
+            List<PluginExecution> src = source.getExecutions();
+            if ( !src.isEmpty() )
+            {
+                List<PluginExecution> tgt = target.getExecutions();
+                Map<Object, PluginExecution> merged =
+                    new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
+
+                for ( PluginExecution element : tgt )
+                {
+                    Object key = getPluginExecutionKey( element );
+                    merged.put( key, element );
+                }
+
+                for ( PluginExecution element : src )
+                {
+                    Object key = getPluginExecutionKey( element );
+                    PluginExecution existing = merged.get( key );
+                    if ( existing != null )
+                    {
+                        mergePluginExecution( existing, element, sourceDominant, context );
+                    }
+                    else
+                    {
+                        merged.put( key, element );
+                    }
+                }
+
+                target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
+            }
+        }
+
+        @Override
         protected void mergeReporting_Plugins( Reporting target, Reporting source, boolean sourceDominant,
                                                Map<Object, Object> context )
         {
@@ -169,6 +206,40 @@ public class DefaultProfileInjector
                 }
 
                 target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+            }
+        }
+
+        @Override
+        protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                     Map<Object, Object> context )
+        {
+            List<ReportSet> src = source.getReportSets();
+            if ( !src.isEmpty() )
+            {
+                List<ReportSet> tgt = target.getReportSets();
+                Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
+
+                for ( ReportSet element : tgt )
+                {
+                    Object key = getReportSetKey( element );
+                    merged.put( key, element );
+                }
+
+                for ( ReportSet element : src )
+                {
+                    Object key = getReportSetKey( element );
+                    ReportSet existing = merged.get( key );
+                    if ( existing != null )
+                    {
+                        mergeReportSet( existing, element, sourceDominant, context );
+                    }
+                    else
+                    {
+                        merged.put( key, element );
+                    }
+                }
+
+                target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
             }
         }
 
