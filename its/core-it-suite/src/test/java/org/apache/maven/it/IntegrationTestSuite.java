@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng4975ProfileInjectedPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4966AbnormalUrlPreservationTest.class );
         suite.addTestSuite( MavenITmng4960MakeLikeReactorResumeTest.class );
         suite.addTestSuite( MavenITmng4955LocalVsRemoteSnapshotResolutionTest.class );
