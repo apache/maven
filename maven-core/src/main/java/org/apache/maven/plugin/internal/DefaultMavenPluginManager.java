@@ -299,8 +299,10 @@ public class DefaultMavenPluginManager
 
         MavenProject project = session.getCurrentProject();
 
+        Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
+
         PluginRealmCache.Key cacheKey =
-            pluginRealmCache.createKey( plugin, parent, imports, filter, project.getRemotePluginRepositories(),
+            pluginRealmCache.createKey( plugin, parent, foreignImports, filter, project.getRemotePluginRepositories(),
                                         session.getRepositorySession() );
 
         PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
@@ -312,7 +314,7 @@ public class DefaultMavenPluginManager
         }
         else
         {
-            createPluginRealm( pluginDescriptor, session, parent, imports, filter );
+            createPluginRealm( pluginDescriptor, session, parent, foreignImports, filter );
 
             cacheRecord =
                 pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
@@ -322,7 +324,7 @@ public class DefaultMavenPluginManager
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
-                                    List<String> imports, DependencyFilter filter )
+                                    Map<String, ClassLoader> foreignImports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
@@ -364,8 +366,6 @@ public class DefaultMavenPluginManager
         }
 
         List<org.sonatype.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
-
-        Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
 
         ClassRealm pluginRealm =
             classRealmManager.createPluginRealm( plugin, parent, null, foreignImports, pluginArtifacts );

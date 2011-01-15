@@ -58,13 +58,13 @@ public class DefaultPluginRealmCache
 
         private final ClassLoader parentRealm;
 
-        private final List<String> parentImports;
+        private final Map<String, ClassLoader> foreignImports;
 
         private final DependencyFilter filter;
 
         private final int hashCode;
 
-        public CacheKey( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+        public CacheKey( Plugin plugin, ClassLoader parentRealm, Map<String, ClassLoader> foreignImports,
                          DependencyFilter dependencyFilter, List<RemoteRepository> repositories,
                          RepositorySystemSession session )
         {
@@ -84,7 +84,8 @@ public class DefaultPluginRealmCache
                 }
             }
             this.parentRealm = parentRealm;
-            this.parentImports = ( parentImports != null ) ? parentImports : Collections.<String> emptyList();
+            this.foreignImports =
+                ( foreignImports != null ) ? foreignImports : Collections.<String, ClassLoader> emptyMap();
             this.filter = dependencyFilter;
 
             int hash = 17;
@@ -93,7 +94,7 @@ public class DefaultPluginRealmCache
             hash = hash * 31 + hash( localRepo );
             hash = hash * 31 + CacheUtils.repositoriesHashCode( repositories );
             hash = hash * 31 + hash( parentRealm );
-            hash = hash * 31 + this.parentImports.hashCode();
+            hash = hash * 31 + this.foreignImports.hashCode();
             hash = hash * 31 + hash( dependencyFilter );
             this.hashCode = hash;
         }
@@ -133,7 +134,7 @@ public class DefaultPluginRealmCache
             return parentRealm == that.parentRealm && CacheUtils.pluginEquals( plugin, that.plugin )
                 && eq( workspace, that.workspace ) && eq( localRepo, that.localRepo )
                 && CacheUtils.repositoriesEquals( this.repositories, that.repositories ) && eq( filter, that.filter )
-                && eq( parentImports, that.parentImports );
+                && eq( foreignImports, that.foreignImports );
         }
 
         private static <T> boolean eq( T s1, T s2 )
@@ -145,11 +146,11 @@ public class DefaultPluginRealmCache
 
     protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
 
-    public Key createKey( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
+    public Key createKey( Plugin plugin, ClassLoader parentRealm, Map<String, ClassLoader> foreignImports,
                           DependencyFilter dependencyFilter, List<RemoteRepository> repositories,
                           RepositorySystemSession session )
     {
-        return new CacheKey( plugin, parentRealm, parentImports, dependencyFilter, repositories, session );
+        return new CacheKey( plugin, parentRealm, foreignImports, dependencyFilter, repositories, session );
     }
 
     public CacheRecord get( Key key )

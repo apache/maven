@@ -20,6 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
@@ -61,8 +62,9 @@ public interface PluginRealmCache
         // marker interface for cache keys
     }
 
-    Key createKey( Plugin plugin, ClassLoader parentRealm, List<String> parentImports,
-                   DependencyFilter dependencyFilter, List<RemoteRepository> repositories, RepositorySystemSession session );
+    Key createKey( Plugin plugin, ClassLoader parentRealm, Map<String, ClassLoader> foreignImports,
+                   DependencyFilter dependencyFilter, List<RemoteRepository> repositories,
+                   RepositorySystemSession session );
 
     CacheRecord get( Key key );
 
