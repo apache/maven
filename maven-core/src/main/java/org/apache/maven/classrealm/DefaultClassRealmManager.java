@@ -147,6 +147,7 @@ public class DefaultClassRealmManager
         imports.put( "org.apache.maven.project", coreRealm );
         imports.put( "org.apache.maven.reporting", coreRealm );
         imports.put( "org.apache.maven.repository", coreRealm );
+        imports.put( "org.apache.maven.rtinfo", coreRealm );
         imports.put( "org.apache.maven.settings", coreRealm );
         imports.put( "org.apache.maven.toolchain", coreRealm );
         imports.put( "org.apache.maven.usability", coreRealm );
