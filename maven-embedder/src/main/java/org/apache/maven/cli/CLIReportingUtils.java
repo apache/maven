@@ -73,6 +73,8 @@ public final class CLIReportingUtils
 
         stdout.println( msg );
 
+        stdout.println( "Maven home: " + System.getProperty( "maven.home", "<unknown maven home>" ) );
+
         stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
             + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) );
 
