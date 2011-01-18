@@ -216,7 +216,7 @@ class ReactorReader
 
     public File findArtifact( Artifact artifact )
     {
-        String projectKey = artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getVersion();
+        String projectKey = ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
 
         MavenProject project = projectsByGAV.get( projectKey );
 
@@ -230,7 +230,7 @@ class ReactorReader
 
     public List<String> findVersions( Artifact artifact )
     {
-        String key = artifact.getGroupId() + ':' + artifact.getArtifactId();
+        String key = ArtifactUtils.versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
 
         List<MavenProject> projects = projectsByGA.get( key );
         if ( projects == null || projects.isEmpty() )
