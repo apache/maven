@@ -98,5 +98,9 @@ under the License.
       <directory>src/conf</directory>
       <outputDirectory>conf</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>src/lib</directory>
+      <outputDirectory>lib</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>
