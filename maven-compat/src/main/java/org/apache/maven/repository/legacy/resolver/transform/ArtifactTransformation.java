@@ -31,8 +31,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id: ArtifactTransformation.java,v 1.1 2005/03/03 15:37:25
- *          jvanzyl Exp $
+ * @version $Id$
  */
 public interface ArtifactTransformation
 {
