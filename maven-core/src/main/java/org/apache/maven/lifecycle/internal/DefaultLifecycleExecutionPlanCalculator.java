@@ -14,6 +14,16 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.DefaultSchedules;
@@ -44,18 +54,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * @since 3.0
@@ -104,7 +102,7 @@ public class DefaultLifecycleExecutionPlanCalculator
         this.defaultSchedules = defaultSchedules;
     }
 
-    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks )
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks, boolean setup )
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
@@ -113,42 +111,61 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         final List<MojoExecution> executions = calculateMojoExecutions( session, project, tasks );
 
-        setupMojoExections( session, project, executions );
+        if ( setup )
+        {
+            setupMojoExecutions( session, project, executions );
+        }
 
         final List<ExecutionPlanItem> planItem = defaultSchedules.createExecutionPlanItem( project, executions );
 
         return new MavenExecutionPlan( planItem, defaultLifeCycles );
     }
 
-    private void setupMojoExections( MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions )
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks )
+        throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
+        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
+        NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        return calculateExecutionPlan( session, project, tasks, true );
+    }
+
+    private void setupMojoExecutions( MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
     {
         for ( MojoExecution mojoExecution : mojoExecutions )
         {
-            MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
-            if ( mojoDescriptor == null )
-            {
-                mojoDescriptor =
-                    pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
-                                                     project.getRemotePluginRepositories(),
-                                                     session.getRepositorySession() );
-
-                mojoExecution.setMojoDescriptor( mojoDescriptor );
-            }
-
-            populateMojoExecutionConfiguration( project, mojoExecution,
-                                                MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
-
-            finalizeMojoConfiguration( mojoExecution );
-
-            calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
+            setupMojoExecution( session, project, mojoExecution );
         }
     }
 
-    private List<MojoExecution> calculateMojoExecutions( MavenSession session, MavenProject project,
+    public void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        if ( mojoDescriptor == null )
+        {
+            mojoDescriptor =
+                pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
+                                                 project.getRemotePluginRepositories(),
+                                                 session.getRepositorySession() );
+
+            mojoExecution.setMojoDescriptor( mojoDescriptor );
+        }
+
+        populateMojoExecutionConfiguration( project, mojoExecution,
+                                            MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
+
+        finalizeMojoConfiguration( mojoExecution );
+
+        calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
+    }
+    
+    public List<MojoExecution> calculateMojoExecutions( MavenSession session, MavenProject project,
                                                          List<Object> tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,

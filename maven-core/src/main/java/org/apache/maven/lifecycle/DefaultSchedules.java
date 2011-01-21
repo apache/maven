@@ -54,7 +54,7 @@ public class DefaultSchedules
         List<ExecutionPlanItem> result = new ArrayList<ExecutionPlanItem>();
         for ( MojoExecution mojoExecution : executions )
         {
-            String lifeCyclePhase = mojoExecution.getMojoDescriptor().getPhase();
+            String lifeCyclePhase = mojoExecution.getLifecyclePhase();
             final Scheduling scheduling = getScheduling( "default" );
             Schedule schedule = null;
             if ( scheduling != null )

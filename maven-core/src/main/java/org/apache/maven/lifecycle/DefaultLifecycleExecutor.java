@@ -42,6 +42,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,14 +129,14 @@ public class DefaultLifecycleExecutor
     // Used by m2eclipse
 
     @SuppressWarnings( { "UnusedDeclaration" } )
-    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, boolean setup, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
         PluginVersionResolutionException
     {
-
-        List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
+        List<TaskSegment> taskSegments =
+            lifecycleTaskSegmentCalculator.calculateTaskSegments( session, Arrays.asList( tasks ) );
 
         TaskSegment mergedSegment = new TaskSegment( false );
 
@@ -145,7 +146,16 @@ public class DefaultLifecycleExecutor
         }
 
         return lifecycleExecutionPlanCalculator.calculateExecutionPlan( session, session.getCurrentProject(),
-                                                                        mergedSegment.getTasks() );
+                                                                        mergedSegment.getTasks(), setup );
+    }
+
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
+        PluginVersionResolutionException
+    {
+        return calculateExecutionPlan( session, true, tasks );
     }
 
     // Site 3.x

@@ -46,6 +46,11 @@ public class EmptyLifecycleExecutor
         return new MavenExecutionPlan( null, null );
     }
 
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, boolean setup, String... tasks )
+    {
+        return new MavenExecutionPlan( null, null );
+    }
+    
     public void execute( MavenSession session )
     {
     }

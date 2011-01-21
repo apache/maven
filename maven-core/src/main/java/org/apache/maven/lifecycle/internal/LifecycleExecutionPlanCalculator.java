@@ -48,11 +48,20 @@ public interface LifecycleExecutionPlanCalculator
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException;
 
+    MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks,
+                                               boolean setup )
+        throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
+        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
+        NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException;
+
     void calculateForkedExecutions( MojoExecution mojoExecution, MavenSession session )
         throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
         PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException;
 
-
+    void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException;
 
 }

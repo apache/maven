@@ -71,6 +71,12 @@ public interface LifecycleExecutor
         PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
         PluginVersionResolutionException;
 
+    MavenExecutionPlan calculateExecutionPlan( MavenSession session, boolean setup, String... tasks )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+        PluginManagerException, LifecyclePhaseNotFoundException, LifecycleNotFoundException,
+        PluginVersionResolutionException;
+
     void execute( MavenSession session );
 
     // used by the site plugin 3.x

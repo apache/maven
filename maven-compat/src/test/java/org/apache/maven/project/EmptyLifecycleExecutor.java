@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.*;
+import org.apache.maven.lifecycle.DefaultLifecycles;
+import org.apache.maven.lifecycle.LifecycleExecutor;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MojoExecution;
@@ -41,6 +43,11 @@ public class EmptyLifecycleExecutor
 {
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
+    {
+        return new MavenExecutionPlan( null, new DefaultLifecycles() );
+    }
+
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, boolean setup, String... tasks )
     {
         return new MavenExecutionPlan( null, new DefaultLifecycles() );
     }

@@ -111,7 +111,8 @@ public class LifecycleExecutionPlanCalculatorStub
         // Maybe do something ?
     }
 
-    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks )
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks,
+                                                      boolean setup )
         throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
@@ -129,6 +130,21 @@ public class LifecycleExecutionPlanCalculatorStub
         me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
         me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
         return createExecutionPlan( project, me );
+    }
+
+    public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks )
+        throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
+        PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
+        NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
+        return calculateExecutionPlan( session, project, tasks, true );
+    }
+
+    public void setupMojoExecution( MavenSession session, MavenProject project, MojoExecution mojoExecution )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
+        LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException
+    {
     }
 
     public static MavenExecutionPlan getProjectAExceutionPlan()
