@@ -44,7 +44,7 @@
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.4</plexusUtilsVersion>
-    <sisuInjectVersion>1.4.3.1</sisuInjectVersion>
+    <sisuInjectVersion>2.0.0</sisuInjectVersion>
     <wagonVersion>1.0-beta-7</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.4</cipherVersion>
