@@ -53,7 +53,7 @@ public class DefaultArtifact
 
     private final String classifier;
 
-    private String scope;
+    private volatile String scope;
 
     private volatile File file;
 
@@ -67,7 +67,7 @@ public class DefaultArtifact
 
     private List<String> dependencyTrail;
 
-    private String version;
+    private volatile String version;
 
     private VersionRange versionRange;
 
