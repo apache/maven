@@ -15,7 +15,9 @@
 
 package org.apache.maven.lifecycle.internal;
 
-import junit.framework.TestCase;
+import java.io.File;
+
+import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.stub.BuildPluginManagerStub;
@@ -29,7 +31,7 @@ import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
  * @author Kristian Rosenvold>
  */
 public class LifecycleExecutionPlanCalculatorTest
-    extends TestCase
+    extends AbstractCoreMavenComponentTestCase
 {
 
     public void testCalculateExecutionPlanWithGoalTasks()
@@ -59,11 +61,9 @@ public class LifecycleExecutionPlanCalculatorTest
 
     // Maybe also make one with LifeCycleTasks
 
-    public static LifecycleExecutionPlanCalculator createExecutionPlaceCalculator(
-        MojoDescriptorCreator mojoDescriptorCreator )
+    public static LifecycleExecutionPlanCalculator createExecutionPlaceCalculator( MojoDescriptorCreator mojoDescriptorCreator )
     {
-        LifecyclePluginResolver lifecyclePluginResolver =
-            new LifecyclePluginResolver( new PluginVersionResolverStub() );
+        LifecyclePluginResolver lifecyclePluginResolver = new LifecyclePluginResolver( new PluginVersionResolverStub() );
         return new DefaultLifecycleExecutionPlanCalculator( new BuildPluginManagerStub(),
                                                             DefaultLifecyclesStub.createDefaultLifecycles(),
                                                             mojoDescriptorCreator, lifecyclePluginResolver,
@@ -76,4 +76,11 @@ public class LifecycleExecutionPlanCalculatorTest
                                           new PluginPrefixResolverStub(),
                                           new LifecyclePluginResolver( new PluginVersionResolverStub() ) );
     }
+
+    @Override
+    protected String getProjectsDirectory()
+    {
+        return "src/test/projects/lifecycle-executor";
+    }
+
 }

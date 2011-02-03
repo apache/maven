@@ -15,14 +15,19 @@ package org.apache.maven.lifecycle;
  * the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
+import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
-import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
@@ -31,11 +36,6 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class LifecycleExecutorTest
     extends AbstractCoreMavenComponentTestCase
@@ -357,6 +357,27 @@ public class LifecycleExecutorTest
         MavenSession session = createMavenSession( pom );
         Plugin plugin = mojoDescriptorCreator.findPluginForPrefix( "clean", session );
         assertNotNull( plugin );
+    }
+
+    public void testSetupMojoExecution()
+        throws Exception
+    {
+        File pom = getProject( "mojo-configuration" );
+
+        MavenSession session = createMavenSession( pom );
+
+        LifecycleTask task = new LifecycleTask( "generate-sources" );
+        MavenExecutionPlan executionPlan =
+            lifeCycleExecutionPlanCalculator.calculateExecutionPlan( session, session.getCurrentProject(),
+                                                                     Arrays.asList( (Object) task ), false );
+
+        MojoExecution execution = executionPlan.getMojoExecutions().get(0);
+        assertEquals(execution.toString(), "maven-it-plugin", execution.getArtifactId());
+        assertNull(execution.getConfiguration());
+
+        lifeCycleExecutionPlanCalculator.setupMojoExecution( session, session.getCurrentProject(), execution );
+        assertNotNull(execution.getConfiguration());
+        assertEquals("1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ));
     }
 
 }
