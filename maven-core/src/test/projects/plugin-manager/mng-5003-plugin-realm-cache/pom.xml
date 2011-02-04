@@ -1,0 +1,8 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng5003</groupId>
+  <artifactId>mng-5003-plugin-realm-cache</artifactId>
+  <version>1.0</version>
+
+</project>
