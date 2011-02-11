@@ -127,7 +127,7 @@ public class DefaultProjectBuilder
     
                 request.setPomFile( pomFile );
                 request.setModelSource( modelSource );
-                request.setLocationTracking( pomFile != null );
+                request.setLocationTracking( true );
     
                 ModelBuildingResult result;
                 try
