@@ -34,16 +34,42 @@ public interface EventSpy
     interface Context
     {
 
+        /**
+         * Gets key-value pairs providing information about the Maven runtime.
+         * 
+         * @return The key-value pairs, never {@code null}.
+         */
         Map<String, Object> getData();
 
     }
 
+    /**
+     * Initializes the spy.
+     * 
+     * @param context The event spy context, never {@code null}.
+     */
     void init( Context context )
         throws Exception;
 
+    /**
+     * Notifies the spy of some build event/operation.
+     * 
+     * @param event The event, never {@@code null}.
+     * @see org.apache.maven.settings.building.SettingsBuildingRequest
+     * @see org.apache.maven.settings.building.SettingsBuildingResult
+     * @see org.apache.maven.execution.MavenExecutionRequest
+     * @see org.apache.maven.execution.MavenExecutionResult
+     * @see org.apache.maven.project.DependencyResolutionRequest
+     * @see org.apache.maven.project.DependencyResolutionResultt
+     * @see org.apache.maven.execution.ExecutionEvent
+     * @see org.sonatype.aether.RepositoryEvent
+     */
     void onEvent( Object event )
         throws Exception;
 
+    /**
+     * Notifies the spy of Maven's termination, allowing it to free any resources allocated by it.
+     */
     void close()
         throws Exception;
 
