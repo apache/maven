@@ -19,6 +19,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
@@ -60,6 +61,9 @@ public class LifecycleDependencyResolver
 
     @Requirement
     private ArtifactFactory artifactFactory;
+
+    @Requirement
+    private EventSpyDispatcher eventSpyDispatcher;
 
     @SuppressWarnings({"UnusedDeclaration"})
     public LifecycleDependencyResolver()
@@ -162,6 +166,8 @@ public class LifecycleDependencyResolver
                 new DefaultDependencyResolutionRequest( project, session.getRepositorySession() );
             request.setResolutionFilter( resolutionFilter );
 
+            eventSpyDispatcher.onEvent( request );
+
             result = dependenciesResolver.resolve( request );
         }
         catch ( DependencyResolutionException e )
@@ -190,6 +196,8 @@ public class LifecycleDependencyResolver
                 throw new LifecycleExecutionException( null, project, e );
             }
         }
+
+        eventSpyDispatcher.onEvent( result );
 
         Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
         if ( result.getDependencyGraph() != null && !result.getDependencyGraph().getChildren().isEmpty() )
