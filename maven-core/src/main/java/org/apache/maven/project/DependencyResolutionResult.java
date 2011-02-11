@@ -40,8 +40,9 @@ public interface DependencyResolutionResult
     DependencyNode getDependencyGraph();
 
     /**
-     * Gets the transitive dependencies of the project that were not excluded by a filter, whether successfully resolved
-     * or not.
+     * Gets the transitive dependencies of the project that were not excluded by
+     * {@link DependencyResolutionRequest#getResolutionFilter()}. This list is a union of the results from
+     * {@link #getResolvedDependencies()} and {@link #getUnresolvedDependencies()}.
      * 
      * @return The transitive dependencies, never {@code null}.
      */
