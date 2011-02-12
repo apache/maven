@@ -22,13 +22,13 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng4992</groupId>
+  <groupId>org.apache.maven.its.mng5011</groupId>
   <artifactId>test</artifactId>
   <version>1</version>
 
-  <name>Maven Integration Test :: MNG-4992</name> 
+  <name>Maven Integration Test :: MNG-5011</name> 
   <description>
-    Verify that plugin parameters of type java.util.Properties can be configured like any other Map-style parameter.
+    Verify that plugin parameters of type array/collection can be configured using system properties from the CLI.
   </description>
 
   <build>
@@ -39,18 +39,12 @@ under the License.
         <version>2.1-SNAPSHOT</version>
         <configuration>
           <propertiesFile>target/config.properties</propertiesFile>
-          <mapParam>
-            <mapKey>mapValue</mapKey>
-          </mapParam>
-          <propertiesParam>
-            <propKey>propValue</propKey>
-          </propertiesParam>
         </configuration>
         <executions>
           <execution>
             <phase>validate</phase>
             <goals>
-              <goal>config</goal>
+              <goal>cli-config</goal>
             </goals>
           </execution>
         </executions>
