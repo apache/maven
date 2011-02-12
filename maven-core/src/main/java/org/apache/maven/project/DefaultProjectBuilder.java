@@ -303,7 +303,8 @@ public class DefaultProjectBuilder
         ReactorModelCache modelCache = new ReactorModelCache();
 
         boolean noErrors =
-            build( results, interimResults, pomFiles, true, recursive, config, modelPool, modelCache );
+            build( results, interimResults, pomFiles, new LinkedHashSet<File>(), true, recursive, config, modelPool,
+                   modelCache );
 
         populateReactorModelPool( modelPool, interimResults );
 
@@ -329,104 +330,144 @@ public class DefaultProjectBuilder
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
-                           List<File> pomFiles, boolean isRoot, boolean recursive, ProjectBuildingRequest config,
-                           ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
+                           List<File> pomFiles, Set<File> aggregatorFiles, boolean isRoot, boolean recursive,
+                           ProjectBuildingRequest config, ReactorModelPool reactorModelPool,
+                           ReactorModelCache modelCache )
     {
         boolean noErrors = true;
 
         for ( File pomFile : pomFiles )
         {
-            ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
+            aggregatorFiles.add( pomFile );
 
-            MavenProject project = new MavenProject( repositorySystem, this, config, logger );
-
-            request.setPomFile( pomFile );
-            request.setTwoPhaseBuilding( true );
-            request.setLocationTracking( true );
-            request.setModelCache( modelCache );
-
-            DefaultModelBuildingListener listener =
-                new DefaultModelBuildingListener( project, projectBuildingHelper, config );
-            request.setModelBuildingListener( listener );
-
-            try
+            if ( !build( results, interimResults, pomFile, aggregatorFiles, isRoot, recursive, config,
+                         reactorModelPool, modelCache ) )
             {
-                ModelBuildingResult result = modelBuilder.build( request );
-
-                Model model = result.getEffectiveModel();
-
-                InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
-                interimResults.add( interimResult );
-
-                if ( recursive && !model.getModules().isEmpty() )
-                {
-                    File basedir = pomFile.getParentFile();
-
-                    List<File> moduleFiles = new ArrayList<File>();
-
-                    for ( String module : model.getModules() )
-                    {
-                        if ( StringUtils.isEmpty( module ) )
-                        {
-                            continue;
-                        }
-
-                        module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
-
-                        File moduleFile = new File( basedir, module );
-
-                        if ( moduleFile.isDirectory() )
-                        {
-                            moduleFile = modelProcessor.locatePom( moduleFile );
-                        }
-
-                        if ( !moduleFile.isFile() )
-                        {
-                            ModelProblem problem =
-                                new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                    + " does not exist", ModelProblem.Severity.ERROR, model, -1, -1, null );
-                            result.getProblems().add( problem );
-
-                            noErrors = false;
-
-                            continue;
-                        }
-
-                        if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
-                        {
-                            // we don't canonicalize on unix to avoid interfering with symlinks
-                            try
-                            {
-                                moduleFile = moduleFile.getCanonicalFile();
-                            }
-                            catch ( IOException e )
-                            {
-                                moduleFile = moduleFile.getAbsoluteFile();
-                            }
-                        }
-                        else
-                        {
-                            moduleFile = new File( moduleFile.toURI().normalize() );
-                        }
-
-                        moduleFiles.add( moduleFile );
-                    }
-
-                    interimResult.modules = new ArrayList<InterimResult>();
-
-                    if ( !build( results, interimResult.modules, moduleFiles, false, recursive, config,
-                                reactorModelPool, modelCache ) )
-                    {
-                        noErrors = false;
-                    }
-                }
-            }
-            catch ( ModelBuildingException e )
-            {
-                results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
-
                 noErrors = false;
             }
+
+            aggregatorFiles.remove( pomFile );
+        }
+
+        return noErrors;
+    }
+
+    private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults, File pomFile,
+                           Set<File> aggregatorFiles, boolean isRoot, boolean recursive, ProjectBuildingRequest config,
+                           ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
+    {
+        boolean noErrors = true;
+
+        ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
+
+        MavenProject project = new MavenProject( repositorySystem, this, config, logger );
+
+        request.setPomFile( pomFile );
+        request.setTwoPhaseBuilding( true );
+        request.setLocationTracking( true );
+        request.setModelCache( modelCache );
+
+        DefaultModelBuildingListener listener =
+            new DefaultModelBuildingListener( project, projectBuildingHelper, config );
+        request.setModelBuildingListener( listener );
+
+        try
+        {
+            ModelBuildingResult result = modelBuilder.build( request );
+
+            Model model = result.getEffectiveModel();
+
+            InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
+            interimResults.add( interimResult );
+
+            if ( recursive && !model.getModules().isEmpty() )
+            {
+                File basedir = pomFile.getParentFile();
+
+                List<File> moduleFiles = new ArrayList<File>();
+
+                for ( String module : model.getModules() )
+                {
+                    if ( StringUtils.isEmpty( module ) )
+                    {
+                        continue;
+                    }
+
+                    module = module.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
+
+                    File moduleFile = new File( basedir, module );
+
+                    if ( moduleFile.isDirectory() )
+                    {
+                        moduleFile = modelProcessor.locatePom( moduleFile );
+                    }
+
+                    if ( !moduleFile.isFile() )
+                    {
+                        ModelProblem problem =
+                            new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                                + " does not exist", ModelProblem.Severity.ERROR, model, -1, -1, null );
+                        result.getProblems().add( problem );
+
+                        noErrors = false;
+
+                        continue;
+                    }
+
+                    if ( Os.isFamily( Os.FAMILY_WINDOWS ) )
+                    {
+                        // we don't canonicalize on unix to avoid interfering with symlinks
+                        try
+                        {
+                            moduleFile = moduleFile.getCanonicalFile();
+                        }
+                        catch ( IOException e )
+                        {
+                            moduleFile = moduleFile.getAbsoluteFile();
+                        }
+                    }
+                    else
+                    {
+                        moduleFile = new File( moduleFile.toURI().normalize() );
+                    }
+
+                    if ( aggregatorFiles.contains( moduleFile ) )
+                    {
+                        StringBuilder buffer = new StringBuilder( 256 );
+                        for ( File aggregatorFile : aggregatorFiles )
+                        {
+                            buffer.append( aggregatorFile ).append( " -> " );
+                        }
+                        buffer.append( moduleFile );
+
+                        ModelProblem problem =
+                            new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
+                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR, model, -1, -1,
+                                                     null );
+                        result.getProblems().add( problem );
+
+                        noErrors = false;
+
+                        continue;
+                    }
+
+                    moduleFiles.add( moduleFile );
+                }
+
+                interimResult.modules = new ArrayList<InterimResult>();
+
+                if ( !build( results, interimResult.modules, moduleFiles, aggregatorFiles, false, recursive, config,
+                             reactorModelPool, modelCache ) )
+                {
+                    noErrors = false;
+                }
+            }
+        }
+        catch ( ModelBuildingException e )
+        {
+            results.add( new DefaultProjectBuildingResult( e.getModelId(), pomFile, e.getProblems() ) );
+
+            noErrors = false;
         }
 
         return noErrors;
