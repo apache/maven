@@ -149,8 +149,8 @@ if $cygwin; then
     M2_HOME=`cygpath --path --windows "$M2_HOME"`
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
-  [ -n "$HOME" ] &&
-    HOME=`cygpath --path --windows "$HOME"`
+  [ -n "$CLASSPATH" ] &&
+    CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
 fi
 
 exec "$JAVACMD" \
