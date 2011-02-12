@@ -34,6 +34,12 @@ public class Bean
 
     boolean setterCalled;
 
+    public void set( String value )
+    {
+        fieldParam = value;
+        setterCalled = true;
+    }
+
     public void setSetterParam( String value )
     {
         setterParam = value;
