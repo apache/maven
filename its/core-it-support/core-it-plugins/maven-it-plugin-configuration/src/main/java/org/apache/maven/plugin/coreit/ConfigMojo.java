@@ -236,6 +236,13 @@ public class ConfigMojo
     private Properties propertiesParam;
 
     /**
+     * A complex parameter with an alias.
+     * 
+     * @parameter alias="aliasStringParamsLegacy"
+     */
+    private String[] aliasStringParams;
+
+    /**
      * A complex parameter of type {@link org.apache.maven.plugin.coreit.Bean}.
      * 
      * @parameter
@@ -323,6 +330,7 @@ public class ConfigMojo
         PropertiesUtil.serialize( props, "setParam", setParam );
         PropertiesUtil.serialize( props, "mapParam", mapParam );
         PropertiesUtil.serialize( props, "propertiesParam", propertiesParam );
+        PropertiesUtil.serialize( props, "aliasStringParams", aliasStringParams );
         PropertiesUtil.serialize( props, "domParam", domParam );
         if ( beanParam != null )
         {

@@ -20,6 +20,10 @@
           <aliasParamLegacy>MNG-674-1</aliasParamLegacy>
           <!-- parameter that has a default value -->
           <fullyAnnotatedParam>MNG-674-2</fullyAnnotatedParam>
+          <!-- parameter that is complex (cf. MNG-4997) -->
+          <aliasStringParamsLegacy>
+            <item>MNG-4997</item>
+          </aliasStringParamsLegacy>
         </configuration>
         <executions>
           <execution>

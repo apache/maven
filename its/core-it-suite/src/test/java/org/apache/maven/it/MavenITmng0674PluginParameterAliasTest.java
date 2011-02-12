@@ -26,7 +26,8 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-674">MNG-674</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-674">MNG-674</a> and
+ * <a href="http://jira.codehaus.org/browse/MNG-4997">MNG-4997</a>.
  * 
  * @author John Casey
  * @version $Id$
@@ -37,7 +38,7 @@ public class MavenITmng0674PluginParameterAliasTest
 
     public MavenITmng0674PluginParameterAliasTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.0,)" );
     }
 
     /**
@@ -59,6 +60,7 @@ public class MavenITmng0674PluginParameterAliasTest
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
         assertEquals( "MNG-674-2", props.getProperty( "aliasDefaultExpressionParam" ) );
+        assertEquals( "MNG-4997", props.getProperty( "aliasStringParams.0" ) );
     }
 
     /**
@@ -80,6 +82,7 @@ public class MavenITmng0674PluginParameterAliasTest
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( "MNG-674-1", props.getProperty( "aliasParam" ) );
         assertEquals( "MNG-674-2", props.getProperty( "aliasDefaultExpressionParam" ) );
+        assertEquals( "MNG-4997", props.getProperty( "aliasStringParams.0" ) );
     }
 
 }
