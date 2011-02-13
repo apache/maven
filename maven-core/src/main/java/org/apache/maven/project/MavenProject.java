@@ -360,10 +360,7 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    if ( logger != null )
-                    {
-                        logger.debug( "Failed to build parent project for " + getId(), e );
-                    }
+                    throw new IllegalStateException( "Failed to build parent project for " + getId(), e );
                 }
             }
             else if ( model.getParent() != null )
@@ -378,10 +375,7 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    if ( logger != null )
-                    {
-                        logger.debug( "Failed to build parent project for " + getId(), e );
-                    }
+                    throw new IllegalStateException( "Failed to build parent project for " + getId(), e );
                 }
             }
         }
@@ -1856,10 +1850,8 @@ public class MavenProject
                 }
                 catch ( InvalidRepositoryException e )
                 {
-                    if ( logger != null )
-                    {
-                        logger.debug( "Failed to create release distribution repository for " + getId(), e );
-                    }
+                    throw new IllegalStateException( "Failed to create release distribution repository for " + getId(),
+                                                     e );
                 }
             }
         }
@@ -1886,10 +1878,9 @@ public class MavenProject
                 }
                 catch ( InvalidRepositoryException e )
                 {
-                    if ( logger != null )
-                    {
-                        logger.debug( "Failed to create snapshot distribution repository for " + getId(), e );
-                    }
+                    throw new IllegalStateException(
+                                                     "Failed to create snapshot distribution repository for " + getId(),
+                                                     e );
                 }
             }
         }
