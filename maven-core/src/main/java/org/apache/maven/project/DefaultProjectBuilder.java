@@ -141,7 +141,8 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, result, new HashMap<File, Boolean>() );
+                initProject( project, Collections.<String, MavenProject> emptyMap(), result,
+                             new HashMap<File, Boolean>() );
             }
             else if ( configuration.isResolveDependencies() )
             {
@@ -302,9 +303,11 @@ public class DefaultProjectBuilder
 
         ReactorModelCache modelCache = new ReactorModelCache();
 
+        Map<String, MavenProject> projectIndex = new HashMap<String, MavenProject>( 256 );
+
         boolean noErrors =
-            build( results, interimResults, pomFiles, new LinkedHashSet<File>(), true, recursive, config, modelPool,
-                   modelCache );
+            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive, config,
+                   modelPool, modelCache );
 
         populateReactorModelPool( modelPool, interimResults );
 
@@ -313,8 +316,8 @@ public class DefaultProjectBuilder
         try
         {
             noErrors =
-                build( results, new ArrayList<MavenProject>(), interimResults, config, new HashMap<File, Boolean>() )
-                    && noErrors;
+                build( results, new ArrayList<MavenProject>(), projectIndex, interimResults, config,
+                       new HashMap<File, Boolean>() ) && noErrors;
         }
         finally
         {
@@ -330,9 +333,9 @@ public class DefaultProjectBuilder
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
-                           List<File> pomFiles, Set<File> aggregatorFiles, boolean isRoot, boolean recursive,
-                           ProjectBuildingRequest config, ReactorModelPool reactorModelPool,
-                           ReactorModelCache modelCache )
+                           Map<String, MavenProject> projectIndex, List<File> pomFiles, Set<File> aggregatorFiles,
+                           boolean isRoot, boolean recursive, ProjectBuildingRequest config,
+                           ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
     {
         boolean noErrors = true;
 
@@ -340,7 +343,7 @@ public class DefaultProjectBuilder
         {
             aggregatorFiles.add( pomFile );
 
-            if ( !build( results, interimResults, pomFile, aggregatorFiles, isRoot, recursive, config,
+            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config,
                          reactorModelPool, modelCache ) )
             {
                 noErrors = false;
@@ -352,8 +355,9 @@ public class DefaultProjectBuilder
         return noErrors;
     }
 
-    private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults, File pomFile,
-                           Set<File> aggregatorFiles, boolean isRoot, boolean recursive, ProjectBuildingRequest config,
+    private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
+                           Map<String, MavenProject> projectIndex, File pomFile, Set<File> aggregatorFiles,
+                           boolean isRoot, boolean recursive, ProjectBuildingRequest config,
                            ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
     {
         boolean noErrors = true;
@@ -376,6 +380,8 @@ public class DefaultProjectBuilder
             ModelBuildingResult result = modelBuilder.build( request );
 
             Model model = result.getEffectiveModel();
+
+            projectIndex.put( result.getModelIds().get( 0 ), project );
 
             InterimResult interimResult = new InterimResult( pomFile, request, result, listener, isRoot );
             interimResults.add( interimResult );
@@ -456,8 +462,8 @@ public class DefaultProjectBuilder
 
                 interimResult.modules = new ArrayList<InterimResult>();
 
-                if ( !build( results, interimResult.modules, moduleFiles, aggregatorFiles, false, recursive, config,
-                             reactorModelPool, modelCache ) )
+                if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
+                             recursive, config, reactorModelPool, modelCache ) )
                 {
                     noErrors = false;
                 }
@@ -512,7 +518,8 @@ public class DefaultProjectBuilder
     }
 
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
-                           List<InterimResult> interimResults, ProjectBuildingRequest config, Map<File, Boolean> profilesXmls )
+                           Map<String, MavenProject> projectIndex, List<InterimResult> interimResults,
+                           ProjectBuildingRequest config, Map<File, Boolean> profilesXmls )
     {
         boolean noErrors = true;
 
@@ -523,10 +530,11 @@ public class DefaultProjectBuilder
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                 MavenProject project = interimResult.listener.getProject();
-                initProject( project, result, profilesXmls );
+                initProject( project, projectIndex, result, profilesXmls );
 
                 List<MavenProject> modules = new ArrayList<MavenProject>();
-                noErrors = build( results, modules, interimResult.modules, config, profilesXmls ) && noErrors;
+                noErrors =
+                    build( results, modules, projectIndex, interimResult.modules, config, profilesXmls ) && noErrors;
 
                 projects.addAll( modules );
                 projects.add( project );
@@ -547,7 +555,8 @@ public class DefaultProjectBuilder
         return noErrors;
     }
 
-    private void initProject( MavenProject project, ModelBuildingResult result, Map<File, Boolean> profilesXmls )
+    private void initProject( MavenProject project, Map<String, MavenProject> projects, ModelBuildingResult result,
+                              Map<File, Boolean> profilesXmls )
     {
         Model model = result.getEffectiveModel();
 
@@ -558,6 +567,8 @@ public class DefaultProjectBuilder
 
         File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
         project.setParentFile( parentPomFile );
+
+        project.setParent( projects.get( result.getModelIds().get( 1 ) ) );
 
         Artifact projectArtifact =
             repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
