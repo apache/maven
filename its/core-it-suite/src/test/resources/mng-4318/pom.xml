@@ -47,6 +47,8 @@ under the License.
           <outputFile>target/project.properties</outputFile>
           <expressions>
             <expression>project/executionRoot</expression>
+            <expression>project/parent/executionRoot</expression>
+            <expression>project/parent/parent/executionRoot</expression>
           </expressions>
         </configuration>
         <executions>

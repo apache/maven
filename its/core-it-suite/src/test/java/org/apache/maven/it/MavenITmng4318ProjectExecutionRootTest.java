@@ -26,7 +26,8 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4318">MNG-4318</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4318">MNG-4318</a> and
+ * <a href="http://jira.codehaus.org/browse/MNG-5014">MNG-5014</a>.
  * 
  * @author Benjamin Bentmann
  */
@@ -36,7 +37,7 @@ public class MavenITmng4318ProjectExecutionRootTest
 
     public MavenITmng4318ProjectExecutionRootTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[2.0.4,3.0-alpha-1),[3.0.3,)" );
     }
 
     /**
@@ -64,12 +65,16 @@ public class MavenITmng4318ProjectExecutionRootTest
 
         props = verifier.loadProperties( "sub-1/target/project.properties" );
         assertEquals( "false", props.getProperty( "project.executionRoot" ) );
+        assertEquals( "true", props.getProperty( "project.parent.executionRoot" ) );
 
         props = verifier.loadProperties( "sub-2/target/project.properties" );
         assertEquals( "false", props.getProperty( "project.executionRoot" ) );
+        assertEquals( "true", props.getProperty( "project.parent.executionRoot" ) );
 
         props = verifier.loadProperties( "sub-2/sub-3/target/project.properties" );
         assertEquals( "false", props.getProperty( "project.executionRoot" ) );
+        assertEquals( "false", props.getProperty( "project.parent.executionRoot" ) );
+        assertEquals( "true", props.getProperty( "project.parent.parent.executionRoot" ) );
     }
 
 }
