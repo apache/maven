@@ -43,7 +43,7 @@ class DefaultDependencyResolutionResult
 
     private List<Dependency> unresolvedDependencies = new ArrayList<Dependency>();
 
-    private List<Exception> collectionErros = new ArrayList<Exception>();
+    private List<Exception> collectionErrors = new ArrayList<Exception>();
 
     private Map<Dependency, List<Exception>> resolutionErrors = new IdentityHashMap<Dependency, List<Exception>>();
 
@@ -80,18 +80,18 @@ class DefaultDependencyResolutionResult
 
     public List<Exception> getCollectionErrors()
     {
-        return collectionErros;
+        return collectionErrors;
     }
 
     public void setCollectionErrors( List<Exception> exceptions )
     {
         if ( exceptions != null )
         {
-            this.collectionErros = exceptions;
+            this.collectionErrors = exceptions;
         }
         else
         {
-            this.collectionErros = new ArrayList<Exception>();
+            this.collectionErrors = new ArrayList<Exception>();
         }
     }
 
