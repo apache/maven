@@ -85,15 +85,11 @@ public class EventSpyDispatcher
             }
             catch ( Exception e )
             {
-                String msg = "Failed to initialize spy " + eventSpy.getClass().getName() + ": " + e.getMessage();
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( msg, e );
-                }
-                else
-                {
-                    logger.warn( msg );
-                }
+                logError( "initialize", e, eventSpy );
+            }
+            catch ( LinkageError e )
+            {
+                logError( "initialize", e, eventSpy );
             }
         }
     }
@@ -112,15 +108,11 @@ public class EventSpyDispatcher
             }
             catch ( Exception e )
             {
-                String msg = "Failed to forward event to spy " + eventSpy.getClass().getName() + ": " + e.getMessage();
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( msg, e );
-                }
-                else
-                {
-                    logger.warn( msg );
-                }
+                logError( "notify", e, eventSpy );
+            }
+            catch ( LinkageError e )
+            {
+                logError( "notify", e, eventSpy );
             }
         }
     }
@@ -139,16 +131,26 @@ public class EventSpyDispatcher
             }
             catch ( Exception e )
             {
-                String msg = "Failed to close spy " + eventSpy.getClass().getName() + ": " + e.getMessage();
-                if ( logger.isDebugEnabled() )
-                {
-                    logger.warn( msg, e );
-                }
-                else
-                {
-                    logger.warn( msg );
-                }
+                logError( "close", e, eventSpy );
             }
+            catch ( LinkageError e )
+            {
+                logError( "close", e, eventSpy );
+            }
+        }
+    }
+
+    private void logError( String action, Throwable e, EventSpy spy )
+    {
+        String msg = "Failed to " + action + " spy " + spy.getClass().getName() + ": " + e.getMessage();
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.warn( msg, e );
+        }
+        else
+        {
+            logger.warn( msg );
         }
     }
 
