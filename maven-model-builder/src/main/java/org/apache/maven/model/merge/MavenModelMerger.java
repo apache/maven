@@ -120,12 +120,13 @@ public class MavenModelMerger
                                             Map<Object, Object> context )
     {
         Organization src = source.getOrganization();
-        if ( source.getOrganization() != null )
+        if ( src != null )
         {
             Organization tgt = target.getOrganization();
             if ( tgt == null )
             {
                 tgt = new Organization();
+                tgt.setLocation( "", src.getLocation( "" ) );
                 target.setOrganization( tgt );
                 mergeOrganization( tgt, src, sourceDominant, context );
             }
@@ -137,12 +138,13 @@ public class MavenModelMerger
                                                Map<Object, Object> context )
     {
         IssueManagement src = source.getIssueManagement();
-        if ( source.getIssueManagement() != null )
+        if ( src != null )
         {
             IssueManagement tgt = target.getIssueManagement();
             if ( tgt == null )
             {
                 tgt = new IssueManagement();
+                tgt.setLocation( "", src.getLocation( "" ) );
                 target.setIssueManagement( tgt );
                 mergeIssueManagement( tgt, src, sourceDominant, context );
             }
@@ -154,12 +156,13 @@ public class MavenModelMerger
                                             Map<Object, Object> context )
     {
         CiManagement src = source.getCiManagement();
-        if ( source.getCiManagement() != null )
+        if ( src != null )
         {
             CiManagement tgt = target.getCiManagement();
             if ( tgt == null )
             {
                 tgt = new CiManagement();
+                tgt.setLocation( "", src.getLocation( "" ) );
                 target.setCiManagement( tgt );
                 mergeCiManagement( tgt, src, sourceDominant, context );
             }
@@ -367,6 +370,7 @@ public class MavenModelMerger
             if ( sourceDominant || tgt == null )
             {
                 tgt = new DeploymentRepository();
+                tgt.setLocation( "", src.getLocation( "" ) );
                 target.setRepository( tgt );
                 mergeDeploymentRepository( tgt, src, sourceDominant, context );
             }
@@ -386,6 +390,7 @@ public class MavenModelMerger
             if ( sourceDominant || tgt == null )
             {
                 tgt = new DeploymentRepository();
+                tgt.setLocation( "", src.getLocation( "" ) );
                 target.setSnapshotRepository( tgt );
                 mergeDeploymentRepository( tgt, src, sourceDominant, context );
             }
@@ -403,6 +408,7 @@ public class MavenModelMerger
             if ( sourceDominant || tgt == null )
             {
                 tgt = new Site();
+                tgt.setLocation( "", src.getLocation( "" ) );
                 target.setSite( tgt );
                 mergeSite( tgt, src, sourceDominant, context );
             }

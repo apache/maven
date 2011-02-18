@@ -126,6 +126,7 @@ public class DefaultInheritanceAssembler
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
                         Plugin plugin = new Plugin();
+                        plugin.setLocation( "", element.getLocation( "" ) );
                         plugin.setGroupId( null );
                         mergePlugin( plugin, element, sourceDominant, context );
 
@@ -208,6 +209,7 @@ public class DefaultInheritanceAssembler
                     {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
                         ReportPlugin plugin = new ReportPlugin();
+                        plugin.setLocation( "", element.getLocation( "" ) );
                         plugin.setGroupId( null );
                         mergeReportPlugin( plugin, element, sourceDominant, context );
 

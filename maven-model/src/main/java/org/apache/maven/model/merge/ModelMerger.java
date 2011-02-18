@@ -155,7 +155,7 @@ public class ModelMerger
     protected void mergeModel_Parent( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
         Parent src = source.getParent();
-        if ( source.getParent() != null )
+        if ( src != null )
         {
             Parent tgt = target.getParent();
             if ( tgt == null )
@@ -281,7 +281,7 @@ public class ModelMerger
                                             Map<Object, Object> context )
     {
         Organization src = source.getOrganization();
-        if ( source.getOrganization() != null )
+        if ( src != null )
         {
             Organization tgt = target.getOrganization();
             if ( tgt == null )
@@ -409,7 +409,7 @@ public class ModelMerger
                                                Map<Object, Object> context )
     {
         IssueManagement src = source.getIssueManagement();
-        if ( source.getIssueManagement() != null )
+        if ( src != null )
         {
             IssueManagement tgt = target.getIssueManagement();
             if ( tgt == null )
@@ -424,7 +424,7 @@ public class ModelMerger
     protected void mergeModel_Scm( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
         Scm src = source.getScm();
-        if ( source.getScm() != null )
+        if ( src != null )
         {
             Scm tgt = target.getScm();
             if ( tgt == null )
@@ -440,7 +440,7 @@ public class ModelMerger
                                             Map<Object, Object> context )
     {
         CiManagement src = source.getCiManagement();
-        if ( source.getCiManagement() != null )
+        if ( src != null )
         {
             CiManagement tgt = target.getCiManagement();
             if ( tgt == null )
@@ -456,7 +456,7 @@ public class ModelMerger
                                              Map<Object, Object> context )
     {
         Prerequisites src = source.getPrerequisites();
-        if ( source.getPrerequisites() != null )
+        if ( src != null )
         {
             Prerequisites tgt = target.getPrerequisites();
             if ( tgt == null )
@@ -471,7 +471,7 @@ public class ModelMerger
     protected void mergeModel_Build( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
     {
         Build src = source.getBuild();
-        if ( source.getBuild() != null )
+        if ( src != null )
         {
             Build tgt = target.getBuild();
             if ( tgt == null )
@@ -626,7 +626,7 @@ public class ModelMerger
                                                           Map<Object, Object> context )
     {
         DistributionManagement src = source.getDistributionManagement();
-        if ( source.getDistributionManagement() != null )
+        if ( src != null )
         {
             DistributionManagement tgt = target.getDistributionManagement();
             if ( tgt == null )
@@ -642,7 +642,7 @@ public class ModelMerger
                                              Map<Object, Object> context )
     {
         Reporting src = source.getReporting();
-        if ( source.getReporting() != null )
+        if ( src != null )
         {
             Reporting tgt = target.getReporting();
             if ( tgt == null )
@@ -658,7 +658,7 @@ public class ModelMerger
                                                         Map<Object, Object> context )
     {
         DependencyManagement src = source.getDependencyManagement();
-        if ( source.getDependencyManagement() != null )
+        if ( src != null )
         {
             DependencyManagement tgt = target.getDependencyManagement();
             if ( tgt == null )
@@ -2440,7 +2440,7 @@ public class ModelMerger
                                                               boolean sourceDominant, Map<Object, Object> context )
     {
         PluginManagement src = source.getPluginManagement();
-        if ( source.getPluginManagement() != null )
+        if ( src != null )
         {
             PluginManagement tgt = target.getPluginManagement();
             if ( tgt == null )
