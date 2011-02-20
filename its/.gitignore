@@ -1,0 +1,7 @@
+.svn/
+target/
+.project
+.classpath
+.settings/
+bin/
+*.ipr
