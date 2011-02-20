@@ -147,7 +147,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
+        String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "http" );
         
@@ -191,7 +191,7 @@ public class MavenITmng3599useHttpProxyForWebDAVTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        String settings = FileUtils.fileRead( new File( testDir, "settings.xml.template" ) );
+        String settings = FileUtils.fileRead( new File( testDir, "settings-template.xml" ) );
         settings = StringUtils.replace( settings, "@port@", Integer.toString( port ) );
         String newSettings = StringUtils.replace( settings, "@protocol@", "dav" );
         
