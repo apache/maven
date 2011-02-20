@@ -19,6 +19,7 @@ package org.apache.maven.model.inheritance;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -74,7 +75,19 @@ public class DefaultInheritanceAssembler
 
         if ( parent != null )
         {
-            String childArtifactId = child.getArtifactId();
+            String childName = child.getArtifactId();
+
+            /*
+             * This logic exists only for the sake of backward-compat with 2.x (MNG-5000). In generally, it is wrong to
+             * base URL inheritance on the project directory names as this information is unavailable for POMs in the
+             * repository. In other words, projects where artifactId != projectDirName will see different effective URLs
+             * depending on how the POM was constructed.
+             */
+            File childDirectory = child.getProjectDirectory();
+            if ( childDirectory != null )
+            {
+                childName = childDirectory.getName();
+            }
 
             for ( String module : parent.getModules() )
             {
@@ -95,7 +108,7 @@ public class DefaultInheritanceAssembler
 
                 moduleName = moduleName.substring( lastSlash + 1 );
 
-                if ( moduleName.equals( childArtifactId ) && lastSlash >= 0 )
+                if ( moduleName.equals( childName ) && lastSlash >= 0 )
                 {
                     adjustment = module.substring( 0, lastSlash );
                     break;
