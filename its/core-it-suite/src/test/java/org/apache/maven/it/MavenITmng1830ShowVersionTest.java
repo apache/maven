@@ -31,7 +31,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1830">MNG-1830</a>.
  * 
  * @author Brett Porter
- * @version $Id: MavenITmng3906MergedPluginClassPathOrderingTest.java 726432 2008-12-14 13:20:02Z bentmann $
+ * @version $Id$
  */
 public class MavenITmng1830ShowVersionTest
     extends AbstractMavenIntegrationTestCase

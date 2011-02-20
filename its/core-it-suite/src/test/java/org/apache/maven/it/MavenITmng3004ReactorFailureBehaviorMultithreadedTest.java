@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3004">MNG-3004</a>.
  * 
  * @author Dan Fabulich
- * @version $Id: MavenITmng0095ReactorFailureBehaviorTest.java 804194 2009-08-14 12:32:56Z bentmann $
+ * @version $Id$
  */
 public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
     extends AbstractMavenIntegrationTestCase

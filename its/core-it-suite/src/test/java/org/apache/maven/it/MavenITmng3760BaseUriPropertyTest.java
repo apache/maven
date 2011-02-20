@@ -30,7 +30,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3760">MNG-3760</a>.
  * 
  * @author Brett Porter
- * @version $Id: MavenITmng2605BogusProfileActivationTest.java 734813 2009-01-15 20:41:59Z bentmann $
+ * @version $Id$
  */
 public class MavenITmng3760BaseUriPropertyTest
     extends AbstractMavenIntegrationTestCase

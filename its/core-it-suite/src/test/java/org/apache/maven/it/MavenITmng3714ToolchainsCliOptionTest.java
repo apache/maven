@@ -29,7 +29,7 @@ import java.util.Properties;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3714">MNG-3714</a>.
  * 
  * @author Brett Porter
- * @version $Id: MavenITmng0557UserSettingsCliOptionTest.java 744504 2009-02-14 14:49:27Z brett $
+ * @version $Id$
  */
 public class MavenITmng3714ToolchainsCliOptionTest
     extends AbstractMavenIntegrationTestCase

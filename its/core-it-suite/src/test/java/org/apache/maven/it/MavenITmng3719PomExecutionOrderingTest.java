@@ -30,7 +30,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3719">MNG-3719</a>.
  * 
  * @author Brett Porter
- * @version $Id: MavenITmng4016PrefixedPropertyInterpolationTest.java 739321 2009-01-30 16:09:55Z bentmann $
+ * @version $Id$
  */
 public class MavenITmng3719PomExecutionOrderingTest
     extends AbstractMavenIntegrationTestCase
