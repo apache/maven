@@ -1,0 +1,2 @@
+*.pom              -text -crlf
+*.xml              -text -crlf
