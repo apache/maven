@@ -48,9 +48,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.impl.ArtifactResolver;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
 import org.sonatype.aether.repository.LocalRepositoryManager;
+import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.WorkspaceRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
@@ -59,7 +60,7 @@ import org.sonatype.aether.util.artifact.SubArtifact;
 /**
  * @version $Id$
  */
-@Component(role = ProjectBuilder.class)
+@Component( role = ProjectBuilder.class )
 public class DefaultProjectBuilder
     implements ProjectBuilder
 {
@@ -80,7 +81,7 @@ public class DefaultProjectBuilder
     private RepositorySystem repositorySystem;
 
     @Requirement
-    private ArtifactResolver artifactResolver;
+    private org.sonatype.aether.RepositorySystem repoSystem;
 
     @Requirement
     private RemoteRepositoryManager repositoryManager;
@@ -92,43 +93,45 @@ public class DefaultProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
-    public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( pomFile, new FileModelSource( pomFile ), configuration );
+        return build( pomFile, new FileModelSource( pomFile ), new InternalConfig( request, null, null ) );
     }
 
-    public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( null, modelSource, configuration );
+        return build( null, modelSource, new InternalConfig( request, null, null ) );
     }
 
-    private ProjectBuildingResult build( File pomFile, ModelSource modelSource, ProjectBuildingRequest configuration )
+    private ProjectBuildingResult build( File pomFile, ModelSource modelSource, InternalConfig config )
         throws ProjectBuildingException
     {
         ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
 
         try
         {
+            ProjectBuildingRequest configuration = config.request;
+
             MavenProject project = configuration.getProject();
 
             List<ModelProblem> modelProblems = null;
 
             if ( project == null )
             {
-                ModelBuildingRequest request = getModelBuildingRequest( configuration, null );
+                ModelBuildingRequest request = getModelBuildingRequest( config );
 
                 project = new MavenProject( repositorySystem, this, configuration, logger );
 
                 DefaultModelBuildingListener listener =
                     new DefaultModelBuildingListener( project, projectBuildingHelper, configuration );
                 request.setModelBuildingListener( listener );
-    
+
                 request.setPomFile( pomFile );
                 request.setModelSource( modelSource );
                 request.setLocationTracking( true );
-    
+
                 ModelBuildingResult result;
                 try
                 {
@@ -205,13 +208,13 @@ public class DefaultProjectBuilder
         return ids;
     }
 
-    private ModelBuildingRequest getModelBuildingRequest( ProjectBuildingRequest configuration,
-                                                          ReactorModelPool modelPool )
+    private ModelBuildingRequest getModelBuildingRequest( InternalConfig config )
     {
+        ProjectBuildingRequest configuration = config.request;
+
         ModelResolver resolver =
-            new ProjectModelResolver( configuration.getRepositorySession(), artifactResolver, repositoryManager,
-                                      RepositoryUtils.toRepos( configuration.getRemoteRepositories() ),
-                                      configuration.getRepositoryMerging(), modelPool );
+            new ProjectModelResolver( config.session, repoSystem, repositoryManager, config.repositories,
+                                      configuration.getRepositoryMerging(), config.modelPool );
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 
@@ -224,17 +227,18 @@ public class DefaultProjectBuilder
         request.setUserProperties( configuration.getUserProperties() );
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
+        request.setModelCache( config.modelCache );
 
         return request;
     }
 
-    public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        return build( artifact, false, configuration );
+        return build( artifact, false, request );
     }
 
-    public ProjectBuildingResult build( Artifact artifact, boolean allowStubModel, ProjectBuildingRequest configuration )
+    public ProjectBuildingResult build( Artifact artifact, boolean allowStubModel, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
         org.sonatype.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
@@ -243,26 +247,29 @@ public class DefaultProjectBuilder
             pomArtifact = new SubArtifact( pomArtifact, "", "pom" );
         }
 
-        ArtifactResult result;
+        InternalConfig config = new InternalConfig( request, null, null );
+
+        boolean localProject;
+
         try
         {
-            ArtifactRequest request = new ArtifactRequest();
-            request.setArtifact( pomArtifact );
-            request.setRepositories( RepositoryUtils.toRepos( configuration.getRemoteRepositories() ) );
-            result = artifactResolver.resolveArtifact( configuration.getRepositorySession(), request );
-            pomArtifact = result.getArtifact();
+            ArtifactRequest pomRequest = new ArtifactRequest();
+            pomRequest.setArtifact( pomArtifact );
+            pomRequest.setRepositories( config.repositories );
+            ArtifactResult pomResult = repoSystem.resolveArtifact( config.session, pomRequest );
+
+            pomArtifact = pomResult.getArtifact();
+            localProject = pomResult.getRepository() instanceof WorkspaceRepository;
         }
         catch ( org.sonatype.aether.resolution.ArtifactResolutionException e )
         {
             if ( e.getResults().get( 0 ).isMissing() && allowStubModel )
             {
-                return build( null, createStubModelSource( artifact ), configuration );
+                return build( null, createStubModelSource( artifact ), config );
             }
             throw new ProjectBuildingException( artifact.getId(),
                                                 "Error resolving project artifact: " + e.getMessage(), e );
         }
-
-        boolean localProject = result.getRepository() instanceof WorkspaceRepository;
 
         File pomFile = pomArtifact.getFile();
 
@@ -273,7 +280,7 @@ public class DefaultProjectBuilder
             artifact.setResolved( true );
         }
 
-        return build( localProject ? pomFile : null, new FileModelSource( pomFile ), configuration );
+        return build( localProject ? pomFile : null, new FileModelSource( pomFile ), config );
     }
 
     private ModelSource createStubModelSource( Artifact artifact )
@@ -292,7 +299,7 @@ public class DefaultProjectBuilder
         return new StringModelSource( buffer, artifact.getId() );
     }
 
-    public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest config )
+    public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
         List<ProjectBuildingResult> results = new ArrayList<ProjectBuildingResult>();
@@ -303,11 +310,12 @@ public class DefaultProjectBuilder
 
         ReactorModelCache modelCache = new ReactorModelCache();
 
+        InternalConfig config = new InternalConfig( request, modelPool, modelCache );
+
         Map<String, MavenProject> projectIndex = new HashMap<String, MavenProject>( 256 );
 
         boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive, config,
-                   modelPool, modelCache );
+            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive, config );
 
         populateReactorModelPool( modelPool, interimResults );
 
@@ -316,7 +324,7 @@ public class DefaultProjectBuilder
         try
         {
             noErrors =
-                build( results, new ArrayList<MavenProject>(), projectIndex, interimResults, config,
+                build( results, new ArrayList<MavenProject>(), projectIndex, interimResults, request,
                        new HashMap<File, Boolean>() ) && noErrors;
         }
         finally
@@ -334,8 +342,7 @@ public class DefaultProjectBuilder
 
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
                            Map<String, MavenProject> projectIndex, List<File> pomFiles, Set<File> aggregatorFiles,
-                           boolean isRoot, boolean recursive, ProjectBuildingRequest config,
-                           ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
+                           boolean isRoot, boolean recursive, InternalConfig config )
     {
         boolean noErrors = true;
 
@@ -343,8 +350,7 @@ public class DefaultProjectBuilder
         {
             aggregatorFiles.add( pomFile );
 
-            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config,
-                         reactorModelPool, modelCache ) )
+            if ( !build( results, interimResults, projectIndex, pomFile, aggregatorFiles, isRoot, recursive, config ) )
             {
                 noErrors = false;
             }
@@ -357,22 +363,20 @@ public class DefaultProjectBuilder
 
     private boolean build( List<ProjectBuildingResult> results, List<InterimResult> interimResults,
                            Map<String, MavenProject> projectIndex, File pomFile, Set<File> aggregatorFiles,
-                           boolean isRoot, boolean recursive, ProjectBuildingRequest config,
-                           ReactorModelPool reactorModelPool, ReactorModelCache modelCache )
+                           boolean isRoot, boolean recursive, InternalConfig config )
     {
         boolean noErrors = true;
 
-        ModelBuildingRequest request = getModelBuildingRequest( config, reactorModelPool );
+        ModelBuildingRequest request = getModelBuildingRequest( config );
 
-        MavenProject project = new MavenProject( repositorySystem, this, config, logger );
+        MavenProject project = new MavenProject( repositorySystem, this, config.request, logger );
 
         request.setPomFile( pomFile );
         request.setTwoPhaseBuilding( true );
         request.setLocationTracking( true );
-        request.setModelCache( modelCache );
 
         DefaultModelBuildingListener listener =
-            new DefaultModelBuildingListener( project, projectBuildingHelper, config );
+            new DefaultModelBuildingListener( project, projectBuildingHelper, config.request );
         request.setModelBuildingListener( listener );
 
         try
@@ -463,7 +467,7 @@ public class DefaultProjectBuilder
                 interimResult.modules = new ArrayList<InterimResult>();
 
                 if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
-                             recursive, config, reactorModelPool, modelCache ) )
+                             recursive, config ) )
                 {
                     noErrors = false;
                 }
@@ -519,7 +523,7 @@ public class DefaultProjectBuilder
 
     private boolean build( List<ProjectBuildingResult> results, List<MavenProject> projects,
                            Map<String, MavenProject> projectIndex, List<InterimResult> interimResults,
-                           ProjectBuildingRequest config, Map<File, Boolean> profilesXmls )
+                           ProjectBuildingRequest request, Map<File, Boolean> profilesXmls )
     {
         boolean noErrors = true;
 
@@ -534,7 +538,7 @@ public class DefaultProjectBuilder
 
                 List<MavenProject> modules = new ArrayList<MavenProject>();
                 noErrors =
-                    build( results, modules, projectIndex, interimResult.modules, config, profilesXmls ) && noErrors;
+                    build( results, modules, projectIndex, interimResult.modules, request, profilesXmls ) && noErrors;
 
                 projects.addAll( modules );
                 projects.add( project );
@@ -630,6 +634,30 @@ public class DefaultProjectBuilder
         }
 
         return null;
+    }
+
+    class InternalConfig
+    {
+
+        public final ProjectBuildingRequest request;
+
+        public final RepositorySystemSession session;
+
+        public final List<RemoteRepository> repositories;
+
+        public final ReactorModelPool modelPool;
+
+        public final ReactorModelCache modelCache;
+
+        public InternalConfig( ProjectBuildingRequest request, ReactorModelPool modelPool, ReactorModelCache modelCache )
+        {
+            this.request = request;
+            this.modelPool = modelPool;
+            this.modelCache = modelCache;
+            session = request.getRepositorySession();
+            repositories = RepositoryUtils.toRepos( request.getRemoteRepositories() );
+        }
+
     }
 
 }

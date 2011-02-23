@@ -32,9 +32,9 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.impl.ArtifactResolver;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.RepositoryPolicy;
@@ -62,7 +62,7 @@ class ProjectModelResolver
 
     private final List<RemoteRepository> externalRepositories;
 
-    private final ArtifactResolver resolver;
+    private final RepositorySystem resolver;
 
     private final RemoteRepositoryManager remoteRepositoryManager;
 
@@ -72,7 +72,7 @@ class ProjectModelResolver
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
 
-    public ProjectModelResolver( RepositorySystemSession session, ArtifactResolver resolver,
+    public ProjectModelResolver( RepositorySystemSession session, RepositorySystem resolver,
                                  RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories,
                                  ProjectBuildingRequest.RepositoryMerging repositoryMerging, ReactorModelPool modelPool )
     {
