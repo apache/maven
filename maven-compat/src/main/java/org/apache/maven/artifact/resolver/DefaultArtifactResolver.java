@@ -58,11 +58,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
 
 /**
  * @author Jason van Zyl
@@ -129,21 +127,7 @@ public class DefaultArtifactResolver
 
     private RepositorySystemSession getSession( ArtifactRepository localRepository )
     {
-        MavenSession mavenSession = legacySupport.getSession();
-        DefaultRepositorySystemSession session;
-        if ( mavenSession != null )
-        {
-            session = new DefaultRepositorySystemSession( mavenSession.getRepositorySession() );
-        }
-        else
-        {
-            session = new DefaultRepositorySystemSession();
-        }
-        if ( localRepository != null && localRepository.getBasedir() != null )
-        {
-            session.setLocalRepositoryManager( LegacyLocalRepositoryManager.wrap( localRepository, repoSystem ) );
-        }
-        return session;
+        return LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
     }
 
     private void injectSession1( RepositoryRequest request, MavenSession session )

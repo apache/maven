@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
@@ -654,7 +655,9 @@ public class DefaultProjectBuilder
             this.request = request;
             this.modelPool = modelPool;
             this.modelCache = modelCache;
-            session = request.getRepositorySession();
+            session =
+                LegacyLocalRepositoryManager.overlay( request.getLocalRepository(), request.getRepositorySession(),
+                                                      repoSystem );
             repositories = RepositoryUtils.toRepos( request.getRemoteRepositories() );
         }
 

@@ -37,10 +37,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
 /**
@@ -72,9 +71,8 @@ public class DefaultArtifactInstaller
     public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        DefaultRepositorySystemSession session =
-            new DefaultRepositorySystemSession( legacySupport.getRepositorySession() );
-        session.setLocalRepositoryManager( LegacyLocalRepositoryManager.wrap( localRepository, repoSystem ) );
+        RepositorySystemSession session =
+            LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
         InstallRequest request = new InstallRequest();
 

@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 import org.apache.maven.repository.Proxy;
 import org.sonatype.aether.RepositorySystem;
@@ -42,6 +41,8 @@ import org.sonatype.aether.repository.LocalMetadataResult;
 import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.FilterRepositorySystemSession;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -57,16 +58,37 @@ public class LegacyLocalRepositoryManager
 
     private final LocalRepository repo;
 
-    public static LocalRepositoryManager wrap( ArtifactRepository repository, RepositorySystem system )
+    public static RepositorySystemSession overlay( ArtifactRepository repository, RepositorySystemSession session,
+                                                   RepositorySystem system )
     {
-        ArtifactRepositoryLayout layout = repository.getLayout();
-        if ( layout != null && layout.getClass().equals( DefaultRepositoryLayout.class ) )
+        if ( repository == null || repository.getBasedir() == null )
         {
-            // map the default layout to the default impl of the repo system
-            return system.newLocalRepositoryManager( new LocalRepository( repository.getBasedir() ) );
+            return session;
         }
 
-        return new LegacyLocalRepositoryManager( repository );
+        if ( session != null )
+        {
+            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+            if ( lrm != null && lrm.getRepository().getBasedir().equals( new File( repository.getBasedir() ) ) )
+            {
+                return session;
+            }
+        }
+        else
+        {
+            session = new DefaultRepositorySystemSession();
+        }
+
+        final LocalRepositoryManager llrm = new LegacyLocalRepositoryManager( repository );
+
+        return new FilterRepositorySystemSession( session )
+        {
+            @Override
+            public LocalRepositoryManager getLocalRepositoryManager()
+            {
+                return llrm;
+            }
+        };
     }
 
     private LegacyLocalRepositoryManager( ArtifactRepository delegate )

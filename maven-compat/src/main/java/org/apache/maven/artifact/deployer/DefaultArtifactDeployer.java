@@ -38,13 +38,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.deployment.DeployRequest;
 import org.sonatype.aether.deployment.DeployResult;
 import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.metadata.MergeableMetadata;
-import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
 @Component( role = ArtifactDeployer.class, instantiationStrategy = "per-lookup" )
@@ -79,9 +78,8 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        DefaultRepositorySystemSession session =
-            new DefaultRepositorySystemSession( legacySupport.getRepositorySession() );
-        session.setLocalRepositoryManager( LegacyLocalRepositoryManager.wrap( localRepository, repoSystem ) );
+        RepositorySystemSession session =
+            LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
         DeployRequest request = new DeployRequest();
 
