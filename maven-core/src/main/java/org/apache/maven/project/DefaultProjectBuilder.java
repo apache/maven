@@ -160,7 +160,7 @@ public class DefaultProjectBuilder
                 try
                 {
                     DefaultDependencyResolutionRequest resolution =
-                        new DefaultDependencyResolutionRequest( project, configuration.getRepositorySession() );
+                        new DefaultDependencyResolutionRequest( project, config.session );
                     resolutionResult = dependencyResolver.resolve( resolution );
                 }
                 catch ( DependencyResolutionException e )
@@ -175,7 +175,7 @@ public class DefaultProjectBuilder
                                                  Collections.singletonList( project.getArtifact().getId() ), null );
 
                     // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not
-                    LocalRepositoryManager lrm = configuration.getRepositorySession().getLocalRepositoryManager();
+                    LocalRepositoryManager lrm = config.session.getLocalRepositoryManager();
                     for ( Artifact artifact : artifacts )
                     {
                         if ( !artifact.isResolved() )
