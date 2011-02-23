@@ -50,6 +50,8 @@ public class MavenArtifactRepository
 
     private Proxy proxy;
 
+    private List<ArtifactRepository> mirroredRepositories = Collections.emptyList();
+
     public MavenArtifactRepository()
     {
     }
@@ -384,6 +386,23 @@ public class MavenArtifactRepository
     public boolean isProjectAware()
     {
         return false;
+    }
+
+    public List<ArtifactRepository> getMirroredRepositories()
+    {
+        return mirroredRepositories;
+    }
+
+    public void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories )
+    {
+        if ( mirroredRepositories != null )
+        {
+            this.mirroredRepositories = mirroredRepositories;
+        }
+        else
+        {
+            this.mirroredRepositories = Collections.emptyList();
+        }
     }
 
 }

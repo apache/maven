@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -394,12 +395,15 @@ public class LegacyRepositorySystem
 
         for ( List<ArtifactRepository> aliasedRepos : reposByKey.values() )
         {
+            List<ArtifactRepository> mirroredRepos = new ArrayList<ArtifactRepository>();
+
             List<ArtifactRepositoryPolicy> releasePolicies =
                 new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
                 releasePolicies.add( aliasedRepo.getReleases() );
+                mirroredRepos.addAll( aliasedRepo.getMirroredRepositories() );
             }
 
             ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
@@ -423,6 +427,8 @@ public class LegacyRepositorySystem
             effectiveRepository.setAuthentication( aliasedRepo.getAuthentication() );
 
             effectiveRepository.setProxy( aliasedRepo.getProxy() );
+
+            effectiveRepository.setMirroredRepositories( mirroredRepos );
 
             effectiveRepositories.add( effectiveRepository );
         }
@@ -503,6 +509,12 @@ public class LegacyRepositorySystem
     {
         if ( mirror != null )
         {
+            ArtifactRepository original =
+                createArtifactRepository( repository.getId(), repository.getUrl(), repository.getLayout(),
+                                          repository.getSnapshots(), repository.getReleases() );
+
+            repository.setMirroredRepositories( Collections.singletonList( original ) );
+
             repository.setId( mirror.getId() );
             repository.setUrl( mirror.getUrl() );
 

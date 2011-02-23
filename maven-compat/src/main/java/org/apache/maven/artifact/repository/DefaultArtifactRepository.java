@@ -53,6 +53,8 @@ public class DefaultArtifactRepository
 
     private Proxy proxy;
 
+    private List<ArtifactRepository> mirroredRepositories = Collections.emptyList();
+
     /**
      * Create a local repository or a test repository.
      *
@@ -244,6 +246,23 @@ public class DefaultArtifactRepository
     public boolean isUniqueVersion()
     {
         return true;
+    }
+
+    public List<ArtifactRepository> getMirroredRepositories()
+    {
+        return mirroredRepositories;
+    }
+
+    public void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories )
+    {
+        if ( mirroredRepositories != null )
+        {
+            this.mirroredRepositories = mirroredRepositories;
+        }
+        else
+        {
+            this.mirroredRepositories = Collections.emptyList();
+        }
     }
 
 }

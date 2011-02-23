@@ -202,6 +202,7 @@ public class RepositoryUtils
             result.setPolicy( false, toPolicy( repo.getReleases() ) );
             result.setAuthentication( toAuthentication( repo.getAuthentication() ) );
             result.setProxy( toProxy( repo.getProxy() ) );
+            result.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
         }
         return result;
     }

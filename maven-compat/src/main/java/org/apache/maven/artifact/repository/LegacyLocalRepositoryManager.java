@@ -385,6 +385,16 @@ public class LegacyLocalRepositoryManager
         {
             return null;
         }
+
+        public List<ArtifactRepository> getMirroredRepositories()
+        {
+            return Collections.emptyList();
+        }
+
+        public void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories )
+        {
+        }
+
     }
 
 }
