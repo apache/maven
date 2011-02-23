@@ -383,6 +383,7 @@ public class DefaultVersionResolver
         {
             info.version = version;
             info.repository = repository;
+            info.timestamp = timestamp;
         }
     }
 
