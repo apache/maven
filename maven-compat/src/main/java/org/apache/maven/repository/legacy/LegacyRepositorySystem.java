@@ -461,17 +461,7 @@ public class LegacyRepositorySystem
             for ( ArtifactRepository repository : repositories )
             {
                 Mirror mirror = getMirror( repository, mirrors );
-
-                if ( mirror != null )
-                {
-                    repository.setId( mirror.getId() );
-                    repository.setUrl( mirror.getUrl() );
-
-                    if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
-                    {
-                        repository.setLayout( getLayout( mirror.getLayout() ) );
-                    }
-                }
+                injectMirror( repository, mirror );
             }
         }
     }
@@ -504,17 +494,21 @@ public class LegacyRepositorySystem
             for ( ArtifactRepository repository : repositories )
             {
                 Mirror mirror = getMirror( session, repository );
+                injectMirror( repository, mirror );
+            }
+        }
+    }
 
-                if ( mirror != null )
-                {
-                    repository.setId( mirror.getId() );
-                    repository.setUrl( mirror.getUrl() );
+    private void injectMirror( ArtifactRepository repository, Mirror mirror )
+    {
+        if ( mirror != null )
+        {
+            repository.setId( mirror.getId() );
+            repository.setUrl( mirror.getUrl() );
 
-                    if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
-                    {
-                        repository.setLayout( getLayout( mirror.getLayout() ) );
-                    }
-                }
+            if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
+            {
+                repository.setLayout( getLayout( mirror.getLayout() ) );
             }
         }
     }
