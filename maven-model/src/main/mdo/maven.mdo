@@ -3568,7 +3568,7 @@
           <type>String</type>
           <description>
             <![CDATA[
-            The identifier of the POM.
+            The identifier of the POM in the format {@code <groupId>:<artifactId>:<version>}.
             ]]>
           </description>
         </field>
