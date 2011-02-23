@@ -103,7 +103,7 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-jar-plugin:2.3.1:jar
@@ -158,7 +158,7 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-ejb-plugin:2.3:ejb
@@ -222,7 +222,7 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-ejb3-plugin:ejb3
@@ -282,7 +282,7 @@ problem.
             <!-- START SNIPPET: maven-plugin-lifecycle -->
             <phases>
               <generate-resources>
-                org.apache.maven.plugins:maven-plugin-plugin:2.6:descriptor
+                org.apache.maven.plugins:maven-plugin-plugin:2.7:descriptor
               </generate-resources>
               <process-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources
@@ -297,11 +297,11 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-jar-plugin:2.3.1:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:2.6:addPluginArtifactMetadata
+                org.apache.maven.plugins:maven-plugin-plugin:2.7:addPluginArtifactMetadata
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:2.3.1:install
@@ -385,7 +385,7 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-war-plugin:2.1.1:war
@@ -428,13 +428,13 @@ problem.
             <!-- START SNIPPET: ear-lifecycle -->
             <phases>
               <generate-resources>
-                org.apache.maven.plugins:maven-ear-plugin:2.4.2:generate-application-xml
+                org.apache.maven.plugins:maven-ear-plugin:2.5:generate-application-xml
               </generate-resources>
               <process-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources
               </process-resources>
               <package>
-                org.apache.maven.plugins:maven-ear-plugin:2.4.2:ear
+                org.apache.maven.plugins:maven-ear-plugin:2.5:ear
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:2.3.1:install
@@ -486,7 +486,7 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-rar-plugin:2.2:rar
@@ -541,7 +541,7 @@ problem.
                 org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.7.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.7.2:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-par-plugin:par
