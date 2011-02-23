@@ -26,13 +26,13 @@ import java.util.List;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Repository;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.sonatype.aether.RepositorySystemSession;
 
 // This class needs to stick around because it was exposed the the remote resources plugin started using it instead of
 // getting the repositories from the project.
@@ -75,15 +75,15 @@ public final class ProjectUtils
         throws InvalidRepositoryException
     {
         RepositorySystem repositorySystem = rs( c );
-        MavenExecutionRequest executionRequest = er( c );
+        RepositorySystemSession session = rss( c );
 
         ArtifactRepository repository = repositorySystem.buildArtifactRepository( repo );
 
-        if ( executionRequest != null )
+        if ( session != null )
         {
-            repositorySystem.injectMirror( Arrays.asList( repository ), executionRequest.getMirrors() );
-            repositorySystem.injectProxy( Arrays.asList( repository ), executionRequest.getProxies() );
-            repositorySystem.injectAuthentication( Arrays.asList( repository ), executionRequest.getServers() );
+            repositorySystem.injectMirror( session, Arrays.asList( repository ) );
+            repositorySystem.injectProxy( session, Arrays.asList( repository ) );
+            repositorySystem.injectAuthentication( session, Arrays.asList( repository ) );
         }
 
         return repository;
@@ -101,20 +101,13 @@ public final class ProjectUtils
         }
     }
 
-    private static MavenExecutionRequest er( PlexusContainer c )
+    private static RepositorySystemSession rss( PlexusContainer c )
     {
         try
         {
             LegacySupport legacySupport = c.lookup( LegacySupport.class );
 
-            if ( legacySupport.getSession() != null )
-            {
-                return legacySupport.getSession().getRequest();
-            }
-            else
-            {
-                return null;
-            }
+            return legacySupport.getRepositorySession();
         }
         catch ( ComponentLookupException e )
         {

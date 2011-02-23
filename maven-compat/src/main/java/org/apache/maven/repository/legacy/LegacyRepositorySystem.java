@@ -65,6 +65,8 @@ import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
+import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.apache.maven.wagon.proxy.ProxyUtils;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -615,7 +617,23 @@ public class LegacyRepositorySystem
             {
                 if ( proxy.isActive() && repository.getProtocol().equalsIgnoreCase( proxy.getProtocol() ) )
                 {
-                    return proxy;
+                    if ( StringUtils.isNotEmpty( proxy.getNonProxyHosts() ) )
+                    {
+                        ProxyInfo pi = new ProxyInfo();
+                        pi.setNonProxyHosts( proxy.getNonProxyHosts() );
+
+                        org.apache.maven.wagon.repository.Repository repo =
+                            new org.apache.maven.wagon.repository.Repository( repository.getId(), repository.getUrl() );
+
+                        if ( !ProxyUtils.validateNonProxyHosts( pi, repo.getHost() ) )
+                        {
+                            return proxy;
+                        }
+                    }
+                    else
+                    {
+                        return proxy;
+                    }
                 }
             }
         }

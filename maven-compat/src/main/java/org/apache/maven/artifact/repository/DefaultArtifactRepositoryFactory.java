@@ -24,12 +24,11 @@ import java.util.List;
 
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * @author jdcasey
@@ -97,24 +96,20 @@ public class DefaultArtifactRepositoryFactory
 
     private ArtifactRepository injectSession( ArtifactRepository repository, boolean mirrors )
     {
-        MavenSession session = legacySupport.getSession();
+        RepositorySystemSession session = legacySupport.getRepositorySession();
 
         if ( session != null && repository != null && !isLocalRepository( repository ) )
         {
-            MavenExecutionRequest request = session.getRequest();
-            if ( request != null )
+            List<ArtifactRepository> repositories = Arrays.asList( repository );
+
+            if ( mirrors )
             {
-                List<ArtifactRepository> repositories = Arrays.asList( repository );
-
-                if ( mirrors )
-                {
-                    repositorySystem.injectMirror( repositories, request.getMirrors() );
-                }
-
-                repositorySystem.injectProxy( repositories, request.getProxies() );
-
-                repositorySystem.injectAuthentication( repositories, request.getServers() );
+                repositorySystem.injectMirror( session, repositories );
             }
+
+            repositorySystem.injectProxy( session, repositories );
+
+            repositorySystem.injectAuthentication( session, repositories );
         }
 
         return repository;
