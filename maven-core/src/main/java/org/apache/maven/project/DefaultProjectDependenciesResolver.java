@@ -28,6 +28,8 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
+import org.apache.maven.model.InputLocation;
+import org.apache.maven.model.InputSource;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -43,6 +45,8 @@ import org.sonatype.aether.graph.DependencyVisitor;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.resolution.DependencyRequest;
 import org.sonatype.aether.util.DefaultRequestTrace;
+import org.sonatype.aether.util.artifact.ArtifacIdUtils;
+import org.sonatype.aether.util.artifact.ArtifactProperties;
 import org.sonatype.aether.util.artifact.JavaScopes;
 
 /**
@@ -194,6 +198,8 @@ public class DefaultProjectDependenciesResolver
 
         private String indent = "";
 
+        private Map<String, Dependency> managed;
+
         public GraphLogger( MavenProject project )
         {
             this.project = project;
@@ -213,12 +219,16 @@ public class DefaultProjectDependenciesResolver
 
                 if ( node.getPremanagedScope() != null && !node.getPremanagedScope().equals( dep.getScope() ) )
                 {
-                    buffer.append( " (scope managed from " ).append( node.getPremanagedScope() ).append( ")" );
+                    buffer.append( " (scope managed from " ).append( node.getPremanagedScope() );
+                    appendManagementSource( buffer, art, "scope" );
+                    buffer.append( ")" );
                 }
 
                 if ( node.getPremanagedVersion() != null && !node.getPremanagedVersion().equals( art.getVersion() ) )
                 {
-                    buffer.append( " (version managed from " ).append( node.getPremanagedVersion() ).append( ")" );
+                    buffer.append( " (version managed from " ).append( node.getPremanagedVersion() );
+                    appendManagementSource( buffer, art, "version" );
+                    buffer.append( ")" );
                 }
             }
             else
@@ -238,6 +248,41 @@ public class DefaultProjectDependenciesResolver
         {
             indent = indent.substring( 0, indent.length() - 3 );
             return true;
+        }
+
+        private void appendManagementSource( StringBuilder buffer, org.sonatype.aether.artifact.Artifact artifact,
+                                             String field )
+        {
+            if ( managed == null )
+            {
+                managed = new HashMap<String, Dependency>();
+                if ( project.getDependencyManagement() != null )
+                {
+                    for ( Dependency dep : project.getDependencyManagement().getDependencies() )
+                    {
+                        managed.put( dep.getManagementKey(), dep );
+                    }
+                }
+            }
+
+            String key =
+                ArtifacIdUtils.toVersionlessId( artifact.getGroupId(), artifact.getArtifactId(),
+                                                artifact.getProperty( ArtifactProperties.TYPE, "jar" ),
+                                                artifact.getClassifier() );
+
+            Dependency dependency = managed.get( key );
+            if ( dependency != null )
+            {
+                InputLocation location = dependency.getLocation( field );
+                if ( location != null )
+                {
+                    InputSource source = location.getSource();
+                    if ( source != null )
+                    {
+                        buffer.append( " by " ).append( source.getModelId() );
+                    }
+                }
+            }
         }
 
     }
