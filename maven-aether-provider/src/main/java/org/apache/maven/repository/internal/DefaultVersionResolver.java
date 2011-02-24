@@ -44,7 +44,6 @@ import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.SyncContext;
 import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 import org.sonatype.aether.artifact.Artifact;
@@ -455,11 +454,7 @@ public class DefaultVersionResolver
             return true;
         }
 
-        Artifact pomArtifact = artifact;
-        if ( pomArtifact.getClassifier().length() > 0 || !"pom".equals( pomArtifact.getExtension() ) )
-        {
-            pomArtifact = new SubArtifact( artifact, "", "pom" );
-        }
+        Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( artifact );
 
         return workspace.findArtifact( pomArtifact ) == null;
     }

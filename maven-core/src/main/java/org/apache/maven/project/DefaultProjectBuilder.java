@@ -44,6 +44,7 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -58,7 +59,6 @@ import org.sonatype.aether.repository.WorkspaceRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.SubArtifact;
 
 /**
  * @version $Id$
@@ -247,10 +247,7 @@ public class DefaultProjectBuilder
         throws ProjectBuildingException
     {
         org.sonatype.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
-        if ( !pomArtifact.getExtension().equals( "pom" ) )
-        {
-            pomArtifact = new SubArtifact( pomArtifact, "", "pom" );
-        }
+        pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
         InternalConfig config = new InternalConfig( request, null, null );
 

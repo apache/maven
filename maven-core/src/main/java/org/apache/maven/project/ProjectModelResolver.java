@@ -32,13 +32,13 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -113,7 +113,8 @@ class ProjectModelResolver
             return;
         }
 
-        List<RemoteRepository> newRepositories = Collections.singletonList( convert( repository ) );
+        List<RemoteRepository> newRepositories =
+            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( repository ) );
 
         if ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( repositoryMerging ) )
         {
@@ -126,37 +127,6 @@ class ProjectModelResolver
             repositories =
                 remoteRepositoryManager.aggregateRepositories( session, pomRepositories, externalRepositories, false );
         }
-    }
-
-    private static RemoteRepository convert( Repository repository )
-    {
-        RemoteRepository result =
-            new RemoteRepository( repository.getId(), repository.getLayout(), repository.getUrl() );
-        result.setPolicy( true, convert( repository.getSnapshots() ) );
-        result.setPolicy( false, convert( repository.getReleases() ) );
-        return result;
-    }
-
-    private static RepositoryPolicy convert( org.apache.maven.model.RepositoryPolicy policy )
-    {
-        boolean enabled = true;
-        String checksums = RepositoryPolicy.CHECKSUM_POLICY_WARN;
-        String updates = RepositoryPolicy.UPDATE_POLICY_DAILY;
-
-        if ( policy != null )
-        {
-            enabled = policy.isEnabled();
-            if ( policy.getUpdatePolicy() != null )
-            {
-                updates = policy.getUpdatePolicy();
-            }
-            if ( policy.getChecksumPolicy() != null )
-            {
-                checksums = policy.getChecksumPolicy();
-            }
-        }
-
-        return new RepositoryPolicy( enabled, updates, checksums );
     }
 
     public ModelResolver newCopy()

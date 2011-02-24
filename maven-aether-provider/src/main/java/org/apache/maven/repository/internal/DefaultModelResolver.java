@@ -99,7 +99,7 @@ class DefaultModelResolver
         }
 
         List<RemoteRepository> newRepositories =
-            Collections.singletonList( DefaultArtifactDescriptorReader.convert( repository ) );
+            Collections.singletonList( ArtifactDescriptorUtils.toRemoteRepository( repository ) );
 
         this.repositories =
             remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );

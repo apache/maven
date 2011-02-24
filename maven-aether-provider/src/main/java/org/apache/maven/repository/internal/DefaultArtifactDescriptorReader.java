@@ -64,10 +64,7 @@ import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.ArtifactProperties;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.DefaultArtifactType;
-import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.repository.WorkspaceRepository;
 import org.sonatype.aether.resolution.ArtifactDescriptorException;
 import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
@@ -180,7 +177,7 @@ public class DefaultArtifactDescriptorReader
 
             for ( Repository r : model.getRepositories() )
             {
-                result.addRepository( convert( r ) );
+                result.addRepository( ArtifactDescriptorUtils.toRemoteRepository( r ) );
             }
 
             for ( org.apache.maven.model.Dependency dependency : model.getDependencies() )
@@ -259,11 +256,7 @@ public class DefaultArtifactDescriptorReader
                 throw new ArtifactDescriptorException( result );
             }
 
-            Artifact pomArtifact = artifact;
-            if ( pomArtifact.getClassifier().length() > 0 || !"pom".equals( pomArtifact.getExtension() ) )
-            {
-                pomArtifact = new SubArtifact( artifact, "", "pom" );
-            }
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( artifact );
 
             ArtifactResult resolveResult;
             try
@@ -409,37 +402,6 @@ public class DefaultArtifactDescriptorReader
     private Exclusion convert( org.apache.maven.model.Exclusion exclusion )
     {
         return new Exclusion( exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*" );
-    }
-
-    static RemoteRepository convert( Repository repository )
-    {
-        RemoteRepository result =
-            new RemoteRepository( repository.getId(), repository.getLayout(), repository.getUrl() );
-        result.setPolicy( true, convert( repository.getSnapshots() ) );
-        result.setPolicy( false, convert( repository.getReleases() ) );
-        return result;
-    }
-
-    private static RepositoryPolicy convert( org.apache.maven.model.RepositoryPolicy policy )
-    {
-        boolean enabled = true;
-        String checksums = RepositoryPolicy.CHECKSUM_POLICY_WARN;
-        String updates = RepositoryPolicy.UPDATE_POLICY_DAILY;
-
-        if ( policy != null )
-        {
-            enabled = policy.isEnabled();
-            if ( policy.getUpdatePolicy() != null )
-            {
-                updates = policy.getUpdatePolicy();
-            }
-            if ( policy.getChecksumPolicy() != null )
-            {
-                checksums = policy.getChecksumPolicy();
-            }
-        }
-
-        return new RepositoryPolicy( enabled, updates, checksums );
     }
 
     private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
