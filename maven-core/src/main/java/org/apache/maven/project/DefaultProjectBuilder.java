@@ -50,12 +50,14 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
 import org.sonatype.aether.repository.LocalRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.WorkspaceRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
 /**
@@ -213,11 +215,13 @@ public class DefaultProjectBuilder
     {
         ProjectBuildingRequest configuration = config.request;
 
-        ModelResolver resolver =
-            new ProjectModelResolver( config.session, repoSystem, repositoryManager, config.repositories,
-                                      configuration.getRepositoryMerging(), config.modelPool );
-
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
+
+        RequestTrace trace = DefaultRequestTrace.newChild( null, configuration ).newChild( request );
+
+        ModelResolver resolver =
+            new ProjectModelResolver( config.session, trace, repoSystem, repositoryManager, config.repositories,
+                                      configuration.getRepositoryMerging(), config.modelPool );
 
         request.setValidationLevel( configuration.getValidationLevel() );
         request.setProcessPlugins( configuration.isProcessPlugins() );

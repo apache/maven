@@ -49,6 +49,7 @@ import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryException;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
@@ -59,6 +60,7 @@ import org.sonatype.aether.impl.ArtifactResolver;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
 import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.transfer.ArtifactNotFoundException;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.ArtifactProperties;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.DefaultArtifactType;
@@ -224,6 +226,8 @@ public class DefaultArtifactDescriptorReader
                            ArtifactDescriptorResult result )
         throws ArtifactDescriptorException
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+
         Set<String> visited = new LinkedHashSet<String>();
         for ( Artifact artifact = request.getArtifact();; )
         {
@@ -231,6 +235,7 @@ public class DefaultArtifactDescriptorReader
             {
                 VersionRequest versionRequest =
                     new VersionRequest( artifact, request.getRepositories(), request.getRequestContext() );
+                versionRequest.setTrace( trace );
                 VersionResult versionResult = versionResolver.resolveVersion( session, versionRequest );
 
                 artifact = artifact.setVersion( versionResult.getVersion() );
@@ -245,7 +250,7 @@ public class DefaultArtifactDescriptorReader
             {
                 RepositoryException exception =
                     new RepositoryException( "Artifact relocations form a cycle: " + visited );
-                invalidDescriptor( session, artifact, exception );
+                invalidDescriptor( session, trace, artifact, exception );
                 if ( session.isIgnoreInvalidArtifactDescriptor() )
                 {
                     return null;
@@ -265,6 +270,7 @@ public class DefaultArtifactDescriptorReader
             {
                 ArtifactRequest resolveRequest =
                     new ArtifactRequest( pomArtifact, request.getRepositories(), request.getRequestContext() );
+                resolveRequest.setTrace( trace );
                 resolveResult = artifactResolver.resolveArtifact( session, resolveRequest );
                 pomArtifact = resolveResult.getArtifact();
                 result.setRepository( resolveResult.getRepository() );
@@ -273,7 +279,7 @@ public class DefaultArtifactDescriptorReader
             {
                 if ( e.getCause() instanceof ArtifactNotFoundException )
                 {
-                    missingDescriptor( session, artifact, (Exception) e.getCause() );
+                    missingDescriptor( session, trace, artifact, (Exception) e.getCause() );
                     if ( session.isIgnoreMissingArtifactDescriptor() )
                     {
                         return null;
@@ -293,8 +299,9 @@ public class DefaultArtifactDescriptorReader
                 modelRequest.setSystemProperties( toProperties( session.getUserProperties(),
                                                                 session.getSystemProperties() ) );
                 modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
-                modelRequest.setModelResolver( new DefaultModelResolver( session, request.getRequestContext(),
-                                                                         artifactResolver, remoteRepositoryManager,
+                modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
+                                                                         request.getRequestContext(), artifactResolver,
+                                                                         remoteRepositoryManager,
                                                                          request.getRepositories() ) );
                 if ( resolveResult.getRepository() instanceof WorkspaceRepository )
                 {
@@ -317,7 +324,7 @@ public class DefaultArtifactDescriptorReader
                         throw new ArtifactDescriptorException( result );
                     }
                 }
-                invalidDescriptor( session, artifact, e );
+                invalidDescriptor( session, trace, artifact, e );
                 if ( session.isIgnoreInvalidArtifactDescriptor() )
                 {
                     return null;
@@ -435,24 +442,28 @@ public class DefaultArtifactDescriptorReader
         return new RepositoryPolicy( enabled, updates, checksums );
     }
 
-    private void missingDescriptor( RepositorySystemSession session, Artifact artifact, Exception exception )
+    private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
+                                    Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session );
+            DefaultRepositoryEvent event =
+                new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session, trace );
             event.setArtifact( artifact );
             event.setException( exception );
             listener.artifactDescriptorMissing( event );
         }
     }
 
-    private void invalidDescriptor( RepositorySystemSession session, Artifact artifact, Exception exception )
+    private void invalidDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
+                                    Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session );
+            DefaultRepositoryEvent event =
+                new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session, trace );
             event.setArtifact( artifact );
             event.setException( exception );
             listener.artifactDescriptorInvalid( event );

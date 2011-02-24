@@ -33,14 +33,16 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.DependencyCollectionException;
 import org.sonatype.aether.graph.DependencyFilter;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.graph.DependencyVisitor;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.JavaScopes;
 
 /**
@@ -60,6 +62,8 @@ public class DefaultProjectDependenciesResolver
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )
         throws DependencyResolutionException
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+
         DefaultDependencyResolutionResult result = new DefaultDependencyResolutionResult();
 
         MavenProject project = request.getMavenProject();
@@ -113,9 +117,13 @@ public class DefaultProjectDependenciesResolver
             }
         }
 
+        DependencyRequest depRequest = new DependencyRequest( collect, filter );
+        depRequest.setTrace( trace );
+
         DependencyNode node;
         try
         {
+            collect.setTrace( DefaultRequestTrace.newChild( trace, depRequest ) );
             node = repoSystem.collectDependencies( session, collect ).getRoot();
             result.setDependencyGraph( node );
         }
@@ -127,6 +135,8 @@ public class DefaultProjectDependenciesResolver
             throw new DependencyResolutionException( result, "Could not resolve dependencies for project "
                 + project.getId() + ": " + e.getMessage(), e );
         }
+
+        depRequest.setRoot( node );
 
         if ( logger.isWarnEnabled() )
         {
@@ -147,11 +157,11 @@ public class DefaultProjectDependenciesResolver
 
         try
         {
-            process( result, repoSystem.resolveDependencies( session, node, filter ) );
+            process( result, repoSystem.resolveDependencies( session, depRequest ).getArtifactResults() );
         }
-        catch ( ArtifactResolutionException e )
+        catch ( org.sonatype.aether.resolution.DependencyResolutionException e )
         {
-            process( result, e.getResults() );
+            process( result, e.getResult().getArtifactResults() );
 
             throw new DependencyResolutionException( result, "Could not resolve dependencies for project "
                 + project.getId() + ": " + e.getMessage(), e );
@@ -167,7 +177,6 @@ public class DefaultProjectDependenciesResolver
             DependencyNode node = ar.getRequest().getDependencyNode();
             if ( ar.isResolved() )
             {
-                node.setArtifact( ar.getArtifact() );
                 result.addResolvedDependency( node.getDependency() );
             }
             else

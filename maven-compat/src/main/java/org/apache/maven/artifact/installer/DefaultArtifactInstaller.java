@@ -40,6 +40,7 @@ import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.installation.InstallRequest;
 import org.sonatype.aether.installation.InstallationException;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
 /**
@@ -75,6 +76,8 @@ public class DefaultArtifactInstaller
             LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
         InstallRequest request = new InstallRequest();
+
+        request.setTrace( DefaultRequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
         org.sonatype.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
         mainArtifact = mainArtifact.setFile( source );

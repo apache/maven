@@ -32,6 +32,7 @@ import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.ArtifactResolver;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
@@ -53,6 +54,8 @@ class DefaultModelResolver
 
     private final RepositorySystemSession session;
 
+    private final RequestTrace trace;
+
     private final String context;
 
     private List<RemoteRepository> repositories;
@@ -63,10 +66,12 @@ class DefaultModelResolver
 
     private final Set<String> repositoryIds;
 
-    public DefaultModelResolver( RepositorySystemSession session, String context, ArtifactResolver resolver,
-                                 RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories )
+    public DefaultModelResolver( RepositorySystemSession session, RequestTrace trace, String context,
+                                 ArtifactResolver resolver, RemoteRepositoryManager remoteRepositoryManager,
+                                 List<RemoteRepository> repositories )
     {
         this.session = session;
+        this.trace = trace;
         this.context = context;
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
@@ -77,6 +82,7 @@ class DefaultModelResolver
     private DefaultModelResolver( DefaultModelResolver original )
     {
         this.session = original.session;
+        this.trace = original.trace;
         this.context = original.context;
         this.resolver = original.resolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
@@ -112,6 +118,7 @@ class DefaultModelResolver
         try
         {
             ArtifactRequest request = new ArtifactRequest( pomArtifact, repositories, context );
+            request.setTrace( trace );
             pomArtifact = resolver.resolveArtifact( session, request ).getArtifact();
         }
         catch ( ArtifactResolutionException e )

@@ -44,6 +44,7 @@ import org.sonatype.aether.deployment.DeployResult;
 import org.sonatype.aether.deployment.DeploymentException;
 import org.sonatype.aether.metadata.MergeableMetadata;
 import org.sonatype.aether.repository.RemoteRepository;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.SubArtifact;
 
 @Component( role = ArtifactDeployer.class, instantiationStrategy = "per-lookup" )
@@ -82,6 +83,8 @@ public class DefaultArtifactDeployer
             LegacyLocalRepositoryManager.overlay( localRepository, legacySupport.getRepositorySession(), repoSystem );
 
         DeployRequest request = new DeployRequest();
+
+        request.setTrace( DefaultRequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
         org.sonatype.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
         mainArtifact = mainArtifact.setFile( source );

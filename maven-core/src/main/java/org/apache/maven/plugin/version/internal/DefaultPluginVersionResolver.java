@@ -47,10 +47,12 @@ import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.repository.ArtifactRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.MetadataRequest;
 import org.sonatype.aether.resolution.MetadataResult;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 import org.sonatype.aether.util.version.GenericVersionScheme;
@@ -112,6 +114,8 @@ public class DefaultPluginVersionResolver
     private PluginVersionResult resolveFromRepository( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
         org.sonatype.aether.metadata.Metadata metadata =
@@ -120,11 +124,11 @@ public class DefaultPluginVersionResolver
 
         List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
 
-        requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ) );
+        requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ).setTrace( trace ) );
 
         for ( RemoteRepository repository : request.getRepositories() )
         {
-            requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ) );
+            requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ).setTrace( trace ) );
         }
 
         List<MetadataResult> results = repositorySystem.resolveMetadata( request.getRepositorySession(), requests );
@@ -139,7 +143,7 @@ public class DefaultPluginVersionResolver
                 repository = request.getRepositorySession().getLocalRepository();
             }
 
-            mergeMetadata( request.getRepositorySession(), versions, res.getMetadata(), repository );
+            mergeMetadata( request.getRepositorySession(), trace, versions, res.getMetadata(), repository );
         }
 
         selectVersion( result, request, versions );
@@ -275,7 +279,7 @@ public class DefaultPluginVersionResolver
         return true;
     }
 
-    private void mergeMetadata( RepositorySystemSession session, Versions versions,
+    private void mergeMetadata( RepositorySystemSession session, RequestTrace trace, Versions versions,
                                 org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository )
     {
         if ( metadata != null && metadata.getFile() != null && metadata.getFile().isFile() )
@@ -290,18 +294,19 @@ public class DefaultPluginVersionResolver
             }
             catch ( IOException e )
             {
-                invalidMetadata( session, metadata, repository, e );
+                invalidMetadata( session, trace, metadata, repository, e );
             }
         }
     }
 
-    private void invalidMetadata( RepositorySystemSession session, org.sonatype.aether.metadata.Metadata metadata,
-                                  ArtifactRepository repository, Exception exception )
+    private void invalidMetadata( RepositorySystemSession session, RequestTrace trace,
+                                  org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository,
+                                  Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
             event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );

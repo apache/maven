@@ -38,14 +38,18 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryCache;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.SyncContext;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.artifact.SubArtifact;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.MetadataResolver;
+import org.sonatype.aether.impl.SyncContextFactory;
 import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.impl.internal.CacheUtils;
 import org.sonatype.aether.metadata.Metadata;
@@ -80,16 +84,21 @@ public class DefaultVersionResolver
 
     private static final String SNAPSHOT = "SNAPSHOT";
 
+    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
     @Requirement
     private MetadataResolver metadataResolver;
 
+    @Requirement
+    private SyncContextFactory syncContextFactory;
+
     public void initService( ServiceLocator locator )
     {
         setLogger( locator.getService( Logger.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
+        setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
     }
 
     public DefaultVersionResolver setLogger( Logger logger )
@@ -108,9 +117,21 @@ public class DefaultVersionResolver
         return this;
     }
 
+    public DefaultVersionResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
+    {
+        if ( syncContextFactory == null )
+        {
+            throw new IllegalArgumentException( "sync context factory has not been specified" );
+        }
+        this.syncContextFactory = syncContextFactory;
+        return this;
+    }
+
     public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         throws VersionResolutionException
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+
         Artifact artifact = request.getArtifact();
 
         String version = artifact.getVersion();
@@ -184,6 +205,7 @@ public class DefaultVersionResolver
                     new MetadataRequest( metadata, repository, request.getRequestContext() );
                 metadataRequest.setDeleteLocalCopyIfMissing( true );
                 metadataRequest.setFavorLocalRepository( true );
+                metadataRequest.setTrace( trace );
                 metadataRequests.add( metadataRequest );
             }
 
@@ -201,7 +223,7 @@ public class DefaultVersionResolver
                     repository = session.getLocalRepository();
                 }
 
-                Versioning versioning = readVersions( session, metadataResult.getMetadata(), repository, result );
+                Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
                 merge( artifact, infos, versioning, repository );
             }
 
@@ -272,45 +294,61 @@ public class DefaultVersionResolver
         return info != null;
     }
 
-    private Versioning readVersions( RepositorySystemSession session, Metadata metadata, ArtifactRepository repository,
-                                     VersionResult result )
+    private Versioning readVersions( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
+                                     ArtifactRepository repository, VersionResult result )
     {
         Versioning versioning = null;
 
         FileInputStream fis = null;
         try
         {
-            if ( metadata != null && metadata.getFile() != null && metadata.getFile().exists() )
+            if ( metadata != null )
             {
-                fis = new FileInputStream( metadata.getFile() );
-                org.apache.maven.artifact.repository.metadata.Metadata m = new MetadataXpp3Reader().read( fis, false );
-                versioning = m.getVersioning();
+                SyncContext syncContext = syncContextFactory.newInstance( session, true );
 
-                /*
-                 * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata of the
-                 * local repository. This is especially troublesome during snapshot resolution so we try to handle that
-                 * gracefully.
-                 */
-                if ( versioning != null && repository instanceof LocalRepository )
+                try
                 {
-                    if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
-                    {
-                        Versioning repaired = new Versioning();
-                        repaired.setLastUpdated( versioning.getLastUpdated() );
-                        Snapshot snapshot = new Snapshot();
-                        snapshot.setLocalCopy( true );
-                        repaired.setSnapshot( snapshot );
-                        versioning = repaired;
+                    syncContext.acquire( null, Collections.singleton( metadata ) );
 
-                        throw new IOException( "Snapshot information corrupted with remote repository data"
-                            + ", please verify that no remote repository uses the id '" + repository.getId() + "'" );
+                    if ( metadata.getFile() != null && metadata.getFile().exists() )
+                    {
+                        fis = new FileInputStream( metadata.getFile() );
+                        org.apache.maven.artifact.repository.metadata.Metadata m =
+                            new MetadataXpp3Reader().read( fis, false );
+                        versioning = m.getVersioning();
+
+                        /*
+                         * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
+                         * of the local repository. This is especially troublesome during snapshot resolution so we try
+                         * to handle that gracefully.
+                         */
+                        if ( versioning != null && repository instanceof LocalRepository )
+                        {
+                            if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
+                            {
+                                Versioning repaired = new Versioning();
+                                repaired.setLastUpdated( versioning.getLastUpdated() );
+                                Snapshot snapshot = new Snapshot();
+                                snapshot.setLocalCopy( true );
+                                repaired.setSnapshot( snapshot );
+                                versioning = repaired;
+
+                                throw new IOException( "Snapshot information corrupted with remote repository data"
+                                    + ", please verify that no remote repository uses the id '" + repository.getId()
+                                    + "'" );
+                            }
+                        }
                     }
+                }
+                finally
+                {
+                    syncContext.release();
                 }
             }
         }
         catch ( Exception e )
         {
-            invalidMetadata( session, metadata, repository, e );
+            invalidMetadata( session, trace, metadata, repository, e );
             result.addException( e );
         }
         finally
@@ -321,13 +359,13 @@ public class DefaultVersionResolver
         return ( versioning != null ) ? versioning : new Versioning();
     }
 
-    private void invalidMetadata( RepositorySystemSession session, Metadata metadata, ArtifactRepository repository,
-                                  Exception exception )
+    private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
+                                  ArtifactRepository repository, Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
             event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );

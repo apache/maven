@@ -33,6 +33,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -47,7 +48,10 @@ import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
 import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.resolution.DependencyResolutionException;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.FilterRepositorySystemSession;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 import org.sonatype.aether.util.artifact.JavaScopes;
@@ -90,6 +94,8 @@ public class DefaultPluginDependenciesResolver
     public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( null, plugin );
+
         Artifact pluginArtifact = toArtifact( plugin, session );
 
         try
@@ -105,6 +111,7 @@ public class DefaultPluginDependenciesResolver
 
             ArtifactDescriptorRequest request =
                 new ArtifactDescriptorRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+            request.setTrace( trace );
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor( pluginSession, request );
 
             pluginArtifact = result.getArtifact();
@@ -125,6 +132,7 @@ public class DefaultPluginDependenciesResolver
         try
         {
             ArtifactRequest request = new ArtifactRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
+            request.setTrace( trace );
             pluginArtifact = repoSystem.resolveArtifact( session, request ).getArtifact();
         }
         catch ( ArtifactResolutionException e )
@@ -139,6 +147,8 @@ public class DefaultPluginDependenciesResolver
                                    List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( null, plugin );
+
         if ( pluginArtifact == null )
         {
             pluginArtifact = toArtifact( plugin, session );
@@ -181,6 +191,11 @@ public class DefaultPluginDependenciesResolver
                 request.addDependency( pluginDep );
             }
 
+            DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
+            depRequest.setTrace( trace );
+
+            request.setTrace( DefaultRequestTrace.newChild( trace, depRequest ) );
+
             node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
 
             if ( logger.isDebugEnabled() )
@@ -188,15 +203,16 @@ public class DefaultPluginDependenciesResolver
                 node.accept( new GraphLogger() );
             }
 
-            repoSystem.resolveDependencies( session, node, resolutionFilter );
+            depRequest.setRoot( node );
+            repoSystem.resolveDependencies( session, depRequest );
         }
         catch ( DependencyCollectionException e )
         {
             throw new PluginResolutionException( plugin, e );
         }
-        catch ( ArtifactResolutionException e )
+        catch ( DependencyResolutionException e )
         {
-            throw new PluginResolutionException( plugin, e );
+            throw new PluginResolutionException( plugin, e.getCause() );
         }
 
         return node;

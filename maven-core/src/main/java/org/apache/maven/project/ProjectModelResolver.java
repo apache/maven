@@ -34,6 +34,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -54,6 +55,8 @@ class ProjectModelResolver
 
     private final RepositorySystemSession session;
 
+    private final RequestTrace trace;
+
     private final String context = "project";
 
     private List<RemoteRepository> repositories;
@@ -72,11 +75,12 @@ class ProjectModelResolver
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
 
-    public ProjectModelResolver( RepositorySystemSession session, RepositorySystem resolver,
+    public ProjectModelResolver( RepositorySystemSession session, RequestTrace trace, RepositorySystem resolver,
                                  RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories,
                                  ProjectBuildingRequest.RepositoryMerging repositoryMerging, ReactorModelPool modelPool )
     {
         this.session = session;
+        this.trace = trace;
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<RemoteRepository>();
@@ -90,6 +94,7 @@ class ProjectModelResolver
     private ProjectModelResolver( ProjectModelResolver original )
     {
         this.session = original.session;
+        this.trace = original.trace;
         this.resolver = original.resolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
         this.pomRepositories = original.pomRepositories;
@@ -176,6 +181,7 @@ class ProjectModelResolver
             try
             {
                 ArtifactRequest request = new ArtifactRequest( pomArtifact, repositories, context );
+                request.setTrace( trace );
                 pomArtifact = resolver.resolveArtifact( session, request ).getArtifact();
             }
             catch ( ArtifactResolutionException e )

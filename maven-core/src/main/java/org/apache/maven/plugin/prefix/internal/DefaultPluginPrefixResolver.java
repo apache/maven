@@ -42,12 +42,14 @@ import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.repository.ArtifactRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.resolution.MetadataRequest;
 import org.sonatype.aether.resolution.MetadataResult;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.sonatype.aether.util.DefaultRequestTrace;
 import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 
@@ -161,6 +163,8 @@ public class DefaultPluginPrefixResolver
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request )
     {
+        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+
         List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
 
         for ( String pluginGroup : request.getPluginGroups() )
@@ -168,11 +172,11 @@ public class DefaultPluginPrefixResolver
             org.sonatype.aether.metadata.Metadata metadata =
                 new DefaultMetadata( pluginGroup, "maven-metadata.xml", DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT );
 
-            requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ) );
+            requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ).setTrace( trace ) );
 
             for ( RemoteRepository repository : request.getRepositories() )
             {
-                requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ) );
+                requests.add( new MetadataRequest( metadata, repository, REPOSITORY_CONTEXT ).setTrace( trace ) );
             }
         }
 
@@ -181,7 +185,7 @@ public class DefaultPluginPrefixResolver
         List<MetadataResult> results = repositorySystem.resolveMetadata( request.getRepositorySession(), requests );
         requests.clear();
 
-        PluginPrefixResult result = processResults( request, results, requests );
+        PluginPrefixResult result = processResults( request, trace, results, requests );
 
         if ( result != null )
         {
@@ -198,14 +202,14 @@ public class DefaultPluginPrefixResolver
 
             results = repositorySystem.resolveMetadata( session, requests );
 
-            return processResults( request, results, null );
+            return processResults( request, trace, results, null );
         }
 
         return null;
     }
 
-    private PluginPrefixResult processResults( PluginPrefixRequest request, List<MetadataResult> results,
-                                               List<MetadataRequest> requests )
+    private PluginPrefixResult processResults( PluginPrefixRequest request, RequestTrace trace,
+                                               List<MetadataResult> results, List<MetadataRequest> requests )
     {
         for ( MetadataResult res : results )
         {
@@ -220,7 +224,7 @@ public class DefaultPluginPrefixResolver
                 }
 
                 PluginPrefixResult result =
-                    resolveFromRepository( request, metadata.getGroupId(), metadata, repository );
+                    resolveFromRepository( request, trace, metadata.getGroupId(), metadata, repository );
 
                 if ( result != null )
                 {
@@ -237,7 +241,8 @@ public class DefaultPluginPrefixResolver
         return null;
     }
 
-    private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request, String pluginGroup,
+    private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request, RequestTrace trace,
+                                                      String pluginGroup,
                                                       org.sonatype.aether.metadata.Metadata metadata,
                                                       ArtifactRepository repository )
     {
@@ -264,20 +269,21 @@ public class DefaultPluginPrefixResolver
             }
             catch ( IOException e )
             {
-                invalidMetadata( request.getRepositorySession(), metadata, repository, e );
+                invalidMetadata( request.getRepositorySession(), trace, metadata, repository, e );
             }
         }
 
         return null;
     }
 
-    private void invalidMetadata( RepositorySystemSession session, org.sonatype.aether.metadata.Metadata metadata,
-                                  ArtifactRepository repository, Exception exception )
+    private void invalidMetadata( RepositorySystemSession session, RequestTrace trace,
+                                  org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository,
+                                  Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session );
+            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
             event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );
