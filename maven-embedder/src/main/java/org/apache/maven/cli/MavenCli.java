@@ -374,6 +374,9 @@ public class MavenCli
 
             container = new DefaultPlexusContainer( cc );
 
+            // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
+            container.setLookupRealm( null );
+
             container.setLoggerManager( new MavenLoggerManager( logger ) );
 
             customizeContainer( container );

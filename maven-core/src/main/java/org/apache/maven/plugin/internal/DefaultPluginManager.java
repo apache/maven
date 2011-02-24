@@ -109,16 +109,16 @@ public class DefaultPluginManager
             throw new PluginManagerException( plugin, e.getMessage(), e );
         }
 
-        ClassRealm oldRealm = container.getLookupRealm();
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            container.setLookupRealm( pluginDescriptor.getClassRealm() );
+            Thread.currentThread().setContextClassLoader( pluginDescriptor.getClassRealm() );
 
             return container.lookup( role, roleHint );
         }
         finally
         {
-            container.setLookupRealm( oldRealm );
+            Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
     }
 
@@ -141,16 +141,16 @@ public class DefaultPluginManager
             throw new PluginManagerException( plugin, e.getMessage(), e );
         }
 
-        ClassRealm oldRealm = container.getLookupRealm();
+        ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            container.setLookupRealm( pluginDescriptor.getClassRealm() );
+            Thread.currentThread().setContextClassLoader( pluginDescriptor.getClassRealm() );
 
             return container.lookupMap( role );
         }
         finally
         {
-            container.setLookupRealm( oldRealm );
+            Thread.currentThread().setContextClassLoader( oldClassLoader );
         }
     }
 

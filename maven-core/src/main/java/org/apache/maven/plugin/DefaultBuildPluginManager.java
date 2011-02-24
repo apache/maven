@@ -24,7 +24,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -38,9 +37,6 @@ import org.sonatype.aether.repository.RemoteRepository;
 public class DefaultBuildPluginManager
     implements BuildPluginManager
 {
-
-    @Requirement
-    private PlexusContainer container;
 
     @Requirement
     private MavenPluginManager mavenPluginManager;
@@ -85,8 +81,6 @@ public class DefaultBuildPluginManager
         {
             throw new PluginExecutionException( mojoExecution, project, e );
         }
-
-        ClassRealm oldLookupRealm = container.setLookupRealm( pluginRealm );
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader( pluginRealm );
@@ -159,7 +153,6 @@ public class DefaultBuildPluginManager
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
-            container.setLookupRealm( oldLookupRealm );
 
             legacySupport.setSession( oldSession );
         }
