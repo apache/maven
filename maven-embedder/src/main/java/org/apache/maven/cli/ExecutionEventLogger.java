@@ -19,10 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
@@ -71,22 +68,28 @@ public class ExecutionEventLogger
 
     private static String getFormattedTime( long time )
     {
-        String pattern = "s.SSS's'";
+        // NOTE: DateFormat is not suitable to format timespans of 24h+
 
-        if ( time / 60000L > 0 )
+        long h = time / ( 60 * 60 * 1000 );
+        long m = ( time - h * 60 * 60 * 1000 ) / ( 60 * 1000 );
+        long s = ( time - h * 60 * 60 * 1000 - m * 60 * 1000 ) / 1000;
+        long ms = time % 1000;
+
+        String format;
+        if ( h > 0 )
         {
-            pattern = "m:s" + pattern;
-
-            if ( time / 3600000L > 0 )
-            {
-                pattern = "H:m" + pattern;
-            }
+            format = "%1$d:%2$02d:%3$02d.%4$03ds";
+        }
+        else if ( m > 0 )
+        {
+            format = "%2$d:%3$02d.%4$03ds";
+        }
+        else
+        {
+            format = "%3$d.%4$03ds";
         }
 
-        DateFormat fmt = new SimpleDateFormat( pattern );
-        fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-
-        return fmt.format( new Date( time ) );
+        return String.format( format, h, m, s, ms );
     }
 
     @Override
