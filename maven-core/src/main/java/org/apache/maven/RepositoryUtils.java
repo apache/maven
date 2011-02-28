@@ -197,7 +197,7 @@ public class RepositoryUtils
         RemoteRepository result = null;
         if ( repo != null )
         {
-            result = new RemoteRepository( repo.getId(), repo.getLayout().getId(), repo.getUrl() );
+            result = new RemoteRepository( repo.getId(), getLayout( repo ), repo.getUrl() );
             result.setPolicy( true, toPolicy( repo.getSnapshots() ) );
             result.setPolicy( false, toPolicy( repo.getReleases() ) );
             result.setAuthentication( toAuthentication( repo.getAuthentication() ) );
@@ -205,6 +205,31 @@ public class RepositoryUtils
             result.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
         }
         return result;
+    }
+
+    public static String getLayout( ArtifactRepository repo )
+    {
+        try
+        {
+            return repo.getLayout().getId();
+        }
+        catch ( LinkageError e )
+        {
+            /*
+             * NOTE: getId() was added in 3.x and is as such not implemented by plugins compiled against 2.x APIs.
+             */
+            String className = repo.getLayout().getClass().getSimpleName();
+            if ( className.endsWith( "RepositoryLayout" ) )
+            {
+                String layout = className.substring( 0, className.length() - "RepositoryLayout".length() );
+                if ( layout.length() > 0 )
+                {
+                    layout = Character.toLowerCase( layout.charAt( 0 ) ) + layout.substring( 1 );
+                    return layout;
+                }
+            }
+            return "";
+        }
     }
 
     private static RepositoryPolicy toPolicy( ArtifactRepositoryPolicy policy )

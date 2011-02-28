@@ -103,4 +103,10 @@ public class DefaultRepositoryLayout
         return directory.replace( GROUP_SEPARATOR, PATH_SEPARATOR );
     }
 
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
+
 }

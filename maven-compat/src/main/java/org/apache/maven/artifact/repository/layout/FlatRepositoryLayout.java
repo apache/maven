@@ -83,4 +83,11 @@ public class FlatRepositoryLayout
     {
         return pathOfRepositoryMetadata( metadata.getRemoteFilename() );
     }
+
+    @Override
+    public String toString()
+    {
+        return getId();
+    }
+
 }

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
@@ -143,7 +144,7 @@ public class DefaultMirrorSelector
 
     static boolean matchesLayout( ArtifactRepository repository, Mirror mirror )
     {
-        return matchesLayout( repository.getLayout().getId(), mirror.getMirrorOfLayouts() );
+        return matchesLayout( RepositoryUtils.getLayout( repository ), mirror.getMirrorOfLayouts() );
     }
 
     /**

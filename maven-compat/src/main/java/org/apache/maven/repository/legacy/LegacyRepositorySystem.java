@@ -883,6 +883,12 @@ public class LegacyRepositorySystem
             return fallback.pathOfRemoteRepositoryMetadata( metadata );
         }
 
+        @Override
+        public String toString()
+        {
+            return getId();
+        }
+
     }
 
 }
