@@ -37,7 +37,6 @@ under the License.
         <revision>3.0.2</revision>
         <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0.2-bin.zip</file-release>
         <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0.2-bin.tar.gz</file-release>
-        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0.2-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -47,7 +46,6 @@ under the License.
         <revision>3.0.1</revision>
         <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0.1-bin.zip</file-release>
         <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0.1-bin.tar.gz</file-release>
-        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0.1-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
@@ -57,7 +55,6 @@ under the License.
         <revision>3.0</revision>
         <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0-bin.zip</file-release>
         <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0-bin.tar.gz</file-release>
-        <file-release>http://archive.apache.org/dist/maven/binaries/apache-maven-3.0-bin.tar.bz2</file-release>
       </Version>
     </release>
     <release>
