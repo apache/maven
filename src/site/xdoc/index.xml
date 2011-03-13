@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<!--
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+
+<document>
+
+  <properties>
+    <title>Apache Maven 2.2.x</title>
+    <author email="hboutemy_AT_apache_DOT_org">Hervé Boutemy</author>
+  </properties>
+
+  <body>
+
+    <section name="Apache Maven 2.2.x">
+
+      <p>Maven is a project development management and
+    comprehension tool. Based on the concept of a project object model:
+    builds, dependency management, documentation creation, site
+    publication, and distribution publication are all controlled from
+    the declarative file. Maven can be extended by plugins to utilise a
+    number of other development tools for reporting or the build
+    process.</p>
+
+      <p>
+        <img src="images/maven-deps.png" width="910" height="451" border="0" usemap="#Maven_dependencies" />
+        <map name="Maven_dependencies">
+          <area shape="rect" coords="475,0,599,31"    alt="apache-maven" href="./apache-maven/" />
+          <area shape="rect" coords="475,56,599,88"   alt="maven-compat" href="./maven-compat/" />
+          <area shape="rect" coords="475,111,598,142" alt="maven-core" href="./maven-core/" />
+          <area shape="rect" coords="475,173,599,205" alt="maven-project" href="./maven-project/" />
+          <area shape="rect" coords="223,60,347,91"   alt="maven-toolchain" href="./maven-toolchain/" />
+          <area shape="rect" coords="142,110,267,142" alt="maven-reporting-api" href="./maven-reporting-api/" />
+          <area shape="rect" coords="106,151,266,182" alt="maven-error-diagnostics" href="./maven-error-diagnostics/" />
+          <area shape="rect" coords="174,189,267,220" alt="maven-monitor" href="./maven-monitor/" />
+          <area shape="rect" coords="0,226,267,259"   alt="maven-plugin-parameter-documenter" href="./maven-plugin-parameter-documenter/" />
+          <area shape="rect" coords="303,173,453,206" alt="maven-plugin-descriptor" href="./maven-plugin-descriptor/" />
+          <area shape="rect" coords="363,245,470,277" alt="maven-plugin-api" href="./maven-plugin-api/" />
+          <area shape="rect" coords="246,358,323,390" alt="maven-artifact" href="./maven-artifact/" />
+          <area shape="rect" coords="329,358,509,390" alt="maven-repository-metadata" href="./maven-repository-metadata/" />
+          <area shape="rect" coords="405,302,558,334" alt="maven-artifact-manager" href="./maven-artifact-manager/" />
+          <area shape="rect" coords="598,226,732,258" alt="maven-plugin-registry" href="./maven-plugin-registry/" />
+          <area shape="rect" coords="566,302,638,333" alt="maven-profile" href="./maven-profile/" />
+          <area shape="rect" coords="638,302,710,333" alt="maven-settings" href="./maven-settings/" />
+          <area shape="rect" coords="577,358,701,391" alt="maven-model" href="./maven-model/" />
+          <area shape="rect" coords="507,407,682,439" alt="wagon-provider-api" href="http://maven.apache.org/wagon/wagon-provider-api/" />
+          <area shape="rect" coords="756,111,902,143" alt="commons-cli" href="http://commons.apache.org/cli/" />
+          <area shape="rect" coords="756,162,879,194" alt="classworlds" href="http://plexus.codehaus.org/plexus-classworlds/" />
+          <area shape="rect" coords="756,207,887,240" alt="plexus-sec-dispatcher" href="http://plexus.codehaus.org/plexus-components/plexus-sec-dispatcher/project-reports.html" />
+          <area shape="rect" coords="785,257,858,289" alt="plexus-cipher" href="http://plexus.codehaus.org/plexus-components/plexus-cipher/project-reports.html" />
+          <area shape="rect" coords="756,302,902,334" alt="plexus-interpolation" href="http://plexus.codehaus.org/plexus-components/plexus-interpolation/" />
+          <area shape="rect" coords="817,347,902,379" alt="plexus-utils" href="http://plexus.codehaus.org/plexus-utils/" />
+          <area shape="rect" coords="786,389,902,421" alt="plexus-container" href="http://plexus.codehaus.org/plexus-containers/plexus-container-default/" />
+          <area shape="rect" coords="749,154,909,451" alt="plexus" href="http://plexus.codehaus.org/" />
+        </map>
+      </p>
+
+    </section>
+
+  </body>
+
+</document>
