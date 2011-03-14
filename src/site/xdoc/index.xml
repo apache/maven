@@ -46,7 +46,7 @@
           <area shape="rect" coords="475,111,598,142" alt="maven-core" href="./maven-core/" />
           <area shape="rect" coords="475,173,599,205" alt="maven-project" href="./maven-project/" />
           <area shape="rect" coords="223,60,347,91"   alt="maven-toolchain" href="./maven-toolchain/" />
-          <area shape="rect" coords="142,110,267,142" alt="maven-reporting-api" href="./maven-reporting-api/" />
+          <area shape="rect" coords="142,110,267,142" alt="maven-reporting-api" href="http://maven.apache.org/shared/maven-reporting-api/" />
           <area shape="rect" coords="106,151,266,182" alt="maven-error-diagnostics" href="./maven-error-diagnostics/" />
           <area shape="rect" coords="174,189,267,220" alt="maven-monitor" href="./maven-monitor/" />
           <area shape="rect" coords="0,226,267,259"   alt="maven-plugin-parameter-documenter" href="./maven-plugin-parameter-documenter/" />
