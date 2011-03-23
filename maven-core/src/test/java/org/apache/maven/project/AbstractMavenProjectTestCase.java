@@ -32,7 +32,6 @@ import org.codehaus.plexus.PlexusTestCase;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public abstract class AbstractMavenProjectTestCase
     extends PlexusTestCase

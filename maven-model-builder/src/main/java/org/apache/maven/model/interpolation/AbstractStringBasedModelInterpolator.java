@@ -50,7 +50,6 @@ import java.util.Properties;
  * Use a regular expression search to find and resolve expressions within the POM.
  *
  * @author jdcasey Created on Feb 3, 2005
- * @version $Id$
  */
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator

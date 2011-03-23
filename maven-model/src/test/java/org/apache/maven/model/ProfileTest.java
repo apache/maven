@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Profile}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ProfileTest
     extends TestCase

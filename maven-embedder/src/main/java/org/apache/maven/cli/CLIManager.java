@@ -34,7 +34,6 @@ import org.apache.commons.cli.ParseException;
 
 /**
  * @author Jason van Zyl
- * @version $Revision$
  */
 public class CLIManager
 {

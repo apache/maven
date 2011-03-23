@@ -28,7 +28,6 @@ import org.apache.maven.repository.legacy.resolver.conflict.NewestConflictResolv
  * Tests <code>NewestConflictResolver</code>.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @see NewestConflictResolver
  */
 public class NewestConflictResolverTest

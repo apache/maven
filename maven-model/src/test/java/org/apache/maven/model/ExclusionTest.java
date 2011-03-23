@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Exclusion}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ExclusionTest
     extends TestCase

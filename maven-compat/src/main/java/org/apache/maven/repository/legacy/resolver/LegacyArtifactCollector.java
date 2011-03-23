@@ -37,7 +37,6 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
  * along with their metadata. No artifacts are downloaded.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 @Deprecated
 public interface LegacyArtifactCollector

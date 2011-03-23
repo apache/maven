@@ -30,7 +30,6 @@ import org.apache.maven.project.InvalidProjectVersionException;
  * Thrown if a dependency has an invalid version.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class InvalidDependencyVersionException
     extends InvalidProjectVersionException

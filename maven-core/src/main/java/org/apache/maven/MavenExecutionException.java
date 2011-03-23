@@ -25,7 +25,6 @@ import org.apache.maven.project.ProjectBuildingException;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class MavenExecutionException
     extends Exception

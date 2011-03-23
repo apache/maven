@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
  * Contains metadata about an artifact, and methods to retrieve/store it from an artifact repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  * @todo merge with artifactmetadatasource
  * @todo retrieval exception not appropriate for store
  */

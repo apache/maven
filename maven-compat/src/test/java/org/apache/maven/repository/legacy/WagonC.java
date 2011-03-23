@@ -27,7 +27,6 @@ import org.codehaus.plexus.component.annotations.Component;
  * 
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
  */
 @Component(role=Wagon.class,hint="c")
 public class WagonC

@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Site}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class SiteTest
     extends TestCase

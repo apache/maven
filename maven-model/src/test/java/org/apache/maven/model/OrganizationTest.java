@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Organization}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class OrganizationTest
     extends TestCase

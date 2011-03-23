@@ -34,7 +34,6 @@ import org.apache.maven.wagon.repository.Repository;
  * transfered.
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
- * @version $Id$
  */
 @Deprecated
 public class DefaultArtifactRepository

@@ -27,7 +27,6 @@ import org.codehaus.plexus.component.annotations.Configuration;
 /**
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  *
- * @version $Id$
  */
 @Component( role = GraphConflictResolutionPolicy.class )
 public class DefaultGraphConflictResolutionPolicy

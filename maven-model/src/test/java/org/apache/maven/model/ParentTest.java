@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Parent}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ParentTest
     extends TestCase

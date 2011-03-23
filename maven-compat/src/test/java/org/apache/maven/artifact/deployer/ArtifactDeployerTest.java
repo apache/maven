@@ -28,7 +28,6 @@ import org.codehaus.plexus.util.FileUtils;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
  */
 public class ArtifactDeployerTest
     extends AbstractArtifactComponentTestCase

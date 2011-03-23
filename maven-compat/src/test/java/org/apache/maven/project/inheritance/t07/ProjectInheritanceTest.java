@@ -31,7 +31,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * A test which demonstrates maven's dependency management
  *
  * @author Jason van Zyl
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase

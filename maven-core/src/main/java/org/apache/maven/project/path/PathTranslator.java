@@ -25,7 +25,6 @@ import org.apache.maven.model.Model;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 @Deprecated
 public interface PathTranslator

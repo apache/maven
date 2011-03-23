@@ -37,7 +37,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  *    they do not explicitly state a scope.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase

@@ -28,7 +28,6 @@ import java.util.List;
 
 /**
  *
- * @version $Id$
  */
 @Deprecated
 public class PathTranslatingPostProcessor

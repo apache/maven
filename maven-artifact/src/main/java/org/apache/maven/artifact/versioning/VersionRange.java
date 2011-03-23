@@ -30,7 +30,6 @@ import org.apache.maven.artifact.Artifact;
  * Construct a version range from a specification.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class VersionRange
 {

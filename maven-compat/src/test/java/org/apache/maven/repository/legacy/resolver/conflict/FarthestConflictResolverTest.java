@@ -28,7 +28,6 @@ import org.apache.maven.repository.legacy.resolver.conflict.FarthestConflictReso
  * Tests <code>FarthestConflictResolver</code>.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @see FarthestConflictResolver
  */
 public class FarthestConflictResolverTest

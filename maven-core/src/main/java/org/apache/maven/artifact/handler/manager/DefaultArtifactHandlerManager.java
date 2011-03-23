@@ -30,7 +30,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 @Component( role = ArtifactHandlerManager.class )
 public class DefaultArtifactHandlerManager

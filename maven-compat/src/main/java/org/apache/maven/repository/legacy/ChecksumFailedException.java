@@ -25,7 +25,6 @@ import org.apache.maven.wagon.TransferFailedException;
  * Occurs when a download checksum fails.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class ChecksumFailedException
     extends TransferFailedException

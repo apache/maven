@@ -25,7 +25,6 @@ import org.apache.maven.artifact.Artifact;
  * Error while retrieving repository metadata from the repository.
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
  */
 public class ArtifactMetadataRetrievalException
     extends Exception 

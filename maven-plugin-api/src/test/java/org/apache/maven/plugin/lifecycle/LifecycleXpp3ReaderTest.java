@@ -29,7 +29,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * Test the lifecycle reader.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class LifecycleXpp3ReaderTest
     extends TestCase

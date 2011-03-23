@@ -23,7 +23,6 @@ package org.apache.maven.artifact.repository.metadata;
  * Error while deploying repository metadata.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class RepositoryMetadataDeploymentException
     extends Throwable

@@ -23,7 +23,6 @@ package org.apache.maven.repository;
  *
  *
  * @author Oleg Gusakov
- * @version $Id$
  *
  */
 public class MavenArtifactMetadata

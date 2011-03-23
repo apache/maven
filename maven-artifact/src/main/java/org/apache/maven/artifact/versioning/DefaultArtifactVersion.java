@@ -25,7 +25,6 @@ import java.util.StringTokenizer;
  * Default implementation of artifact versioning.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class DefaultArtifactVersion
     implements ArtifactVersion

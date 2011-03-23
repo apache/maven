@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code RepositoryPolicy}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class RepositoryPolicyTest
     extends TestCase

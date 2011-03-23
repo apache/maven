@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code License}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class LicenseTest
     extends TestCase

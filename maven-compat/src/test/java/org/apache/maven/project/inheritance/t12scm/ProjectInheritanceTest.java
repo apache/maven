@@ -28,7 +28,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * Verifies SCM inheritance uses modules statement from parent.
  *
  * @author jdcasey
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase

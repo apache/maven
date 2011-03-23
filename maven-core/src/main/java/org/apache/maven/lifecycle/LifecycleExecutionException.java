@@ -24,7 +24,6 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
  */
 public class LifecycleExecutionException
     extends Exception

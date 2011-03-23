@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code PluginManagement}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class PluginManagementTest
     extends TestCase

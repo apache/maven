@@ -28,7 +28,6 @@ import org.codehaus.plexus.component.annotations.Component;
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @since 3.0
  */
 @Component( role = ConflictResolver.class, hint = "nearest" )

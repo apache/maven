@@ -61,7 +61,6 @@ import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.DefaultRequestTrace;
 
 /**
- * @version $Id$
  */
 @Component( role = ProjectBuilder.class )
 public class DefaultProjectBuilder

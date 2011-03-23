@@ -29,7 +29,6 @@ import org.apache.maven.artifact.Artifact;
  * Tests version range construction.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class VersionRangeTest
     extends TestCase

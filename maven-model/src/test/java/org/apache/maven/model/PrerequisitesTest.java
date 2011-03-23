@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Prerequisites}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class PrerequisitesTest
     extends TestCase

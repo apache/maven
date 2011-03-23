@@ -28,7 +28,6 @@ import org.apache.maven.repository.legacy.resolver.conflict.NearestConflictResol
  * Tests <code>NearestConflictResolver</code>.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @see NearestConflictResolver
  */
 public class NearestConflictResolverTest

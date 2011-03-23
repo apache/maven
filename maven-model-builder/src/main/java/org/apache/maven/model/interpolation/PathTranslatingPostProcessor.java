@@ -29,7 +29,6 @@ import java.util.List;
 
 /**
  *
- * @version $Id$
  */
 class PathTranslatingPostProcessor
     implements InterpolationPostProcessor

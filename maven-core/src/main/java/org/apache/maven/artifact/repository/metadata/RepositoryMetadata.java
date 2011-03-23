@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
  * Describes repository directory metadata.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  * @todo not happy about the store method - they use "this"
  */
 public interface RepositoryMetadata

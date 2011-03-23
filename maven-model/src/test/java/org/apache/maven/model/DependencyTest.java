@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Dependency}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class DependencyTest
     extends TestCase

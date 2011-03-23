@@ -35,7 +35,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  * @todo this should probably be a component with some dynamic control of filtering
  */
 @Component(role = ArtifactFilterManager.class)

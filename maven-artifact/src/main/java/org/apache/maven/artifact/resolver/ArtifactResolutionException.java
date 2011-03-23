@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class ArtifactResolutionException
     extends AbstractArtifactResolutionException

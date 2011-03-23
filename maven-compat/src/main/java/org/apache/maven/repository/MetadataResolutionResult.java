@@ -35,7 +35,6 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  *
  *
  * @author Oleg Gusakov
- * @version $Id$
  *
  */
 public class MetadataResolutionResult

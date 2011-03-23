@@ -31,7 +31,6 @@ import org.apache.maven.artifact.Artifact;
  * Apply multiple filters.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class AndArtifactFilter
     implements ArtifactFilter

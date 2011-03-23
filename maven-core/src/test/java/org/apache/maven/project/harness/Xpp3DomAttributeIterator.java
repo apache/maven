@@ -33,7 +33,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * An attribute iterator for JXPath to support <code>Xpp3Dom</code>.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 class Xpp3DomAttributeIterator
     implements NodeIterator

@@ -29,7 +29,6 @@ import org.apache.maven.model.Dependency;
  * Thrown if a dependency has an invalid version.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class VersionNotFoundException
     extends Exception

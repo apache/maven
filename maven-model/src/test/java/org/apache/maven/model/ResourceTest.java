@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Resource}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ResourceTest
     extends TestCase

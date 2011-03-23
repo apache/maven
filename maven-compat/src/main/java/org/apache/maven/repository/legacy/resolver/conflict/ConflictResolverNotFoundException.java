@@ -23,7 +23,6 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * Indicates that a specified conflict resolver implementation could not be found.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @since 3.0
  */
 public class ConflictResolverNotFoundException

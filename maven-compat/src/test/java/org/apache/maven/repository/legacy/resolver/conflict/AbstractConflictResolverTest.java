@@ -31,7 +31,6 @@ import org.codehaus.plexus.PlexusTestCase;
  * Provides a basis for testing conflict resolvers.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  */
 public abstract class AbstractConflictResolverTest
     extends PlexusTestCase

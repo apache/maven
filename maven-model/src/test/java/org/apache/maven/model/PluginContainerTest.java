@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code PluginContainer}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class PluginContainerTest
     extends TestCase

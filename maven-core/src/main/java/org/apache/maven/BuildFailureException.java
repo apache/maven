@@ -23,7 +23,6 @@ package org.apache.maven;
  * One or more builds failed.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class BuildFailureException
     extends Exception

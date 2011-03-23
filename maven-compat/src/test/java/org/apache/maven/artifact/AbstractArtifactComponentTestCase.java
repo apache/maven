@@ -59,7 +59,6 @@ import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
  */
 public abstract class AbstractArtifactComponentTestCase
     extends PlexusTestCase

@@ -54,7 +54,6 @@ import java.util.Stack;
  * @see <a href="http://docs.codehaus.org/display/MAVEN/Versioning">"Versioning" on Maven Wiki</a>
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
- * @version $Id$
  */
 public class ComparableVersion
     implements Comparable<ComparableVersion>

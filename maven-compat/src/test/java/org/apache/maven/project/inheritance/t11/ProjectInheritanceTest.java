@@ -28,7 +28,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * Verifies scope of root project is preserved regardless of parent depenedency management.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
- * @version $Id$
  * @see <a href="http://jira.codehaus.org/browse/MNG-2919">MNG-2919</a>
  */
 public class ProjectInheritanceTest

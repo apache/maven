@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * @author <a href="michal@codehaus.org">Michal Maczka</a>
- * @version $Id$
  */
 public interface ArtifactInstaller
 {

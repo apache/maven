@@ -24,7 +24,6 @@ import java.io.File;
 /**
  * To handle runtime informations like local repository or profiles.
  *
- * @version $Id$
  */
 @Deprecated
 public class RuntimeInfo

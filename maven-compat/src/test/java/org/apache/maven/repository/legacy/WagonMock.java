@@ -25,7 +25,6 @@ import org.apache.maven.wagon.providers.file.FileWagon;
  * Mock of a Wagon for testing
  * 
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
- * @version $Id$
  */
 public class WagonMock
     extends FileWagon

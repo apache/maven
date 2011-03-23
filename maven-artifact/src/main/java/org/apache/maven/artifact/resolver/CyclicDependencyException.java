@@ -25,7 +25,6 @@ import org.apache.maven.artifact.Artifact;
  * Indiciates a cycle in the dependency graph.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class CyclicDependencyException
     extends ArtifactResolutionException

@@ -31,7 +31,6 @@ import org.codehaus.plexus.util.StringUtils;
  * Describes runtime information about the application.
  * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 @Deprecated
 @Component( role = RuntimeInformation.class )

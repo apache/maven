@@ -39,7 +39,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * Shared methods of the repository metadata handling.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public abstract class AbstractRepositoryMetadata
     implements RepositoryMetadata

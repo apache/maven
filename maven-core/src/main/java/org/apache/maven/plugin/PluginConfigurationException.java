@@ -26,7 +26,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class PluginConfigurationException
     extends Exception

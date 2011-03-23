@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Build}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class BuildTest
     extends TestCase

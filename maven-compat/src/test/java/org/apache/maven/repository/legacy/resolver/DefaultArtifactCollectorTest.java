@@ -54,7 +54,6 @@ import org.codehaus.plexus.PlexusTestCase;
  * Test the default artifact collector.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class DefaultArtifactCollectorTest
     extends PlexusTestCase

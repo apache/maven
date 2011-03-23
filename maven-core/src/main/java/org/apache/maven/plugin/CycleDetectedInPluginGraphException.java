@@ -26,7 +26,6 @@ import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphEx
  * Exception occurring trying to resolve a plugin.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class CycleDetectedInPluginGraphException
     extends Exception

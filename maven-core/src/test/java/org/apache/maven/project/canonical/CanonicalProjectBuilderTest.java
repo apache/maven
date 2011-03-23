@@ -31,7 +31,6 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class CanonicalProjectBuilderTest
     extends AbstractMavenProjectTestCase

@@ -33,7 +33,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * dependency, listed transitively.
  *
  * @author <a href="mailto:pschneider@gmail.com">Patrick Schneider</a>
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase

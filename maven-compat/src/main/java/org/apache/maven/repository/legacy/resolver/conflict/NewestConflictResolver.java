@@ -29,7 +29,6 @@ import org.codehaus.plexus.component.annotations.Component;
  * declaration whose version is greater according to <code>ArtifactVersion.compareTo</code>.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @see ArtifactVersion#compareTo
  * @since 3.0
  */

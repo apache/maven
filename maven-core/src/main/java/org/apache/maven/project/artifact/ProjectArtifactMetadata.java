@@ -33,7 +33,6 @@ import org.codehaus.plexus.util.FileUtils;
  * Attach a POM to an artifact.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class ProjectArtifactMetadata
     extends AbstractArtifactMetadata

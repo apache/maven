@@ -24,7 +24,6 @@ package org.apache.maven.artifact.versioning;
  * compares two versions.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public interface ArtifactVersion
     extends Comparable<ArtifactVersion>

@@ -29,7 +29,6 @@ import org.apache.maven.model.building.ModelProblemUtils;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class ProjectBuildingException
     extends Exception

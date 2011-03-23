@@ -21,7 +21,6 @@ package org.apache.maven.artifact.deployer;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class ArtifactDeploymentException
     extends Exception

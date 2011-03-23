@@ -23,7 +23,6 @@ package org.apache.maven.artifact.resolver.filter;
  * Filter to only retain objects in the given artifactScope or better.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class ScopeArtifactFilter
     extends AbstractScopeArtifactFilter

@@ -42,7 +42,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * Describes a version transformation during artifact resolution.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  * @todo try and refactor to remove abstract methods - not particular happy about current design
  */
 public abstract class AbstractVersionTransformation

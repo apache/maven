@@ -24,7 +24,6 @@ import org.codehaus.plexus.component.annotations.Component;
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
- * @version $Id$
  */
 @Component( role = ArtifactHandler.class )
 public class DefaultArtifactHandler

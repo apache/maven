@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Test DefaultArtifactVersion.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class DefaultArtifactVersionTest
     extends TestCase

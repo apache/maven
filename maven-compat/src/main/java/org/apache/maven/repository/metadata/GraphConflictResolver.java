@@ -26,7 +26,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * Different implementations will implement different conflict resolution policies.
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
- * @version $Id$
  */
 public interface GraphConflictResolver
 {

@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Contributor}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ContributorTest
     extends TestCase

@@ -28,7 +28,6 @@ import java.util.List;
  * Metadata for the group directory of the repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class GroupRepositoryMetadata
     extends AbstractRepositoryMetadata

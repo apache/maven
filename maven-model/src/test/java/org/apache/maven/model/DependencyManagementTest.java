@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code DependencyManagement}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class DependencyManagementTest
     extends TestCase

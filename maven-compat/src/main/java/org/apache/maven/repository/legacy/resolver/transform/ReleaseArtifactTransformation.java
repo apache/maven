@@ -34,7 +34,6 @@ import org.codehaus.plexus.component.annotations.Component;
  * Change the version <code>RELEASE</code> to the appropriate release version from the remote repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 @Component( role = ArtifactTransformation.class, hint = "release" )
 public class ReleaseArtifactTransformation

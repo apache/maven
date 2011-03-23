@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Activation}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ActivationTest
     extends TestCase

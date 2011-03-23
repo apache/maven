@@ -31,7 +31,6 @@ import java.util.Set;
  * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author jdcasey
- * @version $Id$
  */
 public class CumulativeScopeArtifactFilter
     extends AbstractScopeArtifactFilter

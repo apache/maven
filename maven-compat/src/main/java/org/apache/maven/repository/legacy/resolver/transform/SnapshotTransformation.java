@@ -41,7 +41,6 @@ import org.codehaus.plexus.util.StringUtils;
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
- * @version $Id$
  */
 @Component( role = ArtifactTransformation.class, hint = "snapshot" )
 public class SnapshotTransformation

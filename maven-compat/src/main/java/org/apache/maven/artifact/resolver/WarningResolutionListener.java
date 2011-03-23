@@ -27,7 +27,6 @@ import org.codehaus.plexus.logging.Logger;
  * Send resolution warning events to the warning log.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class WarningResolutionListener
     implements ResolutionListener

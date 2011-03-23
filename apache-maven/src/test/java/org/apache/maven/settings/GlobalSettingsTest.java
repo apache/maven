@@ -32,7 +32,6 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
  * Tests that the global settings.xml shipped with the distribution is in good state.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class GlobalSettingsTest
     extends TestCase

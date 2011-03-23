@@ -30,7 +30,6 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
  * artifact.
  *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id$
  */
 public interface ArtifactMetadataSource
 {

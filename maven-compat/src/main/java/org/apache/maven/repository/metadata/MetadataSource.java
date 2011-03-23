@@ -28,7 +28,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * artifact.
  *
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface MetadataSource
 {

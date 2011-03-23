@@ -25,7 +25,6 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface ArtifactHandlerManager
 {

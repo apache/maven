@@ -1,3 +1,2 @@
-*.java             ident
 *.jar              -text -crlf
 *.graffle          -text -crlf

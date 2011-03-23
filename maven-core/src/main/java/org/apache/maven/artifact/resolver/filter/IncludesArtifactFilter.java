@@ -31,7 +31,6 @@ import org.apache.maven.artifact.Artifact;
  * Filter to include from a list of artifact patterns.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class IncludesArtifactFilter
     implements ArtifactFilter

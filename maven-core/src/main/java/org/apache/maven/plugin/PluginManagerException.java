@@ -33,7 +33,6 @@ import org.codehaus.plexus.configuration.PlexusConfigurationException;
  * Exception in the plugin manager.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class PluginManagerException
     extends Exception

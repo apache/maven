@@ -31,7 +31,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
  * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
- * @version $Id$
  */
 @Component( role = GraphConflictResolver.class )
 public class DefaultGraphConflictResolver

@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code ReportSet}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ReportSetTest
     extends TestCase

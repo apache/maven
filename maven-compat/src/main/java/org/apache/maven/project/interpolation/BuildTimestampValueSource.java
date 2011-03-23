@@ -26,7 +26,6 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
 
 /**
  *
- * @version $Id$
  */
 @Deprecated
 public class BuildTimestampValueSource

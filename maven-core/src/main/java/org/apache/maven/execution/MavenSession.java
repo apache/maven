@@ -40,7 +40,6 @@ import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class MavenSession
     implements Cloneable

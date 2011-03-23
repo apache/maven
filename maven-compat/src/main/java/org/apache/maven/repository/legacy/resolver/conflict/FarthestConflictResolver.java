@@ -27,7 +27,6 @@ import org.codehaus.plexus.component.annotations.Component;
  * declaration that has the most transitive steps away from the project being built.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @version $Id$
  * @since 3.0
  */
 @Component( role = ConflictResolver.class, hint = "farthest" )

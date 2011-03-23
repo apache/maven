@@ -32,7 +32,6 @@ import org.apache.maven.wagon.proxy.ProxyInfo;
  * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.
  *
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
- * @version $Id$
  */
 @Deprecated
 public interface WagonManager

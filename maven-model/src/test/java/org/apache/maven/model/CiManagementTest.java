@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code CiManagement}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class CiManagementTest
     extends TestCase

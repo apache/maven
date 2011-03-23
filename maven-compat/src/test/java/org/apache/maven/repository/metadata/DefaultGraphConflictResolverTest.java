@@ -13,7 +13,6 @@ import org.codehaus.plexus.logging.Logger;
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
  * 
- * @version $Id$
  */
 
 public class DefaultGraphConflictResolverTest

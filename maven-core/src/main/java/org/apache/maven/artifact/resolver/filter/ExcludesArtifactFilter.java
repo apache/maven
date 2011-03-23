@@ -27,7 +27,6 @@ import org.apache.maven.artifact.Artifact;
  * Filter to exclude from a list of artifact patterns.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  * @todo I think this is equiv. to exclusion set filter in maven-core
  */
 public class ExcludesArtifactFilter

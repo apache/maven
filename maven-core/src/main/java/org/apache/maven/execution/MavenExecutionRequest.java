@@ -38,7 +38,6 @@ import org.sonatype.aether.transfer.TransferListener;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface MavenExecutionRequest
 {

@@ -46,7 +46,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
- * @version $Id$
  */
 @Component( role = MavenProjectBuilder.class )
 @Deprecated

@@ -51,7 +51,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public class PluginParameterExpressionEvaluatorTest
     extends AbstractCoreMavenComponentTestCase

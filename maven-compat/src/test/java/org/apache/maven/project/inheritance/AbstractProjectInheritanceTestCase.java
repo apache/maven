@@ -25,7 +25,6 @@ import org.apache.maven.project.AbstractMavenProjectTestCase;
 
 /**
  * @author Jason van Zyl
- * @version $Id$
  */
 public abstract class AbstractProjectInheritanceTestCase
     extends AbstractMavenProjectTestCase

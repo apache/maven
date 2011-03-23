@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code MailingList}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class MailingListTest
     extends TestCase

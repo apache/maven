@@ -25,7 +25,6 @@ import junit.framework.TestCase;
  * Tests {@code Scm}.
  * 
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class ScmTest
     extends TestCase

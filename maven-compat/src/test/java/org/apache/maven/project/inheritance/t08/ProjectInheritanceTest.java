@@ -31,7 +31,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * A test which demonstrates maven's dependency management
  *
  * @author <a href="rgoers@apache.org">Ralph Goers</a>
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase

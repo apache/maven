@@ -28,7 +28,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * not clobbered by the same elements elsewhere in the lineage.
  *
  * @author Jason van Zyl
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase

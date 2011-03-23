@@ -31,7 +31,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author <a href="mailto:trygvis@inamo.no">Trygve Laugst&oslash;l</a>
- * @version $Id$
  */
 @Component( role = ModelValidator.class )
 @Deprecated

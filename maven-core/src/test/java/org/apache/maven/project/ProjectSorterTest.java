@@ -38,7 +38,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
  * Test sorting projects by dependencies.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class ProjectSorterTest
     extends TestCase

@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
  * Metadata for the artifact version directory of the repository.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  * @todo split instantiation (versioning, plugin mappings) from definition
  */
 public class SnapshotArtifactRepositoryMetadata

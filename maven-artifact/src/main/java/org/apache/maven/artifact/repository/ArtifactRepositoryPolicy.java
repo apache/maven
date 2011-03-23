@@ -27,7 +27,6 @@ import java.util.TimeZone;
  * Describes a set of policies for a repository to use under certain conditions.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class ArtifactRepositoryPolicy
 {

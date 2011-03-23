@@ -29,7 +29,6 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
  * Occurs when ranges exclude each other and no valid value remains.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
  */
 public class OverConstrainedVersionException
     extends ArtifactResolutionException

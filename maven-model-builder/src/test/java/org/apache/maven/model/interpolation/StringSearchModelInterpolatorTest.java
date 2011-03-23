@@ -36,7 +36,6 @@ import java.util.concurrent.FutureTask;
 /**
  * @author jdcasey
  * @author Benjamin Bentmann
- * @version $Id$
  */
 public class StringSearchModelInterpolatorTest
     extends AbstractModelInterpolatorTest 

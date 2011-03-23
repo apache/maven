@@ -41,7 +41,6 @@ import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
  * down in the lineage are bubbling up where they should.
  *
  * @author Jason van Zyl
- * @version $Id$
  */
 public class ProjectInheritanceTest
     extends AbstractProjectInheritanceTestCase
