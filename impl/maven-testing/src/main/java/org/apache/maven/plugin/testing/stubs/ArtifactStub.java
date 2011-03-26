@@ -171,14 +171,7 @@ public class ArtifactStub
      */
     public String getDependencyConflictId()
     {
-        StringBuffer buffer = new StringBuffer();
-
-        buffer.append( getGroupId() );
-        buffer.append( ":" ).append( getArtifactId() );
-        buffer.append( ":" ).append( getType() );
-        buffer.append( ":" ).append( getClassifier() );
-
-        return buffer.toString();
+        return getGroupId() + ':' + getArtifactId() + ':' + getType() + getClassifier();
     }
 
     /**

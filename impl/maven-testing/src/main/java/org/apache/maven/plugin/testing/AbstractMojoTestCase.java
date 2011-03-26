@@ -27,6 +27,7 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -114,17 +115,27 @@ public abstract class AbstractMojoTestCase
     {
         File pluginPom = new File( getBasedir(), "pom.xml" );
 
-        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( pluginPom ) );
+        Reader reader = null;
+        try
+        {
+            reader = ReaderFactory.newXmlReader( pluginPom );
 
-        String artifactId = pluginPomDom.getChild( "artifactId" ).getValue();
-
-        String groupId = resolveFromRootThenParent( pluginPomDom, "groupId" );
-
-        String version = resolveFromRootThenParent( pluginPomDom, "version" );
-
-        PlexusConfiguration pluginConfiguration = extractPluginConfiguration( artifactId, pom );
-
-        return lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
+            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build( reader );
+    
+            String artifactId = pluginPomDom.getChild( "artifactId" ).getValue();
+    
+            String groupId = resolveFromRootThenParent( pluginPomDom, "groupId" );
+    
+            String version = resolveFromRootThenParent( pluginPomDom, "version" );
+    
+            PlexusConfiguration pluginConfiguration = extractPluginConfiguration( artifactId, pom );
+    
+            return lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
     }
 
     /**
@@ -140,15 +151,25 @@ public abstract class AbstractMojoTestCase
     {
         File pluginPom = new File( getBasedir(), "pom.xml" );
 
-        Xpp3Dom pluginPomDom = Xpp3DomBuilder.build( ReaderFactory.newXmlReader( pluginPom ) );
+        Reader reader = null;
+        try
+        {
+            reader = ReaderFactory.newXmlReader( pluginPom );
 
-        String artifactId = pluginPomDom.getChild( "artifactId" ).getValue();
+            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build( reader );
 
-        String groupId = resolveFromRootThenParent( pluginPomDom, "groupId" );
+            String artifactId = pluginPomDom.getChild( "artifactId" ).getValue();
 
-        String version = resolveFromRootThenParent( pluginPomDom, "version" );
+            String groupId = resolveFromRootThenParent( pluginPomDom, "groupId" );
 
-        return lookupMojo( groupId, artifactId, version, goal, null );
+            String version = resolveFromRootThenParent( pluginPomDom, "version" );
+
+            return lookupMojo( groupId, artifactId, version, goal, null );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
     }
 
     /*
@@ -208,11 +229,19 @@ public abstract class AbstractMojoTestCase
     protected PlexusConfiguration extractPluginConfiguration( String artifactId, File pom )
         throws Exception
     {
-        Reader reader = ReaderFactory.newXmlReader( pom );
+        Reader reader = null;
+        try
+        {
+            reader = ReaderFactory.newXmlReader( pom );
 
-        Xpp3Dom pomDom = Xpp3DomBuilder.build( reader );
+            Xpp3Dom pomDom = Xpp3DomBuilder.build( reader );
 
-        return extractPluginConfiguration( artifactId, pomDom );
+            return extractPluginConfiguration( artifactId, pomDom );
+        }
+        finally
+        {
+            IOUtil.close( reader );
+        }
     }
 
     /**
