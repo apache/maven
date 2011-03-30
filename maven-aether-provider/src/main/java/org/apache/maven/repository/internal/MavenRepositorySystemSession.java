@@ -54,7 +54,9 @@ public class MavenRepositorySystemSession
 
     /**
      * Creates a new Maven-like repository system session by initializing the session with values typical for
-     * Maven-based resolution.
+     * Maven-based resolution. In more detail, this constructor configures settings relevant for the processing of
+     * dependency graphs, most other settings remain at their generic default value. Use the various setters to further
+     * configure the session with authentication, mirror, proxy and other information required for your environment.
      */
     public MavenRepositorySystemSession()
     {
