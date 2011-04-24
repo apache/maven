@@ -25,7 +25,6 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +56,9 @@ public class MojoDescriptor
 
     private static final String DEFAULT_LANGUAGE = "java";
 
-    private List parameters;
+    private List<Parameter> parameters;
 
-    private Map parameterMap;
+    private Map<String, Parameter> parameterMap;
 
     /** By default, the execution strategy is "once-per-session" */
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
@@ -107,7 +106,7 @@ public class MojoDescriptor
     /**  Plugin descriptor */
     private PluginDescriptor pluginDescriptor;
 
-    /**  By default, the Mojo is herited */
+    /**  By default, the Mojo is inherited */
     private boolean inheritedByDefault = true;
 
     /**  By default, the Mojo could not be invoke directly */
@@ -164,7 +163,7 @@ public class MojoDescriptor
     /**
      * @return the list of parameters
      */
-    public List getParameters()
+    public List<Parameter> getParameters()
     {
         return parameters;
     }
@@ -173,12 +172,11 @@ public class MojoDescriptor
      * @param parameters the new list of parameters
      * @throws DuplicateParameterException if any
      */
-    public void setParameters( List parameters )
+    public void setParameters( List<Parameter> parameters )
         throws DuplicateParameterException
     {
-        for ( Iterator it = parameters.iterator(); it.hasNext(); )
+        for ( Parameter parameter : parameters )
         {
-            Parameter parameter = (Parameter) it.next();
             addParameter( parameter );
         }
     }
@@ -199,7 +197,7 @@ public class MojoDescriptor
 
         if ( parameters == null )
         {
-            parameters = new LinkedList();
+            parameters = new LinkedList<Parameter>();
         }
 
         parameters.add( parameter );
@@ -210,18 +208,16 @@ public class MojoDescriptor
     /**
      * @return the list parameters as a Map
      */
-    public Map getParameterMap()
+    public Map<String, Parameter> getParameterMap()
     {
         if ( parameterMap == null )
         {
-            parameterMap = new HashMap();
+            parameterMap = new HashMap<String, Parameter>();
 
             if ( parameters != null )
             {
-                for ( Iterator iterator = parameters.iterator(); iterator.hasNext(); )
+                for ( Parameter pd : parameters )
                 {
-                    Parameter pd = (Parameter) iterator.next();
-
                     parameterMap.put( pd.getName(), pd );
                 }
             }
