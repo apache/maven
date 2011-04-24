@@ -24,7 +24,8 @@ under the License.
   <id>lifecycle-mappings</id>
   <name>LifecycleMappings</name>
   <description><![CDATA[
-    Configuration of custom lifecycle mappings for the plugin.
+    Configuration of custom lifecycle mappings for the plugin, as generally stored in
+    <code>META-INF/maven/lifecycle.xml</code> in a plugin's jar artifact.
   ]]></description>
   <defaults>
     <default>
@@ -36,7 +37,7 @@ under the License.
     <class rootElement="true" xml.tagName="lifecycles" xsd.compositor="sequence">
       <name>LifecycleConfiguration</name>
       <version>1.0.0</version>
-      <description>Root element of the lifecycle.xml file.</description>
+      <description><![CDATA[Root element of the <code>lifecycle.xml</code> file.]]></description>
       <fields>
         <field>
           <name>lifecycles</name>
