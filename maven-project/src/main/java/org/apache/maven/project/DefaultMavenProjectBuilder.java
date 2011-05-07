@@ -234,7 +234,7 @@ public class DefaultMavenProjectBuilder
     // sure this is ideal. I remove all caching from the builder and all reactor related ITs which assume
     // access to simbling project resources failed.
     public MavenProject buildFromRepository( Artifact artifact,
-                                             List<ArtifactRepository> remoteArtifactRepositories,
+                                             List remoteArtifactRepositories,
                                              ArtifactRepository localRepository,
                                              boolean allowStubModel )
         throws ProjectBuildingException
@@ -245,7 +245,7 @@ public class DefaultMavenProjectBuilder
     }
 
     public MavenProject buildFromRepository( Artifact artifact,
-                                             List<ArtifactRepository> remoteArtifactRepositories,
+                                             List remoteArtifactRepositories,
                                              ProjectBuilderConfiguration config,
                                              boolean allowStubModel )
         throws ProjectBuildingException
@@ -266,7 +266,7 @@ public class DefaultMavenProjectBuilder
     }
 
     public MavenProject buildFromRepository( Artifact artifact,
-                                             List<ArtifactRepository> remoteArtifactRepositories,
+                                             List remoteArtifactRepositories,
                                              ArtifactRepository localRepository )
         throws ProjectBuildingException
     {

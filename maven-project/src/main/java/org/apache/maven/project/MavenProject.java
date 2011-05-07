@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.Extension;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -56,11 +56,9 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Prerequisites;
-import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.ReportSet;
 import org.apache.maven.model.Reporting;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
@@ -98,60 +96,60 @@ public class MavenProject
 
     private File file;
 
-    private Set<Artifact> artifacts;
+    private Set artifacts;
 
     private Artifact parentArtifact;
 
-    private Set<Artifact> pluginArtifacts;
+    private Set pluginArtifacts;
 
-    private List<ArtifactRepository> remoteArtifactRepositories;
+    private List remoteArtifactRepositories;
 
-    private List<MavenProject> collectedProjects = Collections.emptyList();
+    private List collectedProjects = Collections.EMPTY_LIST;
 
-    private List<Artifact> attachedArtifacts;
+    private List attachedArtifacts;
 
     private MavenProject executionProject;
 
-    private List<String> compileSourceRoots = new ArrayList<String>();
+    private List compileSourceRoots = new ArrayList();
 
-    private List<String> testCompileSourceRoots = new ArrayList<String>();
+    private List testCompileSourceRoots = new ArrayList();
 
-    private List<String> scriptSourceRoots = new ArrayList<String>();
+    private List scriptSourceRoots = new ArrayList();
 
-    private List<ArtifactRepository> pluginArtifactRepositories;
+    private List pluginArtifactRepositories;
 
     private ArtifactRepository releaseArtifactRepository;
 
     private ArtifactRepository snapshotArtifactRepository;
 
-    private List<Profile> activeProfiles = new ArrayList<Profile>();
+    private List activeProfiles = new ArrayList();
 
-    private Set<Artifact> dependencyArtifacts;
+    private Set dependencyArtifacts;
 
     private Artifact artifact;
 
     // calculated.
-    private Map<String, Artifact> artifactMap;
+    private Map artifactMap;
 
     private Model originalModel;
 
-    private Map<String, Artifact> pluginArtifactMap;
+    private Map pluginArtifactMap;
 
-    private Set<Artifact> reportArtifacts;
+    private Set reportArtifacts;
 
-    private Map<String, Artifact> reportArtifactMap;
+    private Map reportArtifactMap;
 
-    private Set<Artifact> extensionArtifacts;
+    private Set extensionArtifacts;
 
-    private Map<String, Artifact> extensionArtifactMap;
+    private Map extensionArtifactMap;
 
-    private Map<String, Artifact> managedVersionMap;
+    private Map managedVersionMap;
 
-    private Map<String, MavenProject> projectReferences = new HashMap<String, MavenProject>();
+    private Map projectReferences = new HashMap();
 
     private boolean executionRoot;
 
-    private Map<String, String> moduleAdjustments;
+    private Map moduleAdjustments;
 
     private File basedir;
 
@@ -248,23 +246,23 @@ public class MavenProject
         if ( project.getAttachedArtifacts() != null )
         {
             // clone properties modifyable by plugins in a forked lifecycle
-            setAttachedArtifacts( new ArrayList<Artifact>( project.getAttachedArtifacts() ) );
+            setAttachedArtifacts( new ArrayList( project.getAttachedArtifacts() ) );
         }
 
         if ( project.getCompileSourceRoots() != null )
         {
             // clone source roots
-            setCompileSourceRoots( ( new ArrayList<String>( project.getCompileSourceRoots() ) ) );
+            setCompileSourceRoots( ( new ArrayList( project.getCompileSourceRoots() ) ) );
         }
 
         if ( project.getTestCompileSourceRoots() != null )
         {
-            setTestCompileSourceRoots( ( new ArrayList<String>( project.getTestCompileSourceRoots() ) ) );
+            setTestCompileSourceRoots( ( new ArrayList( project.getTestCompileSourceRoots() ) ) );
         }
 
         if ( project.getScriptSourceRoots() != null )
         {
-            setScriptSourceRoots( ( new ArrayList<String>( project.getScriptSourceRoots() ) ) );
+            setScriptSourceRoots( ( new ArrayList( project.getScriptSourceRoots() ) ) );
         }
 
         setModel( ( ModelUtils.cloneModel( project.getModel() ) ) );
@@ -301,25 +299,25 @@ public class MavenProject
             setDynamicBuild( ModelUtils.cloneBuild( project.getDynamicBuild() ) );
             setOriginalInterpolatedBuild( ModelUtils.cloneBuild( project.getOriginalInterpolatedBuild() ) );
 
-            List<String> dynamicRoots = project.getDynamicCompileSourceRoots();
+            List dynamicRoots = project.getDynamicCompileSourceRoots();
             if ( dynamicRoots != null )
             {
-                setDynamicCompileSourceRoots( new ArrayList<String>( dynamicRoots ) );
-                setOriginalInterpolatedCompileSourceRoots( new ArrayList<String>( project.getOriginalInterpolatedCompileSourceRoots() ) );
+                setDynamicCompileSourceRoots( new ArrayList( dynamicRoots ) );
+                setOriginalInterpolatedCompileSourceRoots( new ArrayList( project.getOriginalInterpolatedCompileSourceRoots() ) );
             }
 
             dynamicRoots = project.getDynamicTestCompileSourceRoots();
             if ( dynamicRoots != null )
             {
-                setDynamicTestCompileSourceRoots( new ArrayList<String>( dynamicRoots ) );
-                setOriginalInterpolatedTestCompileSourceRoots( new ArrayList<String>( project.getOriginalInterpolatedTestCompileSourceRoots() ) );
+                setDynamicTestCompileSourceRoots( new ArrayList( dynamicRoots ) );
+                setOriginalInterpolatedTestCompileSourceRoots( new ArrayList( project.getOriginalInterpolatedTestCompileSourceRoots() ) );
             }
 
             dynamicRoots = project.getDynamicScriptSourceRoots();
             if ( dynamicRoots != null )
             {
-                setDynamicScriptSourceRoots( new ArrayList<String>( dynamicRoots ) );
-                setOriginalInterpolatedScriptSourceRoots( new ArrayList<String>( project.getOriginalInterpolatedScriptSourceRoots() ) );
+                setDynamicScriptSourceRoots( new ArrayList( dynamicRoots ) );
+                setOriginalInterpolatedScriptSourceRoots( new ArrayList( project.getOriginalInterpolatedScriptSourceRoots() ) );
             }
         }
 
@@ -350,13 +348,14 @@ public class MavenProject
 
         if ( moduleAdjustments == null )
         {
-            moduleAdjustments = new HashMap<String, String>();
+            moduleAdjustments = new HashMap();
 
-            List<String> modules = getModules();
+            List modules = getModules();
             if ( modules != null )
             {
-                for ( String modulePath : modules )
+                for ( Iterator it = modules.iterator(); it.hasNext(); )
                 {
+                    String modulePath = (String) it.next();
                     String moduleName = modulePath;
 
                     if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
@@ -417,12 +416,12 @@ public class MavenProject
         this.parent = parent;
     }
 
-    public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
+    public void setRemoteArtifactRepositories( List remoteArtifactRepositories )
     {
         this.remoteArtifactRepositories = remoteArtifactRepositories;
     }
 
-    public List<ArtifactRepository> getRemoteArtifactRepositories()
+    public List getRemoteArtifactRepositories()
     {
         return remoteArtifactRepositories;
     }
@@ -462,12 +461,12 @@ public class MavenProject
         return basedir;
     }
 
-    public void setDependencies( List<Dependency> dependencies )
+    public void setDependencies( List dependencies )
     {
         getModel().setDependencies( dependencies );
     }
 
-    public List<Dependency> getDependencies()
+    public List getDependencies()
     {
         return getModel().getDependencies();
     }
@@ -526,30 +525,32 @@ public class MavenProject
         }
     }
 
-    public List<String> getCompileSourceRoots()
+    public List getCompileSourceRoots()
     {
         return compileSourceRoots;
     }
 
-    public List<String> getScriptSourceRoots()
+    public List getScriptSourceRoots()
     {
         return scriptSourceRoots;
     }
 
-    public List<String> getTestCompileSourceRoots()
+    public List getTestCompileSourceRoots()
     {
         return testCompileSourceRoots;
     }
 
-    public List<String> getCompileClasspathElements()
+    public List getCompileClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() );
+        List list = new ArrayList( getArtifacts().size() );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -563,12 +564,14 @@ public class MavenProject
         return list;
     }
 
-    public List<Artifact> getCompileArtifacts()
+    public List getCompileArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List list = new ArrayList( getArtifacts().size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -583,19 +586,21 @@ public class MavenProject
         return list;
     }
 
-    public List<Dependency> getCompileDependencies()
+    public List getCompileDependencies()
     {
-        Set<Artifact> artifacts = getArtifacts();
+        Set artifacts = getArtifacts();
 
         if ( artifacts == null || artifacts.isEmpty() )
         {
-            return Collections.emptyList();
+            return Collections.EMPTY_LIST;
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List list = new ArrayList( artifacts.size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
                 || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
@@ -615,17 +620,19 @@ public class MavenProject
         return list;
     }
 
-    public List<String> getTestClasspathElements()
+    public List getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() + 1 );
+        List list = new ArrayList( getArtifacts().size() + 1 );
 
         list.add( getBuild().getTestOutputDirectory() );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -646,12 +653,14 @@ public class MavenProject
         return list;
     }
 
-    public List<Artifact> getTestArtifacts()
+    public List getTestArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List list = new ArrayList( getArtifacts().size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -670,19 +679,21 @@ public class MavenProject
         return list;
     }
 
-    public List<Dependency> getTestDependencies()
+    public List getTestDependencies()
     {
-        Set<Artifact> artifacts = getArtifacts();
+        Set artifacts = getArtifacts();
 
         if ( artifacts == null || artifacts.isEmpty() )
         {
-            return Collections.emptyList();
+            return Collections.EMPTY_LIST;
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List list = new ArrayList( artifacts.size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: let the scope handler deal with this
             // NOTE: [jc] scope == 'test' is the widest possible scope, so we don't really need to perform
             // this check...
@@ -705,15 +716,17 @@ public class MavenProject
         return list;
     }
 
-    public List<String> getRuntimeClasspathElements()
+    public List getRuntimeClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() + 1 );
+        List list = new ArrayList( getArtifacts().size() + 1 );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -731,12 +744,14 @@ public class MavenProject
         return list;
     }
 
-    public List<Artifact> getRuntimeArtifacts()
+    public List getRuntimeArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List list = new ArrayList( getArtifacts().size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -750,19 +765,21 @@ public class MavenProject
         return list;
     }
 
-    public List<Dependency> getRuntimeDependencies()
+    public List getRuntimeDependencies()
     {
-        Set<Artifact> artifacts = getArtifacts();
+        Set artifacts = getArtifacts();
 
         if ( artifacts == null || artifacts.isEmpty() )
         {
-            return Collections.emptyList();
+            return Collections.EMPTY_LIST;
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List list = new ArrayList( artifacts.size() );
 
-        for ( Artifact a : artifacts )
+        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
             {
@@ -781,15 +798,17 @@ public class MavenProject
         return list;
     }
 
-    public List<String> getSystemClasspathElements()
+    public List getSystemClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() );
+        List list = new ArrayList( getArtifacts().size() );
 
         list.add( getBuild().getOutputDirectory() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
                 // TODO: let the scope handler deal with this
@@ -802,12 +821,14 @@ public class MavenProject
         return list;
     }
 
-    public List<Artifact> getSystemArtifacts()
+    public List getSystemArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List list = new ArrayList( getArtifacts().size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath() )
             {
@@ -821,19 +842,21 @@ public class MavenProject
         return list;
     }
 
-    public List<Dependency> getSystemDependencies()
+    public List getSystemDependencies()
     {
-        Set<Artifact> artifacts = getArtifacts();
+        Set artifacts = getArtifacts();
 
         if ( artifacts == null || artifacts.isEmpty() )
         {
-            return Collections.emptyList();
+            return Collections.EMPTY_LIST;
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List list = new ArrayList( artifacts.size() );
 
-        for ( Artifact a : getArtifacts() )
+        for ( Iterator i = getArtifacts().iterator(); i.hasNext(); )
         {
+            Artifact a = (Artifact) i.next();
+
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
@@ -1028,12 +1051,12 @@ public class MavenProject
         return getModel().getScm();
     }
 
-    public void setMailingLists( List<MailingList> mailingLists )
+    public void setMailingLists( List mailingLists )
     {
         getModel().setMailingLists( mailingLists );
     }
 
-    public List<MailingList> getMailingLists()
+    public List getMailingLists()
     {
         return getModel().getMailingLists();
     }
@@ -1043,12 +1066,12 @@ public class MavenProject
         getModel().addMailingList( mailingList );
     }
 
-    public void setDevelopers( List<Developer> developers )
+    public void setDevelopers( List developers )
     {
         getModel().setDevelopers( developers );
     }
 
-    public List<Developer> getDevelopers()
+    public List getDevelopers()
     {
         return getModel().getDevelopers();
     }
@@ -1058,12 +1081,12 @@ public class MavenProject
         getModel().addDeveloper( developer );
     }
 
-    public void setContributors( List<Contributor> contributors )
+    public void setContributors( List contributors )
     {
         getModel().setContributors( contributors );
     }
 
-    public List<Contributor> getContributors()
+    public List getContributors()
     {
         return getModel().getContributors();
     }
@@ -1083,12 +1106,12 @@ public class MavenProject
         return getModelBuild();
     }
 
-    public List<Resource> getResources()
+    public List getResources()
     {
         return getBuild().getResources();
     }
 
-    public List<Resource> getTestResources()
+    public List getTestResources()
     {
         return getBuild().getTestResources();
     }
@@ -1113,12 +1136,12 @@ public class MavenProject
         return getModel().getReporting();
     }
 
-    public void setLicenses( List<License> licenses )
+    public void setLicenses( List licenses )
     {
         getModel().setLicenses( licenses );
     }
 
-    public List<License> getLicenses()
+    public List getLicenses()
     {
         return getModel().getLicenses();
     }
@@ -1128,7 +1151,7 @@ public class MavenProject
         getModel().addLicense( license );
     }
 
-    public void setArtifacts( Set<Artifact> artifacts )
+    public void setArtifacts( Set artifacts )
     {
         this.artifacts = artifacts;
 
@@ -1143,12 +1166,12 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
-    public Set<Artifact> getArtifacts()
+    public Set getArtifacts()
     {
-        return artifacts == null ? Collections.<Artifact>emptySet() : artifacts;
+        return artifacts == null ? Collections.EMPTY_SET : artifacts;
     }
 
-    public Map<String, Artifact> getArtifactMap()
+    public Map getArtifactMap()
     {
         if ( artifactMap == null )
         {
@@ -1158,19 +1181,19 @@ public class MavenProject
         return artifactMap;
     }
 
-    public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
+    public void setPluginArtifacts( Set pluginArtifacts )
     {
         this.pluginArtifacts = pluginArtifacts;
 
         this.pluginArtifactMap = null;
     }
 
-    public Set<Artifact> getPluginArtifacts()
+    public Set getPluginArtifacts()
     {
         return pluginArtifacts;
     }
 
-    public Map<String, Artifact> getPluginArtifactMap()
+    public Map getPluginArtifactMap()
     {
         if ( pluginArtifactMap == null )
         {
@@ -1180,19 +1203,19 @@ public class MavenProject
         return pluginArtifactMap;
     }
 
-    public void setReportArtifacts( Set<Artifact> reportArtifacts )
+    public void setReportArtifacts( Set reportArtifacts )
     {
         this.reportArtifacts = reportArtifacts;
 
         this.reportArtifactMap = null;
     }
 
-    public Set<Artifact> getReportArtifacts()
+    public Set getReportArtifacts()
     {
         return reportArtifacts;
     }
 
-    public Map<String, Artifact> getReportArtifactMap()
+    public Map getReportArtifactMap()
     {
         if ( reportArtifactMap == null )
         {
@@ -1202,19 +1225,19 @@ public class MavenProject
         return reportArtifactMap;
     }
 
-    public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
+    public void setExtensionArtifacts( Set extensionArtifacts )
     {
         this.extensionArtifacts = extensionArtifacts;
 
         this.extensionArtifactMap = null;
     }
 
-    public Set<Artifact> getExtensionArtifacts()
+    public Set getExtensionArtifacts()
     {
         return this.extensionArtifacts;
     }
 
-    public Map<String, Artifact> getExtensionArtifactMap()
+    public Map getExtensionArtifactMap()
     {
         if ( extensionArtifactMap == null )
         {
@@ -1234,7 +1257,7 @@ public class MavenProject
         return parentArtifact;
     }
 
-    public List<Repository> getRepositories()
+    public List getRepositories()
     {
         return getModel().getRepositories();
     }
@@ -1243,7 +1266,7 @@ public class MavenProject
     // Plugins
     // ----------------------------------------------------------------------
 
-    public List<ReportPlugin> getReportPlugins()
+    public List getReportPlugins()
     {
         if ( getModel().getReporting() == null )
         {
@@ -1253,7 +1276,7 @@ public class MavenProject
 
     }
 
-    public List<Plugin> getBuildPlugins()
+    public List getBuildPlugins()
     {
         if ( getModel().getBuild() == null )
         {
@@ -1262,7 +1285,7 @@ public class MavenProject
         return getModel().getBuild().getPlugins();
     }
 
-    public List<String> getModules()
+    public List getModules()
     {
         return getModel().getModules();
     }
@@ -1313,30 +1336,30 @@ public class MavenProject
 
         if ( pm != null )
         {
-            Map<String, Plugin> pmByKey = pm.getPluginsAsMap();
+            Map pmByKey = pm.getPluginsAsMap();
 
             String pluginKey = plugin.getKey();
 
             if ( pmByKey != null && pmByKey.containsKey( pluginKey ) )
             {
-                Plugin pmPlugin = pmByKey.get( pluginKey );
+                Plugin pmPlugin = (Plugin) pmByKey.get( pluginKey );
 
                 ModelUtils.mergePluginDefinitions( plugin, pmPlugin, false );
             }
         }
     }
 
-    public List<MavenProject> getCollectedProjects()
+    public List getCollectedProjects()
     {
         return collectedProjects;
     }
 
-    public void setCollectedProjects( List<MavenProject> collectedProjects )
+    public void setCollectedProjects( List collectedProjects )
     {
         this.collectedProjects = collectedProjects;
     }
 
-    public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
+    public void setPluginArtifactRepositories( List pluginArtifactRepositories )
     {
         this.pluginArtifactRepositories = pluginArtifactRepositories;
     }
@@ -1345,7 +1368,7 @@ public class MavenProject
      * @return a list of ArtifactRepository objects constructed
      *         from the Repository objects returned by getPluginRepositories.
      */
-    public List<ArtifactRepository> getPluginArtifactRepositories()
+    public List getPluginArtifactRepositories()
     {
         return pluginArtifactRepositories;
     }
@@ -1356,17 +1379,17 @@ public class MavenProject
             : getReleaseArtifactRepository();
     }
 
-    public List<Repository> getPluginRepositories()
+    public List getPluginRepositories()
     {
         return getModel().getPluginRepositories();
     }
 
-    public void setActiveProfiles( List<Profile> activeProfiles )
+    public void setActiveProfiles( List activeProfiles )
     {
         this.activeProfiles.addAll( activeProfiles );
     }
 
-    public List<Profile> getActiveProfiles()
+    public List getActiveProfiles()
     {
         return activeProfiles;
     }
@@ -1376,11 +1399,11 @@ public class MavenProject
         getAttachedArtifacts().add( artifact );
     }
 
-    public List<Artifact> getAttachedArtifacts()
+    public List getAttachedArtifacts()
     {
         if ( attachedArtifacts == null )
         {
-            attachedArtifacts = new ArrayList<Artifact>();
+            attachedArtifacts = new ArrayList();
         }
         return attachedArtifacts;
     }
@@ -1398,8 +1421,10 @@ public class MavenProject
 
         if ( getBuildPlugins() != null )
         {
-            for ( Plugin plugin : getBuildPlugins() )
+            for ( Iterator iterator = getBuildPlugins().iterator(); iterator.hasNext(); )
             {
+                Plugin plugin = (Plugin) iterator.next();
+
                 if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
                 {
                     dom = (Xpp3Dom) plugin.getConfiguration();
@@ -1474,15 +1499,17 @@ public class MavenProject
 
         if ( getReportPlugins() != null )
         {
-            for ( ReportPlugin plugin : getReportPlugins() )
+            for ( Iterator iterator = getReportPlugins().iterator(); iterator.hasNext(); )
             {
+                ReportPlugin plugin = (ReportPlugin) iterator.next();
+
                 if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
                 {
                     dom = (Xpp3Dom) plugin.getConfiguration();
 
                     if ( reportSetId != null )
                     {
-                        ReportSet reportSet = plugin.getReportSetsAsMap().get( reportSetId );
+                        ReportSet reportSet = (ReportSet) plugin.getReportSetsAsMap().get( reportSetId );
                         if ( reportSet != null )
                         {
                             Xpp3Dom executionConfiguration = (Xpp3Dom) reportSet.getConfiguration();
@@ -1538,12 +1565,12 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getArtifacts() to get all transitive dependencies
      */
-    public Set<Artifact> getDependencyArtifacts()
+    public Set getDependencyArtifacts()
     {
         return dependencyArtifacts;
     }
 
-    public void setDependencyArtifacts( Set<Artifact> dependencyArtifacts )
+    public void setDependencyArtifacts( Set dependencyArtifacts )
     {
         this.dependencyArtifacts = dependencyArtifacts;
     }
@@ -1568,17 +1595,16 @@ public class MavenProject
         return originalModel;
     }
 
-    public void setManagedVersionMap( Map<String, Artifact> map )
+    public void setManagedVersionMap( Map map )
     {
         this.managedVersionMap = map;
     }
 
-    public Map<String, Artifact> getManagedVersionMap()
+    public Map getManagedVersionMap()
     {
         return this.managedVersionMap;
     }
 
-    @Override
     public boolean equals( Object other )
     {
         if ( other == this )
@@ -1597,18 +1623,17 @@ public class MavenProject
         }
     }
 
-    @Override
     public int hashCode()
     {
         return getId().hashCode();
     }
 
-    public List<Extension> getBuildExtensions()
+    public List getBuildExtensions()
     {
         Build build = getBuild();
         if ( build == null || build.getExtensions() == null )
         {
-            return Collections.emptyList();
+            return Collections.EMPTY_LIST;
         }
         else
         {
@@ -1620,7 +1645,7 @@ public class MavenProject
      * @todo the lazy initialisation of this makes me uneasy.
      * @return {@link Set} &lt; {@link Artifact} >
      */
-    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
+    public Set createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
                                 ArtifactFilter dependencyFilter )
         throws InvalidDependencyVersionException
     {
@@ -1650,12 +1675,12 @@ public class MavenProject
         return getModel().getProperties();
     }
 
-    public List<String> getFilters()
+    public List getFilters()
     {
         return getBuild().getFilters();
     }
 
-    public Map<String, MavenProject> getProjectReferences()
+    public Map getProjectReferences()
     {
         return projectReferences;
     }
@@ -1681,22 +1706,22 @@ public class MavenProject
         this.model = model;
     }
 
-    protected void setAttachedArtifacts( List<Artifact> attachedArtifacts )
+    protected void setAttachedArtifacts( List attachedArtifacts )
     {
         this.attachedArtifacts = attachedArtifacts;
     }
 
-    protected void setCompileSourceRoots( List<String> compileSourceRoots )
+    protected void setCompileSourceRoots( List compileSourceRoots )
     {
         this.compileSourceRoots = compileSourceRoots;
     }
 
-    protected void setTestCompileSourceRoots( List<String> testCompileSourceRoots )
+    protected void setTestCompileSourceRoots( List testCompileSourceRoots )
     {
         this.testCompileSourceRoots = testCompileSourceRoots;
     }
 
-    protected void setScriptSourceRoots( List<String> scriptSourceRoots )
+    protected void setScriptSourceRoots( List scriptSourceRoots )
     {
         this.scriptSourceRoots = scriptSourceRoots;
     }
@@ -1713,17 +1738,18 @@ public class MavenProject
 
     public void resolveActiveArtifacts()
     {
-        Set<Artifact> depArtifacts = getDependencyArtifacts();
+        Set depArtifacts = getDependencyArtifacts();
         if ( depArtifacts == null )
         {
             return;
         }
 
-        Set<Artifact> updated = new LinkedHashSet<Artifact>( depArtifacts.size() );
+        Set updated = new LinkedHashSet( depArtifacts.size() );
         int updatedCount = 0;
 
-        for ( Artifact depArtifact : depArtifacts )
+        for ( Iterator it = depArtifacts.iterator(); it.hasNext(); )
         {
+            Artifact depArtifact = (Artifact) it.next();
             Artifact replaced = replaceWithActiveArtifact( depArtifact );
 
             if ( depArtifact != replaced )
@@ -1790,14 +1816,15 @@ public class MavenProject
      * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
      * @return The matching artifact or <code>null</code> if not found.
      */
-    private Artifact findMatchingArtifact( List<Artifact> artifacts, Artifact requestedArtifact )
+    private Artifact findMatchingArtifact( List artifacts, Artifact requestedArtifact )
     {
         if ( artifacts != null && !artifacts.isEmpty() )
         {
             // first try matching by dependency conflict id
             String requestedId = requestedArtifact.getDependencyConflictId();
-            for ( Artifact artifact : artifacts )
+            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
             {
+                Artifact artifact = (Artifact) it.next();
                 if ( requestedId.equals( artifact.getDependencyConflictId() ) )
                 {
                     return artifact;
@@ -1806,8 +1833,9 @@ public class MavenProject
 
             // next try matching by repository conflict id
             requestedId = getRepositoryConflictId( requestedArtifact );
-            for ( Artifact artifact : artifacts )
+            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
             {
+                Artifact artifact = (Artifact) it.next();
                 if ( requestedId.equals( getRepositoryConflictId( artifact ) ) )
                 {
                     return artifact;
@@ -1871,7 +1899,7 @@ public class MavenProject
         }
     }
 
-    private void addArtifactPath( Artifact a, List<String> list )
+    private void addArtifactPath( Artifact a, List list )
         throws DependencyResolutionRequiredException
     {
         File file = a.getFile();
@@ -1912,7 +1940,6 @@ public class MavenProject
      * @throws CloneNotSupportedException
      * @since 2.0.9
      */
-    @Override
     public Object clone()
         throws CloneNotSupportedException
     {
@@ -1929,17 +1956,17 @@ public class MavenProject
 
     private Build originalInterpolatedBuild;
 
-    private List<String> dynamicCompileSourceRoots;
+    private List dynamicCompileSourceRoots;
 
-    private List<String> originalInterpolatedCompileSourceRoots;
+    private List originalInterpolatedCompileSourceRoots;
 
-    private List<String> dynamicTestCompileSourceRoots;
+    private List dynamicTestCompileSourceRoots;
 
-    private List<String> originalInterpolatedTestCompileSourceRoots;
+    private List originalInterpolatedTestCompileSourceRoots;
 
-    private List<String> dynamicScriptSourceRoots;
+    private List dynamicScriptSourceRoots;
 
-    private List<String> originalInterpolatedScriptSourceRoots;
+    private List originalInterpolatedScriptSourceRoots;
 
     private boolean isConcrete = false;
 
@@ -1963,32 +1990,32 @@ public class MavenProject
         return originalInterpolatedBuild;
     }
 
-    public List<String> getDynamicCompileSourceRoots()
+    public List getDynamicCompileSourceRoots()
     {
         return dynamicCompileSourceRoots;
     }
 
-    public List<String> getOriginalInterpolatedCompileSourceRoots()
+    public List getOriginalInterpolatedCompileSourceRoots()
     {
         return originalInterpolatedCompileSourceRoots;
     }
 
-    public List<String> getDynamicTestCompileSourceRoots()
+    public List getDynamicTestCompileSourceRoots()
     {
         return dynamicTestCompileSourceRoots;
     }
 
-    public List<String> getOriginalInterpolatedTestCompileSourceRoots()
+    public List getOriginalInterpolatedTestCompileSourceRoots()
     {
         return originalInterpolatedTestCompileSourceRoots;
     }
 
-    public List<String> getDynamicScriptSourceRoots()
+    public List getDynamicScriptSourceRoots()
     {
         return dynamicScriptSourceRoots;
     }
 
-    public List<String> getOriginalInterpolatedScriptSourceRoots()
+    public List getOriginalInterpolatedScriptSourceRoots()
     {
         return originalInterpolatedScriptSourceRoots;
     }
@@ -2009,19 +2036,19 @@ public class MavenProject
         originalInterpolatedBuild = null;
     }
 
-    public void preserveCompileSourceRoots( List<String> originalInterpolatedCompileSourceRoots )
+    public void preserveCompileSourceRoots( List originalInterpolatedCompileSourceRoots )
     {
         dynamicCompileSourceRoots = getCompileSourceRoots();
         this.originalInterpolatedCompileSourceRoots = originalInterpolatedCompileSourceRoots;
     }
 
-    public void preserveTestCompileSourceRoots( List<String> originalInterpolatedTestCompileSourceRoots )
+    public void preserveTestCompileSourceRoots( List originalInterpolatedTestCompileSourceRoots )
     {
         dynamicTestCompileSourceRoots = getTestCompileSourceRoots();
         this.originalInterpolatedTestCompileSourceRoots = originalInterpolatedTestCompileSourceRoots;
     }
 
-    public void preserveScriptSourceRoots( List<String> originalInterpolatedScriptSourceRoots )
+    public void preserveScriptSourceRoots( List originalInterpolatedScriptSourceRoots )
     {
         dynamicScriptSourceRoots = getScriptSourceRoots();
         this.originalInterpolatedScriptSourceRoots = originalInterpolatedScriptSourceRoots;
@@ -2046,32 +2073,32 @@ public class MavenProject
         this.originalInterpolatedBuild = originalInterpolatedBuild;
     }
 
-    protected void setDynamicCompileSourceRoots( List<String> dynamicCompileSourceRoots )
+    protected void setDynamicCompileSourceRoots( List dynamicCompileSourceRoots )
     {
         this.dynamicCompileSourceRoots = dynamicCompileSourceRoots;
     }
 
-    protected void setOriginalInterpolatedCompileSourceRoots( List<String> originalInterpolatedCompileSourceRoots )
+    protected void setOriginalInterpolatedCompileSourceRoots( List originalInterpolatedCompileSourceRoots )
     {
         this.originalInterpolatedCompileSourceRoots = originalInterpolatedCompileSourceRoots;
     }
 
-    protected void setDynamicTestCompileSourceRoots( List<String> dynamicTestCompileSourceRoots )
+    protected void setDynamicTestCompileSourceRoots( List dynamicTestCompileSourceRoots )
     {
         this.dynamicTestCompileSourceRoots = dynamicTestCompileSourceRoots;
     }
 
-    protected void setOriginalInterpolatedTestCompileSourceRoots( List<String> originalInterpolatedTestCompileSourceRoots )
+    protected void setOriginalInterpolatedTestCompileSourceRoots( List originalInterpolatedTestCompileSourceRoots )
     {
         this.originalInterpolatedTestCompileSourceRoots = originalInterpolatedTestCompileSourceRoots;
     }
 
-    protected void setDynamicScriptSourceRoots( List<String> dynamicScriptSourceRoots )
+    protected void setDynamicScriptSourceRoots( List dynamicScriptSourceRoots )
     {
         this.dynamicScriptSourceRoots = dynamicScriptSourceRoots;
     }
 
-    protected void setOriginalInterpolatedScriptSourceRoots( List<String> originalInterpolatedScriptSourceRoots )
+    protected void setOriginalInterpolatedScriptSourceRoots( List originalInterpolatedScriptSourceRoots )
     {
         this.originalInterpolatedScriptSourceRoots = originalInterpolatedScriptSourceRoots;
     }
@@ -2089,7 +2116,7 @@ public class MavenProject
         if ( p != null )
         {
             preservedProperties = new Properties();
-            for ( Enumeration<?> e = p.propertyNames(); e.hasMoreElements(); )
+            for ( Enumeration e = p.propertyNames(); e.hasMoreElements(); )
             {
                 String key = (String) e.nextElement();
                 preservedProperties.setProperty( key, p.getProperty( key ) );

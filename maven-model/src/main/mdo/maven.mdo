@@ -760,15 +760,16 @@
      * @return a Map of plugins field with <code>Plugins#getKey()</code> as key
      * @see org.apache.maven.model.Plugin#getKey()
      */
-    public java.util.Map<String, Plugin> getPluginsAsMap()
+    public java.util.Map getPluginsAsMap()
     {
         if ( pluginMap == null )
         {
-            pluginMap = new java.util.LinkedHashMap<String, Plugin>();
+            pluginMap = new java.util.LinkedHashMap();
             if ( plugins != null )
             {
-                for ( Plugin plugin : plugins )
+                for ( java.util.Iterator it = plugins.iterator(); it.hasNext(); )
                 {
+                    Plugin plugin = (Plugin) it.next();
                     pluginMap.put( plugin.getKey(), plugin );
                 }
             }
@@ -3120,15 +3121,16 @@
      * @return a Map of reportSets field with <code>ReportSet#getId()</code> as key
      * @see org.apache.maven.model.ReportSet#getId()
      */
-    public java.util.Map<String, ReportSet> getReportSetsAsMap()
+    public java.util.Map getReportSetsAsMap()
     {
         if ( reportSetMap == null )
         {
-            reportSetMap = new java.util.LinkedHashMap<String, ReportSet>();
+            reportSetMap = new java.util.LinkedHashMap();
             if ( getReportSets() != null )
             {
-                for ( ReportSet reportSet : getReportSets() )
+                for ( java.util.Iterator i = getReportSets().iterator(); i.hasNext(); )
                 {
+                    ReportSet reportSet = (ReportSet) i.next();
                     reportSetMap.put( reportSet.getId(), reportSet );
                 }
             }

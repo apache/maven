@@ -72,7 +72,7 @@ public interface MavenProjectBuilder
      * @return the built project
      * @throws ProjectBuildingException
      */
-    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteArtifactRepositories,
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                       ArtifactRepository localRepository )
         throws ProjectBuildingException;
 
@@ -86,7 +86,7 @@ public interface MavenProjectBuilder
      * @return the built project
      * @throws ProjectBuildingException
      */
-    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteArtifactRepositories,
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                       ArtifactRepository localRepository, boolean allowStubModel )
         throws ProjectBuildingException;
 
@@ -102,7 +102,7 @@ public interface MavenProjectBuilder
      * @return the built project
      * @throws ProjectBuildingException
      */
-    MavenProject buildFromRepository( Artifact artifact, List<ArtifactRepository> remoteArtifactRepositories,
+    MavenProject buildFromRepository( Artifact artifact, List remoteArtifactRepositories,
                                       ProjectBuilderConfiguration configuration, boolean allowStubModel )
         throws ProjectBuildingException;
 
