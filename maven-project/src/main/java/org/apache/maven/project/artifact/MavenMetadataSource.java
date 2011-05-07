@@ -106,7 +106,7 @@ public class MavenMetadataSource
     /**
      * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
      */
-    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    public Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         if ( artifact instanceof ActiveProjectArtifact )
@@ -162,7 +162,8 @@ public class MavenMetadataSource
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
-    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    private ProjectRelocation retrieveRelocatedProject( Artifact artifact, ArtifactRepository localRepository,
+                                                        List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
         MavenProject project = null;
@@ -442,16 +443,15 @@ public class MavenMetadataSource
      * @todo desperately needs refactoring. It's just here because it's implementation is maven-project specific
      * @return {@link Set} &lt; {@link Artifact} >
      */
-    public static Set createArtifacts( ArtifactFactory artifactFactory, List dependencies, String inheritedScope,
-                                       ArtifactFilter dependencyFilter, MavenProject project )
+    public static Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, List<Dependency> dependencies,
+                                                 String inheritedScope, ArtifactFilter dependencyFilter,
+                                                 MavenProject project )
         throws InvalidDependencyVersionException
     {
-        Set projectArtifacts = new LinkedHashSet( dependencies.size() );
+        Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>( dependencies.size() );
 
-        for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+        for ( Dependency d : dependencies )
         {
-            Dependency d = (Dependency) i.next();
-
             String scope = d.getScope();
 
             if ( StringUtils.isEmpty( scope ) )

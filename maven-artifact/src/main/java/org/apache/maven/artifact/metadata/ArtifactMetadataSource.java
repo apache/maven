@@ -21,6 +21,7 @@ package org.apache.maven.artifact.metadata;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 import java.util.List;
 
@@ -35,13 +36,15 @@ public interface ArtifactMetadataSource
 {
     String ROLE = ArtifactMetadataSource.class.getName();
 
-    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                              List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
      * Resolve all relocations in the POM for this artifact, and return the new artifact coordinate.
      */
-    Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    Artifact retrieveRelocatedArtifact( Artifact artifact, ArtifactRepository localRepository,
+                                        List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
@@ -55,6 +58,7 @@ public interface ArtifactMetadataSource
      * @return {@link List} $lt; {@link ArtifactVersion} >
      * @throws ArtifactMetadataRetrievalException in case of error while retrieving repository metadata from the repository.
      */
-    List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                     List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 }
