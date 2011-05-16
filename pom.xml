@@ -154,6 +154,10 @@
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://builds.apache.org/hudson/job/maven-3.0.x/</url>
+  </ciManagement>
   <distributionManagement>
     <site>
       <id>apache.website</id>
