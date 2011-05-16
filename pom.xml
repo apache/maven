@@ -119,6 +119,10 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x</developerConnection>
     <url>http://svn.apache.org/viewvc/maven/maven-2/branches/maven-2.2.x</url>
   </scm>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://builds.apache.org/hudson/job/maven-2.2.x/</url>
+  </ciManagement>
 
   <build>
     <pluginManagement>
