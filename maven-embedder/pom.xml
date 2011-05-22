@@ -88,20 +88,6 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <!--
-        HACK: Enforcing version 2.4.2 while the other modules use 2.4.3 to get testTwoExecutionsDoNotCacheChangedData()
-        passing on the grid until the embedder can handle HTTP auth. This just pulls down all plugin dependencies during
-        the main build instead of the test.
-        -->
-        <version>2.4.2</version>
-        <configuration>
-          <excludes>
-            <exclude>**/TestComponentOverride.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
 </project>
