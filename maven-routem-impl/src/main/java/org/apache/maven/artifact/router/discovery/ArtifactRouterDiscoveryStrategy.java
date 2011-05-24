@@ -19,12 +19,13 @@ package org.apache.maven.artifact.router.discovery;
  * under the License.
  */
 
+import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
 
 public interface ArtifactRouterDiscoveryStrategy
 {
 
-    DiscoveryResult findRouter()
+    ArtifactRouter findRouter()
         throws ArtifactRouterException;
 
 }

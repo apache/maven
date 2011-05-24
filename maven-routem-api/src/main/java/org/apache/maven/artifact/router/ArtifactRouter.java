@@ -47,6 +47,24 @@ public final class ArtifactRouter
         selectedMirrors.clear();
         return this;
     }
+    
+    public synchronized ArtifactRouter merge( ArtifactRouter other )
+    {
+        addMirrors( other.mirrors );
+        addGroups( other.groups.values() );
+        
+        for ( Map.Entry<String, MirrorRoute> entry : other.selectedMirrors.entrySet() )
+        {
+            String url = entry.getKey();
+            
+            if ( !selectedMirrors.containsKey( url ) )
+            {
+                selectedMirrors.put( url, entry.getValue() );
+            }
+        }
+        
+        return this;
+    }
 
     public synchronized ArtifactRouter addMirrors( final Collection<MirrorRoute> mirrors )
     {

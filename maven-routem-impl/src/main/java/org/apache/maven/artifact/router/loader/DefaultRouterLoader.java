@@ -40,7 +40,6 @@ import org.apache.maven.artifact.router.GroupRoute;
 import org.apache.maven.artifact.router.MirrorRoute;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.discovery.ArtifactRouterDiscoveryStrategy;
-import org.apache.maven.artifact.router.discovery.DiscoveryResult;
 import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
 import org.apache.maven.artifact.router.io.ArtifactRouterModelException;
 import org.codehaus.plexus.component.annotations.Component;
@@ -236,21 +235,12 @@ public class DefaultRouterLoader
                         }
                     }
 
-                    DiscoveryResult discoveryResult = null;
                     for ( final ArtifactRouterDiscoveryStrategy strategy : strats )
                     {
-                        discoveryResult = strategy.findRouter();
-                        if ( discoveryResult != null )
+                        ArtifactRouter result = strategy.findRouter();
+                        if ( result != null )
                         {
-                            if ( discoveryResult.getMirrorsUrl() != null )
-                            {
-                                routes.addMirrors( getMirrorMapping( discoveryResult.getMirrorsUrl(), config, client ) );
-                            }
-                            
-                            if ( discoveryResult.getGroupsUrl() != null )
-                            {
-                                routes.addGroups( getGroupMapping( discoveryResult.getGroupsUrl(), config, client ) );
-                            }
+                            routes.merge( result );
                         }
                     }
                 }
