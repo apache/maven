@@ -29,6 +29,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.automirror.MirrorRoutingTable;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -185,6 +186,7 @@ public class DefaultMavenExecutionRequest
         copy.setWorkspaceReader( original.getWorkspaceReader() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
+        copy.setMirrorRoutingTable( original.getMirrorRoutingTable() );
         return copy;
     }
 
@@ -1076,4 +1078,22 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
+    private MirrorRoutingTable mirrorRoutingTable;
+
+    public synchronized MirrorRoutingTable getMirrorRoutingTable()
+    {
+        if ( mirrorRoutingTable == null )
+        {
+            mirrorRoutingTable = new MirrorRoutingTable();
+        }
+
+        return mirrorRoutingTable;
+    }
+
+    public MavenExecutionRequest setMirrorRoutingTable( final MirrorRoutingTable mirrorRoutingTable )
+    {
+        this.mirrorRoutingTable = mirrorRoutingTable;
+        return this;
+    }
+    
 }
