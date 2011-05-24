@@ -17,11 +17,20 @@
 
 package org.apache.maven.repository.mirror;
 
-import org.apache.maven.repository.automirror.MirrorRoute;
-
-public interface MirrorRouter
+public class MirrorRouterException
+    extends Exception
 {
 
-    MirrorRoute getWeightedRandomSuggestion( final String canonicalUrl );
+    private static final long serialVersionUID = 1L;
+
+    public MirrorRouterException( final String message, final Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public MirrorRouterException( final String message )
+    {
+        super( message );
+    }
 
 }

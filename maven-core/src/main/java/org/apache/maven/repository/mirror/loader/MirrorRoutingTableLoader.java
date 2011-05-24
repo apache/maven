@@ -15,13 +15,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.apache.maven.repository.mirror;
+package org.apache.maven.repository.mirror.loader;
 
-import org.apache.maven.repository.automirror.MirrorRoute;
+import org.apache.maven.repository.automirror.MirrorRoutingTable;
+import org.apache.maven.repository.mirror.MirrorRouterException;
+import org.apache.maven.repository.mirror.configuration.MirrorRouterConfiguration;
 
-public interface MirrorRouter
+public interface MirrorRoutingTableLoader
 {
 
-    MirrorRoute getWeightedRandomSuggestion( final String canonicalUrl );
+    MirrorRoutingTable load( MirrorRouterConfiguration config )
+        throws MirrorRouterException;
 
 }

@@ -15,13 +15,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.apache.maven.repository.mirror;
+package org.apache.maven.repository.mirror.configuration;
 
-import org.apache.maven.repository.automirror.MirrorRoute;
-
-public interface MirrorRouter
+public class MirrorRouterConfigurationException
+    extends Exception
 {
 
-    MirrorRoute getWeightedRandomSuggestion( final String canonicalUrl );
+    private static final long serialVersionUID = 1L;
+
+    public MirrorRouterConfigurationException( final String message, final Throwable cause )
+    {
+        super( message, cause );
+    }
+
+    public MirrorRouterConfigurationException( final String message )
+    {
+        super( message );
+    }
 
 }
