@@ -855,6 +855,8 @@ public class DefaultMavenExecutionRequest
     // calculated from request attributes.
     private ProjectBuildingRequest projectBuildingRequest;
 
+    private File extensionConfDir;
+
     public boolean isProjectPresent()
     {
         return isProjectPresent;
@@ -1073,6 +1075,17 @@ public class DefaultMavenExecutionRequest
     public MavenExecutionRequest setCacheNotFound( boolean cacheNotFound )
     {
         this.cacheNotFound = cacheNotFound;
+        return this;
+    }
+
+    public File getUserExtensionConfDir()
+    {
+        return extensionConfDir;
+    }
+
+    public MavenExecutionRequest setUserExtensionConfDir( File extensionConfDir )
+    {
+        this.extensionConfDir = extensionConfDir;
         return this;
     }
 

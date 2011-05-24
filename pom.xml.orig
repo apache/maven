@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
+
+  <!--
     Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
     file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
     to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
@@ -7,7 +8,9 @@
     applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
     governing permissions and limitations under the License.
-  --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -140,7 +143,6 @@
     <module>maven-model-builder</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
-    <module>maven-auto-mirror-model</module>
   </modules>
 
   <scm>
@@ -169,11 +171,6 @@
     <dependencies>
       <!--  Maven Modules -->
       <!--bootstrap-start-comment-->
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-auto-mirror-model</artifactId>
-        <version>${project.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-model</artifactId>
@@ -344,20 +341,6 @@
         <artifactId>commons-jxpath</artifactId>
         <version>${jxpathVersion}</version>
       </dependency>
-      
-      <!-- START: Used in auto-mirror handling -->
-      <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.httpcomponents</groupId>
-        <artifactId>httpclient</artifactId>
-        <version>4.0.2</version>
-      </dependency>
-      <!-- END: Used in auto-mirror handling -->
-      
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
@@ -558,7 +541,7 @@
             <reportSets>
               <reportSet>
                 <!-- Disabled at it kills the site generation via a NoClassDefFoundError -->
-                <reports/>
+                <reports />
               </reportSet>
             </reportSets>
           </plugin>
@@ -610,9 +593,9 @@
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
-                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator"/>
-                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator"/>
-                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator"/>
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
