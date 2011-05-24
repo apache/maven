@@ -31,8 +31,8 @@ public class RouterMirrorSerializerTest
         throws Exception
     {
         final MirrorRoutingTable mirrorMap =
-            new MirrorRoutingTable().addMirror( new MirrorRoute( "central", "http://repo1.maven.org/maven2",
-                                                             "http://localhost:8081/nexus", 99, true ) );
+            new MirrorRoutingTable().addMirror( new MirrorRoute( "central",
+                                                             "http://localhost:8081/nexus", 99, true, "http://repo1.maven.org/maven2" ) );
 
         final StringWriter sw = new StringWriter();
         MirrorRouteSerializer.serialize( mirrorMap, sw );
@@ -44,8 +44,8 @@ public class RouterMirrorSerializerTest
         throws Exception
     {
         final MirrorRoutingTable mirrorMap =
-            new MirrorRoutingTable().addMirror( new MirrorRoute( "central", "http://repo1.maven.org/maven2",
-                                                             "http://localhost:8081/nexus", 99, true ) );
+            new MirrorRoutingTable().addMirror( new MirrorRoute( "central",
+                                                             "http://localhost:8081/nexus", 99, true, "http://repo1.maven.org/maven2" ) );
 
         System.out.println( MirrorRouteSerializer.serializeToString( mirrorMap ) );
     }
@@ -54,8 +54,8 @@ public class RouterMirrorSerializerTest
         throws Exception
     {
         final MirrorRoutingTable mirrorMap =
-            new MirrorRoutingTable().addMirror( new MirrorRoute( "central", "http://repo1.maven.org/maven2",
-                                                             "http://localhost:8081/nexus", 99, true ) );
+            new MirrorRoutingTable().addMirror( new MirrorRoute( "central",
+                                                             "http://localhost:8081/nexus", 99, true, "http://repo1.maven.org/maven2" ) );
 
         final String ser = MirrorRouteSerializer.serializeToString( mirrorMap );
         final MirrorRoutingTable result = MirrorRouteSerializer.deserialize( ser );

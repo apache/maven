@@ -29,7 +29,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MirrorRouteSerializer
 {
@@ -37,7 +39,7 @@ public class MirrorRouteSerializer
     // NOTE: Gson is supposed to be threadsafe, so all this static stuff should be fine.
     private static Gson gson;
 
-    public static void serializeList( final List<MirrorRoute> mirrors, final Writer writer )
+    public static void serializeLoose( final Set<MirrorRoute> mirrors, final Writer writer )
         throws MirrorRouterModelException
     {
         try
@@ -50,7 +52,7 @@ public class MirrorRouteSerializer
         }
     }
 
-    public static String serializeListToString( final List<MirrorRoute> mirrors )
+    public static String serializeLooseToString( final Set<MirrorRoute> mirrors )
         throws MirrorRouterModelException
     {
         try
@@ -63,12 +65,12 @@ public class MirrorRouteSerializer
         }
     }
 
-    public static List<MirrorRoute> deserializeList( final Reader reader )
+    public static Set<MirrorRoute> deserializeLoose( final Reader reader )
         throws MirrorRouterModelException
     {
         try
         {
-            return getGson().fromJson( reader, RepositoryMirrorListCreator.getType() );
+            return getGson().fromJson( reader, RepositoryMirrorSetCreator.getType() );
         }
         catch ( final JsonParseException e )
         {
@@ -76,12 +78,12 @@ public class MirrorRouteSerializer
         }
     }
 
-    public static List<MirrorRoute> deserializeList( final String source )
+    public static Set<MirrorRoute> deserializeLoose( final String source )
         throws MirrorRouterModelException
     {
         try
         {
-            return getGson().fromJson( source, RepositoryMirrorListCreator.getType() );
+            return getGson().fromJson( source, RepositoryMirrorSetCreator.getType() );
         }
         catch ( final JsonParseException e )
         {
@@ -147,6 +149,7 @@ public class MirrorRouteSerializer
         {
             final GsonBuilder builder = new GsonBuilder();
             builder.disableHtmlEscaping().disableInnerClassSerialization().setPrettyPrinting();
+            builder.registerTypeAdapter( RepositoryMirrorSetCreator.getType(), new RepositoryMirrorSetCreator() );
             builder.registerTypeAdapter( RepositoryMirrorListCreator.getType(), new RepositoryMirrorListCreator() );
 
             gson = builder.create();
@@ -167,6 +170,24 @@ public class MirrorRouteSerializer
         public static Type getType()
         {
             return new TypeToken<List<MirrorRoute>>()
+            {
+            }.getType();
+        }
+
+    }
+
+    public static final class RepositoryMirrorSetCreator
+        implements InstanceCreator<Set<MirrorRoute>>
+    {
+
+        public Set<MirrorRoute> createInstance( final Type type )
+        {
+            return new LinkedHashSet<MirrorRoute>();
+        }
+
+        public static Type getType()
+        {
+            return new TypeToken<Set<MirrorRoute>>()
             {
             }.getType();
         }

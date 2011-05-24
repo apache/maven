@@ -41,7 +41,10 @@ public class MirrorRoutingTable
         if ( !mirrors.contains( mirror ) )
         {
             mirrors.add( mirror );
-            indexGrabBags.remove( mirror.getUrl() );
+            for ( String url : mirror.getMirrorOfUrls() )
+            {
+                indexGrabBags.remove( url );
+            }
         }
 
         return this;
@@ -93,9 +96,9 @@ public class MirrorRoutingTable
                 for ( int idx = 0; idx < mirrors.size(); idx++ )
                 {
                     final MirrorRoute mirror = mirrors.get( idx );
-                    if ( !mirror.isEnabled() )
+                    if ( !mirror.isEnabled() || !mirror.isMirrorOf( canonicalUrl ) )
                     {
-                        // only select from enabled mirrors.
+                        // only select from enabled mirrors that actually mirror the given canonical repository URL.
                         continue;
                     }
 
@@ -114,13 +117,13 @@ public class MirrorRoutingTable
                     }
                 }
 
-                final int[] grabBag = new int[gb.size()];
-                for ( int i = 0; i < grabBag.length; i++ )
+                indexGrabBag = new int[gb.size()];
+                for ( int i = 0; i < indexGrabBag.length; i++ )
                 {
-                    grabBag[i] = gb.get( i );
+                    indexGrabBag[i] = gb.get( i );
                 }
 
-                indexGrabBags.put( canonicalUrl, grabBag );
+                indexGrabBags.put( canonicalUrl, indexGrabBag );
             }
         }
 
@@ -207,7 +210,7 @@ public class MirrorRoutingTable
     {
         for ( final MirrorRoute mirror : mirrors )
         {
-            if ( mirror.isEnabled() && canonicalUrl.equals( mirror.getUrl() ) )
+            if ( mirror.isEnabled() && mirror.isMirrorOf( canonicalUrl ) )
             {
                 return true;
             }

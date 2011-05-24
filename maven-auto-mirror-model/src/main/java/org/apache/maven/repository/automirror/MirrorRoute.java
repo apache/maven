@@ -19,37 +19,77 @@ package org.apache.maven.repository.automirror;
  * under the License.
  */
 
+import static org.codehaus.plexus.util.StringUtils.join;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 public class MirrorRoute
     implements Comparable<MirrorRoute>
 {
 
     private final String id;
 
-    private final String mirrorUrl;
+    private final String myUrl;
 
     private final int weight;
 
     private final boolean enabled;
 
-    private final String url;
+    private final Set<String> mirrorOfUrls;
 
+    // NOTE: ONLY used during deserialization!
     MirrorRoute()
     {
         id = null;
-        url = null;
-        mirrorUrl = null;
+        mirrorOfUrls = Collections.emptySet();
+        myUrl = null;
         weight = 0;
         enabled = false;
     }
 
-    public MirrorRoute( final String id, final String url, final String mirrorUrl, final int weight,
-                        final boolean enabled )
+    public MirrorRoute( final String id, final String myUrl, final int weight,
+                        final boolean enabled, final String... mirrorOfUrls )
     {
+        if ( mirrorOfUrls.length < 1 )
+        {
+            throw new IllegalArgumentException( "Cannot construct a mirror route without at least one mirror-of URL." );
+        }
+        
         this.id = id;
-        this.url = url;
-        this.mirrorUrl = mirrorUrl;
+        this.mirrorOfUrls = toLowerCaseSet( Arrays.asList( mirrorOfUrls ) );
+        this.myUrl = myUrl;
         this.weight = weight;
         this.enabled = enabled;
+    }
+
+    public MirrorRoute( final String id, final String myUrl, final int weight,
+                        final boolean enabled, final Collection<String> mirrorOfUrls )
+    {
+        if ( mirrorOfUrls.size() < 1 )
+        {
+            throw new IllegalArgumentException( "Cannot construct a mirror route without at least one mirror-of URL." );
+        }
+        
+        this.id = id;
+        this.mirrorOfUrls = toLowerCaseSet( mirrorOfUrls );
+        this.myUrl = myUrl;
+        this.weight = weight;
+        this.enabled = enabled;
+    }
+
+    private Set<String> toLowerCaseSet( Collection<String> src )
+    {
+        Set<String> result = new HashSet<String>( src.size() );
+        for ( String srcItem : src )
+        {
+            result.add( srcItem.toLowerCase() );
+        }
+        
+        return result;
     }
 
     public String getId()
@@ -57,9 +97,9 @@ public class MirrorRoute
         return id;
     }
 
-    public String getMirrorUrl()
+    public String getRouteUrl()
     {
-        return mirrorUrl;
+        return myUrl;
     }
 
     public int getWeight()
@@ -80,7 +120,7 @@ public class MirrorRoute
     @Override
     public String toString()
     {
-        return "mirror [id: " + id + ", weight: " + weight + ", url: " + url + ", mirror-url: " + mirrorUrl
+        return "mirror [id: " + id + ", weight: " + weight + ", mirror-of urls: " + join( mirrorOfUrls.iterator(), ", " ) + ", mirror-url: " + myUrl
                         + ", enabled: " + enabled + "]";
     }
 
@@ -89,7 +129,7 @@ public class MirrorRoute
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( ( mirrorUrl == null ) ? 0 : mirrorUrl.hashCode() );
+        result = prime * result + ( ( myUrl == null ) ? 0 : myUrl.hashCode() );
         return result;
     }
 
@@ -109,23 +149,28 @@ public class MirrorRoute
             return false;
         }
         final MirrorRoute other = (MirrorRoute) obj;
-        if ( mirrorUrl == null )
+        if ( myUrl == null )
         {
-            if ( other.mirrorUrl != null )
+            if ( other.myUrl != null )
             {
                 return false;
             }
         }
-        else if ( !mirrorUrl.equals( other.mirrorUrl ) )
+        else if ( !myUrl.equals( other.myUrl ) )
         {
             return false;
         }
         return true;
     }
 
-    public String getUrl()
+    public Set<String> getMirrorOfUrls()
     {
-        return url;
+        return mirrorOfUrls;
+    }
+
+    public boolean isMirrorOf( String canonicalUrl )
+    {
+        return mirrorOfUrls.contains( canonicalUrl.toLowerCase() );
     }
 
 }

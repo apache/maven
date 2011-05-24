@@ -78,7 +78,7 @@ public class RoutingMirrorSelector
 
                 mirror.setRepositoryManager( false );
                 mirror.setId( route.getId() );
-                mirror.setUrl( route.getMirrorUrl() );
+                mirror.setUrl( route.getRouteUrl() );
                 mirror.setContentType( repository.getContentType() );
                 mirror.setPolicy( true, repository.getPolicy( true ) );
                 mirror.setPolicy( false, repository.getPolicy( false ) );

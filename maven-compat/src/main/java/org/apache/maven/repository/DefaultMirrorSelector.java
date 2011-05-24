@@ -88,7 +88,7 @@ public class DefaultMirrorSelector
                 // FIXME!
                 mirror.setLayout( "default" );
                 mirror.setId( rMirror.getId() );
-                mirror.setUrl( rMirror.getMirrorUrl() );
+                mirror.setUrl( rMirror.getRouteUrl() );
             }
             else
             {
