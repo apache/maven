@@ -213,9 +213,13 @@ class RoutingConnectorWrapper
     public synchronized void close()
     {
         Map<GroupRoute, RepositoryConnector> openConnectors = getOpenConnectors();
-        for ( RepositoryConnector connector : openConnectors.values() )
+        if ( openConnectors != null )
         {
-            connector.close();
+            for ( RepositoryConnector connector : openConnectors.values() )
+            {
+                connector.close();
+            }
+            
         }
         
         setOpenConnectors( null );

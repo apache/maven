@@ -937,7 +937,7 @@ public class MavenCli
             userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        routerConfig = new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR ).build();
+        routerConfig = new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR, logger ).build();
         if ( commandLine.hasOption( CLIManager.ROUTER_OPTIONS ) )
         {
             routerConfig.setOptions( ArtifactRouterOption.parse( commandLine.getOptionValues( CLIManager.ROUTER_OPTIONS ) ) );

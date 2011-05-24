@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-@Component( role = RouterConfigBuilder.class )
 public class FileRouterConfigBuilder
     implements RouterConfigBuilder
 {
@@ -55,14 +54,14 @@ public class FileRouterConfigBuilder
     
     private static final String CONFIG_FILENAME = "router.properties";
     
-    @Requirement
     private Logger logger;
     
     private File confDir;
     
-    public FileRouterConfigBuilder( File confDir )
+    public FileRouterConfigBuilder( File confDir, Logger logger )
     {
         this.confDir = confDir;
+        this.logger = logger;
     }
 
     public ArtifactRouterConfiguration build()

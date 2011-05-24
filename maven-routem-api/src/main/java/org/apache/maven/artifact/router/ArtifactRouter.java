@@ -50,9 +50,12 @@ public final class ArtifactRouter
 
     public synchronized ArtifactRouter addMirrors( final Collection<MirrorRoute> mirrors )
     {
-        for ( MirrorRoute route : mirrors )
+        if ( mirrors != null )
         {
-            addMirror( route );
+            for ( MirrorRoute route : mirrors )
+            {
+                addMirror( route );
+            }
         }
 
         return this;
@@ -60,6 +63,11 @@ public final class ArtifactRouter
 
     public synchronized ArtifactRouter addMirror( final MirrorRoute mirror )
     {
+        if ( mirror == null )
+        {
+            return this;
+        }
+        
         if ( !mirrors.contains( mirror ) )
         {
             mirrors.add( mirror );
@@ -87,9 +95,12 @@ public final class ArtifactRouter
 
     public synchronized ArtifactRouter addGroups( final Collection<GroupRoute> groups )
     {
-        for ( GroupRoute route : groups )
+        if ( groups != null )
         {
-            addGroup( route );
+            for ( GroupRoute route : groups )
+            {
+                addGroup( route );
+            }
         }
 
         return this;
@@ -97,6 +108,11 @@ public final class ArtifactRouter
 
     public synchronized ArtifactRouter addGroup( final GroupRoute group )
     {
+        if ( group == null )
+        {
+            return this;
+        }
+        
         GroupRoute toInsert = group;
 
         List<GroupRoute> routes = new ArrayList<GroupRoute>( groups.values() );
