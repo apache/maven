@@ -1,4 +1,6 @@
-package org.apache.maven.artifact.router.conf;
+package org.apache.maven.artifact.router.io;
+
+import org.apache.maven.artifact.router.ArtifactRouterException;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,17 +21,20 @@ package org.apache.maven.artifact.router.conf;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-
-public interface RouterConfigSource
+public class ArtifactRouterModelException
+    extends ArtifactRouterException
 {
 
-    Object getSource();
+    private static final long serialVersionUID = 1L;
 
-    boolean canRead();
+    public ArtifactRouterModelException( final String message, final Throwable cause )
+    {
+        super( message, cause );
+    }
 
-    InputStream getInputStream()
-        throws IOException;
+    public ArtifactRouterModelException( final String message )
+    {
+        super( message );
+    }
 
 }

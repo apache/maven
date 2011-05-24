@@ -38,8 +38,8 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
-import org.apache.maven.artifact.router.conf.FileRouterConfigSource;
-import org.apache.maven.artifact.router.conf.RouterConfigBuilder;
+import org.apache.maven.artifact.router.conf.ArtifactRouterOption;
+import org.apache.maven.artifact.router.conf.FileRouterConfigBuilder;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.loader.ArtifactRouterLoader;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -122,8 +122,6 @@ public class MavenCli
 
     private SettingsBuilder settingsBuilder;
 
-    private RouterConfigBuilder routerConfBuilder;
-    
     private ArtifactRouterLoader routerLoader;
 
     private DefaultSecDispatcher dispatcher;
@@ -427,7 +425,6 @@ public class MavenCli
 
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
-        routerConfBuilder = container.lookup( RouterConfigBuilder.class );
         routerLoader = container.lookup( ArtifactRouterLoader.class );
         
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
@@ -555,7 +552,7 @@ public class MavenCli
 
         try
         {
-            routerLoader.saveSelectedMirrors( cliRequest.request.getArtifactRouter(), routerConfig );
+            routerLoader.save( cliRequest.request.getArtifactRouter(), routerConfig );
         }
         catch ( ArtifactRouterException e )
         {
@@ -940,8 +937,13 @@ public class MavenCli
             userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        routerConfig =
-            routerConfBuilder.build( new FileRouterConfigSource( DEFAULT_USER_EXT_CONF_DIR ) );
+        routerConfig = new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR ).build();
+        if ( commandLine.hasOption( CLIManager.ROUTER_OPTIONS ) )
+        {
+            routerConfig.setOptions( ArtifactRouterOption.parse( commandLine.getOptionValues( CLIManager.ROUTER_OPTIONS ) ) );
+        }
+        
+        routerConfig.setOffline( request.isOffline() );
         
         ArtifactRouter router = routerLoader.load( routerConfig );
         

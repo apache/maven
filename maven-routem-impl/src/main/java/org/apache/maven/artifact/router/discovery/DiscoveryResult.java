@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.router;
+package org.apache.maven.artifact.router.discovery;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,20 +19,33 @@ package org.apache.maven.artifact.router;
  * under the License.
  */
 
-public class ArtifactRouterModelException
-    extends Exception
+public final class DiscoveryResult
 {
+    
+    private String mirrorsUrl;
+    
+    private String groupsUrl;
 
-    private static final long serialVersionUID = 1L;
-
-    public ArtifactRouterModelException( final String message, final Throwable cause )
+    public String getMirrorsUrl()
     {
-        super( message, cause );
+        return mirrorsUrl;
     }
 
-    public ArtifactRouterModelException( final String message )
+    public DiscoveryResult setMirrorsUrl( String mirrorsUrl )
     {
-        super( message );
+        this.mirrorsUrl = mirrorsUrl;
+        return this;
     }
 
+    public String getGroupsUrl()
+    {
+        return groupsUrl;
+    }
+
+    public DiscoveryResult setGroupsUrl( String groupsUrl )
+    {
+        this.groupsUrl = groupsUrl;
+        return this;
+    }
+    
 }

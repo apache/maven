@@ -20,29 +20,43 @@ package org.apache.maven.artifact.router;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public final class ArtifactRoutingTables
+public final class ArtifactRouter
 {
 
     private List<MirrorRoute> mirrors = new ArrayList<MirrorRoute>();
-    
+
     private Map<GroupPattern, GroupRoute> groups = new HashMap<GroupPattern, GroupRoute>();
 
     private final transient Random random = new Random();
 
     private transient Map<String, int[]> mirrorIndexGrabBags = new HashMap<String, int[]>();
+
+    private Map<String, MirrorRoute> selectedMirrors = new HashMap<String, MirrorRoute>();
     
-    public ArtifactRoutingTables()
+    public synchronized ArtifactRouter clearSelections()
     {
-        addGroup( GroupRoute.CENTRAL );
+        selectedMirrors.clear();
+        return this;
     }
-    
-    public synchronized ArtifactRoutingTables addMirror( final MirrorRoute mirror )
+
+    public synchronized ArtifactRouter addMirrors( final Collection<MirrorRoute> mirrors )
+    {
+        for ( MirrorRoute route : mirrors )
+        {
+            addMirror( route );
+        }
+
+        return this;
+    }
+
+    public synchronized ArtifactRouter addMirror( final MirrorRoute mirror )
     {
         if ( !mirrors.contains( mirror ) )
         {
@@ -50,6 +64,7 @@ public final class ArtifactRoutingTables
             for ( String url : mirror.getMirrorOfUrls() )
             {
                 mirrorIndexGrabBags.remove( url );
+                selectedMirrors.remove( url );
             }
         }
 
@@ -58,13 +73,30 @@ public final class ArtifactRoutingTables
 
     public synchronized MirrorRoute getMirror( final String canonicalUrl )
     {
-        return getWeightedRandomMirror( canonicalUrl );
+        MirrorRoute route = selectedMirrors.get( canonicalUrl );
+        if ( route == null )
+        {
+            route = getWeightedRandomMirror( canonicalUrl );
+            selectedMirrors.put( canonicalUrl, route );
+        }
+
+        return route;
     }
-    
-    public synchronized ArtifactRoutingTables addGroup( final GroupRoute group )
+
+    public synchronized ArtifactRouter addGroups( final Collection<GroupRoute> groups )
+    {
+        for ( GroupRoute route : groups )
+        {
+            addGroup( route );
+        }
+
+        return this;
+    }
+
+    public synchronized ArtifactRouter addGroup( final GroupRoute group )
     {
         GroupRoute toInsert = group;
-        
+
         List<GroupRoute> routes = new ArrayList<GroupRoute>( groups.values() );
         int idx = routes.indexOf( group );
         if ( idx > -1 )
@@ -74,19 +106,19 @@ public final class ArtifactRoutingTables
             {
                 groups.remove( p );
             }
-            
+
             existing.merge( group.getGroupPatterns() );
             toInsert = existing;
         }
-        
+
         for ( GroupPattern p : toInsert.getGroupPatterns() )
         {
             groups.put( p, toInsert );
         }
-        
+
         return this;
     }
-    
+
     public GroupRoute getGroup( String groupId )
     {
         List<GroupPattern> matches = new ArrayList<GroupPattern>();
@@ -97,36 +129,43 @@ public final class ArtifactRoutingTables
                 matches.add( p );
             }
         }
-        
-        Collections.sort( matches );
-        GroupPattern pattern = matches.get( 0 );
-        
-        return groups.get( pattern );
+
+        if ( matches.isEmpty() )
+        {
+            return GroupRoute.CENTRAL;
+        }
+        else
+        {
+            Collections.sort( matches );
+            GroupPattern pattern = matches.get( 0 );
+
+            return groups.get( pattern );
+        }
     }
-    
-//    private MirrorRoute getHighestPriorityMirror( final String canonicalUrl )
-//    {
-//        if ( mirrors.isEmpty() )
-//        {
-//            return null;
-//        }
-//
-//        final List<MirrorRoute> available = new ArrayList<MirrorRoute>( mirrors );
-//
-//        // sort by weight.
-//        Collections.sort( available );
-//
-//        for ( final MirrorRoute mirror : available )
-//        {
-//            // return the highest-priority ENABLED mirror.
-//            if ( mirror.isEnabled() && canonicalUrl.equals( mirror.getUrl() ) )
-//            {
-//                return mirror;
-//            }
-//        }
-//
-//        return null;
-//    }
+
+    // private MirrorRoute getHighestPriorityMirror( final String canonicalUrl )
+    // {
+    // if ( mirrors.isEmpty() )
+    // {
+    // return null;
+    // }
+    //
+    // final List<MirrorRoute> available = new ArrayList<MirrorRoute>( mirrors );
+    //
+    // // sort by weight.
+    // Collections.sort( available );
+    //
+    // for ( final MirrorRoute mirror : available )
+    // {
+    // // return the highest-priority ENABLED mirror.
+    // if ( mirror.isEnabled() && canonicalUrl.equals( mirror.getUrl() ) )
+    // {
+    // return mirror;
+    // }
+    // }
+    //
+    // return null;
+    // }
 
     private MirrorRoute getWeightedRandomMirror( final String canonicalUrl )
     {
@@ -180,7 +219,7 @@ public final class ArtifactRoutingTables
         {
             return null;
         }
-        
+
         // generate a random number that will correspond to an index stored in the index grab bag.
         int idx = Math.abs( random.nextInt() ) % indexGrabBag.length;
 
@@ -220,7 +259,7 @@ public final class ArtifactRoutingTables
         {
             return false;
         }
-        final ArtifactRoutingTables other = (ArtifactRoutingTables) obj;
+        final ArtifactRouter other = (ArtifactRouter) obj;
         if ( mirrors == null )
         {
             if ( other.mirrors != null )

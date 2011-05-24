@@ -34,20 +34,19 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.maven.artifact.router.MirrorRoute;
-import org.apache.maven.artifact.router.ArtifactRouteSerializer;
-import org.apache.maven.artifact.router.ArtifactRouterModelException;
-import org.apache.maven.artifact.router.ArtifactRoutingTables;
 import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.GroupRoute;
+import org.apache.maven.artifact.router.MirrorRoute;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.discovery.ArtifactRouterDiscoveryStrategy;
+import org.apache.maven.artifact.router.discovery.DiscoveryResult;
+import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
+import org.apache.maven.artifact.router.io.ArtifactRouterModelException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
-
-import javax.inject.Named;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,15 +55,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//@Component( role = ArtifactRouterLoader.class )
-@Named( "default" )
+@Component( role = ArtifactRouterLoader.class )
 public class DefaultRouterLoader
     implements ArtifactRouterLoader
 {
@@ -78,18 +73,15 @@ public class DefaultRouterLoader
     public ArtifactRouter load( final ArtifactRouterConfiguration config )
         throws ArtifactRouterException
     {
-        if ( config == null )
+        if ( config == null || config.isDisabled() )
         {
             return new ArtifactRouter();
         }
         
-        ArtifactRoutingTables routingTable = loadRoutingTable( config );
-        Map<String, MirrorRoute> selectedRoutes = loadSelectedRoutes( config );
-
-        return new ArtifactRouter( routingTable, selectedRoutes );
+        return loadRoutes( config );
     }
 
-    public void saveSelectedMirrors( final ArtifactRouter router, final ArtifactRouterConfiguration config )
+    public void save( final ArtifactRouter router, final ArtifactRouterConfiguration config )
         throws ArtifactRouterException
     {
         if ( config == null )
@@ -97,29 +89,28 @@ public class DefaultRouterLoader
             return;
         }
         
-        Map<String, MirrorRoute> selectedRoutes = router.getSelectedRoutes();
-        File selectedRoutesFile = config.getSelectedRoutesFile();
-        if ( selectedRoutesFile != null )
+        File routingTablesFile = config.getRoutesFile();
+        if ( routingTablesFile != null )
         {
             FileWriter writer = null;
             try
             {
-                File dir = selectedRoutesFile.getParentFile();
+                File dir = routingTablesFile.getParentFile();
                 if ( dir != null && !dir.exists() )
                 {
                     dir.mkdirs();
                 }
                 
-                writer = new FileWriter( selectedRoutesFile );
-                ArtifactRouteSerializer.serializeLoose( new LinkedHashSet<MirrorRoute>( selectedRoutes.values() ), writer );
+                writer = new FileWriter( routingTablesFile );
+                ArtifactRouteSerializer.serialize( router, writer );
             }
             catch ( IOException e )
             {
-                throw new ArtifactRouterException( "Cannot write selected mirrors to: " + selectedRoutesFile, e );
+                throw new ArtifactRouterException( "Cannot write artifact router to: " + routingTablesFile, e );
             }
             catch ( ArtifactRouterModelException e )
             {
-                throw new ArtifactRouterException( "Cannot write selected mirrors to: " + selectedRoutesFile, e );
+                throw new ArtifactRouterException( "Cannot write artifact router to: " + routingTablesFile, e );
             }
             finally
             {
@@ -128,36 +119,25 @@ public class DefaultRouterLoader
         }
     }
 
-    protected Map<String, MirrorRoute> loadSelectedRoutes( ArtifactRouterConfiguration config )
+    protected ArtifactRouter loadSaved( ArtifactRouterConfiguration config )
         throws ArtifactRouterException
     {
-        File selectedRoutesFile = config.getSelectedRoutesFile();
-        if ( selectedRoutesFile != null && selectedRoutesFile.exists() && selectedRoutesFile.canRead() )
+        File routesFile = config.getRoutesFile();
+        if ( routesFile != null && routesFile.exists() && routesFile.canRead() )
         {
             FileReader reader = null;
             try
             {
-                reader = new FileReader( selectedRoutesFile );
-                Set<MirrorRoute> routes = ArtifactRouteSerializer.deserializeLoose( reader );
-                
-                Map<String, MirrorRoute> result = new LinkedHashMap<String, MirrorRoute>();
-                for ( MirrorRoute route : routes )
-                {
-                    for ( String mirrorOf : route.getMirrorOfUrls() )
-                    {
-                        result.put( mirrorOf, route );
-                    }
-                }
-                
-                return result;
+                reader = new FileReader( routesFile );
+                return ArtifactRouteSerializer.deserialize( reader );
             }
             catch ( IOException e )
             {
-                throw new ArtifactRouterException( "Cannot read selected mirrors from: " + selectedRoutesFile, e );
+                throw new ArtifactRouterException( "Cannot read saved route information from: " + routesFile, e );
             }
             catch ( ArtifactRouterModelException e )
             {
-                throw new ArtifactRouterException( "Cannot read selected mirrors from: " + selectedRoutesFile, e );
+                throw new ArtifactRouterException( "Cannot read saved route information from: " + routesFile, e );
             }
             finally
             {
@@ -165,16 +145,27 @@ public class DefaultRouterLoader
             }
         }
         
-        return Collections.emptyMap();
+        return new ArtifactRouter();
     }
 
-    protected ArtifactRoutingTables loadRoutingTable( final ArtifactRouterConfiguration config )
+    protected ArtifactRouter loadRoutes( final ArtifactRouterConfiguration config )
         throws ArtifactRouterException
     {
-        ArtifactRoutingTables routingTable = null;
-
-        if ( !config.isDisabled() )
+        ArtifactRouter routes = null;
+        
+        if ( config.isClear() )
         {
+            routes = new ArtifactRouter();
+            save( routes, config );
+        }
+        else
+        {
+            routes = loadSaved( config );
+        }
+
+        if ( config.isUpdate() && !config.isOffline() )
+        {
+            // FIXME: What about proxies?! Should be using settings.xml proxy defs.
             final DefaultHttpClient client = new DefaultHttpClient();
             if ( config.getRouterCredentials() != null )
             {
@@ -200,11 +191,18 @@ public class DefaultRouterLoader
             {
                 if ( config.getRouterMirrorsUrl() != null )
                 {
-                    routingTable = getMirrorMapping( config.getRouterMirrorsUrl(), config, client );
+                    routes.addMirrors( getMirrorMapping( config.getRouterMirrorsUrl(), config, client ) );
                 }
-                else
+                
+                if ( config.getRouterGroupsUrl() != null )
                 {
-                    final String[] discoStrategies = config.getDiscoveryStrategies();
+                    routes.addGroups( getGroupMapping( config.getRouterGroupsUrl(), config, client ) );
+                }
+                
+                final String[] discoStrategies = config.getDiscoveryStrategies();
+                if ( discoStrategies != null && discoStrategies.length > 0
+                    && !"none".equalsIgnoreCase( discoStrategies[0].toLowerCase() ) )
+                {
                     final List<ArtifactRouterDiscoveryStrategy> strats = new ArrayList<ArtifactRouterDiscoveryStrategy>();
                     if ( discoStrategies.length == 1 )
                     {
@@ -238,42 +236,52 @@ public class DefaultRouterLoader
                         }
                     }
 
-                    String routerUrl = null;
+                    DiscoveryResult discoveryResult = null;
                     for ( final ArtifactRouterDiscoveryStrategy strategy : strats )
                     {
-                        routerUrl = strategy.findRouter();
-                        if ( routerUrl != null && routerUrl.trim().length() > 0 )
+                        discoveryResult = strategy.findRouter();
+                        if ( discoveryResult != null )
                         {
-                            routingTable = getMirrorMapping( routerUrl, config, client );
-                            if ( routingTable != null )
+                            if ( discoveryResult.getMirrorsUrl() != null )
                             {
-                                break;
+                                routes.addMirrors( getMirrorMapping( discoveryResult.getMirrorsUrl(), config, client ) );
+                            }
+                            
+                            if ( discoveryResult.getGroupsUrl() != null )
+                            {
+                                routes.addGroups( getGroupMapping( discoveryResult.getGroupsUrl(), config, client ) );
                             }
                         }
                     }
                 }
 
-                final String centralRouterUrl = config.getCanonicalMirrorsUrl();
-                if ( routingTable == null && centralRouterUrl != null && centralRouterUrl.trim().length() > 0 )
+                final String centralMirrorsUrl = config.getCanonicalMirrorsUrl();
+                if ( centralMirrorsUrl != null && centralMirrorsUrl.trim().length() > 0 )
                 {
-                    routingTable = getMirrorMapping( centralRouterUrl, config, client );
+                    routes.addMirrors( getMirrorMapping( centralMirrorsUrl, config, client ) );
+                }
+                
+                final String centralGroupsUrl = config.getCanonicalGroupsUrl();
+                if ( centralGroupsUrl != null && centralGroupsUrl.trim().length() > 0 )
+                {
+                    routes.addGroups( getGroupMapping( centralGroupsUrl, config, client ) );
                 }
             }
             catch ( final ArtifactRouterException e )
             {
                 if ( logger.isDebugEnabled() )
                 {
-                    logger.error( "Failed to auto-detect mirrors: " + e.getMessage(), e );
+                    logger.error( "Failed to auto-detect routing information: " + e.getMessage(), e );
                 }
             }
         }
 
-        if ( routingTable == null )
+        if ( routes == null )
         {
-            routingTable = new ArtifactRoutingTables();
+            routes = new ArtifactRouter();
         }
 
-        return routingTable;
+        return routes;
     }
 
     private ArtifactRouterDiscoveryStrategy getDiscoveryStrategy( final String key )
@@ -292,14 +300,9 @@ public class DefaultRouterLoader
         return strat;
     }
 
-    private ArtifactRoutingTables getMirrorMapping( final String routerUrl, final ArtifactRouterConfiguration config,
+    private Set<MirrorRoute> getMirrorMapping( final String routerUrl, final ArtifactRouterConfiguration config,
                                                  final HttpClient client )
     {
-        if ( config.isDisabled() )
-        {
-            return new ArtifactRoutingTables();
-        }
-
         if ( routerUrl != null && routerUrl.trim().length() > 0 )
         {
             if ( logger.isDebugEnabled() )
@@ -313,9 +316,9 @@ public class DefaultRouterLoader
 
             try
             {
-                return client.execute( get, new ResponseHandler<ArtifactRoutingTables>()
+                return client.execute( get, new ResponseHandler<Set<MirrorRoute>>()
                 {
-                    public ArtifactRoutingTables handleResponse( final HttpResponse response )
+                    public Set<MirrorRoute> handleResponse( final HttpResponse response )
                         throws /* ClientProtocolException, */IOException
                     {
                         final int statusCode = response.getStatusLine().getStatusCode();
@@ -359,7 +362,7 @@ public class DefaultRouterLoader
                                         + content );
                                 }
 
-                                return ArtifactRouteSerializer.deserialize( content );
+                                return ArtifactRouteSerializer.deserializeMirrors( content );
                             }
                             catch ( final ArtifactRouterModelException e )
                             {
@@ -400,5 +403,109 @@ public class DefaultRouterLoader
 
         return null;
     }
+
+    private Set<GroupRoute> getGroupMapping( final String routerUrl, final ArtifactRouterConfiguration config,
+                                               final HttpClient client )
+  {
+      if ( routerUrl != null && routerUrl.trim().length() > 0 )
+      {
+          if ( logger.isDebugEnabled() )
+          {
+              logger.debug( "Grabbing mirror mappings from: " + routerUrl.toString() );
+          }
+          System.out.println( "Grabbing mirror mappings from: " + routerUrl );
+
+          final HttpGet get = new HttpGet( routerUrl );
+          get.addHeader( "Accept", "application/json;q=0.9,*/*;q=0.8" );
+
+          try
+          {
+              return client.execute( get, new ResponseHandler<Set<GroupRoute>>()
+              {
+                  public Set<GroupRoute> handleResponse( final HttpResponse response )
+                      throws /* ClientProtocolException, */IOException
+                  {
+                      final int statusCode = response.getStatusLine().getStatusCode();
+                      if ( statusCode == 200 )
+                      {
+                          InputStream stream = null;
+                          try
+                          {
+                              stream = response.getEntity().getContent();
+                              final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                              IOUtil.copy( stream, baos );
+
+                              String content = null;
+                              final Header contentType = response.getFirstHeader( "Content-Type" );
+                              if ( contentType != null )
+                              {
+                                  final HeaderElement[] contentTypeElts = contentType.getElements();
+
+                                  if ( contentTypeElts != null )
+                                  {
+                                      for ( final HeaderElement elt : contentTypeElts )
+                                      {
+                                          final NameValuePair nv = elt.getParameterByName( "charset" );
+                                          if ( nv != null )
+                                          {
+                                              content = new String( baos.toByteArray(), nv.getValue() );
+                                          }
+                                      }
+                                  }
+                              }
+
+                              if ( content == null )
+                              {
+                                  content = new String( baos.toByteArray() );
+                              }
+
+                              if ( logger.isDebugEnabled() )
+                              {
+                                  logger.debug( "Response code/message: '" + response.getStatusLine().getStatusCode()
+                                      + " " + response.getStatusLine().getReasonPhrase() + "'\nContent is:\n\n"
+                                      + content );
+                              }
+
+                              return ArtifactRouteSerializer.deserializeGroups( content );
+                          }
+                          catch ( final ArtifactRouterModelException e )
+                          {
+                              logger.error( "Failed to retrieve mirror mapping from: " + routerUrl, e );
+                          }
+                          finally
+                          {
+                              close( stream );
+                          }
+                      }
+                      else if ( logger.isDebugEnabled() )
+                      {
+                          logger.debug( "Response: " + response.getStatusLine().getStatusCode() + " "
+                              + response.getStatusLine().getReasonPhrase() );
+                      }
+
+                      return null;
+                  }
+              } );
+          }
+          catch ( final ClientProtocolException e )
+          {
+              if ( logger.isDebugEnabled() )
+              {
+                  logger.debug( "Failed to read proxied repositories from: '" + routerUrl + "'. Reason: "
+                                    + e.getMessage(), e );
+              }
+          }
+          catch ( final IOException e )
+          {
+              if ( logger.isDebugEnabled() )
+              {
+                  logger.debug( "Failed to read proxied repositories from: '" + routerUrl + "'. Reason: "
+                                    + e.getMessage(), e );
+              }
+          }
+      }
+
+      return null;
+  }
 
 }

@@ -26,21 +26,22 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import javax.inject.Named;
-
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-//@Component( role = RouterConfigBuilder.class )
-@Named( "default" )
-public class DefaultRouterConfigBuilder
+@Component( role = RouterConfigBuilder.class )
+public class FileRouterConfigBuilder
     implements RouterConfigBuilder
 {
 
     private static final String KEY_ROUTER_MIRRORS_URL = "router-mirrors-url";
 
     private static final String KEY_ROUTER_GROUPS_URL = "router-groups-url";
+    
+    private static final String KEY_ROUTES_FILE = "routing-tables-file";
 
     private static final String KEY_ROUTER_USER = "router-user";
 
@@ -50,30 +51,49 @@ public class DefaultRouterConfigBuilder
 
     private static final String KEY_DISCOVERY_STRATEGIES = "discovery-strategies";
 
+    private static final String ROUTES_FILE = "artifact-routes.json";
+    
+    private static final String CONFIG_FILENAME = "router.properties";
+    
     @Requirement
     private Logger logger;
+    
+    private File confDir;
+    
+    public FileRouterConfigBuilder( File confDir )
+    {
+        this.confDir = confDir;
+    }
 
-    public ArtifactRouterConfiguration build( final RouterConfigSource source )
+    public ArtifactRouterConfiguration build()
         throws ArtifactRouterConfigurationException
     {
         final ArtifactRouterConfiguration config = new ArtifactRouterConfiguration();
+        File routerConfig = new File( confDir, CONFIG_FILENAME );
 
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "Loading mirror configuration from file: " + source.getSource() );
+            logger.debug( "Loading mirror configuration from file: " + routerConfig );
         }
 
-        if ( source.canRead() )
+        if ( routerConfig.canRead() )
         {
             InputStream stream = null;
             try
             {
-                stream = source.getInputStream();
+                stream = new FileInputStream( routerConfig );
                 final Properties p = new Properties();
                 p.load( stream );
 
                 config.setRouterMirrorsUrl( p.getProperty( KEY_ROUTER_MIRRORS_URL ) );
                 config.setRouterGroupsUrl( p.getProperty( KEY_ROUTER_GROUPS_URL ) );
+                
+                String path = p.getProperty( KEY_ROUTES_FILE );
+                if ( path != null )
+                {
+                    config.setRoutesFile( new File( path ) );
+                }
+
                 config.setDisabled( Boolean.parseBoolean( p.getProperty( KEY_DISABLED, "false" ) ) );
 
                 final String user = p.getProperty( KEY_ROUTER_USER );
@@ -93,7 +113,7 @@ public class DefaultRouterConfigBuilder
             catch ( final IOException e )
             {
                 throw new ArtifactRouterConfigurationException( "Failed to read router config properties from: '"
-                                + source.getSource() + "'.", e );
+                                + routerConfig + "'.", e );
             }
             finally
             {
@@ -104,9 +124,14 @@ public class DefaultRouterConfigBuilder
         {
             if ( logger.isDebugEnabled() )
             {
-                logger.debug( "Cannot read router configuration from: " + source.getSource()
+                logger.debug( "Cannot read router configuration from: " + routerConfig
                                 + ". Using defaults." );
             }
+        }
+        
+        if ( config.getRoutesFile() == null )
+        {
+            config.setRoutesFile( new File( confDir, ROUTES_FILE ) );
         }
 
         return config;

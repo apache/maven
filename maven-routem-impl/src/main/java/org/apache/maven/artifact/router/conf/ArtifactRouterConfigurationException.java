@@ -1,5 +1,7 @@
 package org.apache.maven.artifact.router.conf;
 
+import org.apache.maven.artifact.router.ArtifactRouterException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,7 +22,7 @@ package org.apache.maven.artifact.router.conf;
  */
 
 public class ArtifactRouterConfigurationException
-    extends Exception
+    extends ArtifactRouterException
 {
 
     private static final long serialVersionUID = 1L;

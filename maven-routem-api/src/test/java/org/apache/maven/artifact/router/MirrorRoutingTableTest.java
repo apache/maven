@@ -18,7 +18,7 @@
 package org.apache.maven.artifact.router;
 
 import org.apache.maven.artifact.router.MirrorRoute;
-import org.apache.maven.artifact.router.ArtifactRoutingTables;
+import org.apache.maven.artifact.router.ArtifactRouter;
 
 import junit.framework.TestCase;
 
@@ -30,7 +30,7 @@ public class MirrorRoutingTableTest
     {
         String canonical = "http://repo1.maven.org/maven2";
         
-        ArtifactRoutingTables table = new ArtifactRoutingTables();
+        ArtifactRouter table = new ArtifactRouter();
         MirrorRoute route = new MirrorRoute( "test", "http://nowhere.com/mirror", 10, true, canonical );
         table.addMirror( route );
         
@@ -43,7 +43,7 @@ public class MirrorRoutingTableTest
     {
         String canonical = "http://repo1.maven.org/maven3";
         
-        ArtifactRoutingTables table = new ArtifactRoutingTables();
+        ArtifactRouter table = new ArtifactRouter();
         MirrorRoute route = new MirrorRoute( "test", "http://nowhere.com/mirror", 10, true, "http://repo1.maven.org/maven2" );
         table.addMirror( route );
         

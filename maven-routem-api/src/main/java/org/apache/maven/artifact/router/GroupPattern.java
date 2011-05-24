@@ -25,8 +25,6 @@ public final class GroupPattern
     
     private static final String GROUP_SEPARATOR = "[\\/.]";
 
-    public static final GroupPattern GLOBAL_WILDCARD = new GroupPattern( "*" );
-    
     private final String pattern;
     
     private transient final String[] parts;
@@ -38,7 +36,6 @@ public final class GroupPattern
     public GroupPattern( String pattern )
     {
         this.pattern = pattern;
-        
         if ( pattern.endsWith("*") )
         {
             wildcard = true;

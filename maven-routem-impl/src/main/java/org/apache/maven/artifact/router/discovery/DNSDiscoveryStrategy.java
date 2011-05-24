@@ -38,7 +38,7 @@ final class DNSDiscoveryStrategy
     implements ArtifactRouterDiscoveryStrategy
 {
 
-    public String findRouter()
+    public DiscoveryResult findRouter()
         throws ArtifactRouterException
     {
         final Map<String, String> env = new HashMap<String, String>();
@@ -96,11 +96,16 @@ final class DNSDiscoveryStrategy
 
                 if ( txtRecord != null )
                 {
-                    return txtRecord;
+                    return parse( txtRecord );
                 }
             }
         }
 
+        return null;
+    }
+
+    private DiscoveryResult parse( String record )
+    {
         return null;
     }
 

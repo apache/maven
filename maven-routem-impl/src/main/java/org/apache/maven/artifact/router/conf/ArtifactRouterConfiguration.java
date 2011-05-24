@@ -22,6 +22,8 @@ package org.apache.maven.artifact.router.conf;
 import org.apache.http.auth.UsernamePasswordCredentials;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class ArtifactRouterConfiguration
 {
@@ -34,7 +36,7 @@ public final class ArtifactRouterConfiguration
 
     public static final String NO_DISCOVERY_STRATEGIES = "none";
     
-    private File selectedRoutesFile;
+    private File routesFile;
 
     private String routerMirrorsUrl;
 
@@ -45,6 +47,13 @@ public final class ArtifactRouterConfiguration
     private String[] discoveryStrategies = { ALL_DISCOVERY_STRATEGIES };
 
     private String routerGroupsUrl;
+
+    private final Set<ArtifactRouterOption> routerOptions = new HashSet<ArtifactRouterOption>();
+    
+    public ArtifactRouterConfiguration()
+    {
+        setUpdate( true );
+    }
 
     public ArtifactRouterConfiguration setRouterCredentials( final String user, final String password )
     {
@@ -110,14 +119,70 @@ public final class ArtifactRouterConfiguration
         return this;
     }
     
-    public File getSelectedRoutesFile()
+    public File getRoutesFile()
     {
-        return selectedRoutesFile;
+        return routesFile;
     }
     
-    public ArtifactRouterConfiguration setSelectedRoutesFile( File selectedRoutesFile )
+    public ArtifactRouterConfiguration setRoutesFile( File routesFile )
     {
-        this.selectedRoutesFile = selectedRoutesFile;
+        this.routesFile = routesFile;
+        return this;
+    }
+    
+    public ArtifactRouterConfiguration setOffline( boolean offline )
+    {
+        return setOption( ArtifactRouterOption.offline, offline );
+    }
+
+    private ArtifactRouterConfiguration setOption( ArtifactRouterOption option, boolean enabled )
+    {
+        if ( enabled )
+        {
+            routerOptions.add( option );
+        }
+        else
+        {
+            routerOptions.remove( option );
+        }
+        
+        return this;
+    }
+
+    public boolean isOffline()
+    {
+        return this.routerOptions.contains( ArtifactRouterOption.offline );
+    }
+    
+    public ArtifactRouterConfiguration setClear( boolean clear )
+    {
+        return setOption( ArtifactRouterOption.clear, clear );
+    }
+    
+    public boolean isClear()
+    {
+        return routerOptions.contains( ArtifactRouterOption.clear );
+    }
+
+    public ArtifactRouterConfiguration setUpdate( boolean update )
+    {
+        return setOption( ArtifactRouterOption.update, update );
+    }
+    
+    public boolean isUpdate()
+    {
+        return routerOptions.contains( ArtifactRouterOption.update );
+    }
+
+    public ArtifactRouterConfiguration setOptions( Set<ArtifactRouterOption> routerOptions )
+    {
+        if ( routerOptions.remove( ArtifactRouterOption.unset ) )
+        {
+            this.routerOptions.clear();
+        }
+        
+        this.routerOptions.addAll( routerOptions );
+        
         return this;
     }
 

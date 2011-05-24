@@ -24,7 +24,7 @@ import org.apache.maven.artifact.router.ArtifactRouterException;
 public interface ArtifactRouterDiscoveryStrategy
 {
 
-    String findRouter()
+    DiscoveryResult findRouter()
         throws ArtifactRouterException;
 
 }

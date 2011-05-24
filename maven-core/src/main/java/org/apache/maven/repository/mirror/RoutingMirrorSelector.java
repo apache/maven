@@ -32,15 +32,15 @@ public class RoutingMirrorSelector
     implements MirrorSelector
 {
 
-    private final ArtifactRouter mirrorRouter;
+    private final ArtifactRouter router;
 
     private final DefaultMirrorSelector delegate = new DefaultMirrorSelector();
 
     private final Logger logger;
     
-    public RoutingMirrorSelector( final ArtifactRouter mirrorRouter, final Logger logger )
+    public RoutingMirrorSelector( final ArtifactRouter router, final Logger logger )
     {
-        this.mirrorRouter = mirrorRouter;
+        this.router = router;
         this.logger = logger;
     }
 
@@ -66,7 +66,7 @@ public class RoutingMirrorSelector
         {
             final String repoUrl = repository.getUrl();
 
-            final MirrorRoute route = mirrorRouter.getMirror( repoUrl );
+            final MirrorRoute route = router.getMirror( repoUrl );
 
             if ( route != null )
             {

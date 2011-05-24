@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.router;
+package org.apache.maven.artifact.router.io;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,22 +20,22 @@ package org.apache.maven.artifact.router;
  */
 
 import org.apache.maven.artifact.router.MirrorRoute;
-import org.apache.maven.artifact.router.ArtifactRouteSerializer;
-import org.apache.maven.artifact.router.ArtifactRoutingTables;
+import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
 
 import java.io.StringWriter;
 
 import junit.framework.TestCase;
 
-public class RouterMirrorSerializerTest
+public class ArtifactRouteSerializerTest
     extends TestCase
 {
 
     public void testSerializeOneMirror()
         throws Exception
     {
-        final ArtifactRoutingTables mirrorMap =
-            new ArtifactRoutingTables().addMirror( new MirrorRoute( "central",
+        final ArtifactRouter mirrorMap =
+            new ArtifactRouter().addMirror( new MirrorRoute( "central",
                                                              "http://localhost:8081/nexus", 99, true, "http://repo1.maven.org/maven2" ) );
 
         final StringWriter sw = new StringWriter();
@@ -47,8 +47,8 @@ public class RouterMirrorSerializerTest
     public void testSerializeToStringOneMirror()
         throws Exception
     {
-        final ArtifactRoutingTables mirrorMap =
-            new ArtifactRoutingTables().addMirror( new MirrorRoute( "central",
+        final ArtifactRouter mirrorMap =
+            new ArtifactRouter().addMirror( new MirrorRoute( "central",
                                                              "http://localhost:8081/nexus", 99, true, "http://repo1.maven.org/maven2" ) );
 
         System.out.println( ArtifactRouteSerializer.serializeToString( mirrorMap ) );
@@ -57,12 +57,12 @@ public class RouterMirrorSerializerTest
     public void testRoundTripOneMirror()
         throws Exception
     {
-        final ArtifactRoutingTables mirrorMap =
-            new ArtifactRoutingTables().addMirror( new MirrorRoute( "central",
+        final ArtifactRouter mirrorMap =
+            new ArtifactRouter().addMirror( new MirrorRoute( "central",
                                                              "http://localhost:8081/nexus", 99, true, "http://repo1.maven.org/maven2" ) );
 
         final String ser = ArtifactRouteSerializer.serializeToString( mirrorMap );
-        final ArtifactRoutingTables result = ArtifactRouteSerializer.deserialize( ser );
+        final ArtifactRouter result = ArtifactRouteSerializer.deserialize( ser );
 
         assertEquals( mirrorMap, result );
         assertTrue( result.getMirror( "http://repo1.maven.org/maven2" ).isEnabled() );

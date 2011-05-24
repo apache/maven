@@ -29,7 +29,7 @@ public interface ArtifactRouterLoader
     ArtifactRouter load( ArtifactRouterConfiguration config )
         throws ArtifactRouterException;
     
-    void saveSelectedMirrors( ArtifactRouter router, ArtifactRouterConfiguration config )
+    void save( ArtifactRouter router, ArtifactRouterConfiguration config )
         throws ArtifactRouterException;
 
 }

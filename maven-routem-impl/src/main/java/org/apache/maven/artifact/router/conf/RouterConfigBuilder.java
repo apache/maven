@@ -22,7 +22,7 @@ package org.apache.maven.artifact.router.conf;
 public interface RouterConfigBuilder
 {
 
-    ArtifactRouterConfiguration build( final RouterConfigSource source )
+    ArtifactRouterConfiguration build()
         throws ArtifactRouterConfigurationException;
 
 }
