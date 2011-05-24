@@ -18,6 +18,58 @@ public class MirrorRouteSerializer
     // NOTE: Gson is supposed to be threadsafe, so all this static stuff should be fine.
     private static Gson gson;
 
+    public static void serializeList( final List<MirrorRoute> mirrors, final Writer writer )
+        throws MirrorRouterModelException
+    {
+        try
+        {
+            getGson().toJson( mirrors, writer );
+        }
+        catch ( final JsonParseException e )
+        {
+            throw new MirrorRouterModelException( "Cannot read router-mirrors.", e );
+        }
+    }
+
+    public static String serializeListToString( final List<MirrorRoute> mirrors )
+        throws MirrorRouterModelException
+    {
+        try
+        {
+            return getGson().toJson( mirrors );
+        }
+        catch ( final JsonParseException e )
+        {
+            throw new MirrorRouterModelException( "Cannot read router-mirrors.", e );
+        }
+    }
+
+    public static List<MirrorRoute> deserializeList( final Reader reader )
+        throws MirrorRouterModelException
+    {
+        try
+        {
+            return getGson().fromJson( reader, RepositoryMirrorListCreator.getType() );
+        }
+        catch ( final JsonParseException e )
+        {
+            throw new MirrorRouterModelException( "Cannot read router-mirrors.", e );
+        }
+    }
+
+    public static List<MirrorRoute> deserializeList( final String source )
+        throws MirrorRouterModelException
+    {
+        try
+        {
+            return getGson().fromJson( source, RepositoryMirrorListCreator.getType() );
+        }
+        catch ( final JsonParseException e )
+        {
+            throw new MirrorRouterModelException( "Cannot read router-mirrors.", e );
+        }
+    }
+
     public static void serialize( final MirrorRoutingTable mirrors, final Writer writer )
         throws MirrorRouterModelException
     {

@@ -42,7 +42,7 @@ public class RouterMirrorSerializerTest
         final MirrorRoutingTable result = MirrorRouteSerializer.deserialize( ser );
 
         assertEquals( mirrorMap, result );
-        assertTrue( result.getHighestPriorityMirror( "http://repo1.maven.org/maven2" ).isEnabled() );
+        assertTrue( result.getMirror( "http://repo1.maven.org/maven2" ).isEnabled() );
     }
 
 }

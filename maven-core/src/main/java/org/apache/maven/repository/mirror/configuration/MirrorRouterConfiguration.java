@@ -18,6 +18,8 @@ package org.apache.maven.repository.mirror.configuration;
 
 import org.apache.http.auth.UsernamePasswordCredentials;
 
+import java.io.File;
+
 public class MirrorRouterConfiguration
 {
 
@@ -26,6 +28,8 @@ public class MirrorRouterConfiguration
     public static final String ALL_DISCOVERY_STRATEGIES = "all";
 
     public static final String NO_DISCOVERY_STRATEGIES = "none";
+    
+    private File selectedRoutesFile;
 
     private String routerUrl;
 
@@ -81,6 +85,17 @@ public class MirrorRouterConfiguration
     public MirrorRouterConfiguration setDiscoveryStrategies( final String... strategies )
     {
         discoveryStrategies = strategies;
+        return this;
+    }
+    
+    public File getSelectedRoutesFile()
+    {
+        return selectedRoutesFile;
+    }
+    
+    public MirrorRouterConfiguration setSelectedRoutesFile( File selectedRoutesFile )
+    {
+        this.selectedRoutesFile = selectedRoutesFile;
         return this;
     }
 

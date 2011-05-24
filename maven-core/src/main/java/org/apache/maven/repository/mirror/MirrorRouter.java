@@ -18,10 +18,48 @@
 package org.apache.maven.repository.mirror;
 
 import org.apache.maven.repository.automirror.MirrorRoute;
+import org.apache.maven.repository.automirror.MirrorRoutingTable;
 
-public interface MirrorRouter
+import java.util.Collections;
+import java.util.Map;
+
+public class MirrorRouter
 {
+    
+    private MirrorRoutingTable routingTable;
+    
+    private Map<String, MirrorRoute> selectedRoutes;
+    
+    public MirrorRouter( MirrorRoutingTable routingTable, Map<String, MirrorRoute> selectedRoutes )
+    {
+        this.routingTable = routingTable;
+        this.selectedRoutes = selectedRoutes;
+    }
 
-    MirrorRoute getWeightedRandomSuggestion( final String canonicalUrl );
+    public MirrorRouter()
+    {
+        routingTable = new MirrorRoutingTable();
+        selectedRoutes = Collections.emptyMap();
+    }
+
+    public synchronized MirrorRoute getMirror( String canonicalUrl )
+    {
+        MirrorRoute route = selectedRoutes.get( canonicalUrl );
+        if ( route == null )
+        {
+            route = routingTable.getMirror( canonicalUrl );
+            if ( route != null )
+            {
+                selectedRoutes.put( canonicalUrl, route );
+            }
+        }
+        
+        return route;
+    }
+    
+    public Map<String, MirrorRoute> getSelectedRoutes()
+    {
+        return selectedRoutes;
+    }
 
 }

@@ -15,7 +15,6 @@
 package org.apache.maven.repository.automirror;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,7 @@ public class MirrorRoutingTable
     private final transient Random random = new Random();
 
     private transient Map<String, int[]> indexGrabBags = new HashMap<String, int[]>();
-
+    
     public synchronized MirrorRoutingTable addMirror( final MirrorRoute mirror )
     {
         if ( !mirrors.contains( mirror ) )
@@ -43,31 +42,36 @@ public class MirrorRoutingTable
         return this;
     }
 
-    public MirrorRoute getHighestPriorityMirror( final String canonicalUrl )
+    public synchronized MirrorRoute getMirror( final String canonicalUrl )
     {
-        if ( mirrors.isEmpty() )
-        {
-            return null;
-        }
-
-        final List<MirrorRoute> available = new ArrayList<MirrorRoute>( mirrors );
-
-        // sort by weight.
-        Collections.sort( available );
-
-        for ( final MirrorRoute mirror : available )
-        {
-            // return the highest-priority ENABLED mirror.
-            if ( mirror.isEnabled() && canonicalUrl.equals( mirror.getUrl() ) )
-            {
-                return mirror;
-            }
-        }
-
-        return null;
+        return getWeightedRandomMirror( canonicalUrl );
     }
+    
+//    private MirrorRoute getHighestPriorityMirror( final String canonicalUrl )
+//    {
+//        if ( mirrors.isEmpty() )
+//        {
+//            return null;
+//        }
+//
+//        final List<MirrorRoute> available = new ArrayList<MirrorRoute>( mirrors );
+//
+//        // sort by weight.
+//        Collections.sort( available );
+//
+//        for ( final MirrorRoute mirror : available )
+//        {
+//            // return the highest-priority ENABLED mirror.
+//            if ( mirror.isEnabled() && canonicalUrl.equals( mirror.getUrl() ) )
+//            {
+//                return mirror;
+//            }
+//        }
+//
+//        return null;
+//    }
 
-    public MirrorRoute getWeightedRandomSuggestion( final String canonicalUrl )
+    private MirrorRoute getWeightedRandomMirror( final String canonicalUrl )
     {
         if ( mirrors.isEmpty() )
         {

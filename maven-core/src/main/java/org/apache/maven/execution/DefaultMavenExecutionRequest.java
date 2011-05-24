@@ -29,7 +29,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.automirror.MirrorRoutingTable;
+import org.apache.maven.repository.mirror.MirrorRouter;
+import org.apache.maven.repository.mirror.configuration.MirrorRouterConfiguration;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -186,7 +187,8 @@ public class DefaultMavenExecutionRequest
         copy.setWorkspaceReader( original.getWorkspaceReader() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
-        copy.setMirrorRoutingTable( original.getMirrorRoutingTable() );
+        copy.setMirrorRouter( original.getMirrorRouter() );
+        
         return copy;
     }
 
@@ -1078,22 +1080,22 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    private MirrorRoutingTable mirrorRoutingTable;
+    private MirrorRouter mirrorRouter;
 
-    public synchronized MirrorRoutingTable getMirrorRoutingTable()
+    public synchronized MirrorRouter getMirrorRouter()
     {
-        if ( mirrorRoutingTable == null )
+        if ( mirrorRouter == null )
         {
-            mirrorRoutingTable = new MirrorRoutingTable();
+            mirrorRouter = new MirrorRouter();
         }
 
-        return mirrorRoutingTable;
+        return mirrorRouter;
     }
 
-    public MavenExecutionRequest setMirrorRoutingTable( final MirrorRoutingTable mirrorRoutingTable )
+    public MavenExecutionRequest setMirrorRouter( final MirrorRouter mirrorRouter )
     {
-        this.mirrorRoutingTable = mirrorRoutingTable;
+        this.mirrorRouter = mirrorRouter;
         return this;
     }
-    
+
 }

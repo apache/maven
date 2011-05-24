@@ -51,11 +51,13 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.repository.automirror.MirrorRoutingTable;
+import org.apache.maven.repository.mirror.MirrorRouter;
+import org.apache.maven.repository.mirror.MirrorRouterException;
 import org.apache.maven.repository.mirror.configuration.FileMirrorRouterConfigSource;
 import org.apache.maven.repository.mirror.configuration.MirrorRouterConfigBuilder;
 import org.apache.maven.repository.mirror.configuration.MirrorRouterConfiguration;
 import org.apache.maven.repository.mirror.configuration.MirrorRouterConfigurationException;
-import org.apache.maven.repository.mirror.loader.MirrorRoutingTableLoader;
+import org.apache.maven.repository.mirror.loader.MirrorRouterLoader;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
@@ -124,9 +126,11 @@ public class MavenCli
 
     private MirrorRouterConfigBuilder routerConfBuilder;
     
-    private MirrorRoutingTableLoader routingTableLoader;
+    private MirrorRouterLoader routerLoader;
 
     private DefaultSecDispatcher dispatcher;
+
+    private MirrorRouterConfiguration routerConfig;
 
     public MavenCli()
     {
@@ -426,7 +430,7 @@ public class MavenCli
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
         routerConfBuilder = container.lookup( MirrorRouterConfigBuilder.class );
-        routingTableLoader = container.lookup( MirrorRoutingTableLoader.class );
+        routerLoader = container.lookup( MirrorRouterLoader.class );
         
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
     }
@@ -551,6 +555,15 @@ public class MavenCli
 
         MavenExecutionResult result = maven.execute( cliRequest.request );
 
+        try
+        {
+            routerLoader.saveSelectedMirrors( cliRequest.request.getMirrorRouter(), routerConfig );
+        }
+        catch ( MirrorRouterException e )
+        {
+            result.addException( e );
+        }
+        
         eventSpyDispatcher.onEvent( result );
 
         eventSpyDispatcher.close();
@@ -929,10 +942,10 @@ public class MavenCli
             userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        final MirrorRouterConfiguration routerConfig =
+        routerConfig =
             routerConfBuilder.build( new FileMirrorRouterConfigSource( DEFAULT_USER_EXT_CONF_DIR ) );
         
-        MirrorRoutingTable mirrorRoutingTable = routingTableLoader.load( routerConfig );
+        MirrorRouter mirrorRouter = routerLoader.load( routerConfig );
         
         request.setBaseDirectory( baseDirectory ).setGoals( goals )
             .setSystemProperties( cliRequest.systemProperties )
@@ -948,7 +961,7 @@ public class MavenCli
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setUserToolchainsFile( userToolchainsFile )
-            .setMirrorRoutingTable( mirrorRoutingTable );
+            .setMirrorRouter( mirrorRouter );
 
         if ( alternatePomFile != null )
         {

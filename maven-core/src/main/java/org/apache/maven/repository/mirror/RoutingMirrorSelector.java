@@ -18,7 +18,6 @@
 package org.apache.maven.repository.mirror;
 
 import org.apache.maven.repository.automirror.MirrorRoute;
-import org.apache.maven.repository.automirror.MirrorRoutingTable;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.repository.MirrorSelector;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -30,15 +29,15 @@ public class RoutingMirrorSelector
     implements MirrorSelector
 {
 
-    private final MirrorRoutingTable mirrorRoutingTable;
+    private final MirrorRouter mirrorRouter;
 
     private final DefaultMirrorSelector delegate = new DefaultMirrorSelector();
 
     private final Logger logger;
-
-    public RoutingMirrorSelector( final MirrorRoutingTable mirrorRoutingTable, final Logger logger )
+    
+    public RoutingMirrorSelector( final MirrorRouter mirrorRouter, final Logger logger )
     {
-        this.mirrorRoutingTable = mirrorRoutingTable;
+        this.mirrorRouter = mirrorRouter;
         this.logger = logger;
     }
 
@@ -64,7 +63,7 @@ public class RoutingMirrorSelector
         {
             final String repoUrl = repository.getUrl();
 
-            final MirrorRoute route = mirrorRoutingTable.getWeightedRandomSuggestion( repoUrl );
+            final MirrorRoute route = mirrorRouter.getMirror( repoUrl );
 
             if ( route != null )
             {

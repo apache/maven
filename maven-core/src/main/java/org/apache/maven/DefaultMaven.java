@@ -101,7 +101,6 @@ import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
 import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
 import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
-import org.sonatype.aether.util.repository.DefaultMirrorSelector;
 import org.sonatype.aether.util.repository.DefaultProxySelector;
 
 /**
@@ -325,7 +324,7 @@ public class DefaultMaven
         {
             return processResult( result, session.getResult().getExceptions().get( 0 ) );
         }
-
+        
         return result;
     }
 
@@ -378,7 +377,7 @@ public class DefaultMaven
         }
 
         final RoutingMirrorSelector mirrorSelector =
-            new RoutingMirrorSelector( request.getMirrorRoutingTable(), logger );
+            new RoutingMirrorSelector( request.getMirrorRouter(), logger );
         
         for ( Mirror mirror : request.getMirrors() )
         {
