@@ -33,6 +33,8 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.mirror.RoutingMirrorSelector;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
@@ -58,7 +60,6 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
-import org.apache.maven.repository.mirror.RoutingMirrorSelector;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -331,6 +332,7 @@ public class DefaultMaven
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        session.getData().set( ArtifactRouter.SESSION_KEY, request.getArtifactRouter() );
 
         session.setCache( request.getRepositoryCache() );
 

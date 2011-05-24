@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO: Needs to have a layout field!
 public final class MirrorRoute
     implements Comparable<MirrorRoute>
 {
@@ -183,6 +184,11 @@ public final class MirrorRoute
         }
         
         return mirrorOfUrls.contains( check );
+    }
+
+    public String getLayout()
+    {
+        return "default";
     }
 
 }

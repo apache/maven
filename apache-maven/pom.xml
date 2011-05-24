@@ -60,8 +60,8 @@
       <artifactId>wagon-file</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-connector-wagon</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-routem-aether-wagon-connector</artifactId>
     </dependency>
   </dependencies>
 

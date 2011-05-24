@@ -49,6 +49,7 @@
     <jxpathVersion>1.3</jxpathVersion>
     <aetherVersion>1.11</aetherVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <plexusContainerVersion>1.5.5</plexusContainerVersion>
   </properties>
 
   <mailingLists>
@@ -142,6 +143,7 @@
     <module>maven-compat</module>
     <module>maven-routem-api</module>
     <module>maven-routem-impl</module>
+    <module>maven-routem-aether-wagon-connector</module>
   </modules>
 
   <scm>
@@ -235,6 +237,11 @@
         <artifactId>maven-repository-metadata</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-routem-aether-wagon-connector</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <!--bootstrap-end-comment-->
       <!--  Plexus -->
       <dependency>
@@ -264,6 +271,12 @@
             <artifactId>junit</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-container-default</artifactId>
+        <version>${plexusContainerVersion}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -317,17 +330,6 @@
         <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-util</artifactId>
         <version>${aetherVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.aether</groupId>
-        <artifactId>aether-connector-wagon</artifactId>
-        <version>${aetherVersion}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!--  Commons -->
       <dependency>

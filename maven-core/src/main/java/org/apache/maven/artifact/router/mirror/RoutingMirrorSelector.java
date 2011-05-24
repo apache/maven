@@ -1,4 +1,4 @@
-package org.apache.maven.repository.mirror;
+package org.apache.maven.artifact.router.mirror;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

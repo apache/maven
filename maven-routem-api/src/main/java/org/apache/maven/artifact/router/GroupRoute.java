@@ -28,7 +28,7 @@ import java.util.List;
 public final class GroupRoute
 {
     
-    public static final GroupRoute CENTRAL = new GroupRoute( "http://repo1.maven.org/maven2", new GroupPattern( "*" ) );
+    public static final GroupRoute DEFAULT = new GroupRoute( "http://repo1.maven.org/maven2", new GroupPattern( "*" ) );
 
     private final String canonicalUrl;
     

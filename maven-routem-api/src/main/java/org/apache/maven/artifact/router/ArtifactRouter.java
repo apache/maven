@@ -30,6 +30,8 @@ import java.util.Random;
 public final class ArtifactRouter
 {
 
+    public static final String SESSION_KEY = ArtifactRouter.class.getName();
+
     private List<MirrorRoute> mirrors = new ArrayList<MirrorRoute>();
 
     private Map<GroupPattern, GroupRoute> groups = new HashMap<GroupPattern, GroupRoute>();
@@ -132,7 +134,7 @@ public final class ArtifactRouter
 
         if ( matches.isEmpty() )
         {
-            return GroupRoute.CENTRAL;
+            return GroupRoute.DEFAULT;
         }
         else
         {
