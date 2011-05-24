@@ -84,6 +84,8 @@ public class DefaultMirrorSelector
 
                 mirror = new Mirror();
                 mirror.setMirrorOf( repository.getId() );
+                
+                // FIXME!
                 mirror.setLayout( "default" );
                 mirror.setId( rMirror.getId() );
                 mirror.setUrl( rMirror.getMirrorUrl() );
