@@ -50,12 +50,6 @@ import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
-import org.apache.maven.repository.automirror.MirrorRoutingTable;
-import org.apache.maven.repository.mirror.configuration.FileMirrorRouterConfigSource;
-import org.apache.maven.repository.mirror.configuration.MirrorRouterConfigBuilder;
-import org.apache.maven.repository.mirror.configuration.MirrorRouterConfiguration;
-import org.apache.maven.repository.mirror.configuration.MirrorRouterConfigurationException;
-import org.apache.maven.repository.mirror.loader.MirrorRoutingTableLoader;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
@@ -101,8 +95,6 @@ public class MavenCli
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
-    public static final File DEFAULT_USER_EXT_CONF_DIR = new File( userMavenConfigurationHome, "conf" );
-    
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
     private ClassWorld classWorld;
@@ -121,10 +113,6 @@ public class MavenCli
     private MavenExecutionRequestPopulator executionRequestPopulator;
 
     private SettingsBuilder settingsBuilder;
-
-    private MirrorRouterConfigBuilder routerConfBuilder;
-    
-    private MirrorRoutingTableLoader routingTableLoader;
 
     private DefaultSecDispatcher dispatcher;
 
@@ -425,9 +413,6 @@ public class MavenCli
 
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
-        routerConfBuilder = container.lookup( MirrorRouterConfigBuilder.class );
-        routingTableLoader = container.lookup( MirrorRoutingTableLoader.class );
-        
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
     }
 
@@ -767,7 +752,6 @@ public class MavenCli
     }
 
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
-        throws Exception
     {
         MavenExecutionRequest request = cliRequest.request;
         CommandLine commandLine = cliRequest.commandLine;
@@ -929,11 +913,6 @@ public class MavenCli
             userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        final MirrorRouterConfiguration routerConfig =
-            routerConfBuilder.build( new FileMirrorRouterConfigSource( DEFAULT_USER_EXT_CONF_DIR ) );
-        
-        MirrorRoutingTable mirrorRoutingTable = routingTableLoader.load( routerConfig );
-        
         request.setBaseDirectory( baseDirectory ).setGoals( goals )
             .setSystemProperties( cliRequest.systemProperties )
             .setUserProperties( cliRequest.userProperties )
@@ -947,8 +926,7 @@ public class MavenCli
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setUserToolchainsFile( userToolchainsFile )
-            .setMirrorRoutingTable( mirrorRoutingTable );
+            .setUserToolchainsFile( userToolchainsFile );
 
         if ( alternatePomFile != null )
         {

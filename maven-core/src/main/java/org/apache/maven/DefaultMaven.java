@@ -58,7 +58,6 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
-import org.apache.maven.repository.mirror.RoutingMirrorSelector;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -377,9 +376,7 @@ public class DefaultMaven
             }
         }
 
-        final RoutingMirrorSelector mirrorSelector =
-            new RoutingMirrorSelector( request.getMirrorRoutingTable(), logger );
-        
+        DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
         for ( Mirror mirror : request.getMirrors() )
         {
             mirrorSelector.add( mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),

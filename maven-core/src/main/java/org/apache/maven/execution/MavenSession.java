@@ -33,7 +33,6 @@ import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.automirror.MirrorRoutingTable;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -394,9 +393,4 @@ public class MavenSession
         return repositorySession;
     }
 
-    public MirrorRoutingTable getMirrorRoutingTable()
-    {
-        return request.getMirrorRoutingTable();
-    }
-    
 }
