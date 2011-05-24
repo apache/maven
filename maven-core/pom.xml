@@ -102,6 +102,14 @@
       <artifactId>commons-jxpath</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+    	<groupId>org.apache.maven</groupId>
+    	<artifactId>maven-auto-mirror-model</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

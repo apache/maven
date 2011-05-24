@@ -94,6 +94,8 @@ public class MavenCli
         new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
+    
+    public static final File DEFAULT_USER_EXT_CONF_DIR = new File( userMavenConfigurationHome, "conf" );
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
@@ -926,7 +928,8 @@ public class MavenCli
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setUserToolchainsFile( userToolchainsFile );
+            .setUserToolchainsFile( userToolchainsFile )
+            .setUserExtensionConfDir( MavenCli.DEFAULT_USER_EXT_CONF_DIR );
 
         if ( alternatePomFile != null )
         {
