@@ -25,8 +25,13 @@ import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.repository.automirror.MirrorRoute;
+import org.apache.maven.repository.automirror.MirrorRoutingTable;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
 @Component( role = MirrorSelector.class )
@@ -37,8 +42,65 @@ public class DefaultMirrorSelector
     private static final String WILDCARD = "*";
 
     private static final String EXTERNAL_WILDCARD = "external:*";
+    
+    @Requirement
+    private Logger logger;
+    
+    @Requirement
+    private LegacySupport legacySupport;
 
-    public Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
+    public Mirror getMirror( final ArtifactRepository repository, final List<Mirror> mirrors )
+    {
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "MAVEN-SELECT: " + repository.getUrl() );
+        }
+
+        Mirror mirror = getSettingsMirror( repository, mirrors );
+
+        if ( mirror != null )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "MAVEN-SELECT using mirror from settings.xml." );
+            }
+
+            return mirror;
+        }
+
+        if ( mirror == null )
+        {
+            final String repoUrl = repository.getUrl();
+
+            MirrorRoutingTable routingTable = legacySupport.getSession().getMirrorRoutingTable();
+            final MirrorRoute rMirror = routingTable.getWeightedRandomSuggestion( repoUrl );
+
+            if ( rMirror != null )
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "\t==> " + rMirror );
+                }
+
+                mirror = new Mirror();
+                mirror.setMirrorOf( repository.getId() );
+                mirror.setLayout( "default" );
+                mirror.setId( rMirror.getId() );
+                mirror.setUrl( rMirror.getMirrorUrl() );
+            }
+            else
+            {
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.debug( "MAVEN-SELECT: no auto-mirror found." );
+                }
+            }
+        }
+
+        return mirror;
+    }
+    
+    private Mirror getSettingsMirror( ArtifactRepository repository, List<Mirror> mirrors )
     {
         String repoId = repository.getId();
 
