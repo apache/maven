@@ -33,7 +33,7 @@ public class MirrorRoute
 
     private final String id;
 
-    private final String myUrl;
+    private final String routeUrl;
 
     private final int weight;
 
@@ -46,12 +46,12 @@ public class MirrorRoute
     {
         id = null;
         mirrorOfUrls = Collections.emptySet();
-        myUrl = null;
+        routeUrl = null;
         weight = 0;
         enabled = false;
     }
 
-    public MirrorRoute( final String id, final String myUrl, final int weight,
+    public MirrorRoute( final String id, final String routeUrl, final int weight,
                         final boolean enabled, final String... mirrorOfUrls )
     {
         if ( mirrorOfUrls.length < 1 )
@@ -60,13 +60,13 @@ public class MirrorRoute
         }
         
         this.id = id;
-        this.mirrorOfUrls = toLowerCaseSet( Arrays.asList( mirrorOfUrls ) );
-        this.myUrl = myUrl;
+        this.mirrorOfUrls = normalizeMirrorOfUrls( Arrays.asList( mirrorOfUrls ) );
+        this.routeUrl = routeUrl;
         this.weight = weight;
         this.enabled = enabled;
     }
 
-    public MirrorRoute( final String id, final String myUrl, final int weight,
+    public MirrorRoute( final String id, final String routeUrl, final int weight,
                         final boolean enabled, final Collection<String> mirrorOfUrls )
     {
         if ( mirrorOfUrls.size() < 1 )
@@ -75,18 +75,24 @@ public class MirrorRoute
         }
         
         this.id = id;
-        this.mirrorOfUrls = toLowerCaseSet( mirrorOfUrls );
-        this.myUrl = myUrl;
+        this.mirrorOfUrls = normalizeMirrorOfUrls( mirrorOfUrls );
+        this.routeUrl = routeUrl;
         this.weight = weight;
         this.enabled = enabled;
     }
 
-    private Set<String> toLowerCaseSet( Collection<String> src )
+    private Set<String> normalizeMirrorOfUrls( Collection<String> src )
     {
         Set<String> result = new HashSet<String>( src.size() );
         for ( String srcItem : src )
         {
-            result.add( srcItem.toLowerCase() );
+            String item = srcItem.toLowerCase();
+            if ( item.endsWith( "/" ) )
+            {
+                item = item.substring( 0, item.length() - 1 );
+            }
+            
+            result.add( item );
         }
         
         return result;
@@ -99,7 +105,7 @@ public class MirrorRoute
 
     public String getRouteUrl()
     {
-        return myUrl;
+        return routeUrl;
     }
 
     public int getWeight()
@@ -120,7 +126,7 @@ public class MirrorRoute
     @Override
     public String toString()
     {
-        return "mirror [id: " + id + ", weight: " + weight + ", mirror-of urls: " + join( mirrorOfUrls.iterator(), ", " ) + ", mirror-url: " + myUrl
+        return "mirror [id: " + id + ", weight: " + weight + ", mirror-of urls: " + join( mirrorOfUrls.iterator(), ", " ) + ", route-url: " + routeUrl
                         + ", enabled: " + enabled + "]";
     }
 
@@ -129,7 +135,7 @@ public class MirrorRoute
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( ( myUrl == null ) ? 0 : myUrl.hashCode() );
+        result = prime * result + ( ( routeUrl == null ) ? 0 : routeUrl.hashCode() );
         return result;
     }
 
@@ -149,14 +155,14 @@ public class MirrorRoute
             return false;
         }
         final MirrorRoute other = (MirrorRoute) obj;
-        if ( myUrl == null )
+        if ( routeUrl == null )
         {
-            if ( other.myUrl != null )
+            if ( other.routeUrl != null )
             {
                 return false;
             }
         }
-        else if ( !myUrl.equals( other.myUrl ) )
+        else if ( !routeUrl.equals( other.routeUrl ) )
         {
             return false;
         }
@@ -168,9 +174,15 @@ public class MirrorRoute
         return mirrorOfUrls;
     }
 
-    public boolean isMirrorOf( String canonicalUrl )
+    public boolean isMirrorOf( final String canonicalUrl )
     {
-        return mirrorOfUrls.contains( canonicalUrl.toLowerCase() );
+        String check = canonicalUrl.toLowerCase();
+        if ( check.endsWith( "/" ) )
+        {
+            check = check.substring( 0, check.length() - 1 );
+        }
+        
+        return mirrorOfUrls.contains( check );
     }
 
 }

@@ -19,8 +19,11 @@
     <version>3.0.3-SNAPSHOT</version>
   </parent>
   
-  <artifactId>maven-auto-mirror-model</artifactId>
-  <name>Maven Auto-Mirror Data Model</name>
+  <artifactId>maven-routem-api</artifactId>
+  
+  <name>Maven Route-M API</name>
+  <description>Maven Route-M auto-mirroring data API</description>
+  
   <dependencies>
   	<dependency>
   		<groupId>com.google.code.gson</groupId>

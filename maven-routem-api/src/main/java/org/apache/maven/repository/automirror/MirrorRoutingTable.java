@@ -127,6 +127,11 @@ public class MirrorRoutingTable
             }
         }
 
+        if ( indexGrabBag.length == 0 )
+        {
+            return null;
+        }
+        
         // generate a random number that will correspond to an index stored in the index grab bag.
         int idx = Math.abs( random.nextInt() ) % indexGrabBag.length;
 
