@@ -377,7 +377,7 @@ public class DefaultMaven
         }
 
         final RoutingMirrorSelector mirrorSelector =
-            new RoutingMirrorSelector( request.getMirrorRouter(), logger );
+            new RoutingMirrorSelector( request.getArtifactRouter(), logger );
         
         for ( Mirror mirror : request.getMirrors() )
         {

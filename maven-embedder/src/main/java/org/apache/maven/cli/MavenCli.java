@@ -36,6 +36,12 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.conf.FileRouterConfigSource;
+import org.apache.maven.artifact.router.conf.RouterConfigBuilder;
+import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
+import org.apache.maven.artifact.router.loader.ArtifactRouterLoader;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -50,12 +56,6 @@ import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
-import org.apache.maven.repository.mirror.MirrorRouter;
-import org.apache.maven.repository.mirror.MirrorRouterException;
-import org.apache.maven.repository.mirror.configuration.FileMirrorRouterConfigSource;
-import org.apache.maven.repository.mirror.configuration.MirrorRouterConfigBuilder;
-import org.apache.maven.repository.mirror.configuration.MirrorRouterConfiguration;
-import org.apache.maven.repository.mirror.loader.MirrorRouterLoader;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
@@ -122,13 +122,13 @@ public class MavenCli
 
     private SettingsBuilder settingsBuilder;
 
-    private MirrorRouterConfigBuilder routerConfBuilder;
+    private RouterConfigBuilder routerConfBuilder;
     
-    private MirrorRouterLoader routerLoader;
+    private ArtifactRouterLoader routerLoader;
 
     private DefaultSecDispatcher dispatcher;
 
-    private MirrorRouterConfiguration routerConfig;
+    private ArtifactRouterConfiguration routerConfig;
 
     public MavenCli()
     {
@@ -427,8 +427,8 @@ public class MavenCli
 
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
-        routerConfBuilder = container.lookup( MirrorRouterConfigBuilder.class );
-        routerLoader = container.lookup( MirrorRouterLoader.class );
+        routerConfBuilder = container.lookup( RouterConfigBuilder.class );
+        routerLoader = container.lookup( ArtifactRouterLoader.class );
         
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
     }
@@ -555,9 +555,9 @@ public class MavenCli
 
         try
         {
-            routerLoader.saveSelectedMirrors( cliRequest.request.getMirrorRouter(), routerConfig );
+            routerLoader.saveSelectedMirrors( cliRequest.request.getArtifactRouter(), routerConfig );
         }
-        catch ( MirrorRouterException e )
+        catch ( ArtifactRouterException e )
         {
             result.addException( e );
         }
@@ -941,9 +941,9 @@ public class MavenCli
         }
 
         routerConfig =
-            routerConfBuilder.build( new FileMirrorRouterConfigSource( DEFAULT_USER_EXT_CONF_DIR ) );
+            routerConfBuilder.build( new FileRouterConfigSource( DEFAULT_USER_EXT_CONF_DIR ) );
         
-        MirrorRouter mirrorRouter = routerLoader.load( routerConfig );
+        ArtifactRouter router = routerLoader.load( routerConfig );
         
         request.setBaseDirectory( baseDirectory ).setGoals( goals )
             .setSystemProperties( cliRequest.systemProperties )
@@ -959,7 +959,7 @@ public class MavenCli
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setUserToolchainsFile( userToolchainsFile )
-            .setMirrorRouter( mirrorRouter );
+            .setArtifactRouter( router );
 
         if ( alternatePomFile != null )
         {

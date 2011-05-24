@@ -19,7 +19,8 @@ package org.apache.maven.repository.mirror;
  * under the License.
  */
 
-import org.apache.maven.repository.automirror.MirrorRoute;
+import org.apache.maven.artifact.router.MirrorRoute;
+import org.apache.maven.artifact.router.ArtifactRouter;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.repository.MirrorSelector;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -31,13 +32,13 @@ public class RoutingMirrorSelector
     implements MirrorSelector
 {
 
-    private final MirrorRouter mirrorRouter;
+    private final ArtifactRouter mirrorRouter;
 
     private final DefaultMirrorSelector delegate = new DefaultMirrorSelector();
 
     private final Logger logger;
     
-    public RoutingMirrorSelector( final MirrorRouter mirrorRouter, final Logger logger )
+    public RoutingMirrorSelector( final ArtifactRouter mirrorRouter, final Logger logger )
     {
         this.mirrorRouter = mirrorRouter;
         this.logger = logger;

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>3.0.4-SNAPSHOT</version>
+  </parent>
+  <artifactId>maven-routem-impl</artifactId>
+  <name>Maven Route-M Implementation</name>
+  <description>Maven Route-M artifact-router Implementation</description>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.maven</groupId>
+    	<artifactId>maven-routem-api</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpclient</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.codehaus.plexus</groupId>
+    	<artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+    	<groupId>org.sonatype.sisu</groupId>
+    	<artifactId>sisu-inject-plexus</artifactId>
+    </dependency>
+  </dependencies>
+</project>

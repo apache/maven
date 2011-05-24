@@ -37,7 +37,7 @@
     <classWorldsVersion>2.4</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
-    <junitVersion>3.8.2</junitVersion>
+    <junitVersion>4.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.6</plexusUtilsVersion>
@@ -141,6 +141,7 @@
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>maven-routem-api</module>
+    <module>maven-routem-impl</module>
   </modules>
 
   <scm>
@@ -172,6 +173,11 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-routem-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-routem-impl</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

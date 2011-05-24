@@ -140,7 +140,7 @@
     <module>maven-model-builder</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
-    <module>maven-auto-mirror-model</module>
+    <module>maven-routem-api</module>
   </modules>
 
   <scm>
@@ -171,7 +171,7 @@
       <!--bootstrap-start-comment-->
       <dependency>
         <groupId>org.apache.maven</groupId>
-        <artifactId>maven-auto-mirror-model</artifactId>
+        <artifactId>maven-routem-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -345,7 +345,7 @@
         <version>${jxpathVersion}</version>
       </dependency>
       
-      <!-- START: Used in auto-mirror handling -->
+      <!-- START: Used in Route-M auto-mirror handling -->
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>

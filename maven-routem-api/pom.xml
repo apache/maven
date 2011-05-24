@@ -16,22 +16,22 @@
   <parent>
     <artifactId>maven</artifactId>
     <groupId>org.apache.maven</groupId>
-    <version>3.0.3-SNAPSHOT</version>
+    <version>3.0.4-SNAPSHOT</version>
   </parent>
   
   <artifactId>maven-routem-api</artifactId>
   
   <name>Maven Route-M API</name>
-  <description>Maven Route-M auto-mirroring data API</description>
+  <description>Maven Route-M artifact-routing API</description>
   
   <dependencies>
-  	<dependency>
-  		<groupId>com.google.code.gson</groupId>
-  		<artifactId>gson</artifactId>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.codehaus.plexus</groupId>
-  		<artifactId>plexus-utils</artifactId>
-  	</dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
   </dependencies>
 </project>

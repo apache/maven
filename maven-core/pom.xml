@@ -110,6 +110,10 @@
     	<groupId>org.apache.httpcomponents</groupId>
     	<artifactId>httpclient</artifactId>
     </dependency>
+    <dependency>
+    	<groupId>org.apache.maven</groupId>
+    	<artifactId>maven-routem-impl</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

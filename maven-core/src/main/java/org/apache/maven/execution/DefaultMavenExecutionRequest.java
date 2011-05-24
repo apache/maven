@@ -26,11 +26,10 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.apache.maven.repository.mirror.MirrorRouter;
-import org.apache.maven.repository.mirror.configuration.MirrorRouterConfiguration;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -187,7 +186,7 @@ public class DefaultMavenExecutionRequest
         copy.setWorkspaceReader( original.getWorkspaceReader() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
-        copy.setMirrorRouter( original.getMirrorRouter() );
+        copy.setArtifactRouter( original.getArtifactRouter() );
         
         return copy;
     }
@@ -1080,21 +1079,21 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    private MirrorRouter mirrorRouter;
+    private ArtifactRouter artifactRouter;
 
-    public synchronized MirrorRouter getMirrorRouter()
+    public synchronized ArtifactRouter getArtifactRouter()
     {
-        if ( mirrorRouter == null )
+        if ( artifactRouter == null )
         {
-            mirrorRouter = new MirrorRouter();
+            artifactRouter = new ArtifactRouter();
         }
 
-        return mirrorRouter;
+        return artifactRouter;
     }
 
-    public MavenExecutionRequest setMirrorRouter( final MirrorRouter mirrorRouter )
+    public MavenExecutionRequest setArtifactRouter( final ArtifactRouter mirrorRouter )
     {
-        this.mirrorRouter = mirrorRouter;
+        this.artifactRouter = mirrorRouter;
         return this;
     }
 

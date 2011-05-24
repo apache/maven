@@ -25,9 +25,9 @@ import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.MirrorRoute;
 import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.repository.automirror.MirrorRoute;
-import org.apache.maven.repository.mirror.MirrorRouter;
 import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -75,7 +75,7 @@ public class DefaultMirrorSelector
         {
             final String repoUrl = repository.getUrl();
 
-            MirrorRouter routingTable = legacySupport.getSession().getMirrorRouter();
+            ArtifactRouter routingTable = legacySupport.getSession().getMirrorRouter();
             final MirrorRoute rMirror = routingTable.getMirror( repoUrl );
 
             if ( rMirror != null )
