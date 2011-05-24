@@ -68,7 +68,10 @@ public class DefaultMirrorSelector
             return mirror;
         }
 
-        if ( mirror == null )
+        // FIXME: I suspect we need a better approach than simply punting when the session hasn't 
+        // been set. This will nullify the mirror selection taking place in the 
+        // DefaultMavenExecutionRequestPopulator.
+        if ( mirror == null && legacySupport.getSession() != null )
         {
             final String repoUrl = repository.getUrl();
 

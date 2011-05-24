@@ -58,6 +58,10 @@
       <artifactId>maven-aether-provider</artifactId>
     </dependency>
     <dependency>
+    	<groupId>org.apache.maven</groupId>
+    	<artifactId>maven-routem-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
       <version>${aetherVersion}</version>
@@ -101,10 +105,6 @@
       <groupId>commons-jxpath</groupId>
       <artifactId>commons-jxpath</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-    	<groupId>org.apache.maven</groupId>
-    	<artifactId>maven-auto-mirror-model</artifactId>
     </dependency>
     <dependency>
     	<groupId>org.apache.httpcomponents</groupId>
