@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.repository.automirror.MirrorRoutingTable;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -341,8 +342,21 @@ public interface MavenExecutionRequest
 
     ProjectBuildingRequest getProjectBuildingRequest();
 
-    File getUserExtensionConfDir();
+    /**
+     * List of mirrors, URLs they mirror, weight for each mirror, whether it's disabled, etc. This is used to select a
+     * mirror for a particular repository URL.
+     * 
+     * @return The routing table instance for use in this build. Never {@code null}.
+     */
+    MirrorRoutingTable getMirrorRoutingTable();
 
-    MavenExecutionRequest setUserExtensionConfDir( File extensionConfDir );
+    /**
+     * Set the list of mirrors, urls they mirror, weight for each mirror, whether it's disabled, etc.
+     * 
+     * @param routingTable
+     *            The {@link MirrorRoutingTable} to use for the current build.
+     * @return This request, never {@code null}.
+     */
+    MavenExecutionRequest setMirrorRoutingTable( MirrorRoutingTable routingTable );
 
 }

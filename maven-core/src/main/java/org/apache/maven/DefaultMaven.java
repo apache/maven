@@ -15,22 +15,6 @@ package org.apache.maven;
  * the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -58,6 +42,7 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
+import org.apache.maven.repository.mirror.RoutingMirrorSelector;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -93,20 +78,35 @@ import org.sonatype.aether.util.graph.selector.ExclusionDependencySelector;
 import org.sonatype.aether.util.graph.selector.OptionalDependencySelector;
 import org.sonatype.aether.util.graph.selector.ScopeDependencySelector;
 import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
 import org.sonatype.aether.util.graph.transformer.ConflictMarker;
 import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
+import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
 import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
 import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
 import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
-import org.sonatype.aether.util.repository.DefaultMirrorSelector;
 import org.sonatype.aether.util.repository.DefaultProxySelector;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @author Jason van Zyl
  */
-@Component(role = Maven.class)
+@Component( role = Maven.class )
 public class DefaultMaven
     implements Maven
 {
@@ -147,7 +147,7 @@ public class DefaultMaven
     @Requirement
     private EventSpyDispatcher eventSpyDispatcher;
 
-    public MavenExecutionResult execute( MavenExecutionRequest request )
+    public MavenExecutionResult execute( final MavenExecutionRequest request )
     {
         MavenExecutionResult result;
 
@@ -155,15 +155,15 @@ public class DefaultMaven
         {
             result = doExecute( populator.populateDefaults( request ) );
         }
-        catch ( OutOfMemoryError e )
+        catch ( final OutOfMemoryError e )
         {
             result = processResult( new DefaultMavenExecutionResult(), e );
         }
-        catch ( MavenExecutionRequestPopulationException e )
+        catch ( final MavenExecutionRequestPopulationException e )
         {
             result = processResult( new DefaultMavenExecutionResult(), e );
         }
-        catch ( RuntimeException e )
+        catch ( final RuntimeException e )
         {
             result =
                 processResult( new DefaultMavenExecutionResult(),
@@ -177,46 +177,48 @@ public class DefaultMaven
         return result;
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored"})
-    private MavenExecutionResult doExecute( MavenExecutionRequest request )
+    @SuppressWarnings( { "ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored" } )
+    private MavenExecutionResult doExecute( final MavenExecutionRequest request )
     {
-        //TODO: Need a general way to inject standard properties
+        // TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
-            request.getSystemProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
-        }        
-        
+            request.getSystemProperties()
+                   .put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
+        }
+
         request.setStartTime( new Date() );
-        
-        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+        final MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try
         {
             validateLocalRepository( request );
         }
-        catch ( LocalRepositoryNotAccessibleException e )
+        catch ( final LocalRepositoryNotAccessibleException e )
         {
             return processResult( result, e );
         }
 
-        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
+        final DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
             new DelegatingLocalArtifactRepository( request.getLocalRepository() );
-        
-        request.setLocalRepository( delegatingLocalArtifactRepository );        
 
-        DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
+        request.setLocalRepository( delegatingLocalArtifactRepository );
 
-        MavenSession session = new MavenSession( container, repoSession, request, result );
+        final DefaultRepositorySystemSession repoSession =
+            (DefaultRepositorySystemSession) newRepositorySession( request );
+
+        final MavenSession session = new MavenSession( container, repoSession, request, result );
         legacySupport.setSession( session );
 
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject> emptyList() ) )
+            for ( final AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject> emptyList() ) )
             {
                 listener.afterSessionStart( session );
             }
         }
-        catch ( MavenExecutionException e )
+        catch ( final MavenExecutionException e )
         {
             return processResult( result, e );
         }
@@ -225,14 +227,14 @@ public class DefaultMaven
 
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
-        //TODO: optimize for the single project or no project
-        
+        // TODO: optimize for the single project or no project
+
         List<MavenProject> projects;
         try
         {
-            projects = getProjectsForMavenReactor( request );                                                
+            projects = getProjectsForMavenReactor( request );
         }
-        catch ( ProjectBuildingException e )
+        catch ( final ProjectBuildingException e )
         {
             return processResult( result, e );
         }
@@ -240,40 +242,40 @@ public class DefaultMaven
         session.setProjects( projects );
 
         result.setTopologicallySortedProjects( session.getProjects() );
-        
+
         result.setProject( session.getTopLevelProject() );
 
         try
         {
             Map<String, MavenProject> projectMap;
             projectMap = getProjectMap( session.getProjects() );
-    
+
             // Desired order of precedence for local artifact repositories
             //
             // Reactor
             // Workspace
             // User Local Repository
-            ReactorReader reactorRepository = new ReactorReader( projectMap );
+            final ReactorReader reactorRepository = new ReactorReader( projectMap );
 
             repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorRepository,
                                                                                 repoSession.getWorkspaceReader() ) );
         }
-        catch ( org.apache.maven.DuplicateProjectException e )
+        catch ( final org.apache.maven.DuplicateProjectException e )
         {
             return processResult( result, e );
         }
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( projects ) )
+            for ( final AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( projects ) )
             {
                 Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
 
                 listener.afterProjectsRead( session );
             }
         }
-        catch ( MavenExecutionException e )
+        catch ( final MavenExecutionException e )
         {
             return processResult( result, e );
         }
@@ -284,27 +286,27 @@ public class DefaultMaven
 
         try
         {
-            ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
+            final ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
 
-            ProjectDependencyGraph projectDependencyGraph = createDependencyGraph( projectSorter, request );
+            final ProjectDependencyGraph projectDependencyGraph = createDependencyGraph( projectSorter, request );
 
             session.setProjects( projectDependencyGraph.getSortedProjects() );
 
             session.setProjectDependencyGraph( projectDependencyGraph );
         }
-        catch ( CycleDetectedException e )
-        {            
-            String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
+        catch ( final CycleDetectedException e )
+        {
+            final String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
 
-            ProjectCycleException error = new ProjectCycleException( message, e );
+            final ProjectCycleException error = new ProjectCycleException( message, e );
 
             return processResult( result, error );
         }
-        catch ( DuplicateProjectException e )
+        catch ( final DuplicateProjectException e )
         {
             return processResult( result, e );
         }
-        catch ( MavenExecutionException e )
+        catch ( final MavenExecutionException e )
         {
             return processResult( result, e );
         }
@@ -328,15 +330,15 @@ public class DefaultMaven
         return result;
     }
 
-    public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
+    public RepositorySystemSession newRepositorySession( final MavenExecutionRequest request )
     {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        final DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
 
         session.setCache( request.getRepositoryCache() );
 
         session.setIgnoreInvalidArtifactDescriptor( true ).setIgnoreMissingArtifactDescriptor( true );
 
-        Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
+        final Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, Boolean.valueOf( request.isInteractiveMode() ) );
         configProps.putAll( request.getSystemProperties() );
@@ -351,7 +353,7 @@ public class DefaultMaven
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
-        LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
+        final LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
         session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
 
         if ( request.getWorkspaceReader() != null )
@@ -363,57 +365,61 @@ public class DefaultMaven
             session.setWorkspaceReader( workspaceRepository );
         }
 
-        DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
+        final DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
         decrypt.setProxies( request.getProxies() );
         decrypt.setServers( request.getServers() );
-        SettingsDecryptionResult decrypted = settingsDecrypter.decrypt( decrypt );
+        final SettingsDecryptionResult decrypted = settingsDecrypter.decrypt( decrypt );
 
         if ( logger.isDebugEnabled() )
         {
-            for ( SettingsProblem problem : decrypted.getProblems() )
+            for ( final SettingsProblem problem : decrypted.getProblems() )
             {
                 logger.debug( problem.getMessage(), problem.getException() );
             }
         }
 
-        DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
-        for ( Mirror mirror : request.getMirrors() )
+        final RoutingMirrorSelector mirrorSelector =
+            new RoutingMirrorSelector( request.getMirrorRoutingTable(), logger );
+        
+        for ( final Mirror mirror : request.getMirrors() )
         {
             mirrorSelector.add( mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),
                                 mirror.getMirrorOfLayouts() );
         }
+        
         session.setMirrorSelector( mirrorSelector );
 
-        DefaultProxySelector proxySelector = new DefaultProxySelector();
-        for ( Proxy proxy : decrypted.getProxies() )
+        final DefaultProxySelector proxySelector = new DefaultProxySelector();
+        for ( final Proxy proxy : decrypted.getProxies() )
         {
-            Authentication proxyAuth = new Authentication( proxy.getUsername(), proxy.getPassword() );
-            proxySelector.add( new org.sonatype.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
-                                                                proxyAuth ), proxy.getNonProxyHosts() );
+            final Authentication proxyAuth = new Authentication( proxy.getUsername(), proxy.getPassword() );
+            proxySelector.add( new org.sonatype.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
+                                                                         proxy.getPort(), proxyAuth ),
+                               proxy.getNonProxyHosts() );
         }
         session.setProxySelector( proxySelector );
 
-        DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
-        for ( Server server : decrypted.getServers() )
+        final DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
+        for ( final Server server : decrypted.getServers() )
         {
-            Authentication auth =
+            final Authentication auth =
                 new Authentication( server.getUsername(), server.getPassword(), server.getPrivateKey(),
                                     server.getPassphrase() );
             authSelector.add( server.getId(), auth );
 
             if ( server.getConfiguration() != null )
             {
-                Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
+                final Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
                 for ( int i = dom.getChildCount() - 1; i >= 0; i-- )
                 {
-                    Xpp3Dom child = dom.getChild( i );
+                    final Xpp3Dom child = dom.getChild( i );
                     if ( "wagonProvider".equals( child.getName() ) )
                     {
                         dom.removeChild( i );
                     }
                 }
 
-                XmlPlexusConfiguration config = new XmlPlexusConfiguration( dom );
+                final XmlPlexusConfiguration config = new XmlPlexusConfiguration( dom );
                 configProps.put( "aether.connector.wagon.config." + server.getId(), config );
             }
 
@@ -422,18 +428,18 @@ public class DefaultMaven
         }
         session.setAuthenticationSelector( authSelector );
 
-        DependencyTraverser depTraverser = new FatArtifactTraverser();
+        final DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser( depTraverser );
 
-        DependencyManager depManager = new ClassicDependencyManager();
+        final DependencyManager depManager = new ClassicDependencyManager();
         session.setDependencyManager( depManager );
 
-        DependencySelector depFilter =
-            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ), new OptionalDependencySelector(),
-                                     new ExclusionDependencySelector() );
+        final DependencySelector depFilter =
+            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
+                                       new OptionalDependencySelector(), new ExclusionDependencySelector() );
         session.setDependencySelector( depFilter );
 
-        DependencyGraphTransformer transformer =
+        final DependencyGraphTransformer transformer =
             new ChainedDependencyGraphTransformer( new ConflictMarker(), new JavaEffectiveScopeCalculator(),
                                                    new NearestVersionConflictResolver(),
                                                    new JavaDependencyContextRefiner() );
@@ -452,7 +458,7 @@ public class DefaultMaven
 
     private String getUserAgent()
     {
-        StringBuilder buffer = new StringBuilder( 128 );
+        final StringBuilder buffer = new StringBuilder( 128 );
 
         buffer.append( "Apache-Maven/" ).append( getMavenVersion() );
         buffer.append( " (" );
@@ -466,16 +472,17 @@ public class DefaultMaven
 
     private String getMavenVersion()
     {
-        Properties props = new Properties();
+        final Properties props = new Properties();
 
-        InputStream is = getClass().getResourceAsStream( "/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
+        final InputStream is =
+            getClass().getResourceAsStream( "/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
         if ( is != null )
         {
             try
             {
                 props.load( is );
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
                 logger.debug( "Failed to read Maven version", e );
             }
@@ -485,11 +492,11 @@ public class DefaultMaven
         return props.getProperty( "version", "unknown-version" );
     }
 
-    @SuppressWarnings({"ResultOfMethodCallIgnored"})
-    private void validateLocalRepository( MavenExecutionRequest request )
+    @SuppressWarnings( { "ResultOfMethodCallIgnored" } )
+    private void validateLocalRepository( final MavenExecutionRequest request )
         throws LocalRepositoryNotAccessibleException
     {
-        File localRepoDir = request.getLocalRepositoryPath();
+        final File localRepoDir = request.getLocalRepositoryPath();
 
         logger.debug( "Using local repository at " + localRepoDir );
 
@@ -501,29 +508,29 @@ public class DefaultMaven
         }
     }
 
-    private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
+    private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( final Collection<MavenProject> projects )
     {
-        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
+        final Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
             new LinkedHashSet<AbstractMavenLifecycleParticipant>();
 
-        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
             try
             {
                 lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
             }
-            catch ( ComponentLookupException e )
+            catch ( final ComponentLookupException e )
             {
                 // this is just silly, lookupList should return an empty list!
                 logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
             }
 
-            Collection<ClassLoader> scannedRealms = new HashSet<ClassLoader>();
+            final Collection<ClassLoader> scannedRealms = new HashSet<ClassLoader>();
 
-            for ( MavenProject project : projects )
+            for ( final MavenProject project : projects )
             {
-                ClassLoader projectRealm = project.getClassRealm();
+                final ClassLoader projectRealm = project.getClassRealm();
 
                 if ( projectRealm != null && scannedRealms.add( projectRealm ) )
                 {
@@ -533,7 +540,7 @@ public class DefaultMaven
                     {
                         lifecycleListeners.addAll( container.lookupList( AbstractMavenLifecycleParticipant.class ) );
                     }
-                    catch ( ComponentLookupException e )
+                    catch ( final ComponentLookupException e )
                     {
                         // this is just silly, lookupList should return an empty list!
                         logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
@@ -549,7 +556,7 @@ public class DefaultMaven
         return lifecycleListeners;
     }
 
-    private MavenExecutionResult processResult( MavenExecutionResult result, Throwable e )
+    private MavenExecutionResult processResult( final MavenExecutionResult result, final Throwable e )
     {
         if ( !result.getExceptions().contains( e ) )
         {
@@ -558,41 +565,43 @@ public class DefaultMaven
 
         return result;
     }
-    
-    private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
+
+    private List<MavenProject> getProjectsForMavenReactor( final MavenExecutionRequest request )
         throws ProjectBuildingException
     {
-        List<MavenProject> projects =  new ArrayList<MavenProject>();
+        final List<MavenProject> projects = new ArrayList<MavenProject>();
 
         // We have no POM file.
         //
         if ( request.getPom() == null )
         {
-            ModelSource modelSource = new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
-            MavenProject project =
+            final ModelSource modelSource =
+                new UrlModelSource( DefaultMaven.class.getResource( "project/standalone.xml" ) );
+            final MavenProject project =
                 projectBuilder.build( modelSource, request.getProjectBuildingRequest() ).getProject();
             project.setExecutionRoot( true );
             projects.add( project );
             request.setProjectPresent( false );
             return projects;
         }
-        
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );        
+
+        final List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
         collectProjects( projects, files, request );
         return projects;
     }
 
-    private Map<String, MavenProject> getProjectMap( List<MavenProject> projects )
+    private Map<String, MavenProject> getProjectMap( final List<MavenProject> projects )
         throws org.apache.maven.DuplicateProjectException
     {
-        Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
-        Map<String, List<File>> collisions = new LinkedHashMap<String, List<File>>();
+        final Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
+        final Map<String, List<File>> collisions = new LinkedHashMap<String, List<File>>();
 
-        for ( MavenProject project : projects )
+        for ( final MavenProject project : projects )
         {
-            String projectId = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+            final String projectId =
+                ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
 
-            MavenProject collision = index.get( projectId );
+            final MavenProject collision = index.get( projectId );
 
             if ( collision == null )
             {
@@ -617,23 +626,25 @@ public class DefaultMaven
         if ( !collisions.isEmpty() )
         {
             throw new org.apache.maven.DuplicateProjectException( "Two or more projects in the reactor"
-                + " have the same identifier, please make sure that <groupId>:<artifactId>:<version>"
-                + " is unique for each project: " + collisions, collisions );
+                            + " have the same identifier, please make sure that <groupId>:<artifactId>:<version>"
+                            + " is unique for each project: " + collisions, collisions );
         }
 
         return index;
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+    private void collectProjects( final List<MavenProject> projects, final List<File> files,
+                                  final MavenExecutionRequest request )
         throws ProjectBuildingException
     {
-        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
+        final ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
+        final List<ProjectBuildingResult> results =
+            projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
 
         boolean problems = false;
 
-        for ( ProjectBuildingResult result : results )
+        for ( final ProjectBuildingResult result : results )
         {
             projects.add( result.getProject() );
 
@@ -641,11 +652,11 @@ public class DefaultMaven
             {
                 logger.warn( "" );
                 logger.warn( "Some problems were encountered while building the effective model for "
-                    + result.getProject().getId() );
+                                + result.getProject().getId() );
 
-                for ( ModelProblem problem : result.getProblems() )
+                for ( final ModelProblem problem : result.getProblems() )
                 {
-                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
+                    final String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
                     logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
                 }
 
@@ -657,30 +668,30 @@ public class DefaultMaven
         {
             logger.warn( "" );
             logger.warn( "It is highly recommended to fix these problems"
-                + " because they threaten the stability of your build." );
+                            + " because they threaten the stability of your build." );
             logger.warn( "" );
             logger.warn( "For this reason, future Maven versions might no"
-                + " longer support building such malformed projects." );
+                            + " longer support building such malformed projects." );
             logger.warn( "" );
         }
     }
 
-    private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
+    private void validateActivatedProfiles( final List<MavenProject> projects, final List<String> activeProfileIds )
     {
-        Collection<String> notActivatedProfileIds = new LinkedHashSet<String>( activeProfileIds );
+        final Collection<String> notActivatedProfileIds = new LinkedHashSet<String>( activeProfileIds );
 
-        for ( MavenProject project : projects )
+        for ( final MavenProject project : projects )
         {
-            for ( List<String> profileIds : project.getInjectedProfileIds().values() )
+            for ( final List<String> profileIds : project.getInjectedProfileIds().values() )
             {
                 notActivatedProfileIds.removeAll( profileIds );
             }
         }
 
-        for ( String notActivatedProfileId : notActivatedProfileIds )
+        for ( final String notActivatedProfileId : notActivatedProfileIds )
         {
             logger.warn( "The requested profile \"" + notActivatedProfileId
-                + "\" could not be activated because it does not exist." );
+                            + "\" could not be activated because it does not exist." );
         }
     }
 
@@ -689,7 +700,8 @@ public class DefaultMaven
         return logger;
     }
 
-    private ProjectDependencyGraph createDependencyGraph( ProjectSorter sorter, MavenExecutionRequest request )
+    private ProjectDependencyGraph createDependencyGraph( final ProjectSorter sorter,
+                                                          final MavenExecutionRequest request )
         throws MavenExecutionException
     {
         ProjectDependencyGraph graph = new DefaultProjectDependencyGraph( sorter );
@@ -707,8 +719,9 @@ public class DefaultMaven
         return graph;
     }
 
-    private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
-                                                     MavenExecutionRequest request )
+    private List<MavenProject> trimSelectedProjects( final List<MavenProject> projects,
+                                                     final ProjectDependencyGraph graph,
+                                                     final MavenExecutionRequest request )
         throws MavenExecutionException
     {
         List<MavenProject> result = projects;
@@ -721,13 +734,13 @@ public class DefaultMaven
                 reactorDirectory = new File( request.getBaseDirectory() );
             }
 
-            Collection<MavenProject> selectedProjects = new LinkedHashSet<MavenProject>( projects.size() );
+            final Collection<MavenProject> selectedProjects = new LinkedHashSet<MavenProject>( projects.size() );
 
-            for ( String selector : request.getSelectedProjects() )
+            for ( final String selector : request.getSelectedProjects() )
             {
                 MavenProject selectedProject = null;
 
-                for ( MavenProject project : projects )
+                for ( final MavenProject project : projects )
                 {
                     if ( isMatchingProject( project, selector, reactorDirectory ) )
                     {
@@ -743,7 +756,7 @@ public class DefaultMaven
                 else
                 {
                     throw new MavenExecutionException( "Could not find the selected project in the reactor: "
-                        + selector, request.getPom() );
+                                    + selector, request.getPom() );
                 }
             }
 
@@ -771,7 +784,7 @@ public class DefaultMaven
 
             if ( makeUpstream || makeDownstream )
             {
-                for ( MavenProject selectedProject : new ArrayList<MavenProject>( selectedProjects ) )
+                for ( final MavenProject selectedProject : new ArrayList<MavenProject>( selectedProjects ) )
                 {
                     if ( makeUpstream )
                     {
@@ -786,7 +799,7 @@ public class DefaultMaven
 
             result = new ArrayList<MavenProject>( selectedProjects.size() );
 
-            for ( MavenProject project : projects )
+            for ( final MavenProject project : projects )
             {
                 if ( selectedProjects.contains( project ) )
                 {
@@ -798,7 +811,8 @@ public class DefaultMaven
         return result;
     }
 
-    private List<MavenProject> trimResumedProjects( List<MavenProject> projects, MavenExecutionRequest request )
+    private List<MavenProject> trimResumedProjects( final List<MavenProject> projects,
+                                                    final MavenExecutionRequest request )
         throws MavenExecutionException
     {
         List<MavenProject> result = projects;
@@ -811,13 +825,13 @@ public class DefaultMaven
                 reactorDirectory = new File( request.getBaseDirectory() );
             }
 
-            String selector = request.getResumeFrom();
+            final String selector = request.getResumeFrom();
 
             result = new ArrayList<MavenProject>( projects.size() );
 
             boolean resumed = false;
 
-            for ( MavenProject project : projects )
+            for ( final MavenProject project : projects )
             {
                 if ( !resumed && isMatchingProject( project, selector, reactorDirectory ) )
                 {
@@ -833,14 +847,14 @@ public class DefaultMaven
             if ( !resumed )
             {
                 throw new MavenExecutionException( "Could not find project to resume reactor build from: " + selector
-                    + " vs " + projects, request.getPom() );
+                                + " vs " + projects, request.getPom() );
             }
         }
 
         return result;
     }
 
-    private boolean isMatchingProject( MavenProject project, String selector, File reactorDirectory )
+    private boolean isMatchingProject( final MavenProject project, final String selector, final File reactorDirectory )
     {
         // [groupId]:artifactId
         if ( selector.indexOf( ':' ) >= 0 )
@@ -863,7 +877,7 @@ public class DefaultMaven
         // relative path, e.g. "sub", "../sub" or "."
         else if ( reactorDirectory != null )
         {
-            File selectedProject = new File( new File( reactorDirectory, selector ).toURI().normalize() );
+            final File selectedProject = new File( new File( reactorDirectory, selector ).toURI().normalize() );
 
             if ( selectedProject.isFile() )
             {
