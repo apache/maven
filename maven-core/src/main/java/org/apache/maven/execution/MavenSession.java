@@ -394,7 +394,7 @@ public class MavenSession
         return repositorySession;
     }
 
-    public ArtifactRouter getMirrorRouter()
+    public ArtifactRouter getArtifactRouter()
     {
         return request.getArtifactRouter();
     }

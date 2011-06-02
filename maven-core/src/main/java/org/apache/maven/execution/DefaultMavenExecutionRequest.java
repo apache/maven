@@ -19,14 +19,9 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -37,6 +32,12 @@ import org.sonatype.aether.RepositoryCache;
 import org.sonatype.aether.repository.WorkspaceReader;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.aether.util.DefaultRepositoryCache;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * @author Jason van Zyl
@@ -1081,6 +1082,8 @@ public class DefaultMavenExecutionRequest
 
     private ArtifactRouter artifactRouter;
 
+    private ArtifactRouterConfiguration artifactRouterConfig;
+
     public synchronized ArtifactRouter getArtifactRouter()
     {
         if ( artifactRouter == null )
@@ -1091,10 +1094,21 @@ public class DefaultMavenExecutionRequest
         return artifactRouter;
     }
 
-    public MavenExecutionRequest setArtifactRouter( final ArtifactRouter mirrorRouter )
+    public MavenExecutionRequest setArtifactRouter( final ArtifactRouter artifactRouter )
     {
-        this.artifactRouter = mirrorRouter;
+        this.artifactRouter = artifactRouter;
         return this;
+    }
+
+    public MavenExecutionRequest setArtifactRouterConfiguration( ArtifactRouterConfiguration artifactRouterConfig )
+    {
+        this.artifactRouterConfig = artifactRouterConfig;
+        return this;
+    }
+
+    public ArtifactRouterConfiguration getArtifactRouterConfiguration()
+    {
+        return artifactRouterConfig;
     }
 
 }

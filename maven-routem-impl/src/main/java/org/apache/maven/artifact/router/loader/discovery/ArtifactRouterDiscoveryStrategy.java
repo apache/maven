@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.maven.artifact.router;
+package org.apache.maven.artifact.router.loader.discovery;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -38,20 +38,14 @@ package org.apache.maven.artifact.router;
  * under the License.
  */
 
-public class ArtifactRouterException
-    extends Exception
+import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.session.ArtifactRouterSession;
+
+public interface ArtifactRouterDiscoveryStrategy
 {
 
-    private static final long serialVersionUID = 1L;
-
-    public ArtifactRouterException( final String message, final Throwable cause )
-    {
-        super( message, cause );
-    }
-
-    public ArtifactRouterException( final String message )
-    {
-        super( message );
-    }
+    ArtifactRouter findRouter( final ArtifactRouterSession session )
+        throws ArtifactRouterException;
 
 }

@@ -1,3 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.maven.artifact.router.conf;
 
 /*
@@ -19,18 +38,17 @@ package org.apache.maven.artifact.router.conf;
  * under the License.
  */
 
-import org.apache.http.auth.UsernamePasswordCredentials;
-
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public final class ArtifactRouterConfiguration
 {
 
-    private static final String CANONICAL_MIRRORS_URL = "http://repository.apache.org/router/mirrors.json";
-
-    private static final String CANONICAL_GROUPS_URL = "http://repository.apache.org/router/groups.json";
+    private static final RouterSource CANONICAL_SOURCE = new RouterSource( "default", "http://repository.apache.org/router/routes.json" );
 
     public static final String ALL_DISCOVERY_STRATEGIES = "all";
 
@@ -38,53 +56,35 @@ public final class ArtifactRouterConfiguration
     
     private File routesFile;
 
-    private String routerMirrorsUrl;
-
-    private UsernamePasswordCredentials routerCredentials;
-
     private boolean disabled = false;
 
     private String[] discoveryStrategies = { ALL_DISCOVERY_STRATEGIES };
 
-    private String routerGroupsUrl;
-
     private final Set<ArtifactRouterOption> routerOptions = new HashSet<ArtifactRouterOption>();
+    
+    private final List<RouterSource> routerSources = new ArrayList<RouterSource>();
     
     public ArtifactRouterConfiguration()
     {
         setUpdate( true );
     }
-
-    public ArtifactRouterConfiguration setRouterCredentials( final String user, final String password )
+    
+    public ArtifactRouterConfiguration addSource( String id, String url, String username, String password )
     {
-        routerCredentials = new UsernamePasswordCredentials( user, password );
+        routerSources.add( new RouterSource( id, url, username, password ) );
         return this;
-    }
-
-    public UsernamePasswordCredentials getRouterCredentials()
-    {
-        return routerCredentials;
-    }
-
-    public ArtifactRouterConfiguration setRouterMirrorsUrl( final String routerMirrorsUrl )
-    {
-        this.routerMirrorsUrl = routerMirrorsUrl;
-        return this;
-    }
-
-    public String getRouterMirrorsUrl()
-    {
-        return routerMirrorsUrl;
-    }
-
-    public void setRouterGroupsUrl( String routerGroupsUrl )
-    {
-        this.routerGroupsUrl = routerGroupsUrl;
     }
     
-    public String getRouterGroupsUrl()
+    public List<RouterSource> getSources()
     {
-        return routerGroupsUrl;
+        if ( routerSources.isEmpty() )
+        {
+            return Collections.singletonList( CANONICAL_SOURCE );
+        }
+        else
+        {
+            return routerSources;
+        }
     }
 
     public boolean isDisabled()
@@ -96,16 +96,6 @@ public final class ArtifactRouterConfiguration
     {
         this.disabled = disabled;
         return this;
-    }
-
-    public String getCanonicalMirrorsUrl()
-    {
-        return CANONICAL_MIRRORS_URL;
-    }
-
-    public String getCanonicalGroupsUrl()
-    {
-        return CANONICAL_GROUPS_URL;
     }
 
     public String[] getDiscoveryStrategies()

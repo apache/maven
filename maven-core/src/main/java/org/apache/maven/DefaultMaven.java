@@ -34,7 +34,11 @@ import java.util.Properties;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.loader.ArtifactRouterLoader;
 import org.apache.maven.artifact.router.mirror.RoutingMirrorSelector;
+import org.apache.maven.artifact.router.session.ArtifactRouterSession;
+import org.apache.maven.artifact.router.session.DefaultArtifactRouterSession;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
@@ -147,6 +151,9 @@ public class DefaultMaven
 
     @Requirement
     private EventSpyDispatcher eventSpyDispatcher;
+    
+    @Requirement
+    private ArtifactRouterLoader artifactRouterLoader;
 
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
@@ -332,7 +339,6 @@ public class DefaultMaven
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
-        session.getData().set( ArtifactRouter.SESSION_KEY, request.getArtifactRouter() );
 
         session.setCache( request.getRepositoryCache() );
 
@@ -378,6 +384,24 @@ public class DefaultMaven
             }
         }
 
+        if ( request.getArtifactRouter() == null )
+        {
+            ArtifactRouterSession routerSession =
+                new DefaultArtifactRouterSession( request.getArtifactRouterConfiguration(), decrypted.getServers(),
+                                                  decrypted.getProxies() );
+            
+            try
+            {
+                request.setArtifactRouter( artifactRouterLoader.load( routerSession ) );
+            }
+            catch ( ArtifactRouterException e )
+            {
+                logger.debug( e.getMessage(), e );
+            }
+        }
+        
+        session.getData().set( ArtifactRouter.SESSION_KEY, request.getArtifactRouter() );
+        
         final RoutingMirrorSelector mirrorSelector =
             new RoutingMirrorSelector( request.getArtifactRouter(), logger );
         

@@ -27,6 +27,8 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
+import org.apache.maven.artifact.router.session.ArtifactRouterSession;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
@@ -287,5 +289,9 @@ public interface MavenExecutionRequest
     ArtifactRouter getArtifactRouter();
 
     MavenExecutionRequest setArtifactRouter( ArtifactRouter router );
+
+    MavenExecutionRequest setArtifactRouterConfiguration( ArtifactRouterConfiguration routerConfig );
+    
+    ArtifactRouterConfiguration getArtifactRouterConfiguration();
 
 }

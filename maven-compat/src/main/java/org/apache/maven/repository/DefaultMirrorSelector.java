@@ -75,7 +75,7 @@ public class DefaultMirrorSelector
         {
             final String repoUrl = repository.getUrl();
 
-            ArtifactRouter router = legacySupport.getSession().getMirrorRouter();
+            ArtifactRouter router = legacySupport.getSession().getArtifactRouter();
             final MirrorRoute rMirror = router.getMirror( repoUrl );
 
             if ( rMirror != null )

@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
@@ -265,8 +266,18 @@ public class DefaultMavenExecutionRequestPopulator
         injectDefaultPluginRepositories( request );
 
         processRepositoriesInSettings( request );
+        
+        injectDefaultArtifactRouterConfiguration( request );
 
         return request;
+    }
+
+    private void injectDefaultArtifactRouterConfiguration( MavenExecutionRequest request )
+    {
+        if ( request.getArtifactRouter() == null && request.getArtifactRouterConfiguration() == null )
+        {
+            request.setArtifactRouterConfiguration( new ArtifactRouterConfiguration() );
+        }
     }
 
 }

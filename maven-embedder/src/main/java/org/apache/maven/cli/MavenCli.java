@@ -42,6 +42,8 @@ import org.apache.maven.artifact.router.conf.ArtifactRouterOption;
 import org.apache.maven.artifact.router.conf.FileRouterConfigBuilder;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.loader.ArtifactRouterLoader;
+import org.apache.maven.artifact.router.session.ArtifactRouterSession;
+import org.apache.maven.artifact.router.session.DefaultArtifactRouterSession;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -125,8 +127,6 @@ public class MavenCli
     private ArtifactRouterLoader routerLoader;
 
     private DefaultSecDispatcher dispatcher;
-
-    private ArtifactRouterConfiguration routerConfig;
 
     public MavenCli()
     {
@@ -552,7 +552,8 @@ public class MavenCli
 
         try
         {
-            routerLoader.save( cliRequest.request.getArtifactRouter(), routerConfig );
+            ArtifactRouterSession session = new DefaultArtifactRouterSession( cliRequest.request.getArtifactRouterConfiguration() );
+            routerLoader.save( cliRequest.request.getArtifactRouter(), session );
         }
         catch ( ArtifactRouterException e )
         {
@@ -937,15 +938,15 @@ public class MavenCli
             userToolchainsFile = MavenCli.DEFAULT_USER_TOOLCHAINS_FILE;
         }
 
-        routerConfig = new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR, logger ).build();
+        ArtifactRouterConfiguration routerConfig =
+            new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR, dispatcher, logger ).build();
+        
         if ( commandLine.hasOption( CLIManager.ROUTER_OPTIONS ) )
         {
             routerConfig.setOptions( ArtifactRouterOption.parse( commandLine.getOptionValues( CLIManager.ROUTER_OPTIONS ) ) );
         }
         
         routerConfig.setOffline( request.isOffline() );
-        
-        ArtifactRouter router = routerLoader.load( routerConfig );
         
         request.setBaseDirectory( baseDirectory ).setGoals( goals )
             .setSystemProperties( cliRequest.systemProperties )
@@ -961,7 +962,7 @@ public class MavenCli
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
             .setUserToolchainsFile( userToolchainsFile )
-            .setArtifactRouter( router );
+            .setArtifactRouterConfiguration( routerConfig );
 
         if ( alternatePomFile != null )
         {
@@ -1158,6 +1159,8 @@ public class MavenCli
         extends Exception
     {
 
+        private static final long serialVersionUID = 1L;
+        
         public int exitCode;
 
         public ExitException( int exitCode )
