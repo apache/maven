@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4233">MNG-4233</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest
@@ -58,8 +57,8 @@ public class MavenITmng4233ReactorResolutionForManuallyCreatedArtifactTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "consumer/target/artifact.properties" );
-        assertEquals( new File( testDir, "producer/pom.xml" ), 
-            new File( props.getProperty( "org.apache.maven.its.mng4233:producer:jar:1.0-SNAPSHOT" ) ) );
+        assertEquals( new File( testDir, "producer/pom.xml" ).getCanonicalFile(), new File(
+            props.getProperty( "org.apache.maven.its.mng4233:producer:jar:1.0-SNAPSHOT" ) ).getCanonicalFile() );
     }
 
 }
