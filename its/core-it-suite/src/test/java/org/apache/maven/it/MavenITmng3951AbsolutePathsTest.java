@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3951">MNG-3951</a>.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -71,7 +70,8 @@ public class MavenITmng3951AbsolutePathsTest
         verifier.assertFilePresent( "target/path.properties" );
         Properties props = verifier.loadProperties( "target/path.properties" );
         assertEquals( new File( testDir, "tmp" ).getAbsoluteFile(), new File( props.getProperty( "fileParams.0" ) ) );
-        assertEquals( new File( getRoot( testDir ), "tmp" ).getAbsoluteFile(), new File( props.getProperty( "fileParams.1" ) ) );
+        assertEquals( new File( getRoot( testDir ), "tmp" ).getCanonicalFile().getAbsoluteFile(),
+                      new File( props.getProperty( "fileParams.1" ) ) );
         assertEquals( new File( repoDir ), new File( props.getProperty( "stringParams.0" ) ) );
     }
 
