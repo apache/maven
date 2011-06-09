@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -54,7 +53,8 @@ public class MavenITmng5012CollectionVsArrayParamCoercionTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( new File( testDir, "src/main/java" ), new File( props.getProperty( "stringParams.0" ) ) );
+        assertEquals( new File( testDir, "src/main/java" ).getCanonicalFile(),
+                      new File( props.getProperty( "stringParams.0" ) ).getCanonicalFile() );
     }
 
 }

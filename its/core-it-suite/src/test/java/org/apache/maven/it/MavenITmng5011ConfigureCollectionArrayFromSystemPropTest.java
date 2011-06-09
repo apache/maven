@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -60,8 +59,10 @@ public class MavenITmng5011ConfigureCollectionArrayFromSystemPropTest
         assertEquals( "0", props.getProperty( "stringParams" ) );
 
         assertEquals( "2", props.getProperty( "fileParams" ) );
-        assertEquals( new File( testDir, "foo" ), new File( props.getProperty( "fileParams.0" ) ) );
-        assertEquals( new File( testDir, "bar" ), new File( props.getProperty( "fileParams.1" ) ) );
+        assertEquals( new File( testDir, "foo" ).getCanonicalFile(),
+                      new File( props.getProperty( "fileParams.0" ) ).getCanonicalFile() );
+        assertEquals( new File( testDir, "bar" ).getCanonicalFile(),
+                      new File( props.getProperty( "fileParams.1" ) ).getCanonicalFile() );
 
         assertEquals( "5", props.getProperty( "listParam" ) );
         assertEquals( "", props.getProperty( "listParam.0", "" ) );
