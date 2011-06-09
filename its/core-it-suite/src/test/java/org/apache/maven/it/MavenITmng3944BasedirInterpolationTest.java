@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3944">MNG-3944</a>.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -59,8 +58,8 @@ public class MavenITmng3944BasedirInterpolationTest
 
         verifier.assertFilePresent( "target/basedir.properties" );
         Properties props = verifier.loadProperties( "target/basedir.properties" );
-        assertEquals( testDir, new File( props.getProperty( "project.properties.prop0" ) ) );
-        assertEquals( testDir, new File( props.getProperty( "project.properties.prop1" ) ) );
+        assertEquals( testDir.getCanonicalFile(), new File( props.getProperty( "project.properties.prop0" ) ) );
+        assertEquals( testDir.getCanonicalFile(), new File( props.getProperty( "project.properties.prop1" ) ) );
     }
 
 }
