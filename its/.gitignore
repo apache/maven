@@ -1,7 +1,8 @@
-.svn/
-target/
+.svn
+target
 .project
 .classpath
-.settings/
-bin/
+.settings
+bin
 *.ipr
+*.iml
