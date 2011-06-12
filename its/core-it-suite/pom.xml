@@ -83,7 +83,7 @@ under the License.
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
+      <version>4.8.2</version>
       <!-- NOTE: Use compile scope for transitivity. -->
     </dependency>
     <dependency>
