@@ -19,14 +19,15 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
-  <!-- TODO remove when using Maven Parent 17+ -->
-  <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-stylus-skin</artifactId>
-    <version>1.2</version>
-  </skin>
+<project xmlns="http://maven.apache.org/DECORATION/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd">
   <body>
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="JavaDocs" href="apidocs/index.html"/>
+      <!--item name="FAQ" href="faq.html"/-->
+    </menu>
+
     <menu ref="modules"/>
     <menu ref="reports"/>
   </body>
