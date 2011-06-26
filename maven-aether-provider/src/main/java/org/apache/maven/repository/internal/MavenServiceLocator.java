@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
  */
 
 import org.sonatype.aether.impl.ArtifactDescriptorReader;
+import org.sonatype.aether.impl.internal.DefaultServiceLocator;
 import org.sonatype.aether.impl.MetadataGeneratorFactory;
 import org.sonatype.aether.impl.VersionRangeResolver;
 import org.sonatype.aether.impl.VersionResolver;
@@ -27,20 +28,19 @@ import org.sonatype.aether.impl.VersionResolver;
 /**
  * A simple service locator that is already setup with all components from this library. To acquire a complete
  * repository system, clients need to add some repository connectors for remote transfers. <em>Note:</em> This component
- * is meant to assists those clients that employ the repository systems outside of an IoC container, Maven plugins
+ * is meant to assist those clients that employ the repository systems outside of an IoC container, Maven plugins
  * should instead always use regular dependency injection to acquire the repository system.
  * 
  * @author Benjamin Bentmann
- * @deprecated use {@link MavenServiceLocator} instead, which is more explicit.
  */
-public class DefaultServiceLocator
-    extends org.sonatype.aether.impl.internal.DefaultServiceLocator
+public class MavenServiceLocator
+    extends DefaultServiceLocator
 {
 
     /**
-     * Creates a new service locator that already knows about all service implementations included this library.
+     * Creates a new service locator that already knows about all service implementations included in this library.
      */
-    public DefaultServiceLocator()
+    public MavenServiceLocator()
     {
         addService( ArtifactDescriptorReader.class, DefaultArtifactDescriptorReader.class );
         addService( VersionResolver.class, DefaultVersionResolver.class );
