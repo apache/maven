@@ -528,6 +528,9 @@
             <version>2.8</version>
             <configuration>
               <linksource>true</linksource>
+              <links combine.children="append">
+                <link>http://sonatype.github.com/sonatype-aether/apidocs/</link>
+              </links>
             </configuration>
             <reportSets>
               <reportSet>
