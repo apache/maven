@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.maven.its.mng5064</groupId>
+    <artifactId>test-snapshot-ovverride</artifactId>
+    <version>1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Maven Integration Test :: MNG-5604 - test of -nsu</name>
+    <description>
+    Integration test that -nsu works as defined.
+  </description>
+    <properties>
+        <localRepo1>${project.build.directory}/localRepo1</localRepo1>
+        <localRepo2>${project.build.directory}/localRepo2</localRepo2>
+        <deployRepo>${project.build.directory}/deployRepo</deployRepo>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-invoker-plugin</artifactId>
+                <version>1.5</version>
+                <configuration>
+                    <projectsDirectory>src/it</projectsDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>createLocalSnapshot</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+			<phase>generate-test-sources</phase>
+			<configuration>
+			  <invokerTest>test-snapshot</invokerTest>
+			  <localRepositoryPath>${localRepo1}</localRepositoryPath>
+			  <properties>
+			    <whichVersion>local</whichVersion>
+			  </properties>
+			  <goals>
+			    <goal>clean</goal>
+			    <goal>install</goal>
+			  </goals>
+			</configuration>
+                    </execution>
+                    <execution>
+                        <id>createNewerDeployment</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+			<phase>generate-test-sources</phase>
+			<configuration>
+			  <invokerTest>test-snapshot</invokerTest>
+			  <localRepositoryPath>${localRepo2}</localRepositoryPath>
+			  <properties>
+			    <whichVersion>deployed</whichVersion>
+			    <deployRepo>${deployRepo}</deployRepo>
+			    <altDeploymentRepository>test.deploy.repo::default::file://${deployRepo}</altDeploymentRepository>
+			  </properties>
+			  <goals>
+			    <goal>clean</goal>
+			    <goal>deploy</goal>
+			  </goals>
+			</configuration>
+                    </execution>
+		    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+			<phase>integration-test</phase>
+			<configuration>
+			  <invokerTest>test-nsu</invokerTest>
+			  <localRepositoryPath>${localRepo1}</localRepositoryPath>
+			  <properties>
+			    <whichVersion>deployed</whichVersion>
+			    <deployRepoUrl>file://${deployRepo}</deployRepoUrl>
+			    <mavenOpts>-nsu</mavenOpts>
+			  </properties>
+			  <goals>
+			    <goal>clean</goal>
+			    <goal>test</goal>
+			  </goals>
+			</configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
