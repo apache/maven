@@ -31,7 +31,7 @@ under the License.
         <repository>
           <id>central</id>
           <name>Apache Maven Integration Testing Repository</name>
-          <url>http://repository.sonatype.org/content/repositories/public</url>
+          <url>http://mirrors.ibiblio.org/pub/mirrors/maven/</url>
           <releases>
             <enabled>true</enabled>
           </releases>
@@ -44,7 +44,7 @@ under the License.
         <pluginRepository>
           <id>central</id>
           <name>Apache Maven Integration Testing Repository</name>
-          <url>http://repository.sonatype.org/content/repositories/public</url>
+          <url>http://mirrors.ibiblio.org/pub/mirrors/maven/</url>
           <releases>
             <enabled>true</enabled>
           </releases>

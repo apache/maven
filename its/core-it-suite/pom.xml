@@ -70,7 +70,7 @@ under the License.
     <!-- The (possibly instrumented copy of the) Maven distribution we actually use for the tests. -->
     <preparedMavenHome>${mavenHome}</preparedMavenHome>
     <!-- default properties used to filter the global settings -->
-    <maven.it.central>http://repository.sonatype.org/content/repositories/public</maven.it.central>
+    <maven.it.central>http://repo1.maven.org/maven2</maven.it.central>
     <proxy.active>false</proxy.active>
     <proxy.host>localhost</proxy.host>
     <proxy.port>80</proxy.port>

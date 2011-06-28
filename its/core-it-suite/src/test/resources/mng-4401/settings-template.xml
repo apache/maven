@@ -29,7 +29,7 @@ under the License.
     <mirror>
       <id>central</id>
       <mirrorOf>maven.it</mirrorOf>
-      <url>http://repository.sonatype.org/content/repositories/public</url>
+      <url>http://mirrors.ibiblio.org/pub/mirrors/maven/</url>
     </mirror>
   </mirrors>
   <profiles>
