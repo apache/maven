@@ -2582,7 +2582,20 @@
           <type>String</type>
         </field>
         <field>
-          <description>The configuration as DOM object.</description>
+          <description>
+            <![CDATA[
+            The configuration as DOM object.
+            You can control how child POMs inherit configuration from parent POMs by adding <code>combine.children</code>
+            or <code>combine.self</code> attributes to the children of the configuration element:
+            <ul>
+            <li><code>combine.children</code>: available values are <code>merge</code> (default) and <code>append</code>,</li>
+            <li><code>combine.self</code>: available values are <code>merge</code> (default) and <code>override</code>.</li>
+            </ul>
+            See <a href="http://maven.apache.org/pom.html#Plugins">POM Reference documentation</a> and
+            <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
+            for more information.
+            ]]>
+          </description>
           <name>configuration</name>
           <type>DOM</type>
         </field>
