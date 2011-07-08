@@ -30,11 +30,11 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven.its</groupId>
-  <artifactId>core-integration-testing-parent</artifactId>
+  <artifactId>core-its</artifactId>
   <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Tests Parent</name>
+  <name>Maven Core Integration Tests</name>
 
   <modules>
     <module>core-it-support</module>
@@ -46,6 +46,11 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/</developerConnection>
     <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/</url>
   </scm>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://builds.apache.org/hudson/view/M-R/view/Maven/job/core-integration-testing-maven-3-trunk/</url>
+  </ciManagement>
+
   <build>
     <pluginManagement>
       <plugins>
