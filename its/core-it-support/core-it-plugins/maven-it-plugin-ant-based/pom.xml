@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-ant-based</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Ant-Based</name>
+  <name>Maven IT Plugin :: Ant-Based</name>
   <description>
     A test plugin whose mojos are implemented via Ant scripts.
   </description>

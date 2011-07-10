@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-extension-provider</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Extension Provider</name>
+  <name>Maven IT Plugin :: Extension Provider</name>
   <description>
     A test plugin that will be used as a build extension and should contribute a stateful singleton component for reuse
     by other plugins in the same project and other projects that use the same extension plugin.

@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-packaging</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Packaging</name>
+  <name>Maven IT Plugin :: Packaging</name>
   <description>
     A test plugin that defines a custom aritfact handler ("it-artifact") and a new packaging type ("it-packaging").
   </description>

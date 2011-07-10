@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-site</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Site</name>
+  <name>Maven IT Plugin :: Site</name>
   <description>
     A test plugin that works with reports.
   </description>

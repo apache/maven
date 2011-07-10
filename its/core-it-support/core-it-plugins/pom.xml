@@ -32,7 +32,7 @@ under the License.
   <artifactId>maven-it-plugins</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Tests :: Plugins</name>
+  <name>Maven IT :: Plugins</name>
 
   <modules>
     <module>maven-it-plugin-active-collection</module>

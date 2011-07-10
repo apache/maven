@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-core-stubs</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Tests :: Core Plugin Stubs</name>
+  <name>Maven ITs :: Core Plugin Stubs</name>
 
   <modules>
     <module>maven-clean-plugin</module>

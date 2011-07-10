@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-dependency-collection</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Dependency Collection</name>
+  <name>Maven IT Plugin :: Dependency Collection</name>
   <description>
     A test plugin that provides several goals which employ @requiresDependencyCollection with different scopes. If
     desired, the resulting artifact identifiers can be written to a text file.

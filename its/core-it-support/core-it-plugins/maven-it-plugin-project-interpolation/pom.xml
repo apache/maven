@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-project-interpolation</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Project Interpolation</name>
+  <name>Maven IT Plugin :: Project Interpolation</name>
   <inceptionYear>2001</inceptionYear>
 
   <dependencies>

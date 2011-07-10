@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>core-it-toolchain</artifactId>
 
-  <name>Maven Integration Test Toolchain</name>
+  <name>Maven IT Toolchain</name>
 
   <dependencies>
     <dependency>

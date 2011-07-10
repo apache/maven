@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>maven-it-helper</artifactId>
 
-  <name>Maven Integration Test Helper Library</name>
+  <name>Maven IT Helper Library</name>
 
   <dependencies>
     <!-- needed for VersionRange and Version -->

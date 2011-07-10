@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>core-it-extension</artifactId>
 
-  <name>Maven Integration Test Extension</name>
+  <name>Maven IT Extension</name>
 
   <dependencies>
     <dependency>

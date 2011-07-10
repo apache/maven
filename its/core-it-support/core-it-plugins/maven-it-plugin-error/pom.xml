@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-error</artifactId>
   <packaging>maven-plugin</packaging>
   
-  <name>Maven Integration Test Plugin :: Error Mojos</name>
+  <name>Maven IT Plugin :: Error Mojos</name>
   <description>
     A test plugin that throws various sorts of errors when loaded or executed. This plugin is designed to test Maven's ability
     to repackage runtime exceptions and other similar errors in a way that helps the user.

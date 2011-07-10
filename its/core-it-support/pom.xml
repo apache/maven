@@ -29,7 +29,7 @@ under the License.
   <artifactId>core-it-support</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Testing Support</name>
+  <name>Maven IT Support</name>
 
   <modules>
     <module>core-it-plugins</module>

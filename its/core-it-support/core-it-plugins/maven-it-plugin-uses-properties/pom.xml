@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-uses-properties</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Uses Properties Plugin</name>
+  <name>Maven IT Plugin :: Uses Properties Plugin</name>
   <inceptionYear>2006</inceptionYear>
 
   <properties>

@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-all</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: This plugin should contain the mojos needed by all tests.</name>
+  <name>Maven IT Plugin :: This plugin should contain the mojos needed by all tests.</name>
   <inceptionYear>2007</inceptionYear>
 
   <properties>

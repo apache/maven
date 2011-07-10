@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-artifact</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Artifact</name>
+  <name>Maven IT Plugin :: Artifact</name>
   <description>
     A test plugin that manages the build artifacts of a project. More precisely, it can set the main artifact's file,
     attach artifacts and install/deploy them to the repos. As such, it is the simplified essence of a bunch of

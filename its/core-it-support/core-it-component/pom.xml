@@ -30,5 +30,5 @@ under the License.
 
   <artifactId>core-it-component</artifactId>
 
-  <name>Maven Integration Test Component</name>
+  <name>Maven IT Component</name>
 </project>

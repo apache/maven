@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-active-collection</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Active Collection</name>
+  <name>Maven IT Plugin :: Active Collection</name>
   <description>
     A test plugin that depends on active collections of core components.
   </description>

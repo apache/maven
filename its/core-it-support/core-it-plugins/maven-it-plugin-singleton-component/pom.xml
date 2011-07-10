@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-singleton-component</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Singleton Component</name>
+  <name>Maven IT Plugin :: Singleton Component</name>
   <description>
     A test plugin to check that the lookup of a singleton component works reliably.
   </description>

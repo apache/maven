@@ -23,8 +23,8 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>maven-it-plugins</artifactId>
     <groupId>org.apache.maven.its.plugins</groupId>
+    <artifactId>maven-it-plugins</artifactId>
     <version>2.1-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
@@ -33,7 +33,7 @@ under the License.
   <artifactId>dep-c</artifactId>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test Plugin :: Class Loader :: Dependency C</name>
+  <name>Maven IT Plugin :: Class Loader :: Dependency C</name>
   <description>
     A test dependency for the test plugin.
   </description>

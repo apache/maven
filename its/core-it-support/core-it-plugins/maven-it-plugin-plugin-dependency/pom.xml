@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-plugin-dependency</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Plugin Dependency</name>
+  <name>Maven IT Plugin :: Plugin Dependency</name>
 
   <dependencies>
     <dependency>

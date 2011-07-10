@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-uses-wagon</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Uses Wagon Plugin</name>
+  <name>Maven IT Plugin :: Uses Wagon Plugin</name>
   <inceptionYear>2006</inceptionYear>
 
   <dependencies>

@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-optional-mojos</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Optional Mojos</name>
+  <name>Maven IT Plugin :: Optional Mojos</name>
   <description>
     A test plugin that defines a custom lifecycle mapping with optional mojos.
   </description>

@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-dependency-resolution</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Dependency Resolution</name>
+  <name>Maven IT Plugin :: Dependency Resolution</name>
   <description>
     A test plugin that provides several goals which employ @requiresDependencyResolution with different scopes. If
     desired, the resulting class path or artifact identifiers can be written to a text file.

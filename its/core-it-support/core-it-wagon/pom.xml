@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>core-it-wagon</artifactId>
 
-  <name>Maven Integration Test Wagon</name>
+  <name>Maven IT Wagon</name>
 
   <dependencies>
     <dependency>

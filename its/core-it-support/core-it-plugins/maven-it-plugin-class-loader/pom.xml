@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-it-plugin-class-loader-aggregator</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test Plugin :: Class Loader :: Aggregator</name>
+  <name>Maven IT Plugin :: Class Loader :: Aggregator</name>
 
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support/core-it-plugins/maven-it-plugin-class-loader</connection>

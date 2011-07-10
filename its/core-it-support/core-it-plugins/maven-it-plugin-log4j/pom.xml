@@ -32,7 +32,7 @@ under the License.
   <artifactId>maven-it-plugin-log4j</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven Integration Test Plugin :: Log4J Client</name>
+  <name>Maven IT Plugin :: Log4J Client</name>
   <description>
     A test plugin that uses log4j.
   </description>
