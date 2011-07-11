@@ -30,7 +30,8 @@ under the License.
 
   <artifactId>core-it-suite</artifactId>
 
-  <name>Maven Integration Tests</name>
+  <name>Maven ITs</name>
+  <description>The effective Maven Integration Tests suite.</description>
 
   <!--
   By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
@@ -56,12 +57,6 @@ under the License.
   required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
   repository manager that proxies the required artifacts.
   -->
-
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-suite</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-suite</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-suite</url>
-  </scm>
 
   <properties>
     <surefireMemory>-Xmx384m -XX:MaxPermSize=128m</surefireMemory>

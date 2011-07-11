@@ -34,7 +34,8 @@ under the License.
   <version>2.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Core Integration Tests</name>
+  <name>Maven Core ITs</name>
+  <description>Maven Core Integration Tests provide tooling to test every aspect of Maven functionalities with any Maven version.</description>
 
   <modules>
     <module>core-it-support</module>

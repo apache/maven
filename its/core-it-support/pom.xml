@@ -30,6 +30,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven IT Support</name>
+  <description>Maven Integration Tests support tools, to completely decouple ITs from production plugins.</description>
 
   <modules>
     <module>core-it-plugins</module>
@@ -41,11 +42,6 @@ under the License.
     <module>core-it-extension</module>
   </modules>
 
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/core-integration-testing/trunk/core-it-support</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/core-integration-testing/trunk/core-it-support</url>
-  </scm>
   <issueManagement>
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>

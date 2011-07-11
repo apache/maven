@@ -28,6 +28,8 @@
 
 Maven Integration Tests
 
+  This module provides the effective Integration Tests suite.
+
   By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
   
 +----
