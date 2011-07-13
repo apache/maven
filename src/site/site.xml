@@ -28,6 +28,11 @@ under the License.
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
 
+    <menu name="Development">
+      <item name="Maven Developer Centre" href="/developers/index.html"/>
+      <item name="Maven Core ITs" href="/core-its/index.html"/>
+    </menu>
+
     <menu ref="modules"/>
     <menu ref="reports"/>
   </body>
