@@ -33,7 +33,7 @@
     number of other development tools for reporting or the build
     process.
   </description>
-  <url>http://maven.apache.org/</url>
+  <url>http://maven.apache.org/ref/${project.version}/</url>
   <inceptionYear>2001</inceptionYear>
 
   <properties>
