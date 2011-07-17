@@ -276,6 +276,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4129PluginExecutionInheritanceTest.class );
         suite.addTestSuite( MavenITmng4126ParentProfilesXmlTest.class );
         suite.addTestSuite( MavenITmng4116UndecodedUrlsTest.class );
+        suite.addTestSuite( MavenITmng4112MavenVersionPropertyTest.class );
         suite.addTestSuite( MavenITmng4107InterpolationUsesDominantProfileSourceTest.class );
         suite.addTestSuite( MavenITmng4106InterpolationUsesDominantProfileTest.class );
         suite.addTestSuite( MavenITmng4102InheritedPropertyInterpolationTest.class );

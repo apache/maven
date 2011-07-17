@@ -1,0 +1,35 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Maven Integration Test :: MNG-4112</name> 
+  <groupId>org.apache.maven.its.mgn4112</groupId>
+  <artifactId>maven-it-mng4112</artifactId>
+  <description>Test for ${maven.version} property</description>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <mkdir dir="${project.build.directory}"/>
+                <echo file="${project.build.directory}/build.properties"
+                      message="maven.version = ${maven.version}${line.separator}"/>
+                <echo file="${project.build.directory}/build.properties"
+                      append="true"
+                      message="maven.build.version = ${maven.build.version}${line.separator}"/>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
