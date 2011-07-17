@@ -1064,6 +1064,19 @@ public class MavenCli
         }
 
         systemProperties.putAll( System.getProperties() );
+        
+        // ----------------------------------------------------------------------
+        // Properties containing info about the currently running version of Maven
+        // These override any corresponding properties set on the command line
+        // ----------------------------------------------------------------------
+
+        Properties buildProperties = CLIReportingUtils.getBuildProperties();
+
+        String mavenVersion = buildProperties.getProperty( CLIReportingUtils.BUILD_VERSION_PROPERTY );
+        systemProperties.setProperty( "maven.version", mavenVersion );
+
+        String mavenBuildVersion = CLIReportingUtils.createMavenVersionString( buildProperties );
+        systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
     }
 
     private static void setCliProperty( String property, Properties properties )

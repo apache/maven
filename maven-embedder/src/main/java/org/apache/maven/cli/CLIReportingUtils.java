@@ -47,14 +47,39 @@ public final class CLIReportingUtils
     public static final int MS_PER_SEC = 1000;
 
     public static final int SEC_PER_MIN = 60;
+    
+    public static final String BUILD_VERSION_PROPERTY = "version";
 
     public static void showVersion( PrintStream stdout )
     {
         Properties properties = getBuildProperties();
+        stdout.println( createMavenVersionString( properties ) );
 
-        String timestamp = reduce( properties.getProperty( "timestamp" ) );
-        String version = reduce( properties.getProperty( "version" ) );
-        String rev = reduce( properties.getProperty( "buildNumber" ) );
+        stdout.println( "Maven home: " + System.getProperty( "maven.home", "<unknown maven home>" ) );
+
+        stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
+            + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) );
+
+        stdout.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
+
+        stdout.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
+            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
+
+        stdout.println( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH
+            + "\", family: \"" + Os.OS_FAMILY + "\"" );
+    }
+
+    /**
+     * Create a human readable string containing the Maven version, buildnumber, and time of build
+     * 
+     * @param buildProperties The build properties
+     * @return Readable build info
+     */
+    static String createMavenVersionString( Properties buildProperties )
+    {
+        String timestamp = reduce( buildProperties.getProperty( "timestamp" ) );
+        String version = reduce( buildProperties.getProperty( BUILD_VERSION_PROPERTY ) );
+        String rev = reduce( buildProperties.getProperty( "buildNumber" ) );
 
         String msg = "Apache Maven ";
         msg += ( version != null ? version : "<version unknown>" );
@@ -70,21 +95,7 @@ public final class CLIReportingUtils
             }
             msg += ")";
         }
-
-        stdout.println( msg );
-
-        stdout.println( "Maven home: " + System.getProperty( "maven.home", "<unknown maven home>" ) );
-
-        stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
-            + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) );
-
-        stdout.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
-
-        stdout.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
-            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
-
-        stdout.println( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH
-            + "\", family: \"" + Os.OS_FAMILY + "\"" );
+        return msg;
     }
 
     private static String reduce( String s )
