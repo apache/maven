@@ -21,6 +21,7 @@ package org.apache.maven.repository.internal;
 
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.impl.MetadataGeneratorFactory;
+import org.sonatype.aether.spi.locator.ServiceLocator;
 
 import junit.framework.TestCase;
 
@@ -30,14 +31,14 @@ public class DefaultServiceLocatorTest
 
     public void testGetRepositorySystem()
     {
-        DefaultServiceLocator locator = new DefaultServiceLocator();
+        ServiceLocator locator = new MavenServiceLocator();
         RepositorySystem repoSys = locator.getService( RepositorySystem.class );
         assertNotNull( repoSys );
     }
 
     public void testGetMetadataGeneratorFactories()
     {
-        DefaultServiceLocator locator = new DefaultServiceLocator();
+        ServiceLocator locator = new MavenServiceLocator();
         assertEquals( 2, locator.getServices( MetadataGeneratorFactory.class ).size() );
     }
 
