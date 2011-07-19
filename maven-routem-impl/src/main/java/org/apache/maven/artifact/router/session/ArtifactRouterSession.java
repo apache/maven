@@ -19,23 +19,24 @@
 
 package org.apache.maven.artifact.router.session;
 
+import java.io.File;
+
 import org.apache.maven.artifact.router.conf.RouterSource;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 
-import java.io.File;
-import java.util.List;
-
 public interface ArtifactRouterSession
 {
 
-    public String[] getDiscoveryStrategies();
+    public String getDiscoveryStrategy();
 
     Proxy getProxy( String protocol );
     
     Server getServer( String id );
 
-    List<RouterSource> getSources();
+    RouterSource getSource();
+
+    RouterSource getDefaultSource();
 
     File getRoutesFile();
 
@@ -46,7 +47,5 @@ public interface ArtifactRouterSession
     boolean isOffline();
 
     boolean isUpdate();
-    
-    
 
 }

@@ -98,11 +98,6 @@ class RoutingConnectorWrapper
         this.router = router;
         
         this.session = session;
-        
-        if ( getOpenConnectors() == null )
-        {
-            setOpenConnectors( new HashMap<GroupRoute, RepositoryConnector>() );
-        }
     }
 
     public synchronized void get( Collection<? extends ArtifactDownload> artifactDownloads,
@@ -152,12 +147,12 @@ class RoutingConnectorWrapper
             RepositoryConnector connector = entry.getValue();
             Set<ArtifactDownload> artifacts = artifactDownloadsByGroup.get( route );
             Set<MetadataDownload> metadatas = metadataDownloadsByGroup.get( route );
-            
+
             if ( ( artifacts == null || artifacts.isEmpty() ) && ( metadatas == null || metadatas.isEmpty() ) )
             {
                 continue;
             }
-            
+
             connector.get( artifacts, metadatas );
         }
     }
@@ -305,9 +300,18 @@ class RoutingConnectorWrapper
     }
 
     @SuppressWarnings( "unchecked" )
-    private Map<GroupRoute, RepositoryConnector> getOpenConnectors()
+    private synchronized Map<GroupRoute, RepositoryConnector> getOpenConnectors()
     {
-        return (Map<GroupRoute, RepositoryConnector>) session.getData().get( OPEN_CONNECTORS_KEY );
+        Map<GroupRoute, RepositoryConnector> connectors =
+            (Map<GroupRoute, RepositoryConnector>) session.getData().get( OPEN_CONNECTORS_KEY );
+
+        if ( connectors == null )
+        {
+            connectors = new HashMap<GroupRoute, RepositoryConnector>();
+            session.getData().set( OPEN_CONNECTORS_KEY, connectors );
+        }
+
+        return connectors;
     }
     
     private void setOpenConnectors( Map<GroupRoute, RepositoryConnector> connectors  )

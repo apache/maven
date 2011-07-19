@@ -19,14 +19,10 @@
 
 package org.apache.maven.artifact.router.conf;
 
-import java.net.PasswordAuthentication;
-
 public class RouterSource
 {
 
     private final String url;
-
-    private final PasswordAuthentication credentials;
 
     private final String id;
 
@@ -34,16 +30,8 @@ public class RouterSource
     {
         this.id = id;
         this.url = url;
-        this.credentials = null;
     }
 
-    public RouterSource( String id, String url, String username, String password )
-    {
-        this.id = id;
-        this.url = url;
-        this.credentials = new PasswordAuthentication( username, password.toCharArray() );
-    }
-    
     public String getId()
     {
         return id;
@@ -54,15 +42,9 @@ public class RouterSource
         return url;
     }
 
-    public PasswordAuthentication getCredentials()
-    {
-        return credentials;
-    }
-
     public String toString()
     {
-        return "RouterSource[" + ( getCredentials() == null ? "" : getCredentials().getUserName() + "@" ) + getUrl()
-            + "]";
+        return "RouterSource[" + id + "@" + getUrl() + "]";
     }
 
 }

@@ -40,6 +40,12 @@ package org.apache.maven.artifact.router.loader;
 
 import static org.codehaus.plexus.util.IOUtil.close;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
@@ -51,14 +57,6 @@ import org.apache.maven.artifact.router.session.ArtifactRouterSession;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @Component( role = ArtifactRouterLoader.class )
 public class DefaultRouterLoader
@@ -171,7 +169,10 @@ public class DefaultRouterLoader
         {
             try
             {
-                for ( RouterSource src : session.getSources() )
+                final String discoveryStrategy = session.getDiscoveryStrategy();
+                RouterSource src = session.getSource();
+
+                if ( session.getSource() != null )
                 {
                     ArtifactRouter r = routerReader.loadRouter( src, session );
                     if ( r != null )
@@ -179,51 +180,34 @@ public class DefaultRouterLoader
                         routes.merge( r );
                     }
                 }
-                
-                final String[] discoStrategies = session.getDiscoveryStrategies();
-                if ( discoStrategies != null && discoStrategies.length > 0
-                    && !"none".equalsIgnoreCase( discoStrategies[0].toLowerCase() ) )
+                else if ( discoveryStrategy != null
+                    && !ArtifactRouterConfiguration.NO_DISCOVERY_STRATEGIES.equalsIgnoreCase( discoveryStrategy.toLowerCase() ) )
                 {
-                    final List<ArtifactRouterDiscoveryStrategy> strats = new ArrayList<ArtifactRouterDiscoveryStrategy>();
-                    if ( discoStrategies.length == 1 )
+                    final String key = discoveryStrategy;
+                    final ArtifactRouterDiscoveryStrategy strategy = getDiscoveryStrategy( key );
+                    if ( strategy == null )
                     {
-                        final String key = discoStrategies[0];
-                        if ( ArtifactRouterConfiguration.NO_DISCOVERY_STRATEGIES.equalsIgnoreCase( key ) )
+                        if ( logger.isDebugEnabled() )
                         {
-                            // NOP
-                        }
-                        else if ( ArtifactRouterConfiguration.ALL_DISCOVERY_STRATEGIES.equalsIgnoreCase( key ) )
-                        {
-                            strats.addAll( strategies.values() );
-                        }
-                        else
-                        {
-                            final ArtifactRouterDiscoveryStrategy strat = getDiscoveryStrategy( key );
-                            if ( strat != null )
-                            {
-                                strats.add( strat );
-                            }
+                            logger.error( "Router discovery strategy cannot be found: " + discoveryStrategy );
                         }
                     }
                     else
-                    {
-                        for ( final String key : discoStrategies )
-                        {
-                            final ArtifactRouterDiscoveryStrategy strat = getDiscoveryStrategy( key );
-                            if ( strat != null )
-                            {
-                                strats.add( strat );
-                            }
-                        }
-                    }
-
-                    for ( final ArtifactRouterDiscoveryStrategy strategy : strats )
                     {
                         ArtifactRouter result = strategy.findRouter( session );
                         if ( result != null )
                         {
                             routes.merge( result );
                         }
+                    }
+                }
+                else
+                {
+                    src = session.getDefaultSource();
+                    ArtifactRouter r = routerReader.loadRouter( src, session );
+                    if ( r != null )
+                    {
+                        routes.merge( r );
                     }
                 }
             }

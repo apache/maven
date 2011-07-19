@@ -19,30 +19,8 @@
 
 package org.apache.maven.artifact.router.conf;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public final class ArtifactRouterConfiguration
@@ -50,41 +28,32 @@ public final class ArtifactRouterConfiguration
 
     private static final RouterSource CANONICAL_SOURCE = new RouterSource( "default", "http://repository.apache.org/router/routes.json" );
 
-    public static final String ALL_DISCOVERY_STRATEGIES = "all";
-
     public static final String NO_DISCOVERY_STRATEGIES = "none";
     
     private File routesFile;
 
     private boolean disabled = false;
 
-    private String[] discoveryStrategies = { ALL_DISCOVERY_STRATEGIES };
+    private String discoveryStrategy = NO_DISCOVERY_STRATEGIES;
 
     private final Set<ArtifactRouterOption> routerOptions = new HashSet<ArtifactRouterOption>();
     
-    private final List<RouterSource> routerSources = new ArrayList<RouterSource>();
+    private RouterSource routerSource;
     
     public ArtifactRouterConfiguration()
     {
         setUpdate( true );
     }
     
-    public ArtifactRouterConfiguration addSource( String id, String url, String username, String password )
+    public ArtifactRouterConfiguration setSource( String id, String url )
     {
-        routerSources.add( new RouterSource( id, url, username, password ) );
+        routerSource = new RouterSource( id, url );
         return this;
     }
     
-    public List<RouterSource> getSources()
+    public RouterSource getSource()
     {
-        if ( routerSources.isEmpty() )
-        {
-            return Collections.singletonList( CANONICAL_SOURCE );
-        }
-        else
-        {
-            return routerSources;
-        }
+        return routerSource;
     }
 
     public boolean isDisabled()
@@ -98,14 +67,14 @@ public final class ArtifactRouterConfiguration
         return this;
     }
 
-    public String[] getDiscoveryStrategies()
+    public String getDiscoveryStrategy()
     {
-        return discoveryStrategies == null ? new String[0] : discoveryStrategies;
+        return discoveryStrategy;
     }
 
-    public ArtifactRouterConfiguration setDiscoveryStrategies( final String... strategies )
+    public ArtifactRouterConfiguration setDiscoveryStrategy( final String strategy )
     {
-        discoveryStrategies = strategies;
+        discoveryStrategy = strategy;
         return this;
     }
     
@@ -174,6 +143,11 @@ public final class ArtifactRouterConfiguration
         this.routerOptions.addAll( routerOptions );
         
         return this;
+    }
+
+    public RouterSource getDefaultSource()
+    {
+        return CANONICAL_SOURCE;
     }
 
 }

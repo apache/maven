@@ -28,6 +28,7 @@ import org.apache.maven.artifact.router.conf.RouterSource;
 import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
 import org.apache.maven.artifact.router.session.ArtifactRouterSession;
 import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
 import org.codehaus.plexus.component.annotations.Component;
 
 import java.io.IOException;
@@ -187,7 +188,11 @@ public class DefaultArtifactRouterReader
             }
             else
             {
-                return source.getCredentials();
+                Server server = session.getServer( source.getId() );
+                if ( server != null )
+                {
+                    return new PasswordAuthentication( server.getUsername(), server.getPassword().toCharArray() );
+                }
             }
 
             return null;

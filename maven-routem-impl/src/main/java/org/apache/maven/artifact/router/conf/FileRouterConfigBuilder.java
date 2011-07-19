@@ -39,32 +39,23 @@ package org.apache.maven.artifact.router.conf;
  */
 
 import static org.codehaus.plexus.util.IOUtil.close;
-import static org.codehaus.plexus.util.StringUtils.isBlank;
-import static org.codehaus.plexus.util.StringUtils.isNotBlank;
-
-import org.codehaus.plexus.logging.Logger;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
-import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
+
+import org.codehaus.plexus.logging.Logger;
 
 public class FileRouterConfigBuilder
     implements RouterConfigBuilder
 {
 
-    private static final String KEY_ID = "id";
-    
-    private static final String KEY_URL = "url";
-
     private static final String KEY_ROUTES_FILE = "routing-tables-file";
-
-    private static final String KEY_USER = "user";
-
-    private static final String KEY_PASSWORD = "password";
+    
+    private static final String KEY_ROUTER_SOURCE = "route-source";
 
     private static final String KEY_DISABLED = "disabled";
 
@@ -74,16 +65,15 @@ public class FileRouterConfigBuilder
 
     private static final String CONFIG_FILENAME = "router.properties";
 
+    public static final String DEFAULT_SOURCE_ID = "central.router";
+
     private Logger logger;
 
     private File confDir;
 
-    private final SecDispatcher secDispatcher;
-
-    public FileRouterConfigBuilder( File confDir, SecDispatcher secDispatcher, Logger logger )
+    public FileRouterConfigBuilder( File confDir, Logger logger )
     {
         this.confDir = confDir;
-        this.secDispatcher = secDispatcher;
         this.logger = logger;
     }
 
@@ -115,16 +105,45 @@ public class FileRouterConfigBuilder
 
                 config.setDisabled( Boolean.parseBoolean( p.getProperty( KEY_DISABLED, "false" ) ) );
 
-                final String[] strat =
-                    p.getProperty( KEY_DISCOVERY_STRATEGIES, ArtifactRouterConfiguration.ALL_DISCOVERY_STRATEGIES )
-                     .split( "\\s*,\\s*" );
+                final String strat = p.getProperty( KEY_DISCOVERY_STRATEGIES );
+                if ( strat != null )
+                {
+                    config.setDiscoveryStrategy( strat );
+                }
 
-                config.setDiscoveryStrategies( strat );
+                String sourceUrl = p.getProperty( KEY_ROUTER_SOURCE );
+                if ( sourceUrl != null )
+                {
+                    URL u = new URL( sourceUrl );
+                    String id = u.getUserInfo();
+
+                    if ( id == null )
+                    {
+                        id = DEFAULT_SOURCE_ID;
+                    }
+                    else
+                    {
+                        StringBuilder sb = new StringBuilder( u.getProtocol() ).append( ":://" ).append( u.getHost() );
+                        if ( u.getPort() > 0 )
+                        {
+                            sb.append( ":" ).append( u.getPort() );
+                        }
+
+                        if ( u.getFile() != null )
+                        {
+                            sb.append( u.getFile() );
+                        }
+
+                        sourceUrl = sb.toString();
+                    }
+
+                    config.setSource( id, sourceUrl );
+                }
             }
             catch ( final IOException e )
             {
                 throw new ArtifactRouterConfigurationException( "Failed to read router config properties from: '"
-                                + routerConfig + "'.", e );
+                    + routerConfig + "'.\nReason: " + e.getMessage(), e );
             }
             finally
             {
@@ -145,52 +164,6 @@ public class FileRouterConfigBuilder
             config.setRoutesFile( new File( confDir, ROUTES_FILE ) );
         }
         
-        File routesD = new File( confDir, "routes.d" );
-        if ( routesD.exists() && routesD.isDirectory() )
-        {
-            for ( File src : routesD.listFiles() )
-            {
-                InputStream stream = null;
-                try
-                {
-                    stream = new FileInputStream( src );
-                    final Properties p = new Properties();
-                    p.load( stream );
-                    
-                    String id = p.getProperty( KEY_ID );
-
-                    String url = p.getProperty( KEY_URL );
-                    if ( isBlank( url ) )
-                    {
-                        continue;
-                    }
-                    
-                    String user = p.getProperty( KEY_USER );
-                    String pass = p.getProperty( KEY_PASSWORD );
-                    
-                    if ( isNotBlank( user ) && isNotBlank( pass ) )
-                    {
-                        pass = secDispatcher.decrypt( pass );
-                        config.addSource( id, url, user, pass );
-                    }
-                }
-                catch ( final IOException e )
-                {
-                    throw new ArtifactRouterConfigurationException( "Failed to read router config properties from: '"
-                        + src + "'.", e );
-                }
-                catch ( SecDispatcherException e )
-                {
-                    throw new ArtifactRouterConfigurationException( "Failed to read router config properties from: '"
-                        + src + "'.", e );
-                }
-                finally
-                {
-                    close( stream );
-                }
-            }
-        }
-
         return config;
     }
 

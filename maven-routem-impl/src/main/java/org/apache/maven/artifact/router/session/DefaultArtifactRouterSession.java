@@ -19,14 +19,14 @@
 
 package org.apache.maven.artifact.router.session;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.conf.RouterSource;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
 
 public class DefaultArtifactRouterSession
     implements ArtifactRouterSession
@@ -57,9 +57,9 @@ public class DefaultArtifactRouterSession
      * {@inheritDoc}
      * @see org.apache.maven.artifact.router.session.ArtifactRouterSession#getDiscoveryStrategies()
      */
-    public String[] getDiscoveryStrategies()
+    public String getDiscoveryStrategy()
     {
-        return config.getDiscoveryStrategies();
+        return config.getDiscoveryStrategy();
     }
 
     /**
@@ -106,9 +106,14 @@ public class DefaultArtifactRouterSession
      * {@inheritDoc}
      * @see org.apache.maven.artifact.router.session.ArtifactRouterSession#getSources()
      */
-    public List<RouterSource> getSources()
+    public RouterSource getSource()
     {
-        return config.getSources();
+        return config.getSource();
+    }
+
+    public RouterSource getDefaultSource()
+    {
+        return config.getDefaultSource();
     }
 
     /**

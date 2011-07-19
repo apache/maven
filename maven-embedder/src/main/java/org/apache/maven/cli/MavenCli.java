@@ -36,11 +36,10 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
-import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.conf.ArtifactRouterOption;
 import org.apache.maven.artifact.router.conf.FileRouterConfigBuilder;
-import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.loader.ArtifactRouterLoader;
 import org.apache.maven.artifact.router.session.ArtifactRouterSession;
 import org.apache.maven.artifact.router.session.DefaultArtifactRouterSession;
@@ -939,7 +938,7 @@ public class MavenCli
         }
 
         ArtifactRouterConfiguration routerConfig =
-            new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR, dispatcher, logger ).build();
+            new FileRouterConfigBuilder( DEFAULT_USER_EXT_CONF_DIR, logger ).build();
         
         if ( commandLine.hasOption( CLIManager.ROUTER_OPTIONS ) )
         {
