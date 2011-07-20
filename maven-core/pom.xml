@@ -22,6 +22,7 @@
   <artifactId>maven-core</artifactId>
 
   <name>Maven Core</name>
+  <description>Maven Core classes.</description>
 
   <dependencies>
     <!--  Maven -->

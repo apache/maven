@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-model</artifactId>
 
   <name>Maven Model</name>
-  <description>Maven Model</description>
+  <description>Model for Maven POM (Project Object Model)</description>
 
   <dependencies>
     <dependency>

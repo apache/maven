@@ -22,6 +22,7 @@
   <artifactId>maven-compat</artifactId>
 
   <name>Maven Compat</name>
+  <description>Maven classes maintained as compatibility layer for tools done with Maven 2.</description>
 
   <dependencies>
     <dependency>

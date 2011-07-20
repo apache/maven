@@ -28,6 +28,7 @@
   <packaging>pom</packaging>
 
   <name>Maven Distribution</name>
+  <description>Module to build the Maven distribution, source and binary, in zip and tar.gz formats.</description>
 
   <dependencies>
     <dependency>

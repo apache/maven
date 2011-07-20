@@ -31,6 +31,7 @@ under the License.
   <artifactId>maven-settings-builder</artifactId>
 
   <name>Maven Settings Builder</name>
+  <description>The effective settings builder, with inheritance and password decryption.</description>
 
   <dependencies>
     <dependency>

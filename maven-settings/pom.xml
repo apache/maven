@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-settings</artifactId>
 
   <name>Maven Settings</name>
-  <description>Maven Settings</description>
+  <description>Maven Settings model.</description>
 
   <dependencies>
     <dependency>

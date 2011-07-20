@@ -22,6 +22,7 @@
   <artifactId>maven-embedder</artifactId>
 
   <name>Maven Embedder</name>
+  <description>Maven embeddable component, with CLI support.</description>
 
   <dependencies>
     <dependency>

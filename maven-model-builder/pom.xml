@@ -22,6 +22,7 @@
   <artifactId>maven-model-builder</artifactId>
 
   <name>Maven Model Builder</name>
+  <description>The effective model builder, with inheritance, profile activation</description>
 
   <dependencies>
     <dependency>

@@ -31,7 +31,7 @@ under the License.
   <artifactId>maven-repository-metadata</artifactId>
 
   <name>Maven Repository Metadata Model</name>
-  <description>Per-directory repository metadata.</description>
+  <description>Per-directory local and remote repository metadata.</description>
 
   <dependencies>
     <dependency>

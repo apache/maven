@@ -31,6 +31,7 @@ under the License.
   <artifactId>maven-plugin-api</artifactId>
 
   <name>Maven Plugin API</name>
+  <description>The API for plugins - Mojos - development.</description>
 
   <dependencies>
     <dependency>

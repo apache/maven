@@ -32,7 +32,8 @@ under the License.
 
   <name>Maven Aether Provider</name>
   <description>
-    This module provides extensions to Aether for utilizing the Maven POM and Maven repository metadata.
+    This module provides extensions to Aether for utilizing the Maven POM and Maven repository metadata for artifacts resolution
+    and download.
   </description>
 
   <dependencies>
