@@ -962,6 +962,7 @@ public class DefaultModelBuilder
                     importRequest.setModelCache( request.getModelCache() );
                     importRequest.setSystemProperties( request.getSystemProperties() );
                     importRequest.setUserProperties( request.getUserProperties() );
+                    importRequest.setLocationTracking( request.isLocationTracking() );
                 }
 
                 importRequest.setModelSource( importSource );
