@@ -1,32 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Maven Integration Test :: MNG-4112</name> 
+
   <groupId>org.apache.maven.its.mgn4112</groupId>
-  <artifactId>maven-it-mng4112</artifactId>
-  <description>Test for ${maven.version} property</description>
+  <artifactId>test</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
+
+  <name>Maven Integration Test :: MNG-4112</name> 
+  <description>
+    Test for ${maven.version} and ${maven.build.version} property
+  </description>
+
+  <properties>
+    <simpleVersion>${maven.version}</simpleVersion>
+    <fullVersion>${maven.build.version}</fullVersion>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-expression</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <outputFile>target/pom.properties</outputFile>
+          <expressions>
+            <expression>project/properties</expression>
+          </expressions>
+        </configuration>
         <executions>
           <execution>
-            <phase>package</phase>
+            <id>test</id>
+            <phase>validate</phase>
             <goals>
-              <goal>run</goal>
+              <goal>eval</goal>
             </goals>
-            <configuration>
-              <tasks>
-                <mkdir dir="${project.build.directory}"/>
-                <echo file="${project.build.directory}/build.properties"
-                      message="maven.version = ${maven.version}${line.separator}"/>
-                <echo file="${project.build.directory}/build.properties"
-                      append="true"
-                      message="maven.build.version = ${maven.build.version}${line.separator}"/>
-              </tasks>
-            </configuration>
           </execution>
         </executions>
       </plugin>

@@ -29,30 +29,33 @@ import java.util.Properties;
 public class MavenITmng4112MavenVersionPropertyTest
     extends AbstractMavenIntegrationTestCase
 {
+
     public MavenITmng4112MavenVersionPropertyTest()
     {
         super( "(3.0.3,)" );
     }
 
     /**
-     * Test simple POM interpolation
+     * Test for ${maven.version} and ${maven.build.version} property
      */
-    public void testitMNG4112()
+    public void testit()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4112" );
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoal( "package" );
+        verifier.executeGoal( "validate" );
 
-        Properties props = verifier.loadProperties( "target/build.properties" );
+        Properties props = verifier.loadProperties( "target/pom.properties" );
 
-        String testMavenVersion = props.getProperty( "maven.version" );
-        assertFalse( testMavenVersion.contains( "$" ) );
+        String testMavenVersion = props.getProperty( "project.properties.simpleVersion", "" );
+        assertFalse( testMavenVersion, testMavenVersion.contains( "$" ) );
+        assertTrue( testMavenVersion, testMavenVersion.matches( "[0-9]+\\.[0-9]+.*" ) );
 
-        String testMavenBuildVersion = props.getProperty( "maven.build.version" );
-        assertTrue( testMavenBuildVersion.contains( testMavenVersion ) );
+        String testMavenBuildVersion = props.getProperty( "project.properties.fullVersion", "" );
+        assertTrue( testMavenBuildVersion, testMavenBuildVersion.contains( testMavenVersion ) );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
