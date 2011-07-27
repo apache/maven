@@ -112,12 +112,12 @@ public class LegacyLocalRepositoryManager
 
     public String getPathForLocalArtifact( Artifact artifact )
     {
-        return delegate.pathOf( RepositoryUtils.toArtifact( artifact ) );
+        return delegate.pathOf( RepositoryUtils.toArtifact( artifact.setVersion( artifact.getBaseVersion() ) ) );
     }
 
     public String getPathForRemoteArtifact( Artifact artifact, RemoteRepository repository, String context )
     {
-        return getPathForLocalArtifact( artifact );
+        return delegate.pathOf( RepositoryUtils.toArtifact( artifact ) );
     }
 
     public String getPathForLocalMetadata( Metadata metadata )
