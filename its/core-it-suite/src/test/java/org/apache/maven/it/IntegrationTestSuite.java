@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5064SuppressSnapshotUpdatesTest.class );
         suite.addTestSuite( MavenITmng5013ConfigureParamBeanFromScalarValueTest.class );
         suite.addTestSuite( MavenITmng5012CollectionVsArrayParamCoercionTest.class );
         suite.addTestSuite( MavenITmng5011ConfigureCollectionArrayFromSystemPropTest.class );

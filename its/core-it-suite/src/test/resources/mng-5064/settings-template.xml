@@ -19,31 +19,27 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project>
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>org.apache.maven.its.mng5064</groupId>
-  <artifactId>test-snapshot</artifactId>
-  <version>1-SNAPSHOT</version>
-  <packaging>jar</packaging>
-
-  <name>Maven Integration Test :: MNG-5604 - project to make snapshots</name> 
-  <description>
-    This is used to create two different 1-SNAPSHOT's -- one in local repo, one in other repo.
-  </description>
-
-  <properties>
-    <!-- invoker runs that build this specify -DwhichVersion=xxxx -->
-    <whichVersion>neither</whichVersion>
-  </properties>
-
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-  </build>
-
-</project>
+<settings>
+  <profiles>
+    <profile>
+      <id>maven-core-it-repo</id>
+      <repositories>
+        <repository>
+          <id>maven-core-it</id>
+          <url>http://localhost:@port@/repo</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <!-- This should get overridden via -nsu CLI argument -->
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>maven-core-it-repo</activeProfile>
+  </activeProfiles>
+</settings>
