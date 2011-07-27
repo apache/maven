@@ -27,12 +27,12 @@ import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 import org.apache.maven.project.ModelUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -196,18 +196,16 @@ public class DefaultModelInheritanceAssembler
             }
             else
             {
-                List childDeps = childDepMgmt.getDependencies();
+                List<Dependency> childDeps = childDepMgmt.getDependencies();
 
-                Map mappedChildDeps = new TreeMap();
-                for ( Iterator it = childDeps.iterator(); it.hasNext(); )
+                Map<String, Dependency> mappedChildDeps = new TreeMap<String, Dependency>();
+                for ( Dependency dep : childDeps )
                 {
-                    Dependency dep = (Dependency) it.next();
                     mappedChildDeps.put( dep.getManagementKey(), dep );
                 }
 
-                for ( Iterator it = parentDepMgmt.getDependencies().iterator(); it.hasNext(); )
+                for ( Dependency dep : parentDepMgmt.getDependencies() )
                 {
-                    Dependency dep = (Dependency) it.next();
                     if ( !mappedChildDeps.containsKey( dep.getManagementKey() ) )
                     {
                         childDepMgmt.addDependency( dep );
@@ -319,7 +317,7 @@ public class DefaultModelInheritanceAssembler
 
         ModelUtils.mergeFilterLists( childBuild.getFilters(), parentBuild.getFilters() );
 
-        List resources = childBuild.getResources();
+        List<Resource> resources = childBuild.getResources();
         if ( ( resources == null ) || resources.isEmpty() )
         {
             childBuild.setResources( parentBuild.getResources() );
@@ -514,7 +512,7 @@ public class DefaultModelInheritanceAssembler
     // TODO: Move this to plexus-utils' PathTool.
     private static String resolvePath( String uncleanPath )
     {
-        LinkedList pathElements = new LinkedList();
+        LinkedList<String> pathElements = new LinkedList<String>();
 
         StringTokenizer tokenizer = new StringTokenizer( uncleanPath, "/" );
 

@@ -72,123 +72,123 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public final class ModelUtils
 {
 
-    private static final ModelPartCloner DEPENDENCY_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Dependency> DEPENDENCY_CLONER = new ModelPartCloner<Dependency>()
     {
-        public Object cloneModelPart( Object src )
+        public Dependency cloneModelPart( Dependency src )
         {
-            return ModelUtils.cloneDependency( (Dependency) src );
+            return ModelUtils.cloneDependency( src );
         }
     };
 
-    private static final ModelPartCloner PLUGIN_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Plugin> PLUGIN_CLONER = new ModelPartCloner<Plugin>()
     {
-        public Object cloneModelPart( Object src )
+        public Plugin cloneModelPart( Plugin src )
         {
-            return ModelUtils.clonePlugin( (Plugin) src );
+            return ModelUtils.clonePlugin( src );
         }
     };
 
-    private static final ModelPartCloner EXTENSION_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Extension> EXTENSION_CLONER = new ModelPartCloner<Extension>()
     {
-        public Object cloneModelPart( Object src )
+        public Extension cloneModelPart( Extension src )
         {
-            return ModelUtils.cloneExtension( (Extension) src );
+            return ModelUtils.cloneExtension( src );
         }
     };
 
-    private static final ModelPartCloner RESOURCE_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Resource> RESOURCE_CLONER = new ModelPartCloner<Resource>()
     {
-        public Object cloneModelPart( Object src )
+        public Resource cloneModelPart( Resource src )
         {
-            return ModelUtils.cloneResource( (Resource) src );
+            return ModelUtils.cloneResource( src );
         }
     };
 
-    private static final ModelPartCloner NOTIFIER_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Notifier> NOTIFIER_CLONER = new ModelPartCloner<Notifier>()
     {
-        public Object cloneModelPart( Object src )
+        public Notifier cloneModelPart( Notifier src )
         {
-            return ModelUtils.cloneNotifier( (Notifier) src );
+            return ModelUtils.cloneNotifier( src );
         }
     };
 
-    private static final ModelPartCloner CONTRIBUTOR_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Contributor> CONTRIBUTOR_CLONER = new ModelPartCloner<Contributor>()
     {
-        public Object cloneModelPart( Object src )
+        public Contributor cloneModelPart( Contributor src )
         {
-            return ModelUtils.cloneContributor( (Contributor) src );
+            return ModelUtils.cloneContributor( src );
         }
     };
 
-    private static final ModelPartCloner DEVELOPER_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Developer> DEVELOPER_CLONER = new ModelPartCloner<Developer>()
     {
-        public Object cloneModelPart( Object src )
+        public Developer cloneModelPart( Developer src )
         {
-            return ModelUtils.cloneDeveloper( (Developer) src );
+            return ModelUtils.cloneDeveloper( src );
         }
     };
 
-    private static final ModelPartCloner LICENSE_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<License> LICENSE_CLONER = new ModelPartCloner<License>()
     {
-        public Object cloneModelPart( Object src )
+        public License cloneModelPart( License src )
         {
-            return ModelUtils.cloneLicense( (License) src );
+            return ModelUtils.cloneLicense( src );
         }
     };
 
-    private static final ModelPartCloner MAILING_LIST_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<MailingList> MAILING_LIST_CLONER = new ModelPartCloner<MailingList>()
     {
-        public Object cloneModelPart( Object src )
+        public MailingList cloneModelPart( MailingList src )
         {
-            return ModelUtils.cloneMailingList( (MailingList) src );
+            return ModelUtils.cloneMailingList( src );
         }
     };
 
-    private static final ModelPartCloner REPOSITORY_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Repository> REPOSITORY_CLONER = new ModelPartCloner<Repository>()
     {
-        public Object cloneModelPart( Object src )
+        public Repository cloneModelPart( Repository src )
         {
-            return ModelUtils.cloneRepository( (Repository) src );
+            return ModelUtils.cloneRepository( src );
         }
     };
 
-    private static final ModelPartCloner PROFILE_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Profile> PROFILE_CLONER = new ModelPartCloner<Profile>()
     {
-        public Object cloneModelPart( Object src )
+        public Profile cloneModelPart( Profile src )
         {
-            return ModelUtils.cloneProfile( (Profile) src );
+            return ModelUtils.cloneProfile( src );
         }
     };
 
-    private static final ModelPartCloner REPORT_PLUGIN_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<ReportPlugin> REPORT_PLUGIN_CLONER = new ModelPartCloner<ReportPlugin>()
     {
-        public Object cloneModelPart( Object src )
+        public ReportPlugin cloneModelPart( ReportPlugin src )
         {
-            return ModelUtils.cloneReportPlugin( (ReportPlugin) src );
+            return ModelUtils.cloneReportPlugin( src );
         }
     };
 
-    private static final ModelPartCloner REPORT_SET_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<ReportSet> REPORT_SET_CLONER = new ModelPartCloner<ReportSet>()
     {
-        public Object cloneModelPart( Object src )
+        public ReportSet cloneModelPart( ReportSet src )
         {
-            return ModelUtils.cloneReportSet( (ReportSet) src );
+            return ModelUtils.cloneReportSet( src );
         }
     };
 
-    private static final ModelPartCloner DEPENDENCY_EXCLUSION_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<Exclusion> DEPENDENCY_EXCLUSION_CLONER = new ModelPartCloner<Exclusion>()
     {
-        public Object cloneModelPart( Object src )
+        public Exclusion cloneModelPart( Exclusion src )
         {
-            return ModelUtils.cloneExclusion( (Exclusion) src );
+            return ModelUtils.cloneExclusion( src );
         }
     };
 
-    private static final ModelPartCloner PLUGIN_EXECUTION_CLONER = new ModelPartCloner()
+    private static final ModelPartCloner<PluginExecution> PLUGIN_EXECUTION_CLONER = new ModelPartCloner<PluginExecution>()
     {
-        public Object cloneModelPart( Object src )
+        public PluginExecution cloneModelPart( PluginExecution src )
         {
-            return ModelUtils.clonePluginExecution( (PluginExecution) src );
+            return ModelUtils.clonePluginExecution( src );
         }
     };
 
@@ -211,19 +211,17 @@ public final class ModelUtils
             return;
         }
 
-        List originalPlugins = pluginContainer.getPlugins();
+        List<Plugin> originalPlugins = pluginContainer.getPlugins();
 
         if ( ( originalPlugins == null ) || originalPlugins.isEmpty() )
         {
             return;
         }
 
-        List normalized = new ArrayList( originalPlugins.size() );
+        List<Plugin> normalized = new ArrayList<Plugin>( originalPlugins.size() );
 
-        for ( Iterator it = originalPlugins.iterator(); it.hasNext(); )
+        for ( Plugin currentPlugin : originalPlugins )
         {
-            Plugin currentPlugin = (Plugin) it.next();
-
             if ( normalized.contains( currentPlugin ) )
             {
                 int idx = normalized.indexOf( currentPlugin );
@@ -473,19 +471,19 @@ public final class ModelUtils
             return;
         }
 
-        List parentPlugins = parent.getPlugins();
+        List<Plugin> parentPlugins = parent.getPlugins();
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            parentPlugins = new ArrayList( parentPlugins );
+            parentPlugins = new ArrayList<Plugin>( parentPlugins );
 
             // If we're processing this merge as an inheritance, we have to build up a list of
             // plugins that were considered for inheritance.
             if ( handleAsInheritance )
             {
-                for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+                for ( Iterator<Plugin> it = parentPlugins.iterator(); it.hasNext(); )
                 {
-                    Plugin plugin = (Plugin) it.next();
+                    Plugin plugin = it.next();
 
                     String inherited = plugin.getInherited();
 
@@ -496,14 +494,12 @@ public final class ModelUtils
                 }
             }
 
-            List assembledPlugins = new ArrayList();
+            List<Plugin> assembledPlugins = new ArrayList<Plugin>();
 
-            Map childPlugins = child.getPluginsAsMap();
+            Map<String, Plugin> childPlugins = child.getPluginsAsMap();
 
-            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            for ( Plugin parentPlugin : parentPlugins )
             {
-                Plugin parentPlugin = (Plugin) it.next();
-
                 String parentInherited = parentPlugin.getInherited();
 
                 // only merge plugin definition from the parent if at least one
@@ -537,9 +533,7 @@ public final class ModelUtils
 
                 // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
                 // since this list is a local one, and may have been modified during processing.
-                List results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
-                                                                        child.getPlugins() );
-
+                List<Plugin> results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins, child.getPlugins() );
 
                 child.setPlugins( results );
 
@@ -548,30 +542,26 @@ public final class ModelUtils
         }
     }
 
-    public static List orderAfterMerge( List merged, List highPrioritySource, List lowPrioritySource )
+    public static <T> List<T> orderAfterMerge( List<T> merged, List<T> highPrioritySource, List<T> lowPrioritySource )
     {
-        List results = new ArrayList();
+        List<T> results = new ArrayList<T>();
 
         if ( !merged.isEmpty() )
         {
             results.addAll( merged );
         }
 
-        List missingFromResults = new ArrayList();
+        List<T> missingFromResults = new ArrayList<T>();
 
-        List sources = new ArrayList();
+        List<List<T>> sources = new ArrayList<List<T>>();
 
         sources.add( highPrioritySource );
         sources.add( lowPrioritySource );
 
-        for ( Iterator sourceIterator = sources.iterator(); sourceIterator.hasNext(); )
+        for ( List<T> source : sources )
         {
-            List source = (List) sourceIterator.next();
-
-            for ( Iterator it = source.iterator(); it.hasNext(); )
+            for ( T item : source )
             {
-                Object item = it.next();
-
                 if ( results.contains( item ) )
                 {
                     if ( !missingFromResults.isEmpty() )
@@ -621,19 +611,19 @@ public final class ModelUtils
             return;
         }
 
-        List parentPlugins = parent.getPlugins();
+        List<ReportPlugin> parentPlugins = parent.getPlugins();
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            parentPlugins = new ArrayList( parentPlugins );
+            parentPlugins = new ArrayList<ReportPlugin>( parentPlugins );
 
             // If we're processing this merge as an inheritance, we have to build up a list of
             // plugins that were considered for inheritance.
             if ( handleAsInheritance )
             {
-                for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+                for ( Iterator<ReportPlugin> it = parentPlugins.iterator(); it.hasNext(); )
                 {
-                    ReportPlugin plugin = (ReportPlugin) it.next();
+                    ReportPlugin plugin = it.next();
 
                     String inherited = plugin.getInherited();
 
@@ -644,14 +634,12 @@ public final class ModelUtils
                 }
             }
 
-            List assembledPlugins = new ArrayList();
+            List<ReportPlugin> assembledPlugins = new ArrayList<ReportPlugin>();
 
-            Map childPlugins = child.getReportPluginsAsMap();
+            Map<String, ReportPlugin> childPlugins = child.getReportPluginsAsMap();
 
-            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            for ( ReportPlugin parentPlugin : parentPlugins )
             {
-                ReportPlugin parentPlugin = (ReportPlugin) it.next();
-
                 String parentInherited = parentPlugin.getInherited();
 
                 // only merge plugin definition from the parent if at least one
@@ -662,7 +650,7 @@ public final class ModelUtils
                 if ( !handleAsInheritance || ( parentInherited == null )
                     || Boolean.valueOf( parentInherited ).booleanValue() )
                 {
-                    ReportPlugin childPlugin = (ReportPlugin) childPlugins.get( parentPlugin.getKey() );
+                    ReportPlugin childPlugin = childPlugins.get( parentPlugin.getKey() );
 
                     if ( ( childPlugin != null ) && !assembledPlugins.contains( childPlugin ) )
                     {
@@ -685,7 +673,7 @@ public final class ModelUtils
 
                 // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
                 // since this list is a local one, and may have been modified during processing.
-                List results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
+                List<ReportPlugin> results = ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins,
                                                                         child.getPlugins() );
 
                 child.setPlugins( results );
@@ -727,20 +715,18 @@ public final class ModelUtils
 
         boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
 
-        List parentExecutions = parent.getExecutions();
+        List<PluginExecution> parentExecutions = parent.getExecutions();
 
         if ( ( parentExecutions != null ) && !parentExecutions.isEmpty() )
         {
-            List mergedExecutions = new ArrayList();
+            List<PluginExecution> mergedExecutions = new ArrayList<PluginExecution>();
 
-            Map assembledExecutions = new TreeMap();
+            Map<String, PluginExecution> assembledExecutions = new TreeMap<String, PluginExecution>();
 
-            Map childExecutions = child.getExecutionsAsMap();
+            Map<String, PluginExecution> childExecutions = child.getExecutionsAsMap();
 
-            for ( Iterator it = parentExecutions.iterator(); it.hasNext(); )
+            for ( PluginExecution parentExecution : parentExecutions )
             {
-                PluginExecution parentExecution = (PluginExecution) it.next();
-
                 String inherited = parentExecution.getInherited();
 
                 boolean parentExecInherited = parentIsInherited && ( ( inherited == null ) || Boolean.valueOf( inherited ).booleanValue() );
@@ -767,10 +753,8 @@ public final class ModelUtils
                 }
             }
 
-            for ( Iterator it = child.getExecutions().iterator(); it.hasNext(); )
+            for ( PluginExecution childExecution : child.getExecutions() )
             {
-                PluginExecution childExecution = (PluginExecution) it.next();
-
                 if ( !assembledExecutions.containsKey( childExecution.getId() ) )
                 {
                     mergedExecutions.add( childExecution );
@@ -814,23 +798,21 @@ public final class ModelUtils
         }
 
         // from here to the end of the method is dealing with merging of the <executions/> section.
-        List parentReportSets = parent.getReportSets();
+        List<ReportSet> parentReportSets = parent.getReportSets();
 
         if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
         {
-            Map assembledReportSets = new TreeMap();
+            Map<String, ReportSet> assembledReportSets = new TreeMap<String, ReportSet>();
 
-            Map childReportSets = child.getReportSetsAsMap();
+            Map<String, ReportSet> childReportSets = child.getReportSetsAsMap();
 
-            for ( Iterator it = parentReportSets.iterator(); it.hasNext(); )
+            for ( ReportSet parentReportSet : parentReportSets )
             {
-                ReportSet parentReportSet = (ReportSet) it.next();
-
                 if ( !handleAsInheritance || parentIsInherited )
                 {
                     ReportSet assembledReportSet = parentReportSet;
 
-                    ReportSet childReportSet = (ReportSet) childReportSets.get( parentReportSet.getId() );
+                    ReportSet childReportSet = childReportSets.get( parentReportSet.getId() );
 
                     if ( childReportSet != null )
                     {
@@ -847,11 +829,9 @@ public final class ModelUtils
                 }
             }
 
-            for ( Iterator it = childReportSets.entrySet().iterator(); it.hasNext(); )
+            for ( Map.Entry<String, ReportSet> entry : childReportSets.entrySet() )
             {
-                Map.Entry entry = (Map.Entry) it.next();
-
-                String id = (String) entry.getKey();
+                String id = entry.getKey();
 
                 if ( !assembledReportSets.containsKey( id ) )
                 {
@@ -859,7 +839,7 @@ public final class ModelUtils
                 }
             }
 
-            child.setReportSets( new ArrayList( assembledReportSets.values() ) );
+            child.setReportSets( new ArrayList<ReportSet>( assembledReportSets.values() ) );
 
             child.flushReportSetMap();
         }
@@ -873,10 +853,10 @@ public final class ModelUtils
             child.setPhase( parent.getPhase() );
         }
 
-        List parentGoals = parent.getGoals();
-        List childGoals = child.getGoals();
+        List<String> parentGoals = parent.getGoals();
+        List<String> childGoals = child.getGoals();
 
-        List goals = new ArrayList();
+        List<String> goals = new ArrayList<String>();
 
         if ( ( childGoals != null ) && !childGoals.isEmpty() )
         {
@@ -885,10 +865,8 @@ public final class ModelUtils
 
         if ( parentGoals != null )
         {
-            for ( Iterator goalIterator = parentGoals.iterator(); goalIterator.hasNext(); )
+            for ( String goal : parentGoals )
             {
-                String goal = (String) goalIterator.next();
-
                 if ( !goals.contains( goal ) )
                 {
                     goals.add( goal );
@@ -908,10 +886,10 @@ public final class ModelUtils
 
     private static void mergeReportSetDefinitions( ReportSet child, ReportSet parent )
     {
-        List parentReports = parent.getReports();
-        List childReports = child.getReports();
+        List<String> parentReports = parent.getReports();
+        List<String> childReports = child.getReports();
 
-        List reports = new ArrayList();
+        List<String> reports = new ArrayList<String>();
 
         if ( ( childReports != null ) && !childReports.isEmpty() )
         {
@@ -920,10 +898,8 @@ public final class ModelUtils
 
         if ( parentReports != null )
         {
-            for ( Iterator i = parentReports.iterator(); i.hasNext(); )
+            for ( String report : parentReports )
             {
-                String report = (String) i.next();
-
                 if ( !reports.contains( report ) )
                 {
                     reports.add( report );
@@ -1150,15 +1126,15 @@ public final class ModelUtils
         return result;
     }
 
-    private static List cloneList( List src, ModelPartCloner cloner )
+    private static <T> List<T> cloneList( List<T> src, ModelPartCloner<T> cloner )
     {
-        List result = null;
+        List<T> result = null;
         if ( src != null )
         {
-            result = new ArrayList( src.size() );
-            for ( Iterator it = src.iterator(); it.hasNext(); )
+            result = new ArrayList<T>( src.size() );
+            for ( T o : src )
             {
-                result.add( cloner.cloneModelPart( (Object) it.next() ) );
+                result.add( cloner.cloneModelPart( o ) );
             }
         }
 
@@ -1215,13 +1191,13 @@ public final class ModelUtils
 
         CiManagement result = new CiManagement();
 
-        List notifiers = null;
+        List<Notifier> notifiers = null;
         if ( src.getNotifiers() != null )
         {
-            notifiers = new ArrayList( src.getNotifiers().size() );
-            for ( Iterator it = src.getNotifiers().iterator(); it.hasNext(); )
+            notifiers = new ArrayList<Notifier>( src.getNotifiers().size() );
+            for ( Notifier notifier : src.getNotifiers() )
             {
-                notifiers.add( cloneNotifier( (Notifier) it.next() ) );
+                notifiers.add( cloneNotifier( notifier ) );
             }
         }
         result.setNotifiers( cloneList( src.getNotifiers(), NOTIFIER_CLONER ) );
@@ -1258,7 +1234,7 @@ public final class ModelUtils
         }
 
         Properties result = new Properties();
-        for ( Enumeration e = src.propertyNames(); e.hasMoreElements(); )
+        for ( Enumeration<?> e = src.propertyNames(); e.hasMoreElements(); )
         {
             String key = (String) e.nextElement();
             result.setProperty( key, src.getProperty( key ) );
@@ -1420,15 +1396,14 @@ public final class ModelUtils
         return result;
     }
 
-    public static List cloneListOfStrings( List src )
+    public static List<String> cloneListOfStrings( List<String> src )
     {
-        List result = null;
+        List<String> result = null;
         if ( src != null )
         {
-            result = new ArrayList( src.size() );
-            for ( Iterator it = src.iterator(); it.hasNext(); )
+            result = new ArrayList<String>( src.size() );
+            for ( String item : src )
             {
-                String item = (String) it.next();
                 result.add( item );
             }
         }
@@ -1477,21 +1452,17 @@ public final class ModelUtils
         return result;
     }
 
-    public static List mergeRepositoryLists( List dominant, List recessive )
+    public static List<Repository> mergeRepositoryLists( List<Repository> dominant, List<Repository> recessive )
     {
-        List repositories = new ArrayList();
+        List<Repository> repositories = new ArrayList<Repository>();
 
-        for ( Iterator it = dominant.iterator(); it.hasNext(); )
+        for ( Repository repository : dominant )
         {
-            Repository repository = (Repository) it.next();
-
             repositories.add( repository );
         }
 
-        for ( Iterator it = recessive.iterator(); it.hasNext(); )
+        for ( Repository repository : recessive )
         {
-            Repository repository = (Repository) it.next();
-
             if ( !repositories.contains( repository ) )
             {
                 repositories.add( repository );
@@ -1503,15 +1474,14 @@ public final class ModelUtils
 
     public static void mergeExtensionLists( Build childBuild, Build parentBuild )
     {
-        Map extMap = new LinkedHashMap();
+        Map<String, Extension> extMap = new LinkedHashMap<String, Extension>();
 
-        List ext = childBuild.getExtensions();
+        List<Extension> ext = childBuild.getExtensions();
 
         if ( ext != null )
         {
-            for ( Iterator it = ext.iterator(); it.hasNext(); )
+            for ( Extension extension : ext )
             {
-                Extension extension = (Extension) it.next();
                 extMap.put( extension.getKey(), extension );
             }
         }
@@ -1520,9 +1490,8 @@ public final class ModelUtils
 
         if ( ext != null )
         {
-            for ( Iterator it = ext.iterator(); it.hasNext(); )
+            for ( Extension extension : ext )
             {
-                Extension extension = (Extension) it.next();
                 if ( !extMap.containsKey( extension.getKey() ) )
                 {
                     extMap.put( extension.getKey(), extension );
@@ -1530,14 +1499,13 @@ public final class ModelUtils
             }
         }
 
-        childBuild.setExtensions( new ArrayList( extMap.values() ) );
+        childBuild.setExtensions( new ArrayList<Extension>( extMap.values() ) );
     }
 
-    public static void mergeResourceLists( List childResources, List parentResources )
+    public static void mergeResourceLists( List<Resource> childResources, List<Resource> parentResources )
     {
-        for ( Iterator i = parentResources.iterator(); i.hasNext(); )
+        for ( Resource r : parentResources )
         {
-            Resource r = (Resource) i.next();
             if ( !childResources.contains( r ) )
             {
                 childResources.add( r );
@@ -1545,11 +1513,10 @@ public final class ModelUtils
         }
     }
 
-    public static void mergeFilterLists( List childFilters, List parentFilters )
+    public static void mergeFilterLists( List<String> childFilters, List<String> parentFilters )
     {
-        for ( Iterator i = parentFilters.iterator(); i.hasNext(); )
+        for ( String f : parentFilters )
         {
-            String f = (String) i.next();
             if ( !childFilters.contains( f ) )
             {
                 childFilters.add( f );
@@ -1557,24 +1524,22 @@ public final class ModelUtils
         }
     }
 
-    public static List mergeDependencyList( List child, List parent )
+    public static List<Dependency> mergeDependencyList( List<Dependency> child, List<Dependency> parent )
     {
-        Map depsMap = new LinkedHashMap();
+        Map<String, Dependency> depsMap = new LinkedHashMap<String, Dependency>();
 
         if ( child != null )
         {
-            for ( Iterator it = child.iterator(); it.hasNext(); )
+            for ( Dependency dependency : child )
             {
-                Dependency dependency = (Dependency) it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
 
         if ( parent != null )
         {
-            for ( Iterator it = parent.iterator(); it.hasNext(); )
+            for ( Dependency dependency : parent )
             {
-                Dependency dependency = (Dependency) it.next();
                 if ( !depsMap.containsKey( dependency.getManagementKey() ) )
                 {
                     depsMap.put( dependency.getManagementKey(), dependency );
@@ -1582,12 +1547,12 @@ public final class ModelUtils
             }
         }
 
-        return new ArrayList( depsMap.values() );
+        return new ArrayList<Dependency>( depsMap.values() );
     }
 
-    public static interface ModelPartCloner
+    public static interface ModelPartCloner<T>
     {
-        Object cloneModelPart( Object src );
+        T cloneModelPart( T src );
     }
 
 
