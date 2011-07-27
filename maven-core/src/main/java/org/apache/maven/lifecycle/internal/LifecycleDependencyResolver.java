@@ -93,41 +93,55 @@ public class LifecycleDependencyResolver
                                             boolean aggregating, Set<Artifact> projectArtifacts )
         throws LifecycleExecutionException
     {
-        if ( project.getDependencyArtifacts() == null )
+        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        try
         {
-            try
+            ClassLoader projectRealm = project.getClassRealm();
+            if ( projectRealm != null && projectRealm != tccl )
             {
-                project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+                Thread.currentThread().setContextClassLoader( projectRealm );
             }
-            catch ( InvalidDependencyVersionException e )
+
+            if ( project.getDependencyArtifacts() == null )
             {
-                throw new LifecycleExecutionException( e );
-            }
-        }
-
-        Set<Artifact> artifacts =
-            getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts );
-
-        project.setResolvedArtifacts( artifacts );
-
-        Map<String, Artifact> map = new HashMap<String, Artifact>();
-        for ( Artifact artifact : artifacts )
-        {
-            map.put( artifact.getDependencyConflictId(), artifact );
-        }
-        for ( Artifact artifact : project.getDependencyArtifacts() )
-        {
-            if ( artifact.getFile() == null )
-            {
-                Artifact resolved = map.get( artifact.getDependencyConflictId() );
-                if ( resolved != null )
+                try
                 {
-                    artifact.setFile( resolved.getFile() );
-                    artifact.setDependencyTrail( resolved.getDependencyTrail() );
-                    artifact.setResolvedVersion( resolved.getVersion() );
-                    artifact.setResolved( true );
+                    project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+                }
+                catch ( InvalidDependencyVersionException e )
+                {
+                    throw new LifecycleExecutionException( e );
                 }
             }
+
+            Set<Artifact> artifacts =
+                getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts );
+
+            project.setResolvedArtifacts( artifacts );
+
+            Map<String, Artifact> map = new HashMap<String, Artifact>();
+            for ( Artifact artifact : artifacts )
+            {
+                map.put( artifact.getDependencyConflictId(), artifact );
+            }
+            for ( Artifact artifact : project.getDependencyArtifacts() )
+            {
+                if ( artifact.getFile() == null )
+                {
+                    Artifact resolved = map.get( artifact.getDependencyConflictId() );
+                    if ( resolved != null )
+                    {
+                        artifact.setFile( resolved.getFile() );
+                        artifact.setDependencyTrail( resolved.getDependencyTrail() );
+                        artifact.setResolvedVersion( resolved.getVersion() );
+                        artifact.setResolved( true );
+                    }
+                }
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( tccl );
         }
     }
 
