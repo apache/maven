@@ -222,7 +222,12 @@ class ReactorReader
 
         if ( project != null )
         {
-            return find( project, artifact );
+            File file = find( project, artifact );
+            if ( file == null && project != project.getExecutionProject() )
+            {
+                file = find( project.getExecutionProject(), artifact );
+            }
+            return file;
         }
 
         return null;
