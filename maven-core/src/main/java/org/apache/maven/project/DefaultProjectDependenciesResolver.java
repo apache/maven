@@ -36,6 +36,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
+import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -92,7 +93,18 @@ public class DefaultProjectDependenciesResolver
             Map<String, Dependency> dependencies = new HashMap<String, Dependency>();
             for ( Dependency dependency : project.getDependencies() )
             {
-                String key = dependency.getManagementKey();
+                String classifier = dependency.getClassifier();
+                if ( classifier == null )
+                {
+                    ArtifactType type = stereotypes.get( dependency.getType() );
+                    if ( type != null )
+                    {
+                        classifier = type.getClassifier();
+                    }
+                }
+                String key =
+                    ArtifacIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
+                                                    dependency.getType(), classifier );
                 dependencies.put( key, dependency );
             }
             for ( Artifact artifact : project.getDependencyArtifacts() )
