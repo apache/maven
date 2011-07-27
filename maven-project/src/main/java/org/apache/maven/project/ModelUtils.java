@@ -802,7 +802,7 @@ public final class ModelUtils
 
         if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
         {
-            Map<String, ReportSet> assembledReportSets = new TreeMap<String, ReportSet>();
+            Map<String, ReportSet> assembledReportSets = new LinkedHashMap<String, ReportSet>();
 
             Map<String, ReportSet> childReportSets = child.getReportSetsAsMap();
 
