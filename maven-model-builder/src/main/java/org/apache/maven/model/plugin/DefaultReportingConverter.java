@@ -116,8 +116,8 @@ public class DefaultReportingConverter
             reportPlugins.addChild( reportPlugin );
 
             if ( !reporting.isExcludeDefaults() && !hasMavenProjectInfoReportsPlugin
-                && "org.apache.maven.plugins".equals( reportPlugin.getChild( "groupId" ).getValue() )
-                && "maven-project-info-reports-plugin".equals( reportPlugin.getChild( "artifactId" ).getValue() ) )
+                && "org.apache.maven.plugins".equals( plugin.getGroupId() )
+                && "maven-project-info-reports-plugin".equals( plugin.getArtifactId() ) )
             {
                 hasMavenProjectInfoReportsPlugin = true;
             }
