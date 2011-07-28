@@ -32,7 +32,9 @@ END SNIPPET: ant-bootstrap -->
 <project default="all" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <property name="distributionDirectory" value="apache-maven"/>
-  <property name="distributionName" value="apache-maven"/>
+  <property name="distributionId" value="apache-maven"/>
+  <property name="distributionShortName" value="Maven"/>
+  <property name="distributionName" value="Apache Maven"/>
   <property name="it.workdir.version" value="3.0.x" />
 
   <target name="initTaskDefs">
@@ -75,7 +77,7 @@ Do you want to continue?</input>
 
   <target name="init" depends="isMavenHomeSet">
     <!-- Initialize properties -->
-    <property name="maven.home.basename.expected" value="${distributionName}-${xmlPom.project.version}" />
+    <property name="maven.home.basename.expected" value="${distributionId}-${xmlPom.project.version}" />
     <property name="maven.assembly" location="${distributionDirectory}/target/${maven.home.basename.expected}-bin.zip" />
     <property name="maven.repo.local" value="${user.home}/.m2/repository" />
     <property name="maven.debug" value="-e" />
@@ -258,6 +260,8 @@ Do you want to continue?</input>
       <arg value="-Dmaven.repo.local=${maven.repo.local}" />
       <arg value="-Dsurefire.useFile=${surefire.useFile}" />
       <arg value="-Dmaven.test.redirectTestOutputToFile=${maven.test.redirectTestOutputToFile}" />
+      <arg value="-DdistributionId=${distributionId}" />
+      <arg value="-DdistributionShortName=${distributionShortName}" />
       <arg value="-DdistributionName=${distributionName}" />
     </java>
   </target>
