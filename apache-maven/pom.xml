@@ -30,6 +30,10 @@
   <name>Maven Distribution</name>
   <description>Module to build the Maven distribution, source and binary, in zip and tar.gz formats.</description>
 
+  <properties>
+    <distributionName>apache-maven</distributionName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -67,6 +71,7 @@
   </dependencies>
 
   <build>
+    <finalName>${distributionId}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

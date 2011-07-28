@@ -54,8 +54,9 @@ public final class CLIReportingUtils
     {
         Properties properties = getBuildProperties();
         stdout.println( createMavenVersionString( properties ) );
+        String shortName = reduce( properties.getProperty( "distributionShortName" ) );
 
-        stdout.println( "Maven home: " + System.getProperty( "maven.home", "<unknown maven home>" ) );
+        stdout.println( shortName + " home: " + System.getProperty( "maven.home", "<unknown maven home>" ) );
 
         stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
             + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) );
@@ -80,8 +81,9 @@ public final class CLIReportingUtils
         String timestamp = reduce( buildProperties.getProperty( "timestamp" ) );
         String version = reduce( buildProperties.getProperty( BUILD_VERSION_PROPERTY ) );
         String rev = reduce( buildProperties.getProperty( "buildNumber" ) );
+        String distributionName = reduce( buildProperties.getProperty( "distributionName" ) );
 
-        String msg = "Apache Maven ";
+        String msg = distributionName + " ";
         msg += ( version != null ? version : "<version unknown>" );
         if ( rev != null || timestamp != null )
         {
