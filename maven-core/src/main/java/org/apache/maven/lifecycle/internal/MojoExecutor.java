@@ -242,7 +242,7 @@ public class MojoExecutor
         }
     }
 
-    private void ensureDependenciesAreResolved( MojoDescriptor mojoDescriptor, MavenSession session,
+    public void ensureDependenciesAreResolved( MojoDescriptor mojoDescriptor, MavenSession session,
                                                 DependencyContext dependencyContext )
         throws LifecycleExecutionException
 
