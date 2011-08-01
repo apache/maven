@@ -55,6 +55,8 @@ public class MavenITmng3877BasedirAlignedModelTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        testDir = testDir.getCanonicalFile();
+
         Properties modelProps = verifier.loadProperties( "target/model.properties" );
 
         assertPathEquals( testDir, "target", modelProps.getProperty( "project.build.directory" ) );

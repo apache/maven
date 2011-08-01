@@ -54,6 +54,8 @@ public class MavenITmng3760BaseUriPropertyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        testDir = testDir.getCanonicalFile();
+
         Properties props = verifier.loadProperties( "target/profile.properties" );
         // set via project
         assertEquals( testDir.toURI().toString(), props.getProperty( "project.properties.pomProperty" ) );
@@ -75,6 +77,8 @@ public class MavenITmng3760BaseUriPropertyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        testDir = testDir.getCanonicalFile();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         // set via project

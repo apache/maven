@@ -56,6 +56,8 @@ public class MavenITmng3475BaseAlignedDirTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
+        testDir = testDir.getCanonicalFile();
+
         Properties configProps = verifier.loadProperties( "target/config.properties" );
 
         assertPathEquals( testDir, "target", configProps.getProperty( "mapParam.buildDirectory" ) );

@@ -51,6 +51,8 @@ public class MavenITmng3843PomInheritanceTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3843" );
 
+        testDir = testDir.getCanonicalFile();
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "test-1/target" );

@@ -46,6 +46,9 @@ public class MavenITmng0680ParentBasedirTest
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0680" );
+
+        testDir = testDir.getCanonicalFile();
+
         File subDir = new File( testDir, "subproject" );
 
         Verifier verifier = newVerifier( subDir.getAbsolutePath() );
