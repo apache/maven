@@ -73,7 +73,7 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
     {
-        return injectSession( factory.createArtifactRepository( layoutId, url, layoutId, snapshots, releases ), true );
+        return injectSession( factory.createArtifactRepository( id, url, layoutId, snapshots, releases ), true );
     }
 
     public ArtifactRepository createArtifactRepository( String id, String url,
