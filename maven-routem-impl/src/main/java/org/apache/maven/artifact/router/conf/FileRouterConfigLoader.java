@@ -44,23 +44,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
 import org.codehaus.plexus.logging.Logger;
 
-public class FileRouterConfigBuilder
-    implements RouterConfigBuilder
+public class FileRouterConfigLoader
+    implements ArtifactRouterConfigLoader
 {
 
     private static final String KEY_ROUTES_FILE = "routing-tables-file";
     
-    private static final String KEY_ROUTER_SOURCE = "route-source";
+    private static final String KEY_MIRROR_SOURCE = "mirror-source";
+
+    private static final String KEY_GROUP_SOURCE = "group-source";
 
     private static final String KEY_DISABLED = "disabled";
 
-    private static final String KEY_DISCOVERY_STRATEGIES = "discovery-strategies";
+    private static final String KEY_DISCOVERY_STRATEGY = "discovery-strategy";
 
+    private static final String KEY_SELECTION_STRATEGY = "selection-strategy";
+    
     private static final String ROUTES_FILE = "artifact-routes.json";
 
     private static final String CONFIG_FILENAME = "router.properties";
@@ -71,7 +76,7 @@ public class FileRouterConfigBuilder
 
     private File confDir;
 
-    public FileRouterConfigBuilder( File confDir, Logger logger )
+    public FileRouterConfigLoader( File confDir, Logger logger )
     {
         this.confDir = confDir;
         this.logger = logger;
@@ -80,7 +85,7 @@ public class FileRouterConfigBuilder
     public ArtifactRouterConfiguration build()
         throws ArtifactRouterConfigurationException
     {
-        final ArtifactRouterConfiguration config = new ArtifactRouterConfiguration();
+        RouterConfigBuilder builder = new RouterConfigBuilder();
         File routerConfig = new File( confDir, CONFIG_FILENAME );
 
         if ( logger.isDebugEnabled() )
@@ -88,6 +93,8 @@ public class FileRouterConfigBuilder
             logger.debug( "Loading mirror configuration from file: " + routerConfig );
         }
 
+        File routesFile = null;
+        
         if ( routerConfig.canRead() )
         {
             InputStream stream = null;
@@ -100,44 +107,33 @@ public class FileRouterConfigBuilder
                 String path = p.getProperty( KEY_ROUTES_FILE );
                 if ( path != null )
                 {
-                    config.setRoutesFile( new File( path ) );
+                    routesFile = new File( path );
                 }
 
-                config.setDisabled( Boolean.parseBoolean( p.getProperty( KEY_DISABLED, "false" ) ) );
+                builder.withEnabled( !Boolean.parseBoolean( p.getProperty( KEY_DISABLED, "false" ) ) );
 
-                final String strat = p.getProperty( KEY_DISCOVERY_STRATEGIES );
+                String strat = p.getProperty( KEY_DISCOVERY_STRATEGY );
                 if ( strat != null )
                 {
-                    config.setDiscoveryStrategy( strat );
+                    builder.withDiscoveryStrategy( strat );
                 }
 
-                String sourceUrl = p.getProperty( KEY_ROUTER_SOURCE );
-                if ( sourceUrl != null )
+                strat = p.getProperty( KEY_SELECTION_STRATEGY );
+                if ( strat != null )
                 {
-                    URL u = new URL( sourceUrl );
-                    String id = u.getUserInfo();
+                    builder.withDiscoveryStrategy( strat );
+                }
 
-                    if ( id == null )
-                    {
-                        id = DEFAULT_SOURCE_ID;
-                    }
-                    else
-                    {
-                        StringBuilder sb = new StringBuilder( u.getProtocol() ).append( ":://" ).append( u.getHost() );
-                        if ( u.getPort() > 0 )
-                        {
-                            sb.append( ":" ).append( u.getPort() );
-                        }
-
-                        if ( u.getFile() != null )
-                        {
-                            sb.append( u.getFile() );
-                        }
-
-                        sourceUrl = sb.toString();
-                    }
-
-                    config.setSource( id, sourceUrl );
+                RouterSource src = loadRouterSource( p, KEY_MIRROR_SOURCE );
+                if ( src != null )
+                {
+                    builder.withMirrorSource( src );
+                }
+                
+                src = loadRouterSource( p, KEY_GROUP_SOURCE );
+                if ( src != null )
+                {
+                    builder.withGroupSource( src );
                 }
             }
             catch ( final IOException e )
@@ -159,12 +155,45 @@ public class FileRouterConfigBuilder
             }
         }
         
-        if ( config.getRoutesFile() == null )
+        if ( routesFile == null )
         {
-            config.setRoutesFile( new File( confDir, ROUTES_FILE ) );
+            routesFile = new File( confDir, ROUTES_FILE );
         }
         
-        return config;
+        builder.withRoutesFile( routesFile );
+        
+        return builder.build();
+    }
+
+    private RouterSource loadRouterSource( Properties p, String keyMirrorSource )
+        throws MalformedURLException
+    {
+        String url = p.getProperty( KEY_MIRROR_SOURCE );
+        String id = DEFAULT_SOURCE_ID;
+        
+        if ( url != null )
+        {
+            URL u = new URL( url );
+            if ( u.getUserInfo() != null )
+            {
+                id = u.getUserInfo();
+                
+                StringBuilder sb = new StringBuilder( u.getProtocol() ).append( "://" ).append( u.getHost() );
+                if ( u.getPort() > 0 )
+                {
+                    sb.append( ":" ).append( u.getPort() );
+                }
+
+                if ( u.getFile() != null )
+                {
+                    sb.append( u.getFile() );
+                }
+
+                url = sb.toString();
+            }
+        }
+        
+        return new RouterSource( id, url );
     }
 
 }

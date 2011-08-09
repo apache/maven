@@ -104,16 +104,30 @@ public class DefaultArtifactRouterSession
 
     /**
      * {@inheritDoc}
-     * @see org.apache.maven.artifact.router.session.ArtifactRouterSession#getSources()
+     * @see org.apache.maven.artifact.router.session.ArtifactRouterSession#getGroupSource()
      */
-    public RouterSource getSource()
+    public RouterSource getGroupSource()
     {
-        return config.getSource();
+        return config.getGroupSource();
     }
 
-    public RouterSource getDefaultSource()
+    /**
+     * {@inheritDoc}
+     * @see org.apache.maven.artifact.router.session.ArtifactRouterSession#getMirrorSource()
+     */
+    public RouterSource getMirrorSource()
     {
-        return config.getDefaultSource();
+        return config.getMirrorSource();
+    }
+
+    public RouterSource getDefaultGroupSource()
+    {
+        return config.getDefaultGroupSource();
+    }
+
+    public RouterSource getDefaultMirrorSource()
+    {
+        return config.getDefaultMirrorSource();
     }
 
     /**

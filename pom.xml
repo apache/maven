@@ -408,6 +408,7 @@
           <version>${plexusVersion}</version>
           <executions>
             <execution>
+              <id>generate-component-metadata</id>
               <goals>
                 <goal>generate-metadata</goal>
                 <goal>generate-test-metadata</goal>

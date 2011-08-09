@@ -38,24 +38,26 @@ package org.apache.maven.artifact.router.loader.discovery;
  * under the License.
  */
 
-import org.apache.maven.artifact.router.ArtifactRouter;
-import org.apache.maven.artifact.router.ArtifactRouterException;
-import org.apache.maven.artifact.router.conf.RouterSource;
-import org.apache.maven.artifact.router.loader.ArtifactRouterReader;
-import org.apache.maven.artifact.router.session.ArtifactRouterSession;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.GroupRoute;
+import org.apache.maven.artifact.router.MirrorRoute;
+import org.apache.maven.artifact.router.conf.RouterSource;
+import org.apache.maven.artifact.router.loader.ArtifactRouterReader;
+import org.apache.maven.artifact.router.session.ArtifactRouterSession;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 @Component( role = ArtifactRouterDiscoveryStrategy.class, hint = "dns" )
 final class DNSDiscoveryStrategy
@@ -68,7 +70,7 @@ final class DNSDiscoveryStrategy
     @Requirement
     private ArtifactRouterReader routerReader;
 
-    public ArtifactRouter findRouter( final ArtifactRouterSession session )
+    private RouterSource findRouterSource( final ArtifactRouterSession session )
         throws ArtifactRouterException
     {
         final Map<String, String> env = new HashMap<String, String>();
@@ -141,12 +143,24 @@ final class DNSDiscoveryStrategy
                         url = txtRecord.substring( idx + 2 );
                     }
                     
-                    return routerReader.loadRouter( new RouterSource( id, url ), session );
+                    return new RouterSource( id, url );
                 }
             }
         }
 
         return null;
+    }
+
+    public Collection<GroupRoute> findGroupRoutes( ArtifactRouterSession session )
+        throws ArtifactRouterException
+    {
+        return routerReader.loadGroupRoutes( findRouterSource( session ), session );
+    }
+
+    public Collection<MirrorRoute> findMirrorRoutes( ArtifactRouterSession session )
+        throws ArtifactRouterException
+    {
+        return routerReader.loadMirrorRoutes( findRouterSource( session ), session );
     }
 
 }

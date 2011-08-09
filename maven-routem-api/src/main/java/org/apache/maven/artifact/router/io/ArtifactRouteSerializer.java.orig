@@ -42,7 +42,6 @@ import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.GroupPattern;
 import org.apache.maven.artifact.router.GroupRoute;
 import org.apache.maven.artifact.router.MirrorRoute;
-import org.apache.maven.artifact.router.ArtifactRouter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

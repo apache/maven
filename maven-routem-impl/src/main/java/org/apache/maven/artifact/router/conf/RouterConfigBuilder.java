@@ -1,47 +1,114 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 package org.apache.maven.artifact.router.conf;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
+import static org.apache.maven.artifact.router.conf.ArtifactRouterOption.*;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
-public interface RouterConfigBuilder
+public class RouterConfigBuilder
 {
 
+    private File routesFile;
+
+    private RouterSource groupSource;
+
+    private RouterSource mirrorSource;
+
+    private String discoveryStrategy = ArtifactRouterConfiguration.NO_DISCOVERY_STRATEGIES;
+
+    private String selectionStrategy = ArtifactRouterConfiguration.WEIGHTED_RANDOM_STRATEGY;
+
+    private boolean disabled = false;
+
+    private Set<ArtifactRouterOption> options = new HashSet<ArtifactRouterOption>();
+
     ArtifactRouterConfiguration build()
-        throws ArtifactRouterConfigurationException;
+    {
+        return new DefaultArtifactRouterConfiguration( routesFile, groupSource, mirrorSource, discoveryStrategy,
+                                                       selectionStrategy, disabled, options );
+    }
+
+    RouterConfigBuilder withRoutesFile( File routesFile )
+    {
+        this.routesFile = routesFile;
+        return this;
+    }
+
+    RouterConfigBuilder withGroupSource( RouterSource groupSource )
+    {
+        this.groupSource = groupSource;
+        return this;
+    }
+
+    RouterConfigBuilder withMirrorSource( RouterSource mirrorSource )
+    {
+        this.mirrorSource = mirrorSource;
+        return this;
+    }
+
+    RouterConfigBuilder withGroupSource( String id, String url )
+    {
+        this.groupSource = new RouterSource( id, url );
+        return this;
+    }
+
+    RouterConfigBuilder withMirrorSource( String id, String url )
+    {
+        this.mirrorSource = new RouterSource( id, url );
+        return this;
+    }
+
+    RouterConfigBuilder withDiscoveryStrategy( String discoveryStrategy )
+    {
+        this.discoveryStrategy = discoveryStrategy;
+        return this;
+    }
+    
+    RouterConfigBuilder withSelectionStrategy( String selectionStrategy )
+    {
+        this.selectionStrategy = selectionStrategy;
+        return this;
+    }
+    
+    RouterConfigBuilder disabled()
+    {
+        this.disabled = true;
+        return this;
+    }
+    
+    RouterConfigBuilder withEnabled( boolean enabled )
+    {
+        this.disabled = !enabled;
+        return this;
+    }
+    
+    RouterConfigBuilder withOffline( boolean enable )
+    {
+        return withOption( offline, enable );
+    }
+    
+    RouterConfigBuilder withClear( boolean enable )
+    {
+        return withOption( clear, enable );
+    }
+
+    RouterConfigBuilder withUpdate( boolean enable )
+    {
+        return withOption( update, enable );
+    }
+
+    RouterConfigBuilder withOption( ArtifactRouterOption option, boolean enable )
+    {
+        if ( enable )
+        {
+            options.add( option );
+        }
+        else
+        {
+            options.remove( option );
+        }
+        
+        return this;
+    }
 
 }

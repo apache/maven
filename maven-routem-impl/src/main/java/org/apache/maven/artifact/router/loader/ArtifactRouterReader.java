@@ -19,13 +19,23 @@
 
 package org.apache.maven.artifact.router.loader;
 
+import java.util.Collection;
+
 import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.GroupRoute;
+import org.apache.maven.artifact.router.MirrorRoute;
 import org.apache.maven.artifact.router.conf.RouterSource;
 import org.apache.maven.artifact.router.session.ArtifactRouterSession;
 
 public interface ArtifactRouterReader
 {
+    
+    Collection<GroupRoute> loadGroupRoutes( RouterSource source, ArtifactRouterSession session )
+        throws ArtifactRouterException;
+
+    Collection<MirrorRoute> loadMirrorRoutes( RouterSource source, ArtifactRouterSession session )
+                    throws ArtifactRouterException;
 
     ArtifactRouter loadRouter( RouterSource source, ArtifactRouterSession session )
         throws ArtifactRouterException;

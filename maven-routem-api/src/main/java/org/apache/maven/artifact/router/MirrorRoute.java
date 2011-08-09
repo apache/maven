@@ -58,7 +58,7 @@ public final class MirrorRoute
     private final int weight;
 
     private final boolean enabled;
-
+    
     private final Set<String> mirrorOfUrls;
 
     // NOTE: ONLY used during deserialization!
@@ -71,8 +71,8 @@ public final class MirrorRoute
         enabled = false;
     }
 
-    public MirrorRoute( final String id, final String routeUrl, final int weight,
-                        final boolean enabled, final String... mirrorOfUrls )
+    public MirrorRoute( final String id, final String routeUrl,
+                        final int weight, final boolean enabled, final String... mirrorOfUrls )
     {
         if ( mirrorOfUrls.length < 1 )
         {
@@ -86,8 +86,8 @@ public final class MirrorRoute
         this.enabled = enabled;
     }
 
-    public MirrorRoute( final String id, final String routeUrl, final int weight,
-                        final boolean enabled, final Collection<String> mirrorOfUrls )
+    public MirrorRoute( final String id, final String routeUrl,
+                        final int weight, final boolean enabled, final Collection<String> mirrorOfUrls )
     {
         if ( mirrorOfUrls.size() < 1 )
         {

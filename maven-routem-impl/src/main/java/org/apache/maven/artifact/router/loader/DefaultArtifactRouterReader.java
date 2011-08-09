@@ -22,15 +22,6 @@ package org.apache.maven.artifact.router.loader;
 import static org.codehaus.plexus.util.IOUtil.close;
 import static org.codehaus.plexus.util.StringUtils.isNotBlank;
 
-import org.apache.maven.artifact.router.ArtifactRouter;
-import org.apache.maven.artifact.router.ArtifactRouterException;
-import org.apache.maven.artifact.router.conf.RouterSource;
-import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
-import org.apache.maven.artifact.router.session.ArtifactRouterSession;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
-import org.codehaus.plexus.component.annotations.Component;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,8 +32,20 @@ import java.net.PasswordAuthentication;
 import java.net.Proxy.Type;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
 import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
+
+import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.GroupRoute;
+import org.apache.maven.artifact.router.MirrorRoute;
+import org.apache.maven.artifact.router.conf.RouterSource;
+import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
+import org.apache.maven.artifact.router.session.ArtifactRouterSession;
+import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Server;
+import org.codehaus.plexus.component.annotations.Component;
 
 @Component( role = ArtifactRouterReader.class )
 public class DefaultArtifactRouterReader
@@ -56,6 +59,54 @@ public class DefaultArtifactRouterReader
      *      org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration)
      */
     public ArtifactRouter loadRouter( RouterSource source, ArtifactRouterSession session )
+        throws ArtifactRouterException
+    {
+        InputStream in = null;
+        try
+        {
+            in = getRouteSourceContent( source, session );
+
+            return in == null ? null : ArtifactRouteSerializer.deserialize( new InputStreamReader( in ) );
+        }
+        finally
+        {
+            close( in );
+        }
+    }
+
+    public Collection<GroupRoute> loadGroupRoutes( RouterSource source, ArtifactRouterSession session )
+        throws ArtifactRouterException
+    {
+        InputStream in = null;
+        try
+        {
+            in = getRouteSourceContent( source, session );
+
+            return in == null ? null : ArtifactRouteSerializer.deserializeGroups( new InputStreamReader( in ) );
+        }
+        finally
+        {
+            close( in );
+        }
+    }
+
+    public Collection<MirrorRoute> loadMirrorRoutes( RouterSource source, ArtifactRouterSession session )
+        throws ArtifactRouterException
+    {
+        InputStream in = null;
+        try
+        {
+            in = getRouteSourceContent( source, session );
+
+            return in == null ? null : ArtifactRouteSerializer.deserializeMirrors( new InputStreamReader( in ) );
+        }
+        finally
+        {
+            close( in );
+        }
+    }
+
+    private InputStream getRouteSourceContent( RouterSource source, ArtifactRouterSession session )
         throws ArtifactRouterException
     {
         RouterAuthenticator authenticator = new RouterAuthenticator( source, session );
@@ -73,7 +124,6 @@ public class DefaultArtifactRouterReader
 
         Proxy proxy = authenticator.getProxy( url.getProtocol(), url.getHost() );
 
-        ArtifactRouter router = null;
         InputStream in = null;
         try
         {
@@ -85,7 +135,7 @@ public class DefaultArtifactRouterReader
             else
             {
                 Type type = proxy.getProtocol().toLowerCase().startsWith( "socks" ) ? Type.SOCKS : Type.HTTP;
-                
+
                 java.net.Proxy connProxy =
                     new java.net.Proxy( type, new InetSocketAddress( proxy.getHost(), proxy.getPort() ) );
 
@@ -102,19 +152,13 @@ public class DefaultArtifactRouterReader
             {
                 in = new GZIPInputStream( in );
             }
-
-            router = ArtifactRouteSerializer.deserialize( new InputStreamReader( in ) );
         }
         catch ( IOException e )
         {
             throw new ArtifactRouterException( "Cannot load artifact routes from: " + source, e );
         }
-        finally
-        {
-            close( in );
-        }
 
-        return router;
+        return in;
     }
 
     // private Proxy setProxy( Proxy proxy )

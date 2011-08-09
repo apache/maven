@@ -34,9 +34,13 @@ public interface ArtifactRouterSession
     
     Server getServer( String id );
 
-    RouterSource getSource();
+    RouterSource getGroupSource();
 
-    RouterSource getDefaultSource();
+    RouterSource getMirrorSource();
+
+    RouterSource getDefaultGroupSource();
+
+    RouterSource getDefaultMirrorSource();
 
     File getRoutesFile();
 

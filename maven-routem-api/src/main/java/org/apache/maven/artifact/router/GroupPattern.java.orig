@@ -163,7 +163,7 @@ public final class GroupPattern
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( ( basePattern == null ) ? 0 : basePattern.hashCode() ) + ( wildcard ? 1 : 0 );
+        result = prime * result + ( ( basePattern == null ) ? 0 : basePattern.hashCode() );
         return result;
     }
 
@@ -184,8 +184,7 @@ public final class GroupPattern
         }
         else if ( !basePattern.equals( other.basePattern ) )
             return false;
-        
-        return wildcard == other.wildcard;
+        return true;
     }
     
     public String getBasePattern()

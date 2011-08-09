@@ -91,7 +91,7 @@ public class GroupRouteTest
         assertTrue( "Before merge, " + m + " NOT matched!", r.contains( m ) );
         assertFalse( "Before merge, " + a + " matched!", r.contains( a ) );
         
-        r.merge( new GroupRoute( "http://maven.apache.org", new GroupPattern( "org.apache.maven.*" ) ) );
+        r.merge( new GroupPattern( "org.apache.maven.*" ) );
         assertTrue( "After merge, " + m + " NO LONGER matched!", r.contains( m ) );
         assertTrue( "After merge, " + a + " STILL not matched!", r.contains( a ) );
     }
@@ -100,7 +100,7 @@ public class GroupRouteTest
     public void mergeReplacesObsoletePattern()
     {
         GroupRoute r = new GroupRoute( "http://maven.apache.org", new GroupPattern( "org.apache.maven" ) );
-        r.merge( new GroupRoute( "http://maven.apache.org", new GroupPattern( "org.apache.maven.*" ) ) );
+        r.merge( new GroupPattern( "org.apache.maven.*" ) );
         
         assertEquals( "After merge, obsolete pattern NOT replaced!", 1, r.getGroupPatterns().size() );
     }

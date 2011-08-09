@@ -48,6 +48,8 @@ import java.util.Map;
 
 import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.ArtifactRouterException;
+import org.apache.maven.artifact.router.DefaultArtifactRouter;
+import org.apache.maven.artifact.router.WeightedRandomRouteSelector;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
 import org.apache.maven.artifact.router.conf.RouterSource;
 import org.apache.maven.artifact.router.io.ArtifactRouteSerializer;
@@ -77,7 +79,9 @@ public class DefaultRouterLoader
     {
         if ( session == null || session.isDisabled() )
         {
-            return new ArtifactRouter();
+            // FIXME
+            throw new UnsupportedOperationException();
+//            return new DefaultArtifactRouter( new WeightedRandomRouteSelector(), null, null );
         }
         
         return loadRoutes( session );
@@ -147,7 +151,9 @@ public class DefaultRouterLoader
             }
         }
         
-        return new ArtifactRouter();
+        // FIXME
+        throw new UnsupportedOperationException();
+//        return new DefaultArtifactRouter();
     }
 
     protected ArtifactRouter loadRoutes( final ArtifactRouterSession session )
@@ -157,8 +163,10 @@ public class DefaultRouterLoader
         
         if ( session.isClear() )
         {
-            routes = new ArtifactRouter();
+            // FIXME
+//            routes = new DefaultArtifactRouter();
             save( routes, session );
+            throw new UnsupportedOperationException();
         }
         else
         {
@@ -177,7 +185,7 @@ public class DefaultRouterLoader
                     ArtifactRouter r = routerReader.loadRouter( src, session );
                     if ( r != null )
                     {
-                        routes.merge( r );
+                        routes = merge( routes, r );
                     }
                 }
                 else if ( discoveryStrategy != null
@@ -197,7 +205,7 @@ public class DefaultRouterLoader
                         ArtifactRouter result = strategy.findRouter( session );
                         if ( result != null )
                         {
-                            routes.merge( result );
+                            routes = merge( routes, result );
                         }
                     }
                 }
@@ -207,7 +215,7 @@ public class DefaultRouterLoader
                     ArtifactRouter r = routerReader.loadRouter( src, session );
                     if ( r != null )
                     {
-                        routes.merge( r );
+                        routes = merge( routes, r );
                     }
                 }
             }
@@ -222,10 +230,18 @@ public class DefaultRouterLoader
 
         if ( routes == null )
         {
-            routes = new ArtifactRouter();
+            // FIXME
+            throw new UnsupportedOperationException();
+//            routes = new DefaultArtifactRouter();
         }
 
         return routes;
+    }
+
+    private ArtifactRouter merge( ArtifactRouter routes, ArtifactRouter r )
+    {
+        // FIXME
+        throw new UnsupportedOperationException();
     }
 
     private ArtifactRouterDiscoveryStrategy getDiscoveryStrategy( final String key )
@@ -242,6 +258,12 @@ public class DefaultRouterLoader
         }
 
         return strat;
+    }
+
+    public DefaultArtifactRouter loadDefault()
+    {
+        // FIXME Implement this!
+        throw new UnsupportedOperationException( "TODO: Implement me!" );
     }
 
 }

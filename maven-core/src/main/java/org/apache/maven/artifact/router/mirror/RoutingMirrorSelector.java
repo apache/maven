@@ -19,8 +19,8 @@ package org.apache.maven.artifact.router.mirror;
  * under the License.
  */
 
-import org.apache.maven.artifact.router.MirrorRoute;
 import org.apache.maven.artifact.router.ArtifactRouter;
+import org.apache.maven.artifact.router.MirrorRoute;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.aether.repository.MirrorSelector;
 import org.sonatype.aether.repository.RemoteRepository;
@@ -66,7 +66,7 @@ public class RoutingMirrorSelector
         {
             final String repoUrl = repository.getUrl();
 
-            final MirrorRoute route = router.getMirror( repoUrl );
+            final MirrorRoute route = router.selectSingleMirror( repoUrl );
 
             if ( route != null )
             {

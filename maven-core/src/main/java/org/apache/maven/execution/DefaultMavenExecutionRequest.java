@@ -20,8 +20,8 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.router.ArtifactRouter;
 import org.apache.maven.artifact.router.conf.ArtifactRouterConfiguration;
+import org.apache.maven.artifact.router.internal.DefaultArtifactRouter;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingRequest;
@@ -1080,21 +1080,16 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    private ArtifactRouter artifactRouter;
+    private DefaultArtifactRouter artifactRouter;
 
     private ArtifactRouterConfiguration artifactRouterConfig;
 
-    public synchronized ArtifactRouter getArtifactRouter()
+    public synchronized DefaultArtifactRouter getArtifactRouter()
     {
-        if ( artifactRouter == null )
-        {
-            artifactRouter = new ArtifactRouter();
-        }
-
         return artifactRouter;
     }
 
-    public MavenExecutionRequest setArtifactRouter( final ArtifactRouter artifactRouter )
+    public MavenExecutionRequest setArtifactRouter( final DefaultArtifactRouter artifactRouter )
     {
         this.artifactRouter = artifactRouter;
         return this;

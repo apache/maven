@@ -49,56 +49,98 @@ public final class GroupRoute
     
     public static final GroupRoute DEFAULT = new GroupRoute( "http://repo1.maven.org/maven2", new GroupPattern( "*" ) );
 
-    private final String canonicalUrl;
+    private final String canonicalReleasesUrl;
     
-    private final List<GroupPattern> groupPatterns = new ArrayList<GroupPattern>();
+    private String canonicalSnapshotsUrl;
     
-    public GroupRoute( String canonicalUrl, Collection<GroupPattern> groupPatterns )
+    private List<GroupPattern> groupPatterns = new ArrayList<GroupPattern>();
+    
+    public GroupRoute( String canonicalReleasesUrl, Collection<GroupPattern> groupPatterns )
     {
-        this.canonicalUrl = canonicalUrl;
-        merge( groupPatterns );
+        this( canonicalReleasesUrl, null, groupPatterns );
     }
     
-    public GroupRoute( String canonicalUrl, GroupPattern...groupPatterns )
+    public GroupRoute( String canonicalReleasesUrl, GroupPattern...groupPatterns )
     {
-        this.canonicalUrl = canonicalUrl;
-        merge( groupPatterns );
+        this( canonicalReleasesUrl, null, groupPatterns );
     }
     
-    public boolean merge( GroupPattern...groupPatterns )
+    public GroupRoute( String canonicalReleasesUrl, String canonicalSnapshotsUrl, Collection<GroupPattern> groupPatterns )
     {
-        return merge( Arrays.asList( groupPatterns ) );
+        this.canonicalReleasesUrl = canonicalReleasesUrl;
+        this.canonicalSnapshotsUrl = canonicalSnapshotsUrl;
+        this.groupPatterns = consolidate( this.groupPatterns, groupPatterns );
     }
     
-    public synchronized boolean merge( Collection<GroupPattern> groupPatterns )
+    public GroupRoute( String canonicalReleasesUrl, String canonicalSnapshotsUrl, GroupPattern...groupPatterns )
+    {
+        this.canonicalReleasesUrl = canonicalReleasesUrl;
+        this.canonicalSnapshotsUrl = canonicalSnapshotsUrl;
+        this.groupPatterns.clear();
+        this.groupPatterns = consolidate( this.groupPatterns, Arrays.asList( groupPatterns ) );
+    }
+    
+    public synchronized boolean merge( GroupRoute otherRoute )
     {
         boolean changed = false;
         
-        if ( groupPatterns != null && !groupPatterns.isEmpty() )
+        if ( this.canonicalSnapshotsUrl == null && patternsAreEqual( otherRoute ) )
         {
-            List<GroupPattern> all = new ArrayList<GroupPattern>( this.groupPatterns );
-            all.addAll( groupPatterns );
-            Collections.sort( all );
-            Collections.reverse( all );
-            
-            this.groupPatterns.clear();
-            
-            GroupPattern last = all.remove( 0 );
-            for ( GroupPattern p : all )
-            {
-                if ( !last.implies( p ) )
-                {
-                    this.groupPatterns.add( last );
-                    last = p;
-                }
-            }
-            
-            this.groupPatterns.add( last );
+            this.canonicalSnapshotsUrl = otherRoute.getCanonicalSnapshotsUrl();
         }
+        
+        this.groupPatterns = consolidate( this.groupPatterns, otherRoute.getGroupPatterns() );
         
         return changed;
     }
     
+    private boolean patternsAreEqual( GroupRoute otherRoute )
+    {
+        List<GroupPattern> otherPatterns = otherRoute.getGroupPatterns();
+        if ( groupPatterns.size() != otherPatterns.size() )
+            return false;
+        
+        for( int i = 0; i< groupPatterns.size(); i++ )
+        {
+            if ( !groupPatterns.get( i ).equals( otherPatterns.get( i ) ) )
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private synchronized List<GroupPattern> consolidate( List<GroupPattern> myPatterns,
+                                                                    Collection<GroupPattern> otherPatterns )
+    {
+        if ( otherPatterns == null || otherPatterns.isEmpty() )
+        {
+            return myPatterns;
+        }
+        
+        List<GroupPattern> result = new ArrayList<GroupPattern>();
+        
+        List<GroupPattern> all = new ArrayList<GroupPattern>( myPatterns );
+        all.addAll( otherPatterns );
+        Collections.sort( all );
+        Collections.reverse( all );
+        
+        GroupPattern last = all.remove( 0 );
+        for ( GroupPattern p : all )
+        {
+            if ( !last.implies( p ) )
+            {
+                result.add( last );
+                last = p;
+            }
+        }
+        
+        result.add( last );
+
+        return result;
+    }
+
     public boolean contains( GroupPattern pattern )
     {
         for ( GroupPattern p : groupPatterns )
@@ -125,12 +167,17 @@ public final class GroupRoute
         return false;
     }
     
-    public String getCanonicalUrl()
+    public String getCanonicalReleasesUrl()
     {
-        return canonicalUrl;
+        return canonicalReleasesUrl;
     }
     
-    public Collection<GroupPattern> getGroupPatterns()
+    public String getCanonicalSnapshotsUrl()
+    {
+        return canonicalSnapshotsUrl;
+    }
+    
+    public List<GroupPattern> getGroupPatterns()
     {
         return groupPatterns;
     }
@@ -140,7 +187,7 @@ public final class GroupRoute
     {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ( ( canonicalUrl == null ) ? 0 : canonicalUrl.hashCode() );
+        result = prime * result + ( ( canonicalReleasesUrl == null ) ? 0 : canonicalReleasesUrl.hashCode() );
         return result;
     }
 
@@ -154,12 +201,12 @@ public final class GroupRoute
         if ( getClass() != obj.getClass() )
             return false;
         GroupRoute other = (GroupRoute) obj;
-        if ( canonicalUrl == null )
+        if ( canonicalReleasesUrl == null )
         {
-            if ( other.canonicalUrl != null )
+            if ( other.canonicalReleasesUrl != null )
                 return false;
         }
-        else if ( !canonicalUrl.equals( other.canonicalUrl ) )
+        else if ( !canonicalReleasesUrl.equals( other.canonicalReleasesUrl ) )
             return false;
         return true;
     }

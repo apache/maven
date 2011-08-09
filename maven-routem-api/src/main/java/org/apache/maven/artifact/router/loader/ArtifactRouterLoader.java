@@ -51,4 +51,6 @@ public interface ArtifactRouterLoader
     void save( ArtifactRouter router, ArtifactRouterSession session )
         throws ArtifactRouterException;
 
+    ArtifactRouter loadDefault();
+
 }
