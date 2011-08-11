@@ -161,6 +161,7 @@ public class ModelMerger
             if ( tgt == null )
             {
                 tgt = new Parent();
+                tgt.setRelativePath( null );
                 target.setParent( tgt );
             }
             mergeParent( tgt, src, sourceDominant, context );
@@ -430,6 +431,7 @@ public class ModelMerger
             if ( tgt == null )
             {
                 tgt = new Scm();
+                tgt.setTag( null );
                 target.setScm( tgt );
             }
             mergeScm( tgt, src, sourceDominant, context );
@@ -462,6 +464,7 @@ public class ModelMerger
             if ( tgt == null )
             {
                 tgt = new Prerequisites();
+                tgt.setMaven( null );
                 target.setPrerequisites( tgt );
             }
             mergePrerequisites( tgt, src, sourceDominant, context );
