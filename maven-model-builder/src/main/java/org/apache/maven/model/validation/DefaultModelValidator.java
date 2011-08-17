@@ -356,6 +356,12 @@ public class DefaultModelValidator
         {
             String key = dependency.getManagementKey();
 
+            validateStringNotEmpty( prefix + ".groupId", problems, Severity.ERROR, dependency.getGroupId(), key,
+                                    dependency );
+
+            validateStringNotEmpty( prefix + ".artifactId", problems, Severity.ERROR, dependency.getArtifactId(), key,
+                                    dependency );
+
             if ( "import".equals( dependency.getScope() ) )
             {
                 if ( !"pom".equals( dependency.getType() ) )

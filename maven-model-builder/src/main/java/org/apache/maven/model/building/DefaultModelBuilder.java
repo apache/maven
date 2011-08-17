@@ -909,6 +909,13 @@ public class DefaultModelBuilder
             String artifactId = dependency.getArtifactId();
             String version = dependency.getVersion();
 
+            if ( version == null || version.length() <= 0 )
+            {
+                problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.version' for "
+                    + dependency.getManagementKey() + " is missing.", dependency.getLocation( "" ), null );
+                continue;
+            }
+
             String imported = groupId + ':' + artifactId + ':' + version;
 
             if ( importIds.contains( imported ) )
@@ -1045,8 +1052,9 @@ public class DefaultModelBuilder
 
     private boolean containsCoordinates( String message, String groupId, String artifactId, String version )
     {
-        return message != null && message.contains( groupId ) && message.contains( artifactId )
-            && message.contains( version );
+        return message != null && ( groupId == null || message.contains( groupId ) )
+            && ( artifactId == null || message.contains( artifactId ) )
+            && ( version == null || message.contains( version ) );
     }
 
 }
