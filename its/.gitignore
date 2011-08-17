@@ -6,3 +6,4 @@ target
 bin
 *.ipr
 *.iml
+*.iws
