@@ -19,7 +19,9 @@ package org.apache.maven.settings.validation;
  * under the License.
  */
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
@@ -77,11 +79,19 @@ public class DefaultSettingsValidator
 
         if ( servers != null )
         {
+            Set<String> serverIds = new HashSet<String>();
+
             for ( int i = 0; i < servers.size(); i++ )
             {
                 Server server = servers.get( i );
 
                 validateStringNotEmpty( problems, "servers.server[" + i + "].id", server.getId(), null );
+
+                if ( !serverIds.add( server.getId() ) )
+                {
+                    addViolation( problems, Severity.WARNING, "servers.server.id", null,
+                                  "must be unique but found duplicate server with id " + server.getId() );
+                }
             }
         }
 
@@ -113,17 +123,29 @@ public class DefaultSettingsValidator
 
         if ( profiles != null )
         {
+            Set<String> profileIds = new HashSet<String>();
+
             for ( Profile profile : profiles )
             {
-                validateRepositories( problems, profile.getRepositories(), "repositories.repository" );
-                validateRepositories( problems, profile.getPluginRepositories(),
-                                      "pluginRepositories.pluginRepository" );
+                if ( !profileIds.add( profile.getId() ) )
+                {
+                    addViolation( problems, Severity.WARNING, "profiles.profile.id", null,
+                                  "must be unique but found duplicate profile with id " + profile.getId() );
+                }
+
+                String prefix = "profiles.profile[" + profile.getId() + "].";
+
+                validateRepositories( problems, profile.getRepositories(), prefix + "repositories.repository" );
+                validateRepositories( problems, profile.getPluginRepositories(), prefix
+                    + "pluginRepositories.pluginRepository" );
             }
         }
     }
 
     private void validateRepositories( SettingsProblemCollector problems, List<Repository> repositories, String prefix )
     {
+        Set<String> repoIds = new HashSet<String>();
+
         for ( Repository repository : repositories )
         {
             validateStringNotEmpty( problems, prefix + ".id", repository.getId(), repository.getUrl() );
@@ -136,6 +158,12 @@ public class DefaultSettingsValidator
                 addViolation( problems, Severity.WARNING, prefix + ".id", null, "must not be 'local'"
                     + ", this identifier is reserved for the local repository"
                     + ", using it for other repositories will corrupt your repository metadata." );
+            }
+
+            if ( !repoIds.add( repository.getId() ) )
+            {
+                addViolation( problems, Severity.WARNING, prefix + ".id", null,
+                              "must be unique but found duplicate repository with id " + repository.getId() );
             }
 
             validateStringNotEmpty( problems, prefix + ".url", repository.getUrl(), repository.getId() );
