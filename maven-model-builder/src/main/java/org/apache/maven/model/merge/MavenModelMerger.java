@@ -551,6 +551,40 @@ public class MavenModelMerger
     }
 
     @Override
+    protected void mergeReportPlugin_ReportSets( ReportPlugin target, ReportPlugin source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+    {
+        List<ReportSet> src = source.getReportSets();
+        if ( !src.isEmpty() )
+        {
+            List<ReportSet> tgt = target.getReportSets();
+            Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
+
+            for ( ReportSet element : src )
+            {
+                if ( sourceDominant || ( element.getInherited() != null ? element.isInherited() : source.isInherited() ) )
+                {
+                    Object key = getReportSetKey( element );
+                    merged.put( key, element );
+                }
+            }
+
+            for ( ReportSet element : tgt )
+            {
+                Object key = getReportSetKey( element );
+                ReportSet existing = merged.get( key );
+                if ( existing != null )
+                {
+                    mergeReportSet( element, existing, sourceDominant, context );
+                }
+                merged.put( key, element );
+            }
+
+            target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
+        }
+    }
+
+    @Override
     protected Object getDependencyKey( Dependency dependency )
     {
         return dependency.getManagementKey();
