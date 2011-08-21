@@ -89,7 +89,8 @@ public class StringSearchModelInterpolatorTest
         assertEquals( "value2", values[1] );
     }
 
-    private ModelBuildingRequest createModelBuildingRequest(Properties p) {
+    private ModelBuildingRequest createModelBuildingRequest(Properties p)
+    {
         ModelBuildingRequest config = new DefaultModelBuildingRequest();
         config.setSystemProperties( p);
         return config;
@@ -186,7 +187,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
 
-        List values = Collections.unmodifiableList( Collections.singletonList( "${key}" ) );
+        List<String> values = Collections.unmodifiableList( Collections.singletonList( "${key}" ) );
 
         ObjectWithListField obj = new ObjectWithListField( values );
 
@@ -348,7 +349,9 @@ public class StringSearchModelInterpolatorTest
     }
 
 
-    public void testConcurrentInterpolation() throws Exception {
+    public void testConcurrentInterpolation()
+        throws Exception
+    {
         final Model model = new Model();
 
         final Properties p = new Properties();
@@ -365,7 +368,8 @@ public class StringSearchModelInterpolatorTest
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         List<Future<SimpleProblemCollector>>  futures = new ArrayList<Future<SimpleProblemCollector>>();
-        for (int i = 0; i < numItems; i++){
+        for ( int i = 0; i < numItems; i++ )
+        {
             Callable<SimpleProblemCollector> future = new Callable<SimpleProblemCollector>() {
                 public SimpleProblemCollector call() throws Exception {
                     final ObjectWithMixedProtection obj = getValueList();
@@ -382,7 +386,8 @@ public class StringSearchModelInterpolatorTest
             new Thread( task).start();
         }
         countDownLatch.countDown(); // Start all the threads
-        for(Future<SimpleProblemCollector> result : futures){
+        for ( Future<SimpleProblemCollector> result : futures )
+        {
             SimpleProblemCollector problemCollector = result.get(); // ArrayIndexOutOfBoundsException are typical indication of threading issues
             assertProblemFree(  problemCollector );
             
@@ -444,7 +449,8 @@ public class StringSearchModelInterpolatorTest
         List<?> values3;
         private String fooBar;
 
-        private ObjectWithMixedProtection(List<?> values1, List<?> values2, List<?> values3) {
+        private ObjectWithMixedProtection( List<?> values1, List<?> values2, List<?> values3 )
+        {
             this.values1 = values1;
             this.values2 = values2;
             this.values3 = values3;
