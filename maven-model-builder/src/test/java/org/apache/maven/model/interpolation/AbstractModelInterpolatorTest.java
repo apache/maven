@@ -77,7 +77,10 @@ public abstract class AbstractModelInterpolatorTest
     private ModelBuildingRequest createModelBuildingRequest( Properties p )
     {
         ModelBuildingRequest config = new DefaultModelBuildingRequest();
-        if (p!= null) config.setSystemProperties( p);
+        if ( p != null )
+        {
+            config.setSystemProperties( p );
+        }
         return config;
     }
     
@@ -123,8 +126,8 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel( model, new File("."), createModelBuildingRequest(context),
-                                                   collector );
+        Model out =
+            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
 
         assertProblemFree(  collector );
         assertEquals( "${test}/somepath", out.getScm().getConnection() );
@@ -145,7 +148,7 @@ public abstract class AbstractModelInterpolatorTest
             ModelInterpolator interpolator = createInterpolator();
 
             final SimpleProblemCollector collector = new SimpleProblemCollector();
-            interpolator.interpolateModel( model, null, createModelBuildingRequest(context), collector );
+            interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
             assertColllectorState(  0, 1, 0, collector );
         }
         catch ( Exception e )
@@ -169,8 +172,8 @@ public abstract class AbstractModelInterpolatorTest
         ModelInterpolator interpolator = createInterpolator();
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
-        Model out = interpolator.interpolateModel( model, new File("."), createModelBuildingRequest(context),
-                                                   collector );
+        Model out =
+            interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
 
         assertProblemFree(  collector );
 
@@ -217,7 +220,6 @@ public abstract class AbstractModelInterpolatorTest
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
         assertColllectorState(0, 0, 1, collector );
         
-
         assertEquals( "3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
@@ -277,7 +279,6 @@ public abstract class AbstractModelInterpolatorTest
         assertColllectorState( 0, 0, 2, collector );
         
         assertEquals( "foo-3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
-
     }
 
     public void testBasedir()

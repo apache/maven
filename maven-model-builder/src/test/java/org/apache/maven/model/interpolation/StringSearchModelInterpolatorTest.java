@@ -41,7 +41,6 @@ public class StringSearchModelInterpolatorTest
     extends AbstractModelInterpolatorTest 
 {
 
-
     protected ModelInterpolator interpolator;
 
     @Override
@@ -49,7 +48,7 @@ public class StringSearchModelInterpolatorTest
         throws Exception
     {
         super.setUp();
-        interpolator =  lookup(ModelInterpolator.class);
+        interpolator = lookup( ModelInterpolator.class );
     }
 
 
@@ -82,17 +81,16 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( values, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );        
 
         assertEquals( "value", values[0] );
         assertEquals( "value2", values[1] );
     }
 
-    private ModelBuildingRequest createModelBuildingRequest(Properties p)
+    private ModelBuildingRequest createModelBuildingRequest( Properties p )
     {
         ModelBuildingRequest config = new DefaultModelBuildingRequest();
-        config.setSystemProperties( p);
+        config.setSystemProperties( p );
         return config;
     }
 
@@ -111,12 +109,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );        
 
         assertEquals( "value", obj.values[0] );
         assertEquals( "value2", obj.values[1] );
@@ -139,12 +136,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );
 
         assertEquals( "value", obj.values.get( 0 ) );
         assertEquals( "value2", obj.values.get( 1 ) );
@@ -167,12 +163,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );        
 
         assertEquals( "key", obj.values.get( 0 ) );
         assertEquals( "value2", obj.values.get( 1 ) );
@@ -193,12 +188,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );        
 
         assertEquals( "${key}", obj.values.get( 0 ) );
     }
@@ -222,12 +216,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );
 
         assertEquals( "value", ( (String[]) obj.values.get( 0 ) )[0] );
         assertEquals( "value2", ( (String[]) obj.values.get( 0 ) )[1] );
@@ -252,12 +245,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );
 
         assertEquals( "value", obj.values.get( "key" ) );
         assertEquals( "value2", obj.values.get( "key2" ) );
@@ -280,12 +272,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );        
 
         assertEquals( "val", obj.values.get( "key" ) );
         assertEquals( "value2", obj.values.get( "key2" ) );
@@ -306,12 +297,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );
 
         assertEquals( "${key}", obj.values.get( "key" ) );
     }
@@ -335,12 +325,11 @@ public class StringSearchModelInterpolatorTest
 
         StringSearchModelInterpolator interpolator = (StringSearchModelInterpolator) createInterpolator();
 
-        ModelBuildingRequest config = createModelBuildingRequest(p);
+        ModelBuildingRequest config = createModelBuildingRequest( p );
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree(  collector );
-        
+        assertProblemFree( collector );        
 
         assertEquals( "value", ( (String[]) obj.values.get( "key" ) )[0] );
         assertEquals( "value2", ( (String[]) obj.values.get( "key" ) )[1] );
@@ -370,27 +359,29 @@ public class StringSearchModelInterpolatorTest
         List<Future<SimpleProblemCollector>>  futures = new ArrayList<Future<SimpleProblemCollector>>();
         for ( int i = 0; i < numItems; i++ )
         {
-            Callable<SimpleProblemCollector> future = new Callable<SimpleProblemCollector>() {
-                public SimpleProblemCollector call() throws Exception {
+            Callable<SimpleProblemCollector> future = new Callable<SimpleProblemCollector>()
+            {
+                public SimpleProblemCollector call()
+                    throws Exception
+                {
                     final ObjectWithMixedProtection obj = getValueList();
-                    final ModelBuildingRequest config = createModelBuildingRequest(p);
+                    final ModelBuildingRequest config = createModelBuildingRequest( p );
 
                     countDownLatch.await();
                     final SimpleProblemCollector collector = new SimpleProblemCollector();
-                    interpolator.interpolateObject( obj, model, new File( "." ), config, collector);
+                    interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
                     return collector;
                 }
             };
-            FutureTask<SimpleProblemCollector> task = new FutureTask<SimpleProblemCollector>(future);
-            futures.add ( task);
-            new Thread( task).start();
+            FutureTask<SimpleProblemCollector> task = new FutureTask<SimpleProblemCollector>( future );
+            futures.add( task );
+            new Thread( task ).start();
         }
         countDownLatch.countDown(); // Start all the threads
         for ( Future<SimpleProblemCollector> result : futures )
         {
             SimpleProblemCollector problemCollector = result.get(); // ArrayIndexOutOfBoundsException are typical indication of threading issues
-            assertProblemFree(  problemCollector );
-            
+            assertProblemFree( problemCollector );
         }
     }
 

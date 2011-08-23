@@ -36,7 +36,7 @@ public class DefaultModelValidatorTest
     extends PlexusTestCase
 {
 
-    private DefaultModelValidator validator;
+    private ModelValidator validator;
 
     private Model read( String pom )
         throws Exception
@@ -94,7 +94,7 @@ public class DefaultModelValidatorTest
     {
         super.setUp();
 
-        validator = (DefaultModelValidator) lookup( ModelValidator.class );
+        validator = lookup( ModelValidator.class );
     }
 
     @Override
