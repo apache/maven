@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
@@ -38,7 +39,7 @@ public class DefaultMavenExecutionResult
 
     private DependencyResolutionResult dependencyResolutionResult;
 
-    private List<Throwable> exceptions;
+    private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>(  );
 
     private Map<MavenProject, BuildSummary> buildSummaries;
 
@@ -85,11 +86,6 @@ public class DefaultMavenExecutionResult
 
     public MavenExecutionResult addException( Throwable t )
     {
-        if ( exceptions == null )
-        {
-            exceptions = new ArrayList<Throwable>();
-        }
-
         exceptions.add( t );
 
         return this;
