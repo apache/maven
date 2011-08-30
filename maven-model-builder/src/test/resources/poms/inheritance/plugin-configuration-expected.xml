@@ -58,4 +58,21 @@ under the License.
       </plugin>
     </plugins>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>MNG-5115</artifactId>
+        <reportSets>
+          <reportSet>
+            <id>default-inherited</id>
+            <reports>
+              <report>to-be-inherited</report>
+            </reports>
+          </reportSet>
+          <!-- reportSet with inherited=false is not here -->
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
