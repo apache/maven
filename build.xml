@@ -290,6 +290,8 @@ This goal just validates the presence of that distribution.
     <chmod perm="+x">
       <fileset dir="${maven.home}/bin">
         <include name="mvn" />
+        <include name="mvnDebug" />
+        <include name="mvnyjp" />
       </fileset>
     </chmod>
   </target>
