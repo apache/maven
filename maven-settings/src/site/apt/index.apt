@@ -1,5 +1,5 @@
  -----
- Maven Settings
+ Introduction
  -----
  Vincent Siveton
  -----
@@ -16,4 +16,4 @@ Maven Settings Model
 
    * A {{{./settings.html}Descriptor Reference}}
 
-   * An {{{ http://maven.apache.org/xsd/settings-1.0.0.xsd}XSD}}
+   * An {{{http://maven.apache.org/xsd/settings-1.0.0.xsd}XSD}}
