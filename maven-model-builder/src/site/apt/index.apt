@@ -1,0 +1,61 @@
+ -----
+ Introduction
+ -----
+ Hervé Boutemy
+ -----
+ 2011-09-03
+ -----
+
+Maven Model Builder
+
+ The effective model builder, with inheritance, profile activation, interpolation, ...
+
+ The main component is <<<ModelBuilder>>>
+ ({{{./apidocs/org/apache/maven/model/building/ModelBuilder.html}javadoc}},
+ {{{./xref/org/apache/maven/model/building/ModelBuilder.html}source}}),
+ with its <<<DefaultModelBuilder>>> implementation
+ ({{{./apidocs/org/apache/maven/model/building/DefaultModelBuilder.html}javadoc}},
+ {{{./xref/org/apache/maven/model/building/DefaultModelBuilder.html}source}})
+ that manages the steps sequence.
+
+ The sequence is divided into 2 phases, with optional plugin processing:
+
+ * phase 1
+
+   ** profile activation
+
+   ** model normalization
+
+   ** profile injection
+
+   ** parent resolution
+
+   ** inheritance assembly
+
+   ** model interpolation
+
+   ** url normalization
+
+   []
+
+ * phase 2
+
+   ** model path translation
+
+   ** plugin management injection
+
+   ** <(optional)> lifecycle bindings injection
+
+   ** dependency management injection
+
+   ** <(optional)> reports configuration
+
+   ** <(optional)> reports conversion to decoupled site plugin
+
+   ** <(optional)> plugins configuration
+
+   ** effective model validation
+
+   []
+
+ []
