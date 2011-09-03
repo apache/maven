@@ -869,7 +869,8 @@ public class DefaultModelValidator
                 int idx = fieldName.lastIndexOf( '.' );
                 if ( idx >= 0 )
                 {
-                    key = fieldName = fieldName.substring( idx + 1 );
+                    fieldName = fieldName.substring( idx + 1 );
+                    key = fieldName;
                 }
 
                 if ( fieldName.endsWith( "]" ) )

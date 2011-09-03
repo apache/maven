@@ -34,7 +34,7 @@ class UrlNormalizingPostProcessor
     implements InterpolationPostProcessor
 {
 
-    private static final Set<String> urlExpressions;
+    private static final Set<String> URL_EXPRESSIONS;
 
     static
     {
@@ -45,7 +45,7 @@ class UrlNormalizingPostProcessor
         expressions.add( "project.scm.developerConnection" );
         expressions.add( "project.distributionManagement.site.url" );
 
-        urlExpressions = expressions;
+        URL_EXPRESSIONS = expressions;
     }
 
     private UrlNormalizer normalizer;
@@ -57,7 +57,7 @@ class UrlNormalizingPostProcessor
 
     public Object execute( String expression, Object value )
     {
-        if ( value != null && urlExpressions.contains( expression ) )
+        if ( value != null && URL_EXPRESSIONS.contains( expression ) )
         {
             return normalizer.normalize( value.toString() );
         }
