@@ -183,7 +183,7 @@
           <multiplicity>*</multiplicity>
           </association>
           </field -->
-        <field>
+        <field xdoc.separator="blank">
           <name>proxies</name>
           <version>1.0.0+</version>
           <description>
@@ -200,7 +200,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>servers</name>
           <version>1.0.0+</version>
           <description>
@@ -215,7 +215,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>mirrors</name>
           <version>1.0.0+</version>
           <description>
@@ -226,7 +226,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>profiles</name>
           <version>1.0.0+</version>
           <description>
@@ -240,7 +240,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>activeProfiles</name>
           <version>1.0.0+</version>
           <description>
@@ -721,7 +721,7 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>repositories</name>
           <version>1.0.0+</version>
           <description>
