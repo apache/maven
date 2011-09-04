@@ -135,18 +135,18 @@
   </mailingLists>
 
   <modules>
-    <module>maven-core</module>
-    <module>apache-maven</module>
+    <module>maven-plugin-api</module>
     <module>maven-model</module>
+    <module>maven-model-builder</module>
+    <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
     <module>maven-aether-provider</module>
     <module>maven-repository-metadata</module>
-    <module>maven-plugin-api</module>
-    <module>maven-model-builder</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
+    <module>apache-maven</module>
   </modules>
 
   <scm>
@@ -548,6 +548,7 @@
                 <id>non-aggregate</id>
                 <reports>
                   <report>javadoc</report>
+                  <report>test-javadoc</report>
                 </reports>
               </reportSet>
               <reportSet>
@@ -568,6 +569,7 @@
                 <id>non-aggregate</id>
                 <reports>
                   <report>jxr</report>
+                  <report>test-jxr</report>
                 </reports>
               </reportSet>
               <reportSet>
