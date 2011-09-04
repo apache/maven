@@ -1,0 +1,16 @@
+ -----
+ Introduction
+ -----
+ Hervé Boutemy
+ -----
+ 2011-09-04
+ -----
+
+Maven Core ITs
+
+ Maven Core Integration Tests provide tooling to test every aspect of Maven functionalities with any Maven version.
+
+ This project has declared the following modules:
+
+ * {{{./core-it-support/}Maven IT Support}}: Maven Integration Tests support tools, to completely decouple ITs from production plugins.
+ * {{{./core-it-suite/}Maven ITs}}: The effective Maven Integration Tests suite.
