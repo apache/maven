@@ -13,4 +13,5 @@ Maven Core ITs
  This project has declared the following modules:
 
  * {{{./core-it-support/}Maven IT Support}}: Maven Integration Tests support tools, to completely decouple ITs from production plugins.
+
  * {{{./core-it-suite/}Maven ITs}}: The effective Maven Integration Tests suite.
