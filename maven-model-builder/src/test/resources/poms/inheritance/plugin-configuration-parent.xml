@@ -31,6 +31,15 @@ under the License.
   <description>Model inheritance description</description>
   <url>http://www.apache.org/</url>
 
+  <mailingLists>
+    <mailingList>
+      <name>parent</name>
+      <post>post@mailing.list.com</post>
+      <subscribe>subscribe@mailing.list.com</subscribe>
+      <unsubscribe>unsubscribe@mailing.list.com</unsubscribe>
+    </mailingList>
+  </mailingLists>
+
   <build>
     <plugins>
       <plugin>

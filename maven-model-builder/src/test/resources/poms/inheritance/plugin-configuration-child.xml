@@ -26,6 +26,15 @@ under the License.
   <artifactId>child</artifactId>
   <version>12-SNAPSHOT</version>
 
+  <mailingLists>
+    <!--mailingList> MNG-3124: no way to add a list to parent content, only full override
+      <name>child</name>
+      <post>post@mailing.list.com</post>
+      <subscribe>subscribe@mailing.list.com</subscribe>
+      <unsubscribe>unsubscribe@mailing.list.com</unsubscribe>
+    </mailingList-->
+  </mailingLists>
+
   <build>
     <plugins>
       <plugin>
