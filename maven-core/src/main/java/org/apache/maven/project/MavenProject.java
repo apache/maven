@@ -1379,7 +1379,7 @@ public class MavenProject
 
     public List<Repository> getPluginRepositories()
     {
-        return getModel().getRepositories();
+        return getModel().getPluginRepositories();
     }
 
     public List<RemoteRepository> getRemoteProjectRepositories()
