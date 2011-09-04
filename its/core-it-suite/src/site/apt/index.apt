@@ -3,7 +3,7 @@
  -----
  Hervé Boutemy
  -----
- 2011-07-08
+ 2011-09-04
  -----
 
 ~~ Licensed to the Apache Software Foundation (ASF) under one
@@ -28,16 +28,16 @@
 
 Maven Integration Tests
 
-  This module provides the effective Integration Tests suite.
+  This module provides the {{{./testapidocs/org/apache/maven/it/package-summary.html}effective Integration Tests suite}}.
 
-  By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
+  By default, the project just packages the tests in an artifact. To actually run them, activate the <<<run-its>>> profile:
   
 +----
 mvn clean test -Prun-its
 +----
   
   This will subject the Maven version running the build to the integration tests. If you would like to test a different
-  Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
+  Maven distribution, you can use the <<<mavenHome>>> system property to specify the path of the Maven distribution to test:
   
 +----
 mvn clean test -Prun-its -DmavenHome=<maven-under-test>
@@ -50,11 +50,11 @@ mvn clean test -Prun-its -DmavenHome=<maven-under-test>
 mvn clean test -Prun-its -DmavenVersion=2.2.1
 +----
   
-  To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
+  To run the ITs using embedded Maven 3.x, additionally activate the <<<embedded>>> profile.
   
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
   Maven dependencies are added to the test class path.
   
-  If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the
-  required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
+  If you're behind a proxy, use the <<<proxy.host>>>, <<<proxy.port>>>, <<<proxy.user>>> and <<<proxy.pass>>> system properties
+  to specify the required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
   repository manager that proxies the required artifacts.
