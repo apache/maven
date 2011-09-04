@@ -25,7 +25,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Test that profiles with multiple activators are activated 
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3106">MNG-3106</a>:
+ * it tests that profiles with multiple activators are activated 
  * when any of the activators are on.
  * 
  */

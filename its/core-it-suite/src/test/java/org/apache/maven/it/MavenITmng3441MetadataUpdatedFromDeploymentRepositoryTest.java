@@ -30,6 +30,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3441">MNG-3441</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     extends AbstractMavenIntegrationTestCase
 {

@@ -28,7 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Check that plugin versions in the POM obey the correct order
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3394">MNG-3394</a>:
+ * it checks that plugin versions in the POM obey the correct order
  * of precedence. Specifically, that mojos in the default lifecycle
  * bindings can find plugin versions in the pluginManagement section
  * when the build/plugins section is missing that plugin, and that

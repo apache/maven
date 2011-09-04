@@ -25,7 +25,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Checks that a plugin execution with an id that contains an expression will 
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3679">MNG-3679</a>:
+ * it checks that a plugin execution with an id that contains an expression will 
  * still execute without a problem.
  * 
  * @author jdcasey

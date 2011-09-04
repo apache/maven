@@ -26,8 +26,9 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Simple IT test invoking maven in a reactor with 2 projects.
- * First project produced a test-jar, which is required to 
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2045">MNG-2045</a>:
+ * Simple IT test invoking maven in a reactor with 2 projects -- 
+ * first project produces a test-jar, which is required to 
  * compile second project. 
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>

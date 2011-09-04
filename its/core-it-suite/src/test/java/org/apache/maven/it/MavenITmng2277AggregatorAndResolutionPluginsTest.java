@@ -25,8 +25,10 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2277">MNG-2277</a>.
  * 
+ * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
+ * @version $Id$
  */
 public class MavenITmng2277AggregatorAndResolutionPluginsTest
     extends AbstractMavenIntegrationTestCase

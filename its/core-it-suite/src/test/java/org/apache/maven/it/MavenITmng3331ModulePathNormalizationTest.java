@@ -25,14 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a sample integration test. The IT tests typically
- * operate by having a sample project in the
- * /src/test/resources folder along with a junit test like
- * this one. The junit test uses the verifier (which uses
- * the invoker) to invoke a new instance of Maven on the
- * project in the resources folder. It then checks the
- * results. This is a non-trivial example that shows two
- * phases. See more information inline in the code.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3331">MNG-3331</a>.
  * 
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * 

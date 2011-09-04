@@ -24,6 +24,11 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3535">MNG-3535</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3535SelfReferentialPropertiesTest
     extends AbstractMavenIntegrationTestCase
 {

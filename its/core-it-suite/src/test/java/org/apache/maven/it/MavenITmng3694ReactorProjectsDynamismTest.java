@@ -25,6 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3694">MNG-3694</a>:
  * Verify that any plugin injecting reactorProjects gets project instances that
  * have their concrete state calculated.
  * 

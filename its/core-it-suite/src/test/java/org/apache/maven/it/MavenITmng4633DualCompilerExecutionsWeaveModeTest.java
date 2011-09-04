@@ -24,6 +24,9 @@ import java.io.File;
  */
 
 /**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4633">MNG-4633</a>.
+ * 
+ * @version $Id$
  * @author Kristian Rosenvold
  */
 public class MavenITmng4633DualCompilerExecutionsWeaveModeTest

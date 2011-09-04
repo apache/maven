@@ -24,6 +24,11 @@ import org.apache.maven.it.Verifier;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3536">MNG-3536</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3536AppendedAbsolutePathsTest
     extends AbstractMavenIntegrationTestCase
 {

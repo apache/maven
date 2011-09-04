@@ -25,6 +25,11 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 import java.util.Properties;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3600">MNG-3600</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3600DeploymentModeDefaultsTest
     extends AbstractMavenIntegrationTestCase
 {

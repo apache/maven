@@ -26,7 +26,8 @@ import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Test that changes to a project's POM file reference (MavenProject.setFile(..))
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3693">MNG-3693</a>:
+ * it tests that changes to a project's POM file reference (MavenProject.setFile(..))
  * doesn't affect the basedir of the project instance for using that project's classes directory
  * in the classpath of another project's build...this happens when both projects are
  * built in the same reactor, and one project depends on the other.

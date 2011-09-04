@@ -27,6 +27,11 @@ import java.util.Date;
 import java.util.Properties;
 import java.text.SimpleDateFormat;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2562">MNG-2562</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng2562TimestampTest
     extends AbstractMavenIntegrationTestCase
 {

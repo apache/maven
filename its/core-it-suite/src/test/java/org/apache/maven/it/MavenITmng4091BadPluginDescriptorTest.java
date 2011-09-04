@@ -27,7 +27,8 @@ import java.util.Properties;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * MNG-4091 - Bad plugin descriptor error handling
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4091">MNG-4091</a>:
+ * Bad plugin descriptor error handling
  */
 public class MavenITmng4091BadPluginDescriptorTest
     extends AbstractMavenIntegrationTestCase

@@ -24,6 +24,11 @@ import java.io.File;
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3396">MNG-3396</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3396DependencyManagementForOverConstrainedRangesTest
     extends AbstractMavenIntegrationTestCase
 {

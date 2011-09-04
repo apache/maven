@@ -25,6 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3684">MNG-3684</a>:
  * Verify that the Build instance injected as a plugin parameter contains
  * interpolated values for things like the various build paths, etc.
  * 

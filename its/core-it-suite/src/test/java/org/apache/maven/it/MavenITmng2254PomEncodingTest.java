@@ -26,9 +26,10 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Test that pom.xml encoding is properly detected.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2254">MNG-2254</a>:
+ * it tests that pom.xml encoding is properly detected.
  * 
- * @author <a href="mailto:herve.boutemy@free.fr">Herve Boutemy</a>
+ * @author <a href="mailto:herve.boutemy@free.fr">Hervé Boutemy</a>
  * 
  */
 public class MavenITmng2254PomEncodingTest

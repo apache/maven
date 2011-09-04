@@ -25,7 +25,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Test activation and deactivation of profiles.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3545">MNG-3545</a>:
+ * it tests activation and deactivation of profiles.
  * 
  */
 public class MavenITmng3545ProfileDeactivationTest

@@ -25,7 +25,8 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * Integration test to check MNG-3284 - that explicitly defined plugins are used, not the one that is cached.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3284">MNG-3284</a>:
+ * that explicitly defined plugins are used, not the one that is cached.
  */
 public class MavenITmng3284UsingCachedPluginsTest
     extends AbstractMavenIntegrationTestCase

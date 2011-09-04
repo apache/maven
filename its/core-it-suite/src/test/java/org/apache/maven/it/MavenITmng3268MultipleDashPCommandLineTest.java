@@ -24,6 +24,11 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3268">MNG-3268</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3268MultipleDashPCommandLineTest
     extends AbstractMavenIntegrationTestCase
 {

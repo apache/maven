@@ -34,6 +34,11 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3652">MNG-3652</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3652UserAgentHeaderTest
     extends AbstractMavenIntegrationTestCase
 {

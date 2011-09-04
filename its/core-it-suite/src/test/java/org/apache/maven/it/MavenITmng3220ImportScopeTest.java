@@ -27,6 +27,11 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3220">MNG-3220</a>.
+ * 
+ * @version $Id$
+ */
 public class MavenITmng3220ImportScopeTest
     extends AbstractMavenIntegrationTestCase
 {
