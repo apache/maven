@@ -292,7 +292,7 @@
      */
     public synchronized Proxy getActiveProxy()
     {
-        if (activeProxy == null)
+        if ( activeProxy == null )
         {
             java.util.List<Proxy> proxies = getProxies();
             if ( proxies != null && !proxies.isEmpty() )
@@ -315,12 +315,11 @@
     {
         Server match = null;
 
-        java.util.List servers = getServers();
+        java.util.List<Server> servers = getServers();
         if ( servers != null && serverId != null )
         {
-            for ( java.util.Iterator it = servers.iterator(); it.hasNext(); )
+            for ( Server server : servers )
             {
-                Server server = (Server) it.next();
                 if ( serverId.equals( server.getId() ) )
                 {
                     match = server;
@@ -337,12 +336,11 @@
     {
         Mirror match = null;
 
-        java.util.List mirrors = getMirrors();
+        java.util.List<Mirror> mirrors = getMirrors();
         if ( mirrors != null && repositoryId != null )
         {
-            for ( java.util.Iterator it = mirrors.iterator(); it.hasNext(); )
+            for ( Mirror mirror : mirrors )
             {
-                Mirror mirror = (Mirror) it.next();
                 if ( repositoryId.equals( mirror.getMirrorOf() ) )
                 {
                     match = mirror;
@@ -354,7 +352,7 @@
         return match;
     }
 
-    private java.util.Map profileMap;
+    private java.util.Map<String, Profile> profileMap;
 
     /**
      * Reset the <code>profileMap</code> field to <code>null</code>
@@ -368,18 +366,16 @@
      * @return a Map of profiles field with <code>Profile#getId()</code> as key
      * @see org.apache.maven.settings.Profile#getId()
      */
-    public java.util.Map getProfilesAsMap()
+    public java.util.Map<String, Profile> getProfilesAsMap()
     {
         if ( profileMap == null )
         {
-            profileMap = new java.util.LinkedHashMap();
+            profileMap = new java.util.LinkedHashMap<String, Profile>();
 
             if ( getProfiles() != null )
             {
-                for ( java.util.Iterator it = getProfiles().iterator(); it.hasNext(); )
+                for ( Profile profile : getProfiles() )
                 {
-                    Profile profile = (Profile) it.next();
-
                     profileMap.put( profile.getId(), profile );
                 }
             }
@@ -908,7 +904,7 @@
       <version>1.0.0+</version>
       <description>
         Repository contains the information needed for establishing
-        connections with remote repoistory
+        connections with remote repository
       </description>
       <fields>
         <field>
@@ -932,7 +928,7 @@
           </association>
         </field>
       </fields>
-      <!-- prevent modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
+      <!-- prevent Modello generation of an incorrect equals method. Could be avoided by using <identity/> tags to mark ID as the only identity field -->
       <codeSegments>
         <codeSegment>
           <version>1.0.0+</version>
