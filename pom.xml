@@ -544,7 +544,7 @@
             <artifactId>cobertura-maven-plugin</artifactId>
             <reportSets>
               <reportSet>
-                <!--Disabled at it kills the site generation via a NoClassDefFoundError-->
+                <!-- Disabled as it kills the site generation via a NoClassDefFoundError -->
                 <reports />
               </reportSet>
             </reportSets>
