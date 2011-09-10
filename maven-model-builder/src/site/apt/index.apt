@@ -32,7 +32,7 @@ Maven Model Builder
 
    ** inheritance assembly
 
-   ** model interpolation
+   ** model interpolation (see below)
 
    ** url normalization
 
@@ -59,3 +59,47 @@ Maven Model Builder
    []
 
  []
+
+
+* Model Interpolation
+
+  Model Interpolation consists in replacing <<<$\{...\}>>> with calculated value. It is done in <<<StringSearchModelInterpolator>>>
+  ({{{./apidocs/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html}javadoc}},
+  {{{./xref/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html}source}}).
+
+  Values are evaluated in sequence from different syntaxes:
+
+*----+------+------+
+|| value || evaluation result || common examples ||
+*----+------+------+
+| <<<project.*>>>\
+<<<pom.*>>> (<deprecated>)\
+<<<*>>> (<deprecated>) | POM content (see {{{../maven-model/maven.html}POM reference}}) | <<<$\{project.version\}>>>\
+ | | <<<$\{project.build.finalName\}>>>\
+ | | <<<$\{project.build.artifactId\}>>>\
+ | | <<<$\{project.build.directory\}>>> |
+*----+------+------+
+| <<<basedir>>>\
+<<<project.basedir>>>\
+<<<pom.basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | |
+*----+------+------+
+| <<<project.baseUri>>>\
+<<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | |
+*----+------+------+
+| <<<build.timestamp>>>\
+<<<maven.build.timestamp>>> | the timestamp of build start, in <<<yyyyMMdd-HHmm>>> default format, which can be overridden with <<<maven.build.timestamp.format>>> POM property | |
+*----+------+------+
+| <<<*>>> | user properties, set from CLI with <<<-Dproperty=value>>> | <<<$\{skip\}>>> |
+*----+------+------+
+| <<<*>>> | model properties | <<<$\{any.key\}>>> |
+*----+------+------+
+| <<<*>>> | Java system properties (see {{{http://download.oracle.com/javase/1,5.0/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
+ | | <<<$\{java.home\}>>> |
+*----+------+------+
+| <<<env.*>>>\
+<<<*>>> | environment variables | <<<$\{env.PATH\}>>> |
+*----+------+------+
+
+  Notice that after model interpolation, <<<$\{...\}>>> content can remain in the model that will be evaluated later
+  when setting plugin parameters. This happens in particular with <<<settings.*>>> values for
+  {{{../maven-settings/settings.html}Settings Model}}.
