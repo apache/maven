@@ -20,7 +20,6 @@ under the License.
 -->
 
 <!--
-
   There is currently only one component descriptor that cannot be generated from annotations because of the
   accompanying configuration. Our options are to embed this information programatically or use a configuration source
   to pull in the lifecycle information.
@@ -55,6 +54,7 @@ under the License.
       </configuration>
     </component>
 
+    <!-- 'default' lifecycle, without any binding since it is dependent on packaging -->
     <component>
       <role>org.apache.maven.lifecycle.Lifecycle</role>
       <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
@@ -90,6 +90,8 @@ under the License.
         <!-- END SNIPPET: lifecycle -->
       </configuration>
     </component>
+
+    <!-- 'clean' lifecycle, with default binding -->
     <component>
       <role>org.apache.maven.lifecycle.Lifecycle</role>
       <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
@@ -108,6 +110,8 @@ under the License.
         </default-phases>
       </configuration>
     </component>
+
+    <!-- 'site' lifecycle, with default bindings -->
     <component>
       <role>org.apache.maven.lifecycle.Lifecycle</role>
       <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
