@@ -105,7 +105,7 @@ public class DefaultProjectDependenciesResolver
 
         /*
 
-        Logic for transitve global exclusions
+        Logic for transitive global exclusions
 
         List<String> exclusions = new ArrayList<String>();
 

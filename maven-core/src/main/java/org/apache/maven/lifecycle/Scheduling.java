@@ -62,33 +62,33 @@ public class Scheduling
 
     public Schedule getSchedule( String phaseName )
     {
-        if ( phaseName == null )
+        if ( phaseName != null )
         {
-            return null;
-        }
-        for ( Schedule schedule : schedules )
-        {
-            if ( phaseName.equals( schedule.getPhase() ) )
+            for ( Schedule schedule : schedules )
             {
-                return schedule;
+                if ( phaseName.equals( schedule.getPhase() ) )
+                {
+                    return schedule;
+                }
             }
         }
+
         return null;
     }
 
     public Schedule getSchedule( MojoExecution mojoExecution )
     {
-        if ( mojoExecution == null )
+        if ( mojoExecution != null )
         {
-            return null;
-        }
-        for ( Schedule schedule : schedules )
-        {
-            if ( schedule.appliesTo( mojoExecution ) )
+            for ( Schedule schedule : schedules )
             {
-                return schedule;
+                if ( schedule.appliesTo( mojoExecution ) )
+                {
+                    return schedule;
+                }
             }
         }
+
         return null;
     }
 

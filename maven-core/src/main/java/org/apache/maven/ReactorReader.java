@@ -49,7 +49,6 @@ class ReactorReader
 
     private WorkspaceRepository repository;
 
-    @SuppressWarnings( { "ConstantConditions" } )
     public ReactorReader( Map<String, MavenProject> reactorProjects )
     {
         projectsByGAV = reactorProjects;
@@ -203,15 +202,8 @@ class ReactorReader
      */
     private static boolean isTestArtifact( Artifact artifact )
     {
-        if ( "test-jar".equals( artifact.getProperty( "type", "" ) ) )
-        {
-            return true;
-        }
-        else if ( "jar".equals( artifact.getExtension() ) && "tests".equals( artifact.getClassifier() ) )
-        {
-            return true;
-        }
-        return false;
+        return ( "test-jar".equals( artifact.getProperty( "type", "" ) ) )
+            || ( "jar".equals( artifact.getExtension() ) && "tests".equals( artifact.getClassifier() ) );
     }
 
     public File findArtifact( Artifact artifact )

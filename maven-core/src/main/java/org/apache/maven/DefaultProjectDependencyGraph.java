@@ -105,12 +105,9 @@ class DefaultProjectDependencyGraph
     {
         for ( String id : sorter.getDependencies( projectId ) )
         {
-            if ( projectIds.add( id ) )
+            if ( projectIds.add( id ) && transitive )
             {
-                if ( transitive )
-                {
-                    getUpstreamProjects( id, projectIds, transitive );
-                }
+                getUpstreamProjects( id, projectIds, transitive );
             }
         }
     }

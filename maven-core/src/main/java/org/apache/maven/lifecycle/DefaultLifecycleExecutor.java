@@ -107,7 +107,6 @@ public class DefaultLifecycleExecutor
 
     // USED BY MAVEN HELP PLUGIN
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     @Deprecated
     public Map<String, Lifecycle> getPhaseToLifecycleMap()
     {
@@ -166,7 +165,6 @@ public class DefaultLifecycleExecutor
     {
         lifecycleExecutionPlanCalculator.calculateForkedExecutions( mojoExecution, session );
     }
-
 
     // Site 3.x
     public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )

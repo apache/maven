@@ -53,7 +53,6 @@ public class DefaultLifecycles
     @Requirement
     private Logger logger;
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public DefaultLifecycles()
     {
     }
@@ -112,11 +111,11 @@ public class DefaultLifecycles
     public List<Lifecycle> getLifeCycles()
     {
         // ensure canonical order of standard lifecycles
-
         Map<String, Lifecycle> lifecycles = new LinkedHashMap<String, Lifecycle>( this.lifecycles );
 
         LinkedHashSet<String> lifecycleNames = new LinkedHashSet<String>( Arrays.asList( STANDARD_LIFECYCLES ) );
         lifecycleNames.addAll( lifecycles.keySet() );
+
         ArrayList<Lifecycle> result = new ArrayList<Lifecycle>();
         for ( String name : lifecycleNames )
         {

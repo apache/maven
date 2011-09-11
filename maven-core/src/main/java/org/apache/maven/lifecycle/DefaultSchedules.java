@@ -37,7 +37,6 @@ public class DefaultSchedules
 {
     List<Scheduling> schedules;
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public DefaultSchedules()
     {
     }
@@ -56,6 +55,7 @@ public class DefaultSchedules
         {
             String lifeCyclePhase = mojoExecution.getLifecyclePhase();
             final Scheduling scheduling = getScheduling( "default" );
+
             Schedule schedule = null;
             if ( scheduling != null )
             {
@@ -65,8 +65,8 @@ public class DefaultSchedules
                     schedule = scheduling.getSchedule( lifeCyclePhase );
                 }
             }
-            result.add( new ExecutionPlanItem( mojoExecution, schedule ) );
 
+            result.add( new ExecutionPlanItem( mojoExecution, schedule ) );
         }
         return result;
     }

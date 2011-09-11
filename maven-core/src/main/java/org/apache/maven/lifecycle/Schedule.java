@@ -25,7 +25,6 @@ import org.apache.maven.plugin.MojoExecution;
  * @since 3.0
  * @author Kristian Rosenvold
  */
-@SuppressWarnings( { "UnusedDeclaration" } )
 public class Schedule
 {
     private String phase;
@@ -122,33 +121,23 @@ public class Schedule
 
     public boolean appliesTo( MojoExecution mojoExecution )
     {
-        boolean pluginKeyMatches = true;
-        boolean pluginGoalMatches = true;
         if ( pluginKey == null && mojoGoal == null )
         {
             return false;
         }
-        if ( pluginKey != null )
-        {
-            pluginKeyMatches = pluginKey.equals( mojoExecution.getPlugin().getKey() );
-        }
-        if ( mojoGoal != null )
-        {
-            pluginGoalMatches = mojoGoal.equals( mojoExecution.getGoal() );
-        }
 
-        if ( pluginKeyMatches && pluginGoalMatches )
-        {
-            return true;
-        }
-        return false;
+        boolean pluginKeyMatches = ( pluginKey == null ) || pluginKey.equals( mojoExecution.getPlugin().getKey() );
+
+        boolean pluginGoalMatches = ( mojoGoal == null ) || mojoGoal.equals( mojoExecution.getGoal() );
+
+        return pluginKeyMatches && pluginGoalMatches;
     }
 
     @Override
     public String toString()
     {
-        return "Schedule{" + "phase='" + phase + '\'' + ", upstreamPhase='" + upstreamPhase + '\'' + ", pluginKey='"
-            + pluginKey + '\'' + ", mojoGoal='" + mojoGoal + '\'' + ", mojoSynchronized=" + mojoSynchronized
+        return "Schedule{" + "phase='" + phase + "', upstreamPhase='" + upstreamPhase + "', pluginKey='"
+            + pluginKey + "', mojoGoal='" + mojoGoal + "', mojoSynchronized=" + mojoSynchronized
             + ", parallel=" + parallel + '}';
     }
 }

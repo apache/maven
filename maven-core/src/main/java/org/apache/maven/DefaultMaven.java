@@ -183,7 +183,8 @@ public class DefaultMaven
         //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
-            request.getSystemProperties().put( "${build.timestamp}", new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
+            request.getSystemProperties().put( "${build.timestamp}",
+                                               new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
         }        
         
         request.setStartTime( new Date() );
@@ -463,16 +464,9 @@ public class DefaultMaven
 
     private String getUserAgent()
     {
-        StringBuilder buffer = new StringBuilder( 128 );
-
-        buffer.append( "Apache-Maven/" ).append( getMavenVersion() );
-        buffer.append( " (" );
-        buffer.append( "Java " ).append( System.getProperty( "java.version" ) );
-        buffer.append( "; " );
-        buffer.append( System.getProperty( "os.name" ) ).append( " " ).append( System.getProperty( "os.version" ) );
-        buffer.append( ")" );
-
-        return buffer.toString();
+        return "Apache-Maven/" + getMavenVersion()
+            + " (Java " + System.getProperty( "java.version" ) + "; "
+            + System.getProperty( "os.name" ) + " " + System.getProperty( "os.version" ) + ")";
     }
 
     private String getMavenVersion()
@@ -496,7 +490,6 @@ public class DefaultMaven
         return props.getProperty( "version", "unknown-version" );
     }
 
-    @SuppressWarnings({"ResultOfMethodCallIgnored"})
     private void validateLocalRepository( MavenExecutionRequest request )
         throws LocalRepositoryNotAccessibleException
     {
@@ -587,7 +580,7 @@ public class DefaultMaven
             request.setProjectPresent( false );
             return projects;
         }
-        
+
         List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );        
         collectProjects( projects, files, request );
         return projects;

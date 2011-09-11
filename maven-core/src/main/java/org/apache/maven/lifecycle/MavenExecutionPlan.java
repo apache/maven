@@ -58,7 +58,6 @@ public class MavenExecutionPlan
 
     private final Map<String, ExecutionPlanItem> lastMojoExecutionForAllPhases;
 
-
     final List<String> phasesInExecutionPlan;
 
     public MavenExecutionPlan( List<ExecutionPlanItem> planItem, DefaultLifecycles defaultLifecycles )
@@ -88,17 +87,16 @@ public class MavenExecutionPlan
         }
 
         ExecutionPlanItem lastSeenExecutionPlanItem = null;
-        ExecutionPlanItem forThisPhase;
 
         for ( String phase : totalPhaseSet )
         {
-            forThisPhase = lastInExistingPhases.get( phase );
+            ExecutionPlanItem forThisPhase = lastInExistingPhases.get( phase );
             if ( forThisPhase != null )
             {
                 lastSeenExecutionPlanItem = forThisPhase;
             }
-            lastMojoExecutionForAllPhases.put( phase, lastSeenExecutionPlanItem );
 
+            lastMojoExecutionForAllPhases.put( phase, lastSeenExecutionPlanItem );
         }
     }
 
@@ -124,7 +122,6 @@ public class MavenExecutionPlan
     {
         return planItem;
     }
-
 
     private static Iterable<String> getDistinctPhasesInOrderOfExecutionPlanAppearance(
         List<ExecutionPlanItem> planItems )
@@ -189,8 +186,6 @@ public class MavenExecutionPlan
     }
 
     // Used by m2e but will be removed, really.
-
-    @SuppressWarnings( { "UnusedDeclaration" } )
     @Deprecated
     public List<MojoExecution> getExecutions()
     {
