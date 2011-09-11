@@ -65,6 +65,7 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
@@ -73,13 +74,11 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-connector-wagon</artifactId>
-      <version>${aetherVersion}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>easymock</groupId>
       <artifactId>easymock</artifactId>
-      <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -99,14 +98,6 @@
             <model>src/main/mdo/profiles.mdo</model>
             <model>src/main/mdo/paramdoc.mdo</model>
           </models>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
         </configuration>
       </plugin>
     </plugins>
