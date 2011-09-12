@@ -98,6 +98,7 @@ under the License.
       <role-hint>clean</role-hint>
       <configuration>
         <id>clean</id>
+        <!-- START SNIPPET: clean -->
         <phases>
           <phase>pre-clean</phase>
           <phase>clean</phase>
@@ -108,6 +109,7 @@ under the License.
             org.apache.maven.plugins:maven-clean-plugin:2.4.1:clean
           </clean>
         </default-phases>
+        <!-- END SNIPPET: clean -->
       </configuration>
     </component>
 
@@ -118,6 +120,7 @@ under the License.
       <role-hint>site</role-hint>
       <configuration>
         <id>site</id>
+        <!-- START SNIPPET: site -->
         <phases>
           <phase>pre-site</phase>
           <phase>site</phase>
@@ -132,6 +135,7 @@ under the License.
             org.apache.maven.plugins:maven-site-plugin:2.0.1:deploy
           </site-deploy>
         </default-phases>
+        <!-- END SNIPPET: site -->
       </configuration>
     </component>
 

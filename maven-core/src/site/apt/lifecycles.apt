@@ -1,0 +1,32 @@
+ ---
+ Lifecycles Reference
+ ---
+ Hervé Boutemy
+ ---
+ 2011-09-12
+ ---
+  
+Lifecycles Reference
+
+  Maven defines 3 lifecycles:
+
+%{toc|fromDepth=2}
+
+* <<<default>>> Lifecycle
+
+  <<<default>>> lifecycle is defined without any associated.
+  Bindings are {{{./default-bindings.html}defined separately for every packaging}}:
+
+%{snippet|id=lifecycle|file=src/main/resources/META-INF/plexus/components.xml}
+
+* <<<clean>>> Lifecycle
+
+  <<<clean>>> lifecycle is defined directly with its bindings.
+
+%{snippet|id=clean|file=src/main/resources/META-INF/plexus/components.xml}
+
+* <<<site>>> Lifecycle
+
+  <<<site>>> lifecycle is defined directly with its bindings.
+
+%{snippet|id=site|file=src/main/resources/META-INF/plexus/components.xml}

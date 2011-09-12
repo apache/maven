@@ -30,6 +30,11 @@ under the License.
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
 
+    <menu name="Reference">
+      <item name="Lifecycles" href="lifecycles.html"/>
+      <item name="Default Lifecycle Bindings" href="default-bindings.html"/>
+    </menu>
+
     <menu ref="parent"/>
     <menu ref="reports"/>
   </body>
