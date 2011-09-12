@@ -28,7 +28,7 @@ Maven Model Builder
 
    ** profile injection
 
-   ** parent resolution
+   ** parent resolution until {{{./super-pom.html}super-pom}}
 
    ** inheritance assembly
 
