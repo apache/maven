@@ -1,0 +1,51 @@
+ ---
+ Bindings for Default Lifecycle Reference
+ ---
+ Hervé Boutemy
+ ---
+ 2011-09-12
+ ---
+  
+Bindings for <<<default>>> Lifecycle Reference
+
+  The {{{./lifecycles.html}default lifecycle}} is defined without any binding: bindings are defined separately and
+  are specific for each packaging:
+
+%{toc|fromDepth=2}
+
+* Bindings for <<<pom>>> packaging
+
+%{snippet|id=pom-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<jar>>> packaging
+
+%{snippet|id=jar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<ejb>>> packaging
+
+%{snippet|id=ejb-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<ejb3>>> packaging
+
+%{snippet|id=ejb3-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<maven-plugin>>> packaging
+
+%{snippet|id=maven-plugin-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<war>>> packaging
+
+%{snippet|id=war-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<ear>>> packaging
+
+%{snippet|id=ear-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<rar>>> packaging
+
+%{snippet|id=rar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+
+* Bindings for <<<par>>> packaging
+
+%{snippet|id=par-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+  

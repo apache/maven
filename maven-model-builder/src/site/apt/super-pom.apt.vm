@@ -10,4 +10,4 @@ Super POM
 
  All models implicitly inherit from a super-POM:
 
-%{snippet|id=superpom|file=src/main/resources/org/apache/maven/model/pom-4.0.0.xml}
+%{snippet|id=superpom|file=${project.build.sourceDirectory}/../resources/org/apache/maven/model/pom-4.0.0.xml}
