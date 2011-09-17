@@ -88,7 +88,8 @@ public class StringSearchModelInterpolator
         return interpolator;
     }
 
-    private static final class InterpolateObjectAction implements PrivilegedAction<Object>
+    private static final class InterpolateObjectAction
+        implements PrivilegedAction<Object>
     {
 
         private final LinkedList<Object> interpolationTargets;
@@ -125,7 +126,6 @@ public class StringSearchModelInterpolator
             return null;
         }
 
-        @SuppressWarnings( "unchecked" )
         private void traverseObjectWithParents( Class<?> cls, Object target )
         {
             if ( cls == null )
@@ -146,163 +146,183 @@ public class StringSearchModelInterpolator
                     {
                         synchronized ( currentField )
                         {
-                            boolean isAccessible = currentField.isAccessible();
-                            currentField.setAccessible( true );
-                            try
-                            {
-                                if ( String.class == type )
-                                {
-                                    String value = (String) currentField.get( target );
-                                    if ( value != null && !Modifier.isFinal( currentField.getModifiers() ) )
-                                    {
-                                        String interpolated =
-                                            modelInterpolator.interpolateInternal( value, valueSources, postProcessors,
-                                                                                   problems );
-
-                                        if ( !interpolated.equals( value ) )
-                                        {
-                                            currentField.set( target, interpolated );
-                                        }
-                                    }
-                                }
-                                else if ( Collection.class.isAssignableFrom( type ) )
-                                {
-                                    Collection<Object> c = (Collection<Object>) currentField.get( target );
-                                    if ( c != null && !c.isEmpty() )
-                                    {
-                                        List<Object> originalValues = new ArrayList<Object>( c );
-                                        try
-                                        {
-                                            c.clear();
-                                        }
-                                        catch ( UnsupportedOperationException e )
-                                        {
-                                            continue;
-                                        }
-
-                                        for ( Object value : originalValues )
-                                        {
-                                            if ( value != null )
-                                            {
-                                                if ( String.class == value.getClass() )
-                                                {
-                                                    String interpolated =
-                                                        modelInterpolator.interpolateInternal( (String) value,
-                                                                                               valueSources,
-                                                                                               postProcessors,
-                                                                                               problems );
-
-                                                    if ( !interpolated.equals( value ) )
-                                                    {
-                                                        c.add( interpolated );
-                                                    }
-                                                    else
-                                                    {
-                                                        c.add( value );
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    c.add( value );
-                                                    if ( value.getClass().isArray() )
-                                                    {
-                                                        evaluateArray( value );
-                                                    }
-                                                    else
-                                                    {
-                                                        interpolationTargets.add( value );
-                                                    }
-                                                }
-                                            }
-                                            else
-                                            {
-                                                // add the null back in...not sure what else to do...
-                                                c.add( value );
-                                            }
-                                        }
-                                    }
-                                }
-                                else if ( Map.class.isAssignableFrom( type ) )
-                                {
-                                    Map<Object, Object> m = (Map<Object, Object>) currentField.get( target );
-                                    if ( m != null && !m.isEmpty() )
-                                    {
-                                        for ( Map.Entry<Object, Object> entry : m.entrySet() )
-                                        {
-                                            Object value = entry.getValue();
-
-                                            if ( value != null )
-                                            {
-                                                if ( String.class == value.getClass() )
-                                                {
-                                                    String interpolated =
-                                                        modelInterpolator.interpolateInternal( (String) value,
-                                                                                               valueSources,
-                                                                                               postProcessors,
-                                                                                               problems );
-
-                                                    if ( !interpolated.equals( value ) )
-                                                    {
-                                                        try
-                                                        {
-                                                            entry.setValue( interpolated );
-                                                        }
-                                                        catch ( UnsupportedOperationException e )
-                                                        {
-                                                            continue;
-                                                        }
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if ( value.getClass().isArray() )
-                                                    {
-                                                        evaluateArray( value );
-                                                    }
-                                                    else
-                                                    {
-                                                        interpolationTargets.add( value );
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    Object value = currentField.get( target );
-                                    if ( value != null )
-                                    {
-                                        if ( currentField.getType().isArray() )
-                                        {
-                                            evaluateArray( value );
-                                        }
-                                        else
-                                        {
-                                            interpolationTargets.add( value );
-                                        }
-                                    }
-                                }
-                            }
-                            catch ( IllegalArgumentException e )
-                            {
-                                problems.add( Severity.ERROR, "Failed to interpolate field3: " + currentField
-                                    + " on class: " + cls.getName(), null, e );
-                            }
-                            catch ( IllegalAccessException e )
-                            {
-                                problems.add( Severity.ERROR, "Failed to interpolate field4: " + currentField
-                                    + " on class: " + cls.getName(), null, e );
-                            }
-                            finally
-                            {
-                                currentField.setAccessible( isAccessible );
-                            }
+                            interpolateField( cls, target, currentField, type );
                         }
                     }
                 }
 
                 traverseObjectWithParents( cls.getSuperclass(), target );
+            }
+        }
+
+        private void interpolateField( Class<?> cls, Object target, Field field, Class<?> type )
+        {
+            boolean isAccessible = field.isAccessible();
+            field.setAccessible( true );
+            try
+            {
+                if ( String.class == type )
+                {
+                    interpolateStringField( target, field );
+                }
+                else if ( Collection.class.isAssignableFrom( type ) )
+                {
+                    interpolateCollectionField( target, field );
+                }
+                else if ( Map.class.isAssignableFrom( type ) )
+                {
+                    interpolateMapField( target, field );
+                }
+                else
+                {
+                    Object value = field.get( target );
+                    if ( value != null )
+                    {
+                        if ( field.getType().isArray() )
+                        {
+                            evaluateArray( value );
+                        }
+                        else
+                        {
+                            interpolationTargets.add( value );
+                        }
+                    }
+                }
+            }
+            catch ( IllegalArgumentException e )
+            {
+                problems.add( Severity.ERROR, "Failed to interpolate field3: " + field + " on class: " + cls.getName(),
+                              null, e );
+            }
+            catch ( IllegalAccessException e )
+            {
+                problems.add( Severity.ERROR, "Failed to interpolate field4: " + field + " on class: " + cls.getName(),
+                              null, e );
+            }
+            finally
+            {
+                field.setAccessible( isAccessible );
+            }
+        }
+
+        private void interpolateStringField( Object target, Field field )
+            throws IllegalAccessException
+        {
+            String value = (String) field.get( target );
+            if ( value == null || Modifier.isFinal( field.getModifiers() ) )
+            {
+                return;
+            }
+
+            String interpolated =
+                modelInterpolator.interpolateInternal( value, valueSources, postProcessors, problems );
+
+            if ( !interpolated.equals( value ) )
+            {
+                field.set( target, interpolated );
+            }
+        }
+
+        private void interpolateCollectionField( Object target, Field field )
+            throws IllegalAccessException
+        {
+            @SuppressWarnings( "unchecked" )
+            Collection<Object> c = (Collection<Object>) field.get( target );
+            if ( c == null || c.isEmpty() )
+            {
+                return;
+            }
+
+            List<Object> originalValues = new ArrayList<Object>( c );
+            try
+            {
+                c.clear();
+            }
+            catch ( UnsupportedOperationException e )
+            {
+                return;
+            }
+
+            for ( Object value : originalValues )
+            {
+                if ( value == null )
+                {
+                    // add the null back in...not sure what else to do...
+                    c.add( value );
+                }
+                else if ( String.class == value.getClass() )
+                {
+                    String interpolated =
+                        modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, problems );
+
+                    if ( !interpolated.equals( value ) )
+                    {
+                        c.add( interpolated );
+                    }
+                    else
+                    {
+                        c.add( value );
+                    }
+                }
+                else
+                {
+                    c.add( value );
+                    if ( value.getClass().isArray() )
+                    {
+                        evaluateArray( value );
+                    }
+                    else
+                    {
+                        interpolationTargets.add( value );
+                    }
+                }
+            }
+        }
+
+        private void interpolateMapField( Object target, Field field )
+            throws IllegalAccessException
+        {
+            @SuppressWarnings( "unchecked" )
+            Map<Object, Object> m = (Map<Object, Object>) field.get( target );
+            if ( m == null || m.isEmpty() )
+            {
+                return;
+            }
+
+            for ( Map.Entry<Object, Object> entry : m.entrySet() )
+            {
+                Object value = entry.getValue();
+
+                if ( value == null )
+                {
+                    continue;
+                }
+
+                if ( String.class == value.getClass() )
+                {
+                    String interpolated =
+                        modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, problems );
+
+                    if ( !interpolated.equals( value ) )
+                    {
+                        try
+                        {
+                            entry.setValue( interpolated );
+                        }
+                        catch ( UnsupportedOperationException e )
+                        {
+                            continue;
+                        }
+                    }
+                }
+                else if ( value.getClass().isArray() )
+                {
+                    evaluateArray( value );
+                }
+                else
+                {
+                    interpolationTargets.add( value );
+                }
             }
         }
 

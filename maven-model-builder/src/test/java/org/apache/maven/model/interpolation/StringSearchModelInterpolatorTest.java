@@ -432,7 +432,7 @@ public class StringSearchModelInterpolatorTest
         }
     }
 
-    @SuppressWarnings({"UnusedDeclaration", "unused"})
+    @SuppressWarnings( "unused" )
     private static final class ObjectWithMixedProtection
     {
         private List<?> values1;
@@ -475,7 +475,6 @@ public class StringSearchModelInterpolatorTest
         assertProblemFree(  problems );
     }
 
-    @SuppressWarnings({"UnusedDeclaration"})
     static class ClassWithFinalField
     {
         public static final String CONSTANT = "${expression}";
