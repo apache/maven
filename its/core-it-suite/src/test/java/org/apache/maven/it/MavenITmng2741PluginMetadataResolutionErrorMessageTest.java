@@ -75,17 +75,25 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
         catch ( VerificationException e )
         {
             boolean foundCause = false;
+            StringBuilder sb = new StringBuilder(  );
             List lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
             for ( int i = 0; i < lines.size(); i++ )
             {
                 String line = lines.get( i ).toString();
+                sb.append( line ).append( System.getProperty( "line.separator" ) );
                 if ( line.matches( ".*Connection refused.*" ) )
                 {
                     foundCause = true;
                     break;
                 }
+                if ( line.matches( ".*Connection to http://localhost:54312 refused.*" ) )
+                {
+                    foundCause = true;
+                    break;
+                }
+
             }
-            assertTrue( "Transfer error cause was not found", foundCause );
+            assertTrue( "Transfer error cause was not found : " +  sb.toString(), foundCause );
         }
         finally
         {
