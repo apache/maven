@@ -131,8 +131,8 @@ public class PomConstructionTest
     	throws Exception 
     {
     	PomTestWrapper pom = buildPom( "profile-properties-interpolation", "interpolation-profile" );
-    	assertEquals("PASSED", pom.getValue("properties[1]/test"));
-    	assertEquals("PASSED", pom.getValue("properties[1]/property"));
+        assertEquals( "PASSED", pom.getValue( "properties[1]/test" ) );
+        assertEquals( "PASSED", pom.getValue( "properties[1]/property" ) );
     }
 
 
@@ -145,8 +145,8 @@ public class PomConstructionTest
     public void testThatExecutionsWithoutIdsAreMergedAndTheChildWins()
         throws Exception
     {
-      PomTestWrapper tester = buildPom("micromailer");
-      assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
+        PomTestWrapper tester = buildPom( "micromailer" );
+        assertModelEquals( tester, "child-descriptor", "build/plugins[1]/executions[1]/goals[1]" );
     }
 
     /*MNG-
@@ -246,7 +246,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "parent-interpolation/sub" );
-        pom = new PomTestWrapper(pom.getMavenProject().getParent());
+        pom = new PomTestWrapper( pom.getMavenProject().getParent() );
         assertEquals( "1.3.0-SNAPSHOT", pom.getValue( "build/plugins[1]/version" ) );
     }
 
@@ -256,8 +256,9 @@ public class PomConstructionTest
     {
         PomTestWrapper pom =  buildPomFromMavenProject( "maven-build/sub/pom.xml", null );
   
-        for(String s: pom.getMavenProject().getTestClasspathElements()){
-            System.out.println(s);
+        for( String s: pom.getMavenProject().getTestClasspathElements() ) 
+        {
+            System.out.println( s );
         }
         
     }
@@ -286,9 +287,9 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "reporting-interpolation" );
-        assertEquals( createPath(Arrays.asList(System.getProperty("user.dir"),
-                "src", "test", "resources-project-builder", "reporting-interpolation", "target", "site")),
-                pom.getValue( "reporting/outputDirectory" ) );
+        assertEquals( createPath( Arrays.asList( System.getProperty( "user.dir" ), "src", "test",
+                                                 "resources-project-builder", "reporting-interpolation", "target",
+                                                 "site" ) ), pom.getValue( "reporting/outputDirectory" ) );
     }
 
 
@@ -331,8 +332,10 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "execution-configuration" );
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions" ) ).size() );
-        assertEquals( "src/main/mdo/nexus.xml", ( pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/model" ) ));
-        assertEquals( "src/main/mdo/security.xml", ( pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/model" ) ));
+        assertEquals( "src/main/mdo/nexus.xml",
+                      ( pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/model" ) ) );
+        assertEquals( "src/main/mdo/security.xml",
+                      ( pom.getValue( "build/plugins[1]/executions[2]/configuration[1]/model" ) ) );
     }
     
     /*
@@ -350,8 +353,10 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "single-configuration-inheritance" );
 
         assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules" ) ).size() );
-        assertEquals("2.0.6", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireMavenVersion[1]/version" ) );
-        assertEquals("[1.4,)", pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireJavaVersion[1]/version" ) );
+        assertEquals( "2.0.6",
+                      pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireMavenVersion[1]/version" ) );
+        assertEquals( "[1.4,)",
+                      pom.getValue( "build/plugins[1]/executions[1]/configuration[1]/rules[1]/requireJavaVersion[1]/version" ) );
     }
 
     public void testConfigWithPluginManagement()
@@ -555,7 +560,7 @@ public class PomConstructionTest
         PomTestWrapper pom = buildPom( "merged-plugin-class-path-order/wo-plugin-mngt/sub" );
 
         assertEquals( 5, ( (List<?>) pom.getValue( "build/plugins[1]/dependencies" ) ).size() );
-        assertNotNull( pom.getValue( "build/plugins[1]/dependencies[1]" ));
+        assertNotNull( pom.getValue( "build/plugins[1]/dependencies[1]" ) );
         assertEquals( "c", pom.getValue( "build/plugins[1]/dependencies[1]/artifactId" ) );
         assertEquals( "1", pom.getValue( "build/plugins[1]/dependencies[1]/version" ) );
         assertEquals( "a", pom.getValue( "build/plugins[1]/dependencies[2]/artifactId" ) );
@@ -951,8 +956,8 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "dependency-inheritance/sub" );
-        assertEquals(1,  ( (List<?>) pom.getValue( "dependencies" ) ).size() );
-        assertEquals("4.4",  pom.getValue("dependencies[1]/version") );
+        assertEquals( 1, ( (List<?>) pom.getValue( "dependencies" ) ).size() );
+        assertEquals( "4.4", pom.getValue( "dependencies[1]/version" ) );
     }
 
     /** MNG-4034 */
@@ -974,7 +979,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "profile-module-inheritance/sub", "dist" );
-        assertEquals(0, ( (List<?>) pom.getValue( "modules" ) ).size());
+        assertEquals( 0, ( (List<?>) pom.getValue( "modules" ) ).size() );
     }
     
     /** MNG-3621 */
@@ -982,7 +987,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "unc-path/sub" );
-        assertEquals("file:////host/site/test-child", pom.getValue( "distributionManagement/site/url" ));
+        assertEquals( "file:////host/site/test-child", pom.getValue( "distributionManagement/site/url" ) );
     }
     
     /** MNG-2006 */
@@ -990,11 +995,11 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "url-append/child" );
-        assertEquals("http://project.url/child", pom.getValue( "url" ));
-        assertEquals("http://viewvc.project.url/child", pom.getValue( "scm/url" ));
-        assertEquals("http://scm.project.url/child", pom.getValue( "scm/connection" ));
-        assertEquals("https://scm.project.url/child", pom.getValue( "scm/developerConnection" ));
-        assertEquals("http://site.project.url/child", pom.getValue( "distributionManagement/site/url" ));
+        assertEquals( "http://project.url/child", pom.getValue( "url" ) );
+        assertEquals( "http://viewvc.project.url/child", pom.getValue( "scm/url" ) );
+        assertEquals( "http://scm.project.url/child", pom.getValue( "scm/connection" ) );
+        assertEquals( "https://scm.project.url/child", pom.getValue( "scm/developerConnection" ) );
+        assertEquals( "http://site.project.url/child", pom.getValue( "distributionManagement/site/url" ) );
     } 
 
     /** MNG-0479 */
@@ -1002,7 +1007,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "repo-inheritance" );
-        assertEquals(1, ( (List<?>) pom.getValue( "repositories" ) ).size());
+        assertEquals( 1, ( (List<?>) pom.getValue( "repositories" ) ).size() );
         assertEquals( "it0043", pom.getValue( "repositories[1]/name" ) );
     }   
     
@@ -1010,7 +1015,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = this.buildPom( "empty-scm" );
-        assertNull(pom.getValue( "scm" ));
+        assertNull( pom.getValue( "scm" ) );
     }       
     
     public void testPluginConfigurationUsingAttributesWithoutPluginManagement()
@@ -1078,18 +1083,18 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "reporting-plugin-config/sub" );
 
-        assertEquals(2,  ( (List<?>) pom.getValue( "reporting/plugins[1]/configuration/stringParams" ) ).size());
-        assertEquals("parentParam",  pom.getValue( "reporting/plugins[1]/configuration/stringParams[1]/stringParam[1]"));
-        assertEquals("childParam",  pom.getValue( "reporting/plugins[1]/configuration/stringParams[1]/stringParam[2]"));
-        assertEquals("true",  pom.getValue( "reporting/plugins[1]/configuration/booleanParam"));
+        assertEquals( 2, ( (List<?>) pom.getValue( "reporting/plugins[1]/configuration/stringParams" ) ).size() );
+        assertEquals( "parentParam", pom.getValue( "reporting/plugins[1]/configuration/stringParams[1]/stringParam[1]" ) );
+        assertEquals( "childParam", pom.getValue( "reporting/plugins[1]/configuration/stringParams[1]/stringParam[2]" ) );
+        assertEquals( "true", pom.getValue( "reporting/plugins[1]/configuration/booleanParam" ) );
     }    
     
     public void testPropertiesNoDuplication()
     	throws Exception
     {
     	PomTestWrapper pom = buildPom( "properties-no-duplication/sub" );	
-    	assertEquals(1, ( (Properties) pom.getValue( "properties" ) ).size());
-    	assertEquals("child",  pom.getValue( "properties/pomProfile" ) );
+        assertEquals( 1, ( (Properties) pom.getValue( "properties" ) ).size() );
+        assertEquals( "child", pom.getValue( "properties/pomProfile" ) );
     }
 
     public void testPomInheritance()
@@ -1350,7 +1355,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "inherited-properties-interpolation/active-profile/sub" );
 
-        assertEquals(1, pom.getMavenProject().getModel().getProfiles().size());
+        assertEquals( 1, pom.getMavenProject().getModel().getProfiles().size() );
 
         buildPom( "inherited-properties-interpolation/active-profile/sub", "it-parent", "it-child" );
         assertEquals( "CHILD", pom.getValue( "properties/overridden" ) );
@@ -1361,10 +1366,10 @@ public class PomConstructionTest
     public void testProfileDefaultActivation()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "profile-default-deactivation" , "profile4");
-        assertEquals(1, pom.getMavenProject().getActiveProfiles().size() );
-        assertEquals(1, ( (List<?>) pom.getValue( "build/plugins" )).size() );
-        assertEquals("2.1", pom.getValue( "build/plugins[1]/version" ));
+        PomTestWrapper pom = buildPom( "profile-default-deactivation", "profile4" );
+        assertEquals( 1, pom.getMavenProject().getActiveProfiles().size() );
+        assertEquals( 1, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
+        assertEquals( "2.1", pom.getValue( "build/plugins[1]/version" ) );
     }    
     
     /* MNG-1995 */
@@ -1382,11 +1387,11 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "build-extension-inheritance/sub" ); 
-        assertEquals(3, ( (List<?>) pom.getValue( "build/extensions" )).size() );
-        assertEquals("b", pom.getValue( "build/extensions[1]/artifactId" ) );
-        assertEquals("a", pom.getValue( "build/extensions[2]/artifactId" ) );
-        assertEquals("0.2", pom.getValue( "build/extensions[2]/version" ) );
-        assertEquals("c", pom.getValue( "build/extensions[3]/artifactId" ) );
+        assertEquals( 3, ( (List<?>) pom.getValue( "build/extensions" ) ).size() );
+        assertEquals( "b", pom.getValue( "build/extensions[1]/artifactId" ) );
+        assertEquals( "a", pom.getValue( "build/extensions[2]/artifactId" ) );
+        assertEquals( "0.2", pom.getValue( "build/extensions[2]/version" ) );
+        assertEquals( "c", pom.getValue( "build/extensions[3]/artifactId" ) );
     }
     
     /*MNG-1957*/
@@ -1394,21 +1399,21 @@ public class PomConstructionTest
     	throws Exception
 	{
     	Properties props = new Properties();
-	    props.put("java.version", "1.5.0_15");
-	    	
-	    PomTestWrapper pom = buildPom( "jdk-activation",  props ); 
-	    assertEquals(3, pom.getMavenProject().getActiveProfiles().size());	
-	    assertEquals("PASSED", pom.getValue("properties/jdkProperty3"));
-	    assertEquals("PASSED", pom.getValue("properties/jdkProperty2"));
-	    assertEquals("PASSED", pom.getValue("properties/jdkProperty1"));
+        props.put( "java.version", "1.5.0_15" );
+
+        PomTestWrapper pom = buildPom( "jdk-activation", props );
+        assertEquals( 3, pom.getMavenProject().getActiveProfiles().size() );
+        assertEquals( "PASSED", pom.getValue( "properties/jdkProperty3" ) );
+        assertEquals( "PASSED", pom.getValue( "properties/jdkProperty2" ) );
+        assertEquals( "PASSED", pom.getValue( "properties/jdkProperty1" ) );
 	}   
     
     /* MNG-2174 */
     public void testProfilePluginMngDependencies()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "profile-plugin-mng-dependencies/sub" , "maven-core-it"); 
-        assertEquals("a", pom.getValue( "build/plugins[1]/dependencies[1]/artifactId" ) );
+        PomTestWrapper pom = buildPom( "profile-plugin-mng-dependencies/sub", "maven-core-it" );
+        assertEquals( "a", pom.getValue( "build/plugins[1]/dependencies[1]/artifactId" ) );
     }    
     
     /** MNG-4116 */
@@ -1433,45 +1438,46 @@ public class PomConstructionTest
     public void testPluginManagementInheritance()
         throws Exception
     {
-        PomTestWrapper pom = this.buildPom( "plugin-management-inheritance");
-        assertEquals("0.1-stub-SNAPSHOT", pom.getValue( "build/pluginManagement/plugins[@artifactId='maven-compiler-plugin']/version" ) );
+        PomTestWrapper pom = this.buildPom( "plugin-management-inheritance" );
+        assertEquals( "0.1-stub-SNAPSHOT",
+                      pom.getValue( "build/pluginManagement/plugins[@artifactId='maven-compiler-plugin']/version" ) );
     }   
     
     public void testProfilePlugins()
 	    throws Exception
 	{
-	    PomTestWrapper pom = this.buildPom( "profile-plugins", "standard");
-	    assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
-	    assertEquals("maven-assembly2-plugin", pom.getValue( "build/plugins[2]/artifactId" ) );	    
+        PomTestWrapper pom = this.buildPom( "profile-plugins", "standard" );
+        assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );
+        assertEquals( "maven-assembly2-plugin", pom.getValue( "build/plugins[2]/artifactId" ) );
 	}       
     
     public void testPluginInheritanceSimple()
 	    throws Exception
 	{
-	    PomTestWrapper pom = this.buildPom( "plugin-inheritance-simple/sub");
+        PomTestWrapper pom = this.buildPom( "plugin-inheritance-simple/sub" );
 	    assertEquals( 2, ( (List<?>) pom.getValue( "build/plugins" ) ).size() );   
 	} 
     
     public void testPluginManagementDuplicate()
 	    throws Exception
 	{
-	    PomTestWrapper pom = this.buildPom( "plugin-management-duplicate/sub");
-	    assertEquals( 12, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );   
+        PomTestWrapper pom = this.buildPom( "plugin-management-duplicate/sub" );
+        assertEquals( 12, ( (List<?>) pom.getValue( "build/pluginManagement/plugins" ) ).size() );
 	} 
     
     public void testDistributionManagement()
 	    throws Exception
 	{
-	    PomTestWrapper pom = this.buildPom( "distribution-management");
-	    assertEquals("legacy", pom.getValue( "distributionManagement/repository/layout" ));
+        PomTestWrapper pom = this.buildPom( "distribution-management" );
+        assertEquals( "legacy", pom.getValue( "distributionManagement/repository/layout" ) );
 	}      
     
     public void testDependencyScopeInheritance()
 	    throws Exception
 	{
-	    PomTestWrapper pom = buildPom( "dependency-scope-inheritance/sub" );
-	    String scope = (String) pom.getValue("dependencies[1]/scope");
-	    assertEquals( "compile", scope );
+        PomTestWrapper pom = buildPom( "dependency-scope-inheritance/sub" );
+        String scope = (String) pom.getValue( "dependencies[1]/scope" );
+        assertEquals( "compile", scope );
 	}   
     
     public void testDependencyScope()

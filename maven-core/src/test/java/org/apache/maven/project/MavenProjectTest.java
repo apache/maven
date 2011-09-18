@@ -46,7 +46,9 @@ public class MavenProjectTest
 
         MavenProject childProject = new MavenProject( childModel );
         
-        File childFile = new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis() + "/child/pom.xml" );
+        File childFile =
+            new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis()
+                + "/child/pom.xml" );
 
         childProject.setFile( childFile );
 
@@ -169,7 +171,7 @@ public class MavenProjectTest
 
         assertEquals( "Expecting 1 active profile", 1, activeProfilesClone.size() );
 
-        assertNotSame( "The list of active profiles should have been cloned too but is same",
-                activeProfilesOrig, activeProfilesClone);
+        assertNotSame( "The list of active profiles should have been cloned too but is same", activeProfilesOrig,
+                       activeProfilesClone );
     }
 }

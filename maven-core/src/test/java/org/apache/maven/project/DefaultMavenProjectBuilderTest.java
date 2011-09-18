@@ -140,16 +140,19 @@ public class DefaultMavenProjectBuilderTest
         throws Exception
     {
         ArtifactRepositoryLayout repoLayout = lookup( ArtifactRepositoryLayout.class, "default" );
-        ArtifactRepository r = repositorySystem.createArtifactRepository( "local", "file://" + localRepoDir.getAbsolutePath(), repoLayout, null, null );
+        ArtifactRepository r =
+            repositorySystem.createArtifactRepository( "local", "file://" + localRepoDir.getAbsolutePath(), repoLayout,
+                                                       null, null );
         return r;
     }
     
-    public void xtestLoop() throws Exception
+    public void xtestLoop()
+        throws Exception
     {
-        while( true )
+        while ( true )
         {
-        File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
-        getProject( f1 );
+            File f1 = getTestFile( "src/test/resources/projects/duplicate-plugins-merged-pom.xml" );
+            getProject( f1 );
         }
     }
     
