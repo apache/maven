@@ -1248,6 +1248,13 @@ public class PomConstructionTest
         assertEquals( "org.apache.maven.its", pom.getValue( "dependencies[1]/exclusions[1]/groupId" ) );
         assertEquals( "excluded-dep", pom.getValue( "dependencies[1]/exclusions[1]/artifactId" ) );
 
+        assertEquals( 2, ( (List<?>) pom.getValue( "repositories" ) ).size() );
+        assertEquals( "project-remote-repo", pom.getValue( "repositories[1]/id" ) );
+        assertEquals( "http://project.url/remote", pom.getValue( "repositories[1]/url" ) );
+        assertEquals( "repo", pom.getValue( "repositories[1]/name" ) );
+        assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_ID, pom.getValue( "repositories[2]/id" ) );
+        assertEquals( RepositorySystem.DEFAULT_REMOTE_REPO_URL, pom.getValue( "repositories[2]/url" ) );
+
         assertEquals( "test", pom.getValue( "build/defaultGoal" ) );
         assertEquals( "coreit", pom.getValue( "build/finalName" ) );
 
