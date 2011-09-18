@@ -86,8 +86,6 @@ Maven Model Builder
 | <<<project.baseUri>>>\
 <<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |
 *----+------+------+
-| <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.xml/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
-*----+------+------+
 | <<<build.timestamp>>>\
 <<<maven.build.timestamp>>> | the timestamp of build start, in <<<yyyyMMdd-HHmm>>> default format, which can be overridden with <<<maven.build.timestamp.format>>> POM property | <<<$\{maven.build.timestamp\}>>> |
 *----+------+------+
@@ -95,7 +93,7 @@ Maven Model Builder
 *----+------+------+
 | <<<*>>> | model properties, such as project properties set in the pom | <<<$\{any.key\}>>> |
 *----+------+------+
-| <<<maven.home>>> | The path to the current Maven execution. | <<<$\{maven.home\}>>> |
+| <<<maven.home>>> | The path to the current Maven home. | <<<$\{maven.home\}>>> |
 *----+------+------+
 | <<<maven.version>>> | The version number of the current Maven execution. For example, "<<<3.0.3>>>". | <<<$\{maven.version\}>>> |
 *----+------+------+
@@ -106,6 +104,8 @@ Maven Model Builder
 *----+------+------+
 | <<<env.*>>>\
 <<<*>>> | environment variables | <<<$\{env.PATH\}>>> |
+*----+------+------+
+| <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.xml/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
 *----+------+------+
 
   Notice that after model interpolation, <<<$\{...\}>>> content can remain in the model that will be evaluated later
