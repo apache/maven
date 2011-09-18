@@ -95,6 +95,8 @@ Maven Model Builder
 *----+------+------+
 | <<<*>>> | model properties, such as project properties set in the pom | <<<$\{any.key\}>>> |
 *----+------+------+
+| <<<maven.home>>> | The path to the current Maven execution. | <<<$\{maven.home\}>>> |
+*----+------+------+
 | <<<maven.version>>> | The version number of the current Maven execution. For example, "<<<3.0.3>>>". | <<<$\{maven.version\}>>> |
 *----+------+------+
 | <<<maven.build.version>>> | The full build version of the current Maven execution. For example, "<<<Apache Maven 3.0.3 (r1075438; 2011-02-28 11:31:09-0600)>>>". | <<<$\{maven.build.version\}>>> |
