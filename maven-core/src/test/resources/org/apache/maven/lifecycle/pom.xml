@@ -394,7 +394,7 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http-lightweight</artifactId>
+        <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
       </dependency>
       <dependency>
