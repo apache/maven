@@ -45,7 +45,7 @@
     <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.6</plexusUtilsVersion>
     <sisuInjectVersion>2.1.1</sisuInjectVersion>
-    <wagonVersion>1.0</wagonVersion>
+    <wagonVersion>2.0-SNAPSHOT</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
     <modelloVersion>1.4.1</modelloVersion>
@@ -283,8 +283,9 @@
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http-lightweight</artifactId>
+        <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
+        <classifier>shaded</classifier>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
