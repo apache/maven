@@ -95,9 +95,9 @@ Maven Model Builder
 *----+------+------+
 | <<<maven.home>>> | The path to the current Maven home. | <<<$\{maven.home\}>>> |
 *----+------+------+
-| <<<maven.version>>> | The version number of the current Maven execution. For example, "<<<3.0.3>>>". | <<<$\{maven.version\}>>> |
+| <<<maven.version>>> | The version number of the current Maven execution <(since 3.0.4)>. For example, "<<<3.0.3>>>". | <<<$\{maven.version\}>>> |
 *----+------+------+
-| <<<maven.build.version>>> | The full build version of the current Maven execution. For example, "<<<Apache Maven 3.0.3 (r1075438; 2011-02-28 11:31:09-0600)>>>". | <<<$\{maven.build.version\}>>> |
+| <<<maven.build.version>>> | The full build version of the current Maven execution <(since 3.0.4)>. For example, "<<<Apache Maven 3.0.3 (r1075438; 2011-02-28 11:31:09-0600)>>>". | <<<$\{maven.build.version\}>>> |
 *----+------+------+
 | <<<*>>> | Java system properties (see {{{http://download.oracle.com/javase/1,5.0/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
  | | <<<$\{java.home\}>>> |
