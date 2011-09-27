@@ -19,7 +19,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +41,8 @@ class DefaultModelProblemCollector
     implements ModelProblemCollector
 {
 
+    private final ModelBuildingResult result;
+
     private List<ModelProblem> problems;
 
     private String source;
@@ -52,9 +53,10 @@ class DefaultModelProblemCollector
 
     private Set<ModelProblem.Severity> severities = EnumSet.noneOf( ModelProblem.Severity.class );
 
-    public DefaultModelProblemCollector( List<ModelProblem> problems )
+    public DefaultModelProblemCollector( ModelBuildingResult result )
     {
-        this.problems = ( problems != null ) ? problems : new ArrayList<ModelProblem>();
+        this.result = result;
+        this.problems = result.getProblems();
 
         for ( ModelProblem problem : this.problems )
         {
@@ -174,6 +176,23 @@ class DefaultModelProblemCollector
         ModelProblem problem = new DefaultModelProblem( message, severity, source, line, column, modelId, cause );
 
         add( problem );
+    }
+
+    public ModelBuildingException newModelBuildingException()
+    {
+        ModelBuildingResult result = this.result;
+        if ( result.getModelIds().isEmpty() )
+        {
+            DefaultModelBuildingResult tmp = new DefaultModelBuildingResult();
+            tmp.setEffectiveModel( result.getEffectiveModel() );
+            tmp.setProblems( getProblems() );
+            tmp.setActiveExternalProfiles( result.getActiveExternalProfiles() );
+            String id = getRootModelId();
+            tmp.addModelId( id );
+            tmp.setRawModel( id, getRootModel() );
+            result = tmp;
+        }
+        return new ModelBuildingException( result );
     }
 
 }

@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.model.Model;
@@ -37,11 +37,7 @@ public class ModelBuildingException
     extends Exception
 {
 
-    private final Model model;
-
-    private final String modelId;
-
-    private final List<ModelProblem> problems;
+    private final ModelBuildingResult result;
 
     /**
      * Creates a new exception with the specified problems.
@@ -49,19 +45,50 @@ public class ModelBuildingException
      * @param model The model that could not be built, may be {@code null}.
      * @param modelId The identifier of the model that could not be built, may be {@code null}.
      * @param problems The problems that causes this exception, may be {@code null}.
+     * @deprecated Use {@link #ModelBuildingException(ModelBuildingResult)} instead.
      */
+    @Deprecated
     public ModelBuildingException( Model model, String modelId, List<ModelProblem> problems )
     {
         super( toMessage( modelId, problems ) );
 
-        this.model = model;
-        this.modelId = ( modelId != null ) ? modelId : "";
-
-        this.problems = new ArrayList<ModelProblem>();
-        if ( problems != null )
+        if ( model != null )
         {
-            this.problems.addAll( problems );
+            DefaultModelBuildingResult tmp = new DefaultModelBuildingResult();
+            if ( modelId == null )
+            {
+                modelId = "";
+            }
+            tmp.addModelId( modelId );
+            tmp.setRawModel( modelId, model );
+            tmp.setProblems( problems );
+            result = tmp;
         }
+        else
+        {
+            result = null;
+        }
+    }
+
+    /**
+     * Creates a new exception from the specified interim result and its associated problems.
+     * 
+     * @param result The interim result, may be {@code null}.
+     */
+    public ModelBuildingException( ModelBuildingResult result )
+    {
+        super( toMessage( result ) );
+        this.result = result;
+    }
+
+    /**
+     * Gets the interim result of the model building up to the point where it failed.
+     * 
+     * @return The interim model building result or {@code null} if not available.
+     */
+    public ModelBuildingResult getResult()
+    {
+        return result;
     }
 
     /**
@@ -71,7 +98,15 @@ public class ModelBuildingException
      */
     public Model getModel()
     {
-        return model;
+        if ( result == null )
+        {
+            return null;
+        }
+        if ( result.getEffectiveModel() != null )
+        {
+            return result.getEffectiveModel();
+        }
+        return result.getRawModel();
     }
 
     /**
@@ -83,7 +118,11 @@ public class ModelBuildingException
      */
     public String getModelId()
     {
-        return modelId;
+        if ( result == null || result.getModelIds().isEmpty() )
+        {
+            return "";
+        }
+        return result.getModelIds().get( 0 );
     }
 
     /**
@@ -93,7 +132,20 @@ public class ModelBuildingException
      */
     public List<ModelProblem> getProblems()
     {
-        return problems;
+        if ( result == null )
+        {
+            return Collections.emptyList();
+        }
+        return result.getProblems();
+    }
+
+    private static String toMessage( ModelBuildingResult result )
+    {
+        if ( result != null && !result.getModelIds().isEmpty() )
+        {
+            return toMessage( result.getModelIds().get( 0 ), result.getProblems() );
+        }
+        return null;
     }
 
     private static String toMessage( String modelId, List<ModelProblem> problems )

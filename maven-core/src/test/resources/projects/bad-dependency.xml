@@ -1,0 +1,27 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>test</groupId>
+  <artifactId>invalid</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>file:src/test/remote-repo</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <!-- groupId deliberately missing -->
+      <artifactId>b</artifactId>
+      <version>0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>a</artifactId>
+      <version>0.1</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -18,6 +18,7 @@ package org.apache.maven.project;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -119,6 +120,7 @@ public class DefaultProjectBuilder
             MavenProject project = configuration.getProject();
 
             List<ModelProblem> modelProblems = null;
+            Throwable error = null;
 
             if ( project == null )
             {
@@ -141,7 +143,13 @@ public class DefaultProjectBuilder
                 }
                 catch ( ModelBuildingException e )
                 {
-                    throw new ProjectBuildingException( e.getModelId(), e.getMessage(), pomFile, e );
+                    result = e.getResult();
+                    if ( result == null || result.getEffectiveModel() == null )
+                    {
+                        throw new ProjectBuildingException( e.getModelId(), e.getMessage(), pomFile, e );
+                    }
+                    // validation error, continue project building and delay failing to help IDEs
+                    error = e;
                 }
 
                 modelProblems = result.getProblems();
@@ -158,44 +166,61 @@ public class DefaultProjectBuilder
 
             if ( configuration.isResolveDependencies() )
             {
-                try
-                {
-                    DefaultDependencyResolutionRequest resolution =
-                        new DefaultDependencyResolutionRequest( project, config.session );
-                    resolutionResult = dependencyResolver.resolve( resolution );
-                }
-                catch ( DependencyResolutionException e )
-                {
-                    resolutionResult = e.getResult();
-                }
-
-                Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
-                if ( resolutionResult.getDependencyGraph() != null )
-                {
-                    RepositoryUtils.toArtifacts( artifacts, resolutionResult.getDependencyGraph().getChildren(),
-                                                 Collections.singletonList( project.getArtifact().getId() ), null );
-
-                    // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not
-                    LocalRepositoryManager lrm = config.session.getLocalRepositoryManager();
-                    for ( Artifact artifact : artifacts )
-                    {
-                        if ( !artifact.isResolved() )
-                        {
-                            String path = lrm.getPathForLocalArtifact( RepositoryUtils.toArtifact( artifact ) );
-                            artifact.setFile( new File( lrm.getRepository().getBasedir(), path ) );
-                        }
-                    }
-                }
-                project.setResolvedArtifacts( artifacts );
-                project.setArtifacts( artifacts );
+                resolutionResult = resolveDependencies( project, config.session );
             }
 
-            return new DefaultProjectBuildingResult( project, modelProblems, resolutionResult );
+            ProjectBuildingResult result = new DefaultProjectBuildingResult( project, modelProblems, resolutionResult );
+
+            if ( error != null )
+            {
+                ProjectBuildingException e = new ProjectBuildingException( Arrays.asList( result ) );
+                e.initCause( error );
+                throw e;
+            }
+
+            return result;
         }
         finally
         {
             Thread.currentThread().setContextClassLoader( oldContextClassLoader );
         }
+    }
+
+    private DependencyResolutionResult resolveDependencies( MavenProject project, RepositorySystemSession session )
+    {
+        DependencyResolutionResult resolutionResult = null;
+
+        try
+        {
+            DefaultDependencyResolutionRequest resolution = new DefaultDependencyResolutionRequest( project, session );
+            resolutionResult = dependencyResolver.resolve( resolution );
+        }
+        catch ( DependencyResolutionException e )
+        {
+            resolutionResult = e.getResult();
+        }
+
+        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+        if ( resolutionResult.getDependencyGraph() != null )
+        {
+            RepositoryUtils.toArtifacts( artifacts, resolutionResult.getDependencyGraph().getChildren(),
+                                         Collections.singletonList( project.getArtifact().getId() ), null );
+
+            // Maven 2.x quirk: an artifact always points at the local repo, regardless whether resolved or not
+            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+            for ( Artifact artifact : artifacts )
+            {
+                if ( !artifact.isResolved() )
+                {
+                    String path = lrm.getPathForLocalArtifact( RepositoryUtils.toArtifact( artifact ) );
+                    artifact.setFile( new File( lrm.getRepository().getBasedir(), path ) );
+                }
+            }
+        }
+        project.setResolvedArtifacts( artifacts );
+        project.setArtifacts( artifacts );
+
+        return resolutionResult;
     }
 
     private List<String> getProfileIds( List<Profile> profiles )

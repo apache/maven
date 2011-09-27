@@ -33,6 +33,7 @@ import org.apache.maven.model.InputSource;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
@@ -85,6 +86,12 @@ public class DefaultProjectDependenciesResolver
         {
             for ( Dependency dependency : project.getDependencies() )
             {
+                if ( StringUtils.isEmpty( dependency.getGroupId() ) || StringUtils.isEmpty( dependency.getArtifactId() )
+                    || StringUtils.isEmpty( dependency.getVersion() ) )
+                {
+                    // guard against case where best-effort resolution for invalid models is requested
+                    continue;
+                }
                 collect.addDependency( RepositoryUtils.toDependency( dependency, stereotypes ) );
             }
         }
