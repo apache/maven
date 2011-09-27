@@ -124,12 +124,10 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProjectWithDependencies( File pom )
         throws Exception
     {
-        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
-        configuration.setLocalRepository( getLocalRepository() );
+        ProjectBuildingRequest configuration = newBuildingRequest();
         configuration.setRemoteRepositories( Arrays.asList( new ArtifactRepository[] {} ) );
         configuration.setProcessPlugins( false );
         configuration.setResolveDependencies( true );
-        initRepoSession( configuration );
 
         try
         {
@@ -146,7 +144,6 @@ public abstract class AbstractMavenProjectTestCase
                     message += problem + "\n";
                 }
                 System.out.println( message );
-                fail( message );
             }
 
             throw e;
@@ -156,11 +153,18 @@ public abstract class AbstractMavenProjectTestCase
     protected MavenProject getProject( File pom )
         throws Exception
     {
+        ProjectBuildingRequest configuration = newBuildingRequest();
+
+        return projectBuilder.build( pom, configuration ).getProject();
+    }
+
+    protected ProjectBuildingRequest newBuildingRequest()
+        throws Exception
+    {
         ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
         configuration.setLocalRepository( getLocalRepository() );
         initRepoSession( configuration );
-
-        return projectBuilder.build( pom, configuration ).getProject();
+        return configuration;
     }
 
     protected void initRepoSession( ProjectBuildingRequest request )

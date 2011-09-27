@@ -33,6 +33,7 @@ import org.sonatype.aether.spi.connector.ArtifactUpload;
 import org.sonatype.aether.spi.connector.MetadataDownload;
 import org.sonatype.aether.spi.connector.MetadataUpload;
 import org.sonatype.aether.spi.connector.RepositoryConnector;
+import org.sonatype.aether.transfer.ArtifactNotFoundException;
 import org.sonatype.aether.transfer.ArtifactTransferException;
 
 /**
@@ -77,7 +78,14 @@ public class TestRepositoryConnector
                 }
                 catch ( IOException e )
                 {
-                    download.setException( new ArtifactTransferException( download.getArtifact(), repository, e ) );
+                    if ( !remoteFile.exists() )
+                    {
+                        download.setException( new ArtifactNotFoundException( download.getArtifact(), repository ) );
+                    }
+                    else
+                    {
+                        download.setException( new ArtifactTransferException( download.getArtifact(), repository, e ) );
+                    }
                 }
             }
         }
