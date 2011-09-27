@@ -909,6 +909,18 @@ public class DefaultModelBuilder
             String artifactId = dependency.getArtifactId();
             String version = dependency.getVersion();
 
+            if ( groupId == null || groupId.length() <= 0 )
+            {
+                problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.groupId' for "
+                    + dependency.getManagementKey() + " is missing.", dependency.getLocation( "" ), null );
+                continue;
+            }
+            if ( artifactId == null || artifactId.length() <= 0 )
+            {
+                problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.artifactId' for "
+                    + dependency.getManagementKey() + " is missing.", dependency.getLocation( "" ), null );
+                continue;
+            }
             if ( version == null || version.length() <= 0 )
             {
                 problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.version' for "
