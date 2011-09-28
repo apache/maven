@@ -7,3 +7,5 @@ bin/
 # Intellij
 *.ipr
 *.iml
+
+.DS_Store
