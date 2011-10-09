@@ -88,6 +88,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5012CollectionVsArrayParamCoercionTest.class );
         suite.addTestSuite( MavenITmng5011ConfigureCollectionArrayFromSystemPropTest.class );
         suite.addTestSuite( MavenITmng5009AggregationCycleTest.class );
+        suite.addTestSuite( MavenITmng5006VersionRangeDependencyParentResolutionTest.class );
         suite.addTestSuite( MavenITmng5000ChildPathAwareUrlInheritanceTest.class );
         suite.addTestSuite( MavenITmng4992MapStylePropertiesParamConfigTest.class );
         suite.addTestSuite( MavenITmng4991NonProxyHostsTest.class );
