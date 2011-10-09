@@ -40,7 +40,6 @@ import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryCache;
 import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.SyncContext;
 import org.sonatype.aether.util.DefaultRequestTrace;
@@ -48,6 +47,7 @@ import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.MetadataResolver;
+import org.sonatype.aether.impl.RepositoryEventDispatcher;
 import org.sonatype.aether.impl.SyncContextFactory;
 import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.impl.internal.CacheUtils;
@@ -93,11 +93,15 @@ public class DefaultVersionResolver
     @Requirement
     private SyncContextFactory syncContextFactory;
 
+    @Requirement
+    private RepositoryEventDispatcher repositoryEventDispatcher;
+
     public void initService( ServiceLocator locator )
     {
         setLogger( locator.getService( Logger.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
+        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
     }
 
     public DefaultVersionResolver setLogger( Logger logger )
@@ -123,6 +127,16 @@ public class DefaultVersionResolver
             throw new IllegalArgumentException( "sync context factory has not been specified" );
         }
         this.syncContextFactory = syncContextFactory;
+        return this;
+    }
+
+    public DefaultVersionResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
+    {
+        if ( repositoryEventDispatcher == null )
+        {
+            throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
+        }
+        this.repositoryEventDispatcher = repositoryEventDispatcher;
         return this;
     }
 
@@ -361,15 +375,12 @@ public class DefaultVersionResolver
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
                                   ArtifactRepository repository, Exception exception )
     {
-        RepositoryListener listener = session.getRepositoryListener();
-        if ( listener != null )
-        {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
-            event.setMetadata( metadata );
-            event.setException( exception );
-            event.setRepository( repository );
-            listener.metadataInvalid( event );
-        }
+        DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+        event.setMetadata( metadata );
+        event.setException( exception );
+        event.setRepository( repository );
+
+        repositoryEventDispatcher.dispatch( event );
     }
 
     private void merge( Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning,

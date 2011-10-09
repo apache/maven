@@ -32,7 +32,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.SyncContext;
@@ -45,6 +44,7 @@ import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionConstraint;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.aether.impl.MetadataResolver;
+import org.sonatype.aether.impl.RepositoryEventDispatcher;
 import org.sonatype.aether.impl.SyncContextFactory;
 import org.sonatype.aether.impl.VersionRangeResolver;
 import org.sonatype.aether.metadata.Metadata;
@@ -81,11 +81,15 @@ public class DefaultVersionRangeResolver
     @Requirement
     private SyncContextFactory syncContextFactory;
 
+    @Requirement
+    private RepositoryEventDispatcher repositoryEventDispatcher;
+
     public void initService( ServiceLocator locator )
     {
         setLogger( locator.getService( Logger.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
+        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
     }
 
     public DefaultVersionRangeResolver setLogger( Logger logger )
@@ -111,6 +115,16 @@ public class DefaultVersionRangeResolver
             throw new IllegalArgumentException( "sync context factory has not been specified" );
         }
         this.syncContextFactory = syncContextFactory;
+        return this;
+    }
+
+    public DefaultVersionRangeResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
+    {
+        if ( repositoryEventDispatcher == null )
+        {
+            throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
+        }
+        this.repositoryEventDispatcher = repositoryEventDispatcher;
         return this;
     }
 
@@ -271,15 +285,12 @@ public class DefaultVersionRangeResolver
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
                                   ArtifactRepository repository, Exception exception )
     {
-        RepositoryListener listener = session.getRepositoryListener();
-        if ( listener != null )
-        {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
-            event.setMetadata( metadata );
-            event.setException( exception );
-            event.setRepository( repository );
-            listener.metadataInvalid( event );
-        }
+        DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+        event.setMetadata( metadata );
+        event.setException( exception );
+        event.setRepository( repository );
+
+        repositoryEventDispatcher.dispatch( event );
     }
 
 }
