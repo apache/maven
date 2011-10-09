@@ -47,7 +47,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositoryException;
-import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.artifact.Artifact;
@@ -58,6 +57,7 @@ import org.sonatype.aether.graph.Exclusion;
 import org.sonatype.aether.impl.ArtifactDescriptorReader;
 import org.sonatype.aether.impl.ArtifactResolver;
 import org.sonatype.aether.impl.RemoteRepositoryManager;
+import org.sonatype.aether.impl.RepositoryEventDispatcher;
 import org.sonatype.aether.impl.VersionResolver;
 import org.sonatype.aether.transfer.ArtifactNotFoundException;
 import org.sonatype.aether.util.DefaultRequestTrace;
@@ -102,6 +102,9 @@ public class DefaultArtifactDescriptorReader
     private ArtifactResolver artifactResolver;
 
     @Requirement
+    private RepositoryEventDispatcher repositoryEventDispatcher;
+
+    @Requirement
     private ModelBuilder modelBuilder;
 
     public void initService( ServiceLocator locator )
@@ -110,6 +113,7 @@ public class DefaultArtifactDescriptorReader
         setRemoteRepositoryManager( locator.getService( RemoteRepositoryManager.class ) );
         setVersionResolver( locator.getService( VersionResolver.class ) );
         setArtifactResolver( locator.getService( ArtifactResolver.class ) );
+        setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
         modelBuilder = locator.getService( ModelBuilder.class );
         if ( modelBuilder == null )
         {
@@ -150,6 +154,16 @@ public class DefaultArtifactDescriptorReader
             throw new IllegalArgumentException( "artifact resolver has not been specified" );
         }
         this.artifactResolver = artifactResolver;
+        return this;
+    }
+
+    public DefaultArtifactDescriptorReader setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
+    {
+        if ( repositoryEventDispatcher == null )
+        {
+            throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
+        }
+        this.repositoryEventDispatcher = repositoryEventDispatcher;
         return this;
     }
 
@@ -407,29 +421,23 @@ public class DefaultArtifactDescriptorReader
     private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
                                     Exception exception )
     {
-        RepositoryListener listener = session.getRepositoryListener();
-        if ( listener != null )
-        {
-            DefaultRepositoryEvent event =
-                new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session, trace );
-            event.setArtifact( artifact );
-            event.setException( exception );
-            listener.artifactDescriptorMissing( event );
-        }
+        DefaultRepositoryEvent event =
+            new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session, trace );
+        event.setArtifact( artifact );
+        event.setException( exception );
+
+        repositoryEventDispatcher.dispatch( event );
     }
 
     private void invalidDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
                                     Exception exception )
     {
-        RepositoryListener listener = session.getRepositoryListener();
-        if ( listener != null )
-        {
-            DefaultRepositoryEvent event =
-                new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session, trace );
-            event.setArtifact( artifact );
-            event.setException( exception );
-            listener.artifactDescriptorInvalid( event );
-        }
+        DefaultRepositoryEvent event =
+            new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session, trace );
+        event.setArtifact( artifact );
+        event.setException( exception );
+
+        repositoryEventDispatcher.dispatch( event );
     }
 
 }
