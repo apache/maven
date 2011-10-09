@@ -83,6 +83,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5135AggregatorDepResolutionModuleExtensionTest.class );
         suite.addTestSuite( MavenITmng5096ExclusionAtDependencyWithImpliedClassifierTest.class );
         suite.addTestSuite( MavenITmng5064SuppressSnapshotUpdatesTest.class );
         suite.addTestSuite( MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest.class );
