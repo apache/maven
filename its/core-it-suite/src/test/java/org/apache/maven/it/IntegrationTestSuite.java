@@ -90,6 +90,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5009AggregationCycleTest.class );
         suite.addTestSuite( MavenITmng5000ChildPathAwareUrlInheritanceTest.class );
         suite.addTestSuite( MavenITmng4992MapStylePropertiesParamConfigTest.class );
+        suite.addTestSuite( MavenITmng4987TimestampBasedSnapshotSelectionTest.class );
         suite.addTestSuite( MavenITmng4975ProfileInjectedPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4973ExtensionVisibleToPluginInReactorTest.class );
         suite.addTestSuite( MavenITmng4966AbnormalUrlPreservationTest.class );
