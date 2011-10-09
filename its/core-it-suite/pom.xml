@@ -48,6 +48,10 @@ under the License.
   
     mvn clean test -Prun-its -DmavenVersion=2.2.1
   
+  It's also possible to point the ITs at an already downloaded Maven distribution:
+  
+    mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive>
+  
   To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
   
   ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
@@ -273,7 +277,7 @@ under the License.
       </build>
     </profile>
     <profile>
-      <id>maven-distro</id>
+      <id>maven-from-repo</id>
       <activation>
         <property>
           <name>mavenVersion</name>
@@ -333,6 +337,50 @@ under the License.
                     <delete dir="${mavenHome}"/>
                     <unzip src="${project.build.directory}/maven-bin.zip" dest="${mavenHome}">
                       <globmapper from="apache-maven-${mavenVersion}/*" to="*" handledirsep="true" />
+                    </unzip>
+                    <chmod dir="${mavenHome}/bin" perm="ugo+rx" includes="mvn,mvnDebug"/>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-distro</id>
+      <activation>
+        <property>
+          <name>mavenDistro</name>
+        </property>
+      </activation>
+      <properties>
+        <mavenHome>${project.build.directory}/apache-maven</mavenHome>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>unpack-maven-distro</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <delete dir="${mavenHome}"/>
+                    <unzip src="${mavenDistro}" dest="${mavenHome}">
+                      <regexpmapper from="^([^/]+)/(.*)$" to="\2" handledirsep="true" />
                     </unzip>
                     <chmod dir="${mavenHome}/bin" perm="ugo+rx" includes="mvn,mvnDebug"/>
                   </tasks>
