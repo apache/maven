@@ -93,6 +93,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4975ProfileInjectedPluginExecutionOrderTest.class );
         suite.addTestSuite( MavenITmng4973ExtensionVisibleToPluginInReactorTest.class );
         suite.addTestSuite( MavenITmng4966AbnormalUrlPreservationTest.class );
+        suite.addTestSuite( MavenITmng4963ParentResolutionFromMirrorTest.class );
         suite.addTestSuite( MavenITmng4960MakeLikeReactorResumeTest.class );
         suite.addTestSuite( MavenITmng4955LocalVsRemoteSnapshotResolutionTest.class );
         suite.addTestSuite( MavenITmng4952MetadataReleaseInfoUpdateTest.class );
@@ -268,7 +269,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng4196ExclusionOnPluginDepTest.class );
         suite.addTestSuite( MavenITmng4193UniqueRepoIdTest.class );
         suite.addTestSuite( MavenITmng4190MirrorRepoMergingTest.class );
-        suite.addTestSuite( MavenITmng4189UniqueVersionSnapshotTest.class ); 
+        suite.addTestSuite( MavenITmng4189UniqueVersionSnapshotTest.class );
         suite.addTestSuite( MavenITmng4180PerDependencyExclusionsTest.class );
         suite.addTestSuite( MavenITmng4172EmptyDependencySetTest.class );
         suite.addTestSuite( MavenITmng4166HideCoreCommonsCliTest.class );
@@ -404,7 +405,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3535SelfReferentialPropertiesTest.class );
         suite.addTestSuite( MavenITmng3530DynamicPOMInterpolationTest.class );
         suite.addTestSuite( MavenITmng3529QuotedCliArgTest.class );
-        suite.addTestSuite( MavenITmng3506ArtifactHandlersFromPluginsTest.class);
+        suite.addTestSuite( MavenITmng3506ArtifactHandlersFromPluginsTest.class );
         suite.addTestSuite( MavenITmng3503Xpp3ShadingTest.class );
         suite.addTestSuite( MavenITmng3498ForkToOtherMojoTest.class );
         suite.addTestSuite( MavenITmng3485OverrideWagonExtensionTest.class );
