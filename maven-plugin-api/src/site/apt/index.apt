@@ -1,0 +1,17 @@
+ -----
+ Introduction
+ -----
+ Hervé Boutemy
+ -----
+ 2011-10-16
+ -----
+
+Maven Plugin API
+
+ The API for plugins - Mojos - development.
+
+* See Also
+
+ * {{{/developers/mojo-api-specification.html}Mojo API Specification}}
+
+ * {{{/plugin-tools/}plugin-tools}}, containing {{{/plugins/maven-plugin-plugin/}maven-plugin-plugin}}
