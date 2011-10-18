@@ -31,6 +31,7 @@
     </menu>
     <menu name="Reference">
       <item name="lifecycle.xml" href="lifecycle-mappings.html"/>
+      <item name="plugin.xml" href="plugin.html"/>
     </menu>
 
     <menu ref="parent"/>
