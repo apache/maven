@@ -46,6 +46,8 @@ Maven Model Builder
 
    ** <(optional)> lifecycle bindings injection
 
+   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
+
    ** dependency management injection
 
    ** <(optional)> reports configuration
