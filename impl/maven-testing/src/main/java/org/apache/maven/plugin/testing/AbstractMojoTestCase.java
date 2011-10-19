@@ -26,14 +26,30 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.RepositorySystem;
+import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -41,6 +57,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
@@ -50,6 +67,7 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -73,6 +91,8 @@ public abstract class AbstractMojoTestCase
     private ComponentConfigurator configurator;
 
     private PlexusContainer container;
+
+    private Map<String, MojoDescriptor> mojoDescriptors;
     
     /*
      * for the harness I think we have decided against going the route of using the maven project builder.
@@ -95,9 +115,23 @@ public abstract class AbstractMojoTestCase
 
         PluginDescriptor pluginDescriptor = new PluginDescriptorBuilder().build( interpolationFilterReader );
 
+        Artifact artifact =
+            lookup( RepositorySystem.class ).createArtifact( pluginDescriptor.getGroupId(),
+                                                             pluginDescriptor.getArtifactId(),
+                                                             pluginDescriptor.getVersion(), ".jar" );
+        artifact.setFile( new File( getBasedir() ).getCanonicalFile() );
+        pluginDescriptor.setPluginArtifact( artifact );
+        pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
+
         for ( ComponentDescriptor<?> desc : pluginDescriptor.getComponents() )
         {
             getContainer().addComponentDescriptor( desc );
+        }
+
+        mojoDescriptors = new HashMap<String, MojoDescriptor>();
+        for ( MojoDescriptor mojoDescriptor : pluginDescriptor.getMojos() )
+        {
+            mojoDescriptors.put( mojoDescriptor.getGoal(), mojoDescriptor );
         }
     }
 
@@ -119,10 +153,7 @@ public abstract class AbstractMojoTestCase
 
     protected void setupContainer()
     {
-        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
-
-        ContainerConfiguration cc =
-            new DefaultContainerConfiguration().setClassWorld( classWorld ).setName( "embedder" );
+        ContainerConfiguration cc = setupContainerConfiguration();
         try
         {
             container = new DefaultPlexusContainer( cc );
@@ -132,6 +163,13 @@ public abstract class AbstractMojoTestCase
             e.printStackTrace();
             fail( "Failed to create plexus container." );
         }   
+    }
+
+    protected ContainerConfiguration setupContainerConfiguration()
+    {
+        ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
+
+        return new DefaultContainerConfiguration().setClassWorld( classWorld ).setName( "embedder" );
     }
     
     protected PlexusContainer getContainer()
@@ -270,6 +308,109 @@ public abstract class AbstractMojoTestCase
         }
 
         return mojo;
+    }
+
+    protected Mojo lookupConfiguredMojo( MavenProject project, String goal )
+        throws Exception
+    {
+        return lookupConfiguredMojo( newMavenSession( project ), newMojoExecution( goal ) );
+    }
+
+    protected Mojo lookupConfiguredMojo( MavenSession session, MojoExecution execution )
+        throws Exception, ComponentConfigurationException
+    {
+        MavenProject project = session.getCurrentProject();
+        MojoDescriptor mojoDescriptor = execution.getMojoDescriptor();
+
+        Mojo mojo = (Mojo) lookup( mojoDescriptor.getRole(), mojoDescriptor.getRoleHint() );
+
+        ExpressionEvaluator evaluator = new PluginParameterExpressionEvaluator( session, execution );
+
+        Xpp3Dom configuration = null;
+        Plugin plugin = project.getPlugin( mojoDescriptor.getPluginDescriptor().getPluginLookupKey() );
+        if ( plugin != null )
+        {
+            configuration = (Xpp3Dom) plugin.getConfiguration();
+        }
+        if ( configuration == null )
+        {
+            configuration = new Xpp3Dom( "configuration" );
+        }
+        configuration = Xpp3Dom.mergeXpp3Dom( execution.getConfiguration(), configuration );
+
+        PlexusConfiguration pluginConfiguration = new XmlPlexusConfiguration( configuration );
+
+        configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
+
+        return mojo;
+    }
+
+    protected MavenSession newMavenSession( MavenProject project )
+    {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+        MavenSession session = new MavenSession( container, new MavenRepositorySystemSession(), request, result );
+        session.setCurrentProject( project );
+        session.setProjects( Arrays.asList( project ) );
+        return session;
+    }
+
+    protected MojoExecution newMojoExecution( String goal )
+    {
+        MojoDescriptor mojoDescriptor = mojoDescriptors.get( goal );
+        assertNotNull( mojoDescriptor );
+        MojoExecution execution = new MojoExecution( mojoDescriptor );
+        finalizeMojoConfiguration( execution );
+        return execution;
+    }
+
+    // copy&paste from org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator.finalizeMojoConfiguration(MojoExecution)
+    private void finalizeMojoConfiguration( MojoExecution mojoExecution )
+    {
+        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+        Xpp3Dom executionConfiguration = mojoExecution.getConfiguration();
+        if ( executionConfiguration == null )
+        {
+            executionConfiguration = new Xpp3Dom( "configuration" );
+        }
+
+        Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert( mojoDescriptor );;
+
+        Xpp3Dom finalConfiguration = new Xpp3Dom( "configuration" );
+
+        if ( mojoDescriptor.getParameters() != null )
+        {
+            for ( Parameter parameter : mojoDescriptor.getParameters() )
+            {
+                Xpp3Dom parameterConfiguration = executionConfiguration.getChild( parameter.getName() );
+
+                if ( parameterConfiguration == null )
+                {
+                    parameterConfiguration = executionConfiguration.getChild( parameter.getAlias() );
+                }
+
+                Xpp3Dom parameterDefaults = defaultConfiguration.getChild( parameter.getName() );
+
+                parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults, Boolean.TRUE );
+
+                if ( parameterConfiguration != null )
+                {
+                    parameterConfiguration = new Xpp3Dom( parameterConfiguration, parameter.getName() );
+
+                    if ( StringUtils.isEmpty( parameterConfiguration.getAttribute( "implementation" ) )
+                        && StringUtils.isNotEmpty( parameter.getImplementation() ) )
+                    {
+                        parameterConfiguration.setAttribute( "implementation", parameter.getImplementation() );
+                    }
+
+                    finalConfiguration.addChild( parameterConfiguration );
+                }
+            }
+        }
+
+        mojoExecution.setConfiguration( finalConfiguration );
     }
 
     /**

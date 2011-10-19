@@ -232,4 +232,9 @@ public class StubArtifactRepository
         return Collections.emptyList();
     }
 
+    public boolean isProjectAware()
+    {
+        return false;
+    }
+
 }
