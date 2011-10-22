@@ -92,6 +92,18 @@ under the License.
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field xdoc.separator="blank">
+          <name>dependencies</name>
+          <version>1.0.0</version>
+          <association>
+            <type>Dependency</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <description>
+            A set of dependencies which the plugin requires in order to function. This enables the plugin to function
+            independently of its POM (or at least to declare the libraries it needs to run).
+          </description>
+        </field>
       </fields>
     </class>
 
@@ -391,33 +403,34 @@ under the License.
     <class>
       <name>Dependency</name>
       <version>1.0.0</version>
-      <description></description>
+      <description>Definition of a dependency, needed by the plugin at runtime.</description>
       <fields>
         <field>
           <name>groupId</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>The group id of the dependency.</description>
         </field>
         <field>
           <name>artifactId</name>
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
-        </field>
-        <field>
-          <name>type</name>
-          <version>1.0.0</version>
-          <type>String</type>
-          <description></description>
+          <description>The artifact id of the dependency.</description>
         </field>
         <field>
           <name>version</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>The version of the dependency.</description>
+        </field>
+        <field>
+          <name>type</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <defaultValue>jar</defaultValue>
+          <description>The type of dependency.</description>
         </field>
       </fields>
     </class>
