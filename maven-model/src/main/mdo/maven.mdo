@@ -1961,16 +1961,16 @@
       </description>
       <fields>
         <field>
-          <name>artifactId</name>
+          <name>groupId</name>
           <version>4.0.0</version>
-          <description>The artifact id of the parent project to inherit from.</description>
+          <description>The group id of the parent project to inherit from.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
-          <name>groupId</name>
+          <name>artifactId</name>
           <version>4.0.0</version>
-          <description>The group id of the parent project to inherit from.</description>
+          <description>The artifact id of the parent project to inherit from.</description>
           <required>true</required>
           <type>String</type>
         </field>
