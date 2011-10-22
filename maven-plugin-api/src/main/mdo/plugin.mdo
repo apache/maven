@@ -49,19 +49,19 @@ under the License.
         <field>
           <name>groupId</name>
           <version>1.0.0</version>
-          <description></description>
+          <description>The group id of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
           <version>1.0.0</version>
-          <description></description>
+          <description>The artifact id of the plugin.</description>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
           <version>1.0.0</version>
-          <description></description>
+          <description>The version of the plugin.</description>
           <type>String</type>
         </field>
         <field>
@@ -91,6 +91,7 @@ under the License.
             <type>MojoDescriptor</type>
             <multiplicity>*</multiplicity>
           </association>
+          <description>Description of each Mojo provided by the plugin.</description>
         </field>
         <field xdoc.separator="blank">
           <name>dependencies</name>
@@ -119,32 +120,42 @@ under the License.
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>
+            The name for the Mojo that users will reference from the command line to execute the Mojo directly,
+            or inside a POM in order to provide Mojo-specific configuration.
+          </description>
         </field>
         <field>
           <name>description</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>The description of this Mojo's functionality.</description>
         </field>
         <field>
           <name>implementation</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>
+            The Mojo's fully-qualified class name (or script path in the case of non-Java Mojos).
+          </description>
         </field>
         <field>
           <name>language</name>
           <version>1.0.0</version>
           <type>String</type>
           <defaultValue>java</defaultValue>
-          <description></description>
+          <description>The implementation language for this Mojo (Java, beanshell, etc.).</description>
         </field>
         <field>
           <name>phase</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description><![CDATA[
+            Defines a default phase to bind a mojo execution to if the user does not explicitly set a phase in the POM.
+            <i>Note:</i> This annotation will not automagically make a mojo run when the plugin declaration is added
+            to the POM. It merely enables the user to omit the <code>&lt;phase&gt;</code> element from the
+            surrounding <code>&lt;execution&gt;</code> element.
+          ]]></description>
         </field>
         <field>
           <name>executePhase</name>
@@ -168,9 +179,11 @@ under the License.
           <name>requiresDependencyResolution</name>
           <version>1.0.0</version>
           <type>String</type>
+          <defaultValue>runtime</defaultValue>
           <description><![CDATA[
-            The scope of (transitive) dependencies that should be resolved:
-            <code>compile</code>, <code>runtime</code>, <code>test</code>, <code>provided</code>
+            Flags this Mojo as requiring the dependencies in the specified class path to be resolved before it can
+            execute: <code>compile</code>, <code>runtime</code>, <code>test</code>,
+            <code>compile+runtime</code> (since Maven 3.0)
           ]]></description>
         </field>
         <field>
@@ -178,84 +191,107 @@ under the License.
           <version>1.0.0</version>
           <type>String</type>
           <description><![CDATA[
-            The scope of (transitive) dependencies that should be collected but not resolved:
-            <code>compile</code>, <code>runtime</code>, <code>test</code>, <code>provided</code>.
+            Flags this mojo as requiring information about the dependencies that would make up the specified class
+            path. As the name suggests, this is similar to requiresDependencyResolution and supports the same values.
+            The important difference is this will not resolve the files for the dependencies, i.e. the artifacts
+            associated with a Maven project can lack a file. As such, this annotation is meant for mojos that only
+            want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
+            full dependency resolution might fail due to projects which haven't been built yet.
           ]]></description>
         </field>
         <field>
           <name>requiresDirectInvocation</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>Flags this Mojo to be invoked directly.</description>
+          <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>requiresProject</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>Flags this Mojo to run inside of a project.</description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
           <name>requiresReports</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>Flags this Mojo to require reports. Unsupported since Maven 3.0.</description>
+          <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>requiresOnline</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>Flags this Mojo to require online mode for its operation.</description>
+          <defaultValue>false</defaultValue>
         </field>
         <field>
           <name>aggregator</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>
+            Flags this Mojo to run it in a multi module way, i.e. aggregate the build with the set of projects
+            listed as modules.
+          </description>
         </field>
         <field>
           <name>inheritedByDefault</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>Specify that the Mojo is inherited.</description>
           <defaultValue>true</defaultValue>
         </field>
         <field>
           <name>threadSafe</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>
+            Marks this mojo as being thread-safe, i.e. the mojo safely supports concurrent execution during parallel
+            builds. Mojos without this annotation will make Maven output a warning when used during a parallel build
+            session. Since Maven 3.0.
+          </description>
         </field>
         <field>
           <name>instantiationStrategy</name>
           <version>1.0.0</version>
           <type>String</type>
           <defaultValue>per-lookup</defaultValue>
-          <description>per-lookup</description>
+          <description>Specify the instantiation strategy.</description>
         </field>
         <field>
           <name>executionStrategy</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description>once-per-session, always</description>
+          <description><![CDATA[
+            Specify the execution strategy: <code>once-per-session</code>, <code>always</code>.
+          ]]></description>
         </field>
         <field>
           <name>since</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description>the version when the Mojo was added to the API. Similar to Javadoc since.</description>
+          <description>Specify the version when the Mojo was added to the API. Similar to Javadoc since.</description>
         </field>
         <field>
           <name>deprecated</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description>the version when the Mojo was deprecated to the API. Similar to Javadoc deprecated.</description>
+          <description>
+            Specify the version when the Mojo was deprecated to the API. Similar to Javadoc deprecated. This will
+            trigger a warning when a user tries to configure a parameter marked as deprecated.
+          </description>
         </field>
         <field>
           <name>configurator</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>
+            The configurator type to use when injecting parameter values into this Mojo. The value is normally deduced
+            from the Mojo's implementation language, but can be specified to allow a custom ComponentConfigurator
+            implementation to be used.
+          </description>
         </field>
         <field>
           <name>composer</name>
@@ -300,35 +336,57 @@ under the License.
       <fields>
         <field>
           <name>name</name>
-          <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <required>true</required>
+          <description>
+            The name of the parameter, to be used in configuring this parameter from the Mojo's declared defaults
+            or from the POM.
+          </description>
         </field>
         <field>
           <name>alias</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>
+            Specifies an alias which can be used to configure this parameter from the POM.
+            This is primarily useful to improve user-friendliness, where Mojo field names are not intuitive to the
+            user or are otherwise not conducive to configuration via the POM.
+          </description>
         </field>
         <field>
           <name>type</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <required>true</required>
+          <description>
+            The Java type for this parameter. This is used to validate the result of any expressions used to calculate
+            the value which should be injected into the Mojo for this parameter.
+          </description>
         </field>
         <field>
           <name>required</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description></description>
+          <description>
+            Whether this parameter is required for the Mojo to function. This is used to validate the configuration
+            for a Mojo before it is injected, and before the Mojo is executed from some half-state.
+          </description>
         </field>
         <field>
           <name>editable</name>
           <version>1.0.0</version>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
-          <description></description>
+          <description><![CDATA[
+            Specifies that this parameter cannot be configured directly by the user (as in the case of POM-specified
+            configuration). This is useful when you want to force the user to use common POM elements rather than
+            plugin configurations, as in the case where you want to use the artifact's final name as a parameter. In
+            this case, you want the user to modify <code>&lt;build&gt;&lt;finalName/&gt;&lt;/build&gt;</code> rather
+            than specifying a value for finalName directly in the plugin configuration section. It is also useful to
+            ensure that - for example - a List-typed parameter which expects items of type Artifact doesn't get a List
+            full of Strings.
+          ]]></description>
         </field>
         <field>
           <name>implementation</name>
@@ -340,13 +398,22 @@ under the License.
           <name>description</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>The description of this parameter's use inside the Mojo.</description>
+        </field>
+        <field>
+          <name>since</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description>Specify the version when the parameter was added to the API. Similar to Javadoc since.</description>
         </field>
         <field>
           <name>deprecated</name>
           <version>1.0.0</version>
           <type>String</type>
-          <description></description>
+          <description>
+            Specify the version when the parameter was deprecated to the API. Similar to Javadoc deprecated.
+            This will trigger a warning when a user tries to configure a parameter marked as deprecated.
+          </description>
         </field>
       </fields>
     </class>
