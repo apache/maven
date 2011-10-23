@@ -94,6 +94,7 @@ public class PluginDescriptorBuilderTest
 
         assertEquals( "${jar.finalName}", pc.getValue() );
         assertEquals( "${project.build.finalName}", pc.getAttribute( "default-value" ) );
+        assertEquals( "java.lang.String", pc.getAttribute( "implementation" ) );
 
         Parameter mp = md.getParameters().get( 0 );
 
