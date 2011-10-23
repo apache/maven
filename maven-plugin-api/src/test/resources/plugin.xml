@@ -43,7 +43,7 @@
         </parameter>
       </parameters>
       <configuration>
-        <finalName default-value="${project.build.finalName}">${jar.finalName}</finalName>
+        <finalName implementation="java.lang.String" default-value="${project.build.finalName}">${jar.finalName}</finalName>
       </configuration>
       <requirements>
         <requirement>

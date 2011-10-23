@@ -430,6 +430,12 @@ under the License.
           <type>String</type>
           <description>Parameter expression.</description>
         </field>
+        <field xml.attribute="true" xml.tagName="implementation">
+          <name>implementation</name>
+          <version>1.0.0</version>
+          <type>String</type>
+          <description></description>
+        </field>
         <field xml.attribute="true" xml.tagName="default-value">
           <name>defaultValue</name>
           <version>1.0.0</version>
