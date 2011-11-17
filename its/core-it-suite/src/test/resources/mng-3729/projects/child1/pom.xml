@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-        <artifactId>projects</artifactId>
-        <groupId>org.apache.maven.its.mng3729</groupId>
-        <version>1</version>
-    </parent>
+    <artifactId>projects</artifactId>
+    <groupId>org.apache.maven.its.mng3729</groupId>
+    <version>1</version>
+  </parent>
   <groupId>org.apache.maven.its.mng3729</groupId>
   <artifactId>child1</artifactId>
   <version>1</version>
@@ -15,7 +15,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3729</groupId>
-        <artifactId>maven-mng3729-plugin</artifactId>
+        <artifactId>mavenit-mng3729-plugin</artifactId>
         <version>1</version>
         <executions>
           <execution>

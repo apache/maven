@@ -18,7 +18,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3703</groupId>
-        <artifactId>maven-mng3703-plugin</artifactId>
+        <artifactId>mavenit-mng3703-plugin</artifactId>
         <version>1</version>
         <executions>
           <execution>
@@ -37,7 +37,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3703</groupId>
-        <artifactId>maven-mng3703-plugin</artifactId>
+        <artifactId>mavenit-mng3703-plugin</artifactId>
         <version>1</version>
         <reportSets>
           <reportSet>

@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3743</groupId>
-  <artifactId>maven-mng3743-report-plugin</artifactId>
+  <artifactId>mavenit-mng3743-report-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <name>maven-mng3743-report-plugin Maven Mojo</name>
   <version>1</version>

@@ -22,7 +22,7 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.its.mng3498</groupId>
-  <artifactId>maven-mng3498-plugin</artifactId>
+  <artifactId>mavenit-mng3498-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>1</version>
   <name>maven-mng3498-plugin Maven Mojo</name>

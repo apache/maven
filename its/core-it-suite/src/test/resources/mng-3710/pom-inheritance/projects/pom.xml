@@ -14,7 +14,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3710</groupId>
-        <artifactId>maven-mng3710-pomInheritance-plugin</artifactId>
+        <artifactId>mavenit-mng3710-pomInheritance-plugin</artifactId>
         <version>1</version>
       </plugin>
     </plugins>

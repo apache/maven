@@ -15,7 +15,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3723</groupId>
-        <artifactId>maven-mng3723-plugin</artifactId>
+        <artifactId>mavenit-mng3723-plugin</artifactId>
         <version>1</version>
         <executions>
           <execution>

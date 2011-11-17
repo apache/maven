@@ -13,7 +13,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3693</groupId>
-        <artifactId>maven-mng3693-plugin</artifactId>
+        <artifactId>mavenit-mng3693-plugin</artifactId>
         <version>1</version>
         
         <executions>

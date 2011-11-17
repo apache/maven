@@ -9,7 +9,7 @@
           <lifecycle>
             <id>default</id>
             <phases>
-              <initialize>org.apache.maven.its.mng3743:maven-mng3743-check-plugin:check</initialize>
+              <initialize>org.apache.maven.its.mng3743:mavenit-mng3743-check-plugin:check</initialize>
             </phases>
           </lifecycle>
         </lifecycles>

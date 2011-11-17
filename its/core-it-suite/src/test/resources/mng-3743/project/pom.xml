@@ -25,7 +25,7 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.its.mng3743</groupId>
-          <artifactId>maven-mng3743-check-plugin</artifactId>
+          <artifactId>mavenit-mng3743-check-plugin</artifactId>
           <configuration>
             <skipError>true</skipError>
           </configuration>
@@ -39,7 +39,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3743</groupId>
-        <artifactId>maven-mng3743-report-plugin</artifactId>
+        <artifactId>mavenit-mng3743-report-plugin</artifactId>
         <version>1</version>
       </plugin>
     </plugins>

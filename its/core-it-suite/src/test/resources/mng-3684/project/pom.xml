@@ -10,7 +10,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3684</groupId>
-        <artifactId>maven-mng3684-plugin</artifactId>
+        <artifactId>mavenit-mng3684-plugin</artifactId>
         <version>1</version>
         <executions>
           <execution>
@@ -30,7 +30,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.its.mng3684</groupId>
-        <artifactId>maven-mng3684-plugin</artifactId>
+        <artifactId>mavenit-mng3684-plugin</artifactId>
         <version>1</version>
       </plugin>
     </plugins>
