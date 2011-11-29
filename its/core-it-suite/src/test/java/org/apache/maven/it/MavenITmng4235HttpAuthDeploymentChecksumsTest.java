@@ -19,18 +19,8 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
-
+import org.codehaus.plexus.util.StringUtils;
 import org.mortbay.jetty.HttpMethods;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
@@ -44,9 +34,19 @@ import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.resource.Resource;
 import org.mortbay.util.IO;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4235">MNG-4235</a>.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -60,6 +60,8 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
     private int port;
 
+    RepoHandler repoHandler = new RepoHandler();
+
     public MavenITmng4235HttpAuthDeploymentChecksumsTest()
     {
         super( "[2.0.5,2.2.0),(2.2.0,)" );
@@ -72,49 +74,11 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
         testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4235" );
 
-        ResourceHandler repoHandler = new ResourceHandler()
-        {
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
-            {
-                System.out.println( request.getMethod() + " " + request.getRequestURI() );
-
-                if ( HttpMethods.PUT.equals( request.getMethod() ) )
-                {
-                    Resource resource = getResource( request );
-
-                    // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
-                    File dir = resource.getFile().getParentFile();
-                    for ( int i = 0; i < 10 && !dir.exists(); i++ )
-                    {
-                        dir.mkdirs();
-                    }
-
-                    OutputStream os = resource.getOutputStream();
-                    try
-                    {
-                        IO.copy( request.getInputStream(), os );
-                    }
-                    finally
-                    {
-                        os.close();
-                    }
-
-                    response.setStatus( HttpServletResponse.SC_NO_CONTENT );
-
-                    ( (Request) request ).setHandled( true );
-                }
-                else
-                {
-                    super.handle( target, request, response, dispatch );
-                }
-            }
-        };
         repoHandler.setResourceBase( testDir.getAbsolutePath() );
 
         Constraint constraint = new Constraint();
         constraint.setName( Constraint.__BASIC_AUTH );
-        constraint.setRoles( new String[] { "deployer" } );
+        constraint.setRoles( new String[]{ "deployer" } );
         constraint.setAuthenticate( true );
 
         ConstraintMapping constraintMapping = new ConstraintMapping();
@@ -127,7 +91,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
         SecurityHandler securityHandler = new SecurityHandler();
         securityHandler.setUserRealm( userRealm );
-        securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
+        securityHandler.setConstraintMappings( new ConstraintMapping[]{ constraintMapping } );
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler( securityHandler );
@@ -184,6 +148,17 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".sha1", "SHA-1" );
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".md5", "MD5" );
+
+        System.out.println( "deployedResources:" + repoHandler.deployedResources );
+
+        for ( DeployedResource deployedResource : repoHandler.deployedResources )
+        {
+            if ( StringUtils.equalsIgnoreCase( "chunked", deployedResource.transferEncoding ) )
+            {
+                fail( "deployedResource " + deployedResource
+                          + " use chuncked transfert encoding some http server doesn't support that" );
+            }
+        }
     }
 
     private void assertHash( Verifier verifier, String dataFile, String hashExt, String algo )
@@ -193,7 +168,91 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
         String expectedHash = verifier.loadLines( dataFile + hashExt, "UTF-8" ).get( 0 ).toString().trim();
 
-        assertTrue( "expected=" + expectedHash + ", actual=" + actualHash, expectedHash.equalsIgnoreCase( actualHash ) );
+        assertTrue( "expected=" + expectedHash + ", actual=" + actualHash,
+                    expectedHash.equalsIgnoreCase( actualHash ) );
     }
 
+
+    public static class RepoHandler
+        extends ResourceHandler
+    {
+        List<DeployedResource> deployedResources = new ArrayList<DeployedResource>();
+
+        public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            throws IOException, ServletException
+        {
+            System.out.println( request.getMethod() + " " + request.getRequestURI() );
+
+            if ( HttpMethods.PUT.equals( request.getMethod() ) )
+            {
+                Resource resource = getResource( request );
+
+                // NOTE: This can get called concurrently but File.mkdirs() isn't thread-safe in all JREs
+                File dir = resource.getFile().getParentFile();
+                for ( int i = 0; i < 10 && !dir.exists(); i++ )
+                {
+                    dir.mkdirs();
+                }
+
+                OutputStream os = resource.getOutputStream();
+
+                int contentLength = request.getContentLength();
+
+                try
+                {
+                    IO.copy( request.getInputStream(), os );
+                }
+                finally
+                {
+                    os.close();
+                }
+
+                DeployedResource deployedResource = new DeployedResource();
+
+                deployedResource.httpMethod = request.getMethod();
+                deployedResource.requestUri = request.getRequestURI();
+                deployedResource.transferEncoding = request.getHeader( "Transfer-Encoding" );
+                deployedResource.contentLength = request.getHeader( "Content-Length" );
+
+                deployedResources.add( deployedResource );
+
+                response.setStatus( HttpServletResponse.SC_NO_CONTENT );
+
+                ( (Request) request ).setHandled( true );
+            }
+            else
+            {
+                super.handle( target, request, response, dispatch );
+            }
+        }
+    }
+
+    static class DeployedResource
+    {
+        String httpMethod;
+
+        String requestUri;
+
+        String contentLength;
+
+        String transferEncoding;
+
+        public DeployedResource()
+        {
+            // no op
+        }
+
+        @Override
+        public String toString()
+        {
+            final StringBuilder sb = new StringBuilder();
+            sb.append( "DeployedResource" );
+            sb.append( "{httpMethod='" ).append( httpMethod ).append( '\'' );
+            sb.append( ", requestUri='" ).append( requestUri ).append( '\'' );
+            sb.append( ", contentLength='" ).append( contentLength ).append( '\'' );
+            sb.append( ", transferEncoding='" ).append( transferEncoding ).append( '\'' );
+            sb.append( '}' );
+            return sb.toString();
+        }
+    }
 }
