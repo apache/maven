@@ -149,7 +149,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".sha1", "SHA-1" );
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".md5", "MD5" );
 
-        System.out.println( "deployedResources:" + repoHandler.deployedResources );
+        //  System.out.println( "deployedResources:" + repoHandler.deployedResources );
 
         for ( DeployedResource deployedResource : repoHandler.deployedResources )
         {
