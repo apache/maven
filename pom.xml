@@ -169,7 +169,7 @@
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://builds.apache.org/hudson/job/maven-3.0.x/</url>
+    <url>https://builds.apache.org/job/maven-3.0.x/</url>
   </ciManagement>
   <distributionManagement>
     <site>
