@@ -38,7 +38,7 @@
     number of other development tools for reporting or the build
     process.
   </description>
-  <url>http://maven.apache.org/ref/${project.version}/</url>
+  <url>${siteUrl}</url>
   <inceptionYear>2001</inceptionYear>
 
   <properties>
@@ -61,6 +61,10 @@
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
+
+    <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
+    <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
+
   </properties>
 
   <mailingLists>
@@ -170,7 +174,7 @@
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
+      <url>${siteDeployUrl}</url>
     </site>
   </distributionManagement>
 
