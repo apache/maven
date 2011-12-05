@@ -19,21 +19,16 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
-import org.mortbay.resource.FileResource;
-import org.mortbay.resource.Resource;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.Properties;
 
 public class MavenIT0146InstallerSnapshotNaming
@@ -60,7 +55,6 @@ public class MavenIT0146InstallerSnapshotNaming
 
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setResourceBase( new File( testDir, "repo" ).getAbsolutePath() );
-       // org/apache/maven/its/it0146/dep/0.1-SNAPSHOT/maven-metadata.xml
         HandlerList handlers = new HandlerList();
         handlers.setHandlers( new Handler[]{ resourceHandler, new DefaultHandler() } );
 
@@ -71,7 +65,6 @@ public class MavenIT0146InstallerSnapshotNaming
         port = server.getConnectors()[0].getLocalPort();
 
     }
-
 
 
     protected void tearDown()
@@ -102,7 +95,6 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
-
         verifier.getCliOptions().add( "--settings" );
         verifier.getCliOptions().add( "settings.xml" );
 
@@ -120,4 +112,44 @@ public class MavenIT0146InstallerSnapshotNaming
 
     }
 
+
+    public void testitNonTimestampedNameWithInstalledSNAPSHOT()
+        throws Exception
+    {
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.deleteArtifacts( "org.apache.maven.its.it0146" );
+        verifier.getCliOptions().add( "-f" );
+        verifier.getCliOptions().add( "project/pom.xml" );
+        verifier.deleteDirectory( "project/target" );
+        verifier.setLogFileName( "log2.txt" );
+
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier = newVerifier( testDir.getAbsolutePath() );
+
+        Properties properties = verifier.newDefaultFilterProperties();
+        properties.setProperty( "@host@", InetAddress.getLocalHost().getCanonicalHostName() );
+        properties.setProperty( "@port@", Integer.toString( port ) );
+
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
+
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.setLogFileName( "log3.txt" );
+
+
+        verifier.getCliOptions().add( "-X" );
+
+        verifier.deleteDirectory( "target" );
+
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/appassembler/repo/dep-0.1-SNAPSHOT.jar" );
+
+    }
 }
