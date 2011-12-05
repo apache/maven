@@ -9,17 +9,5 @@
       <buildNumber>1</buildNumber>
     </snapshot>
     <lastUpdated>20110726105319</lastUpdated>
-    <snapshotVersions>
-      <snapshotVersion>
-        <extension>jar</extension>
-        <value>0.1-20110726.105319-1</value>
-        <updated>20110726105319</updated>
-      </snapshotVersion>
-      <snapshotVersion>
-        <extension>pom</extension>
-        <value>0.1-20110726.105319-1</value>
-        <updated>20110726105319</updated>
-      </snapshotVersion>
-    </snapshotVersions>
   </versioning>
 </metadata>
