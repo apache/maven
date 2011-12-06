@@ -292,6 +292,8 @@ public class PluginManagerTest
                                       session.getRepositorySession() );
         pluginManager.getPluginRealm( session, pluginDescriptor );
 
+        assertEquals( 1, pluginDescriptor.getDependencies().size() );
+
         for ( ComponentDescriptor<?> descriptor : pluginDescriptor.getComponents() )
         {
             assertNotNull( descriptor.getRealm() );
@@ -307,6 +309,8 @@ public class PluginManagerTest
             pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
                                       session.getRepositorySession() );
         pluginManager.getPluginRealm( session, pluginDescriptor );
+
+        assertEquals( 1, pluginDescriptor.getDependencies().size() );
 
         for ( ComponentDescriptor<?> descriptor : pluginDescriptor.getComponents() )
         {

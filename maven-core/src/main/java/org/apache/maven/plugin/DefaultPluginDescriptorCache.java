@@ -96,6 +96,8 @@ public class DefaultPluginDescriptorCache
             clone.setId( original.getId() );
             clone.setIsolatedRealm( original.isIsolatedRealm() );
             clone.setSource( original.getSource() );
+
+            clone.setDependencies( original.getDependencies() );
         }
 
         return clone;
