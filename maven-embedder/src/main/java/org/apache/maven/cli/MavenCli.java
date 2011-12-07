@@ -180,6 +180,7 @@ public class MavenCli
     // TODO: need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
+        PlexusContainer localContainer = this.container;
         try
         {
             initialize( cliRequest );
@@ -188,7 +189,7 @@ public class MavenCli
             logging( cliRequest );
             version( cliRequest );
             properties( cliRequest );
-            container( cliRequest );
+            localContainer = container( cliRequest );
             commands( cliRequest );
             settings( cliRequest );
             populateRequest( cliRequest );
@@ -218,6 +219,10 @@ public class MavenCli
         }
         finally
         {
+            if ( localContainer != this.container )
+            {
+                localContainer.dispose();
+            }
             if ( cliRequest.fileStream != null )
             {
                 cliRequest.fileStream.close();
@@ -353,7 +358,7 @@ public class MavenCli
         populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
     }
 
-    private void container( CliRequest cliRequest )
+    private PlexusContainer container( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.classWorld == null )
@@ -414,6 +419,8 @@ public class MavenCli
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
+
+        return container;
     }
 
     private PrintStreamLogger setupLogger( CliRequest cliRequest )
