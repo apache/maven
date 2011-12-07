@@ -54,8 +54,11 @@ public class MavenITmng5206PlexusLifecycleHonoured
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.verifyTextInLog( "MojoWithPlexusLifecycle :: dispose" );
         verifier.verifyTextInLog( "MojoWithPlexusLifecycle :: contextualize" );
+        verifier.verifyTextInLog( "DefaultFakeComponent :: contextualize" );
+        verifier.verifyTextInLog( "MojoWithPlexusLifecycle :: dispose" );
+        // olamy dispose on injected component is not called
+        //verifier.verifyTextInLog( "DefaultFakeComponent :: dispose" );
     }
 
 }

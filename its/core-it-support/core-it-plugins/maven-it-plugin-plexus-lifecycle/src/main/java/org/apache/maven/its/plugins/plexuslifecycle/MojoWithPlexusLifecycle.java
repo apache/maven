@@ -1,4 +1,4 @@
-package org.apache.maven.its.plugins;
+package org.apache.maven.its.plugins.plexuslifecycle;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,11 +21,8 @@ package org.apache.maven.its.plugins;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Configurable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 
@@ -38,10 +35,18 @@ public class MojoWithPlexusLifecycle
     extends AbstractMojo
     implements Contextualizable, Disposable
 {
+    /**
+     * @component
+     * @throws MojoExecutionException
+     * @throws MojoFailureException
+     */
+    private FakeComponent fakeComponent;
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
         getLog().info( "execute MojoWithPlexusLifecycle" );
+        fakeComponent.doNothing();
     }
 
     public void dispose()
