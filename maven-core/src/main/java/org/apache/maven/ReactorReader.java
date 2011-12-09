@@ -85,9 +85,10 @@ class ReactorReader
         {
             return projectArtifact.getFile();
         }
-        else if ( !hasBeenPackaged( project ) )
+        else if ( !hasBeenPackaged( project ) ) 
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
+            // and only for plain old jars. Not war files, not ear files, not anything else.
 
             if ( isTestArtifact( artifact ) )
             {
@@ -98,7 +99,7 @@ class ReactorReader
             }
             else
             {
-                if ( project.hasLifecyclePhase( "compile" ) )
+                if ( project.hasLifecyclePhase( "compile" ) && artifact.getProperty( "type", "").equals( "jar" ) ) /* also reject non-"" classifier? */
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
@@ -143,7 +144,9 @@ class ReactorReader
         {
             for ( org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts )
             {
-                if ( requestedRepositoryConflictId.equals( getConflictId( attachedArtifact ) ) )
+                if ( requestedArtifact.getProperty ( "type", "" ).equals( attachedArtifact.getType() )
+                     && classifierComparison ( requestedArtifact.getClassifier(), attachedArtifact.getClassifier() )                                
+                     && requestedRepositoryConflictId.equals( getConflictId( attachedArtifact ) ) )
                 {
                     return attachedArtifact;
                 }
@@ -151,6 +154,12 @@ class ReactorReader
         }
 
         return null;
+    }
+    
+    private boolean classifierComparison ( String c1, String c2 )
+    {
+        return c1 == null && c2 == null
+                        || ((c1 != null) && c1.equals(c2));
     }
 
     /**
