@@ -27,6 +27,7 @@ import org.sonatype.aether.repository.WorkspaceRepository;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,13 +43,16 @@ import java.util.Map;
 class ReactorReader
     implements WorkspaceReader
 {
+    private final static Collection<String> JAR_LIKE_TYPES = Arrays.asList( "jar", "test-jar", "ejb-client" );
+
+    private final static Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
 
     private Map<String, List<MavenProject>> projectsByGA;
 
     private WorkspaceRepository repository;
-
+    
     public ReactorReader( Map<String, MavenProject> reactorProjects )
     {
         projectsByGAV = reactorProjects;
@@ -99,7 +103,8 @@ class ReactorReader
             }
             else
             {
-                if ( project.hasLifecyclePhase( "compile" ) && artifact.getProperty( "type", "").equals( "jar" ) ) /* also reject non-"" classifier? */
+                String type = artifact.getProperty( "type", "");
+                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
@@ -194,11 +199,7 @@ class ReactorReader
         {
             typeOk = true;
         }
-        else if ( "test-jar".equals ( requestedType ) && "jar".equals( attachedType ) )
-        {
-            typeOk = true;
-        }
-        else if ( "jar".equals ( requestedType ) && "test-jar".equals( attachedType ) )
+        else if ( JAR_LIKE_TYPES.contains( requestedType ) && JAR_LIKE_TYPES.contains( attachedType ) )
         {
             typeOk = true;
         }
