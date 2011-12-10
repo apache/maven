@@ -128,6 +128,8 @@ class ReactorReader
      * @param project The project to try to resolve the artifact from, must not be <code>null</code>.
      * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
      * @return The matching artifact from the project or <code>null</code> if not found.
+     * 
+     * Note that this 
      */
     private org.apache.maven.artifact.Artifact findMatchingArtifact( MavenProject project, Artifact requestedArtifact )
     {
@@ -144,9 +146,10 @@ class ReactorReader
         {
             for ( org.apache.maven.artifact.Artifact attachedArtifact : attachedArtifacts )
             {
-                if ( requestedArtifact.getProperty ( "type", "" ).equals( attachedArtifact.getType() )
-                     && classifierComparison ( requestedArtifact.getClassifier(), attachedArtifact.getClassifier() )                                
-                     && requestedRepositoryConflictId.equals( getConflictId( attachedArtifact ) ) )
+                /*
+                 * Don't use the conflict ids, use a customized comparison that takes various ideas into account.
+                 */
+                if ( attachedArtifactComparison ( requestedArtifact, attachedArtifact ) )
                 {
                     return attachedArtifact;
                 }
@@ -156,12 +159,57 @@ class ReactorReader
         return null;
     }
     
-    private boolean classifierComparison ( String c1, String c2 )
+    /**
+     * Try to satisfy both MNG-4065 and MNG-5214. Consider jar and test-jar equivalent.
+     * @param requestedType
+     * @param artifactType
+     * @return
+     */
+    private boolean attachedArtifactComparison ( Artifact requestedArtifact, org.apache.maven.artifact.Artifact attachedArtifact )
     {
-        return c1 == null && c2 == null
-                        || ((c1 != null) && c1.equals(c2));
+        if ( ! requestedArtifact.getGroupId().equals ( attachedArtifact.getGroupId() ) ) 
+        { 
+            return false;
+        }
+        if ( ! requestedArtifact.getArtifactId().equals ( attachedArtifact.getArtifactId() ) ) 
+        { 
+            return false;
+        }
+        String requestedExtension = requestedArtifact.getExtension();
+        String attachedExtension = null;
+        if ( attachedArtifact.getArtifactHandler() != null ) 
+            {
+                attachedExtension = attachedArtifact.getArtifactHandler().getExtension();
+            }
+        String requestedType = requestedArtifact.getProperty ( "type", "" );
+        String attachedType = attachedArtifact.getType();
+        boolean typeOk = false;
+        
+        if ( requestedExtension.equals ( attachedExtension ) )
+        {
+            // the ideal case.
+            typeOk = true;
+        }
+        else if ( requestedType.equals( attachedType ) )
+        {
+            typeOk = true;
+        }
+        else if ( "test-jar".equals ( requestedType ) && "jar".equals( attachedType ) )
+        {
+            typeOk = true;
+        }
+        else if ( "jar".equals ( requestedType ) && "test-jar".equals( attachedType ) )
+        {
+            typeOk = true;
+        }
+        
+        if ( !typeOk )
+        {
+            return false;
+        }
+        return requestedArtifact.getClassifier().equals ( attachedArtifact.getClassifier() );
     }
-
+    
     /**
      * Gets the repository conflict id of the specified artifact. Unlike the dependency conflict id, the repository
      * conflict id uses the artifact file extension instead of the artifact type. Hence, the repository conflict id more
