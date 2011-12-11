@@ -146,7 +146,8 @@ public class MavenProjectTest
         assertEquals( "..", pathAdjustment );
     }
     
-    public void testCloneWithDistributionManagement() throws Exception
+    public void testCloneWithDistributionManagement()
+        throws Exception
     {
         
         File f = getFileForClasspathResource( "distributionManagement-pom.xml" );
@@ -156,7 +157,8 @@ public class MavenProjectTest
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
     }
 
-    public void testCloneWithActiveProfile() throws Exception
+    public void testCloneWithActiveProfile()
+        throws Exception
     {
 
         File f = getFileForClasspathResource( "withActiveByDefaultProfile-pom.xml" );
@@ -174,4 +176,20 @@ public class MavenProjectTest
         assertNotSame( "The list of active profiles should have been cloned too but is same", activeProfilesOrig,
                        activeProfilesClone );
     }
+
+    public void testUndefinedOutputDirectory()
+        throws Exception
+    {
+        MavenProject p = new MavenProject();
+        assertNoNulls( p.getCompileClasspathElements() );
+        assertNoNulls( p.getSystemClasspathElements() );
+        assertNoNulls( p.getRuntimeClasspathElements() );
+        assertNoNulls( p.getTestClasspathElements() );
+    }
+
+    private void assertNoNulls( List<String> elements )
+    {
+        assertFalse( elements.contains( null ) );
+    }
+
 }
