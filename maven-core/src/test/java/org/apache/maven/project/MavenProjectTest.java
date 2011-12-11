@@ -96,7 +96,7 @@ public class MavenProjectTest
         File f = getFileForClasspathResource( "canonical-pom.xml" );
         MavenProject projectToClone = getProject( f );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
@@ -118,7 +118,7 @@ public class MavenProjectTest
         assertNotNull( "No ManagedVersionMap", map );
         assertTrue( "ManagedVersionMap is empty", !map.isEmpty() );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
@@ -153,7 +153,7 @@ public class MavenProjectTest
         File f = getFileForClasspathResource( "distributionManagement-pom.xml" );
         MavenProject projectToClone = getProject( f );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
     }
 
@@ -167,7 +167,7 @@ public class MavenProjectTest
 
         assertEquals( "Expecting 1 active profile", 1, activeProfilesOrig.size() );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
 
         List<Profile> activeProfilesClone = clonedProject.getActiveProfiles();
 
