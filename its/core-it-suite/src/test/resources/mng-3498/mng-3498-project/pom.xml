@@ -30,7 +30,7 @@ under the License.
     <plugins>
       <plugin>
         <groupId>${project.groupId}</groupId>
-        <artifactId>maven-mng3498-plugin</artifactId>
+        <artifactId>mavenit-mng3498-plugin</artifactId>
         <version>1</version>
         <executions>
           <execution>
