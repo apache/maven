@@ -57,7 +57,7 @@ public class MavenITmng3716AggregatorForkingTest
         verifier.resetStreams();
         
         verifier = newVerifier( projectsDir.getAbsolutePath() );
-        verifier.executeGoal( "org.apache.maven.its.mng3716:maven-mng3716-plugin:1:run" );
+        verifier.executeGoal( "org.apache.maven.its.mng3716:mavenit-mng3716-plugin:1:run" );
 
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
