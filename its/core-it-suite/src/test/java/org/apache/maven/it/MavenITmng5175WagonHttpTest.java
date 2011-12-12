@@ -47,7 +47,7 @@ public class MavenITmng5175WagonHttpTest
 
     public MavenITmng5175WagonHttpTest()
     {
-        super( "[3.0-4,)" ); // 3.0.4+
+        super( "[3.0.4,)" ); // 3.0.4+
     }
 
     public void setUp()
