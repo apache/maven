@@ -47,6 +47,8 @@ public class MavenITmng3652UserAgentHeaderTest
     private int port;
 
     private String userAgent;
+    
+    private String customHeader;
 
     public MavenITmng3652UserAgentHeaderTest()
     {
@@ -64,6 +66,8 @@ public class MavenITmng3652UserAgentHeaderTest
                 System.out.println( "Handling URL: '" + request.getRequestURL() + "'" );
                 
                 userAgent = request.getHeader( "User-Agent" );
+                
+                customHeader = request.getHeader( "Custom-Header" );
                 
                 System.out.println( "Got User-Agent: '" + userAgent + "'" );
 
@@ -258,7 +262,8 @@ public class MavenITmng3652UserAgentHeaderTest
         throws Exception
     {
         // customizing version not supported in Maven 3
-        requiresMavenVersion( "(,3.0-beta-3)" );
+        //requiresMavenVersion( "(,3.0-beta-3)" );
+        requiresMavenVersion("[2.1.0-M1,3.0-alpha-1),[3.0-beta-3,)");
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3652" );
         File pluginDir = new File( testDir, "test-plugin" );
@@ -287,6 +292,43 @@ public class MavenITmng3652UserAgentHeaderTest
         assertNotNull( userAgent );
 
         assertEquals( "Maven Fu", userAgent );
+        assertEquals( "My wonderful header", customHeader );
+    }
+
+    public void testmng3652_AddutionnalHttpHeaderConfiguredInSettings()
+        throws Exception
+    {
+        // customizing version not supported in Maven 3
+        requiresMavenVersion("[2.1.0-M1,3.0-alpha-1),[3.0-beta-3,)");
+
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3652" );
+        File pluginDir = new File( testDir, "test-plugin" );
+        File projectDir = new File( testDir, "test-project" );
+
+        Verifier verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+
+        // test settings with config
+
+        verifier.getCliOptions().add( "-DtestPort=" + port );
+        verifier.getCliOptions().add( "--settings" );
+        verifier.getCliOptions().add( "settings.xml" );
+        verifier.getCliOptions().add( "-X" );
+
+        verifier.setLogFileName( "log-configWithUserAgent.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        String userAgent = this.userAgent;
+        assertNotNull( userAgent );
+
+        assertEquals( "Maven Fu", userAgent );
+        assertEquals( "My wonderful header", customHeader );
     }
 
     private String getMavenUAVersion( String mavenVersion )

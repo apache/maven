@@ -8,6 +8,10 @@
             <name>User-Agent</name>
             <value>Maven Fu</value>
           </property>
+          <property>
+            <name>Custom-Header</name>
+            <value>My wonderful header</value>
+          </property>
         </httpHeaders>
       </configuration>
     </server>
