@@ -20,6 +20,7 @@ package org.apache.maven.it;
  */
 
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
 import org.mortbay.jetty.HttpMethods;
 import org.mortbay.jetty.Request;
@@ -149,8 +150,6 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".sha1", "SHA-1" );
         assertHash( verifier, "repo/org/apache/maven/its/mng4235/test/maven-metadata.xml", ".md5", "MD5" );
 
-        //  System.out.println( "deployedResources:" + repoHandler.deployedResources );
-
         for ( DeployedResource deployedResource : repoHandler.deployedResources )
         {
             if ( StringUtils.equalsIgnoreCase( "chunked", deployedResource.transferEncoding ) )
@@ -227,32 +226,5 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
         }
     }
 
-    static class DeployedResource
-    {
-        String httpMethod;
 
-        String requestUri;
-
-        String contentLength;
-
-        String transferEncoding;
-
-        public DeployedResource()
-        {
-            // no op
-        }
-
-        @Override
-        public String toString()
-        {
-            final StringBuilder sb = new StringBuilder();
-            sb.append( "DeployedResource" );
-            sb.append( "{httpMethod='" ).append( httpMethod ).append( '\'' );
-            sb.append( ", requestUri='" ).append( requestUri ).append( '\'' );
-            sb.append( ", contentLength='" ).append( contentLength ).append( '\'' );
-            sb.append( ", transferEncoding='" ).append( transferEncoding ).append( '\'' );
-            sb.append( '}' );
-            return sb.toString();
-        }
-    }
 }

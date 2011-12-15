@@ -21,7 +21,9 @@ package org.apache.maven.it;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.it.utils.DeployedResource;
+import org.codehaus.plexus.util.StringUtils;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
@@ -55,6 +59,8 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
     private int port;
 
     private volatile boolean deployed;
+
+    List<DeployedResource> deployedResources = new ArrayList<DeployedResource>();
 
     public MavenITmng4470AuthenticatedDeploymentToProxyTest()
     {
@@ -87,11 +93,21 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
                     response.addHeader( "Proxy-Authenticate", "Basic realm=\"Squid proxy-caching web server\"" );
                     ( (Request) request ).setHandled( true );
                 }
+
+                DeployedResource deployedResource = new DeployedResource();
+
+                deployedResource.httpMethod = request.getMethod();
+                deployedResource.requestUri = request.getRequestURI();
+                deployedResource.transferEncoding = request.getHeader( "Transfer-Encoding" );
+                deployedResource.contentLength = request.getHeader( "Content-Length" );
+
+                deployedResources.add( deployedResource );
             }
         };
 
         Handler repoHandler = new AbstractHandler()
         {
+
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
             {
@@ -108,6 +124,15 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
                 }
 
                 ( (Request) request ).setHandled( true );
+
+                DeployedResource deployedResource = new DeployedResource();
+
+                deployedResource.httpMethod = request.getMethod();
+                deployedResource.requestUri = request.getRequestURI();
+                deployedResource.transferEncoding = request.getHeader( "Transfer-Encoding" );
+                deployedResource.contentLength = request.getHeader( "Content-Length" );
+
+                deployedResources.add( deployedResource );
             }
         };
 
@@ -175,6 +200,9 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
     private void testit( String project )
         throws Exception
     {
+
+        deployedResources = new ArrayList<DeployedResource>();
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4470/" + project );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
@@ -186,6 +214,15 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+
+        for ( DeployedResource deployedResource : deployedResources )
+        {
+            if ( StringUtils.equalsIgnoreCase( "chunked", deployedResource.transferEncoding ) )
+            {
+                fail( "deployedResource " + deployedResource
+                          + " use chuncked transfert encoding some http server doesn't support that" );
+            }
+        }
 
         assertTrue( deployed );
     }
