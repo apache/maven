@@ -1,5 +1,5 @@
  -----
- Maven Integration Tests
+ Maven Core Integration Tests
  -----
  Hervé Boutemy
  -----
@@ -26,7 +26,7 @@
 ~~ NOTE: For help with the syntax of this file, see:
 ~~ http://maven.apache.org/doxia/references/apt-format.html
 
-Maven Integration Tests
+Maven Core Integration Tests
 
   This module provides the {{{./testapidocs/org/apache/maven/it/package-summary.html}effective Integration Tests suite}}.
 
@@ -36,8 +36,10 @@ Maven Integration Tests
 mvn clean test -Prun-its
 +----
   
-  This will subject the Maven version running the build to the integration tests. If you would like to test a different
-  Maven distribution, you can use the <<<mavenHome>>> system property to specify the path of the Maven distribution to test:
+  This will subject the Maven version running the build to the integration tests.
+  
+  If you would like to test a different Maven distribution, you can use the <<<mavenHome>>> system property to specify the
+  path of the Maven distribution to test:
   
 +----
 mvn clean test -Prun-its -DmavenHome=<maven-under-test>
@@ -56,5 +58,5 @@ mvn clean test -Prun-its -DmavenVersion=2.2.1
   Maven dependencies are added to the test class path.
   
   If you're behind a proxy, use the <<<proxy.host>>>, <<<proxy.port>>>, <<<proxy.user>>> and <<<proxy.pass>>> system properties
-  to specify the required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
+  to specify the required proxy setup for the ITs. Alternatively, set the <<<maven.it.central>>> system property to a URL of a local
   repository manager that proxies the required artifacts.
