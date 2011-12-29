@@ -167,7 +167,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
     /**
      * This allows fine-grained control over execution of individual test methods
-     * by allowing tests to adjust to the current maven version, or else simply avoid
+     * by allowing tests to adjust to the current Maven version, or else simply avoid
      * executing altogether if the wrong version is present.
      */
     protected boolean matchesVersionRange( String versionRangeStr )
@@ -205,7 +205,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
         if ( skip )
         {
-            out.println( "SKIPPED - version " + getMavenVersion() + " not in range " + versionRange );
+            out.println( "SKIPPED - Maven version " + getMavenVersion() + " not in range " + versionRange );
             return;
         }
 
@@ -228,7 +228,7 @@ public abstract class AbstractMavenIntegrationTestCase
         }
         catch ( UnsupportedMavenVersionException e )
         {
-            out.println( "SKIPPED - version " + e.mavenVersion + " not in range " + e.supportedRange );
+            out.println( "SKIPPED - Maven version " + e.mavenVersion + " not in range " + e.supportedRange );
             return;
         }
         catch ( Throwable t )
