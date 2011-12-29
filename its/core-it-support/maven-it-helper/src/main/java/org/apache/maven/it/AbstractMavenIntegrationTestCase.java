@@ -199,13 +199,13 @@ public abstract class AbstractMavenIntegrationTestCase
     protected void runTest()
         throws Throwable
     {
-        String line = getTestName() + "..";
+        String line = getTestName();
         out.print( line );
+        out.print( pad( RESULT_COLUMN - line.length() ) );
 
         if ( skip )
         {
-            out.println( pad( RESULT_COLUMN - line.length() ) + "SKIPPED - version " + getMavenVersion()
-                + " not in range " + versionRange );
+            out.println( "SKIPPED - version " + getMavenVersion() + " not in range " + versionRange );
             return;
         }
 
@@ -219,26 +219,22 @@ public abstract class AbstractMavenIntegrationTestCase
         {
             super.runTest();
             milliseconds = System.currentTimeMillis() - milliseconds;
-            String result = "OK " + formatTime( milliseconds );
-            out.println( pad( RESULT_COLUMN - line.length() ) + result );
+            out.println( "OK " + formatTime( milliseconds ) );
         }
         catch ( UnsupportedJavaVersionException e )
         {
-            String result = "SKIPPED - Java version " + e.javaVersion + " not in range " + e.supportedRange;
-            out.println( pad( RESULT_COLUMN - line.length() ) + result );
+            out.println( "SKIPPED - Java version " + e.javaVersion + " not in range " + e.supportedRange );
             return;
         }
         catch ( UnsupportedMavenVersionException e )
         {
-            String result = "SKIPPED - version " + e.mavenVersion + " not in range " + e.supportedRange;
-            out.println( pad( RESULT_COLUMN - line.length() ) + result );
+            out.println( "SKIPPED - version " + e.mavenVersion + " not in range " + e.supportedRange );
             return;
         }
         catch ( Throwable t )
         {
             milliseconds = System.currentTimeMillis() - milliseconds;
-            String result = "FAILURE " + formatTime( milliseconds );
-            out.println( pad( RESULT_COLUMN - line.length() ) + result );
+            out.println( "FAILURE " + formatTime( milliseconds ) );
             throw t;
         }
     }
