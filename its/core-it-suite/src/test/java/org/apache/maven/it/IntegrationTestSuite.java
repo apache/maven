@@ -19,20 +19,34 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
+
+import org.codehaus.plexus.util.IOUtil;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+/**
+ * The Core IT suite.
+ */
 public class IntegrationTestSuite
     extends TestCase
 {
     private static PrintStream out = System.out;
 
-    public static Test suite()
-        throws VerificationException
+    private static void infoProperty( PrintStream info, String property )
     {
+        info.println( property + ": " + System.getProperty( property ) );
+    }
+
+    public static Test suite()
+        throws VerificationException, FileNotFoundException
+    {
+        PrintStream info = null;
         Verifier verifier = null;
         try
         {
@@ -41,10 +55,18 @@ public class IntegrationTestSuite
 
             String executable = verifier.getExecutable();
 
-            out.println( "Running integration tests for Maven " + mavenVersion + "\n\tusing Maven executable: " +
-                executable );
+            out.println( "Running integration tests for Maven " + mavenVersion );
+            out.println( "\tusing Maven executable: " + executable );
 
             System.setProperty( "maven.version", mavenVersion );
+
+            String basedir = System.getProperty( "basedir" );
+            info = new PrintStream( new FileOutputStream( new File( basedir, "target/surefire-reports/info.txt" ) ) );
+
+            infoProperty( info, "maven.version" );
+            infoProperty( info, "java.version" );
+            infoProperty( info, "os.name" );
+            infoProperty( info, "os.version" );
         }
         finally
         {
@@ -52,6 +74,7 @@ public class IntegrationTestSuite
             {
                 verifier.resetStreams();
             }
+            IOUtil.close( info );
         }
 
         TestSuite suite = new TestSuite();

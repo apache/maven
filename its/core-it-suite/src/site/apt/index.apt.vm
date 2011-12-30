@@ -30,6 +30,8 @@ Maven Core Integration Tests
 
   This module provides the {{{./testapidocs/org/apache/maven/it/package-summary.html}effective Integration Tests suite}}.
 
+* Running the ITs
+
   By default, the project just packages the tests in an artifact. To actually run them, activate the <<<run-its>>> profile:
   
 +----
@@ -60,3 +62,15 @@ mvn clean test -Prun-its -DmavenVersion=2.2.1
   If you're behind a proxy, use the <<<proxy.host>>>, <<<proxy.port>>>, <<<proxy.user>>> and <<<proxy.pass>>> system properties
   to specify the required proxy setup for the ITs. Alternatively, set the <<<maven.it.central>>> system property to a URL of a local
   repository manager that proxies the required artifacts.
+
+* Results
+
+  ITs results are displayed on the console and can be published in the site through Surefire Report.
+
++----
+mvn -Preporting site
++----
+
+  Currently deployed {{{./surefire-report.html}Surefire Report}} was generated with following environment:
+
+%{snippet|file=${project.build.directory}/surefire-reports/info.txt}
