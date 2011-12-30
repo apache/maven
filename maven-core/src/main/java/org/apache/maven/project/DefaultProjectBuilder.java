@@ -59,7 +59,6 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.util.DefaultRequestTrace;
 
 /**
  */
@@ -241,7 +240,7 @@ public class DefaultProjectBuilder
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 
-        RequestTrace trace = DefaultRequestTrace.newChild( null, configuration ).newChild( request );
+        RequestTrace trace = RequestTrace.newChild( null, configuration ).newChild( request );
 
         ModelResolver resolver =
             new ProjectModelResolver( config.session, trace, repoSystem, repositoryManager, config.repositories,

@@ -67,7 +67,6 @@ import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.util.ConfigUtils;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 
@@ -169,7 +168,7 @@ public class DefaultVersionResolver
     public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         throws VersionResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
         Artifact artifact = request.getArtifact();
 

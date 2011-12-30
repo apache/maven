@@ -47,7 +47,6 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.DependencyVisitor;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
 
@@ -68,7 +67,7 @@ public class DefaultProjectDependenciesResolver
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )
         throws DependencyResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+        RequestTrace trace = RequestTrace.newChild( null, request );
 
         DefaultDependencyResolutionResult result = new DefaultDependencyResolutionResult();
 
@@ -146,7 +145,7 @@ public class DefaultProjectDependenciesResolver
         DependencyNode node;
         try
         {
-            collect.setTrace( DefaultRequestTrace.newChild( trace, depRequest ) );
+            collect.setTrace( RequestTrace.newChild( trace, depRequest ) );
             node = repoSystem.collectDependencies( session, collect ).getRoot();
             result.setDependencyGraph( node );
         }

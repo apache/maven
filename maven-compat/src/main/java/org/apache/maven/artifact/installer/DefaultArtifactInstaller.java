@@ -38,9 +38,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
 /**
@@ -77,7 +77,7 @@ public class DefaultArtifactInstaller
 
         InstallRequest request = new InstallRequest();
 
-        request.setTrace( DefaultRequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
+        request.setTrace( RequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
         org.eclipse.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
         mainArtifact = mainArtifact.setFile( source );

@@ -80,7 +80,6 @@ import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.artifact.DefaultArtifact;
 import org.eclipse.aether.util.artifact.DefaultArtifactType;
 import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
@@ -269,7 +268,7 @@ public class DefaultArtifactDescriptorReader
                            ArtifactDescriptorResult result )
         throws ArtifactDescriptorException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
         Set<String> visited = new LinkedHashSet<String>();
         for ( Artifact artifact = request.getArtifact();; )

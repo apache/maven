@@ -39,12 +39,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeployResult;
 import org.eclipse.aether.deployment.DeploymentException;
 import org.eclipse.aether.metadata.MergeableMetadata;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.artifact.SubArtifact;
 
 @Component( role = ArtifactDeployer.class, instantiationStrategy = "per-lookup" )
@@ -84,7 +84,7 @@ public class DefaultArtifactDeployer
 
         DeployRequest request = new DeployRequest();
 
-        request.setTrace( DefaultRequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
+        request.setTrace( RequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
         org.eclipse.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
         mainArtifact = mainArtifact.setFile( source );

@@ -56,7 +56,6 @@ import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -210,7 +209,7 @@ public class DefaultVersionRangeResolver
     private Map<String, ArtifactRepository> getVersions( RepositorySystemSession session, VersionRangeResult result,
                                                          VersionRangeRequest request )
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
         Map<String, ArtifactRepository> versionIndex = new HashMap<String, ArtifactRepository>();
 

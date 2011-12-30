@@ -49,7 +49,6 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
 import org.eclipse.aether.util.DefaultRepositorySystemSession;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 
@@ -163,7 +162,7 @@ public class DefaultPluginPrefixResolver
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request )
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+        RequestTrace trace = RequestTrace.newChild( null, request );
 
         List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
 

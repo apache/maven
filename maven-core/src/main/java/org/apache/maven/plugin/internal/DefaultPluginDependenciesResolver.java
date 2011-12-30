@@ -51,7 +51,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.DefaultRepositorySystemSession;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.artifact.DefaultArtifact;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
@@ -93,7 +92,7 @@ public class DefaultPluginDependenciesResolver
     public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, plugin );
+        RequestTrace trace = RequestTrace.newChild( null, plugin );
 
         Artifact pluginArtifact = toArtifact( plugin, session );
 
@@ -140,7 +139,7 @@ public class DefaultPluginDependenciesResolver
                                    List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, plugin );
+        RequestTrace trace = RequestTrace.newChild( null, plugin );
 
         if ( pluginArtifact == null )
         {
@@ -187,7 +186,7 @@ public class DefaultPluginDependenciesResolver
             DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
             depRequest.setTrace( trace );
 
-            request.setTrace( DefaultRequestTrace.newChild( trace, depRequest ) );
+            request.setTrace( RequestTrace.newChild( trace, depRequest ) );
 
             node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
 

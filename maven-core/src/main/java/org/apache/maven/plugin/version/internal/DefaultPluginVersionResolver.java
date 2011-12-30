@@ -52,7 +52,6 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
-import org.eclipse.aether.util.DefaultRequestTrace;
 import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -114,7 +113,7 @@ public class DefaultPluginVersionResolver
     private PluginVersionResult resolveFromRepository( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+        RequestTrace trace = RequestTrace.newChild( null, request );
 
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
