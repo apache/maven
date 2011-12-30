@@ -36,26 +36,27 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.collection.DependencyManager;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.collection.DependencyTraverser;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.graph.manager.ClassicDependencyManager;
-import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-import org.sonatype.aether.util.graph.selector.ExclusionDependencySelector;
-import org.sonatype.aether.util.graph.selector.OptionalDependencySelector;
-import org.sonatype.aether.util.graph.selector.ScopeDependencySelector;
-import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
-import org.sonatype.aether.util.graph.transformer.ConflictMarker;
-import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
-import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencyManager;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.util.DefaultRepositorySystemSession;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
+import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.transformer.NearestVersionConflictResolver;
+import org.eclipse.aether.util.graph.transformer.ConflictMarker;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.eclipse.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
+import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -66,7 +67,14 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactFactory artifactFactory;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+    }
+
     @Override
     protected void setUp()
         throws Exception
@@ -350,7 +358,8 @@ public abstract class AbstractArtifactComponentTestCase
                                                    new JavaDependencyContextRefiner() );
         session.setDependencyGraphTransformer( transformer );
 
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepository().getBasedir() ) );
+        LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( localRepo ) );
 
         return session;
     }

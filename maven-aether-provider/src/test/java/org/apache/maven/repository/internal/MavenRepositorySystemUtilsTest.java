@@ -19,26 +19,26 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.impl.MetadataGeneratorFactory;
-import org.sonatype.aether.spi.locator.ServiceLocator;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.impl.MetadataGeneratorFactory;
+import org.eclipse.aether.spi.locator.ServiceLocator;
 
 import junit.framework.TestCase;
 
-public class DefaultServiceLocatorTest
+public class MavenRepositorySystemUtilsTest
     extends TestCase
 {
 
     public void testGetRepositorySystem()
     {
-        ServiceLocator locator = new MavenServiceLocator();
+        ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         RepositorySystem repoSys = locator.getService( RepositorySystem.class );
         assertNotNull( repoSys );
     }
 
     public void testGetMetadataGeneratorFactories()
     {
-        ServiceLocator locator = new MavenServiceLocator();
+        ServiceLocator locator = MavenRepositorySystemUtils.newServiceLocator();
         assertEquals( 2, locator.getServices( MetadataGeneratorFactory.class ).size() );
     }
 

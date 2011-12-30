@@ -36,7 +36,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * @author Jason van Zyl

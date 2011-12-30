@@ -21,8 +21,8 @@ package org.apache.maven.plugin.version;
 
 import java.util.List;
 
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 
 public class PluginVersionResolutionException
     extends Exception

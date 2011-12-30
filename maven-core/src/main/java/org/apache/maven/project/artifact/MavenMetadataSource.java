@@ -76,9 +76,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.RepositoryPolicy;
-import org.sonatype.aether.transfer.ArtifactNotFoundException;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
  * @author Jason van Zyl
@@ -735,7 +735,7 @@ public class MavenMetadataSource
         {
             return true;
         }
-        if ( e.getCause() instanceof org.sonatype.aether.resolution.ArtifactResolutionException
+        if ( e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
             && e.getCause().getCause() instanceof ArtifactNotFoundException )
         {
             return true;
@@ -749,7 +749,7 @@ public class MavenMetadataSource
         {
             return true;
         }
-        if ( e.getCause() instanceof org.sonatype.aether.resolution.ArtifactResolutionException
+        if ( e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
             && !( e.getCause().getCause() instanceof ArtifactNotFoundException ) )
         {
             return true;

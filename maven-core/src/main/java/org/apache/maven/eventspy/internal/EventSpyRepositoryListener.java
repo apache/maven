@@ -19,9 +19,9 @@ package org.apache.maven.eventspy.internal;
  * under the License.
  */
 
-import org.sonatype.aether.AbstractRepositoryListener;
-import org.sonatype.aether.RepositoryEvent;
-import org.sonatype.aether.RepositoryListener;
+import org.eclipse.aether.AbstractRepositoryListener;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryListener;
 
 /**
  * Forwards repository events to eventspies.

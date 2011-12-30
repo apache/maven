@@ -65,7 +65,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.transfer.TransferListener;
+import org.eclipse.aether.transfer.TransferListener;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -375,6 +375,7 @@ public class MavenCli
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld( cliRequest.classWorld )
                 .setRealm( setupContainerRealm( cliRequest ) )
+                .setAutoWiring( true )
                 .setName( "maven" );
 
             container = new DefaultPlexusContainer( cc );

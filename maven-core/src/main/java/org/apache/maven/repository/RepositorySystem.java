@@ -34,7 +34,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
-import org.sonatype.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * @author Jason van Zyl

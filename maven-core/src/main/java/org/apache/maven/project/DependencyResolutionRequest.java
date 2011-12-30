@@ -19,8 +19,8 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.graph.DependencyFilter;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.graph.DependencyFilter;
 
 /**
  * A request to resolve the dependencies of a project.

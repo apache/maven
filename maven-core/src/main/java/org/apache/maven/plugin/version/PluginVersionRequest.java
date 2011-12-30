@@ -22,8 +22,8 @@ package org.apache.maven.plugin.version;
 import java.util.List;
 
 import org.apache.maven.model.Model;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve the version for a plugin.

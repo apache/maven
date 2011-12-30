@@ -37,15 +37,15 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.deployment.DeployResult;
-import org.sonatype.aether.deployment.DeploymentException;
-import org.sonatype.aether.metadata.MergeableMetadata;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.SubArtifact;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.deployment.DeployResult;
+import org.eclipse.aether.deployment.DeploymentException;
+import org.eclipse.aether.metadata.MergeableMetadata;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.DefaultRequestTrace;
+import org.eclipse.aether.util.artifact.SubArtifact;
 
 @Component( role = ArtifactDeployer.class, instantiationStrategy = "per-lookup" )
 public class DefaultArtifactDeployer
@@ -86,7 +86,7 @@ public class DefaultArtifactDeployer
 
         request.setTrace( DefaultRequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
-        org.sonatype.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
+        org.eclipse.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
         mainArtifact = mainArtifact.setFile( source );
         request.addArtifact( mainArtifact );
 
@@ -103,7 +103,7 @@ public class DefaultArtifactDeployer
         {
             if ( metadata instanceof ProjectArtifactMetadata )
             {
-                org.sonatype.aether.artifact.Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
+                org.eclipse.aether.artifact.Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
                 pomArtifact = pomArtifact.setFile( ( (ProjectArtifactMetadata) metadata ).getFile() );
                 request.addArtifact( pomArtifact );
             }

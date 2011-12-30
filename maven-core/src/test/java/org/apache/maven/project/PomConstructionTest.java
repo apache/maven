@@ -32,9 +32,12 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.project.harness.PomTestWrapper;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.util.DefaultRepositorySystemSession;
 
 public class PomConstructionTest
     extends PlexusTestCase
@@ -50,6 +53,13 @@ public class PomConstructionTest
     private RepositorySystem repositorySystem;
     
     private File testDirectory;
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+    }
 
     protected void setUp()
         throws Exception
@@ -1799,20 +1809,20 @@ public class PomConstructionTest
     }
     
     private PomTestWrapper buildPom( String pomPath, String... profileIds )
-        throws ProjectBuildingException
+        throws Exception
     {
         return buildPom( pomPath, null, profileIds );
     }
 
     private PomTestWrapper buildPom( String pomPath, Properties executionProperties, String... profileIds )
-        throws ProjectBuildingException
+        throws Exception
     {
         return buildPom( pomPath, false, executionProperties, profileIds );
     }
 
     private PomTestWrapper buildPom( String pomPath, boolean lenientValidation, Properties executionProperties,
                                      String... profileIds )
-        throws ProjectBuildingException
+        throws Exception
     {
         File pomFile = new File( testDirectory, pomPath );
         if ( pomFile.isDirectory() )
@@ -1831,10 +1841,9 @@ public class PomConstructionTest
         config.setUserProperties( executionProperties );
         config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
-        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
-        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManager(
-                                                                                 new File(
-                                                                                           config.getLocalRepository().getBasedir() ) ) );
+        DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
+        LocalRepository localRepo = new LocalRepository( config.getLocalRepository().getBasedir() );
+        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( localRepo ) );
         config.setRepositorySession( repoSession );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );

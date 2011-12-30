@@ -19,10 +19,10 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.collection.DependencyCollectionContext;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.graph.Dependency;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.collection.DependencyCollectionContext;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.graph.Dependency;
 
 /**
  * Assists in detecting wagon providers brought into the plugin class path via legacy Maven core artifacts (e.g.

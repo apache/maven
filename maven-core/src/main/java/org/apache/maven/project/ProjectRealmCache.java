@@ -22,7 +22,7 @@ package org.apache.maven.project;
 import java.util.List;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.sonatype.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyFilter;
 
 /**
  * Caches project class realms. <strong>Warning:</strong> This is an internal utility interface that is only public for

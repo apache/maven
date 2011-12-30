@@ -26,44 +26,49 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.SyncContext;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.util.metadata.DefaultMetadata;
-import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.InvalidVersionSpecificationException;
-import org.sonatype.aether.version.Version;
-import org.sonatype.aether.version.VersionConstraint;
-import org.sonatype.aether.version.VersionScheme;
-import org.sonatype.aether.impl.MetadataResolver;
-import org.sonatype.aether.impl.RepositoryEventDispatcher;
-import org.sonatype.aether.impl.SyncContextFactory;
-import org.sonatype.aether.impl.VersionRangeResolver;
-import org.sonatype.aether.metadata.Metadata;
-import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.resolution.MetadataRequest;
-import org.sonatype.aether.resolution.MetadataResult;
-import org.sonatype.aether.resolution.VersionRangeRequest;
-import org.sonatype.aether.resolution.VersionRangeResolutionException;
-import org.sonatype.aether.resolution.VersionRangeResult;
-import org.sonatype.aether.spi.locator.Service;
-import org.sonatype.aether.spi.locator.ServiceLocator;
-import org.sonatype.aether.spi.log.Logger;
-import org.sonatype.aether.spi.log.NullLogger;
+import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.SyncContext;
+import org.eclipse.aether.impl.MetadataResolver;
+import org.eclipse.aether.impl.RepositoryEventDispatcher;
+import org.eclipse.aether.impl.SyncContextFactory;
+import org.eclipse.aether.impl.VersionRangeResolver;
+import org.eclipse.aether.metadata.Metadata;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.resolution.MetadataRequest;
+import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.spi.locator.Service;
+import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.eclipse.aether.spi.log.Logger;
+import org.eclipse.aether.spi.log.LoggerFactory;
+import org.eclipse.aether.spi.log.NullLoggerFactory;
+import org.eclipse.aether.util.DefaultRequestTrace;
+import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
+import org.eclipse.aether.util.metadata.DefaultMetadata;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionConstraint;
+import org.eclipse.aether.version.VersionScheme;
 
 /**
  * @author Benjamin Bentmann
  */
+@Named
 @Component( role = VersionRangeResolver.class )
 public class DefaultVersionRangeResolver
     implements VersionRangeResolver, Service
@@ -72,8 +77,8 @@ public class DefaultVersionRangeResolver
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
     @SuppressWarnings( "unused" )
-    @Requirement
-    private Logger logger = NullLogger.INSTANCE;
+    @Requirement( role = LoggerFactory.class )
+    private Logger logger = NullLoggerFactory.LOGGER;
 
     @Requirement
     private MetadataResolver metadataResolver;
@@ -84,18 +89,39 @@ public class DefaultVersionRangeResolver
     @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
+    public DefaultVersionRangeResolver()
+    {
+        // enable default constructor
+    }
+
+    @Inject
+    DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
+                                 RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+    {
+        setMetadataResolver( metadataResolver );
+        setSyncContextFactory( syncContextFactory );
+        setLoggerFactory( loggerFactory );
+        setRepositoryEventDispatcher( repositoryEventDispatcher );
+    }
+
     public void initService( ServiceLocator locator )
     {
-        setLogger( locator.getService( Logger.class ) );
+        setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
     }
 
-    public DefaultVersionRangeResolver setLogger( Logger logger )
+    public DefaultVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
     {
-        this.logger = ( logger != null ) ? logger : NullLogger.INSTANCE;
+        this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
         return this;
+    }
+
+    void setLogger( LoggerFactory loggerFactory )
+    {
+        // plexus support
+        setLoggerFactory( loggerFactory );
     }
 
     public DefaultVersionRangeResolver setMetadataResolver( MetadataResolver metadataResolver )
@@ -148,7 +174,7 @@ public class DefaultVersionRangeResolver
 
         result.setVersionConstraint( versionConstraint );
 
-        if ( versionConstraint.getRanges().isEmpty() )
+        if ( versionConstraint.getRange() == null )
         {
             result.addVersion( versionConstraint.getVersion() );
         }
@@ -265,7 +291,7 @@ public class DefaultVersionRangeResolver
                 }
                 finally
                 {
-                    syncContext.release();
+                    syncContext.close();
                 }
             }
         }

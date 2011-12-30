@@ -21,7 +21,7 @@ package org.apache.maven.classrealm;
 
 import java.io.File;
 
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * @author Benjamin Bentmann

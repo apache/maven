@@ -56,11 +56,11 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.LocalRepositoryManager;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResult;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  * @author Jason van Zyl
@@ -212,9 +212,9 @@ public class DefaultArtifactResolver
 
                 result = repoSystem.resolveArtifact( session, artifactRequest );
             }
-            catch ( org.sonatype.aether.resolution.ArtifactResolutionException e )
+            catch ( org.eclipse.aether.resolution.ArtifactResolutionException e )
             {
-                if ( e.getCause() instanceof org.sonatype.aether.transfer.ArtifactNotFoundException )
+                if ( e.getCause() instanceof org.eclipse.aether.transfer.ArtifactNotFoundException )
                 {
                     throw new ArtifactNotFoundException( e.getMessage(), artifact, remoteRepositories, e );
                 }

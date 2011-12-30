@@ -22,7 +22,7 @@ package org.apache.maven.plugin.internal;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Helps to provide backward-compatibility with plugins that use legacy components. <strong>Warning:</strong> This is an

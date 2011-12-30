@@ -22,8 +22,8 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.util.Map;
 
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.util.artifact.AbstractArtifact;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.util.artifact.AbstractArtifact;
 
 /**
  * @author Benjamin Bentmann

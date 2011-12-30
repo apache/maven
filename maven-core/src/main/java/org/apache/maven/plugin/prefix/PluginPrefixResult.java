@@ -1,6 +1,6 @@
 package org.apache.maven.plugin.prefix;
 
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

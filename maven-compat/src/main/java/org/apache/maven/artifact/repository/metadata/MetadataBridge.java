@@ -26,8 +26,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.aether.RepositoryException;
-import org.sonatype.aether.metadata.MergeableMetadata;
+import org.eclipse.aether.RepositoryException;
+import org.eclipse.aether.metadata.MergeableMetadata;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part

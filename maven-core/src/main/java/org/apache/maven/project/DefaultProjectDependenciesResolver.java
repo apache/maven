@@ -34,22 +34,22 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.artifact.ArtifactType;
-import org.sonatype.aether.artifact.ArtifactTypeRegistry;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.graph.DependencyVisitor;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.ArtifacIdUtils;
-import org.sonatype.aether.util.artifact.ArtifactProperties;
-import org.sonatype.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.artifact.ArtifactProperties;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.util.DefaultRequestTrace;
+import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+import org.eclipse.aether.util.artifact.JavaScopes;
 
 /**
  * @author Benjamin Bentmann
@@ -110,7 +110,7 @@ public class DefaultProjectDependenciesResolver
                     }
                 }
                 String key =
-                    ArtifacIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
+                    ArtifactIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
                                                     dependency.getType(), classifier );
                 dependencies.put( key, dependency );
             }
@@ -119,11 +119,11 @@ public class DefaultProjectDependenciesResolver
                 String key = artifact.getDependencyConflictId();
                 Dependency dependency = dependencies.get( key );
                 Collection<Exclusion> exclusions = dependency != null ? dependency.getExclusions() : null;
-                org.sonatype.aether.graph.Dependency dep = RepositoryUtils.toDependency( artifact, exclusions );
+                org.eclipse.aether.graph.Dependency dep = RepositoryUtils.toDependency( artifact, exclusions );
                 if ( !JavaScopes.SYSTEM.equals( dep.getScope() ) && dep.getArtifact().getFile() != null )
                 {
                     // enable re-resolution
-                    org.sonatype.aether.artifact.Artifact art = dep.getArtifact();
+                    org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
                     art = art.setFile( null ).setVersion( art.getBaseVersion() );
                     dep = dep.setArtifact( art );
                 }
@@ -182,7 +182,7 @@ public class DefaultProjectDependenciesResolver
         {
             process( result, repoSystem.resolveDependencies( session, depRequest ).getArtifactResults() );
         }
-        catch ( org.sonatype.aether.resolution.DependencyResolutionException e )
+        catch ( org.eclipse.aether.resolution.DependencyResolutionException e )
         {
             process( result, e.getResult().getArtifactResults() );
 
@@ -228,10 +228,10 @@ public class DefaultProjectDependenciesResolver
         {
             StringBuilder buffer = new StringBuilder( 128 );
             buffer.append( indent );
-            org.sonatype.aether.graph.Dependency dep = node.getDependency();
+            org.eclipse.aether.graph.Dependency dep = node.getDependency();
             if ( dep != null )
             {
-                org.sonatype.aether.artifact.Artifact art = dep.getArtifact();
+                org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );
@@ -269,7 +269,7 @@ public class DefaultProjectDependenciesResolver
             return true;
         }
 
-        private void appendManagementSource( StringBuilder buffer, org.sonatype.aether.artifact.Artifact artifact,
+        private void appendManagementSource( StringBuilder buffer, org.eclipse.aether.artifact.Artifact artifact,
                                              String field )
         {
             if ( managed == null )
@@ -285,7 +285,7 @@ public class DefaultProjectDependenciesResolver
             }
 
             String key =
-                ArtifacIdUtils.toVersionlessId( artifact.getGroupId(), artifact.getArtifactId(),
+                ArtifactIdUtils.toVersionlessId( artifact.getGroupId(), artifact.getArtifactId(),
                                                 artifact.getProperty( ArtifactProperties.TYPE, "jar" ),
                                                 artifact.getClassifier() );
 

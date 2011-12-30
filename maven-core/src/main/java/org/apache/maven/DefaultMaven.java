@@ -75,33 +75,33 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.aether.ConfigurationProperties;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.collection.DependencyManager;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.collection.DependencyTraverser;
-import org.sonatype.aether.repository.Authentication;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.graph.manager.ClassicDependencyManager;
-import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-import org.sonatype.aether.util.graph.selector.ExclusionDependencySelector;
-import org.sonatype.aether.util.graph.selector.OptionalDependencySelector;
-import org.sonatype.aether.util.graph.selector.ScopeDependencySelector;
-import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
-import org.sonatype.aether.util.graph.transformer.ConflictMarker;
-import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
-import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
-import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
-import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
-import org.sonatype.aether.util.repository.DefaultMirrorSelector;
-import org.sonatype.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencyManager;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.util.DefaultRepositorySystemSession;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
+import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.transformer.NearestVersionConflictResolver;
+import org.eclipse.aether.util.graph.transformer.ConflictMarker;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.eclipse.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
+import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
+import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
+import org.eclipse.aether.util.repository.DefaultMirrorSelector;
+import org.eclipse.aether.util.repository.DefaultProxySelector;
 
 /**
  * @author Jason van Zyl
@@ -400,7 +400,7 @@ public class DefaultMaven
         for ( Proxy proxy : decrypted.getProxies() )
         {
             Authentication proxyAuth = new Authentication( proxy.getUsername(), proxy.getPassword() );
-            proxySelector.add( new org.sonatype.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
+            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
                                                                 proxyAuth ), proxy.getNonProxyHosts() );
         }
         session.setProxySelector( proxySelector );

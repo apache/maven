@@ -73,10 +73,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.AuthenticationSelector;
-import org.sonatype.aether.repository.ProxySelector;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.ProxySelector;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * @author Jason van Zyl
@@ -478,7 +478,7 @@ public class LegacyRepositorySystem
     {
         if ( session != null )
         {
-            org.sonatype.aether.repository.MirrorSelector selector = session.getMirrorSelector();
+            org.eclipse.aether.repository.MirrorSelector selector = session.getMirrorSelector();
             if ( selector != null )
             {
                 RemoteRepository repo = selector.getMirror( RepositoryUtils.toRepo( repository ) );
@@ -583,7 +583,7 @@ public class LegacyRepositorySystem
             AuthenticationSelector selector = session.getAuthenticationSelector();
             if ( selector != null )
             {
-                org.sonatype.aether.repository.Authentication auth =
+                org.eclipse.aether.repository.Authentication auth =
                     selector.getAuthentication( RepositoryUtils.toRepo( repository ) );
                 if ( auth != null )
                 {
@@ -688,7 +688,7 @@ public class LegacyRepositorySystem
             ProxySelector selector = session.getProxySelector();
             if ( selector != null )
             {
-                org.sonatype.aether.repository.Proxy proxy = selector.getProxy( RepositoryUtils.toRepo( repository ) );
+                org.eclipse.aether.repository.Proxy proxy = selector.getProxy( RepositoryUtils.toRepo( repository ) );
                 if ( proxy != null )
                 {
                     Proxy p = new Proxy();

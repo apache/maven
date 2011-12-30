@@ -21,22 +21,36 @@ package org.apache.maven.project;
 
 import java.io.File;
 
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
-import org.sonatype.aether.repository.LocalArtifactRequest;
-import org.sonatype.aether.repository.LocalArtifactResult;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.metadata.Metadata;
+import org.eclipse.aether.repository.LocalArtifactRegistration;
+import org.eclipse.aether.repository.LocalArtifactRequest;
+import org.eclipse.aether.repository.LocalArtifactResult;
+import org.eclipse.aether.repository.LocalMetadataRegistration;
+import org.eclipse.aether.repository.LocalMetadataRequest;
+import org.eclipse.aether.repository.LocalMetadataResult;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * @author Benjamin Bentmann
  */
 public class LegacyLocalRepositoryManager
-    extends SimpleLocalRepositoryManager
+    implements LocalRepositoryManager
 {
+
+    private final LocalRepository repository;
 
     public LegacyLocalRepositoryManager( File basedir )
     {
-        super( basedir );
+        this.repository = new LocalRepository( basedir.getAbsoluteFile(), "legacy" );
+    }
+
+    public LocalRepository getRepository()
+    {
+        return repository;
     }
 
     public String getPathForLocalArtifact( Artifact artifact )
@@ -59,17 +73,121 @@ public class LegacyLocalRepositoryManager
         return path.toString();
     }
 
+    public String getPathForRemoteArtifact( Artifact artifact, RemoteRepository repository, String context )
+    {
+        return getPathForLocalArtifact( artifact );
+    }
+
+    public String getPathForLocalMetadata( Metadata metadata )
+    {
+        return getPath( metadata, "local" );
+    }
+
+    public String getPathForRemoteMetadata( Metadata metadata, RemoteRepository repository, String context )
+    {
+        return getPath( metadata, getRepositoryKey( repository, context ) );
+    }
+
+    String getRepositoryKey( RemoteRepository repository, String context )
+    {
+        return repository.getId();
+    }
+
+    private String getPath( Metadata metadata, String repositoryKey )
+    {
+        StringBuilder path = new StringBuilder( 128 );
+
+        if ( metadata.getGroupId().length() > 0 )
+        {
+            path.append( metadata.getGroupId().replace( '.', '/' ) ).append( '/' );
+
+            if ( metadata.getArtifactId().length() > 0 )
+            {
+                path.append( metadata.getArtifactId() ).append( '/' );
+
+                if ( metadata.getVersion().length() > 0 )
+                {
+                    path.append( metadata.getVersion() ).append( '/' );
+                }
+            }
+        }
+
+        path.append( insertRepositoryKey( metadata.getType(), repositoryKey ) );
+
+        return path.toString();
+    }
+
+    private String insertRepositoryKey( String filename, String repositoryKey )
+    {
+        String result;
+        int idx = filename.indexOf( '.' );
+        if ( idx < 0 )
+        {
+            result = filename + '-' + repositoryKey;
+        }
+        else
+        {
+            result = filename.substring( 0, idx ) + '-' + repositoryKey + filename.substring( idx );
+        }
+        return result;
+    }
+
     public LocalArtifactResult find( RepositorySystemSession session, LocalArtifactRequest request )
     {
- 	    String path = getPathForLocalArtifact( request.getArtifact() );
- 	    File file = new File( getRepository().getBasedir(), path );
+        String path = getPathForLocalArtifact( request.getArtifact() );
+        File file = new File( getRepository().getBasedir(), path );
+
         LocalArtifactResult result = new LocalArtifactResult( request );
- 	    if ( file.isFile() )
+        if ( file.isFile() )
         {
- 	        result.setFile( file );
- 	        result.setAvailable( true );
- 	    }
- 	    return result;
- 	}
+            result.setFile( file );
+            result.setAvailable( true );
+        }
+
+        return result;
+    }
+
+    public void add( RepositorySystemSession session, LocalArtifactRegistration request )
+    {
+        // noop
+    }
+
+    public LocalMetadataResult find( RepositorySystemSession session, LocalMetadataRequest request )
+    {
+        LocalMetadataResult result = new LocalMetadataResult( request );
+
+        String path;
+
+        Metadata metadata = request.getMetadata();
+        String context = request.getContext();
+        RemoteRepository remote = request.getRepository();
+
+        if ( remote != null )
+        {
+            path = getPathForRemoteMetadata( metadata, remote, context );
+        }
+        else
+        {
+            path = getPathForLocalMetadata( metadata );
+        }
+
+        File file = new File( getRepository().getBasedir(), path );
+        if ( file.isFile() )
+        {
+            result.setFile( file );
+        }
+
+        return result;
+    }
+
+    public void add( RepositorySystemSession session, LocalMetadataRegistration request )
+    {
+        // noop
+    }
+
+    public String toString()
+    {
+        return String.valueOf( getRepository() );
+    }
 
 }
