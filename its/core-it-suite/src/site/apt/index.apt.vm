@@ -73,4 +73,4 @@ mvn -Preporting site
 
   Currently deployed {{{./surefire-report.html}Surefire Report}} was generated with following environment:
 
-%{snippet|file=${project.build.directory}/surefire-reports/info.txt}
+%{snippet|file=${project.build.directory}/info.txt}

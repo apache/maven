@@ -61,7 +61,7 @@ public class IntegrationTestSuite
             System.setProperty( "maven.version", mavenVersion );
 
             String basedir = System.getProperty( "basedir" );
-            info = new PrintStream( new FileOutputStream( new File( basedir, "target/surefire-reports/info.txt" ) ) );
+            info = new PrintStream( new FileOutputStream( new File( basedir, "target/info.txt" ) ) );
 
             infoProperty( info, "maven.version" );
             infoProperty( info, "java.version" );
