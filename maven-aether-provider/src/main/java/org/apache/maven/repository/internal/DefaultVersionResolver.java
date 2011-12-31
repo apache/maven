@@ -41,6 +41,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.SyncContext;
@@ -67,7 +68,6 @@ import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.util.ConfigUtils;
-import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 
 /**
@@ -400,12 +400,13 @@ public class DefaultVersionResolver
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
                                   ArtifactRepository repository, Exception exception )
     {
-        DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+        event.setTrace( trace );
         event.setMetadata( metadata );
         event.setException( exception );
         event.setRepository( repository );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
     }
 
     private void merge( Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning,

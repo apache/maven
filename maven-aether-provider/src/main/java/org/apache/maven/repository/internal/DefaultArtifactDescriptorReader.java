@@ -51,6 +51,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
@@ -82,7 +83,6 @@ import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.eclipse.aether.util.artifact.DefaultArtifact;
 import org.eclipse.aether.util.artifact.DefaultArtifactType;
-import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 
 /**
  * @author Benjamin Bentmann
@@ -469,23 +469,23 @@ public class DefaultArtifactDescriptorReader
     private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
                                     Exception exception )
     {
-        DefaultRepositoryEvent event =
-            new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.ARTIFACT_DESCRIPTOR_MISSING );
+        event.setTrace( trace );
         event.setArtifact( artifact );
         event.setException( exception );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
     }
 
     private void invalidDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
                                     Exception exception )
     {
-        DefaultRepositoryEvent event =
-            new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.ARTIFACT_DESCRIPTOR_INVALID );
+        event.setTrace( trace );
         event.setArtifact( artifact );
         event.setException( exception );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
     }
 
 }

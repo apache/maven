@@ -39,6 +39,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -49,7 +50,6 @@ import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
 import org.eclipse.aether.util.DefaultRepositorySystemSession;
-import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 
 /**
@@ -282,11 +282,12 @@ public class DefaultPluginPrefixResolver
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+            RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+            event.setTrace( trace );
             event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );
-            listener.metadataInvalid( event );
+            listener.metadataInvalid( event.build() );
         }
     }
 

@@ -35,6 +35,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.SyncContext;
@@ -56,7 +57,6 @@ import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
-import org.eclipse.aether.util.listener.DefaultRepositoryEvent;
 import org.eclipse.aether.util.metadata.DefaultMetadata;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
@@ -310,12 +310,13 @@ public class DefaultVersionRangeResolver
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
                                   ArtifactRepository repository, Exception exception )
     {
-        DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+        event.setTrace( trace );
         event.setMetadata( metadata );
         event.setException( exception );
         event.setRepository( repository );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
     }
 
 }
