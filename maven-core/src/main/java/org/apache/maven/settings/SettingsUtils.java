@@ -19,10 +19,10 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.model.ActivationFile;
 import org.apache.maven.settings.merge.MavenSettingsMerger;
+
+import java.util.List;
 
 /**
  * Several convenience methods to handle settings
@@ -45,6 +45,88 @@ public final class SettingsUtils
     public static void merge( Settings dominant, Settings recessive, String recessiveSourceLevel )
     {
         new MavenSettingsMerger().merge( dominant, recessive, recessiveSourceLevel );
+    }
+
+    /**
+     * @param settingsProfile
+     * @return a profile
+     */
+    public static Profile convertToSettingsProfile( org.apache.maven.model.Profile modelProfile )
+    {
+        Profile profile = new Profile();
+
+        profile.setId( modelProfile.getId() );
+
+        org.apache.maven.model.Activation modelActivation = modelProfile.getActivation();
+
+        if ( modelActivation != null )
+        {
+            Activation activation = new Activation();
+
+            activation.setActiveByDefault( modelActivation.isActiveByDefault() );
+
+            activation.setJdk( modelActivation.getJdk() );
+
+            org.apache.maven.model.ActivationProperty modelProp = modelActivation.getProperty();
+
+            if ( modelProp != null )
+            {
+                ActivationProperty prop = new ActivationProperty();
+                prop.setName( modelProp.getName() );
+                prop.setValue( modelProp.getValue() );
+                activation.setProperty( prop );
+            }
+
+            org.apache.maven.model.ActivationOS modelOs = modelActivation.getOs();
+
+            if ( modelOs != null )
+            {
+                ActivationOS os = new ActivationOS();
+
+                os.setArch( modelOs.getArch() );
+                os.setFamily( modelOs.getFamily() );
+                os.setName( modelOs.getName() );
+                os.setVersion( modelOs.getVersion() );
+
+                activation.setOs( os );
+            }
+
+            ActivationFile modelFile = modelActivation.getFile();
+
+            if ( modelFile != null )
+            {
+                org.apache.maven.settings.ActivationFile file = new org.apache.maven.settings.ActivationFile();
+
+                file.setExists( modelFile.getExists() );
+                file.setMissing( modelFile.getMissing() );
+
+                activation.setFile( file );
+            }
+
+            profile.setActivation( activation );
+        }
+
+        profile.setProperties( modelProfile.getProperties() );
+
+        List<org.apache.maven.model.Repository> repos = modelProfile.getRepositories();
+        if ( repos != null )
+        {
+            for ( org.apache.maven.model.Repository repo : repos )
+            {
+                profile.addRepository( convertToSettingsRepository( repo ) );
+            }
+        }
+
+        List<org.apache.maven.model.Repository> pluginRepos = modelProfile.getPluginRepositories();
+        if ( pluginRepos != null )
+        {
+            for ( org.apache.maven.model.Repository pluginRepo : pluginRepos )
+            {
+                profile.addPluginRepository( convertToSettingsRepository( pluginRepo ) );
+            }
+        }
+
+        return profile;
     }
 
     /**
@@ -168,6 +250,44 @@ public final class SettingsUtils
         policy.setEnabled( settingsPolicy.isEnabled() );
         policy.setUpdatePolicy( settingsPolicy.getUpdatePolicy() );
         policy.setChecksumPolicy( settingsPolicy.getChecksumPolicy() );
+        return policy;
+    }
+
+    /**
+     * @param modelRepo
+     * @return a repository
+     */
+    private static Repository convertToSettingsRepository( org.apache.maven.model.Repository modelRepo )
+    {
+        Repository repo = new Repository();
+
+        repo.setId( modelRepo.getId() );
+        repo.setLayout( modelRepo.getLayout() );
+        repo.setName( modelRepo.getName() );
+        repo.setUrl( modelRepo.getUrl() );
+
+        if ( modelRepo.getSnapshots() != null )
+        {
+            repo.setSnapshots( convertRepositoryPolicy( modelRepo.getSnapshots() ) );
+        }
+        if ( modelRepo.getReleases() != null )
+        {
+            repo.setReleases( convertRepositoryPolicy( modelRepo.getReleases() ) );
+        }
+
+        return repo;
+    }
+
+    /**
+     * @param modelPolicy
+     * @return a RepositoryPolicy
+     */
+    private static RepositoryPolicy convertRepositoryPolicy( org.apache.maven.model.RepositoryPolicy modelPolicy )
+    {
+        RepositoryPolicy policy = new RepositoryPolicy();
+        policy.setEnabled( modelPolicy.isEnabled() );
+        policy.setUpdatePolicy( modelPolicy.getUpdatePolicy() );
+        policy.setChecksumPolicy( modelPolicy.getChecksumPolicy() );
         return policy;
     }
 
