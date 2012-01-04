@@ -44,8 +44,8 @@ public class MavenITmng5224InjectedSettings
 
     public MavenITmng5224InjectedSettings()
     {
-        // olamy probably doesn't work with 3.x before 3.0.5
-        super( "[2.0.3,3.0-alpha-1),[3.0.5,)" );
+        // olamy probably doesn't work with 3.x before 3.0.4
+        super( "[2.0.3,3.0-alpha-1),[3.0.4,)" );
     }
 
 
