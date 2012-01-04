@@ -141,7 +141,18 @@ public class MavenITmng5224InjectedSettings
          */
 
         Xpp3Dom activeProfilesNode = dom.getChild( "activeProfiles" );
-        assertEquals( 2, activeProfilesNode.getChildCount() );
+
+        // with maven3 profile activation (activeByDefault) is done later during project building phase
+        // so we have only a "dump" of the settings
+
+        if ( matchesVersionRange( "[2.0.3,3.0-alpha-1)" ) )
+        {
+            assertEquals( 2, activeProfilesNode.getChildCount() );
+        }
+        else
+        {
+            assertEquals( 1, activeProfilesNode.getChildCount() );
+        }
 
         List<String> activeProfiles = new ArrayList<String>( 2 );
 
@@ -150,7 +161,10 @@ public class MavenITmng5224InjectedSettings
             activeProfiles.add( node.getValue() );
         }
 
-        assertTrue( activeProfiles.contains( "apache" ) );
+        if ( matchesVersionRange( "[2.0.3,3.0-alpha-1)" ) )
+        {
+            assertTrue( activeProfiles.contains( "apache" ) );
+        }
         assertTrue( activeProfiles.contains( "it-defaults" ) );
 
     }
