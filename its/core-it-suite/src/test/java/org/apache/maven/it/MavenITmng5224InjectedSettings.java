@@ -26,6 +26,8 @@ import org.mortbay.jetty.Server;
 
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5224">MNG-5175</a>.
@@ -75,6 +77,82 @@ public class MavenITmng5224InjectedSettings
 
         // 3 from the user settings + 1 for the global settings used for its
         assertEquals( 4, profileNodes.length );
+
+        /**
+         <profiles>
+         <profile>
+         <id>apache</id>
+         <activation>
+         <activeByDefault>true</activeByDefault>
+         </activation>
+         <properties>
+         <run-its>true</run-its>
+         </properties>
+         </profile>
+         <profile>
+         <id>release</id>
+         <properties>
+         <gpg.passphrase>verycomplicatedpassphrase</gpg.passphrase>
+         </properties>
+         </profile>
+         <profile>
+         <id>fast</id>
+         <properties>
+         <maven.test.skip>true</maven.test.skip>
+         <skipTests>true</skipTests>
+         </properties>
+         </profile>
+         </profiles>
+         **/
+
+        List<String> profileIds = new ArrayList<String>( 4 );
+
+        for ( Xpp3Dom node : profileNodes )
+        {
+            Xpp3Dom idNode = node.getChild( "id" );
+            profileIds.add( idNode.getValue() );
+            if ( "apache".equals( idNode.getName() ) )
+            {
+                Xpp3Dom propsNode = node.getChild( "properties" );
+                assertEquals( "true", propsNode.getChild( "run-its" ).getValue() );
+            }
+            if ( "release".equals( idNode.getName() ) )
+            {
+                Xpp3Dom propsNode = node.getChild( "properties" );
+                assertEquals( "verycomplicatedpassphrase", propsNode.getChild( "gpg.passphrase" ).getValue() );
+            }
+            if ( "fast".equals( idNode.getName() ) )
+            {
+                Xpp3Dom propsNode = node.getChild( "properties" );
+                assertEquals( "true", propsNode.getChild( "maven.test.skip" ).getValue() );
+                assertEquals( "true", propsNode.getChild( "skipTests" ).getValue() );
+            }
+        }
+
+        assertTrue( profileIds.contains( "apache" ) );
+        assertTrue( profileIds.contains( "release" ) );
+        assertTrue( profileIds.contains( "fast" ) );
+        assertTrue( profileIds.contains( "it-defaults" ) );
+
+        /**
+         <activeProfiles>
+         <activeProfile>it-defaults</activeProfile>
+         <activeProfile>apache</activeProfile>
+         </activeProfiles>
+         */
+
+        Xpp3Dom activeProfilesNode = dom.getChild( "activeProfiles" );
+        assertEquals( 2, activeProfilesNode.getChildCount() );
+
+        List<String> activeProfiles = new ArrayList<String>( 2 );
+
+        for ( Xpp3Dom node : activeProfilesNode.getChildren() )
+        {
+            activeProfiles.add( node.getValue() );
+        }
+
+        assertTrue( activeProfiles.contains( "apache" ) );
+        assertTrue( activeProfiles.contains( "it-defaults" ) );
 
     }
 
