@@ -45,12 +45,12 @@ import org.eclipse.aether.RepositoryListener;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
-import org.eclipse.aether.util.metadata.DefaultMetadata;
 
 /**
  * Resolves a plugin prefix.

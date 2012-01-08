@@ -21,13 +21,13 @@ package org.apache.maven.plugin.internal;
 
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.DependencyGraphTransformationContext;
 import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.util.artifact.DefaultArtifact;
 import org.eclipse.aether.util.artifact.JavaScopes;
-import org.eclipse.aether.util.graph.DefaultDependencyNode;
 
 /**
  * Injects plexus-utils:1.1 into a plugin's class path if it doesn't already declare a dependency on plexus-utils. This

@@ -34,6 +34,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -42,8 +44,6 @@ import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.util.artifact.DefaultArtifact;
-import org.eclipse.aether.util.artifact.DefaultArtifactType;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part

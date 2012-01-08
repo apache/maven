@@ -22,8 +22,8 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.util.Map;
 
+import org.eclipse.aether.artifact.AbstractArtifact;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.util.artifact.AbstractArtifact;
 
 /**
  * @author Benjamin Bentmann
@@ -86,16 +86,6 @@ final class RelocatedArtifact
         {
             return artifact.getVersion();
         }
-    }
-
-    public String getBaseVersion()
-    {
-        return toBaseVersion( getVersion() );
-    }
-
-    public boolean isSnapshot()
-    {
-        return isSnapshot( getVersion() );
     }
 
     public String getClassifier()

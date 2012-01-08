@@ -34,12 +34,12 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.util.artifact.DefaultArtifact;
 
 /**
  * A model resolver to assist building of dependency POMs. This resolver gives priority to those repositories that have

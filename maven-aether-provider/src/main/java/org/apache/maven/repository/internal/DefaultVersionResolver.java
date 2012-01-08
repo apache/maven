@@ -51,6 +51,7 @@ import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.impl.SyncContextFactory;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.internal.impl.CacheUtils;
+import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.LocalRepository;
@@ -68,7 +69,6 @@ import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.util.ConfigUtils;
-import org.eclipse.aether.util.metadata.DefaultMetadata;
 
 /**
  * @author Benjamin Bentmann
