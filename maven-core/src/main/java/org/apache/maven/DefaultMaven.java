@@ -264,6 +264,8 @@ public class DefaultMaven
             return processResult( result, e );
         }
 
+        repoSession.setReadOnly();
+
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
