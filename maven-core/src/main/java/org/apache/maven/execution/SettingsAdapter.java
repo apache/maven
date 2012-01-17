@@ -29,6 +29,7 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.RuntimeInfo;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.apache.maven.settings.SettingsUtils;
 
 /**
  * Adapt a {@link MavenExecutionRequest} to a {@link Settings} object for use in the Maven core.
@@ -103,7 +104,12 @@ class SettingsAdapter
     @Override
     public List<Profile> getProfiles()
     {
-        return new ArrayList<Profile>();
+        List<Profile> result = new ArrayList<Profile>();
+        for ( org.apache.maven.model.Profile profile : request.getProfiles() )
+        {
+            result.add( SettingsUtils.convertToSettingsProfile( profile ) );
+        }
+        return result;
     }
 
     @Override
