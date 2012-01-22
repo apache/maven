@@ -61,17 +61,14 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
-      <version>${aetherVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
-      <version>${aetherVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-util</artifactId>
-      <version>${aetherVersion}</version>
     </dependency>
     <!-- Plexus -->
     <dependency>
