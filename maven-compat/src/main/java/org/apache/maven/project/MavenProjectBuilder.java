@@ -29,6 +29,9 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.profiles.ProfileManager;
 import org.apache.maven.wagon.events.TransferListener;
 
+/**
+ * @deprecated use {@link ProjectBuilder} instead
+ */
 @Deprecated
 public interface MavenProjectBuilder
 {
