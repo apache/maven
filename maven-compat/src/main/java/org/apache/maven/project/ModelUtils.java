@@ -59,19 +59,19 @@ public final class ModelUtils
             return;
         }
 
-        List parentPlugins = parentContainer.getPlugins();
+        List<Plugin> parentPlugins = parentContainer.getPlugins();
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            parentPlugins = new ArrayList( parentPlugins );
+            parentPlugins = new ArrayList<Plugin>( parentPlugins );
 
             // If we're processing this merge as an inheritance, we have to build up a list of
             // plugins that were considered for inheritance.
             if ( handleAsInheritance )
             {
-                for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+                for ( Iterator<Plugin> it = parentPlugins.iterator(); it.hasNext(); )
                 {
-                    Plugin plugin = (Plugin) it.next();
+                    Plugin plugin = it.next();
 
                     String inherited = plugin.getInherited();
 
@@ -82,14 +82,12 @@ public final class ModelUtils
                 }
             }
 
-            List assembledPlugins = new ArrayList();
+            List<Plugin> assembledPlugins = new ArrayList<Plugin>();
 
-            Map childPlugins = childContainer.getPluginsAsMap();
+            Map<String, Plugin> childPlugins = childContainer.getPluginsAsMap();
 
-            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            for ( Plugin parentPlugin : parentPlugins )
             {
-                Plugin parentPlugin = (Plugin) it.next();
-
                 String parentInherited = parentPlugin.getInherited();
 
                 // only merge plugin definition from the parent if at least one
@@ -123,7 +121,7 @@ public final class ModelUtils
 
                 // very important to use the parentPlugins List, rather than parentContainer.getPlugins()
                 // since this list is a local one, and may have been modified during processing.
-                List results =
+                List<Plugin> results =
                     ModelUtils.orderAfterMerge( assembledPlugins, parentPlugins, childContainer.getPlugins() );
 
                 childContainer.setPlugins( results );
@@ -133,30 +131,27 @@ public final class ModelUtils
         }
     }
 
-    public static List orderAfterMerge( List merged, List highPrioritySource, List lowPrioritySource )
+    public static List<Plugin> orderAfterMerge( List<Plugin> merged, List<Plugin> highPrioritySource,
+                                                List<Plugin> lowPrioritySource )
     {
-        List results = new ArrayList();
+        List<Plugin> results = new ArrayList<Plugin>();
 
         if ( !merged.isEmpty() )
         {
             results.addAll( merged );
         }
 
-        List missingFromResults = new ArrayList();
+        List<Plugin> missingFromResults = new ArrayList<Plugin>();
 
-        List sources = new ArrayList();
+        List<List<Plugin>> sources = new ArrayList<List<Plugin>>();
 
         sources.add( highPrioritySource );
         sources.add( lowPrioritySource );
 
-        for ( Iterator sourceIterator = sources.iterator(); sourceIterator.hasNext(); )
+        for ( List<Plugin> source : sources )
         {
-            List source = (List) sourceIterator.next();
-
-            for ( Iterator it = source.iterator(); it.hasNext(); )
+            for ( Plugin item : source )
             {
-                Object item = it.next();
-
                 if ( results.contains( item ) )
                 {
                     if ( !missingFromResults.isEmpty() )
@@ -223,20 +218,18 @@ public final class ModelUtils
 
         boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
 
-        List parentExecutions = parent.getExecutions();
+        List<PluginExecution> parentExecutions = parent.getExecutions();
 
         if ( ( parentExecutions != null ) && !parentExecutions.isEmpty() )
         {
-            List mergedExecutions = new ArrayList();
+            List<PluginExecution> mergedExecutions = new ArrayList<PluginExecution>();
 
-            Map assembledExecutions = new TreeMap();
+            Map<String, PluginExecution> assembledExecutions = new TreeMap<String, PluginExecution>();
 
-            Map childExecutions = child.getExecutionsAsMap();
+            Map<String, PluginExecution> childExecutions = child.getExecutionsAsMap();
 
-            for ( Iterator it = parentExecutions.iterator(); it.hasNext(); )
+            for ( PluginExecution parentExecution : parentExecutions )
             {
-                PluginExecution parentExecution = (PluginExecution) it.next();
-
                 String inherited = parentExecution.getInherited();
 
                 boolean parentExecInherited =
@@ -246,7 +239,7 @@ public final class ModelUtils
                 {
                     PluginExecution assembled = parentExecution;
 
-                    PluginExecution childExecution = (PluginExecution) childExecutions.get( parentExecution.getId() );
+                    PluginExecution childExecution = childExecutions.get( parentExecution.getId() );
 
                     if ( childExecution != null )
                     {
@@ -264,10 +257,8 @@ public final class ModelUtils
                 }
             }
 
-            for ( Iterator it = child.getExecutions().iterator(); it.hasNext(); )
+            for ( PluginExecution childExecution : child.getExecutions() )
             {
-                PluginExecution childExecution = (PluginExecution) it.next();
-
                 if ( !assembledExecutions.containsKey( childExecution.getId() ) )
                 {
                     mergedExecutions.add( childExecution );
@@ -288,10 +279,10 @@ public final class ModelUtils
             child.setPhase( parent.getPhase() );
         }
 
-        List parentGoals = parent.getGoals();
-        List childGoals = child.getGoals();
+        List<String> parentGoals = parent.getGoals();
+        List<String> childGoals = child.getGoals();
 
-        List goals = new ArrayList();
+        List<String> goals = new ArrayList<String>();
 
         if ( ( childGoals != null ) && !childGoals.isEmpty() )
         {
@@ -300,10 +291,8 @@ public final class ModelUtils
 
         if ( parentGoals != null )
         {
-            for ( Iterator goalIterator = parentGoals.iterator(); goalIterator.hasNext(); )
+            for (  String goal : parentGoals )
             {
-                String goal = (String) goalIterator.next();
-
                 if ( !goals.contains( goal ) )
                 {
                     goals.add( goal );
@@ -321,21 +310,17 @@ public final class ModelUtils
         child.setConfiguration( childConfiguration );
     }
 
-    public static List mergeRepositoryLists( List dominant, List recessive )
+    public static List<Repository> mergeRepositoryLists( List<Repository> dominant, List<Repository> recessive )
     {
-        List repositories = new ArrayList();
+        List<Repository> repositories = new ArrayList<Repository>();
 
-        for ( Iterator it = dominant.iterator(); it.hasNext(); )
+        for ( Repository repository : dominant )
         {
-            Repository repository = (Repository) it.next();
-
             repositories.add( repository );
         }
 
-        for ( Iterator it = recessive.iterator(); it.hasNext(); )
+        for ( Repository repository : recessive )
         {
-            Repository repository = (Repository) it.next();
-
             if ( !repositories.contains( repository ) )
             {
                 repositories.add( repository );
@@ -345,11 +330,10 @@ public final class ModelUtils
         return repositories;
     }
 
-    public static void mergeFilterLists( List childFilters, List parentFilters )
+    public static void mergeFilterLists( List<String> childFilters, List<String> parentFilters )
     {
-        for ( Iterator i = parentFilters.iterator(); i.hasNext(); )
+        for ( String f : parentFilters )
         {
-            String f = (String) i.next();
             if ( !childFilters.contains( f ) )
             {
                 childFilters.add( f );
@@ -357,29 +341,27 @@ public final class ModelUtils
         }
     }
 
-    private static List mergeDependencyList( List child, List parent )
+    private static List<Dependency> mergeDependencyList( List<Dependency> child, List<Dependency> parent )
     {
-        Map depsMap = new LinkedHashMap();
+        Map<String, Dependency> depsMap = new LinkedHashMap<String, Dependency>();
 
         if ( parent != null )
         {
-            for ( Iterator it = parent.iterator(); it.hasNext(); )
+            for ( Dependency dependency : parent )
             {
-                Dependency dependency = (Dependency) it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
 
         if ( child != null )
         {
-            for ( Iterator it = child.iterator(); it.hasNext(); )
+            for ( Dependency dependency : child )
             {
-                Dependency dependency = (Dependency) it.next();
                 depsMap.put( dependency.getManagementKey(), dependency );
             }
         }
 
-        return new ArrayList( depsMap.values() );
+        return new ArrayList<Dependency>( depsMap.values() );
     }
 
 }
