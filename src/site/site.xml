@@ -20,9 +20,47 @@ under the License.
 -->
 
 <project xmlns="http://maven.apache.org/DECORATION/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd"
+  name="Apache Maven">
+
+  <bannerLeft>
+    <name>${project.name}</name>
+    <src>http://maven.apache.org/images/apache-maven-project.png</src>
+    <href>http://maven.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>http://maven.apache.org/images/maventxt_logo_200.gif</src>
+  </bannerRight>
+
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>1.0</version>
+  </skin>
 
   <body>
+    <breadcrumbs>
+      <item name="Ref" href="../" />
+      <item name="Maven ${project.version}" href="./" />
+    </breadcrumbs>
+
+    <menu name="Overview">
+      <item name="Introduction" href="index.html"/>
+      <item name="JavaDocs" href="apidocs/index.html"/>
+      <item name="Source Xref" href="xref/index.html"/>
+      <!--item name="FAQ" href="faq.html"/-->
+    </menu>
+
+    <menu name="Descriptors Reference">
+      <item name="POM" href="./maven-model/maven.html"/>
+      <item name="Settings" href="./maven-settings/settings.html"/>
+    </menu>
+
+    <menu name="Development">
+      <item name="Maven Developer Centre" href="../../developers/index.html"/>
+      <item name="Maven Core ITs" href="../../core-its/index.html"/>
+    </menu>
+
     <menu ref="modules"/>
     <menu ref="reports"/>
   </body>
