@@ -25,7 +25,7 @@ under the License.
   <repositories>
     <repository>
       <id>central</id>
-      <name>Maven Repository Switchboard</name>
+      <name>Central Repository</name>
       <layout>default</layout>
       <url>http://repo1.maven.org/maven2</url>
       <snapshots>
@@ -37,7 +37,7 @@ under the License.
   <pluginRepositories>
     <pluginRepository>
       <id>central</id>
-      <name>Maven Plugin Repository</name>
+      <name>Central Repository</name>
       <url>http://repo1.maven.org/maven2</url>
       <layout>default</layout>
       <snapshots>
