@@ -32,8 +32,8 @@ public interface MavenProjectHelper
 
     void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile );
 
-    void addResource( MavenProject project, String resourceDirectory, List includes, List excludes );
+    void addResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes );
 
-    void addTestResource( MavenProject project, String resourceDirectory, List includes, List excludes );
+    void addTestResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes );
 
 }

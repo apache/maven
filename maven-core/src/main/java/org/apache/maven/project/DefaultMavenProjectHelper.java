@@ -106,7 +106,7 @@ public class DefaultMavenProjectHelper
         }
     }
 
-    public void addResource( MavenProject project, String resourceDirectory, List includes, List excludes )
+    public void addResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes )
     {
         Resource resource = new Resource();
         resource.setDirectory( resourceDirectory );
@@ -116,7 +116,7 @@ public class DefaultMavenProjectHelper
         project.addResource( resource );
     }
 
-    public void addTestResource( MavenProject project, String resourceDirectory, List includes, List excludes )
+    public void addTestResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes )
     {
         Resource resource = new Resource();
         resource.setDirectory( resourceDirectory );

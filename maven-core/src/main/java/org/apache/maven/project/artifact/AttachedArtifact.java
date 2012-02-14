@@ -25,6 +25,7 @@ import org.apache.maven.artifact.InvalidArtifactRTException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.util.Collection;
@@ -71,12 +72,12 @@ public class AttachedArtifact
             + " It is derived from the main artifact." );
     }
 
-    public List getAvailableVersions()
+    public List<ArtifactVersion> getAvailableVersions()
     {
         return parent.getAvailableVersions();
     }
 
-    public void setAvailableVersions( List availableVersions )
+    public void setAvailableVersions( List<ArtifactVersion> availableVersions )
     {
         throw new UnsupportedOperationException( "Cannot change the version information for an attached artifact."
             + " It is derived from the main artifact." );
@@ -176,9 +177,9 @@ public class AttachedArtifact
         // we must fail silently here to avoid problems with the artifact transformers.
     }
 
-    public Collection getMetadataList()
+    public Collection<ArtifactMetadata> getMetadataList()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
 }

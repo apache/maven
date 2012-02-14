@@ -20,7 +20,6 @@ package org.apache.maven.toolchain;
  */
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
@@ -74,12 +73,11 @@ public abstract class DefaultToolchain
     }
 
 
-    public boolean matchesRequirements( Map requirements )
+    public boolean matchesRequirements( Map<String, String> requirements )
     {
-        Iterator it = requirements.keySet().iterator();
-        while ( it.hasNext() )
+        for ( Map.Entry<String, String> requirement : requirements.entrySet() )
         {
-            String key = (String) it.next();
+            String key = requirement.getKey();
 
             RequirementMatcher matcher = provides.get( key );
 
@@ -88,7 +86,7 @@ public abstract class DefaultToolchain
                 getLog().debug( "Toolchain " + this + " is missing required property: " + key );
                 return false;
             }
-            if ( !matcher.matches( (String) requirements.get( key ) ) )
+            if ( !matcher.matches( requirement.getValue() ) )
             {
                 getLog().debug( "Toolchain " + this + " doesn't match required property: " + key );
                 return false;
