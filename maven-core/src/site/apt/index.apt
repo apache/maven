@@ -1,0 +1,17 @@
+ -----
+ Introduction
+ -----
+ Hervé Boutemy
+ -----
+ 2012-02-14
+ -----
+
+Maven Core
+
+ Maven Core classes.
+
+* Useful entry points
+
+ * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
+ with its <<<DefaultProjectBuilder>>> implementation
+ ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}})
