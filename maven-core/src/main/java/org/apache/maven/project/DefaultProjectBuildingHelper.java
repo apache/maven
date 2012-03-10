@@ -57,7 +57,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
-import org.eclipse.aether.util.graph.PreorderNodeListGenerator;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for

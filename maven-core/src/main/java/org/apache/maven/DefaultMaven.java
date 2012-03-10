@@ -87,6 +87,7 @@ import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
@@ -102,6 +103,7 @@ import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 
 /**
  * @author Jason van Zyl
@@ -360,8 +362,11 @@ public class DefaultMaven
             session.setUpdatePolicy( null );
         }
 
-        session.setNotFoundCachingEnabled( request.isCacheNotFound() );
-        session.setTransferErrorCachingEnabled( request.isCacheTransferError() );
+        int errorPolicy = 0;
+        errorPolicy |= request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND : 0;
+        errorPolicy |= request.isCacheTransferError() ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR : 0;
+        session.setResolutionErrorPolicy( new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy
+            | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 

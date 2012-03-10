@@ -92,7 +92,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
-import org.eclipse.aether.util.graph.PreorderNodeListGenerator;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
