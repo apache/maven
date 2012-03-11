@@ -69,6 +69,8 @@ import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicyRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.aether.resolution.ArtifactRequest;
@@ -293,7 +295,7 @@ public class DefaultArtifactDescriptorReader
                 RepositoryException exception =
                     new RepositoryException( "Artifact relocations form a cycle: " + visited );
                 invalidDescriptor( session, trace, artifact, exception );
-                if ( session.isIgnoreInvalidArtifactDescriptor() )
+                if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
                 {
                     return null;
                 }
@@ -318,7 +320,7 @@ public class DefaultArtifactDescriptorReader
                 if ( e.getCause() instanceof ArtifactNotFoundException )
                 {
                     missingDescriptor( session, trace, artifact, (Exception) e.getCause() );
-                    if ( session.isIgnoreMissingArtifactDescriptor() )
+                    if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
                     {
                         return null;
                     }
@@ -363,7 +365,7 @@ public class DefaultArtifactDescriptorReader
                     }
                 }
                 invalidDescriptor( session, trace, artifact, e );
-                if ( session.isIgnoreInvalidArtifactDescriptor() )
+                if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
                 {
                     return null;
                 }
@@ -486,6 +488,16 @@ public class DefaultArtifactDescriptorReader
         event.setException( exception );
 
         repositoryEventDispatcher.dispatch( event.build() );
+    }
+
+    private int getPolicy( RepositorySystemSession session, Artifact artifact, ArtifactDescriptorRequest request )
+    {
+        ArtifactDescriptorPolicy policy = session.getArtifactDescriptorPolicy();
+        if ( policy == null )
+        {
+            return ArtifactDescriptorPolicy.STRICT;
+        }
+        return policy.getPolicy( session, new ArtifactDescriptorPolicyRequest( artifact, request.getRequestContext() ) );
     }
 
 }

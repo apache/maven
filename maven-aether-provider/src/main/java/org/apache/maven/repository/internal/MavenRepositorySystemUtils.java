@@ -44,6 +44,7 @@ import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.eclipse.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 import org.eclipse.aether.util.graph.transformer.NearestVersionConflictResolver;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
  * A utility class to assist in setting up a Maven-like repository system. <em>Note:</em> This component is meant to
@@ -121,8 +122,7 @@ public final class MavenRepositorySystemUtils
         stereotypes.add( new DefaultArtifactType( "par", "par", "", "java", false, true ) );
         session.setArtifactTypeRegistry( stereotypes );
 
-        session.setIgnoreInvalidArtifactDescriptor( true );
-        session.setIgnoreMissingArtifactDescriptor( true );
+        session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
         Properties sysProps = System.getProperties();
         session.setSystemProps( sysProps );

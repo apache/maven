@@ -58,6 +58,7 @@ import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility class that
@@ -98,8 +99,8 @@ public class DefaultPluginDependenciesResolver
 
         try
         {
-            RepositorySystemSession pluginSession =
-                new DefaultRepositorySystemSession( session ).setIgnoreMissingArtifactDescriptor( true );
+            DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
+            pluginSession.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, false ) );
 
             ArtifactDescriptorRequest request =
                 new ArtifactDescriptorRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );

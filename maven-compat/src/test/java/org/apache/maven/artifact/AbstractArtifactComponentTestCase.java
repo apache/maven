@@ -57,6 +57,7 @@ import org.eclipse.aether.util.graph.transformer.ConflictMarker;
 import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.eclipse.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -339,8 +340,7 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
-        session.setIgnoreMissingArtifactDescriptor( true );
-        session.setIgnoreInvalidArtifactDescriptor( true );
+        session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser( depTraverser );
 
