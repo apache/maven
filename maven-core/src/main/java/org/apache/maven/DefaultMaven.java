@@ -463,9 +463,9 @@ public class DefaultMaven
 
         session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
 
-        session.setUserProps( request.getUserProperties() );
-        session.setSystemProps( request.getSystemProperties() );
-        session.setConfigProps( configProps );
+        session.setUserProperties( request.getUserProperties() );
+        session.setSystemProperties( request.getSystemProperties() );
+        session.setConfigProperties( configProps );
 
         return session;
     }

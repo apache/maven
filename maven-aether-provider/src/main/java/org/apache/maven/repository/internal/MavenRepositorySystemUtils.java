@@ -125,8 +125,8 @@ public final class MavenRepositorySystemUtils
         session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
         Properties sysProps = System.getProperties();
-        session.setSystemProps( sysProps );
-        session.setConfigProps( sysProps );
+        session.setSystemProperties( sysProps );
+        session.setConfigProperties( sysProps );
 
         return session;
     }
