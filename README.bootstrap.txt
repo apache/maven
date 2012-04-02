@@ -4,7 +4,7 @@ BOOTSTRAPPING BASICS
 You'll need:
 
 - Java 1.5
-- Ant 1.6.5 or later
+- Ant 1.8 or later
 
 First, give Ant a location into which the completed Maven distro should be installed:
 
