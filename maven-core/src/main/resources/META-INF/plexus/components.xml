@@ -149,6 +149,10 @@ under the License.
           <role>org.sonatype.plexus.components.cipher.PlexusCipher</role>
           <field-name>_cipher</field-name>
         </requirement>
+        <requirement>
+          <role>org.sonatype.plexus.components.sec.dispatcher.PasswordDecryptor</role>
+          <field-name>_decryptors</field-name>
+        </requirement>
       </requirements>
       <configuration>
         <_configuration-file>~/.m2/settings-security.xml</_configuration-file>
