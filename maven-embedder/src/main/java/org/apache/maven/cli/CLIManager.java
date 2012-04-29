@@ -97,7 +97,7 @@ public class CLIManager
 
     public static final String THREADS = "T";
 
-    private Options options;
+    protected Options options;
 
     @SuppressWarnings( "static-access" )
     public CLIManager()
@@ -262,5 +262,4 @@ public class CLIManager
 
         pw.flush();
     }
-
 }
