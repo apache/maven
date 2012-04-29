@@ -34,7 +34,7 @@ public class PrintStreamLogger
     extends AbstractLogger
 {
 
-    static interface Provider
+    interface Provider
     {
         PrintStream getStream();
     }

@@ -196,7 +196,7 @@ public class MavenCli
             encryption( cliRequest );
             return execute( cliRequest );
         }
-        catch( ExitException e )
+        catch ( ExitException e )
         {
             return e.exitCode;
         }
@@ -796,7 +796,7 @@ public class MavenCli
         //
         // ----------------------------------------------------------------------
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         List<String> goals = commandLine.getArgList();
 
         boolean recursive = true;
