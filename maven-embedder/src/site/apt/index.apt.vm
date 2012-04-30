@@ -12,4 +12,4 @@ ${project.name}
 
 Supported CLI Options
 
-%{snippet|file=${project.basedir}/target/test-classes/options.apt|verbatim=false}
+%{snippet|file=${project.basedir}/target/test-classes/options.html|verbatim=false}

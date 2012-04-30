@@ -92,7 +92,7 @@ public class CLIManagerTest
     public void testOptionsAsApt()
         throws IOException
     {
-        File options = getTestFile( "target/test-classes/options.apt" );
+        File options = getTestFile( "target/test-classes/options.html" );
         FileUtils.fileWrite( options, "UTF-8", getOptionsAsApt() );
     }
 }
