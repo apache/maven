@@ -38,6 +38,7 @@ import org.sonatype.aether.RepositorySystemSession;
 
 /**
  * @author Jason van Zyl
+ * @since 3.0-alpha
  */
 public interface RepositorySystem
 {

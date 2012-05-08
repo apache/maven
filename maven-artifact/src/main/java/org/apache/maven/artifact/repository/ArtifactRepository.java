@@ -97,7 +97,15 @@ public interface ArtifactRepository
     void setProxy( Proxy proxy );
     Proxy getProxy();
 
+    /**
+     * @since 3.0.3
+     * @return the repositories mirrored by the actual one
+     */
     List<ArtifactRepository> getMirroredRepositories();
+    /**
+     * @since 3.0.3
+     * @param mirroredRepositories the repositories that the actual one mirrors
+     */
     void setMirroredRepositories( List<ArtifactRepository> mirroredRepositories );
 
 }
