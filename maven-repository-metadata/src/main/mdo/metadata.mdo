@@ -45,19 +45,19 @@ under the License.
           <name>groupId</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>The groupId that is directory represents, if any.</description>
+          <description>The groupId that this directory represents, if any.</description>
         </field>
         <field>
           <name>artifactId</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>The artifactId that is directory represents, if any.</description>
+          <description>The artifactId that this directory represents, if any.</description>
         </field>
         <field>
           <name>version</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>The version that is directory represents, if any.</description>
+          <description>The version that this directory represents, if any.</description>
         </field>
         <field>
           <name>versioning</name>
