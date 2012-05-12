@@ -23,7 +23,11 @@ under the License.
   xml.schemaLocation="http://maven.apache.org/xsd/metadata-${version}.xsd">
   <id>repository-metadata</id>
   <name>Metadata</name>
-  <description>Per-directory repository metadata.</description>
+  <description><![CDATA[
+    Per-directory repository metadata. Notice that most metadata content has a meaning when the directory represents
+    an un-versioned artifact (<code>groupId</code>, <code>artifactId</code>, <code>versioning</code>), but
+    <code>plugins</code> is used when the directory represents a group.]]>
+  </description>
   <defaults>
     <default>
       <key>package</key>
@@ -67,10 +71,10 @@ under the License.
           </association>
           <description>Versioning information for the artifact.</description>
         </field>
-        <field>
+        <field xdoc.separator="blank">
           <name>plugins</name>
           <version>1.0.0+</version>
-          <description>The set of plugin mappings for the group</description>
+          <description>The set of plugin mappings for the group represented by this directory</description>
           <association>
             <type>Plugin</type>
             <multiplicity>*</multiplicity>
