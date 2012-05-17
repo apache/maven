@@ -27,6 +27,8 @@ under the License.
     Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
     This descriptor is generally generated from plugin sources, using
     <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>.
+    <i>Notice:</i> this documentation is generated from a Modello model but the code executed is not generated
+    from this descriptor. Please report if you find anything wrong.
   ]]></description>
   <defaults>
     <default>
