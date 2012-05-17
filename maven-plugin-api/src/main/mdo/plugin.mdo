@@ -387,7 +387,7 @@ under the License.
           <type>boolean</type>
           <defaultValue>true</defaultValue>
           <description><![CDATA[
-            Specifies that this parameter cannot be configured directly by the user (as in the case of POM-specified
+            Specifies that this parameter can be configured directly by the user (as in the case of POM-specified
             configuration). This is useful when you want to force the user to use common POM elements rather than
             plugin configurations, as in the case where you want to use the artifact's final name as a parameter. In
             this case, you want the user to modify <code>&lt;build&gt;&lt;finalName/&gt;&lt;/build&gt;</code> rather
