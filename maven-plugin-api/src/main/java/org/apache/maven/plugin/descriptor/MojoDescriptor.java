@@ -63,28 +63,42 @@ public class MojoDescriptor
     /** By default, the execution strategy is "once-per-session" */
     private String executionStrategy = SINGLE_PASS_EXEC_STRATEGY;
 
-    /** The goal name of the Mojo */
+    /**
+     * The goal name for the Mojo, that users will reference from the command line to execute the Mojo directly, or
+     * inside a POM in order to provide Mojo-specific configuration.
+     */
     private String goal;
 
-    /** Reference the binded phase name of the Mojo */
+    /**
+     * Defines a default phase to bind a mojo execution to if the user does not explicitly set a phase in the POM.
+     * <i>Note:</i> This will not automagically make a mojo run when the plugin declaration is added to the POM. It
+     * merely enables the user to omit the <code>&lt;phase&gt;</code> element from the surrounding
+     * <code>&lt;execution&gt;</code> element.
+     */
     private String phase;
 
     /** Specify the version when the Mojo was added to the API. Similar to Javadoc since. */
     private String since;
 
-    /** Reference the invocation phase of the Mojo */
+    /** Reference the invocation phase of the Mojo. */
     private String executePhase;
 
-    /** Reference the invocation goal of the Mojo */
+    /** Reference the invocation goal of the Mojo. */
     private String executeGoal;
 
-    /** Reference the invocation lifecycle of the Mojo */
+    /** Reference the invocation lifecycle of the Mojo. */
     private String executeLifecycle;
 
-    /** Specify the version when the Mojo was deprecated to the API. Similar to Javadoc deprecated. */
+    /**
+     * Specify the version when the Mojo was deprecated to the API. Similar to Javadoc deprecated. This will trigger a
+     * warning when a user tries to configure a parameter marked as deprecated.
+     */
     private String deprecated;
 
-    /** By default, no need to aggregate the Maven project and its child modules */
+    /**
+     * Flags this Mojo to run it in a multi module way, i.e. aggregate the build with the set of projects listed as
+     * modules. By default, no need to aggregate the Maven project and its child modules
+     */
     private boolean aggregator = false;
 
     // ----------------------------------------------------------------------
@@ -112,7 +126,7 @@ public class MojoDescriptor
     /**  By default, the Mojo is inherited */
     private boolean inheritedByDefault = true;
 
-    /**  By default, the Mojo could not be invoke directly */
+    /**  By default, the Mojo cannot be invoked directly */
     private boolean directInvocationOnly = false;
 
     /**  By default, the Mojo don't need reports to run */
@@ -265,8 +279,10 @@ public class MojoDescriptor
     /**
      * Gets the scope of (transitive) dependencies that should be collected. Dependency collection refers to the process
      * of calculating the complete dependency tree in terms of artifact coordinates. In contrast to dependency
-     * resolution, this does not include the download of the files for the dependency artifacts.
-     *
+     * resolution, this does not include the download of the files for the dependency artifacts. It is meant for mojos
+     * that only want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
+     * full dependency resolution might fail due to projects which haven't been built yet.
+     * 
      * @return The scope of (transitive) dependencies that should be collected or {@code null} if none.
      */
     public String getDependencyCollectionRequired()
@@ -597,7 +613,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @return <code>true</code> if the Mojo could not be invoke directly, <code>false</code> otherwise.
+     * @return <code>true</code> if the Mojo cannot be invoked directly, <code>false</code> otherwise.
      */
     public boolean isDirectInvocationOnly()
     {
@@ -605,7 +621,7 @@ public class MojoDescriptor
     }
 
     /**
-     * @param directInvocationOnly <code>true</code> if the Mojo could not be invoke directly,
+     * @param directInvocationOnly <code>true</code> if the Mojo cannot be invoked directly,
      * <code>false</code> otherwise.
      */
     public void setDirectInvocationOnly( boolean directInvocationOnly )
