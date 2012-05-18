@@ -33,6 +33,30 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
 
 /**
+ * Evaluator for plugin parameters expressions. Content surrounded by <code>${</code> and <code>}</code> is evaluated.
+ * Recognized values are:<ul>
+ * <li><code>localRepository</code></li>
+ * <li><code>session</code></li>
+ * <li><code>session.*</code> (since Maven 3)</li>
+ * <li><code>reactorProjects</code></li>
+ * <li><code>mojoExecution</code></li>
+ * <li><code>project</code></li>
+ * <li><code>executedProject</code></li>
+ * <li><code>project.*</code></li>
+ * <li><code>pom.*</code> (since Maven 3)</li>
+ * <li><code>repositorySystemSession</code> (since Maven 3)</li>
+ * <li><code>mojo</code> (since Maven 3)</li>
+ * <li><code>mojo.*</code> (since Maven 3)</li>
+ * <li><code>plugin</code> (since Maven 3)</li>
+ * <li><code>plugin.*</code></li>
+ * <li><code>settings</code></li>
+ * <li><code>settings.*</code></li>
+ * <li><code>basedir</code></li>
+ * <li>system properties</li>
+ * <li>project properties</li>
+ * </ul>
+ * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
+ * 
  * @author Jason van Zyl
  */
 public class PluginParameterExpressionEvaluator
