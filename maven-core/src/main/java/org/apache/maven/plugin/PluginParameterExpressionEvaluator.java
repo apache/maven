@@ -35,6 +35,24 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
+ * Evaluator for plugin parameters expressions. Content surrounded by <code>${</code> and <code>}</code> is evaluated.
+ * Recognized values are:<ul>
+ * <li><code>localRepository</code></li>
+ * <li><code>session</code></li>
+ * <li><code>reactorProjects</code></li>
+ * <li><code>reports</code></li>
+ * <li><code>mojoExecution</code></li>
+ * <li><code>project</code></li>
+ * <li><code>executedProject</code></li>
+ * <li><code>project.*</code></li>
+ * <li><code>plugin.*</code></li>
+ * <li><code>settings</code></li>
+ * <li><code>settings.*</code></li>
+ * <li><code>basedir</code></li>
+ * <li>system properties</li>
+ * <li>project properties</li>
+ * </ul>
+ * 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  * @todo belong in MavenSession, so it only gets created once?
