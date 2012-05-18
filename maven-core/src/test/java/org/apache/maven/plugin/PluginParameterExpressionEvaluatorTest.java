@@ -48,7 +48,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 
-
 /**
  * @author Jason van Zyl
  */
@@ -104,7 +103,9 @@ public class PluginParameterExpressionEvaluatorTest
 
         MavenSession session = newMavenSession();
 
-        List depResults = (List) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifacts}" );
+        @SuppressWarnings( "unchecked" )
+        List<Artifact> depResults =
+            (List<Artifact>) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifacts}" );
 
         System.out.println( "Result: " + depResults );
 
@@ -127,7 +128,9 @@ public class PluginParameterExpressionEvaluatorTest
 
         MavenSession session = newMavenSession();
 
-        Map depResults = (Map) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifactMap}" );
+        @SuppressWarnings( "unchecked" )
+        Map<String, Artifact> depResults =
+            (Map<String, Artifact>) new PluginParameterExpressionEvaluator( session, exec ).evaluate( "${plugin.artifactMap}" );
 
         System.out.println( "Result: " + depResults );
 
@@ -317,11 +320,11 @@ public class PluginParameterExpressionEvaluatorTest
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
             .setSystemProperties( properties )
-            .setGoals( Collections.EMPTY_LIST )
+            .setGoals( Collections.<String>emptyList() )
             .setBaseDirectory( new File( "" ) )
             .setLocalRepository( repo );
 
-        return new MavenSession( container, request, new DefaultMavenExecutionResult(), Collections.EMPTY_LIST  );
+        return new MavenSession( container, request, new DefaultMavenExecutionResult(), Collections.<MavenProject>emptyList()  );
     }
 
     public void testLocalRepositoryExtraction()
@@ -367,11 +370,12 @@ public class PluginParameterExpressionEvaluatorTest
 
         assertTrue( value instanceof List );
 
-        List artifacts = (List) value;
+        @SuppressWarnings( "unchecked" )
+        List<Artifact> artifacts = (List<Artifact>) value;
 
         assertEquals( 1, artifacts.size() );
 
-        Artifact result = (Artifact) artifacts.get( 0 );
+        Artifact result = artifacts.get( 0 );
 
         assertEquals( "testGroup", result.getGroupId() );
     }
