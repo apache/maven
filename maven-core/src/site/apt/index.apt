@@ -12,8 +12,11 @@ Maven Core
 
 * Useful entry points
 
- * {{{./lifecycles.html}lifecycles}} and {{{./default-bindings.html}plugin bindings to <<<default>>> lifecycle,}}
+ * {{{./lifecycles.html}lifecycles}} and {{{./default-bindings.html}plugin bindings to <<<default>>> lifecycle}},
 
  * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
  with its <<<DefaultProjectBuilder>>> implementation
- ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}})
+ ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}}),
+
+ * {{{./apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html}PluginParameterExpressionEvaluator}}, used to
+ evaluate plugin parameters default values.
