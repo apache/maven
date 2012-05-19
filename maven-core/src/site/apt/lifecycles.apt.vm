@@ -14,19 +14,19 @@ Lifecycles Reference
 
 * <<<default>>> Lifecycle
 
-  <<<default>>> lifecycle is defined without any associated.
-  Bindings are {{{./default-bindings.html}defined separately for every packaging}}:
+  <<<default>>> lifecycle is defined <<without>> any associated.
+  Plugin bindings for this lifecycle are {{{./default-bindings.html}defined separately for every packaging}}:
 
 %{snippet|id=lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
 
 * <<<clean>>> Lifecycle
 
-  <<<clean>>> lifecycle is defined directly with its bindings.
+  <<<clean>>> lifecycle is defined directly with its plugin bindings.
 
 %{snippet|id=clean|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
 
 * <<<site>>> Lifecycle
 
-  <<<site>>> lifecycle is defined directly with its bindings.
+  <<<site>>> lifecycle is defined directly with its plugin bindings.
 
 %{snippet|id=site|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
