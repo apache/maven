@@ -46,8 +46,8 @@ under the License.
               the same way you'd write any other JUnit test cases, i.e. by writing a test class which extends
               <i>TestCase</i>.</dd>
             <dt>TestCase from Plexus</dt>
-            <dd>Mojos are written to take specific advantage of the <a href="http://plexus.codehaus.org/">Plexus</a>
-              container. If you need Plexus container services, you could write your class which extends <i>PlexusTestCase</i>,
+            <dd>Mojos are written to take specific advantage of the <a href="http://plexus.codehaus.org/plexus-containers/">Plexus
+              container</a>. If you need Plexus container services, you could write your class which extends <i>PlexusTestCase</i>,
               instead of <i>TestCase</i>.</dd>
             <dt>TestCase from Testing Harness</dt>
             <dd>If you need to inject Maven objects into your mojo, you could use the <i>maven-plugin-testing-harness</i>.

@@ -29,18 +29,18 @@ Maven Plugin Testing Harness
  {{{http://plexus.codehaus.org}Plexus}} components, providing stub objects for Maven functionality such as projects,
  and populating fields from an XML file that resembles the plugin configuration in the POM.
 
- The best way to start is to read the cookbook {{{getting-started/index.html}How to use Maven Plugin Testing Harness}}.
+ The best way to start is to read the cookbook {{{./getting-started/index.html}How to use Maven Plugin Testing Harness}}.
 
 * Examples
 
    The following examples shows how to use the Testing Harness in more advanced usecases:
 
-   * {{{examples/complex-mojo-parameters.html}Testing Complex Mojo Parameters}}
+   * {{{./examples/complex-mojo-parameters.html}Testing Complex Mojo Parameters}}
 
-   * {{{examples/multiproject.html}Testing Multiproject}}
+   * {{{./examples/multiproject.html}Testing Multiproject}}
 
-   * {{{examples/repositories.html}Testing Using Repositories}}
+   * {{{./examples/repositories.html}Testing Using Repositories}}
 
-   * {{{examples/artifact.html}Testing Project Artifact}}
+   * {{{./examples/artifact.html}Testing Project Artifact}}
 
    []
