@@ -37,9 +37,11 @@ import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
 import org.apache.maven.model.Contributor;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.IssueManagement;
 import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
@@ -48,7 +50,10 @@ import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Prerequisites;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.Reporting;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -80,65 +85,65 @@ public class MavenProjectStub
 
     private File file;
 
-    private List collectedProjects;
+    private List<MavenProject> collectedProjects;
 
-    private List attachedArtifacts;
+    private List<Artifact> attachedArtifacts;
 
-    private List compileSourceRoots;
+    private List<String> compileSourceRoots;
 
-    private List testCompileSourceRoots;
+    private List<String> testCompileSourceRoots;
 
-    private List scriptSourceRoots;
+    private List<String> scriptSourceRoots;
 
-    private List pluginArtifactRepositories;
+    private List<ArtifactRepository> pluginArtifactRepositories;
 
     private ArtifactRepository releaseArtifactRepository;
 
     private ArtifactRepository snapshotArtifactRepository;
 
-    private List activeProfiles;
+    private List<Profile> activeProfiles;
 
-    private Set dependencyArtifacts;
+    private Set<Artifact> dependencyArtifacts;
 
     private Artifact artifact;
 
-    private Map artifactMap;
+    private Map<String, Artifact> artifactMap;
 
     private Model originalModel;
 
-    private Map pluginArtifactMap;
+    private Map<String, Artifact> pluginArtifactMap;
 
-    private Map reportArtifactMap;
+    private Map<String, Artifact> reportArtifactMap;
 
-    private Map extensionArtifactMap;
+    private Map<String, Artifact> extensionArtifactMap;
 
-    private Map projectReferences;
+    private Map<String, MavenProject> projectReferences;
 
     private Build buildOverlay;
 
     private boolean executionRoot;
 
-    private List compileArtifacts;
+    private List<Artifact> compileArtifacts;
 
-    private List compileDependencies;
+    private List<Dependency> compileDependencies;
 
-    private List systemDependencies;
+    private List<Dependency> systemDependencies;
 
-    private List testClasspathElements;
+    private List<String> testClasspathElements;
 
-    private List testDependencies;
+    private List<Dependency> testDependencies;
 
-    private List systemClasspathElements;
+    private List<String> systemClasspathElements;
 
-    private List systemArtifacts;
+    private List<Artifact> systemArtifacts;
 
-    private List testArtifacts;
+    private List<Artifact> testArtifacts;
 
-    private List runtimeArtifacts;
+    private List<Artifact> runtimeArtifacts;
 
-    private List runtimeDependencies;
+    private List<Dependency> runtimeDependencies;
 
-    private List runtimeClasspathElements;
+    private List<String> runtimeClasspathElements;
 
     private String modelVersion;
 
@@ -154,7 +159,7 @@ public class MavenProjectStub
 
     private String defaultGoal;
 
-    private List licenses;
+    private List<License> licenses;
 
     private Build build;
 
@@ -258,7 +263,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setRemoteArtifactRepositories(java.util.List)
      */
-    public void setRemoteArtifactRepositories( List list )
+    public void setRemoteArtifactRepositories( List<ArtifactRepository> list )
     {
         // nop
     }
@@ -268,9 +273,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getRemoteArtifactRepositories()
      */
-    public List getRemoteArtifactRepositories()
+    public List<ArtifactRepository> getRemoteArtifactRepositories()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<ArtifactRepository>emptyList();
     }
 
     /** {@inheritDoc} */
@@ -307,7 +312,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setDependencies(java.util.List)
      */
-    public void setDependencies( List list )
+    public void setDependencies( List<Dependency> list )
     {
         // nop
     }
@@ -317,9 +322,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDependencies()
      */
-    public List getDependencies()
+    public List<Dependency> getDependencies()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Dependency>emptyList();
     }
 
     /**
@@ -337,7 +342,7 @@ public class MavenProjectStub
     {
         if ( compileSourceRoots == null )
         {
-            compileSourceRoots = new ArrayList( Collections.singletonList( string ) );
+            compileSourceRoots = new ArrayList<String>( Collections.singletonList( string ) );
         }
         else
         {
@@ -350,7 +355,7 @@ public class MavenProjectStub
     {
         if ( scriptSourceRoots == null )
         {
-            scriptSourceRoots = new ArrayList( Collections.singletonList( string ) );
+            scriptSourceRoots = new ArrayList<String>( Collections.singletonList( string ) );
         }
         else
         {
@@ -363,7 +368,7 @@ public class MavenProjectStub
     {
         if ( testCompileSourceRoots == null )
         {
-            testCompileSourceRoots = new ArrayList( Collections.singletonList( string ) );
+            testCompileSourceRoots = new ArrayList<String>( Collections.singletonList( string ) );
         }
         else
         {
@@ -372,25 +377,25 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
-    public List getCompileSourceRoots()
+    public List<String> getCompileSourceRoots()
     {
         return compileSourceRoots;
     }
 
     /** {@inheritDoc} */
-    public List getScriptSourceRoots()
+    public List<String> getScriptSourceRoots()
     {
         return scriptSourceRoots;
     }
 
     /** {@inheritDoc} */
-    public List getTestCompileSourceRoots()
+    public List<String> getTestCompileSourceRoots()
     {
         return testCompileSourceRoots;
     }
 
     /** {@inheritDoc} */
-    public List getCompileClasspathElements()
+    public List<String> getCompileClasspathElements()
         throws DependencyResolutionRequiredException
     {
         return compileSourceRoots;
@@ -399,70 +404,70 @@ public class MavenProjectStub
     /**
      * @param compileArtifacts
      */
-    public void setCompileArtifacts( List compileArtifacts )
+    public void setCompileArtifacts( List<Artifact> compileArtifacts )
     {
         this.compileArtifacts = compileArtifacts;
     }
 
     /** {@inheritDoc} */
-    public List getCompileArtifacts()
+    public List<Artifact> getCompileArtifacts()
     {
         return compileArtifacts;
     }
 
     /** {@inheritDoc} */
-    public List getCompileDependencies()
+    public List<Dependency> getCompileDependencies()
     {
         return compileDependencies;
     }
 
     /** {@inheritDoc} */
-    public List getTestClasspathElements()
+    public List<String> getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
         return testClasspathElements;
     }
 
     /** {@inheritDoc} */
-    public List getTestArtifacts()
+    public List<Artifact> getTestArtifacts()
     {
         return testArtifacts;
     }
 
     /** {@inheritDoc} */
-    public List getTestDependencies()
+    public List<Dependency> getTestDependencies()
     {
         return testDependencies;
     }
 
     /** {@inheritDoc} */
-    public List getRuntimeClasspathElements()
+    public List<String> getRuntimeClasspathElements()
         throws DependencyResolutionRequiredException
     {
         return runtimeClasspathElements;
     }
 
     /** {@inheritDoc} */
-    public List getRuntimeArtifacts()
+    public List<Artifact> getRuntimeArtifacts()
     {
         return runtimeArtifacts;
     }
 
     /** {@inheritDoc} */
-    public List getRuntimeDependencies()
+    public List<Dependency> getRuntimeDependencies()
     {
         return runtimeDependencies;
     }
 
     /** {@inheritDoc} */
-    public List getSystemClasspathElements()
+    public List<String> getSystemClasspathElements()
         throws DependencyResolutionRequiredException
     {
         return systemClasspathElements;
     }
 
     /** {@inheritDoc} */
-    public List getSystemArtifacts()
+    public List<Artifact> getSystemArtifacts()
     {
         return systemArtifacts;
     }
@@ -470,7 +475,7 @@ public class MavenProjectStub
     /**
      * @param runtimeClasspathElements
      */
-    public void setRuntimeClasspathElements( List runtimeClasspathElements )
+    public void setRuntimeClasspathElements( List<String> runtimeClasspathElements )
     {
         this.runtimeClasspathElements = runtimeClasspathElements;
     }
@@ -478,7 +483,7 @@ public class MavenProjectStub
     /**
      * @param attachedArtifacts
      */
-    public void setAttachedArtifacts( List attachedArtifacts )
+    public void setAttachedArtifacts( List<Artifact> attachedArtifacts )
     {
         this.attachedArtifacts = attachedArtifacts;
     }
@@ -486,7 +491,7 @@ public class MavenProjectStub
     /**
      * @param compileSourceRoots
      */
-    public void setCompileSourceRoots( List compileSourceRoots )
+    public void setCompileSourceRoots( List<String> compileSourceRoots )
     {
         this.compileSourceRoots = compileSourceRoots;
     }
@@ -494,7 +499,7 @@ public class MavenProjectStub
     /**
      * @param testCompileSourceRoots
      */
-    public void setTestCompileSourceRoots( List testCompileSourceRoots )
+    public void setTestCompileSourceRoots( List<String> testCompileSourceRoots )
     {
         this.testCompileSourceRoots = testCompileSourceRoots;
     }
@@ -502,7 +507,7 @@ public class MavenProjectStub
     /**
      * @param scriptSourceRoots
      */
-    public void setScriptSourceRoots( List scriptSourceRoots )
+    public void setScriptSourceRoots( List<String> scriptSourceRoots )
     {
         this.scriptSourceRoots = scriptSourceRoots;
     }
@@ -510,7 +515,7 @@ public class MavenProjectStub
     /**
      * @param artifactMap
      */
-    public void setArtifactMap( Map artifactMap )
+    public void setArtifactMap( Map<String, Artifact> artifactMap )
     {
         this.artifactMap = artifactMap;
     }
@@ -518,7 +523,7 @@ public class MavenProjectStub
     /**
      * @param pluginArtifactMap
      */
-    public void setPluginArtifactMap( Map pluginArtifactMap )
+    public void setPluginArtifactMap( Map<String, Artifact> pluginArtifactMap )
     {
         this.pluginArtifactMap = pluginArtifactMap;
     }
@@ -526,7 +531,7 @@ public class MavenProjectStub
     /**
      * @param reportArtifactMap
      */
-    public void setReportArtifactMap( Map reportArtifactMap )
+    public void setReportArtifactMap( Map<String, Artifact> reportArtifactMap )
     {
         this.reportArtifactMap = reportArtifactMap;
     }
@@ -534,7 +539,7 @@ public class MavenProjectStub
     /**
      * @param extensionArtifactMap
      */
-    public void setExtensionArtifactMap( Map extensionArtifactMap )
+    public void setExtensionArtifactMap( Map<String, Artifact> extensionArtifactMap )
     {
         this.extensionArtifactMap = extensionArtifactMap;
     }
@@ -542,7 +547,7 @@ public class MavenProjectStub
     /**
      * @param projectReferences
      */
-    public void setProjectReferences( Map projectReferences )
+    public void setProjectReferences( Map<String, MavenProject> projectReferences )
     {
         this.projectReferences = projectReferences;
     }
@@ -558,7 +563,7 @@ public class MavenProjectStub
     /**
      * @param compileDependencies
      */
-    public void setCompileDependencies( List compileDependencies )
+    public void setCompileDependencies( List<Dependency> compileDependencies )
     {
         this.compileDependencies = compileDependencies;
     }
@@ -566,7 +571,7 @@ public class MavenProjectStub
     /**
      * @param systemDependencies
      */
-    public void setSystemDependencies( List systemDependencies )
+    public void setSystemDependencies( List<Dependency> systemDependencies )
     {
         this.systemDependencies = systemDependencies;
     }
@@ -574,7 +579,7 @@ public class MavenProjectStub
     /**
      * @param testClasspathElements
      */
-    public void setTestClasspathElements( List testClasspathElements )
+    public void setTestClasspathElements( List<String> testClasspathElements )
     {
         this.testClasspathElements = testClasspathElements;
     }
@@ -582,7 +587,7 @@ public class MavenProjectStub
     /**
      * @param testDependencies
      */
-    public void setTestDependencies( List testDependencies )
+    public void setTestDependencies( List<Dependency> testDependencies )
     {
         this.testDependencies = testDependencies;
     }
@@ -590,7 +595,7 @@ public class MavenProjectStub
     /**
      * @param systemClasspathElements
      */
-    public void setSystemClasspathElements( List systemClasspathElements )
+    public void setSystemClasspathElements( List<String> systemClasspathElements )
     {
         this.systemClasspathElements = systemClasspathElements;
     }
@@ -598,7 +603,7 @@ public class MavenProjectStub
     /**
      * @param systemArtifacts
      */
-    public void setSystemArtifacts( List systemArtifacts )
+    public void setSystemArtifacts( List<Artifact> systemArtifacts )
     {
         this.systemArtifacts = systemArtifacts;
     }
@@ -606,7 +611,7 @@ public class MavenProjectStub
     /**
      * @param testArtifacts
      */
-    public void setTestArtifacts( List testArtifacts )
+    public void setTestArtifacts( List<Artifact> testArtifacts )
     {
         this.testArtifacts = testArtifacts;
     }
@@ -614,7 +619,7 @@ public class MavenProjectStub
     /**
      * @param runtimeArtifacts
      */
-    public void setRuntimeArtifacts( List runtimeArtifacts )
+    public void setRuntimeArtifacts( List<Artifact> runtimeArtifacts )
     {
         this.runtimeArtifacts = runtimeArtifacts;
     }
@@ -622,7 +627,7 @@ public class MavenProjectStub
     /**
      * @param runtimeDependencies
      */
-    public void setRuntimeDependencies( List runtimeDependencies )
+    public void setRuntimeDependencies( List<Dependency> runtimeDependencies )
     {
         this.runtimeDependencies = runtimeDependencies;
     }
@@ -636,7 +641,7 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
-    public List getSystemDependencies()
+    public List<Dependency> getSystemDependencies()
     {
         return systemDependencies;
     }
@@ -874,7 +879,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setMailingLists(java.util.List)
      */
-    public void setMailingLists( List list )
+    public void setMailingLists( List<MailingList> list )
     {
         // nop
     }
@@ -884,9 +889,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getMailingLists()
      */
-    public List getMailingLists()
+    public List<MailingList> getMailingLists()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<MailingList>emptyList();
     }
 
     /**
@@ -904,7 +909,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setDevelopers(java.util.List)
      */
-    public void setDevelopers( List list )
+    public void setDevelopers( List<Developer> list )
     {
         // nop
     }
@@ -914,9 +919,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getDevelopers()
      */
-    public List getDevelopers()
+    public List<Developer> getDevelopers()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Developer>emptyList();
     }
 
     /**
@@ -934,7 +939,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setContributors(java.util.List)
      */
-    public void setContributors( List list )
+    public void setContributors( List<Contributor> list )
     {
         // nop
     }
@@ -944,9 +949,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getContributors()
      */
-    public List getContributors()
+    public List<Contributor> getContributors()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Contributor>emptyList();
     }
 
     /**
@@ -976,9 +981,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getResources()
      */
-    public List getResources()
+    public List<Resource> getResources()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Resource>emptyList();
     }
 
     /**
@@ -986,9 +991,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getTestResources()
      */
-    public List getTestResources()
+    public List<Resource> getTestResources()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Resource>emptyList();
     }
 
     /**
@@ -1032,13 +1037,13 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
-    public void setLicenses( List licenses )
+    public void setLicenses( List<License> licenses )
     {
         this.licenses = licenses;
     }
 
     /** {@inheritDoc} */
-    public List getLicenses()
+    public List<License> getLicenses()
     {
         return licenses;
     }
@@ -1058,7 +1063,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setArtifacts(java.util.Set)
      */
-    public void setArtifacts( Set set )
+    public void setArtifacts( Set<Artifact> set )
     {
         // nop
     }
@@ -1068,9 +1073,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getArtifacts()
      */
-    public Set getArtifacts()
+    public Set<Artifact> getArtifacts()
     {
-        return Collections.EMPTY_SET;
+        return Collections.<Artifact>emptySet();
     }
 
     /**
@@ -1078,9 +1083,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getArtifactMap()
      */
-    public Map getArtifactMap()
+    public Map<String, Artifact> getArtifactMap()
     {
-        return Collections.EMPTY_MAP;
+        return Collections.<String, Artifact>emptyMap();
     }
 
     /**
@@ -1088,7 +1093,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setPluginArtifacts(java.util.Set)
      */
-    public void setPluginArtifacts( Set set )
+    public void setPluginArtifacts( Set<Artifact> set )
     {
         // nop
     }
@@ -1098,9 +1103,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginArtifacts()
      */
-    public Set getPluginArtifacts()
+    public Set<Artifact> getPluginArtifacts()
     {
-        return Collections.EMPTY_SET;
+        return Collections.<Artifact>emptySet();
     }
 
     /**
@@ -1108,9 +1113,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginArtifactMap()
      */
-    public Map getPluginArtifactMap()
+    public Map<String, Artifact> getPluginArtifactMap()
     {
-        return Collections.EMPTY_MAP;
+        return Collections.<String, Artifact>emptyMap();
     }
 
     /**
@@ -1118,7 +1123,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setReportArtifacts(java.util.Set)
      */
-    public void setReportArtifacts( Set set )
+    public void setReportArtifacts( Set<Artifact> set )
     {
         // nop
     }
@@ -1128,9 +1133,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportArtifacts()
      */
-    public Set getReportArtifacts()
+    public Set<Artifact> getReportArtifacts()
     {
-        return Collections.EMPTY_SET;
+        return Collections.<Artifact>emptySet();
     }
 
     /**
@@ -1138,9 +1143,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportArtifactMap()
      */
-    public Map getReportArtifactMap()
+    public Map<String, Artifact> getReportArtifactMap()
     {
-        return Collections.EMPTY_MAP;
+        return Collections.<String, Artifact>emptyMap();
     }
 
     /**
@@ -1148,7 +1153,7 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#setExtensionArtifacts(java.util.Set)
      */
-    public void setExtensionArtifacts( Set set )
+    public void setExtensionArtifacts( Set<Artifact> set )
     {
         // nop
     }
@@ -1158,9 +1163,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getExtensionArtifacts()
      */
-    public Set getExtensionArtifacts()
+    public Set<Artifact> getExtensionArtifacts()
     {
-        return Collections.EMPTY_SET;
+        return Collections.<Artifact>emptySet();
     }
 
     /**
@@ -1168,9 +1173,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getExtensionArtifactMap()
      */
-    public Map getExtensionArtifactMap()
+    public Map<String, Artifact> getExtensionArtifactMap()
     {
-        return Collections.EMPTY_MAP;
+        return Collections.<String, Artifact>emptyMap();
     }
 
     /**
@@ -1198,9 +1203,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getRepositories()
      */
-    public List getRepositories()
+    public List<Repository> getRepositories()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Repository>emptyList();
     }
 
     /**
@@ -1208,9 +1213,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getReportPlugins()
      */
-    public List getReportPlugins()
+    public List<ReportPlugin> getReportPlugins()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<ReportPlugin>emptyList();
     }
 
     /**
@@ -1218,9 +1223,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getBuildPlugins()
      */
-    public List getBuildPlugins()
+    public List<Plugin> getBuildPlugins()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Plugin>emptyList();
     }
 
     /**
@@ -1228,9 +1233,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getModules()
      */
-    public List getModules()
+    public List<String> getModules()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<String>emptyList();
     }
 
     /**
@@ -1264,25 +1269,25 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
-    public List getCollectedProjects()
+    public List<MavenProject> getCollectedProjects()
     {
         return collectedProjects;
     }
 
     /** {@inheritDoc} */
-    public void setCollectedProjects( List list )
+    public void setCollectedProjects( List<MavenProject> list )
     {
         this.collectedProjects = list;
     }
 
     /** {@inheritDoc} */
-    public void setPluginArtifactRepositories( List list )
+    public void setPluginArtifactRepositories( List<ArtifactRepository> list )
     {
         this.pluginArtifactRepositories = list;
     }
 
     /** {@inheritDoc} */
-    public List getPluginArtifactRepositories()
+    public List<ArtifactRepository> getPluginArtifactRepositories()
     {
         return pluginArtifactRepositories;
     }
@@ -1302,19 +1307,19 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getPluginRepositories()
      */
-    public List getPluginRepositories()
+    public List<Repository> getPluginRepositories()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Repository>emptyList();
     }
 
     /** {@inheritDoc} */
-    public void setActiveProfiles( List list )
+    public void setActiveProfiles( List<Profile> list )
     {
         activeProfiles = list;
     }
 
     /** {@inheritDoc} */
-    public List getActiveProfiles()
+    public List<Profile> getActiveProfiles()
     {
         return activeProfiles;
     }
@@ -1324,7 +1329,7 @@ public class MavenProjectStub
     {
         if ( attachedArtifacts == null )
         {
-            this.attachedArtifacts = new ArrayList( Collections.singletonList( artifact ) );
+            this.attachedArtifacts = new ArrayList<Artifact>( Collections.singletonList( artifact ) );
         }
         else
         {
@@ -1333,7 +1338,7 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
-    public List getAttachedArtifacts()
+    public List<Artifact> getAttachedArtifacts()
     {
         return attachedArtifacts;
     }
@@ -1401,13 +1406,13 @@ public class MavenProjectStub
     }
 
     /** {@inheritDoc} */
-    public Set getDependencyArtifacts()
+    public Set<Artifact> getDependencyArtifacts()
     {
         return dependencyArtifacts;
     }
 
     /** {@inheritDoc} */
-    public void setDependencyArtifacts( Set set )
+    public void setDependencyArtifacts( Set<Artifact> set )
     {
         this.dependencyArtifacts = set;
     }
@@ -1441,9 +1446,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getBuildExtensions()
      */
-    public List getBuildExtensions()
+    public List<Extension> getBuildExtensions()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<Extension>emptyList();
     }
 
     /**
@@ -1451,9 +1456,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#createArtifacts(org.apache.maven.artifact.factory.ArtifactFactory, java.lang.String, org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
-    public Set createArtifacts( ArtifactFactory artifactFactory, String string, ArtifactFilter artifactFilter )
+    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String string, ArtifactFilter artifactFilter )
     {
-        return Collections.EMPTY_SET;
+        return Collections.<Artifact>emptySet();
     }
 
     /**
@@ -1491,9 +1496,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getFilters()
      */
-    public List getFilters()
+    public List<String> getFilters()
     {
-        return Collections.EMPTY_LIST;
+        return Collections.<String>emptyList();
     }
 
     /**
@@ -1501,9 +1506,9 @@ public class MavenProjectStub
      *
      * @see org.apache.maven.project.MavenProject#getProjectReferences()
      */
-    public Map getProjectReferences()
+    public Map<String, MavenProject> getProjectReferences()
     {
-        return Collections.EMPTY_MAP;
+        return Collections.<String, MavenProject>emptyMap();
     }
 
     /** {@inheritDoc} */

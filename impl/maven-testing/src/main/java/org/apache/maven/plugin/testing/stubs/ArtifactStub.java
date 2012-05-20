@@ -195,7 +195,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getMetadataList()
      */
-    public Collection getMetadataList()
+    public Collection<ArtifactMetadata> getMetadataList()
     {
         return null;
     }
@@ -273,7 +273,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getDependencyTrail()
      */
-    public List getDependencyTrail()
+    public List<String> getDependencyTrail()
     {
         return null;
     }
@@ -283,7 +283,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setDependencyTrail(java.util.List)
      */
-    public void setDependencyTrail( List list )
+    public void setDependencyTrail( List<String> list )
     {
         // nop
     }
@@ -407,7 +407,7 @@ public class ArtifactStub
      * @return <code>null</code>.
      * @see org.apache.maven.artifact.Artifact#getAvailableVersions()
      */
-    public List getAvailableVersions()
+    public List<ArtifactVersion> getAvailableVersions()
     {
         return null;
     }
@@ -417,7 +417,7 @@ public class ArtifactStub
      *
      * @see org.apache.maven.artifact.Artifact#setAvailableVersions(java.util.List)
      */
-    public void setAvailableVersions( List list )
+    public void setAvailableVersions( List<ArtifactVersion> list )
     {
         // nop
     }
