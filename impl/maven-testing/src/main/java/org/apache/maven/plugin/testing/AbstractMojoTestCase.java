@@ -449,10 +449,8 @@ public abstract class AbstractMojoTestCase
             {
                 Xpp3Dom[] pluginElements = pluginsRootElement.getChildren();
 
-                for ( int i = 0; i < pluginElements.length; i++ )
+                for ( Xpp3Dom pluginElement : pluginElements )
                 {
-                    Xpp3Dom pluginElement = pluginElements[i];
-
                     String pluginElementArtifactId = pluginElement.getChild( "artifactId" ).getValue();
 
                     if ( pluginElementArtifactId.equals( artifactId ) )
@@ -551,7 +549,7 @@ public abstract class AbstractMojoTestCase
      * @param object
      * @return map of variable names and values
      */
-    protected Map getVariablesAndValuesFromObject( Object object )
+    protected Map<String, Object> getVariablesAndValuesFromObject( Object object )
         throws IllegalAccessException
     {
         return getVariablesAndValuesFromObject( object.getClass(), object );
@@ -566,24 +564,21 @@ public abstract class AbstractMojoTestCase
      * @param object
      * @return map of variable names and values
      */
-    protected Map getVariablesAndValuesFromObject( Class clazz, Object object )
+    protected Map<String, Object> getVariablesAndValuesFromObject( Class<?> clazz, Object object )
         throws IllegalAccessException
     {
-        Map map = new HashMap();
+        Map<String, Object> map = new HashMap<String, Object>();
 
         Field[] fields = clazz.getDeclaredFields();
 
         AccessibleObject.setAccessible( fields, true );
 
-        for ( int i = 0; i < fields.length; ++i )
+        for ( Field field : fields )
         {
-            Field field = fields[i];
-
             map.put( field.getName(), field.get( object ) );
-
         }
 
-        Class superclass = clazz.getSuperclass();
+        Class<?> superclass = clazz.getSuperclass();
 
         if ( !Object.class.equals( superclass ) )
         {
