@@ -349,10 +349,10 @@ public class ArtifactStubFactory
      * @see #getReleaseArtifact()
      * @see #getSnapshotArtifact()
      */
-    public Set getReleaseAndSnapshotArtifacts()
+    public Set<Artifact> getReleaseAndSnapshotArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( getReleaseArtifact() );
         set.add( getSnapshotArtifact() );
         return set;
@@ -363,10 +363,10 @@ public class ArtifactStubFactory
      * <code>g:provided:jar:1.0, g:compile:jar:1.0, g:system:jar:1.0, g:test:jar:1.0, g:runtime:jar:1.0</code>
      * @throws IOException if any
      */
-    public Set getScopedArtifacts()
+    public Set<Artifact> getScopedArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( createArtifact( "g", "compile", "1.0", Artifact.SCOPE_COMPILE ) );
         set.add( createArtifact( "g", "provided", "1.0", Artifact.SCOPE_PROVIDED ) );
         set.add( createArtifact( "g", "test", "1.0", Artifact.SCOPE_TEST ) );
@@ -380,10 +380,10 @@ public class ArtifactStubFactory
      * <code>g:d:zip:1.0, g:a:war:1.0, g:b:jar:1.0, g:c:sources:1.0, g:e:rar:1.0</code>
      * @throws IOException if any
      */
-    public Set getTypedArtifacts()
+    public Set<Artifact> getTypedArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( createArtifact( "g", "a", "1.0", Artifact.SCOPE_COMPILE, "war", null ) );
         set.add( createArtifact( "g", "b", "1.0", Artifact.SCOPE_COMPILE, "jar", null ) );
         set.add( createArtifact( "g", "c", "1.0", Artifact.SCOPE_COMPILE, "sources", null ) );
@@ -397,10 +397,10 @@ public class ArtifactStubFactory
      * <code>g:c:jar:three:1.0, g:b:jar:two:1.0, g:d:jar:four:1.0, g:a:jar:one:1.0</code>
      * @throws IOException if any
      */
-    public Set getClassifiedArtifacts()
+    public Set<Artifact> getClassifiedArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( createArtifact( "g", "a", "1.0", Artifact.SCOPE_COMPILE, "jar", "one" ) );
         set.add( createArtifact( "g", "b", "1.0", Artifact.SCOPE_COMPILE, "jar", "two" ) );
         set.add( createArtifact( "g", "c", "1.0", Artifact.SCOPE_COMPILE, "jar", "three" ) );
@@ -413,10 +413,10 @@ public class ArtifactStubFactory
      * <code>g:d:zip:1.0, g:a:war:1.0, g:b:jar:1.0, g:e:rar:1.0</code>
      * @throws IOException if any
      */
-    public Set getTypedArchiveArtifacts()
+    public Set<Artifact> getTypedArchiveArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( createArtifact( "g", "a", "1.0", Artifact.SCOPE_COMPILE, "war", null ) );
         set.add( createArtifact( "g", "b", "1.0", Artifact.SCOPE_COMPILE, "jar", null ) );
         set.add( createArtifact( "g", "d", "1.0", Artifact.SCOPE_COMPILE, "zip", null ) );
@@ -429,10 +429,10 @@ public class ArtifactStubFactory
      * <code>g:one:jar:a:1.0, g:two:jar:a:1.0, g:four:jar:a:1.0, g:three:jar:a:1.0</code>
      * @throws IOException if any
      */
-    public Set getArtifactArtifacts()
+    public Set<Artifact> getArtifactArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( createArtifact( "g", "one", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "g", "two", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "g", "three", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
@@ -446,10 +446,10 @@ public class ArtifactStubFactory
      * two:group-two:jar:a:1.0</code>
      * @throws IOException if any
      */
-    public Set getGroupIdArtifacts()
+    public Set<Artifact> getGroupIdArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.add( createArtifact( "one", "group-one", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "two", "group-two", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
         set.add( createArtifact( "three", "group-three", "1.0", Artifact.SCOPE_COMPILE, "jar", "a" ) );
@@ -464,10 +464,10 @@ public class ArtifactStubFactory
      * @see #getScopedArtifacts()
      * @see #getReleaseAndSnapshotArtifacts()
      */
-    public Set getMixedArtifacts()
+    public Set<Artifact> getMixedArtifacts()
         throws IOException
     {
-        Set set = new HashSet();
+        Set<Artifact> set = new HashSet<Artifact>();
         set.addAll( getTypedArtifacts() );
         set.addAll( getScopedArtifacts() );
         set.addAll( getReleaseAndSnapshotArtifacts() );
