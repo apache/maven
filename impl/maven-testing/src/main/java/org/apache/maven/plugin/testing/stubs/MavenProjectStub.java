@@ -21,7 +21,6 @@ package org.apache.maven.plugin.testing.stubs;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,9 +53,7 @@ import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -191,11 +188,9 @@ public class MavenProjectStub
         {
             pomFile = new File( getBasedir(), pomFile.getPath() );
         }
-        Reader reader = null;
         try
         {
-            reader = ReaderFactory.newXmlReader( pomFile );
-            setModel( new MavenXpp3Reader().read( reader ) );
+            setModel( new MavenXpp3Reader().read( ReaderFactory.newXmlReader( pomFile ) ) );
         }
         catch ( IOException e )
         {
@@ -204,10 +199,6 @@ public class MavenProjectStub
         catch ( XmlPullParserException e )
         {
             throw new RuntimeException( "Failed to parse POM file: " + pomFile, e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
         }
     }
 
@@ -285,7 +276,12 @@ public class MavenProjectStub
     /** {@inheritDoc} */
     public boolean hasParent()
     {
-        return ( parent != null );
+        if ( parent != null )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /** {@inheritDoc} */
@@ -1456,7 +1452,6 @@ public class MavenProjectStub
      * @see org.apache.maven.project.MavenProject#createArtifacts(org.apache.maven.artifact.factory.ArtifactFactory, java.lang.String, org.apache.maven.artifact.resolver.filter.ArtifactFilter)
      */
     public Set createArtifacts( ArtifactFactory artifactFactory, String string, ArtifactFilter artifactFilter )
-        throws InvalidDependencyVersionException
     {
         return Collections.EMPTY_SET;
     }

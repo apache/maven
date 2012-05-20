@@ -29,10 +29,12 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.plugin.testing.ArtifactStubFactory;
+import org.apache.maven.wagon.events.TransferListener;
 
 /**
  * Stub resolver. The constructor allows the specification of the exception to throw so that handling can be tested too.
@@ -180,5 +182,23 @@ public class StubArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         // nop
+    }
+
+    public void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository,
+                         TransferListener downloadMonitor )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    public ArtifactResolutionResult collect( ArtifactResolutionRequest request )
+    {
+        return null;
+    }
+
+    public ArtifactResolutionResult resolve( ArtifactResolutionRequest request )
+    {
+        return null;
     }
 }

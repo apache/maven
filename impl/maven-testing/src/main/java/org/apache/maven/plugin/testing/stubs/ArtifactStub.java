@@ -19,18 +19,18 @@ package org.apache.maven.plugin.testing.stubs;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
+import org.apache.maven.artifact.versioning.VersionRange;
 
 /**
  * Stub class for {@link Artifact} testing.
@@ -62,7 +62,7 @@ public class ArtifactStub
      *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo( Object object )
+    public int compareTo( Artifact artifact )
     {
         return 0;
     }
@@ -171,7 +171,14 @@ public class ArtifactStub
      */
     public String getDependencyConflictId()
     {
-        return getGroupId() + ':' + getArtifactId() + ':' + getType() + getClassifier();
+        StringBuffer buffer = new StringBuffer();
+
+        buffer.append( getGroupId() );
+        buffer.append( ":" ).append( getArtifactId() );
+        buffer.append( ":" ).append( getType() );
+        buffer.append( ":" ).append( getClassifier() );
+
+        return buffer.toString();
     }
 
     /**
@@ -489,5 +496,15 @@ public class ArtifactStub
             sb.append( ":" );
             sb.append( getClassifier() );
         }
+    }
+
+    public boolean isFromAuthoritativeRepository()
+    {
+        return true;
+    }
+
+    public void setFromAuthoritativeRepository( boolean fromAuthoritativeRepository )
+    {
+        // nothing
     }
 }

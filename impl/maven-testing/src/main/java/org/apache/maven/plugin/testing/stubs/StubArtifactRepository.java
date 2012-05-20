@@ -23,7 +23,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.repository.Proxy;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
@@ -169,5 +175,76 @@ public class StubArtifactRepository
     public boolean isBlacklisted()
     {
         return false;
+    }
+
+    public Artifact find( Artifact artifact )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Authentication getAuthentication()
+    {
+        return null;
+    }
+
+    public Proxy getProxy()
+    {
+        return null;
+    }
+
+    public void setAuthentication( Authentication authentication )
+    {
+
+    }
+
+    public void setId( String id )
+    {
+
+    }
+
+    public void setLayout( ArtifactRepositoryLayout layout )
+    {
+
+    }
+
+    public void setProxy( Proxy proxy )
+    {
+
+    }
+
+    public void setReleaseUpdatePolicy( ArtifactRepositoryPolicy policy )
+    {
+
+    }
+
+    public void setSnapshotUpdatePolicy( ArtifactRepositoryPolicy policy )
+    {
+
+    }
+
+    public void setUrl( String url )
+    {
+
+    }
+
+    public List<String> findVersions( Artifact artifact )
+    {
+        return Collections.emptyList();
+    }
+
+    public boolean isProjectAware()
+    {
+        return false;
+    }
+
+    public List<ArtifactRepository> getMirroredRepositories()
+    {
+        return new ArrayList<ArtifactRepository>( 0 );
+    }
+
+    public void setMirroredRepositories( List<ArtifactRepository> artifactRepositories )
+    {
+        // no op
     }
 }

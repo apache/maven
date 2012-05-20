@@ -242,7 +242,8 @@ public class ArtifactStubFactory
     {
         if ( workingDir == null )
         {
-            throw new IllegalArgumentException( "The workingDir must be set." );
+            throw new IllegalArgumentException(
+                                                "The workingDir must be set." );
         }
 
         String fileName = getFormattedFileName( artifact, false );
@@ -262,15 +263,11 @@ public class ArtifactStubFactory
             }
             catch ( NoSuchArchiverException e )
             {
-                IOException ioe = new IOException( "NoSuchArchiverException: " + e.getMessage() );
-                ioe.initCause( e );
-                throw ioe;
+                throw new IOException( "NoSuchArchiverException: " + e.getMessage() );
             }
             catch ( ArchiverException e )
             {
-                IOException ioe = new IOException( "ArchiverException: " + e.getMessage() );
-                ioe.initCause( e );
-                throw ioe;
+                throw new IOException( "ArchiverException: " + e.getMessage() );
             }
         }
         else
@@ -287,7 +284,7 @@ public class ArtifactStubFactory
      */
     public static String getUnpackableFileName( Artifact artifact )
     {
-        return artifact.getGroupId() + "-" + artifact.getArtifactId() + "-" + artifact.getVersion() + "-"
+        return "" + artifact.getGroupId() + "-" + artifact.getArtifactId() + "-" + artifact.getVersion() + "-"
             + artifact.getClassifier() + "-" + artifact.getType() + ".txt";
     }
 

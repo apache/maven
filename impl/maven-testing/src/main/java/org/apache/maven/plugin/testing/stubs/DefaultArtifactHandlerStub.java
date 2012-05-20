@@ -54,7 +54,7 @@ public class DefaultArtifactHandlerStub
     {
         type = t;
         classifier = c;
-        if ( "test-jar".equals( t ) )
+        if ( t.equals( "test-jar" ) )
         {
             extension = "jar";
         }

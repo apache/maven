@@ -46,19 +46,19 @@ public class MojoTestCaseTest
         super.setUp();
 
         pom =
-              "<project>\n"
-            + "  <build>\n"
-            + "    <plugins>\n"
-            + "      <plugin>\n"
-            + "        <artifactId>maven-simple-plugin</artifactId>\n"
-            + "        <configuration>\n"
-            + "          <keyOne>valueOne</keyOne>\n"
-            + "          <keyTwo>valueTwo</keyTwo>\n"
-            + "        </configuration>\n"
-            + "      </plugin>\n"
-            + "    </plugins>\n"
-            + "  </build>\n"
-            + "</project>\n";
+            "<project>" +
+                "<build>" +
+                "<plugins>" +
+                "<plugin>" +
+                "<artifactId>maven-simple-plugin</artifactId>" +
+                "<configuration>" +
+                "<keyOne>valueOne</keyOne>" +
+                "<keyTwo>valueTwo</keyTwo>" +
+                "</configuration>" +
+                "</plugin>" +
+                "</plugins>" +
+                "</build>" +
+                "</project>";
 
         pomDom = Xpp3DomBuilder.build( new StringReader( pom ) );
 
@@ -136,6 +136,7 @@ public class MojoTestCaseTest
         setVariableValueToObject( mojo, "keyOne", "myValueOne" );
 
         assertEquals( "myValueOne", (String)getVariableValueFromObject( mojo, "keyOne" ) );
+
     }
 
 }
