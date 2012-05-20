@@ -30,7 +30,9 @@ under the License.
           Unit tests are designed to be fast.
         </p>
         <p>
-          This testing library is <b>NOT</b> designed for integration or functional testing.
+          This testing library is <b>NOT</b> designed for integration or functional testing:
+          <a href="/plugins/maven-invoker-plugin/"><code>maven-invoker-plugin</code></a> is the way to go if you need it,
+          which gives you a complete Maven environment at the cost of more resources and time consuptions.
         </p>
       </answer>
     </faq>
