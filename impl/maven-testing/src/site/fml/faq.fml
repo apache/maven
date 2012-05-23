@@ -57,5 +57,15 @@ under the License.
         </p>
       </answer>
     </faq>
+    <faq id="Maven 2.x compatibility">
+      <question>Is Mojo Testing Harness 2.x compatible with Maven 2.x?</question>
+      <answer>
+        <p>
+          Mojo Testing Harness 2.0+ requires Maven 3.0. This does not necessary mean that your mojos will be 
+          incompatible with Maven 2.x, it only means that mojo unit tests use Maven 3.x libraries to mock Maven
+          environment. Still, if you want to be absolutely sure your mojo is compatible with Maven 2.x, then you probably want
+          to use Mojo Testing Harness 1.x.
+        </p>
+      </answer>
   </part>
 </faqs>
