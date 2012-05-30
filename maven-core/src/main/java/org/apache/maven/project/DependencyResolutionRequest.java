@@ -54,7 +54,7 @@ public interface DependencyResolutionRequest
 
     /**
      * Sets the filter used to exclude some dependencies from resolution. Note that this filter only controls the
-     * resolution/download of dependency artifacts, not the inclusion of dependency nodes in the resolved dependeny
+     * resolution/download of dependency artifacts, not the inclusion of dependency nodes in the resolved dependency
      * graph.
      * 
      * @param filter The filter to exclude dependencies from resolution, may be {@code null} to resolve all
