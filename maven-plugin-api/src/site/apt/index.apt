@@ -18,3 +18,5 @@ Maven Plugin API
  * {{{/developers/mojo-api-specification.html}Mojo API Specification}}
 
  * {{{/plugin-tools/}plugin-tools}}
+
+ * {{{/plugin-testing/}plugin-testing}}
