@@ -310,12 +310,29 @@ public abstract class AbstractMojoTestCase
         return mojo;
     }
 
+    /**
+     * 
+     * @param project
+     * @param goal
+     * @return
+     * @throws Exception
+     * @since 2.0
+     */
     protected Mojo lookupConfiguredMojo( MavenProject project, String goal )
         throws Exception
     {
         return lookupConfiguredMojo( newMavenSession( project ), newMojoExecution( goal ) );
     }
 
+    /**
+     * 
+     * @param session
+     * @param execution
+     * @return
+     * @throws Exception
+     * @throws ComponentConfigurationException
+     * @since 2.0
+     */
     protected Mojo lookupConfiguredMojo( MavenSession session, MojoExecution execution )
         throws Exception, ComponentConfigurationException
     {
@@ -345,6 +362,12 @@ public abstract class AbstractMojoTestCase
         return mojo;
     }
 
+    /**
+     * 
+     * @param project
+     * @return
+     * @since 2.0
+     */
     protected MavenSession newMavenSession( MavenProject project )
     {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -356,6 +379,12 @@ public abstract class AbstractMojoTestCase
         return session;
     }
 
+    /**
+     * 
+     * @param goal
+     * @return
+     * @since 2.0
+     */
     protected MojoExecution newMojoExecution( String goal )
     {
         MojoDescriptor mojoDescriptor = mojoDescriptors.get( goal );
