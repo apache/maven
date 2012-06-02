@@ -32,7 +32,7 @@ Testing Complex Mojo Parameters
 
  Suppose that you have the following dependencies in the maven-my-plugin pom:
 
------
++---+
 <project>
   ...
   <dependencies>
@@ -49,51 +49,42 @@ Testing Complex Mojo Parameters
     ...
   </dependencies>
 </project>
------
++---+
 
  You will add the following in the <<<MyMojo>>>:
 
------
++---+
 public class MyMojo
     extends AbstractMojo
 {
     /**
      * The Maven Project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Component
     protected MavenProject project;
 
     /**
      * Local Repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     protected ArtifactRepository localRepository;
 
     /**
      * The Maven Settings.
-     *
-     * @parameter default-value="${settings}"
-     * @required
-     * @readonly
      */
+    @Component
     private Settings settings;
 
     ...
 }
------
++---+
 
 * Create Stubs
 
   You need to create stub objects to run <<<MyMojoTest#testSomething()>>>. By convention, the package name should
   reflect the stubs, i.e. in our case <<<org.apache.maven.plugin.my.stubs>>>.
 
------
++---+
 public class MyProjectStub
     extends MavenProjectStub
 {
@@ -145,9 +136,9 @@ public class MyProjectStub
         return new File( super.getBasedir() + "/src/test/resources/unit/project-to-test/" );
     }
 }
------
++---+
 
------
++---+
 public class SettingsStub
     extends Settings
 {
@@ -157,11 +148,11 @@ public class SettingsStub
         return Collections.EMPTY_LIST;
     }
 }
------
++---+
 
 * Configure <<<project-to-test>>> pom
 
------
++---+
 <project>
   ...
   <build>
@@ -183,4 +174,4 @@ public class SettingsStub
     </plugins>
   </build>
 </project>
------
++---+

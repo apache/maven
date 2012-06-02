@@ -30,31 +30,26 @@ Testing Using Repositories
  When developing a Maven plugin you often need to play with repositories. Suppose that the MyMojo needs
  to download artifacts into your local repository, i.e.:
 
------
++----+
 public class MyMojo
     extends AbstractMojo
 {
     /**
      * Used for resolving artifacts
-     *
-     * @component
      */
+    @Component
     private ArtifactResolver resolver;
 
     /**
      * Factory for creating artifact objects
-     *
-     * @component
      */
+    @Component
     private ArtifactFactory factory;
 
     /**
      * Local Repository.
-     *
-     * @parameter expression="${localRepository}"
-     * @required
-     * @readonly
      */
+    @Parameter( defaultValue = "${localRepository}", readonly = true, required = true )
     private ArtifactRepository localRepository;
 
     public void execute()
@@ -79,13 +74,13 @@ public class MyMojo
         ...
      }
 }
------
++----+
 
 * Create Stubs
 
  Stub for the test project:
 
------
++----+
 public class MyProjectStub
     extends MavenProjectStub
 {
@@ -106,11 +101,11 @@ public class MyProjectStub
         return Collections.singletonList( repository );
     }
 }
------
++----+
 
 * Configure <<<project-to-test>>> pom
 
------
++----+
 <project>
   ...
   <build>
@@ -131,7 +126,7 @@ public class MyProjectStub
     </plugins>
   </build>
 </project>
------
++----+
 
 ** Execute test
 

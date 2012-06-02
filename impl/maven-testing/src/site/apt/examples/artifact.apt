@@ -30,17 +30,14 @@ Testing Project Artifact
  Sometimes, your Mojo uses project artifact and ArtifactHandler mechanisms. For instance, you could need to
  filter on Java projects, i.e.:
 
------
++---+
 public class MyMojo
     extends AbstractMojo
 {
     /**
      * The Maven Project.
-     *
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
      */
+    @Component
     protected MavenProject project;
 
     public void execute()
@@ -57,11 +54,11 @@ public class MyMojo
         ...
      }
 }
------
++---+
 
 * Create Stubs
 
------
++---+
 public class MyArtifactHandlerStub
     extends DefaultArtifactHandler
 {
@@ -82,9 +79,9 @@ public class MyArtifactHandlerStub
         this.language = language;
     }
 }
------
++---+
 
------
++---+
 public class MyArtifactStub
     extends ArtifactStub
 {
@@ -192,9 +189,9 @@ public class MyArtifactStub
         this.handler = handler;
     }
 }
------
++---+
 
------
++---+
 public class MyProjectStub
     extends MavenProjectStub
 {
@@ -215,4 +212,4 @@ public class MyProjectStub
 
     ...
 }
------
++---+
