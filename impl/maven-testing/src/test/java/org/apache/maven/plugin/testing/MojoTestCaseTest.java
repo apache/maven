@@ -116,7 +116,7 @@ public class MojoTestCaseTest
 
         mojo = (SimpleMojo) configureMojo( mojo, pluginConfiguration );
 
-        Map map = getVariablesAndValuesFromObject( mojo );
+        Map<String, Object> map = getVariablesAndValuesFromObject( mojo );
 
         assertEquals( "valueOne", (String)map.get( "keyOne" ) );
 
