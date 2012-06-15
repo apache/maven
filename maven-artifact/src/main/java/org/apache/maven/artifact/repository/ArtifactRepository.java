@@ -19,7 +19,6 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
-
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -73,6 +72,12 @@ public interface ArtifactRepository
     //
     // New interface methods for the repository system.
     //
+    /**
+     *
+     * @param artifact
+     * @return
+     * @since 3.0-alpha-3
+     */
     Artifact find( Artifact artifact );
 
     /**
@@ -80,6 +85,7 @@ public interface ArtifactRepository
      *
      * @param artifact The artifact whose available versions should be determined, must not be {@code null}.
      * @return The available versions of the artifact or an empty list if none, never {@code null}.
+     * @since 3.0-alpha-3
      */
     List<String> findVersions( Artifact artifact );
 
@@ -88,13 +94,26 @@ public interface ArtifactRepository
      * are examples of such repositories.
      *
      * @return {@code true} if the repository is backed by actual projects, {@code false} otherwise.
+     * @since 3.0-beta-1
      */
     boolean isProjectAware();
 
+    /**
+     * @since 3.0-alpha-3
+     */
     void setAuthentication( Authentication authentication );
+    /**
+     * @since 3.0-alpha-3
+     */
     Authentication getAuthentication();
 
+    /**
+     * @since 3.0-alpha-3
+     */
     void setProxy( Proxy proxy );
+    /**
+     * @since 3.0-alpha-3
+     */
     Proxy getProxy();
 
     /**
@@ -102,6 +121,7 @@ public interface ArtifactRepository
      * @return the repositories mirrored by the actual one
      */
     List<ArtifactRepository> getMirroredRepositories();
+
     /**
      * @since 3.0.3
      * @param mirroredRepositories the repositories that the actual one mirrors
