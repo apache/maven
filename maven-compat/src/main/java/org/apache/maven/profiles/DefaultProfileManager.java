@@ -36,11 +36,14 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
 @Deprecated
 public class DefaultProfileManager
@@ -195,14 +198,13 @@ public class DefaultProfileManager
             profileSelector.getActiveProfiles( profilesById.values(), context, new ModelProblemCollector()
             {
 
-                public void add( Severity severity, String message, InputLocation location, Exception cause )
+                public void add( ModelProblemCollectorRequest req )
                 {
-                    if ( !ModelProblem.Severity.WARNING.equals( severity ) )
+                    if ( !ModelProblem.Severity.WARNING.equals( req.getSeverity() ) )
                     {
-                        errors.add( new ProfileActivationException( message, cause ) );
+                        errors.add( new ProfileActivationException( req.getMessage(), req.getException() ) );
                     }
                 }
-
             } );
 
         if ( !errors.isEmpty() )

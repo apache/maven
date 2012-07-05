@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.io.ModelParseException;
 
 /**
@@ -38,7 +39,7 @@ import org.apache.maven.model.io.ModelParseException;
  * @author Benjamin Bentmann
  */
 class DefaultModelProblemCollector
-    implements ModelProblemCollector
+    implements ModelProblemCollectorExt
 {
 
     private final ModelBuildingResult result;
@@ -142,21 +143,21 @@ class DefaultModelProblemCollector
         }
     }
 
-    public void add( Severity severity, String message, InputLocation location, Exception cause )
+    public void add( ModelProblemCollectorRequest req )
     {
         int line = -1;
         int column = -1;
         String source = null;
         String modelId = null;
 
-        if ( location != null )
+        if ( req.getLocation() != null )
         {
-            line = location.getLineNumber();
-            column = location.getColumnNumber();
-            if ( location.getSource() != null )
+            line = req.getLocation().getLineNumber();
+            column = req.getLocation().getColumnNumber();
+            if ( req.getLocation().getSource() != null )
             {
-                modelId = location.getSource().getModelId();
-                source = location.getSource().getLocation();
+                modelId = req.getLocation().getSource().getModelId();
+                source = req.getLocation().getSource().getLocation();
             }
         }
 
@@ -166,14 +167,14 @@ class DefaultModelProblemCollector
             source = getSource();
         }
 
-        if ( line <= 0 && column <= 0 && cause instanceof ModelParseException )
+        if ( line <= 0 && column <= 0 && req.getException() instanceof ModelParseException )
         {
-            ModelParseException e = (ModelParseException) cause;
+            ModelParseException e = (ModelParseException) req.getException();
             line = e.getLineNumber();
             column = e.getColumnNumber();
         }
 
-        ModelProblem problem = new DefaultModelProblem( message, severity, source, line, column, modelId, cause );
+        ModelProblem problem = new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source, line, column, modelId, req.getException() );
 
         add( problem );
     }

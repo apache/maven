@@ -46,6 +46,9 @@ public class DefaultModelProblem
 
     private final Severity severity;
 
+    private final Version version;
+
+
     /**
      * Creates a new problem with the specified message and exception.
      * 
@@ -57,10 +60,11 @@ public class DefaultModelProblem
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public DefaultModelProblem( String message, Severity severity, Model source, int lineNumber, int columnNumber,
+    //mkleint: does this need to be public?
+    public DefaultModelProblem( String message, Severity severity, Version version, Model source, int lineNumber, int columnNumber,
                                 Exception exception )
     {
-        this( message, severity, ModelProblemUtils.toPath( source ), lineNumber, columnNumber,
+        this( message, severity, version, ModelProblemUtils.toPath( source ), lineNumber, columnNumber,
               ModelProblemUtils.toId( source ), exception );
     }
 
@@ -70,13 +74,15 @@ public class DefaultModelProblem
      * @param message The message describing the problem, may be {@code null}.
      * @param severity The severity level of the problem, may be {@code null} to default to
      *            {@link ModelProblem.Severity#ERROR}.
+     * @param version The version since the problem is relevant
      * @param source A hint about the source of the problem like a file path, may be {@code null}.
      * @param lineNumber The one-based index of the line containing the problem or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the problem or {@code -1} if unknown.
      * @param modelId The identifier of the model that exhibits the problem, may be {@code null}.
      * @param exception The exception that caused this problem, may be {@code null}.
      */
-    public DefaultModelProblem( String message, Severity severity, String source, int lineNumber, int columnNumber,
+    //mkleint: does this need to be public?
+    public DefaultModelProblem( String message, Severity severity, Version version, String source, int lineNumber, int columnNumber,
                                 String modelId, Exception exception )
     {
         this.message = message;
@@ -86,6 +92,7 @@ public class DefaultModelProblem
         this.columnNumber = columnNumber;
         this.modelId = ( modelId != null ) ? modelId : "";
         this.exception = exception;
+        this.version = version;
     }
 
     public String getSource()
@@ -138,6 +145,11 @@ public class DefaultModelProblem
     {
         return severity;
     }
+
+    public Version getVersion() {
+        return version;
+    }
+    
 
     @Override
     public String toString()

@@ -26,6 +26,8 @@ import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.profile.ProfileActivationContext;
 import org.codehaus.plexus.component.annotations.Component;
@@ -125,8 +127,10 @@ public class FileProfileActivator
         }
         catch ( Exception e )
         {
-            problems.add( Severity.ERROR, "Failed to interpolate file location " + path + " for profile "
-                + profile.getId() + ": " + e.getMessage(), file.getLocation( missing ? "missing" : "exists" ), e );
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+                    .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": " + e.getMessage())
+                    .setLocation( file.getLocation( missing ? "missing" : "exists" ))
+                    .setException( e ));
             return false;
         }
 

@@ -442,7 +442,7 @@ public class DefaultProjectBuilder
                     {
                         ModelProblem problem =
                             new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " does not exist", ModelProblem.Severity.ERROR, model, -1, -1, null );
+                                + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1, -1, null );
                         result.getProblems().add( problem );
 
                         noErrors = false;
@@ -478,7 +478,7 @@ public class DefaultProjectBuilder
 
                         ModelProblem problem =
                             new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR, model, -1, -1,
+                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1, -1,
                                                      null );
                         result.getProblems().add( problem );
 
@@ -630,7 +630,7 @@ public class DefaultProjectBuilder
             ModelProblem problem =
                 new DefaultModelProblem( "Detected profiles.xml alongside " + modelId
                     + ", this file is no longer supported and was ignored" + ", please use the settings.xml instead",
-                                         ModelProblem.Severity.WARNING, model, -1, -1, null );
+                                         ModelProblem.Severity.WARNING, ModelProblem.Version.V30, model, -1, -1, null );
             result.getProblems().add( problem );
         }
     }

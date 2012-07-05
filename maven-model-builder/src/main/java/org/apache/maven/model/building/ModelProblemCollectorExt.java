@@ -20,25 +20,18 @@ package org.apache.maven.model.building;
  */
 
 import java.util.List;
-import org.apache.maven.model.InputLocation;
 
 /**
- * Collects problems that are encountered during model building. The primary purpose of this component is to account for
- * the fact that the problem reporter has/should not have information about the calling context and hence cannot provide
- * an expressive source hint for the model problem. Instead, the source hint is configured by the model builder before
- * it delegates to other components that potentially encounter problems. Then, the problem reporter can focus on
- * providing a simple error message, leaving the donkey work of creating a nice model problem to this component.
- * 
- * @author Benjamin Bentmann
+ * Extends the ModelproblemCollector by the capacity of returning the collected problems.
+ * @author Milos Kleint
  */
-public interface ModelProblemCollector
+public interface ModelProblemCollectorExt extends ModelProblemCollector
 {
-
+    
     /**
-     * Adds the specified problem.
-     * 
-     * @param req must not be null
+     * The collected problems.
+     * @return a list of model problems encountered, never {@code null}
      */
-    void add( ModelProblemCollectorRequest req );
+    List<ModelProblem> getProblems();
 
 }

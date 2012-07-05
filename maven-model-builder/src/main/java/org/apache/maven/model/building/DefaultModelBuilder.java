@@ -42,6 +42,7 @@ import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -322,7 +323,7 @@ public class DefaultModelBuilder
                 }
                 message += currentData.getId();
 
-                problems.add( ModelProblem.Severity.FATAL, message, null, null );
+                problems.add( new ModelProblemCollectorRequest(ModelProblem.Severity.FATAL, ModelProblem.Version.BASE).setMessage(message));
                 throw problems.newModelBuildingException();
             }
         }
@@ -414,7 +415,7 @@ public class DefaultModelBuilder
 
         modelValidator.validateEffectiveModel( resultModel, request, problems );
 
-        if ( problems.hasErrors() )
+        if ( hasModelErrors(problems) )
         {
             throw problems.newModelBuildingException();
         }
@@ -476,13 +477,15 @@ public class DefaultModelBuilder
 
                 if ( pomFile != null )
                 {
-                    problems.add( Severity.ERROR, "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                                  null, e );
+                    problems.add( new ModelProblemCollectorRequest(Severity.ERROR, Version.V20)
+                            .setMessage("Malformed POM " + modelSource.getLocation() + ": " + e.getMessage())
+                            .setException(e ));
                 }
                 else
                 {
-                    problems.add( Severity.WARNING, "Malformed POM " + modelSource.getLocation() + ": "
-                        + e.getMessage(), null, e );
+                    problems.add( new ModelProblemCollectorRequest(Severity.WARNING, Version.V20)
+                            .setMessage("Malformed POM " + modelSource.getLocation() + ": " + e.getMessage())
+                            .setException(e));
                 }
             }
 
@@ -494,8 +497,9 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            problems.add( Severity.FATAL, "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                          null, e );
+            problems.add( new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+                    .setMessage("Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage())
+                    .setException(e));
             throw problems.newModelBuildingException();
         }
         catch ( IOException e )
@@ -513,7 +517,9 @@ public class DefaultModelBuilder
                     msg = e.getClass().getSimpleName();
                 }
             }
-            problems.add( Severity.FATAL, "Non-readable POM " + modelSource.getLocation() + ": " + msg, null, e );
+            problems.add( new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+                    .setMessage("Non-readable POM " + modelSource.getLocation() + ": " + msg)
+                    .setException(e ));
             throw problems.newModelBuildingException();
         }
 
@@ -522,7 +528,7 @@ public class DefaultModelBuilder
         problems.setSource( model );
         modelValidator.validateRawModel( model, request, problems );
 
-        if ( problems.hasFatalErrors() )
+        if ( hasFatalErrors(problems) )
         {
             throw problems.newModelBuildingException();
         }
@@ -562,8 +568,10 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                problems.add( Severity.ERROR, "Invalid repository " + repository.getId() + ": " + e.getMessage(),
-                              repository.getLocation( "" ), e );
+                problems.add( new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage())
+                        .setLocation(repository.getLocation( "" ))
+                        .setException(e) );
             }
         }
     }
@@ -615,8 +623,9 @@ public class DefaultModelBuilder
             if ( versions.get( key ) == null && managedVersions.get( key ) == null )
             {
                 InputLocation location = plugins.get( key ).getLocation( "" );
-                problems.add( Severity.WARNING, "'build.plugins.plugin.version' for " + key + " is missing.", location,
-                              null );
+                problems.add( new ModelProblemCollectorRequest(Severity.WARNING, Version.V20)
+                        .setMessage( "'build.plugins.plugin.version' for " + key + " is missing.")
+                        .setLocation(location));
             }
         }
     }
@@ -691,9 +700,10 @@ public class DefaultModelBuilder
 
             if ( !"pom".equals( parentModel.getPackaging() ) )
             {
-                problems.add( Severity.ERROR, "Invalid packaging for parent POM "
-                    + ModelProblemUtils.toSourceHint( parentModel ) + ", must be \"pom\" but is \""
-                    + parentModel.getPackaging() + "\"", parentModel.getLocation( "packaging" ), null );
+                problems.add( new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                        .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel ) + ", must be \"pom\" but is \""
+                                    + parentModel.getPackaging() + "\"")
+                        .setLocation(parentModel.getLocation( "packaging" )));
             }
         }
         else
@@ -745,7 +755,9 @@ public class DefaultModelBuilder
             buffer.append( ", please verify your project structure" );
 
             problems.setSource( childModel );
-            problems.add( Severity.WARNING, buffer.toString(), parent.getLocation( "" ), null );
+            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE)
+                    .setMessage( buffer.toString())
+                    .setLocation( parent.getLocation( "" )));
             return null;
         }
         if ( version == null || !version.equals( parent.getVersion() ) )
@@ -837,7 +849,10 @@ public class DefaultModelBuilder
                 }
             }
 
-            problems.add( Severity.FATAL, buffer.toString(), parent.getLocation( "" ), e );
+            problems.add( new ModelProblemCollectorRequest(Severity.FATAL, Version.BASE)
+                    .setMessage( buffer.toString())
+                    .setLocation(parent.getLocation( "" ))
+                    .setException(e));
             throw problems.newModelBuildingException();
         }
 
@@ -903,20 +918,23 @@ public class DefaultModelBuilder
 
             if ( groupId == null || groupId.length() <= 0 )
             {
-                problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.groupId' for "
-                    + dependency.getManagementKey() + " is missing.", dependency.getLocation( "" ), null );
+                problems.add( new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                        .setMessage( "'dependencyManagement.dependencies.dependency.groupId' for " + dependency.getManagementKey() + " is missing.")
+                        .setLocation( dependency.getLocation( "" )));
                 continue;
             }
             if ( artifactId == null || artifactId.length() <= 0 )
             {
-                problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.artifactId' for "
-                    + dependency.getManagementKey() + " is missing.", dependency.getLocation( "" ), null );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+                        .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for " + dependency.getManagementKey() + " is missing.")
+                        .setLocation( dependency.getLocation( "" )));
                 continue;
             }
             if ( version == null || version.length() <= 0 )
             {
-                problems.add( Severity.ERROR, "'dependencyManagement.dependencies.dependency.version' for "
-                    + dependency.getManagementKey() + " is missing.", dependency.getLocation( "" ), null );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+                        .setMessage( "'dependencyManagement.dependencies.dependency.version' for " + dependency.getManagementKey() + " is missing.")
+                        .setLocation( dependency.getLocation( "" )));
                 continue;
             }
 
@@ -930,7 +948,7 @@ public class DefaultModelBuilder
                     message += modelId + " -> ";
                 }
                 message += imported;
-                problems.add( Severity.ERROR, message, null, null );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ));
 
                 continue;
             }
@@ -962,7 +980,10 @@ public class DefaultModelBuilder
                     }
                     buffer.append( ": " ).append( e.getMessage() );
 
-                    problems.add( Severity.ERROR, buffer.toString(), dependency.getLocation( "" ), e );
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                            .setMessage( buffer.toString() )
+                            .setLocation( dependency.getLocation( "" ))
+                            .setException( e ));
                     continue;
                 }
 
@@ -1059,6 +1080,27 @@ public class DefaultModelBuilder
         return message != null && ( groupId == null || message.contains( groupId ) )
             && ( artifactId == null || message.contains( artifactId ) )
             && ( version == null || message.contains( version ) );
+    }
+
+    protected boolean hasModelErrors(ModelProblemCollectorExt problems) {
+        if (problems instanceof DefaultModelProblemCollector) {
+            return ((DefaultModelProblemCollector)problems).hasErrors();
+        } else {
+            //the default execution path only knows the DefaultModelProblemCollector,
+            // only reason it's not in signature is because it's package private
+            throw new IllegalStateException(); 
+        }
+        
+    }
+
+    protected boolean hasFatalErrors(ModelProblemCollectorExt problems) {
+        if (problems instanceof DefaultModelProblemCollector) {
+            return ((DefaultModelProblemCollector)problems).hasFatalErrors();
+        } else {
+            //the default execution path only knows the DefaultModelProblemCollector,
+            // only reason it's not in signature is because it's package private
+            throw new IllegalStateException(); 
+        }
     }
 
 }

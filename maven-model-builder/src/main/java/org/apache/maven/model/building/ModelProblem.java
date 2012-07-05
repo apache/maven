@@ -41,6 +41,14 @@ public interface ModelProblem
 
     }
 
+    enum Version {
+        //based on ModeBuildingResult.validationLevel
+        BASE,
+        V20,
+        V30,
+        V31
+    }
+
     /**
      * Gets the hint about the source of the problem. While the syntax of this hint is unspecified and depends on the
      * creator of the problem, the general expectation is that the hint provides sufficient information to the user to
@@ -98,5 +106,11 @@ public interface ModelProblem
      * @return The severity level of this problem, never {@code null}.
      */
     Severity getSeverity();
+
+    /**
+     * Gets the applicable maven version/validation level of this problem
+     * @return The version, never {@code null}.
+     */
+    Version getVersion();
 
 }

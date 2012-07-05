@@ -22,8 +22,6 @@ package org.apache.maven.model.building;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.model.InputLocation;
-import org.apache.maven.model.building.ModelProblem.Severity;
 
 /**
  * A simple model problem collector for testing the model building components.
@@ -55,21 +53,20 @@ public class SimpleProblemCollector
         return fatals;
     }
 
-    public void add( Severity severity, String message, InputLocation location, Exception cause )
+    public void add( ModelProblemCollectorRequest req )
     {
-        switch ( severity )
+        switch ( req.getSeverity() )
         {
             case FATAL:
-                fatals.add( message );
+                fatals.add( req.getMessage() );
                 break;
             case ERROR:
-                errors.add( message );
+                errors.add( req.getMessage() );
                 break;
             case WARNING:
-                warnings.add( message );
+                warnings.add( req.getMessage() );
                 break;
         }
 
     }
-
 }

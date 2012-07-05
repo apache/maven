@@ -41,6 +41,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
 @Component( role = ModelInterpolator.class )
 public class StringSearchModelInterpolator
@@ -191,13 +194,15 @@ public class StringSearchModelInterpolator
             }
             catch ( IllegalArgumentException e )
             {
-                problems.add( Severity.ERROR, "Failed to interpolate field3: " + field + " on class: " + cls.getName(),
-                              null, e );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+                        .setMessage( "Failed to interpolate field3: " + field + " on class: " + cls.getName())
+                        .setException(e));
             }
             catch ( IllegalAccessException e )
             {
-                problems.add( Severity.ERROR, "Failed to interpolate field4: " + field + " on class: " + cls.getName(),
-                              null, e );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+                        .setMessage( "Failed to interpolate field4: " + field + " on class: " + cls.getName())
+                        .setException(e));
             }
             finally
             {
