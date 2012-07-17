@@ -1,10 +1,10 @@
- ---
+ -----
  Lifecycles Reference
- ---
+ -----
  Hervé Boutemy
- ---
+ -----
  2011-09-12
- ---
+ -----
   
 Lifecycles Reference
 
@@ -14,7 +14,7 @@ Lifecycles Reference
 
 * <<<default>>> Lifecycle
 
-  <<<default>>> lifecycle is defined <<without>> any associated.
+  <<<default>>> lifecycle is defined <<without>> any associated plugin.
   Plugin bindings for this lifecycle are {{{./default-bindings.html}defined separately for every packaging}}:
 
 %{snippet|id=lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/components.xml}
