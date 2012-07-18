@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
@@ -61,7 +62,7 @@ public class DefaultModelValidator
     implements ModelValidator
 {
 
-    private static final String ID_REGEX = "[A-Za-z0-9_\\-.]+";
+    private static final Pattern ID_REGEX = Pattern.compile("[A-Za-z0-9_\\-.]+");
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -625,7 +626,7 @@ public class DefaultModelValidator
         }
         else
         {
-            boolean match = id.matches( ID_REGEX );
+            boolean match = ID_REGEX.matcher( id ).matches();
             if ( !match )
             {
                 addViolation( problems, severity, version, fieldName, sourceHint, "with value '" + id
