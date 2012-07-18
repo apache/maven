@@ -230,12 +230,6 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
     {
-        return build( request, new LinkedHashSet<String>() );
-    }
-
-    private ModelBuildingResult build( ModelBuildingRequest request, Collection<String> importIds )
-        throws ModelBuildingException
-    {
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
@@ -1003,7 +997,7 @@ public class DefaultModelBuilder
                 ModelBuildingResult importResult;
                 try
                 {
-                    importResult = build( importRequest, importIds );
+                    importResult = build( importRequest );
                 }
                 catch ( ModelBuildingException e )
                 {
