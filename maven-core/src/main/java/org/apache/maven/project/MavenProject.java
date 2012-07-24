@@ -2180,6 +2180,7 @@ public class MavenProject
      * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
      * 
      * @return The project building request or {@code null}.
+     * @since 2.1
      */
     public ProjectBuildingRequest getProjectBuildingRequest()
     {
@@ -2191,6 +2192,7 @@ public class MavenProject
      * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
      * 
      * @param projectBuildingRequest The project building request, may be {@code null}.
+     * @since 2.1
      */
     public void setProjectBuildingRequest( ProjectBuildingRequest projectBuildingRequest )
     {
