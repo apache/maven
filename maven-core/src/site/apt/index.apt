@@ -3,7 +3,7 @@
  -----
  Hervé Boutemy
  -----
- 2012-02-14
+ 2012-08-13
  -----
 
 Maven Core
@@ -13,6 +13,8 @@ Maven Core
 * Useful entry points
 
  * {{{./lifecycles.html}lifecycles}} and {{{./default-bindings.html}plugin bindings to <<<default>>> lifecycle}},
+
+ * {{{./artifact-handlers.html}default artifact handlers}},
 
  * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
  with its <<<DefaultProjectBuilder>>> implementation
