@@ -22,7 +22,9 @@ package org.apache.maven.model.interpolation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -41,19 +43,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.apache.maven.model.building.ModelProblem;
-import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
 @Component( role = ModelInterpolator.class )
 public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
 
-    private static final Map<Class<?>, Field[]> fieldsByClass =
-            new ConcurrentHashMap<Class<?>, Field[]>( 80, 0.75f, 2 );  // Empirical data from 3.x, actual =40
-    private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass =
-            new ConcurrentHashMap<Class<?>, Boolean>( 62, 0.75f, 2 ); // Empirical data from 3.x, actual 31
+    private static final Map<Class<?>, InterpolateObjectAction.CacheItem> cachedEntries =
+        new ConcurrentHashMap<Class<?>, InterpolateObjectAction.CacheItem>( 80, 0.75f, 2 );
+        // Empirical data from 3.x, actual =40
+
 
     public Model interpolateModel( Model model, File projectDir, ModelBuildingRequest config,
                                    ModelProblemCollector problems )
@@ -69,8 +68,8 @@ public class StringSearchModelInterpolator
         try
         {
             List<? extends ValueSource> valueSources = createValueSources( model, projectDir, config, problems );
-            List<? extends InterpolationPostProcessor> postProcessors = createPostProcessors( model, projectDir,
-                                                                                              config );
+            List<? extends InterpolationPostProcessor> postProcessors =
+                createPostProcessors( model, projectDir, config );
 
             InterpolateObjectAction action =
                 new InterpolateObjectAction( obj, valueSources, postProcessors, this, problems );
@@ -96,9 +95,13 @@ public class StringSearchModelInterpolator
     {
 
         private final LinkedList<Object> interpolationTargets;
+
         private final StringSearchModelInterpolator modelInterpolator;
+
         private final List<? extends ValueSource> valueSources;
+
         private final List<? extends InterpolationPostProcessor> postProcessors;
+
         private final ModelProblemCollector problems;
 
         public InterpolateObjectAction( Object target, List<? extends ValueSource> valueSources,
@@ -129,6 +132,12 @@ public class StringSearchModelInterpolator
             return null;
         }
 
+
+        private String interpolate( String value )
+        {
+            return modelInterpolator.interpolateInternal( value, valueSources, postProcessors, problems );
+        }
+
         private void traverseObjectWithParents( Class<?> cls, Object target )
         {
             if ( cls == null )
@@ -136,210 +145,29 @@ public class StringSearchModelInterpolator
                 return;
             }
 
-            if ( cls.isArray() )
+            CacheItem cacheEntry = getCacheEntry( cls );
+            if ( cacheEntry.isArray() )
             {
-                evaluateArray( target );
+                evaluateArray( target, this );
             }
-            else if ( isQualifiedForInterpolation( cls ) )
+            else if ( cacheEntry.isQualifiedForInterpolation )
             {
-                for ( Field currentField : getFields( cls ) )
-                {
-                    Class<?> type = currentField.getType();
-                    if ( isQualifiedForInterpolation( currentField, type ) )
-                    {
-                        synchronized ( currentField )
-                        {
-                            interpolateField( cls, target, currentField, type );
-                        }
-                    }
-                }
+                cacheEntry.interpolate( target, problems, this );
 
                 traverseObjectWithParents( cls.getSuperclass(), target );
             }
         }
 
-        private void interpolateField( Class<?> cls, Object target, Field field, Class<?> type )
+
+        private CacheItem getCacheEntry( Class<?> cls )
         {
-            boolean isAccessible = field.isAccessible();
-            field.setAccessible( true );
-            try
+            CacheItem cacheItem = cachedEntries.get( cls );
+            if ( cacheItem == null )
             {
-                if ( String.class == type )
-                {
-                    interpolateStringField( target, field );
-                }
-                else if ( Collection.class.isAssignableFrom( type ) )
-                {
-                    interpolateCollectionField( target, field );
-                }
-                else if ( Map.class.isAssignableFrom( type ) )
-                {
-                    interpolateMapField( target, field );
-                }
-                else
-                {
-                    Object value = field.get( target );
-                    if ( value != null )
-                    {
-                        if ( field.getType().isArray() )
-                        {
-                            evaluateArray( value );
-                        }
-                        else
-                        {
-                            interpolationTargets.add( value );
-                        }
-                    }
-                }
+                cacheItem = new CacheItem( cls );
+                cachedEntries.put( cls, cacheItem );
             }
-            catch ( IllegalArgumentException e )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
-                        .setMessage( "Failed to interpolate field3: " + field + " on class: " + cls.getName())
-                        .setException(e));
-            }
-            catch ( IllegalAccessException e )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
-                        .setMessage( "Failed to interpolate field4: " + field + " on class: " + cls.getName())
-                        .setException(e));
-            }
-            finally
-            {
-                field.setAccessible( isAccessible );
-            }
-        }
-
-        private void interpolateStringField( Object target, Field field )
-            throws IllegalAccessException
-        {
-            String value = (String) field.get( target );
-            if ( value == null || Modifier.isFinal( field.getModifiers() ) )
-            {
-                return;
-            }
-
-            String interpolated =
-                modelInterpolator.interpolateInternal( value, valueSources, postProcessors, problems );
-
-            if ( !interpolated.equals( value ) )
-            {
-                field.set( target, interpolated );
-            }
-        }
-
-        private void interpolateCollectionField( Object target, Field field )
-            throws IllegalAccessException
-        {
-            @SuppressWarnings( "unchecked" )
-            Collection<Object> c = (Collection<Object>) field.get( target );
-            if ( c == null || c.isEmpty() )
-            {
-                return;
-            }
-
-            List<Object> originalValues = new ArrayList<Object>( c );
-            try
-            {
-                c.clear();
-            }
-            catch ( UnsupportedOperationException e )
-            {
-                return;
-            }
-
-            for ( Object value : originalValues )
-            {
-                if ( value == null )
-                {
-                    // add the null back in...not sure what else to do...
-                    c.add( value );
-                }
-                else if ( String.class == value.getClass() )
-                {
-                    String interpolated =
-                        modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, problems );
-
-                    if ( !interpolated.equals( value ) )
-                    {
-                        c.add( interpolated );
-                    }
-                    else
-                    {
-                        c.add( value );
-                    }
-                }
-                else
-                {
-                    c.add( value );
-                    if ( value.getClass().isArray() )
-                    {
-                        evaluateArray( value );
-                    }
-                    else
-                    {
-                        interpolationTargets.add( value );
-                    }
-                }
-            }
-        }
-
-        private void interpolateMapField( Object target, Field field )
-            throws IllegalAccessException
-        {
-            @SuppressWarnings( "unchecked" )
-            Map<Object, Object> m = (Map<Object, Object>) field.get( target );
-            if ( m == null || m.isEmpty() )
-            {
-                return;
-            }
-
-            for ( Map.Entry<Object, Object> entry : m.entrySet() )
-            {
-                Object value = entry.getValue();
-
-                if ( value == null )
-                {
-                    continue;
-                }
-
-                if ( String.class == value.getClass() )
-                {
-                    String interpolated =
-                        modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors, problems );
-
-                    if ( !interpolated.equals( value ) )
-                    {
-                        try
-                        {
-                            entry.setValue( interpolated );
-                        }
-                        catch ( UnsupportedOperationException e )
-                        {
-                            continue;
-                        }
-                    }
-                }
-                else if ( value.getClass().isArray() )
-                {
-                    evaluateArray( value );
-                }
-                else
-                {
-                    interpolationTargets.add( value );
-                }
-            }
-        }
-
-        private Field[] getFields( Class<?> cls )
-        {
-            Field[] fields = fieldsByClass.get( cls );
-            if ( fields == null )
-            {
-                fields = cls.getDeclaredFields();
-                fieldsByClass.put( cls, fields );
-            }
-            return fields;
+            return cacheItem;
         }
 
         private boolean isQualifiedForInterpolation( Class<?> cls )
@@ -354,14 +182,7 @@ public class StringSearchModelInterpolator
                 return false;
             }
 
-            Boolean primitive = fieldIsPrimitiveByClass.get( fieldType );
-            if ( primitive == null )
-            {
-                primitive = fieldType.isPrimitive();
-                fieldIsPrimitiveByClass.put( fieldType, primitive );
-            }
-
-            if ( primitive )
+            if ( fieldType.isPrimitive() )
             {
                 return false;
             }
@@ -369,7 +190,7 @@ public class StringSearchModelInterpolator
             return !"parent".equals( field.getName() );
         }
 
-        private void evaluateArray( Object target )
+        private static void evaluateArray( Object target, InterpolateObjectAction ctx )
         {
             int len = Array.getLength( target );
             for ( int i = 0; i < len; i++ )
@@ -379,9 +200,7 @@ public class StringSearchModelInterpolator
                 {
                     if ( String.class == value.getClass() )
                     {
-                        String interpolated =
-                            modelInterpolator.interpolateInternal( (String) value, valueSources, postProcessors,
-                                                                   problems );
+                        String interpolated = ctx.interpolate( (String) value );
 
                         if ( !interpolated.equals( value ) )
                         {
@@ -390,11 +209,315 @@ public class StringSearchModelInterpolator
                     }
                     else
                     {
-                        interpolationTargets.add( value );
+                        ctx.interpolationTargets.add( value );
                     }
                 }
             }
         }
+
+        private static class CacheItem
+        {
+            private final boolean isArray;
+
+            private final boolean isQualifiedForInterpolation;
+
+            private final CacheField[] fields;
+
+            private boolean isQualifiedForInterpolation( Class<?> cls )
+            {
+                return !cls.getName().startsWith( "java" );
+            }
+
+            private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
+            {
+                if ( Map.class.equals( fieldType ) && "locations".equals( field.getName() ) )
+                {
+                    return false;
+                }
+
+                if ( fieldType.isPrimitive() )
+                {
+                    return false;
+                }
+
+                return !"parent".equals( field.getName() );
+            }
+
+            CacheItem( Class clazz )
+            {
+                this.isQualifiedForInterpolation = isQualifiedForInterpolation( clazz );
+                this.isArray = clazz.isArray();
+                List<CacheField> fields = new ArrayList<CacheField>();
+                for ( Field currentField : clazz.getDeclaredFields() )
+                {
+                    Class<?> type = currentField.getType();
+                    if ( isQualifiedForInterpolation( currentField, type ) )
+                    {
+                        if ( String.class == type )
+                        {
+                            if ( !Modifier.isFinal( currentField.getModifiers() ) )
+                            {
+                                fields.add( new StringField( currentField ) );
+                            }
+                        }
+                        else if ( Collection.class.isAssignableFrom( type ) )
+                        {
+                            fields.add( new CollectionField( currentField ) );
+                        }
+                        else if ( Map.class.isAssignableFrom( type ) )
+                        {
+                            fields.add( new MapField( currentField ) );
+                        }
+                        else
+                        {
+                            fields.add( new ObjectField( currentField ) );
+                        }
+                    }
+
+                }
+                this.fields = fields.toArray( new CacheField[fields.size()] );
+
+            }
+
+            public void interpolate( Object target, ModelProblemCollector problems,
+                                     InterpolateObjectAction interpolateObjectAction )
+            {
+                for ( CacheField field : fields )
+                {
+                    field.interpolate( target, problems, interpolateObjectAction );
+                }
+            }
+
+            public boolean isArray()
+            {
+                return isArray;
+            }
+        }
+
+        static abstract class CacheField
+        {
+            protected final Field field;
+
+            CacheField( Field field )
+            {
+                this.field = field;
+            }
+
+            void interpolate( Object target, ModelProblemCollector problems,
+                              InterpolateObjectAction interpolateObjectAction )
+            {
+                synchronized ( field )
+                {
+                    boolean isAccessible = field.isAccessible();
+                    field.setAccessible( true );
+                    try
+                    {
+                        doInterpolate( target, interpolateObjectAction );
+                    }
+                    catch ( IllegalArgumentException e )
+                    {
+                        interpolateObjectAction.problems.add(
+                            new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
+                                "Failed to interpolate field3: " + field + " on class: "
+                                    + field.getType().getName() ).setException(
+                                e ) ); // todo: Not entirely the same message
+                    }
+                    catch ( IllegalAccessException e )
+                    {
+                        interpolateObjectAction.problems.add(
+                            new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage(
+                                "Failed to interpolate field4: " + field + " on class: "
+                                    + field.getType().getName() ).setException( e ) );
+                    }
+                    finally
+                    {
+                        field.setAccessible( isAccessible );
+                    }
+                }
+
+
+            }
+
+            abstract void doInterpolate( Object target, InterpolateObjectAction ctx )
+                throws IllegalAccessException;
+        }
+
+        static final class StringField
+            extends CacheField
+        {
+            StringField( Field field )
+            {
+                super( field );
+            }
+
+            @Override
+            void doInterpolate( Object target, InterpolateObjectAction ctx )
+                throws IllegalAccessException
+            {
+                String value = (String) field.get( target );
+                if ( value == null )
+                {
+                    return;
+                }
+
+                String interpolated = ctx.interpolate( value );
+
+                if ( !interpolated.equals( value ) )
+                {
+                    field.set( target, interpolated );
+                }
+            }
+        }
+
+        static final class CollectionField
+            extends CacheField
+        {
+            CollectionField( Field field )
+            {
+                super( field );
+            }
+
+            @Override
+            void doInterpolate( Object target, InterpolateObjectAction ctx )
+                throws IllegalAccessException
+            {
+                @SuppressWarnings( "unchecked" ) Collection<Object> c = (Collection<Object>) field.get( target );
+                if ( c == null || c.isEmpty() )
+                {
+                    return;
+                }
+
+                List<Object> originalValues = new ArrayList<Object>( c );
+                try
+                {
+                    c.clear();
+                }
+                catch ( UnsupportedOperationException e )
+                {
+                    return;
+                }
+
+                for ( Object value : originalValues )
+                {
+                    if ( value == null )
+                    {
+                        // add the null back in...not sure what else to do...
+                        c.add( value );
+                    }
+                    else if ( String.class == value.getClass() )
+                    {
+                        String interpolated = ctx.interpolate( (String) value );
+
+                        if ( !interpolated.equals( value ) )
+                        {
+                            c.add( interpolated );
+                        }
+                        else
+                        {
+                            c.add( value );
+                        }
+                    }
+                    else
+                    {
+                        c.add( value );
+                        if ( value.getClass().isArray() )
+                        {
+                            evaluateArray( value, ctx );
+                        }
+                        else
+                        {
+                            ctx.interpolationTargets.add( value );
+                        }
+                    }
+                }
+            }
+        }
+
+        static final class MapField
+            extends CacheField
+        {
+            MapField( Field field )
+            {
+                super( field );
+            }
+
+            @Override
+            void doInterpolate( Object target, InterpolateObjectAction ctx )
+                throws IllegalAccessException
+            {
+                @SuppressWarnings( "unchecked" ) Map<Object, Object> m = (Map<Object, Object>) field.get( target );
+                if ( m == null || m.isEmpty() )
+                {
+                    return;
+                }
+
+                for ( Map.Entry<Object, Object> entry : m.entrySet() )
+                {
+                    Object value = entry.getValue();
+
+                    if ( value == null )
+                    {
+                        continue;
+                    }
+
+                    if ( String.class == value.getClass() )
+                    {
+                        String interpolated = ctx.interpolate( (String) value );
+
+                        if ( !interpolated.equals( value ) )
+                        {
+                            try
+                            {
+                                entry.setValue( interpolated );
+                            }
+                            catch ( UnsupportedOperationException e )
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                    else if ( value.getClass().isArray() )
+                    {
+                        evaluateArray( value, ctx );
+                    }
+                    else
+                    {
+                        ctx.interpolationTargets.add( value );
+                    }
+                }
+            }
+        }
+
+        static final class ObjectField
+            extends CacheField
+        {
+            private final boolean isArray;
+
+            ObjectField( Field field )
+            {
+                super( field );
+                this.isArray = field.getType().isArray();
+            }
+
+            @Override
+            void doInterpolate( Object target, InterpolateObjectAction ctx )
+                throws IllegalAccessException
+            {
+                Object value = field.get( target );
+                if ( value != null )
+                {
+                    if ( isArray )
+                    {
+                        evaluateArray( value, ctx );
+                    }
+                    else
+                    {
+                        ctx.interpolationTargets.add( value );
+                    }
+                }
+            }
+        }
+
     }
 
 }
