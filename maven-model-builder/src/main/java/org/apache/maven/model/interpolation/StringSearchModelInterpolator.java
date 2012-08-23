@@ -51,7 +51,7 @@ public class StringSearchModelInterpolator
 
     private static final Map<Class<?>, InterpolateObjectAction.CacheItem> cachedEntries =
         new ConcurrentHashMap<Class<?>, InterpolateObjectAction.CacheItem>( 80, 0.75f, 2 );
-        // Empirical data from 3.x, actual =40
+    // Empirical data from 3.x, actual =40
 
 
     public Model interpolateModel( Model model, File projectDir, ModelBuildingRequest config,
@@ -152,7 +152,7 @@ public class StringSearchModelInterpolator
             }
             else if ( cacheEntry.isQualifiedForInterpolation )
             {
-                cacheEntry.interpolate( target, problems, this );
+                cacheEntry.interpolate( target, this );
 
                 traverseObjectWithParents( cls.getSuperclass(), target );
             }
@@ -168,26 +168,6 @@ public class StringSearchModelInterpolator
                 cachedEntries.put( cls, cacheItem );
             }
             return cacheItem;
-        }
-
-        private boolean isQualifiedForInterpolation( Class<?> cls )
-        {
-            return !cls.getName().startsWith( "java" );
-        }
-
-        private boolean isQualifiedForInterpolation( Field field, Class<?> fieldType )
-        {
-            if ( Map.class.equals( fieldType ) && "locations".equals( field.getName() ) )
-            {
-                return false;
-            }
-
-            if ( fieldType.isPrimitive() )
-            {
-                return false;
-            }
-
-            return !"parent".equals( field.getName() );
         }
 
         private static void evaluateArray( Object target, InterpolateObjectAction ctx )
@@ -235,6 +215,7 @@ public class StringSearchModelInterpolator
                     return false;
                 }
 
+                //noinspection SimplifiableIfStatement
                 if ( fieldType.isPrimitive() )
                 {
                     return false;
@@ -279,12 +260,11 @@ public class StringSearchModelInterpolator
 
             }
 
-            public void interpolate( Object target, ModelProblemCollector problems,
-                                     InterpolateObjectAction interpolateObjectAction )
+            public void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
             {
                 for ( CacheField field : fields )
                 {
-                    field.interpolate( target, problems, interpolateObjectAction );
+                    field.interpolate( target, interpolateObjectAction );
                 }
             }
 
@@ -303,8 +283,7 @@ public class StringSearchModelInterpolator
                 this.field = field;
             }
 
-            void interpolate( Object target, ModelProblemCollector problems,
-                              InterpolateObjectAction interpolateObjectAction )
+            void interpolate( Object target, InterpolateObjectAction interpolateObjectAction )
             {
                 synchronized ( field )
                 {
@@ -470,9 +449,8 @@ public class StringSearchModelInterpolator
                             {
                                 entry.setValue( interpolated );
                             }
-                            catch ( UnsupportedOperationException e )
+                            catch ( UnsupportedOperationException ignore )
                             {
-                                continue;
                             }
                         }
                     }
