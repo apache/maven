@@ -241,9 +241,13 @@ public class StringSearchModelInterpolator
                                 fields.add( new StringField( currentField ) );
                             }
                         }
+                        else if ( List.class.isAssignableFrom( type ) )
+                        {
+                            fields.add( new ListField( currentField ) );
+                        }
                         else if ( Collection.class.isAssignableFrom( type ) )
                         {
-                            fields.add( new CollectionField( currentField ) );
+                            throw new RuntimeException("We dont interpolate into collections, use a list instead");
                         }
                         else if ( Map.class.isAssignableFrom( type ) )
                         {
@@ -348,10 +352,10 @@ public class StringSearchModelInterpolator
             }
         }
 
-        static final class CollectionField
+        static final class ListField
             extends CacheField
         {
-            CollectionField( Field field )
+            ListField( Field field )
             {
                 super( field );
             }
@@ -360,52 +364,47 @@ public class StringSearchModelInterpolator
             void doInterpolate( Object target, InterpolateObjectAction ctx )
                 throws IllegalAccessException
             {
-                @SuppressWarnings( "unchecked" ) Collection<Object> c = (Collection<Object>) field.get( target );
-                if ( c == null || c.isEmpty() )
+                @SuppressWarnings( "unchecked" ) List<Object> c = (List<Object>) field.get( target );
+                if ( c == null )
                 {
                     return;
                 }
 
-                List<Object> originalValues = new ArrayList<Object>( c );
-                try
+                int size = c.size();
+                Object value;
+                for ( int i = 0; i < size; i++ )
                 {
-                    c.clear();
-                }
-                catch ( UnsupportedOperationException e )
-                {
-                    return;
-                }
 
-                for ( Object value : originalValues )
-                {
-                    if ( value == null )
-                    {
-                        // add the null back in...not sure what else to do...
-                        c.add( value );
-                    }
-                    else if ( String.class == value.getClass() )
-                    {
-                        String interpolated = ctx.interpolate( (String) value );
+                    value = c.get( i );
 
-                        if ( !interpolated.equals( value ) )
+                    if ( value != null )
+                    {
+                        if ( String.class == value.getClass() )
                         {
-                            c.add( interpolated );
+                            String interpolated = ctx.interpolate( (String) value );
+
+                            if ( !interpolated.equals( value ) )
+                            {
+                                try
+                                {
+                                    c.set( i, interpolated );
+                                }
+                                catch ( UnsupportedOperationException e )
+                                {
+                                    return;
+                                }
+                            }
                         }
                         else
                         {
-                            c.add( value );
-                        }
-                    }
-                    else
-                    {
-                        c.add( value );
-                        if ( value.getClass().isArray() )
-                        {
-                            evaluateArray( value, ctx );
-                        }
-                        else
-                        {
-                            ctx.interpolationTargets.add( value );
+                            if ( value.getClass().isArray() )
+                            {
+                                evaluateArray( value, ctx );
+                            }
+                            else
+                            {
+                                ctx.interpolationTargets.add( value );
+                            }
                         }
                     }
                 }
