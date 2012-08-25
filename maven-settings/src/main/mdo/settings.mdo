@@ -707,9 +707,11 @@
         <field>
           <name>properties</name>
           <description>
+            <![CDATA[
             Extended configuration specific to this profile goes here.
             Contents take the form of
-            &lt;property.name&gt;property.value&lt;/property.name&gt;
+            <code>&lt;property.name&gt;property.value&lt;/property.name&gt;</code>
+            ]]>
           </description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
