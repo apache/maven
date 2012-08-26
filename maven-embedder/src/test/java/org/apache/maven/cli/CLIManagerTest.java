@@ -31,6 +31,11 @@ import org.apache.commons.cli.Option;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 
+/**
+ * Pseudo test to generate documentation fragment about supported CLI options.
+ * TODO such documentation generation code should not be necessary as unit test but should be run
+ * during site generation (Velocity? Doxia macro?) 
+ */
 public class CLIManagerTest
     extends PlexusTestCase
 {
@@ -94,7 +99,7 @@ public class CLIManagerTest
         return sb.toString();
     }
 
-    public void testOptionsAsApt()
+    public void testOptionsAsHtml()
         throws IOException
     {
         File options = getTestFile( "target/test-classes/options.html" );
