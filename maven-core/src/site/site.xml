@@ -33,6 +33,7 @@ under the License.
     <menu name="Reference">
       <item name="Lifecycles" href="lifecycles.html"/>
       <item name="Plugin Bindings to Default Lifecycle" href="default-bindings.html"/>
+      <item name="Artifact Handlers" href="artifact-handlers.html"/>
     </menu>
 
     <menu ref="parent"/>
