@@ -59,18 +59,22 @@ import org.apache.maven.settings.building.SettingsSource;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.ILoggerFactory;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
+
+import com.google.inject.AbstractModule;
 
 // TODO: push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
 
@@ -372,17 +376,29 @@ public class MavenCli
         {
             logger = setupLogger( cliRequest );
 
+            final MavenLoggerManager loggerManager = new MavenLoggerManager( logger ) ;
+
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld( cliRequest.classWorld )
                 .setRealm( setupContainerRealm( cliRequest ) )
+                .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
+                .setAutoWiring( true )
                 .setName( "maven" );
 
-            container = new DefaultPlexusContainer( cc );
+            container = new DefaultPlexusContainer( cc, new AbstractModule()
+            {
+
+                protected void configure()
+                {
+                    bind( ILoggerFactory.class ).toInstance( new PlexusLoggerFactory( loggerManager ) );
+                }
+
+            } );
 
             // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
             container.setLookupRealm( null );
 
-            container.setLoggerManager( new MavenLoggerManager( logger ) );
+            container.setLoggerManager( loggerManager );
 
             customizeContainer( container );
 
