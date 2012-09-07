@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5338FileOptionToDirectory.class );
         suite.addTestSuite( MavenITmng5280SettingsProfilesRepositoriesOrderTest.class );
         suite.addTestSuite( MavenITmng5224InjectedSettings.class );
         suite.addTestSuite( MavenITmng5214DontMapWsdlToJar.class );
