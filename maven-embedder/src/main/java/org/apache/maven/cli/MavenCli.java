@@ -954,6 +954,10 @@ public class MavenCli
         if ( alternatePomFile != null )
         {
             File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
+            if ( pom.isDirectory() )
+            {
+                pom = new File( pom, "pom.xml" );
+            }
 
             request.setPom( pom );
         }
