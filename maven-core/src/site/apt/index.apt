@@ -20,7 +20,7 @@ Maven Core
  with its <<<DefaultProjectBuilder>>> implementation
  ({{{./xref/org/apache/maven/project/DefaultProjectBuilder.html}source}}),
 
- * <<<MavenPluginManager>>> component ({{{./apidocs/org/apache/maven/plugin/MavenPluginManager.html}javadoc}},
+ * <<<MavenPluginManager>>> component ({{{./apidocs/org/apache/maven/plugin/MavenPluginManager.html}javadoc}}),
  with its <<<DefaultMavenPluginManager>>> implementation
  ({{{./xref/org/apache/maven/plugin/internal/DefaultMavenPluginManager.html}source}}),
 
