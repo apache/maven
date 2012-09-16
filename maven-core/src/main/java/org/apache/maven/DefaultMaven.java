@@ -83,7 +83,6 @@ import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
-import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -99,6 +98,7 @@ import org.eclipse.aether.util.graph.transformer.ConflictMarker;
 import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.eclipse.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
@@ -407,19 +407,21 @@ public class DefaultMaven
         DefaultProxySelector proxySelector = new DefaultProxySelector();
         for ( Proxy proxy : decrypted.getProxies() )
         {
-            Authentication proxyAuth = new Authentication( proxy.getUsername(), proxy.getPassword() );
-            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
-                                                                proxyAuth ), proxy.getNonProxyHosts() );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.username( proxy.getUsername() ).password( proxy.getPassword() );
+            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
+                                                                        proxy.getPort(), authBuilder.build() ),
+                               proxy.getNonProxyHosts() );
         }
         session.setProxySelector( proxySelector );
 
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
         for ( Server server : decrypted.getServers() )
         {
-            Authentication auth =
-                new Authentication( server.getUsername(), server.getPassword(), server.getPrivateKey(),
-                                    server.getPassphrase() );
-            authSelector.add( server.getId(), auth );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.username( server.getUsername() ).password( server.getPassword() );
+            authBuilder.privateKey( server.getPrivateKey(), server.getPassphrase() );
+            authSelector.add( server.getId(), authBuilder.build() );
 
             if ( server.getConfiguration() != null )
             {

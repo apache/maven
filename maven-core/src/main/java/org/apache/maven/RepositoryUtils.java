@@ -44,6 +44,7 @@ import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.Proxy;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -247,8 +248,10 @@ public class RepositoryUtils
         Authentication result = null;
         if ( auth != null )
         {
-            result =
-                new Authentication( auth.getUsername(), auth.getPassword(), auth.getPrivateKey(), auth.getPassphrase() );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.username( auth.getUsername() ).password( auth.getPassword() );
+            authBuilder.privateKey( auth.getPrivateKey(), auth.getPassphrase() );
+            result = authBuilder.build();
         }
         return result;
     }
@@ -258,8 +261,9 @@ public class RepositoryUtils
         Proxy result = null;
         if ( proxy != null )
         {
-            Authentication auth = new Authentication( proxy.getUserName(), proxy.getPassword() );
-            result = new Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), auth );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.username( proxy.getUserName() ).password( proxy.getPassword() );
+            result = new Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build() );
         }
         return result;
     }

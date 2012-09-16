@@ -74,6 +74,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.AuthenticationContext;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.ProxySelector;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -583,13 +584,17 @@ public class LegacyRepositorySystem
             AuthenticationSelector selector = session.getAuthenticationSelector();
             if ( selector != null )
             {
-                org.eclipse.aether.repository.Authentication auth =
-                    selector.getAuthentication( RepositoryUtils.toRepo( repository ) );
+                RemoteRepository repo = RepositoryUtils.toRepo( repository );
+                org.eclipse.aether.repository.Authentication auth = selector.getAuthentication( repo );
                 if ( auth != null )
                 {
-                    Authentication result = new Authentication( auth.getUsername(), auth.getPassword() );
-                    result.setPrivateKey( auth.getPrivateKeyFile() );
-                    result.setPassphrase( auth.getPassphrase() );
+                    AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
+                    Authentication result =
+                        new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
+                                            authCtx.get( AuthenticationContext.PASSWORD ) );
+                    result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
+                    result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
+                    authCtx.close();
                     return result;
                 }
             }
@@ -688,7 +693,8 @@ public class LegacyRepositorySystem
             ProxySelector selector = session.getProxySelector();
             if ( selector != null )
             {
-                org.eclipse.aether.repository.Proxy proxy = selector.getProxy( RepositoryUtils.toRepo( repository ) );
+                RemoteRepository repo = RepositoryUtils.toRepo( repository );
+                org.eclipse.aether.repository.Proxy proxy = selector.getProxy( repo );
                 if ( proxy != null )
                 {
                     Proxy p = new Proxy();
@@ -697,8 +703,12 @@ public class LegacyRepositorySystem
                     p.setPort( proxy.getPort() );
                     if ( proxy.getAuthentication() != null )
                     {
-                        p.setUserName( proxy.getAuthentication().getUsername() );
-                        p.setPassword( proxy.getAuthentication().getPassword() );
+                        AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo );
+                        p.setUserName( authCtx.get( AuthenticationContext.USERNAME ) );
+                        p.setPassword( authCtx.get( AuthenticationContext.PASSWORD ) );
+                        p.setNtlmDomain( authCtx.get( AuthenticationContext.NTLM_DOMAIN ) );
+                        p.setNtlmHost( authCtx.get( AuthenticationContext.NTLM_WORKSTATION ) );
+                        authCtx.close();
                     }
                     return p;
                 }
