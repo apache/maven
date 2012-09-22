@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven.plugin-testing</groupId>
     <artifactId>maven-plugin-testing</artifactId>
-    <version>2.1</version>
+    <version>2.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-plugin-testing-harness</artifactId>
@@ -33,9 +33,9 @@ under the License.
   <description>The Maven Plugin Testing Harness provides mechanisms to manage tests on Mojo.</description>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/plugin-testing/tags/maven-plugin-testing-2.1/maven-plugin-testing-harness</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/plugin-testing/tags/maven-plugin-testing-2.1/maven-plugin-testing-harness</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/plugin-testing/tags/maven-plugin-testing-2.1/maven-plugin-testing-harness</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/plugin-testing/trunk/maven-plugin-testing-harness/</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/plugin-testing/trunk/maven-plugin-testing-harness/</developerConnection>
+    <url>http://svn.apache.org/viewvc/maven/plugin-testing/trunk/maven-plugin-testing-harness/</url>
   </scm>
 
   <dependencies>
