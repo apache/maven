@@ -41,11 +41,11 @@ import java.util.Stack;
  * <li>version components in the text can be digits or strings,</li>
  * <li>strings are checked for well-known qualifiers and the qualifier ordering is used for version ordering.
  *     Well-known qualifiers (case insensitive) are:<ul>
- *     <li><code>snapshot</code></li>
  *     <li><code>alpha</code> or <code>a</code></li>
  *     <li><code>beta</code> or <code>b</code></li>
  *     <li><code>milestone</code> or <code>m</code></li>
  *     <li><code>rc</code> or <code>cr</code></li>
+ *     <li><code>snapshot</code></li>
  *     <li><code>(the empty string)</code> or <code>ga</code> or <code>final</code></li>
  *     <li><code>sp</code></li>
  *     </ul>
