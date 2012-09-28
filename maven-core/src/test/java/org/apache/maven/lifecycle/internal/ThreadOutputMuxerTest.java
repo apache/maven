@@ -1,3 +1,5 @@
+package org.apache.maven.lifecycle.internal;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional information regarding
@@ -12,7 +14,6 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.maven.lifecycle.internal;
 
 import junit.framework.TestCase;
 import org.apache.maven.execution.MavenSession;
@@ -94,7 +95,6 @@ public class ThreadOutputMuxerTest
             Arrays.asList( "Thinkin", "of", "a", "master", "plan", "Cuz", "ain’t", "nuthin", "but", "sweat", "inside",
                            "my", "hand" );
         Iterator<String> lyrics = stringList.iterator();
-        List<Outputter> outputters = new ArrayList<Outputter>();
 
         ExecutorService executor = Executors.newFixedThreadPool( 10 );
         CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );

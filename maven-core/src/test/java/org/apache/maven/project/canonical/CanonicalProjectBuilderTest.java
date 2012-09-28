@@ -20,7 +20,6 @@ package org.apache.maven.project.canonical;
  */
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Plugin;
@@ -52,17 +51,15 @@ public class CanonicalProjectBuilderTest
         // Plugins
         // ----------------------------------------------------------------------
 
-        List plugins = project.getBuildPlugins();
+        List<Plugin> plugins = project.getBuildPlugins();
 
         // Plugin0 [plexus]
 
         String key = "org.apache.maven.plugins:maven-plexus-plugin";
 
         Plugin plugin = null;
-        for ( Iterator it = plugins.iterator(); it.hasNext(); )
+        for ( Plugin check : plugins )
         {
-            Plugin check = (Plugin) it.next();
-
             if ( key.equals( check.getKey() ) )
             {
                 plugin = check;
@@ -87,7 +84,7 @@ public class CanonicalProjectBuilderTest
         // Goal specific configuration
         // ----------------------------------------------------------------------
 
-        List executions = plugin.getExecutions();
+        List<PluginExecution> executions = plugin.getExecutions();
 
         PluginExecution execution = (PluginExecution) executions.get( 0 );
 

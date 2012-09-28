@@ -41,7 +41,7 @@ public class SettingsUtilsTest
 
         SettingsUtils.merge( dominant, recessive, Settings.GLOBAL_LEVEL );
 
-        List pluginGroups = dominant.getPluginGroups();
+        List<String> pluginGroups = dominant.getPluginGroups();
 
         assertNotNull( pluginGroups );
         assertEquals( 3, pluginGroups.size() );
