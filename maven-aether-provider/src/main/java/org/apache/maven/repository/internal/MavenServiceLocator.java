@@ -32,7 +32,8 @@ import org.sonatype.aether.impl.VersionResolver;
  * <em>Note:</em> This component is meant to assist those clients that employ the repository systems outside of an IoC
  * container, Maven plugins should instead always use
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">regular
- * plugin parameter injection</a> to acquire the repository system.
+ * plugin parameter injection</a> to acquire the repository system (created by Maven in
+ * <code><a href="/ref/current/maven-core/apidocs/org/apache/maven/DefaultMaven.html">DefaultMaven.newRepositorySession(MavenExecutionRequest request)</a></code>).
  * 
  * @author Benjamin Bentmann
  */
