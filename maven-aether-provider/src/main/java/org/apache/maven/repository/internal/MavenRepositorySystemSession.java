@@ -43,8 +43,13 @@ import org.sonatype.aether.util.repository.DefaultProxySelector;
 
 /**
  * A simplistic repository system session that mimics Maven's behavior to help third-party developers that want to embed
- * Maven's dependency resolution into their own applications. <strong>Warning:</strong> This class is not intended for
- * usage by Maven plugins, those should always acquire the current repository system session via parameter injection.
+ * Maven's dependency resolution into their own applications.
+ * 
+ * <p><strong>Warning:</strong> This class is not intended for
+ * usage by Maven plugins, those should always acquire the current repository system session via
+ * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">plugin
+ * parameter injection</a>, since the current repository system session is created by Maven in
+ * <code><a href="/ref/current/maven-core/apidocs/org/apache/maven/DefaultMaven.html">DefaultMaven.newRepositorySession(MavenExecutionRequest request)</a></code>.</p>
  * 
  * @author Benjamin Bentmann
  */

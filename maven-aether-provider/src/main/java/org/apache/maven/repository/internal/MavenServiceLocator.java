@@ -30,10 +30,8 @@ import org.sonatype.aether.impl.VersionResolver;
  * repository system, clients need to add some repository connectors for remote transfers.
  * 
  * <em>Note:</em> This component is meant to assist those clients that employ the repository systems outside of an IoC
- * container, Maven plugins should instead always use
- * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">regular
- * plugin parameter injection</a> to acquire the repository system (created by Maven in
- * <code><a href="/ref/current/maven-core/apidocs/org/apache/maven/DefaultMaven.html">DefaultMaven.newRepositorySession(MavenExecutionRequest request)</a></code>).
+ * container, Maven plugins should instead always use regular dependency injection to acquire the repository system:
+ * it is defined as Plexus component in aether-impl with its dependencies.
  * 
  * @author Benjamin Bentmann
  */
