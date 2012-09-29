@@ -3,12 +3,13 @@
  -----
  Hervé Boutemy
  -----
- 2012-08-13
+ 2012-09-29
  -----
 
 Maven Core
 
- Maven Core classes.
+ Maven Core classes, providing <<<Maven>>> component ({{{./apidocs/org/apache/maven/Maven.html}javadoc}}),
+ with its <<<DefaultMaven>>> implementation ({{{./xref/org/apache/maven/DefaultMaven.html}source}}).
 
 * Useful entry points
 
