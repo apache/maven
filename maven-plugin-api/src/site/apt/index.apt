@@ -8,7 +8,7 @@
 
 Maven Plugin API
 
- The API for plugins - Mojos - development.
+ The API for plugins - composed of goals implemented by Mojos - development.
 
  A plugin is described in a {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
  generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}}.
