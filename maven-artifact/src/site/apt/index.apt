@@ -1,0 +1,18 @@
+ -----
+ Introduction
+ -----
+ Hervé Boutemy
+ -----
+ 2012-09-29
+ -----
+
+Maven Artifact
+
+ Maven Artifact classes, providing <<<Artifact>>> component ({{{./apidocs/org/apache/maven/artifact/Artifact.html}javadoc}}),
+ with its <<<DefaultArtifact>>> implementation ({{{./xref/org/apache/maven/artifact/DefaultArtifact.html}source}}).
+
+* Useful entry points
+
+ * artifact version comparison {{{./apidocs/org/apache/maven/artifact/versioning/ComparableVersion.html}javadoc}},
+
+ * {{{./apidocs/org/apache/maven/artifact/versioning/VersionRange.html}version range}}.
