@@ -29,9 +29,9 @@ import org.sonatype.aether.impl.VersionResolver;
  * A simple service locator that is already setup with all components from this library. To acquire a complete
  * repository system, clients need to add some repository connectors for remote transfers.
  * 
- * <em>Note:</em> This component is meant to assist those clients that employ the repository systems outside of an IoC
+ * <p><em>Note:</em> This component is meant to assist those clients that employ the repository systems outside of an IoC
  * container, Maven plugins should instead always use regular dependency injection to acquire the repository system:
- * it is defined as Plexus component in aether-impl with its dependencies.
+ * it is defined as Plexus component in aether-impl with its dependencies.</p>
  * 
  * @author Benjamin Bentmann
  */
