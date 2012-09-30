@@ -588,6 +588,7 @@ public class LegacyRepositorySystem
                 org.eclipse.aether.repository.Authentication auth = selector.getAuthentication( repo );
                 if ( auth != null )
                 {
+                    repo = new RemoteRepository.Builder( repo ).setAuthentication( auth ).build();
                     AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
                     Authentication result =
                         new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
@@ -703,6 +704,7 @@ public class LegacyRepositorySystem
                     p.setPort( proxy.getPort() );
                     if ( proxy.getAuthentication() != null )
                     {
+                        repo = new RemoteRepository.Builder( repo ).setProxy( proxy ).build();
                         AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo );
                         p.setUserName( authCtx.get( AuthenticationContext.USERNAME ) );
                         p.setPassword( authCtx.get( AuthenticationContext.PASSWORD ) );
