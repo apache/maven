@@ -49,11 +49,11 @@ public class ArtifactDescriptorUtils
 
     public static RemoteRepository toRemoteRepository( Repository repository )
     {
-        RemoteRepository result =
-            new RemoteRepository( repository.getId(), repository.getLayout(), repository.getUrl() );
-        result.setPolicy( true, toRepositoryPolicy( repository.getSnapshots() ) );
-        result.setPolicy( false, toRepositoryPolicy( repository.getReleases() ) );
-        return result;
+        RemoteRepository.Builder builder =
+            new RemoteRepository.Builder( repository.getId(), repository.getLayout(), repository.getUrl() );
+        builder.setSnapshotPolicy( toRepositoryPolicy( repository.getSnapshots() ) );
+        builder.setReleasePolicy( toRepositoryPolicy( repository.getReleases() ) );
+        return builder.build();
     }
 
     public static RepositoryPolicy toRepositoryPolicy( org.apache.maven.model.RepositoryPolicy policy )

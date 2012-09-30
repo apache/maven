@@ -198,12 +198,14 @@ public class RepositoryUtils
         RemoteRepository result = null;
         if ( repo != null )
         {
-            result = new RemoteRepository( repo.getId(), getLayout( repo ), repo.getUrl() );
-            result.setPolicy( true, toPolicy( repo.getSnapshots() ) );
-            result.setPolicy( false, toPolicy( repo.getReleases() ) );
-            result.setAuthentication( toAuthentication( repo.getAuthentication() ) );
-            result.setProxy( toProxy( repo.getProxy() ) );
-            result.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
+            RemoteRepository.Builder builder =
+                new RemoteRepository.Builder( repo.getId(), getLayout( repo ), repo.getUrl() );
+            builder.setSnapshotPolicy( toPolicy( repo.getSnapshots() ) );
+            builder.setReleasePolicy( toPolicy( repo.getReleases() ) );
+            builder.setAuthentication( toAuthentication( repo.getAuthentication() ) );
+            builder.setProxy( toProxy( repo.getProxy() ) );
+            builder.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
+            result = builder.build();
         }
         return result;
     }
@@ -249,8 +251,8 @@ public class RepositoryUtils
         if ( auth != null )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.username( auth.getUsername() ).password( auth.getPassword() );
-            authBuilder.privateKey( auth.getPrivateKey(), auth.getPassphrase() );
+            authBuilder.addUsername( auth.getUsername() ).addPassword( auth.getPassword() );
+            authBuilder.addPrivateKey( auth.getPrivateKey(), auth.getPassphrase() );
             result = authBuilder.build();
         }
         return result;
@@ -262,7 +264,7 @@ public class RepositoryUtils
         if ( proxy != null )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.username( proxy.getUserName() ).password( proxy.getPassword() );
+            authBuilder.addUsername( proxy.getUserName() ).addPassword( proxy.getPassword() );
             result = new Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build() );
         }
         return result;

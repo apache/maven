@@ -126,8 +126,10 @@ public class DefaultArtifactDeployer
         if ( deploymentRepository instanceof DefaultArtifactRepository
             && deploymentRepository.getAuthentication() == null )
         {
-            remoteRepo.setAuthentication( session.getAuthenticationSelector().getAuthentication( remoteRepo ) );
-            remoteRepo.setProxy( session.getProxySelector().getProxy( remoteRepo ) );
+            RemoteRepository.Builder builder = new RemoteRepository.Builder( remoteRepo );
+            builder.setAuthentication( session.getAuthenticationSelector().getAuthentication( remoteRepo ) );
+            builder.setProxy( session.getProxySelector().getProxy( remoteRepo ) );
+            remoteRepo = builder.build();
         }
         request.setRepository( remoteRepo );
 

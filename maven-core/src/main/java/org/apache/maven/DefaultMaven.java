@@ -408,7 +408,7 @@ public class DefaultMaven
         for ( Proxy proxy : decrypted.getProxies() )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.username( proxy.getUsername() ).password( proxy.getPassword() );
+            authBuilder.addUsername( proxy.getUsername() ).addPassword( proxy.getPassword() );
             proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
                                                                         proxy.getPort(), authBuilder.build() ),
                                proxy.getNonProxyHosts() );
@@ -419,8 +419,8 @@ public class DefaultMaven
         for ( Server server : decrypted.getServers() )
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.username( server.getUsername() ).password( server.getPassword() );
-            authBuilder.privateKey( server.getPrivateKey(), server.getPassphrase() );
+            authBuilder.addUsername( server.getUsername() ).addPassword( server.getPassword() );
+            authBuilder.addPrivateKey( server.getPrivateKey(), server.getPassphrase() );
             authSelector.add( server.getId(), authBuilder.build() );
 
             if ( server.getConfiguration() != null )
