@@ -52,14 +52,13 @@ under the License.
     <plugins>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-maven-plugin</artifactId>
-        <version>1.3.8</version>
+        <artifactId>plexus-component-metadata</artifactId>
         <executions>
           <execution>
             <id>create-component-descriptor</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>descriptor</goal>
+              <goal>generate-metadata</goal>
             </goals>
           </execution>
         </executions>
