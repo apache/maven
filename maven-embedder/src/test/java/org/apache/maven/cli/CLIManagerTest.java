@@ -62,7 +62,7 @@ public class CLIManagerTest
         }
     }
 
-    public String getOptionsAsApt()
+    public String getOptionsAsHtml()
     {
         StringBuilder sb = new StringBuilder();
         boolean a = true;
@@ -103,6 +103,6 @@ public class CLIManagerTest
         throws IOException
     {
         File options = getTestFile( "target/test-classes/options.html" );
-        FileUtils.fileWrite( options, "UTF-8", getOptionsAsApt() );
+        FileUtils.fileWrite( options, "UTF-8", getOptionsAsHtml() );
     }
 }
