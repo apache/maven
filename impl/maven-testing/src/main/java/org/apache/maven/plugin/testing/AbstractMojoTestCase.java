@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.input.XmlStreamReader;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -68,7 +69,6 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
@@ -108,7 +108,7 @@ public abstract class AbstractMojoTestCase
 
         InputStream is = getClass().getResourceAsStream( "/" + getPluginDescriptorLocation() );
 
-        XmlStreamReader reader = ReaderFactory.newXmlReader( is );
+        XmlStreamReader reader = new XmlStreamReader( is );
 
         InterpolationFilterReader interpolationFilterReader =
             new InterpolationFilterReader( new BufferedReader( reader ), container.getContext().getContextData() );
