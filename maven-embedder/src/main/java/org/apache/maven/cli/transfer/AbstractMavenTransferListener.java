@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven.cli.transfer;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,11 +19,11 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.slf4j.Logger;
 import org.sonatype.aether.transfer.AbstractTransferListener;
 import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
@@ -33,11 +33,13 @@ public abstract class AbstractMavenTransferListener
     extends AbstractTransferListener
 {
 
-    protected PrintStream out;
+    protected Logger out;
+    //protected PrintStream out;
 
-    protected AbstractMavenTransferListener( PrintStream out )
+    protected AbstractMavenTransferListener( Logger out )
     {
-        this.out = ( out != null ) ? out : System.out;
+        this.out = out;
+        //this.out = ( out != null ) ? out : System.out;
     }
 
     @Override
@@ -45,7 +47,7 @@ public abstract class AbstractMavenTransferListener
     {
         String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-        out.println( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
+        out.info( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
     }
 
     @Override
@@ -54,7 +56,7 @@ public abstract class AbstractMavenTransferListener
     {
         TransferResource resource = event.getResource();
 
-        out.println( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
+        out.warn( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
             + resource.getResourceName() );
     }
 
@@ -77,7 +79,7 @@ public abstract class AbstractMavenTransferListener
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
+            out.info( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
                 + throughput + ")" );
         }
     }

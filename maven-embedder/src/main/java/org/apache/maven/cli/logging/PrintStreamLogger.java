@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven.cli.logging;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -34,7 +34,7 @@ public class PrintStreamLogger
     extends AbstractLogger
 {
 
-    interface Provider
+    public interface Provider
     {
         PrintStream getStream();
     }

@@ -36,6 +36,13 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.cli.event.DefaultEventSpyContext;
+import org.apache.maven.cli.event.ExecutionEventLogger;
+import org.apache.maven.cli.logging.PrintStreamLogger;
+import org.apache.maven.cli.logging.Slf4jLoggerManager;
+import org.apache.maven.cli.transfer.BatchModeMavenTransferListener;
+import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
+import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -64,9 +71,11 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.ILoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.transfer.TransferListener;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
@@ -105,9 +114,13 @@ public class MavenCli
 
     // Per-instance container supports fast embedded execution of core ITs
     private DefaultPlexusContainer container;
+    
+    private LoggerManager plexusLoggerManager;
 
-    private Logger logger;
-
+    private ILoggerFactory slf4jLoggerFactory;
+    
+    private Logger slf4jLogger;
+    
     private EventSpyDispatcher eventSpyDispatcher;
 
     private ModelProcessor modelProcessor;
@@ -188,7 +201,6 @@ public class MavenCli
         try
         {
             initialize( cliRequest );
-            // Need to process cli options first to get possible logging options
             cli( cliRequest );
             logging( cliRequest );
             version( cliRequest );
@@ -211,13 +223,13 @@ public class MavenCli
         }
         catch ( BuildAbort e )
         {
-            CLIReportingUtils.showError( logger, "ABORTED", e, cliRequest.showErrors );
+            CLIReportingUtils.showError( slf4jLogger, "ABORTED", e, cliRequest.showErrors );
 
             return 2;
         }
         catch ( Exception e )
         {
-            CLIReportingUtils.showError( logger, "Error executing Maven.", e, cliRequest.showErrors );
+            CLIReportingUtils.showError( slf4jLogger, "Error executing Maven.", e, cliRequest.showErrors );
 
             return 1;
         }
@@ -226,10 +238,6 @@ public class MavenCli
             if ( localContainer != this.container )
             {
                 localContainer.dispose();
-            }
-            if ( cliRequest.fileStream != null )
-            {
-                cliRequest.fileStream.close();
             }
         }
     }
@@ -253,54 +261,6 @@ public class MavenCli
         }
     }
 
-    //
-    // Logging needs to be handled in a standard way at the container level.
-    //
-    private void logging( CliRequest cliRequest )
-    {
-        cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
-        cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
-        cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
-
-        if ( cliRequest.debug )
-        {
-            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
-        }
-        else if ( cliRequest.quiet )
-        {
-            // TODO: we need to do some more work here. Some plugins use sys out or log errors at info level.
-            // Ideally, we could use Warn across the board
-            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
-            // TODO:Additionally, we can't change the mojo level because the component key includes the version and
-            // it isn't known ahead of time. This seems worth changing.
-        }
-        else
-        {
-            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
-        }
-
-        if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
-        {
-            File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
-            logFile = resolveFile( logFile, cliRequest.workingDirectory );
-
-            try
-            {
-                cliRequest.fileStream = new PrintStream( logFile );
-
-                System.setOut( cliRequest.fileStream );
-                System.setErr( cliRequest.fileStream );
-            }
-            catch ( FileNotFoundException e )
-            {
-                System.err.println( e );
-            }
-        }
-    }
-
-    //
-    // Every bit of information taken from the CLI should be processed here.
-    //
     private void cli( CliRequest cliRequest )
         throws Exception
     {
@@ -317,8 +277,6 @@ public class MavenCli
             throw e;
         }
 
-        // TODO: these should be moved out of here. Wrong place.
-        //
         if ( cliRequest.commandLine.hasOption( CLIManager.HELP ) )
         {
             cliManager.displayHelp( System.out );
@@ -327,16 +285,53 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            CLIReportingUtils.showVersion( System.out );
+            System.out.println(CLIReportingUtils.showVersion());
             throw new ExitException( 0 );
         }
+    }    
+
+    //
+    // All logging is handled by SFL4J
+    //
+    private void logging( CliRequest cliRequest )
+    {
+        cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
+        cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
+        cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
+
+        if ( cliRequest.debug )
+        {
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
+            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "debug" );            
+        }
+        else if ( cliRequest.quiet )
+        {
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
+            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "error" );            
+        }
+        else
+        {
+            cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
+            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "info" );
+        }
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
+        {
+            File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
+            logFile = resolveFile( logFile, cliRequest.workingDirectory );
+            System.setProperty("org.slf4j.simpleLogger.logFile", logFile.getAbsolutePath());
+        }
+
+        plexusLoggerManager = new Slf4jLoggerManager();       
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+        slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
     }
 
     private void version( CliRequest cliRequest )
     {
         if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
-            CLIReportingUtils.showVersion( System.out );
+            System.out.print(CLIReportingUtils.showVersion());
         }
     }
 
@@ -344,16 +339,16 @@ public class MavenCli
     {
         if ( cliRequest.showErrors )
         {
-            logger.info( "Error stacktraces are turned on." );
+            slf4jLogger.info( "Error stacktraces are turned on." );
         }
 
         if ( MavenExecutionRequest.CHECKSUM_POLICY_WARN.equals( cliRequest.request.getGlobalChecksumPolicy() ) )
         {
-            logger.info( "Disabling strict checksum verification on all artifact downloads." );
+            slf4jLogger.info( "Disabling strict checksum verification on all artifact downloads." );
         }
         else if ( MavenExecutionRequest.CHECKSUM_POLICY_FAIL.equals( cliRequest.request.getGlobalChecksumPolicy() ) )
         {
-            logger.info( "Enabling strict checksum verification on all artifact downloads." );
+            slf4jLogger.info( "Enabling strict checksum verification on all artifact downloads." );
         }
     }
 
@@ -374,10 +369,6 @@ public class MavenCli
 
         if ( container == null )
         {
-            logger = setupLogger( cliRequest );
-
-            final MavenLoggerManager loggerManager = new MavenLoggerManager( logger ) ;
-
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld( cliRequest.classWorld )
                 .setRealm( setupContainerRealm( cliRequest ) )
@@ -390,7 +381,7 @@ public class MavenCli
 
                 protected void configure()
                 {
-                    bind( ILoggerFactory.class ).toInstance( new PlexusLoggerFactory( loggerManager ) );
+                    bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
                 }
 
             } );
@@ -398,7 +389,7 @@ public class MavenCli
             // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
             container.setLookupRealm( null );
 
-            container.setLoggerManager( loggerManager );
+            container.setLoggerManager( plexusLoggerManager );
 
             customizeContainer( container );
 
@@ -424,7 +415,7 @@ public class MavenCli
         eventSpyDispatcher.init( eventSpyContext );
 
         // refresh logger in case container got customized by spy
-        logger = container.getLoggerManager().getLoggerForComponent( MavenCli.class.getName(), null );
+        slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
 
         maven = container.lookup( Maven.class );
 
@@ -437,21 +428,6 @@ public class MavenCli
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
         return container;
-    }
-
-    private PrintStreamLogger setupLogger( CliRequest cliRequest )
-    {
-        PrintStreamLogger logger = new PrintStreamLogger( new PrintStreamLogger.Provider()
-        {
-            public PrintStream getStream()
-            {
-                return System.out;
-            }
-        } );
-
-        logger.setThreshold( cliRequest.request.getLoggingLevel() );
-
-        return logger;
     }
 
     private ClassRealm setupContainerRealm( CliRequest cliRequest )
@@ -479,13 +455,13 @@ public class MavenCli
 
                 ClassRealm extRealm = cliRequest.classWorld.newRealm( "maven.ext", null );
 
-                logger.debug( "Populating class realm " + extRealm.getId() );
+                slf4jLogger.debug( "Populating class realm " + extRealm.getId() );
 
                 for ( String jar : jars )
                 {
                     File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
 
-                    logger.debug( "  Included " + file );
+                    slf4jLogger.debug( "  Included " + file );
 
                     extRealm.addURL( file.toURI().toURL() );
                 }
@@ -497,10 +473,6 @@ public class MavenCli
         }
 
         return containerRealm;
-    }
-
-    protected void customizeContainer( PlexusContainer container )
-    {
     }
 
     //
@@ -583,39 +555,39 @@ public class MavenCli
                 }
             }
 
-            logger.error( "" );
+            slf4jLogger.error( "" );
 
             if ( !cliRequest.showErrors )
             {
-                logger.error( "To see the full stack trace of the errors, re-run Maven with the -e switch." );
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the -e switch." );
             }
-            if ( !logger.isDebugEnabled() )
+            if ( !slf4jLogger.isDebugEnabled() )
             {
-                logger.error( "Re-run Maven using the -X switch to enable full debug logging." );
+                slf4jLogger.error( "Re-run Maven using the -X switch to enable full debug logging." );
             }
 
             if ( !references.isEmpty() )
             {
-                logger.error( "" );
-                logger.error( "For more information about the errors and possible solutions"
+                slf4jLogger.error( "" );
+                slf4jLogger.error( "For more information about the errors and possible solutions"
                               + ", please read the following articles:" );
 
                 for ( Map.Entry<String, String> entry : references.entrySet() )
                 {
-                    logger.error( entry.getValue() + " " + entry.getKey() );
+                    slf4jLogger.error( entry.getValue() + " " + entry.getKey() );
                 }
             }
 
             if ( project != null && !project.equals( result.getTopologicallySortedProjects().get( 0 ) ) )
             {
-                logger.error( "" );
-                logger.error( "After correcting the problems, you can resume the build with the command" );
-                logger.error( "  mvn <goals> -rf :" + project.getArtifactId() );
+                slf4jLogger.error( "" );
+                slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
+                slf4jLogger.error( "  mvn <goals> -rf :" + project.getArtifactId() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
             {
-                logger.info( "Build failures were ignored." );
+                slf4jLogger.info( "Build failures were ignored." );
 
                 return 0;
             }
@@ -667,11 +639,11 @@ public class MavenCli
 
             if ( i == lines.length - 1 && ( showErrors || ( summary.getException() instanceof InternalErrorException ) ) )
             {
-                logger.error( line, summary.getException() );
+                slf4jLogger.error( line, summary.getException() );
             }
             else
             {
-                logger.error( line );
+                slf4jLogger.error( line );
             }
         }
 
@@ -681,12 +653,6 @@ public class MavenCli
         {
             logSummary( child, references, indent, showErrors );
         }
-    }
-
-    protected ModelProcessor createModelProcessor( PlexusContainer container )
-        throws ComponentLookupException
-    {
-        return container.lookup( ModelProcessor.class );
     }
 
     private void settings( CliRequest cliRequest )
@@ -740,9 +706,9 @@ public class MavenCli
 
         eventSpyDispatcher.onEvent( settingsRequest );
 
-        logger.debug( "Reading global settings from "
+        slf4jLogger.debug( "Reading global settings from "
             + getSettingsLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        logger.debug( "Reading user settings from "
+        slf4jLogger.debug( "Reading user settings from "
             + getSettingsLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
@@ -751,17 +717,17 @@ public class MavenCli
 
         executionRequestPopulator.populateFromSettings( cliRequest.request, settingsResult.getEffectiveSettings() );
 
-        if ( !settingsResult.getProblems().isEmpty() && logger.isWarnEnabled() )
+        if ( !settingsResult.getProblems().isEmpty() && slf4jLogger.isWarnEnabled() )
         {
-            logger.warn( "" );
-            logger.warn( "Some problems were encountered while building the effective settings" );
+            slf4jLogger.warn( "" );
+            slf4jLogger.warn( "Some problems were encountered while building the effective settings" );
 
             for ( SettingsProblem problem : settingsResult.getProblems() )
             {
-                logger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+                slf4jLogger.warn( problem.getMessage() + " @ " + problem.getLocation() );
             }
 
-            logger.warn( "" );
+            slf4jLogger.warn( "" );
         }
     }
 
@@ -787,7 +753,7 @@ public class MavenCli
         {
             if ( commandLine.hasOption( deprecatedOption ) )
             {
-                logger.warn( "Command line option -" + deprecatedOption
+                slf4jLogger.warn( "Command line option -" + deprecatedOption
                     + " is deprecated and will be removed in future Maven versions." );
             }
         }
@@ -909,14 +875,14 @@ public class MavenCli
         }
         else if ( request.isInteractiveMode() )
         {
-            transferListener = new ConsoleMavenTransferListener( System.out );
+            transferListener = new ConsoleMavenTransferListener( slf4jLogger );
         }
         else
         {
-            transferListener = new BatchModeMavenTransferListener( System.out );
+            transferListener = new BatchModeMavenTransferListener( slf4jLogger );
         }
 
-        ExecutionListener executionListener = new ExecutionEventLogger( logger );
+        ExecutionListener executionListener = new ExecutionEventLogger( slf4jLogger );
         executionListener = eventSpyDispatcher.chainListener( executionListener );
 
         String alternatePomFile = null;
@@ -1146,7 +1112,6 @@ public class MavenCli
         boolean debug;
         boolean quiet;
         boolean showErrors = true;
-        PrintStream fileStream;
         Properties userProperties = new Properties();
         Properties systemProperties = new Properties();
         MavenExecutionRequest request;
@@ -1172,4 +1137,32 @@ public class MavenCli
 
     }
 
+    private PrintStreamLogger setupLogger( int loggingLevel )
+    {
+        PrintStreamLogger logger = new PrintStreamLogger( new PrintStreamLogger.Provider()
+        {
+            public PrintStream getStream()
+            {
+                return System.out;
+            }
+        } );
+
+        logger.setThreshold( loggingLevel );
+
+        return logger;
+    }        
+    
+    //
+    // Customizations available via the CLI
+    //
+    
+    protected void customizeContainer( PlexusContainer container )
+    {
+    }
+
+    protected ModelProcessor createModelProcessor( PlexusContainer container )
+        throws ComponentLookupException
+    {
+        return container.lookup( ModelProcessor.class );
+    }        
 }

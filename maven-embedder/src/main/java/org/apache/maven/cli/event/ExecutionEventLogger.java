@@ -1,4 +1,4 @@
-package org.apache.maven.cli;
+package org.apache.maven.cli.event;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -30,7 +30,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 /**
  * Logs execution events to a user-supplied logger.

@@ -21,17 +21,16 @@ package org.apache.maven.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.TimeZone;
 
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
+import org.slf4j.Logger;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -50,24 +49,18 @@ public final class CLIReportingUtils
     
     public static final String BUILD_VERSION_PROPERTY = "version";
 
-    public static void showVersion( PrintStream stdout )
+    public static String showVersion()
     {
+        String LS = System.getProperty("line.separator");
         Properties properties = getBuildProperties();
-        stdout.println( createMavenVersionString( properties ) );
-        String shortName = reduce( properties.getProperty( "distributionShortName" ) );
-
-        stdout.println( shortName + " home: " + System.getProperty( "maven.home", "<unknown maven home>" ) );
-
-        stdout.println( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
-            + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) );
-
-        stdout.println( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) );
-
-        stdout.println( "Default locale: " + Locale.getDefault() + ", platform encoding: "
-            + System.getProperty( "file.encoding", "<unknown encoding>" ) );
-
-        stdout.println( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH
-            + "\", family: \"" + Os.OS_FAMILY + "\"" );
+        StringBuffer version = new StringBuffer();
+        version.append( createMavenVersionString( properties ) ).append( LS );
+        version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: " + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( LS );
+        version.append( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( LS );
+        version.append( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) ).append( LS );
+        version.append( "Default locale: " + Locale.getDefault() + ", platform encoding: " + System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( LS );
+        version.append( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH + "\", family: \"" + Os.OS_FAMILY + "\"" );
+        return version.toString();
     }
 
     /**
@@ -105,75 +98,6 @@ public final class CLIReportingUtils
         return ( s != null ? ( s.startsWith( "${" ) && s.endsWith( "}" ) ? null : s ) : null );
     }
 
-
-    private static void stats( Date start, Logger logger )
-    {
-        Date finish = new Date();
-
-        long time = finish.getTime() - start.getTime();
-
-        logger.info( "Total time: " + formatTime( time ) );
-
-        logger.info( "Finished at: " + finish );
-
-        //noinspection CallToSystemGC
-        System.gc();
-
-        Runtime r = Runtime.getRuntime();
-
-        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
-    }
-
-    private static String formatTime( long ms )
-    {
-        long secs = ms / MS_PER_SEC;
-
-        long min = secs / SEC_PER_MIN;
-
-        secs = secs % SEC_PER_MIN;
-
-        String msg = "";
-
-        if ( min > 1 )
-        {
-            msg = min + " minutes ";
-        }
-        else if ( min == 1 )
-        {
-            msg = "1 minute ";
-        }
-
-        if ( secs > 1 )
-        {
-            msg += secs + " seconds";
-        }
-        else if ( secs == 1 )
-        {
-            msg += "1 second";
-        }
-        else if ( min == 0 )
-        {
-            msg += "< 1 second";
-        }
-        return msg;
-    }
-
-    private static String getFormattedTime( long time )
-    {
-        String pattern = "s.SSS's'";
-        if ( time / 60000L > 0 )
-        {
-            pattern = "m:s" + pattern;
-            if ( time / 3600000L > 0 )
-            {
-                pattern = "H:m" + pattern;
-            }
-        }
-        DateFormat fmt = new SimpleDateFormat( pattern );
-        fmt.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
-        return fmt.format( new Date( time ) );
-    }
-
     static Properties getBuildProperties()
     {
         Properties properties = new Properties();
@@ -201,11 +125,6 @@ public final class CLIReportingUtils
 
     public static void showError( Logger logger, String message, Throwable e, boolean showStackTrace )
     {
-        if ( logger == null )
-        {
-            logger = new PrintStreamLogger( System.out );
-        }
-
         if ( showStackTrace )
         {
             logger.error( message, e );

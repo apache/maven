@@ -211,10 +211,21 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-nop</artifactId>
+        <artifactId>slf4j-simple</artifactId>
         <version>${slf4jVersion}</version>
         <scope>runtime</scope>
+<<<<<<< HEAD
       </dependency>      
+=======
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${log4jVersion}</version>
+        <scope>runtime</scope>
+      </dependency>
+      
+>>>>>>> 4595e08... o Use SLF4J for logging
       <!--  Wagon -->
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>

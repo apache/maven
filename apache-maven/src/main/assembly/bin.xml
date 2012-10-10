@@ -37,30 +37,7 @@ under the License.
       <excludes>
         <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
         <exclude>junit:junit</exclude>
-        <exclude>log4j:log4j</exclude>
         <exclude>commons-logging:commons-logging-api</exclude>
-      
-        <!--exclude>org.codehaus.plexus:plexus-classworlds</exclude>
-        <exclude>org.codehaus.plexus:plexus-component-api</exclude>
-        <exclude>classworlds:classworlds</exclude>
-        <exclude>junit:junit</exclude>
-        <exclude>jmock:jmock</exclude>
-        <exclude>xml-apis:xml-apis</exclude>
-        <exclude>org.apache.maven:apache-maven</exclude>
-        <exclude>org.apache.maven:maven-artifact</exclude>
-        <exclude>org.apache.maven:maven-monitor</exclude>
-        <exclude>org.apache.maven:maven-plugin-descriptor</exclude>
-        <exclude>jdom:jdom</exclude>
-        <exclude>org.apache.maven:apache-maven</exclude>
-        <exclude>bouncycastle:bcprov-jdk15</exclude>
-        <exclude>bouncycastle:bcpg-jdk15</exclude>
-        <exclude>log4j:log4j</exclude>
-        <exclude>org.sonatype.mercury:mercury-mp3-cli</exclude>
-        <exclude>commons-logging:commons-logging-api</exclude>
-        <exclude>org.slf4j:slf4j-api</exclude>
-        <exclude>org.slf4j:slf4j-jdk14</exclude>
-        <exclude>org.apache.maven.mercury:mercury-crypto-api</exclude>
-        <exclude>org.apache.maven.mercury:mercury-crypto-basic</exclude-->        
       </excludes>
     </dependencySet>
   </dependencySets>
