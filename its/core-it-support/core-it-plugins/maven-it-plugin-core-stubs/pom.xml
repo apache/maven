@@ -32,6 +32,10 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven ITs :: Core Plugin Stubs</name>
+  <description>
+    Collection of test plugins that have the same coordinates and goals as the Core Maven Plugins. Their goals only create marker
+    files to check the principle invocation of the goals via the build lifecycle binding.
+  </description>
 
   <modules>
     <module>maven-clean-plugin</module>
