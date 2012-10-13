@@ -31,8 +31,11 @@ under the License.
   <artifactId>maven-it-plugin-settings</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Maven IT Plugin :: Touch</name>
-  <inceptionYear>2001</inceptionYear>
+  <name>Maven IT Plugin :: Settings</name>
+  <description>
+    A test plugin that dumps settings.
+  </description>
+  <inceptionYear>2012</inceptionYear>
 
   <dependencies>
     <dependency>
