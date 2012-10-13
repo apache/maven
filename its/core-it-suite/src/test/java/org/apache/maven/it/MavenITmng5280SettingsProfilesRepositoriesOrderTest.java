@@ -52,7 +52,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
 
     public MavenITmng5280SettingsProfilesRepositoriesOrderTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "(3.0.4,)" );
     }
 
     public void setUp()
