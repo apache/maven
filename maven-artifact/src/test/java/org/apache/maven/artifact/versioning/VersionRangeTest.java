@@ -661,6 +661,7 @@ public class VersionRangeTest
 
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.2-SNAPSHOT" ) ) );
+        assertFalse( range.containsVersion( new DefaultArtifactVersion( "1.0-SNAPSHOT" ) ) );
     }
 
     public void testSnapshotRangeBoundsCanContainSnapshots()
