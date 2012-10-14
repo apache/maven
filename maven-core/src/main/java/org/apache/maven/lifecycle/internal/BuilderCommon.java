@@ -35,6 +35,7 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -69,7 +70,6 @@ public class BuilderCommon
     private Logger logger;
 
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public BuilderCommon()
     {
     }
@@ -101,17 +101,30 @@ public class BuilderCommon
             {
                 logger.warn( "*****************************************************************" );
                 logger.warn( "* Your build is requesting parallel execution, but project      *" );
-                logger.warn( "* contains the following plugin(s) that are not marked as       *" );
-                logger.warn( "* @threadSafe to support parallel building.                     *" );
+                logger.warn( "* contains the following plugin(s) that have goals not marked   *" );
+                logger.warn( "* as @threadSafe to support parallel building.                  *" );
                 logger.warn( "* While this /may/ work fine, please look for plugin updates    *" );
                 logger.warn( "* and/or request plugins be made thread-safe.                   *" );
                 logger.warn( "* If reporting an issue, report it against the plugin in        *" );
                 logger.warn( "* question, not against maven-core                              *" );
                 logger.warn( "*****************************************************************" );
-                logger.warn( "The following plugins are not marked @threadSafe in " + project.getName() + ":" );
-                for ( Plugin unsafePlugin : unsafePlugins )
+                if ( logger.isDebugEnabled() )
                 {
-                    logger.warn( unsafePlugin.getId() );
+                    final Set<MojoDescriptor> unsafeGoals = executionPlan.getNonThreadSafeMojos();
+                    logger.warn( "The following goals are not marked @threadSafe in " + project.getName() + ":" );
+                    for ( MojoDescriptor unsafeGoal : unsafeGoals )
+                    {
+                        logger.warn( unsafeGoal.getId() );
+                    }
+                }
+                else
+                {
+                    logger.warn( "The following plugins are not marked @threadSafe in " + project.getName() + ":" );
+                    for ( Plugin unsafePlugin : unsafePlugins )
+                    {
+                        logger.warn( unsafePlugin.getId() );
+                    }
+                    logger.warn( "Enable debug to see more precisely which goals are not marked @threadSafe." );
                 }
                 logger.warn( "*****************************************************************" );
             }

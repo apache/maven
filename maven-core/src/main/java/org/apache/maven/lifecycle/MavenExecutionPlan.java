@@ -32,6 +32,7 @@ import java.util.Set;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 //TODO: lifecycles being executed
 //TODO: what runs in each phase
@@ -170,7 +171,11 @@ public class MavenExecutionPlan
         return result;
     }
 
-
+    /**
+     * Get set of plugins having a goal/mojo used but not marked @threadSafe
+     *
+     * @return the set of plugins (without info on which goal is concerned)
+     */
     public Set<Plugin> getNonThreadSafePlugins()
     {
         Set<Plugin> plugins = new HashSet<Plugin>();
@@ -183,6 +188,25 @@ public class MavenExecutionPlan
             }
         }
         return plugins;
+    }
+
+    /**
+     * Get set of mojos used but not marked @threadSafe
+     *
+     * @return the set of mojo descriptors
+     */
+    public Set<MojoDescriptor> getNonThreadSafeMojos()
+    {
+        Set<MojoDescriptor> mojos = new HashSet<MojoDescriptor>();
+        for ( ExecutionPlanItem executionPlanItem : planItem )
+        {
+            final MojoExecution mojoExecution = executionPlanItem.getMojoExecution();
+            if ( !mojoExecution.getMojoDescriptor().isThreadSafe() )
+            {
+                mojos.add( mojoExecution.getMojoDescriptor() );
+            }
+        }
+        return mojos;
     }
 
     // Used by m2e but will be removed, really.
