@@ -79,7 +79,7 @@ public class PluginParameterException
         if ( param.isEditable() )
         {
             messageBuffer.append( "Inside the definition for plugin \'" + mojo.getPluginDescriptor().getArtifactId()
-                + "\' specify the following:\n\n<configuration>\n  ...\n  <" + param.getName() + ">VALUE</"
+                + "\', specify the following:\n\n<configuration>\n  ...\n  <" + param.getName() + ">VALUE</"
                 + param.getName() + ">\n</configuration>" );
 
             String alias = param.getAlias();
