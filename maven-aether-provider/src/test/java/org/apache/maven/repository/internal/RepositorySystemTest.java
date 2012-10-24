@@ -71,10 +71,24 @@ public class RepositorySystemTest
         CollectResult collectResult = system.collectDependencies( session, collectRequest );
 
         assertEquals( 1, collectResult.getRoot().getChildren().size() );
-        Artifact dep = collectResult.getRoot().getChildren().get( 0 ).getDependency().getArtifact();
-        assertEquals( "ut.simple", dep.getGroupId() );
-        assertEquals( "dependency", dep.getArtifactId() );
-        assertEquals( "1.0", dep.getVersion() );
+        Dependency dep = collectResult.getRoot().getChildren().get( 0 ).getDependency();
+        assertEquals( "compile", dep.getScope() );
+        assertFalse( dep.isOptional() );
+        assertEquals( 0, dep.getExclusions().size() );
+        Artifact depArtifact = dep.getArtifact();
+        assertEquals( "ut.simple", depArtifact.getGroupId() );
+        assertEquals( "dependency", depArtifact.getArtifactId() );
+        assertEquals( "1.0", depArtifact.getVersion() );
+        assertEquals( "1.0", depArtifact.getBaseVersion() );
+        assertNull( depArtifact.getFile() );
+        assertFalse( depArtifact.isSnapshot() );
+        assertEquals( "", depArtifact.getClassifier() );
+        assertEquals( "jar", depArtifact.getExtension() );
+        assertEquals( "java", depArtifact.getProperty( "language", null ) );
+        assertEquals( "jar", depArtifact.getProperty( "type", null ) );
+        assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) );
+        assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
+        assertEquals( 4, depArtifact.getProperties().size() );
     }
 
     public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
