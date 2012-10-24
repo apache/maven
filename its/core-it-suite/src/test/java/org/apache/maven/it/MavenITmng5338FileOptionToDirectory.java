@@ -55,9 +55,6 @@ public class MavenITmng5338FileOptionToDirectory
         super.tearDown();
     }
 
-    /**
-     * Verify that the repositories are used in the reversed order of definition in settings.xml.
-     */
     public void testFileOptionToADirectory()
         throws Exception
     {
