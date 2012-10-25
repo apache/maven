@@ -19,6 +19,8 @@ package org.apache.maven.exception;
  * under the License.
  */
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +177,14 @@ public class DefaultExceptionHandler
             if ( exception instanceof MojoExecutionException )
             {
                 reference = MojoExecutionException.class.getSimpleName();
+
+                Throwable cause = exception.getCause();
+                if ( cause instanceof IOException ) {
+                    cause = cause.getCause();
+                    if ( cause instanceof ConnectException ) {
+                        reference = ConnectException.class.getSimpleName();
+                    }
+                }
             }
             else if ( exception instanceof MojoFailureException )
             {
