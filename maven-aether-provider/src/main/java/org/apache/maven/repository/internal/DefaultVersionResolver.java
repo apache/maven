@@ -36,15 +36,11 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.ConfigurationProperties;
 import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.RequestTrace;
 import org.sonatype.aether.SyncContext;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.util.metadata.DefaultMetadata;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.MetadataResolver;
 import org.sonatype.aether.impl.RepositoryEventDispatcher;
@@ -66,6 +62,10 @@ import org.sonatype.aether.spi.locator.Service;
 import org.sonatype.aether.spi.locator.ServiceLocator;
 import org.sonatype.aether.spi.log.Logger;
 import org.sonatype.aether.spi.log.NullLogger;
+import org.sonatype.aether.util.ConfigUtils;
+import org.sonatype.aether.util.DefaultRequestTrace;
+import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
+import org.sonatype.aether.util.metadata.DefaultMetadata;
 
 /**
  * @author Benjamin Bentmann
@@ -153,7 +153,8 @@ public class DefaultVersionResolver
 
         Key cacheKey = null;
         RepositoryCache cache = session.getCache();
-        if ( cache != null && !ConfigurationProperties.get( session, "aether.versionResolver.noCache", false ) )
+
+        if ( cache != null && !ConfigUtils.getBoolean( session, false, "aether.versionResolver.noCache" ) )
         {
             cacheKey = new Key( session, request );
 
