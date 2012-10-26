@@ -1,0 +1,26 @@
+<metadata modelVersion="1.1.0">
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>dep-mng5324</artifactId>
+  <version>07.20.3-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20120809.112920</timestamp>
+      <buildNumber>97</buildNumber>
+    </snapshot>
+    <lastUpdated>20120809112920</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <classifier>classifierA</classifier>
+        <extension>jar</extension>
+        <value>07.20.3-20120809.112124-88</value>
+        <updated>20120809112124</updated>
+      </snapshotVersion>
+      <snapshotVersion>
+        <classifier>classifierB</classifier>
+        <extension>jar</extension>
+        <value>07.20.3-20120809.112920-97</value>
+        <updated>20120809112920</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
