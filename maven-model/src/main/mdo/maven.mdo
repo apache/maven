@@ -1311,7 +1311,7 @@
             usually represents the extension on the filename of the dependency,
             that is not always the case. A type can be mapped to a different
             extension and a classifier.
-            The type often correspongs to the packaging used, though this is also
+            The type often corresponds to the packaging used, though this is also
             not always the case.
             Some examples are <code>jar</code>, <code>war</code>, <code>ejb-client</code>
             and <code>test-jar</code>.
