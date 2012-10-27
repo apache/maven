@@ -10,11 +10,13 @@ Maven Repository Metadata Model
 
  This is strictly the model for Maven Repository Metadata, so really just plain objects.
 
- Maven Repository Metadata is stored in directories representing:
+ Maven Repository Metadata is available in directories representing:
 
- * either an artifact (without version)
+ [[1]] an un-versioned artifact: it gives informations about available versions of the artifact,
 
- * or a group containing Maven plugins artifacts.
+ [[2]] a snapshot artifact: it gives precise information on the snapshot,
+
+ [[3]] a group containing Maven plugins artifacts: it gives informations on plugins available in this group.
 
  []
 
