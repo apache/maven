@@ -45,7 +45,8 @@ public class DefaultExceptionHandlerTest
     public void testJdk7ipv6()
     {
         ConnectException connEx = new ConnectException( "Connection refused: connect" );
-        IOException ioEx = new IOException( "Unable to establish loopback connection", connEx );
+        IOException ioEx = new IOException( "Unable to establish loopback connection" );
+        ioEx.initCause( connEx );
         MojoExecutionException mojoEx =
             new MojoExecutionException( "Error executing Jetty: Unable to establish loopback connection", ioEx );
 
