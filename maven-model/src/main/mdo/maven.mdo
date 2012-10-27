@@ -1331,7 +1331,7 @@
             The classifier of the dependency. It is appended to
             the filename after the version. This allows:
             <ul>
-            <li>refering to attached artifact, for example <code>sources</code> and <javadoc>:
+            <li>refering to attached artifact, for example <code>sources</code> and <code>javadoc</code>:
             see <a href="../maven-core/artifact-handlers.html">default artifact handlers</a> for a list,</li>
             <li>distinguishing two artifacts
             that belong to the same POM but were built differently.
