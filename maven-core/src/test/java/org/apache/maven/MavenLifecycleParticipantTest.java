@@ -88,8 +88,9 @@ public class MavenLifecycleParticipantTest
     {
         PlexusContainer container = getContainer();
 
-        ComponentDescriptor cd =
-            new ComponentDescriptor( InjectDependencyLifecycleListener.class, container.getContainerRealm() );
+        ComponentDescriptor<? extends AbstractMavenLifecycleParticipant> cd =
+            new ComponentDescriptor<InjectDependencyLifecycleListener>( InjectDependencyLifecycleListener.class,
+                                                                        container.getContainerRealm() );
         cd.setRoleClass( AbstractMavenLifecycleParticipant.class );
         container.addComponentDescriptor( cd );
 

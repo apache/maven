@@ -1,11 +1,6 @@
 package org.apache.maven;
 
-import java.io.File;
-
 import org.apache.maven.exception.ExceptionHandler;
-import org.apache.maven.exception.ExceptionSummary;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionResult;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 public class MavenTest

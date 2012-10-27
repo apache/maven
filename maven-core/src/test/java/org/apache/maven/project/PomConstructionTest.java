@@ -396,7 +396,7 @@ public class PomConstructionTest
     public void testConsecutiveEmptyElements()
         throws Exception
     {
-        PomTestWrapper pom = buildPom( "consecutive_empty_elements" );
+        buildPom( "consecutive_empty_elements" );
     }
 
     public void testOrderOfGoalsFromPluginExecutionWithoutPluginManagement()
@@ -1490,14 +1490,14 @@ public class PomConstructionTest
     public void testDependencyScope()
 	    throws Exception
 	{
-	    PomTestWrapper pom = buildPom( "dependency-scope/sub" );
+	    buildPom( "dependency-scope/sub" );
 	}   
  
     //This will fail on a validation error if incorrect
     public void testDependencyManagementWithInterpolation()
 	    throws Exception
 	{
-	    PomTestWrapper pom = buildPom( "dependency-management-with-interpolation/sub" );
+	    buildPom( "dependency-management-with-interpolation/sub" );
 	}   
 
     public void testInterpolationWithSystemProperty()
@@ -1514,6 +1514,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-inheritance/wo-merge" );
+        @SuppressWarnings( "unchecked" )
         List<PluginExecution> executions =
             (List<PluginExecution>) pom.getValue( "build/pluginsAsMap[@name='org.apache.maven.its.plugins:maven-it-plugin-log-file']/executions" );
         assertEquals( 1, executions.size() );
@@ -1524,6 +1525,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-inheritance/w-merge" );
+        @SuppressWarnings( "unchecked" )
         List<PluginExecution> executions =
             (List<PluginExecution>) pom.getValue( "build/pluginsAsMap[@name='org.apache.maven.its.plugins:maven-it-plugin-log-file']/executions" );
         assertEquals( 1, executions.size() );
@@ -1684,6 +1686,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-order-and-default-exec" );
+        @SuppressWarnings( "unchecked" )
         List<PluginExecution> executions =
             (List<PluginExecution>) pom.getValue( "build/plugins[@artifactId='maven-resources-plugin']/executions" );
         assertNotNull( executions );
@@ -1698,6 +1701,7 @@ public class PomConstructionTest
         throws Exception
     {
         PomTestWrapper pom = buildPom( "plugin-exec-order-with-lifecycle" );
+        @SuppressWarnings( "unchecked" )
         List<Plugin> plugins = (List<Plugin>) pom.getValue( "build/plugins" );
         int resourcesPlugin = -1;
         int customPlugin = -1;
@@ -1735,7 +1739,9 @@ public class PomConstructionTest
         expected.add( "maven-it-plugin-touch" );
 
         List<String> actual = new ArrayList<String>();
-        for ( Plugin plugin : (List<Plugin>) pom.getValue( "build/plugins" ) )
+        @SuppressWarnings( "unchecked" )
+        List<Plugin> plugins = (List<Plugin>) pom.getValue( "build/plugins" );
+        for ( Plugin plugin : plugins )
         {
             actual.add( plugin.getArtifactId() );
         }
@@ -1762,7 +1768,9 @@ public class PomConstructionTest
         expected.add( "maven-it-plugin-touch" );
 
         List<String> actual = new ArrayList<String>();
-        for ( Plugin plugin : (List<Plugin>) pom.getValue( "build/plugins" ) )
+        @SuppressWarnings( "unchecked" )
+        List<Plugin> plugins = (List<Plugin>) pom.getValue( "build/plugins" );
+        for ( Plugin plugin : plugins )
         {
             actual.add( plugin.getArtifactId() );
         }

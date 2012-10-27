@@ -32,8 +32,6 @@ public class MojoExecutionXPathContainer
 {
     private JXPathContext context;
 
-    private MojoExecution mojoExecution;
-
     static
     {
         JXPathContextReferenceImpl.addNodePointerFactory( new Xpp3DomPointerFactory() );
@@ -42,7 +40,6 @@ public class MojoExecutionXPathContainer
     public MojoExecutionXPathContainer( MojoExecution mojoExecution )
         throws IOException
     {
-        this.mojoExecution = mojoExecution;
         context = JXPathContext.newContext( mojoExecution );
     }
 

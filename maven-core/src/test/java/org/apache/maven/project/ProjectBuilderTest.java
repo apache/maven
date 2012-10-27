@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
@@ -48,6 +47,6 @@ public class ProjectBuilderTest
         // Here we will actually not have any artifacts because the ProjectDependenciesResolver is not involved here. So
         // right now it's not valid to ask for artifacts unless plugins require the artifacts.
         
-        List<String> elements = project.getCompileClasspathElements();
+        project.getCompileClasspathElements();
     }
 }

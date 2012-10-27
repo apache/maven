@@ -58,6 +58,7 @@ public class LifecycleWeaveBuilderTest
     }
   */
 
+    @SuppressWarnings( "unused" )
     public void testBuildProjectThreaded()
         throws Exception
     {
@@ -67,6 +68,7 @@ public class LifecycleWeaveBuilderTest
         executor.shutdown();
     }
 
+    @SuppressWarnings( "unused" )
     public void testBuildProjectThreadedAggressive()
         throws Exception
     {

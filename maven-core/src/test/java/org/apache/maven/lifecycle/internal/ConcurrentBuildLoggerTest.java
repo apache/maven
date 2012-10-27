@@ -29,6 +29,7 @@ import java.util.Iterator;
 public class ConcurrentBuildLoggerTest
     extends TestCase
 {
+    @SuppressWarnings( "unused" )
     public void testToGraph()
         throws Exception
     {

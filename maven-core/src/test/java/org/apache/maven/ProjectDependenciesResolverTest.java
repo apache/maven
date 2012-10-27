@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Exclusion;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
 
@@ -92,6 +91,7 @@ public class ProjectDependenciesResolverTest
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );
         
+        @SuppressWarnings( "deprecation" )
         List<Artifact> artifacts = project.getCompileArtifacts();
         assertEquals( 1, artifacts.size() );
         assertTrue( artifacts.get( 0 ).getFile().getName().endsWith( "tools.jar" ) );

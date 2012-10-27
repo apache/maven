@@ -57,11 +57,13 @@ public class DefaultMavenMetadataCacheTest
         throws Exception
     {
         Artifact a1 = repositorySystem.createArtifact( "testGroup", "testArtifact", "1.2.3", "jar" );
+        @SuppressWarnings( "deprecation" )
         ArtifactRepository lr1 = new DelegatingLocalArtifactRepository( repositorySystem.createDefaultLocalRepository() );
         ArtifactRepository rr1 = repositorySystem.createDefaultRemoteRepository();
         a1.setDependencyFilter( new ExcludesArtifactFilter( Arrays.asList( "foo" ) ) );
 
         Artifact a2 = repositorySystem.createArtifact( "testGroup", "testArtifact", "1.2.3", "jar" );
+        @SuppressWarnings( "deprecation" )
         ArtifactRepository lr2 = new DelegatingLocalArtifactRepository( repositorySystem.createDefaultLocalRepository() );
         ArtifactRepository rr2 = repositorySystem.createDefaultRemoteRepository();
         a2.setDependencyFilter( new ExcludesArtifactFilter( Arrays.asList( "foo" ) ) );

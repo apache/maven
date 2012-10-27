@@ -29,7 +29,6 @@ import java.util.Properties;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -315,6 +314,7 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "value", value );
     }
 
+    @SuppressWarnings( "deprecation" )
     private static MavenSession createSession( PlexusContainer container, ArtifactRepository repo, Properties properties )
         throws CycleDetectedException, DuplicateProjectException
     {
