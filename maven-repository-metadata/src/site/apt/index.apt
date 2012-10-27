@@ -10,6 +10,22 @@ Maven Repository Metadata Model
 
  This is strictly the model for Maven Repository Metadata, so really just plain objects.
 
+ Maven Repository Metadata is stored in directories representing:
+
+ * either an artifact (without version)
+
+ * or a group containing Maven plugins artifacts.
+
+ []
+
+ The metadata file name is:
+
+ * <<<maven-metadata.xml>>> in a remote repository,
+
+ * <<<maven-metadata-\<repo-id>.xml>>> in a local repository, for metatada from a repository with <<<repo-id>>> identifier.
+
+ []
+
  The following are generated from this model:
 
    * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser, to read and write <<<maven-metadata(-*).xml>>> files
