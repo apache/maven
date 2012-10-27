@@ -24,9 +24,11 @@ under the License.
   <id>repository-metadata</id>
   <name>Metadata</name>
   <description><![CDATA[
-    Per-directory repository metadata. Notice that most metadata content has a meaning when the directory represents
-    an un-versioned artifact (<code>groupId</code>, <code>artifactId</code>, <code>versioning</code>), but
-    <code>plugins</code> is used when the directory represents a group.]]>
+    <p>Per-directory repository metadata, for directories representing un-versioned artifact, snapshot artifact
+    or a group containing Maven plugins.</p>
+    <p>Notice that most metadata content has a meaning when the directory represents
+    an artifact (<code>groupId</code>, <code>artifactId</code>, <code>versioning</code>), but
+    <code>plugins</code> is used when the directory represents a group.</p>]]>
   </description>
   <defaults>
     <default>
@@ -61,7 +63,7 @@ under the License.
           <name>version</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>The version that this directory represents, if any.</description>
+          <description>The version that this directory represents, if any. It is used for artifact snapshots only.</description>
         </field>
         <field>
           <name>versioning</name>
@@ -211,7 +213,7 @@ under the License.
     <class java.clone="deep">
       <name>Versioning</name>
       <version>1.0.0+</version>
-      <description>Versioning information for an artifact</description>
+      <description>Versioning information for an artifact (un-versioned or snapshot)</description>
       <fields>
         <field>
           <name>latest</name>
@@ -223,7 +225,7 @@ under the License.
           <name>release</name>
           <version>1.0.0+</version>
           <type>String</type>
-          <description>What the latest version in the directory is, of the releases</description>
+          <description>What the latest version in the directory is, of the releases only</description>
         </field>
         <field>
           <name>snapshot</name>
@@ -231,12 +233,12 @@ under the License.
           <association>
             <type>Snapshot</type>
           </association>
-          <description>The current snapshot data in use for this version</description>
+          <description>The current snapshot data in use for this version (artifact snapshots only)</description>
         </field>
         <field>
           <name>versions</name>
           <version>1.0.0+</version>
-          <description>Versions available for the artifact</description>
+          <description>Versions available of the artifact (both releases and snapshots)</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
@@ -251,7 +253,7 @@ under the License.
         <field>
           <name>snapshotVersions</name>
           <version>1.1.0+</version>
-          <description>The snapshot versions available for the artifact.</description>
+          <description>Information for each sub-artifact available in this artifact snapshot.</description>
           <association>
             <type>SnapshotVersion</type>
             <multiplicity>*</multiplicity>
@@ -281,7 +283,7 @@ under the License.
     <class java.clone="deep">
       <name>Snapshot</name>
       <version>1.0.0+</version>
-      <description>Snapshot data for the current version</description>
+      <description>Snapshot data for the current artifact version</description>
       <fields>
         <field>
           <name>timestamp</name>
@@ -307,26 +309,26 @@ under the License.
     <class java.clone="deep">
       <name>SnapshotVersion</name>
       <version>1.1.0+</version>
-      <description>Versioning information for a snapshot artifact.</description>
+      <description>Versioning information for a sub-artifact of the current snapshot artifact.</description>
       <fields>
         <field>
           <name>classifier</name>
           <version>1.1.0+</version>
           <type>String</type>
-          <description>The classifier of the snapshot artifact this version information belongs to.</description>
+          <description>The classifier of the sub-artifact.</description>
           <defaultValue></defaultValue>
         </field>
         <field>
           <name>extension</name>
           <version>1.1.0+</version>
           <type>String</type>
-          <description>The file extension of the snapshot artifact this version information belongs to.</description>
+          <description>The file extension of thesub-artifact.</description>
         </field>
         <field xml.tagName="value">
           <name>version</name>
           <version>1.1.0+</version>
           <type>String</type>
-          <description>The resolved snapshot version of the artifact.</description>
+          <description>The resolved snapshot version of the sub-artifact.</description>
         </field>
         <field>
           <name>updated</name>
@@ -340,7 +342,7 @@ under the License.
       <name>Plugin</name>
       <version>1.0.0+</version>
       <description>Mapping information for a single plugin within this group</description>
-      <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm.</comment>
+      <comment>NOTE: plugin version is _NOT_ included here, since it is resolved using a separate algorithm in plugins' artifact.</comment>
       <fields>
         <field>
           <name>name</name>
