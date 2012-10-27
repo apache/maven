@@ -65,12 +65,12 @@ public class RepositorySystemTest
         Artifact artifact = new DefaultArtifact( artifactCoords );
 
         CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot( new Dependency( artifact, "" ) );
+        collectRequest.setRoot( new Dependency( artifact, null ) );
         collectRequest.addRepository( newTestRepository() );
 
         CollectResult collectResult = system.collectDependencies( session, collectRequest );
 
-        assertEquals( 1, collectResult.getRoot().getChildren().size() );
+        assertEquals( 2, collectResult.getRoot().getChildren().size() );
         Dependency dep = collectResult.getRoot().getChildren().get( 0 ).getDependency();
         assertEquals( "compile", dep.getScope() );
         assertFalse( dep.isOptional() );
@@ -87,6 +87,25 @@ public class RepositorySystemTest
         assertEquals( "java", depArtifact.getProperty( "language", null ) );
         assertEquals( "jar", depArtifact.getProperty( "type", null ) );
         assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) );
+        assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
+        assertEquals( 4, depArtifact.getProperties().size() );
+
+        dep = collectResult.getRoot().getChildren().get( 1 ).getDependency();
+        assertEquals( "compile", dep.getScope() );
+        assertFalse( dep.isOptional() );
+        assertEquals( 0, dep.getExclusions().size() );
+        depArtifact = dep.getArtifact();
+        assertEquals( "ut.simple", depArtifact.getGroupId() );
+        assertEquals( "dependency", depArtifact.getArtifactId() );
+        assertEquals( "1.0", depArtifact.getVersion() );
+        assertEquals( "1.0", depArtifact.getBaseVersion() );
+        assertNull( depArtifact.getFile() );
+        assertFalse( depArtifact.isSnapshot() );
+        assertEquals( "sources", depArtifact.getClassifier() );
+        assertEquals( "jar", depArtifact.getExtension() );
+        assertEquals( "java", depArtifact.getProperty( "language", null ) );
+        assertEquals( "jar", depArtifact.getProperty( "type", null ) ); // shouldn't it be java-sources given the classifier?
+        assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) ); // shouldn't it be false given the classifier?
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
     }

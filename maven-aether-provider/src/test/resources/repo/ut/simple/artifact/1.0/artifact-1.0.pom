@@ -38,5 +38,11 @@
       <groupId>ut.simple</groupId>
       <artifactId>dependency</artifactId>
     </dependency>
+    <dependency>
+      <groupId>ut.simple</groupId>
+      <artifactId>dependency</artifactId>
+      <version>1.0</version>
+      <classifier>sources</classifier>
+    </dependency>
   </dependencies>
 </project>
