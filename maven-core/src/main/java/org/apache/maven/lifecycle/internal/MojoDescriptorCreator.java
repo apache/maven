@@ -60,7 +60,6 @@ import java.util.StringTokenizer;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-
 @Component( role = MojoDescriptorCreator.class )
 public class MojoDescriptorCreator
 {
@@ -80,7 +79,6 @@ public class MojoDescriptorCreator
     @Requirement
     private LifecyclePluginResolver lifecyclePluginResolver;
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public MojoDescriptorCreator()
     {
     }

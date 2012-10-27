@@ -52,7 +52,6 @@ public class LifecycleThreadedBuilder
     private LifecycleModuleBuilder lifecycleModuleBuilder;
 
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecycleThreadedBuilder()
     {
     }

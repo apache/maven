@@ -87,7 +87,6 @@ public class LifecycleWeaveBuilder
     private Map<MavenProject, MavenExecutionPlan> executionPlans = new HashMap<MavenProject, MavenExecutionPlan>();
 
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecycleWeaveBuilder()
     {
     }

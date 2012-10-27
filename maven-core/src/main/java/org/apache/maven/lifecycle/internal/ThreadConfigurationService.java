@@ -38,7 +38,6 @@ public class ThreadConfigurationService
     private final int cpuCores;
 
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public ThreadConfigurationService()
     {
         cpuCores = Runtime.getRuntime().availableProcessors();

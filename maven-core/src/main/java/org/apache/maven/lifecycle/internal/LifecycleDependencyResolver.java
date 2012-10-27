@@ -65,7 +65,6 @@ public class LifecycleDependencyResolver
     @Requirement
     private EventSpyDispatcher eventSpyDispatcher;
 
-    @SuppressWarnings({"UnusedDeclaration"})
     public LifecycleDependencyResolver()
     {
     }

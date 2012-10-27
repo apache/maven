@@ -53,7 +53,6 @@ public class LifecycleDebugLogger
     private Logger logger;
 
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecycleDebugLogger()
     {
     }

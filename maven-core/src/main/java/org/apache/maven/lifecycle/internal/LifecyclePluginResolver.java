@@ -52,7 +52,6 @@ public class LifecyclePluginResolver
         this.pluginVersionResolver = pluginVersionResolver;
     }
 
-    @SuppressWarnings( { "UnusedDeclaration" } )
     public LifecyclePluginResolver()
     {
     }

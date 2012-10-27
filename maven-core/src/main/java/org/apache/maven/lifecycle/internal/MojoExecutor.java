@@ -154,7 +154,6 @@ public class MojoExecutor
         phaseRecorder.observeExecution( mojoExecution );
     }
 
-    @SuppressWarnings( { "ThrowableInstanceNeverThrown" } )
     private void execute( MavenSession session, MojoExecution mojoExecution, ProjectIndex projectIndex,
                           DependencyContext dependencyContext )
         throws LifecycleExecutionException
