@@ -1291,7 +1291,7 @@
           <version>3.0.0</version>
           <description>
             <![CDATA[
-            The type of dependency. This defaults to <code>jar</code>. While it
+            The type of dependency. While it
             usually represents the extension on the filename of the dependency,
             that is not always the case.
             Some examples are <code>jar</code>, <code>war</code>, and <code>plugin</code>.
@@ -1307,14 +1307,15 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The type of dependency. This defaults to <code>jar</code>. While it
+            The type of dependency. While it
             usually represents the extension on the filename of the dependency,
             that is not always the case. A type can be mapped to a different
             extension and a classifier.
             The type often corresponds to the packaging used, though this is also
             not always the case.
             Some examples are <code>jar</code>, <code>war</code>, <code>ejb-client</code>
-            and <code>test-jar</code>.
+            and <code>test-jar</code>: see <a href="../maven-core/artifact-handlers.html">default
+            artifact handlers</a> for a list.
             New types can be defined by plugins that set
             <code>extensions</code> to <code>true</code>, so this is not a complete list.
             ]]>
@@ -1327,9 +1328,15 @@
           <version>4.0.0</version>
           <description>
             <![CDATA[
-            The classifier of the dependency. This allows distinguishing two artifacts
-            that belong to the same POM but were built differently, and is appended to
-            the filename after the version. For example, <code>jdk14</code> and <code>jdk15</code>.
+            The classifier of the dependency. It is appended to
+            the filename after the version. This allows:
+            <ul>
+            <li>refering to attached artifact, for example <code>sources</code> and <javadoc>:
+            see <a href="../maven-core/artifact-handlers.html">default artifact handlers</a> for a list,</li>
+            <li>distinguishing two artifacts
+            that belong to the same POM but were built differently.
+            For example, <code>jdk14</code> and <code>jdk15</code>.</li>
+            </ul>
             ]]>
           </description>
           <type>String</type>
