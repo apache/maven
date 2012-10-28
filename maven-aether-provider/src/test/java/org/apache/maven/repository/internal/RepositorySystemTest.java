@@ -19,45 +19,15 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.net.MalformedURLException;
-
-import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
-import org.apache.maven.repository.internal.util.ConsoleTransferListener;
-import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
 
 public class RepositorySystemTest
-    extends PlexusTestCase
+    extends AbstractRepositoryTestCase
 {
-    protected RepositorySystem system;
-
-    protected RepositorySystemSession session;
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        system = lookup( RepositorySystem.class );
-        session = newMavenRepositorySystemSession( system );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        session = null;
-        system = null;
-        super.tearDown();
-    }
-
     public void testCollectDependencies()
         throws Exception
     {
@@ -108,24 +78,5 @@ public class RepositorySystemTest
         assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) ); // shouldn't it be false given the classifier?
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
-    }
-
-    public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
-    {
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-
-        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
-        session.setLocalRepositoryManager( system.newLocalRepositoryManager( localRepo ) );
-
-        session.setTransferListener( new ConsoleTransferListener() );
-        session.setRepositoryListener( new ConsoleRepositoryListener() );
-
-        return session;
-    }
-
-    public static RemoteRepository newTestRepository()
-        throws MalformedURLException
-    {
-        return new RemoteRepository( "repo", "default", getTestFile( "target/test-classes/repo" ).toURI().toURL().toString() );
     }
 }

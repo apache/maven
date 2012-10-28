@@ -19,38 +19,24 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.net.MalformedURLException;
-
-import org.apache.maven.repository.internal.util.ConsoleRepositoryListener;
-import org.apache.maven.repository.internal.util.ConsoleTransferListener;
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.impl.VersionResolver;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.VersionRequest;
 import org.sonatype.aether.resolution.VersionResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 public class DefaultVersionResolverTest
-    extends PlexusTestCase
+    extends AbstractRepositoryTestCase
 {
     private DefaultVersionResolver versionResolver;
-
-    private RepositorySystem system;
-
-    private RepositorySystemSession session;
 
     @Override
     protected void setUp()
         throws Exception
     {
+        super.setUp();
         // be sure we're testing the right class, i.e. DefaultVersionResolver.class
         versionResolver = (DefaultVersionResolver) lookup( VersionResolver.class, "default" );
-        system = lookup( RepositorySystem.class );
-        session = newMavenRepositorySystemSession( system );
     }
 
     @Override
@@ -106,25 +92,5 @@ public class DefaultVersionResolverTest
 
         VersionResult resultB = versionResolver.resolveVersion( session, requestB );
         assertEquals( versionB, resultB.getVersion() );
-    }
-
-    public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
-    {
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession();
-
-        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
-        session.setLocalRepositoryManager( system.newLocalRepositoryManager( localRepo ) );
-
-        session.setTransferListener( new ConsoleTransferListener() );
-        session.setRepositoryListener( new ConsoleRepositoryListener() );
-
-        return session;
-    }
-
-    public static RemoteRepository newTestRepository()
-        throws MalformedURLException
-    {
-        return new RemoteRepository( "repo", "default",
-                                     getTestFile( "target/test-classes/repo" ).toURI().toURL().toString() );
     }
 }
