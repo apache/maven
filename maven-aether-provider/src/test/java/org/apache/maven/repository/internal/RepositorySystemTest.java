@@ -23,6 +23,8 @@ import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.resolution.ArtifactRequest;
+import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
 public class RepositorySystemTest
@@ -31,8 +33,8 @@ public class RepositorySystemTest
     public void testCollectDependencies()
         throws Exception
     {
-        String artifactCoords = "ut.simple:artifact:1.0"; // TODO test extension:classifier
-        Artifact artifact = new DefaultArtifact( artifactCoords );
+        Artifact artifact = new DefaultArtifact( "ut.simple:artifact:extension:classifier:1.0" );
+        // notice: extension and classifier not really used in this test...
 
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot( new Dependency( artifact, null ) );
@@ -78,5 +80,40 @@ public class RepositorySystemTest
         assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) ); // shouldn't it be false given the classifier?
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
+    }
+
+    public void testResolveArtifact()
+        throws Exception
+    {
+        Artifact artifact = new DefaultArtifact( "ut.simple:artifact:1.0" );
+
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact( artifact );
+        artifactRequest.addRepository( newTestRepository() );
+
+        ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
+        assertFalse( artifactResult.isMissing() );
+        assertTrue( artifactResult.isResolved() );
+        artifact = artifactResult.getArtifact();
+        assertNotNull( artifact.getFile() );
+        assertEquals( "artifact-1.0.jar", artifact.getFile().getName() );
+
+        artifact = new DefaultArtifact( "ut.simple:artifact:zip:1.0" );
+        artifactRequest.setArtifact( artifact );
+        artifactResult = system.resolveArtifact( session, artifactRequest );
+        assertFalse( artifactResult.isMissing() );
+        assertTrue( artifactResult.isResolved() );
+        artifact = artifactResult.getArtifact();
+        assertNotNull( artifact.getFile() );
+        assertEquals( "artifact-1.0.zip", artifact.getFile().getName() );
+
+        artifact = new DefaultArtifact( "ut.simple:artifact:zip:classifier:1.0" );
+        artifactRequest.setArtifact( artifact );
+        artifactResult = system.resolveArtifact( session, artifactRequest );
+        assertFalse( artifactResult.isMissing() );
+        assertTrue( artifactResult.isResolved() );
+        artifact = artifactResult.getArtifact();
+        assertNotNull( artifact.getFile() );
+        assertEquals( "artifact-1.0-classifier.zip", artifact.getFile().getName() );
     }
 }
