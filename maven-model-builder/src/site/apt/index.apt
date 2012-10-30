@@ -22,7 +22,7 @@ Maven Model Builder
 
  * phase 1
 
-   ** profile activation
+   ** profile activation (see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}})
 
    ** model normalization
 
