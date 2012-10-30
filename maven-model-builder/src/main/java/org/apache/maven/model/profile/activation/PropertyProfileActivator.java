@@ -63,9 +63,9 @@ public class PropertyProfileActivator
 
                 if ( name == null || name.length() <= 0 )
                 {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
-                            .setMessage( "The property name is required to activate the profile " + profile.getId())
-                            .setLocation( property.getLocation( "" )));
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                            .setMessage( "The property name is required to activate the profile " + profile.getId() )
+                            .setLocation( property.getLocation( "" ) ) );
                     return false;
                 }
 

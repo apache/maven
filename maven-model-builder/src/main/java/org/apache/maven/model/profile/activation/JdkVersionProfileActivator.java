@@ -58,9 +58,9 @@ public class JdkVersionProfileActivator
 
                 if ( version == null || version.length() <= 0 )
                 {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
-                            .setMessage( "Failed to determine Java version for profile " + profile.getId())
-                            .setLocation(activation.getLocation( "jdk" )));
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                            .setMessage( "Failed to determine Java version for profile " + profile.getId() )
+                            .setLocation(activation.getLocation( "jdk" ) ) );
                     return false;
                 }
 
