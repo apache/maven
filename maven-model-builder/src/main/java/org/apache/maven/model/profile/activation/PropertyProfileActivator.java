@@ -42,78 +42,64 @@ public class PropertyProfileActivator
 
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
-        boolean active = false;
-
         Activation activation = profile.getActivation();
 
-        if ( activation != null )
+        if ( activation == null )
         {
-            ActivationProperty property = activation.getProperty();
-
-            if ( property != null )
-            {
-                String name = property.getName();
-                boolean reverseName = false;
-
-                if ( name != null && name.startsWith( "!" ) )
-                {
-                    reverseName = true;
-                    name = name.substring( 1 );
-                }
-
-                if ( name == null || name.length() <= 0 )
-                {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                            .setMessage( "The property name is required to activate the profile " + profile.getId() )
-                            .setLocation( property.getLocation( "" ) ) );
-                    return false;
-                }
-
-                String sysValue = context.getUserProperties().get( name );
-                if ( sysValue == null )
-                {
-                    sysValue = context.getSystemProperties().get( name );
-                }
-
-                String propValue = property.getValue();
-                if ( StringUtils.isNotEmpty( propValue ) )
-                {
-                    boolean reverseValue = false;
-                    if ( propValue.startsWith( "!" ) )
-                    {
-                        reverseValue = true;
-                        propValue = propValue.substring( 1 );
-                    }
-
-                    // we have a value, so it has to match the system value...
-                    boolean result = propValue.equals( sysValue );
-
-                    if ( reverseValue )
-                    {
-                        active = !result;
-                    }
-                    else
-                    {
-                        active = result;
-                    }
-                }
-                else
-                {
-                    boolean result = StringUtils.isNotEmpty( sysValue );
-
-                    if ( reverseName )
-                    {
-                        active = !result;
-                    }
-                    else
-                    {
-                        active = result;
-                    }
-                }
-            }
+            return false;
         }
 
-        return active;
+        ActivationProperty property = activation.getProperty();
+
+        if ( property == null )
+        {
+            return false;
+        }
+
+        String name = property.getName();
+        boolean reverseName = false;
+
+        if ( name != null && name.startsWith( "!" ) )
+        {
+            reverseName = true;
+            name = name.substring( 1 );
+        }
+
+        if ( name == null || name.length() <= 0 )
+        {
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                    .setMessage( "The property name is required to activate the profile " + profile.getId() )
+                    .setLocation( property.getLocation( "" ) ) );
+            return false;
+        }
+
+        String sysValue = context.getUserProperties().get( name );
+        if ( sysValue == null )
+        {
+            sysValue = context.getSystemProperties().get( name );
+        }
+
+        String propValue = property.getValue();
+        if ( StringUtils.isNotEmpty( propValue ) )
+        {
+            boolean reverseValue = false;
+            if ( propValue.startsWith( "!" ) )
+            {
+                reverseValue = true;
+                propValue = propValue.substring( 1 );
+            }
+
+            // we have a value, so it has to match the system value...
+            boolean result = propValue.equals( sysValue );
+
+            return reverseValue ? !result : result;
+        }
+        else
+        {
+            boolean result = StringUtils.isNotEmpty( sysValue );
+
+            return reverseName ? !result : result;
+        }
     }
 
 }
