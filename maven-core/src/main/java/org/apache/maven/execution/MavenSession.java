@@ -355,11 +355,6 @@ public class MavenSession
         }
     }
 
-    private String getId( MavenProject project )
-    {
-        return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
-    }
-
     @Deprecated
     public EventDispatcher getEventDispatcher()
     {
