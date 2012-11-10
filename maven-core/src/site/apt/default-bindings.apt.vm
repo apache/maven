@@ -8,8 +8,8 @@
   
 Plugin Bindings for <<<default>>> Lifecycle Reference
 
-  The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding: plugin bindings are defined separately
-  and are specific for each packaging:
+  The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding; plugin bindings are defined separately
+  because they are specific for each packaging:
 
 %{toc|fromDepth=2}
 
