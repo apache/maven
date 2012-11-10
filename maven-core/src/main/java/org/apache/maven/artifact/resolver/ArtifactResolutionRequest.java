@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.settings.Mirror;
@@ -241,16 +240,6 @@ public class ArtifactResolutionRequest
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" );
         
         return sb.toString();
-    }
-
-    public RepositoryCache getCache()
-    {
-        return null;
-    }
-
-    public ArtifactResolutionRequest setCache( RepositoryCache cache )
-    {
-        return this;
     }
 
     public boolean isOffline()
