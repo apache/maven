@@ -61,7 +61,7 @@ public class ArtifactResolutionRequest
     private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
 
     // This is like a filter but overrides all transitive versions 
-    private Map managedVersionMap;
+    private Map<String, Artifact> managedVersionMap;
     
     private boolean resolveRoot = true;
 
@@ -194,12 +194,12 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public Map getManagedVersionMap()
+    public Map<String, Artifact> getManagedVersionMap()
     {
         return managedVersionMap;
     }
 
-    public ArtifactResolutionRequest setManagedVersionMap( Map managedVersionMap )
+    public ArtifactResolutionRequest setManagedVersionMap( Map<String, Artifact> managedVersionMap )
     {
         this.managedVersionMap = managedVersionMap;
 
