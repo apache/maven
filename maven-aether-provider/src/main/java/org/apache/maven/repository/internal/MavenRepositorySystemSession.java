@@ -42,14 +42,15 @@ import org.sonatype.aether.util.repository.DefaultMirrorSelector;
 import org.sonatype.aether.util.repository.DefaultProxySelector;
 
 /**
- * A simplistic repository system session that mimics Maven's behavior to help third-party developers that want to embed
- * Maven's dependency resolution into their own applications.
+ * The base Maven repository system session, without environment configuration (authentication, mirror,
+ * proxy, ...).
  * 
  * <p><strong>Warning:</strong> This class is not intended for
  * usage by Maven plugins, those should always acquire the current repository system session via
  * <a href="/ref/current/maven-core/apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html">plugin
  * parameter injection</a>, since the current repository system session is created by Maven in
- * <code><a href="/ref/current/maven-core/apidocs/org/apache/maven/DefaultMaven.html">DefaultMaven.newRepositorySession(MavenExecutionRequest request)</a></code>.</p>
+ * <a href="/ref/current/maven-core/apidocs/org/apache/maven/DefaultMaven.html">
+ * <code>DefaultMaven.newRepositorySession(MavenExecutionRequest request)</code></a>.</p>
  * 
  * @author Benjamin Bentmann
  */
@@ -58,17 +59,17 @@ public class MavenRepositorySystemSession
 {
 
     /**
-     * Creates a new Maven-like repository system session by initializing the session with values typical for
+     * Creates a new Maven repository system session by initializing the session with values typical for
      * Maven-based resolution. In more detail, this constructor configures settings relevant for the processing of
      * dependency graphs, most other settings remain at their generic default value. Use the various setters to further
      * configure the session with authentication, mirror, proxy and other information required for your environment.
+     * 
+     * @param standalone is this instance expected to be used inside Maven, with Plexus and Maven core components, or
+     *   standalone? If standalone, System properties are used and classical Maven artifact handlers are pre-configured
+     *   to mimic complete Maven repository system session.
      */
-    public MavenRepositorySystemSession()
+    public MavenRepositorySystemSession( boolean standalone )
     {
-        setMirrorSelector( new DefaultMirrorSelector() );
-        setAuthenticationSelector( new DefaultAuthenticationSelector() );
-        setProxySelector( new DefaultProxySelector() );
-
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         setDependencyTraverser( depTraverser );
 
@@ -86,26 +87,33 @@ public class MavenRepositorySystemSession
                                                    new JavaDependencyContextRefiner() );
         setDependencyGraphTransformer( transformer );
 
-        DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        stereotypes.add( new DefaultArtifactType( "pom" ) );
-        stereotypes.add( new DefaultArtifactType( "maven-plugin", "jar", "", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "jar", "jar", "", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "ejb", "jar", "", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "ejb-client", "jar", "client", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "test-jar", "jar", "tests", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "javadoc", "jar", "javadoc", "java" ) );
-        stereotypes.add( new DefaultArtifactType( "java-source", "jar", "sources", "java", false, false ) );
-        stereotypes.add( new DefaultArtifactType( "war", "war", "", "java", false, true ) );
-        stereotypes.add( new DefaultArtifactType( "ear", "ear", "", "java", false, true ) );
-        stereotypes.add( new DefaultArtifactType( "rar", "rar", "", "java", false, true ) );
-        stereotypes.add( new DefaultArtifactType( "par", "par", "", "java", false, true ) );
-        setArtifactTypeRegistry( stereotypes );
-
         setIgnoreInvalidArtifactDescriptor( true );
         setIgnoreMissingArtifactDescriptor( true );
 
-        setSystemProps( System.getProperties() );
-        setConfigProps( System.getProperties() );
+        if ( standalone )
+        {
+            setMirrorSelector( new DefaultMirrorSelector() );
+            setAuthenticationSelector( new DefaultAuthenticationSelector() );
+            setProxySelector( new DefaultProxySelector() );
+
+            DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
+            stereotypes.add( new DefaultArtifactType( "pom" ) );
+            stereotypes.add( new DefaultArtifactType( "maven-plugin", "jar", "", "java" ) );
+            stereotypes.add( new DefaultArtifactType( "jar", "jar", "", "java" ) );
+            stereotypes.add( new DefaultArtifactType( "ejb", "jar", "", "java" ) );
+            stereotypes.add( new DefaultArtifactType( "ejb-client", "jar", "client", "java" ) );
+            stereotypes.add( new DefaultArtifactType( "test-jar", "jar", "tests", "java" ) );
+            stereotypes.add( new DefaultArtifactType( "javadoc", "jar", "javadoc", "java" ) );
+            stereotypes.add( new DefaultArtifactType( "java-source", "jar", "sources", "java", false, false ) );
+            stereotypes.add( new DefaultArtifactType( "war", "war", "", "java", false, true ) );
+            stereotypes.add( new DefaultArtifactType( "ear", "ear", "", "java", false, true ) );
+            stereotypes.add( new DefaultArtifactType( "rar", "rar", "", "java", false, true ) );
+            stereotypes.add( new DefaultArtifactType( "par", "par", "", "java", false, true ) );
+            setArtifactTypeRegistry( stereotypes );
+    
+            setSystemProps( System.getProperties() );
+            setConfigProps( System.getProperties() );
+        }
     }
 
 }

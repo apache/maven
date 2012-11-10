@@ -56,7 +56,7 @@ public abstract class AbstractRepositoryTestCase
 
     public static RepositorySystemSession newMavenRepositorySystemSession( RepositorySystem system )
     {
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession();
+        MavenRepositorySystemSession session = new MavenRepositorySystemSession( true );
 
         LocalRepository localRepo = new LocalRepository( "target/local-repo" );
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( localRepo ) );

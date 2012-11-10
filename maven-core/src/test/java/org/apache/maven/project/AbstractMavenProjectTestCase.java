@@ -170,7 +170,7 @@ public abstract class AbstractMavenProjectTestCase
     protected void initRepoSession( ProjectBuildingRequest request )
     {
         File localRepo = new File( request.getLocalRepository().getBasedir() );
-        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
+        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession( true );
         repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
         request.setRepositorySession( repoSession );
     }

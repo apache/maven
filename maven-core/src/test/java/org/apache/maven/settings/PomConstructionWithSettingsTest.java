@@ -113,7 +113,7 @@ public class PomConstructionWithSettingsTest
         config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl,
                                                                               new DefaultRepositoryLayout(), null, null ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
-        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
+        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession( true );
         repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManager(
                                                                                  new File(
                                                                                            config.getLocalRepository().getBasedir() ) ) );

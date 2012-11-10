@@ -1839,7 +1839,7 @@ public class PomConstructionTest
         config.setUserProperties( executionProperties );
         config.setValidationLevel( lenientValidation ? ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                         : ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
-        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession();
+        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession( true );
         repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManager(
                                                                                  new File(
                                                                                            config.getLocalRepository().getBasedir() ) ) );

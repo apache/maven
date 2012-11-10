@@ -58,6 +58,7 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
+import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -331,11 +332,9 @@ public class DefaultMaven
 
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        MavenRepositorySystemSession session = new MavenRepositorySystemSession( false );
 
         session.setCache( request.getRepositoryCache() );
-
-        session.setIgnoreInvalidArtifactDescriptor( true ).setIgnoreMissingArtifactDescriptor( true );
 
         Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
@@ -433,23 +432,6 @@ public class DefaultMaven
             configProps.put( "aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions() );
         }
         session.setAuthenticationSelector( authSelector );
-
-        DependencyTraverser depTraverser = new FatArtifactTraverser();
-        session.setDependencyTraverser( depTraverser );
-
-        DependencyManager depManager = new ClassicDependencyManager();
-        session.setDependencyManager( depManager );
-
-        DependencySelector depFilter =
-            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ), new OptionalDependencySelector(),
-                                     new ExclusionDependencySelector() );
-        session.setDependencySelector( depFilter );
-
-        DependencyGraphTransformer transformer =
-            new ChainedDependencyGraphTransformer( new ConflictMarker(), new JavaEffectiveScopeCalculator(),
-                                                   new NearestVersionConflictResolver(),
-                                                   new JavaDependencyContextRefiner() );
-        session.setDependencyGraphTransformer( transformer );
 
         session.setTransferListener( request.getTransferListener() );
 

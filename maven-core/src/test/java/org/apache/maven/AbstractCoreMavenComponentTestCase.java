@@ -162,7 +162,7 @@ public abstract class AbstractCoreMavenComponentTestCase
     protected void initRepoSession( ProjectBuildingRequest request )
     {
         File localRepo = new File( request.getLocalRepository().getBasedir() );
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession();
+        MavenRepositorySystemSession session = new MavenRepositorySystemSession( true );
         session.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepo ) );
         request.setRepositorySession( session );
     }
