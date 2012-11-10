@@ -205,7 +205,6 @@ public class MavenArtifactRepository
     // Path Utils
 
     /**
-     * /**
      * Return the protocol name.
      * <br/>
      * E.g: for input
@@ -291,7 +290,7 @@ public class MavenArtifactRepository
 
     /**
      * Decodes the specified (portion of a) URL. <strong>Note:</strong> This decoder assumes that ISO-8859-1 is used to
-     * convert URL-encoded octets to characters.
+     * convert URL-encoded bytes to characters.
      *
      * @param url The URL to decode, may be <code>null</code>.
      * @return The decoded URL or <code>null</code> if the input was <code>null</code>.
