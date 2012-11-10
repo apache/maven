@@ -15,37 +15,37 @@ Plugin Bindings for <<<default>>> Lifecycle Reference
 
 * Plugin bindings for <<<pom>>> packaging
 
-%{snippet|id=pom-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=pom-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<jar>>> packaging
 
-%{snippet|id=jar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=jar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<ejb>>> packaging
 
-%{snippet|id=ejb-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=ejb-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<ejb3>>> packaging
 
-%{snippet|id=ejb3-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=ejb3-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<maven-plugin>>> packaging
 
-%{snippet|id=maven-plugin-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=maven-plugin-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<war>>> packaging
 
-%{snippet|id=war-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=war-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<ear>>> packaging
 
-%{snippet|id=ear-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=ear-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<rar>>> packaging
 
-%{snippet|id=rar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=rar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
 * Plugin bindings for <<<par>>> packaging
 
-%{snippet|id=par-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/artifact-handlers.xml}
+%{snippet|id=par-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
   

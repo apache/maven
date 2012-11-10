@@ -21,13 +21,7 @@ under the License.
 
 <!-- 
 
-Artifact handlers are required by the dependency resolution mechanism and therefore needed by the core.
-The type specified by a dependency could be altered to load a particular plugin in order to get the 
-artifact handler. This would make it easier to encapsulate all handling for a type in one place and
-not be bound to the core. It wouldn't be terrible as the plugin would need to be downloaded, classloaded,
-components discovered which is probably a reasonable price to pay for complete and comprehensible
-encapsulation. All these special entries here is probably understood by no one which is a real
-problem.
+Artifact handlers are required by the dependency resolution mechanism.
 
 -->
 
@@ -44,28 +38,6 @@ problem.
         <type>pom</type>
       </configuration>
     </component>     
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>pom</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: pom-lifecycle -->
-            <phases>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: pom-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>    
     
     <!--
      | JAR
@@ -78,46 +50,6 @@ problem.
         <type>jar</type>
         <language>java</language>
         <addedToClasspath>true</addedToClasspath>
-      </configuration>
-    </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>jar</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: jar-lifecycle -->
-            <phases>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-jar-plugin:2.3.2:jar
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: jar-lifecycle -->
-          </lifecycle>
-        </lifecycles>
       </configuration>
     </component>
           
@@ -135,46 +67,6 @@ problem.
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>ejb</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: ejb-lifecycle -->
-            <phases>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-ejb-plugin:2.3:ejb
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: ejb-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>    
     <component>
       <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
       <role-hint>ejb-client</role-hint>
@@ -199,46 +91,6 @@ problem.
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>   
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>ejb3</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: ejb3-lifecycle -->
-            <phases>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-ejb3-plugin:ejb3
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: ejb3-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>     
 
     <!--
      | TEST JAR
@@ -271,50 +123,6 @@ problem.
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>maven-plugin</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: maven-plugin-lifecycle -->
-            <phases>
-              <generate-resources>
-                org.apache.maven.plugins:maven-plugin-plugin:2.9:descriptor
-              </generate-resources>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-jar-plugin:2.3.1:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:2.9:addPluginArtifactMetadata
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: maven-plugin-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>    
 
     <!--
      | SOURCE JAR
@@ -362,46 +170,6 @@ problem.
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>war</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: war-lifecycle -->
-            <phases>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-war-plugin:2.1.1:war
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: war-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>    
 
     <!--
      | EAR 
@@ -415,37 +183,6 @@ problem.
         <includesDependencies>true</includesDependencies>
         <language>java</language>
         <addedToClasspath>false</addedToClasspath>
-      </configuration>
-    </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>ear</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: ear-lifecycle -->
-            <phases>
-              <generate-resources>
-                org.apache.maven.plugins:maven-ear-plugin:2.5:generate-application-xml
-              </generate-resources>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources
-              </process-resources>
-              <package>
-                org.apache.maven.plugins:maven-ear-plugin:2.6:ear
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: ear-lifecycle -->
-          </lifecycle>
-        </lifecycles>
       </configuration>
     </component>
 
@@ -463,46 +200,6 @@ problem.
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>rar</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: rar-lifecycle -->
-            <phases>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-rar-plugin:2.2:rar
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: rar-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>    
 
     <!--
      | PAR
@@ -518,45 +215,5 @@ problem.
         <addedToClasspath>false</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-      <role-hint>par</role-hint>
-      <implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping</implementation>
-      <configuration>
-        <lifecycles>
-          <lifecycle>
-            <id>default</id>
-            <!-- START SNIPPET: par-lifecycle -->
-            <phases>
-              <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
-              </process-resources>
-              <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
-              </compile>
-              <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
-              </process-test-resources>
-              <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
-              </test-compile>
-              <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
-              </test>
-              <package>
-                org.apache.maven.plugins:maven-par-plugin:par
-              </package>
-              <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
-              </install>
-              <deploy>
-                org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
-              </deploy>
-            </phases>
-            <!-- END SNIPPET: par-lifecycle -->
-          </lifecycle>
-        </lifecycles>
-      </configuration>
-    </component>    
   </components>
 </component-set>
