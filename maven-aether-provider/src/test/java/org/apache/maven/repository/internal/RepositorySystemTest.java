@@ -30,6 +30,28 @@ import org.sonatype.aether.util.artifact.DefaultArtifact;
 public class RepositorySystemTest
     extends AbstractRepositoryTestCase
 {
+    public void testResolveVersionRange()
+        throws Exception
+    {
+        //VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
+        //                throws VersionRangeResolutionException;
+
+    }
+
+    public void testResolveVersion()
+        throws Exception
+    {
+        //VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
+        //                throws VersionResolutionException;
+    }
+
+    public void testReadArtifactDescriptor()
+        throws Exception
+    {
+        //ArtifactDescriptorResult readArtifactDescriptor( RepositorySystemSession session, ArtifactDescriptorRequest request )
+        //                throws ArtifactDescriptorException;
+    }
+
     public void testCollectDependencies()
         throws Exception
     {
@@ -116,4 +138,46 @@ public class RepositorySystemTest
         assertNotNull( artifact.getFile() );
         assertEquals( "artifact-1.0-classifier.zip", artifact.getFile().getName() );
     }
+
+    public void testResolveArtifacts()
+        throws Exception
+    {
+        //List<ArtifactResult> resolveArtifacts( RepositorySystemSession session,
+        //                                       Collection<? extends ArtifactRequest> requests )
+        //        throws ArtifactResolutionException;
+    }
+
+    public void testResolveMetadata()
+        throws Exception
+    {
+        //List<MetadataResult> resolveMetadata( RepositorySystemSession session,
+        //                                      Collection<? extends MetadataRequest> requests );
+    }
+
+    public void testInstall()
+        throws Exception
+    {
+        //InstallResult install( RepositorySystemSession session, InstallRequest request )
+        //                throws InstallationException;
+    }
+
+    public void testDeploy()
+        throws Exception
+    {
+        //DeployResult deploy( RepositorySystemSession session, DeployRequest request )
+        //                throws DeploymentException;
+    }
+
+    public void testNewLocalRepositoryManager()
+        throws Exception
+    {
+        //LocalRepositoryManager newLocalRepositoryManager( LocalRepository localRepository );
+    }
+
+    public void testNewSyncContext()
+        throws Exception
+    {
+        //SyncContext newSyncContext( RepositorySystemSession session, boolean shared );
+    }
+
 }
