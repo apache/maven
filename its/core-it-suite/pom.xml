@@ -76,6 +76,7 @@ under the License.
     <proxy.type>none</proxy.type>
     <proxy.user></proxy.user>
     <proxy.pass></proxy.pass>
+    <slf4jVersion>1.7.2</slf4jVersion>
   </properties>
 
   <dependencies>
@@ -196,7 +197,13 @@ under the License.
         <dependency>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
-          <version>1.6.1</version>
+          <version>${slf4jVersion}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <version>${slf4jVersion}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
