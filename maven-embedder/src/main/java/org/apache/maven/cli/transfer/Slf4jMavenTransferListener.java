@@ -19,23 +19,23 @@ package org.apache.maven.cli.transfer;
  * under the License.
  */
 
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.slf4j.Logger;
 import org.sonatype.aether.transfer.AbstractTransferListener;
 import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferResource;
 
-public abstract class AbstractMavenTransferListener
+public class Slf4jMavenTransferListener
     extends AbstractTransferListener
 {
 
-    protected PrintStream out;
+    protected Logger out;
 
-    protected AbstractMavenTransferListener( PrintStream out )
+    public Slf4jMavenTransferListener( Logger out )
     {
         this.out = out;
     }
@@ -45,7 +45,7 @@ public abstract class AbstractMavenTransferListener
     {
         String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-        out.println( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
+        out.info( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
     }
 
     @Override
@@ -54,8 +54,7 @@ public abstract class AbstractMavenTransferListener
     {
         TransferResource resource = event.getResource();
 
-        out.println( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
-            + resource.getResourceName() );
+        out.warn( event.getException().getMessage() + " for " + resource.getRepositoryUrl() + resource.getResourceName() );
     }
 
     @Override
@@ -77,7 +76,7 @@ public abstract class AbstractMavenTransferListener
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
-            out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
+            out.info( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
                 + throughput + ")" );
         }
     }

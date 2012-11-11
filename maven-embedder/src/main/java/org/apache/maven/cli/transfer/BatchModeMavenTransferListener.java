@@ -1,5 +1,7 @@
 package org.apache.maven.cli.transfer;
 
+import java.io.PrintStream;
+
 import org.slf4j.Logger;
 
 /*
@@ -24,7 +26,7 @@ import org.slf4j.Logger;
 public class BatchModeMavenTransferListener
     extends AbstractMavenTransferListener
 {
-    public BatchModeMavenTransferListener( Logger out )
+    public BatchModeMavenTransferListener( PrintStream out )
     {
         super( out );
     }

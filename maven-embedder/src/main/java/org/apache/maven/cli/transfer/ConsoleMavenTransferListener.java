@@ -19,10 +19,10 @@ package org.apache.maven.cli.transfer;
  * under the License.
  */
 
+import java.io.PrintStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
 import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
 import org.sonatype.aether.transfer.TransferResource;
@@ -40,7 +40,7 @@ public class ConsoleMavenTransferListener
 
     private int lastLength;
 
-    public ConsoleMavenTransferListener( Logger out )
+    public ConsoleMavenTransferListener( PrintStream out )
     {
         super( out );
     }
@@ -70,7 +70,7 @@ public class ConsoleMavenTransferListener
         pad( buffer, pad );
         buffer.append( '\r' );
 
-        out.info( buffer.toString() );
+        out.print( buffer.toString() );
     }
 
     private String getStatus( long complete, long total )
@@ -127,7 +127,7 @@ public class ConsoleMavenTransferListener
         StringBuilder buffer = new StringBuilder( 64 );
         pad( buffer, lastLength );
         buffer.append( '\r' );
-        out.info( buffer.toString() );
+        out.print( buffer.toString() );
     }
 
 }

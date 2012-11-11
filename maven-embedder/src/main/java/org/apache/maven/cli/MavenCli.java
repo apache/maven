@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.transfer.BatchModeMavenTransferListener;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
+import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
@@ -320,6 +322,15 @@ public class MavenCli
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
             System.setProperty("org.slf4j.simpleLogger.logFile", logFile.getAbsolutePath());
+            try {
+              PrintStream ps = new PrintStream(new FileOutputStream(logFile));
+              System.setOut(ps);
+              System.setErr(ps);
+            } catch (FileNotFoundException e) {
+              //
+              // Ignore
+              //
+            }
         }
 
         plexusLoggerManager = new Slf4jLoggerManager();       
@@ -872,14 +883,18 @@ public class MavenCli
         if ( quiet )
         {
             transferListener = new QuietMavenTransferListener();
-        }
-        else if ( request.isInteractiveMode() )
+        }        
+        else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ))
         {
-            transferListener = new ConsoleMavenTransferListener( slf4jLogger );
+            //
+            // If we're logging to a file then we don't want the console transfer listener as it will spew
+            // download progress all over the place
+            //
+            transferListener = getConsoleTransferListener();
         }
         else
         {
-            transferListener = new BatchModeMavenTransferListener( slf4jLogger );
+            transferListener = getBatchTransferListener();
         }
 
         ExecutionListener executionListener = new ExecutionEventLogger( slf4jLogger );
@@ -1136,25 +1151,20 @@ public class MavenCli
         }
 
     }
-
-    private PrintStreamLogger setupLogger( int loggingLevel )
-    {
-        PrintStreamLogger logger = new PrintStreamLogger( new PrintStreamLogger.Provider()
-        {
-            public PrintStream getStream()
-            {
-                return System.out;
-            }
-        } );
-
-        logger.setThreshold( loggingLevel );
-
-        return logger;
-    }        
     
     //
     // Customizations available via the CLI
     //
+    
+    protected TransferListener getConsoleTransferListener() 
+    {
+        return new ConsoleMavenTransferListener( System.out );
+    }
+    
+    protected TransferListener getBatchTransferListener()
+    {
+        return new Slf4jMavenTransferListener( slf4jLogger );
+    }
     
     protected void customizeContainer( PlexusContainer container )
     {
