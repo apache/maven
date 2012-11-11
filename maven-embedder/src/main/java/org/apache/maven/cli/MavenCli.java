@@ -39,9 +39,7 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
-import org.apache.maven.cli.logging.PrintStreamLogger;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
-import org.apache.maven.cli.transfer.BatchModeMavenTransferListener;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -321,28 +319,31 @@ public class MavenCli
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-            System.setProperty("org.slf4j.simpleLogger.logFile", logFile.getAbsolutePath());
-            try {
-              PrintStream ps = new PrintStream(new FileOutputStream(logFile));
-              System.setOut(ps);
-              System.setErr(ps);
-            } catch (FileNotFoundException e) {
-              //
-              // Ignore
-              //
+            System.setProperty( "org.slf4j.simpleLogger.logFile", logFile.getAbsolutePath() );
+            try
+            {
+                PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
+                System.setOut( ps );
+                System.setErr( ps );
+            }
+            catch ( FileNotFoundException e )
+            {
+                //
+                // Ignore
+                //
             }
         }
 
-        plexusLoggerManager = new Slf4jLoggerManager();       
+        plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-        slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
+        slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
     }
 
     private void version( CliRequest cliRequest )
     {
         if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
-            System.out.print(CLIReportingUtils.showVersion());
+            System.out.print( CLIReportingUtils.showVersion() );
         }
     }
 

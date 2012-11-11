@@ -2,8 +2,6 @@ package org.apache.maven.cli.transfer;
 
 import java.io.PrintStream;
 
-import org.slf4j.Logger;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
