@@ -19,10 +19,15 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.util.List;
+
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.CollectResult;
 import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
+import org.sonatype.aether.resolution.ArtifactDescriptorResult;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
@@ -48,28 +53,28 @@ public class RepositorySystemTest
     public void testReadArtifactDescriptor()
         throws Exception
     {
-        //ArtifactDescriptorResult readArtifactDescriptor( RepositorySystemSession session, ArtifactDescriptorRequest request )
-        //                throws ArtifactDescriptorException;
+        Artifact artifact = new DefaultArtifact( "ut.simple:artifact:extension:classifier:1.0" );
+
+        ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
+        request.setArtifact( artifact );
+        request.addRepository( newTestRepository() );
+        
+        ArtifactDescriptorResult result = system.readArtifactDescriptor( session, request );
+
+        List<Dependency> deps = result.getDependencies();
+        assertEquals( 2, deps.size() );
+        checkUtSimpleArtifactDependencies( deps.get( 0 ), deps.get( 1 ) );
     }
 
-    public void testCollectDependencies()
-        throws Exception
+    /**
+     * check ut.simple:artifact:1.0 dependencies
+     */
+    private void checkUtSimpleArtifactDependencies( Dependency dep1, Dependency dep2 )
     {
-        Artifact artifact = new DefaultArtifact( "ut.simple:artifact:extension:classifier:1.0" );
-        // notice: extension and classifier not really used in this test...
-
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot( new Dependency( artifact, null ) );
-        collectRequest.addRepository( newTestRepository() );
-
-        CollectResult collectResult = system.collectDependencies( session, collectRequest );
-
-        assertEquals( 2, collectResult.getRoot().getChildren().size() );
-        Dependency dep = collectResult.getRoot().getChildren().get( 0 ).getDependency();
-        assertEquals( "compile", dep.getScope() );
-        assertFalse( dep.isOptional() );
-        assertEquals( 0, dep.getExclusions().size() );
-        Artifact depArtifact = dep.getArtifact();
+        assertEquals( "compile", dep1.getScope() );
+        assertFalse( dep1.isOptional() );
+        assertEquals( 0, dep1.getExclusions().size() );
+        Artifact depArtifact = dep1.getArtifact();
         assertEquals( "ut.simple", depArtifact.getGroupId() );
         assertEquals( "dependency", depArtifact.getArtifactId() );
         assertEquals( "1.0", depArtifact.getVersion() );
@@ -84,11 +89,10 @@ public class RepositorySystemTest
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
 
-        dep = collectResult.getRoot().getChildren().get( 1 ).getDependency();
-        assertEquals( "compile", dep.getScope() );
-        assertFalse( dep.isOptional() );
-        assertEquals( 0, dep.getExclusions().size() );
-        depArtifact = dep.getArtifact();
+        assertEquals( "compile", dep2.getScope() );
+        assertFalse( dep2.isOptional() );
+        assertEquals( 0, dep2.getExclusions().size() );
+        depArtifact = dep2.getArtifact();
         assertEquals( "ut.simple", depArtifact.getGroupId() );
         assertEquals( "dependency", depArtifact.getArtifactId() );
         assertEquals( "1.0", depArtifact.getVersion() );
@@ -102,6 +106,22 @@ public class RepositorySystemTest
         assertEquals( "true", depArtifact.getProperty( "constitutesBuildPath", null ) ); // shouldn't it be false given the classifier?
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
+    }
+    public void testCollectDependencies()
+        throws Exception
+    {
+        Artifact artifact = new DefaultArtifact( "ut.simple:artifact:extension:classifier:1.0" );
+        // notice: extension and classifier not really used in this test...
+
+        CollectRequest collectRequest = new CollectRequest();
+        collectRequest.setRoot( new Dependency( artifact, null ) );
+        collectRequest.addRepository( newTestRepository() );
+
+        CollectResult collectResult = system.collectDependencies( session, collectRequest );
+
+        List<DependencyNode> nodes = collectResult.getRoot().getChildren();
+        assertEquals( 2, nodes.size() );
+        checkUtSimpleArtifactDependencies( nodes.get( 0 ).getDependency(), nodes.get( 1 ).getDependency() );
     }
 
     public void testResolveArtifact()
