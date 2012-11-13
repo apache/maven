@@ -644,6 +644,7 @@
           <name>layout</name>
           <version>1.1.0+</version>
           <type>String</type>
+          <defaultValue>default</defaultValue>
           <description>The layout of the mirror repository. Since Maven 3.</description>
         </field>
         <field>
