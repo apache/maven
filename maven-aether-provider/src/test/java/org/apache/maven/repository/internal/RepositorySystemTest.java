@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.sonatype.aether.artifact.Artifact;
@@ -107,6 +108,7 @@ public class RepositorySystemTest
         assertEquals( "false", depArtifact.getProperty( "includesDependencies", null ) );
         assertEquals( 4, depArtifact.getProperties().size() );
     }
+
     public void testCollectDependencies()
         throws Exception
     {
@@ -134,37 +136,51 @@ public class RepositorySystemTest
         artifactRequest.addRepository( newTestRepository() );
 
         ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
-        assertFalse( artifactResult.isMissing() );
-        assertTrue( artifactResult.isResolved() );
-        artifact = artifactResult.getArtifact();
-        assertNotNull( artifact.getFile() );
-        assertEquals( "artifact-1.0.jar", artifact.getFile().getName() );
+        checkArtifactResult( artifactResult, "artifact-1.0.jar" );
 
         artifact = new DefaultArtifact( "ut.simple:artifact:zip:1.0" );
         artifactRequest.setArtifact( artifact );
         artifactResult = system.resolveArtifact( session, artifactRequest );
-        assertFalse( artifactResult.isMissing() );
-        assertTrue( artifactResult.isResolved() );
-        artifact = artifactResult.getArtifact();
-        assertNotNull( artifact.getFile() );
-        assertEquals( "artifact-1.0.zip", artifact.getFile().getName() );
+        checkArtifactResult( artifactResult, "artifact-1.0.zip" );
 
         artifact = new DefaultArtifact( "ut.simple:artifact:zip:classifier:1.0" );
         artifactRequest.setArtifact( artifact );
         artifactResult = system.resolveArtifact( session, artifactRequest );
-        assertFalse( artifactResult.isMissing() );
-        assertTrue( artifactResult.isResolved() );
-        artifact = artifactResult.getArtifact();
+        checkArtifactResult( artifactResult, "artifact-1.0-classifier.zip" );
+    }
+
+    private void checkArtifactResult( ArtifactResult result, String filename )
+    {
+        assertFalse( result.isMissing() );
+        assertTrue( result.isResolved() );
+        Artifact artifact = result.getArtifact();
         assertNotNull( artifact.getFile() );
-        assertEquals( "artifact-1.0-classifier.zip", artifact.getFile().getName() );
+        assertEquals( filename, artifact.getFile().getName() );
     }
 
     public void testResolveArtifacts()
         throws Exception
     {
-        //List<ArtifactResult> resolveArtifacts( RepositorySystemSession session,
-        //                                       Collection<? extends ArtifactRequest> requests )
-        //        throws ArtifactResolutionException;
+        ArtifactRequest req1 = new ArtifactRequest();
+        req1.setArtifact( new DefaultArtifact( "ut.simple:artifact:1.0" ) );
+        req1.addRepository( newTestRepository() );
+
+        ArtifactRequest req2 = new ArtifactRequest();
+        req2.setArtifact( new DefaultArtifact( "ut.simple:artifact:zip:1.0" ) );
+        req2.addRepository( newTestRepository() );
+
+        ArtifactRequest req3 = new ArtifactRequest();
+        req3.setArtifact( new DefaultArtifact( "ut.simple:artifact:zip:classifier:1.0" ) );
+        req3.addRepository( newTestRepository() );
+
+        List<ArtifactRequest> requests = Arrays.asList( new ArtifactRequest[] { req1, req2, req3 } );
+
+        List<ArtifactResult> results = system.resolveArtifacts( session, requests );
+
+        assertEquals( 3, results.size() );
+        checkArtifactResult( results.get( 0 ), "artifact-1.0.jar" );
+        checkArtifactResult( results.get( 1 ), "artifact-1.0.zip" );
+        checkArtifactResult( results.get( 2 ), "artifact-1.0-classifier.zip" );
     }
 
     public void testResolveMetadata()
@@ -179,6 +195,7 @@ public class RepositorySystemTest
     {
         //InstallResult install( RepositorySystemSession session, InstallRequest request )
         //                throws InstallationException;
+        // release, snapshot unique ou non unique, attachement
     }
 
     public void testDeploy()
