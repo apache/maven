@@ -29,7 +29,9 @@ public class Slf4jLoggerManager
 
     public Logger getLoggerForComponent( String role, String hint )
     {
-        return new Slf4jLogger( loggerFactory.getLogger( role + "." + hint ) );
+        return ( null == hint
+            ? getLoggerForComponent( role )
+            : new Slf4jLogger( loggerFactory.getLogger( role + "." + hint ) ) );
     }
 
     //
