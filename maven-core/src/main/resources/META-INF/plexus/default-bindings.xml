@@ -41,7 +41,7 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: pom-lifecycle -->
             <phases>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -67,25 +67,25 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: jar-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-jar-plugin:2.3.2:jar
+                org.apache.maven.plugins:maven-jar-plugin:2.4:jar
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -111,25 +111,25 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: ejb-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-ejb-plugin:2.3:ejb
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -151,25 +151,25 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: ejb3-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-ejb3-plugin:ejb3
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -195,29 +195,29 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: maven-plugin-lifecycle -->
             <phases>
               <generate-resources>
-                org.apache.maven.plugins:maven-plugin-plugin:2.9:descriptor
+                org.apache.maven.plugins:maven-plugin-plugin:3.2:descriptor
               </generate-resources>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-jar-plugin:2.3.1:jar,
-                org.apache.maven.plugins:maven-plugin-plugin:2.9:addPluginArtifactMetadata
+                org.apache.maven.plugins:maven-jar-plugin:2.4:jar,
+                org.apache.maven.plugins:maven-plugin-plugin:3.2:addPluginArtifactMetadata
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -243,25 +243,25 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: war-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
-                org.apache.maven.plugins:maven-war-plugin:2.1.1:war
+                org.apache.maven.plugins:maven-war-plugin:2.3:war
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -287,16 +287,16 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: ear-lifecycle -->
             <phases>
               <generate-resources>
-                org.apache.maven.plugins:maven-ear-plugin:2.5:generate-application-xml
+                org.apache.maven.plugins:maven-ear-plugin:2.8:generate-application-xml
               </generate-resources>
               <process-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources
               </process-resources>
               <package>
-                org.apache.maven.plugins:maven-ear-plugin:2.6:ear
+                org.apache.maven.plugins:maven-ear-plugin:2.8:ear
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -322,25 +322,25 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: rar-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-rar-plugin:2.2:rar
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
@@ -366,25 +366,25 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: par-lifecycle -->
             <phases>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:compile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
               <process-test-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.5:testResources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:2.3.2:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:2.5.1:testCompile
               </test-compile>
               <test>
-                org.apache.maven.plugins:maven-surefire-plugin:2.12.1:test
+                org.apache.maven.plugins:maven-surefire-plugin:2.12.4:test
               </test>
               <package>
                 org.apache.maven.plugins:maven-par-plugin:par
               </package>
               <install>
-                org.apache.maven.plugins:maven-install-plugin:2.3.1:install
+                org.apache.maven.plugins:maven-install-plugin:2.4:install
               </install>
               <deploy>
                 org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
