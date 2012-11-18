@@ -48,7 +48,7 @@
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
-    <plexusUtilsVersion>2.0.6</plexusUtilsVersion>
+    <plexusUtilsVersion>3.0.9-SNAPSHOT</plexusUtilsVersion>
     <sisuInjectVersion>2.3.0</sisuInjectVersion>
     <wagonVersion>2.3-SNAPSHOT</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
