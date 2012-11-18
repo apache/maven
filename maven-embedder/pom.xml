@@ -22,7 +22,7 @@
   <artifactId>maven-embedder</artifactId>
 
   <name>Maven Embedder</name>
-  <description>Maven embeddable component, with CLI support.</description>
+  <description>Maven embeddable component, with CLI and logging support.</description>
 
   <dependencies>
     <dependency>
