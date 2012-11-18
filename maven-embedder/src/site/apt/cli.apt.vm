@@ -1,15 +1,11 @@
  -----
- ${project.name}
+ Maven CLI Options Reference
  -----
  Hervé Boutemy
  -----
  2012-04-29
  -----
 
-${project.name}
-
- ${project.description}
-
-Supported CLI Options
+Maven CLI Options Reference
 
 %{snippet|file=${project.basedir}/target/test-classes/options.html|verbatim=false}

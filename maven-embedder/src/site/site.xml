@@ -30,6 +30,10 @@ under the License.
       <!--item name="FAQ" href="faq.html"/-->
     </menu>
 
+    <menu name="Reference">
+      <item name="CLI options" href="cli.html"/>
+    </menu>
+
     <menu ref="parent"/>
     <menu ref="reports"/>
   </body>
