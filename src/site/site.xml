@@ -56,6 +56,13 @@ under the License.
       <item name="Settings" href="./maven-settings/settings.html"/>
     </menu>
 
+    <menu name="Reference">
+      <item name="Lifecycles" href="./maven-core/lifecycles.html"/>
+      <item name="Plugin Bindings to Default Lifecycle" href="./maven-core/default-bindings.html"/>
+      <item name="Artifact Handlers" href="./maven-core/artifact-handlers.html"/>
+      <item name="CLI options" href="./maven-embedder/cli.html"/>
+    </menu>
+
     <menu name="Development">
       <item name="Maven Developer Centre" href="../../developers/index.html"/>
       <item name="Maven Core ITs" href="../../core-its/index.html"/>
