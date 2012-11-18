@@ -1,0 +1,39 @@
+ -----
+ Maven Logging
+ -----
+ Hervé Boutemy
+ -----
+ 2012-04-29
+ -----
+
+Maven Logging
+
+ Maven uses
+ {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
+ Container logging API}}, like any other Plexus components, ie 
+ {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
+ / {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
+
+ Starting with Maven 3.1.0, instead of implementing the API itself,
+ Maven maps to {{{http://slf4j.org/apidocs/}SLF4J API}}'s {{{http://slf4j.org/apidocs/org/slf4j/ILoggerFactory.html}ILoggerFactory}}
+ / {{{http://slf4j.org/apidocs/org/slf4j/Logger.html}Logger}} through
+ {{{./apidocs/org/apache/maven/cli/logging/Slf4jLoggerManager.html}Slf4jLoggerManager}}
+ / {{{./apidocs/org/apache/maven/cli/logging/Slf4jLogger.html}Slf4jLogger}}.
+
+* Getting Logger Instance
+
+ Plexus Logger can be injected in Plexus component using Plexus annotations
+
++------
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+
+@Component( role = MyComponent.class )
+public class DefaultMyComponent
+    implements MyComponent
+{
+    @Requirement
+    private Logger logger;
+}
++------

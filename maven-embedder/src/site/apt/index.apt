@@ -10,4 +10,8 @@ ${project.name}
 
  ${project.description}
 
- See {{{./cli.html}CLI options}} reference.
+* References
+
+ * {{{./cli.html}CLI options}},
+
+ * {{{./logging.html}logging API}}.
