@@ -1,0 +1,13 @@
+ -----
+ ${project.name}
+ -----
+ Hervé Boutemy
+ -----
+ 2012-04-29
+ -----
+
+${project.name}
+
+ ${project.description}
+
+ See {{{./cli.html}CLI options}} reference.
