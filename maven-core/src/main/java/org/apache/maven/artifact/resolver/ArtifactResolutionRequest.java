@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.settings.Mirror;
@@ -317,4 +318,12 @@ public class ArtifactResolutionRequest
         return proxies;
     }
 
+    //
+    // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
+    // this here, possibly indefinitely.
+    //
+    public ArtifactResolutionRequest setCache( RepositoryCache cache )                                                                                             
+    {                                                                                                                                                              
+        return this;                                                                                                                                               
+    }                    
 }
