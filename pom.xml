@@ -565,4 +565,12 @@
     </profile>
   </profiles>
 
+  <repositories>
+    <repository>
+      <id>wagon-2.3-stage</id>
+      <name>wagon-2.3-stage</name>
+      <url>https://repository.apache.org/content/repositories/maven-055/</url>
+    </repository>
+  </repositories>
+
 </project>
