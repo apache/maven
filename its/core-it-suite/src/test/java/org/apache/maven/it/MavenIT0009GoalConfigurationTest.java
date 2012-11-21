@@ -45,7 +45,7 @@ public class MavenIT0009GoalConfigurationTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
-        verifier.assertFilePresent( "target/pluginItem" );
+        verifier.assertFilePresent( "target/  pluginItem  " );
         verifier.assertFilePresent( "target/goalItem" );
         verifier.assertFileNotPresent( "target/bad-item" );
         verifier.verifyErrorFreeLog();
