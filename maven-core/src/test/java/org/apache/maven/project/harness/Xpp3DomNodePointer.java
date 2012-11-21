@@ -78,14 +78,14 @@ class Xpp3DomNodePointer
     @Override
     public Object getValue()
     {
-        return getValue(node);
+        return getValue( node );
     }
 
     private static Object getValue( Xpp3Dom node )
     {
         if ( node.getValue() != null )
         {
-            return node.getValue().trim();
+            return node.getValue();
         }
         else
         {
