@@ -37,8 +37,8 @@ under the License.
           <artifactId>maven-compiler-plugin</artifactId>
           <version>2.1</version>
           <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
+            <source>  1.5  </source>
+            <target xml:space="preserve">  1.5  </target>
           </configuration>
         </plugin>
       </plugins>
