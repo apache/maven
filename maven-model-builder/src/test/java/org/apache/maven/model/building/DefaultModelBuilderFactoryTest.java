@@ -21,6 +21,8 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
 import junit.framework.TestCase;
 
 /**
@@ -49,6 +51,10 @@ public class DefaultModelBuilderFactoryTest
         assertNotNull( result );
         assertNotNull( result.getEffectiveModel() );
         assertEquals( "activated", result.getEffectiveModel().getProperties().get( "profile.file" ) );
+        Xpp3Dom conf = (Xpp3Dom) result.getEffectiveModel().getBuild().getPlugins().get( 0 ).getConfiguration();
+        System.out.println( conf );
+        assertEquals( "1.5", conf.getChild( "source" ).getValue() );
+        assertEquals( "  1.5  ", conf.getChild( "target" ).getValue() );
     }
 
 }
