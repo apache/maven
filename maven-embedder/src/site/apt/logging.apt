@@ -37,3 +37,16 @@ public class DefaultMyComponent
     private Logger logger;
 }
 +------
+
+ Starting with Maven 3.1.0, SLF4J Logger can be used directly too, without Plexus. Of course, this will only work when run under
+ Maven 3.1.0, then this technique can be used safely only in Maven core components.
+ 
++-----
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Wombat
+{
+   final Logger logger = LoggerFactory.getLogger(Wombat.class);
+}
++-----
