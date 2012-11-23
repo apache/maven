@@ -22,7 +22,8 @@ package org.apache.maven.cli.logging;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Adapt an SLF4J logger to a Plexus logger.
+ * Adapt an SLF4J logger to a Plexus logger, ignoring Plexus logger API parts that are not classical and
+ * probably not really used.
  * 
  * @author Jason van Zyl
  */
@@ -112,15 +113,24 @@ public class Slf4jLogger
         return logger.isErrorEnabled();
     }
 
+    /**
+     * <b>Warning</b>: ignored (always return <code>0</code>).
+     */
     public int getThreshold()
     {
         return 0;
     }
 
+    /**
+     * <b>Warning</b>: ignored.
+     */
     public void setThreshold( int threshold )
     {
     }
 
+    /**
+     * <b>Warning</b>: ignored (always return <code>0</code>).
+     */
     public Logger getChildLogger( String name )
     {
         return null;
