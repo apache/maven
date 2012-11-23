@@ -25,7 +25,8 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 /**
- * Use an SLF4J {@link org.slf4j.ILoggerFactory} as a backing for a Plexus {@link org.codehaus.plexus.logging.LoggerManager}.
+ * Use an SLF4J {@link org.slf4j.ILoggerFactory} as a backing for a Plexus {@link org.codehaus.plexus.logging.LoggerManager},
+ * ignoring Plexus logger API parts that are not classical and probably not really used.
  *
  * @author Jason van Zyl
  * @since 3.1
@@ -46,37 +47,61 @@ public class Slf4jLoggerManager
         return new Slf4jLogger( loggerFactory.getLogger( role ) );
     }
 
+    /**
+     * The logger name for a component with a non-null hint is <code>role.hint</code>.
+     * <b>Warning</b>: this does not conform to logger name as class name convention.
+     * (and what about <code>null</code> and <code>default</code> hint equivalence?)
+     */
     public Logger getLoggerForComponent( String role, String hint )
     {
         return ( null == hint
             ? getLoggerForComponent( role )
-            : new Slf4jLogger( loggerFactory.getLogger( role + "." + hint ) ) );
+            : new Slf4jLogger( loggerFactory.getLogger( role + '.' + hint ) ) );
     }
 
     //
     // Trying to give loggers back is a bad idea. Ceki said so :-)
+    // notice to self: what was this method supposed to do?
     //
+    /**
+     * <b>Warning</b>: ignored.
+     */
     public void returnComponentLogger( String role )
     {
     }
 
+    /**
+     * <b>Warning</b>: ignored.
+     */
     public void returnComponentLogger( String role, String hint )
     {
     }
 
+    /**
+     * <b>Warning</b>: ignored (always return <code>0</code>).
+     */
     public int getThreshold()
     {
         return 0;
     }
 
+    /**
+     * <b>Warning</b>: ignored.
+     */
     public void setThreshold( int threshold )
     {
     }
 
+    /**
+     * <b>Warning</b>: ignored.
+     */
     public void setThresholds( int threshold )
     {
     }
 
+    /**
+     * <b>Warning</b>: ignored (always return <code>0</code>).
+     */
     public int getActiveLoggerCount()
     {
         return 0;

@@ -50,3 +50,16 @@ public class Wombat
    final Logger logger = LoggerFactory.getLogger(Wombat.class);
 }
 +-----
+
+* Logger Name
+
+ Before Maven 3.1.0, with logging implementation done in Maven, logger name wasn't used: they are as-is, without clear definition.
+
+ Starting with Maven 3.1.0, logging implementation can be of greatest use if logger names are well defined. This definition still
+ needs to be defined and implemented:
+
+ * classical "class name" pattern?
+
+ * Maven-specific name hierarchy?
+
+ * a mix (some with class name, some with Maven-specific hierarchy)?
