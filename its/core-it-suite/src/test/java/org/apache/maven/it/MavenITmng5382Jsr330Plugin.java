@@ -24,9 +24,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5338">MNG-5338</a>.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5382">MNG-5338</a>.
  *
- * @author Olivier Lamy
+ * @author Jason van Zyl
  */
 public class MavenITmng5382Jsr330Plugin
     extends AbstractMavenIntegrationTestCase
@@ -61,7 +61,7 @@ public class MavenITmng5382Jsr330Plugin
         //
         // Build a plugin that uses a JSR330 plugin
         //    
-        Verifier v0 = newVerifier( testDir.getAbsolutePath() );
+        Verifier v0 = newVerifier( testDir.getAbsolutePath(), "remote" );
         v0.setAutoclean( false );
         v0.deleteDirectory( "target" );
         v0.deleteArtifacts( "org.apache.maven.its.mng5382" );
@@ -72,7 +72,7 @@ public class MavenITmng5382Jsr330Plugin
         //
         // Execute the JSR330 plugin
         //
-        Verifier v1 = newVerifier( testDir.getAbsolutePath() );
+        Verifier v1 = newVerifier( testDir.getAbsolutePath(), "remote" );
         v1.setAutoclean( false );
         v1.executeGoal( "org.apache.maven.its.mng5382:jsr330-maven-plugin:0.0.1-SNAPSHOT:hello" );
         v1.verifyErrorFreeLog();

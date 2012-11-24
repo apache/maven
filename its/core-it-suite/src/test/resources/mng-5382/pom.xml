@@ -13,7 +13,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <mavenVersion>3.0.4</mavenVersion>
-    <mavenPluginPluginVersion>3.1</mavenPluginPluginVersion>
+    <mavenPluginPluginVersion>3.2</mavenPluginPluginVersion>
   </properties>
 
   <dependencies>
@@ -32,12 +32,6 @@
       <artifactId>maven-plugin-annotations</artifactId>
       <version>${mavenPluginPluginVersion}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
