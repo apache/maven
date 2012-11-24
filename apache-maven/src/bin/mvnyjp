@@ -61,15 +61,27 @@ mingw=false
 case "`uname`" in
   CYGWIN*) cygwin=true ;;
   MINGW*) mingw=true;;
-  Darwin*) darwin=true 
-           if [ -z "$JAVA_VERSION" ] ; then
-             JAVA_VERSION="CurrentJDK"
+  Darwin*) darwin=true
+           #
+           # Look for the Apple JDKs first to preserve the existing behaviour, and then look
+           # for the new JDKs provided by Oracle.
+           # 
+           if [[ -z "$JAVA_HOME" && -L /System/Library/Java/JavaVirtualMachines/CurrentJDK ]] ; then
+             #
+             # Apple JDKs
+             #
+             JAVA_HOME=/System/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
            fi
-           if [ -z "$JAVA_HOME" ] ; then
-             JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/${JAVA_VERSION}/Home
-           fi
+             
+           if [[ -z "$JAVA_HOME" && -L "/Library/Java/JavaVirtualMachines/CurrentJDK" ]] ; then
+               #
+               # Oracle JDKs
+               #
+               JAVA_HOME=/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
+           fi           
+  
            if [ -z "$YJP_HOME" ]; then
-             YJP_HOME=/Applications/YourKit.app
+             YJP_HOME=/Applications/YourKit_Java_Profiler_11.0.9.app
            fi
            YJPLIB=$YJP_HOME/bin/mac/libyjpagent.jnilib
            ;;
