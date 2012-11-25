@@ -32,6 +32,7 @@ under the License.
         <exclude>**/*.log</exclude>
         <exclude>**/.gitignore</exclude>
         <exclude>**/.gitattributes</exclude>
+        <exclude>init-git-svn.sh</exclude>
       </excludes>
     </fileSet>
     <fileSet>
