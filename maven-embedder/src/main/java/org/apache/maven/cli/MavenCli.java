@@ -875,7 +875,7 @@ public class MavenCli
         {
             transferListener = new QuietMavenTransferListener();
         }        
-        else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ))
+        else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             //
             // If we're logging to a file then we don't want the console transfer listener as it will spew
