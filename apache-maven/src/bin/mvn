@@ -62,14 +62,14 @@ case "`uname`" in
              #
              # Apple JDKs
              #
-             JAVA_HOME=/System/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
+             export JAVA_HOME=/System/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
            fi
              
            if [[ -z "$JAVA_HOME" && -L "/Library/Java/JavaVirtualMachines/CurrentJDK" ]] ; then
-               #
-               # Oracle JDKs
-               #
-               JAVA_HOME=/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
+             #
+             # Oracle JDKs
+             #
+             export JAVA_HOME=/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
            fi           
            ;;
 esac
