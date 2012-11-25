@@ -19,12 +19,11 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
 import java.util.Properties;
+
+import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4745">MNG-4745</a>.

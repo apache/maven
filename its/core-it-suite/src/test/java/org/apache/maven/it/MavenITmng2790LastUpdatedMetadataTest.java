@@ -19,14 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import java.text.SimpleDateFormat;
+
+import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2790">MNG-2790</a>.

@@ -26,10 +26,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.it.util.StringUtils;
+import org.apache.maven.shared.utils.StringUtils;
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;

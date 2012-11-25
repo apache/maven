@@ -19,16 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
-import org.apache.maven.it.util.ResourceExtractor;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.io.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3441">MNG-3441</a>.

@@ -19,16 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.FileUtils;
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * Downloads a snapshot dependency that was deployed with uniqueVersion = false, and checks it can be

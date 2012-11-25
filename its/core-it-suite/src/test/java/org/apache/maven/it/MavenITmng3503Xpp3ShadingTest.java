@@ -21,8 +21,8 @@ package org.apache.maven.it;
 
 import java.io.File;
 
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3503">MNG-3503</a>. The first test verifies that
