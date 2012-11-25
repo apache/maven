@@ -41,6 +41,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
@@ -66,6 +67,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -389,9 +391,10 @@ public class DefaultMavenPluginManager
                 container.addComponentDescriptor( componentDescriptor );
             }
 
-            container.discoverComponents( pluginRealm );
+            ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm,
+                                                                       MojoExecutionScope.getScopeModule( container ) );
         }
-        catch ( PlexusConfigurationException e )
+        catch ( ComponentLookupException e )
         {
             throw new PluginContainerException( plugin, pluginRealm, "Error in component graph of plugin "
                 + plugin.getId() + ": " + e.getMessage(), e );

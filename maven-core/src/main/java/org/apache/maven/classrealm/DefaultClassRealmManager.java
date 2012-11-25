@@ -139,6 +139,7 @@ public class DefaultClassRealmManager
         imports.put( "org.apache.maven.configuration", coreRealm );
         imports.put( "org.apache.maven.exception", coreRealm );
         imports.put( "org.apache.maven.execution", coreRealm );
+        imports.put( "org.apache.maven.execution.scope", coreRealm );
         imports.put( "org.apache.maven.lifecycle", coreRealm );
         imports.put( "org.apache.maven.model", coreRealm );
         imports.put( "org.apache.maven.monitor", coreRealm );

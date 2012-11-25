@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -48,8 +49,10 @@ public class DefaultBuildPluginManager
     @Requirement
     private LegacySupport legacySupport;
 
+    @Requirement( hint = MojoExecutionScope.SCOPE_NAME )
+    private MojoExecutionScope scope;
+
     /**
-     * 
      * @param plugin
      * @param repositories
      * @param session
@@ -92,8 +95,14 @@ public class DefaultBuildPluginManager
 
         MavenSession oldSession = legacySupport.getSession();
 
+        scope.enter();
+
         try
         {
+            scope.seed( MavenSession.class, session );
+            scope.seed( MavenProject.class, project );
+            scope.seed( MojoExecution.class, mojoExecution );
+            
             mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
 
             legacySupport.setSession( session );
@@ -104,6 +113,8 @@ public class DefaultBuildPluginManager
             try
             {
                 mojo.execute();
+
+                scope.afterExecutionSuccess();
             }
             catch ( ClassCastException e )
             {
@@ -155,7 +166,11 @@ public class DefaultBuildPluginManager
         }
         finally
         {
+            scope.afterExecutionAlways();
+
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
+
+            scope.exit();
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
 

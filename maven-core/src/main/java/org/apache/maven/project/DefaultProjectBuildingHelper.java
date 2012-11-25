@@ -33,6 +33,7 @@ import java.util.Set;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.classrealm.ClassRealmManager;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
@@ -47,6 +48,7 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
@@ -266,7 +268,8 @@ public class DefaultProjectBuildingHelper
 
                 try
                 {
-                    container.discoverComponents( extensionRealm );
+                    ( (DefaultPlexusContainer) container ).discoverComponents( extensionRealm,
+                                                                               MojoExecutionScope.getScopeModule( container ) );
                 }
                 catch ( Exception e )
                 {
