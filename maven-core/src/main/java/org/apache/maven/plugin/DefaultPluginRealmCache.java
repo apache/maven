@@ -29,7 +29,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.graph.DependencyFilter;
 import org.sonatype.aether.repository.LocalRepository;
@@ -41,7 +43,7 @@ import org.sonatype.aether.repository.WorkspaceRepository;
  */
 @Component( role = PluginRealmCache.class )
 public class DefaultPluginRealmCache
-    implements PluginRealmCache
+    implements PluginRealmCache, Disposable
 {
 
     protected static class CacheKey
@@ -179,6 +181,18 @@ public class DefaultPluginRealmCache
 
     public void flush()
     {
+        for ( CacheRecord record : cache.values() )
+        {
+            ClassRealm realm = record.realm;
+            try
+            {
+                realm.getWorld().disposeRealm( realm.getId() );
+            }
+            catch ( NoSuchRealmException e )
+            {
+                // ignore
+            }
+        }
         cache.clear();
     }
 
@@ -195,6 +209,11 @@ public class DefaultPluginRealmCache
     public void register( MavenProject project, CacheRecord record )
     {
         // default cache does not track plugin usage
+    }
+
+    public void dispose()
+    {
+        flush();
     }
 
 }

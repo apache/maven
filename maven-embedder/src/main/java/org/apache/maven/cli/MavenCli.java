@@ -55,6 +55,7 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
@@ -112,9 +113,6 @@ public class MavenCli
 
     private ClassWorld classWorld;
 
-    // Per-instance container supports fast embedded execution of core ITs
-    private DefaultPlexusContainer container;
-    
     private LoggerManager plexusLoggerManager;
 
     private ILoggerFactory slf4jLoggerFactory;
@@ -197,7 +195,7 @@ public class MavenCli
     // TODO: need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
-        PlexusContainer localContainer = this.container;
+        PlexusContainer localContainer = null;
         try
         {
             initialize( cliRequest );
@@ -235,7 +233,7 @@ public class MavenCli
         }
         finally
         {
-            if ( localContainer != this.container )
+            if (localContainer != null)
             {
                 localContainer.dispose();
             }
@@ -377,10 +375,8 @@ public class MavenCli
             cliRequest.classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
         }
 
-        DefaultPlexusContainer container = this.container;
+        DefaultPlexusContainer container = null;
 
-        if ( container == null )
-        {
             ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld( cliRequest.classWorld )
                 .setRealm( setupContainerRealm( cliRequest ) )
@@ -404,12 +400,6 @@ public class MavenCli
             container.setLoggerManager( plexusLoggerManager );
 
             customizeContainer( container );
-
-            if ( cliRequest.classWorld == classWorld )
-            {
-                this.container = container;
-            }
-        }
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
