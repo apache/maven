@@ -19,8 +19,8 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.FileUtils;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.io.FileUtils;
 
 import java.io.File;
 
