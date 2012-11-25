@@ -104,7 +104,9 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // Tests that don't run stable and need to be fixed
         // -------------------------------------------------------------------------------------------------------------
-        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137        
+        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
+
+        suite.addTestSuite( MavenITmng5387ArtifactReplacementPlugin.class );
         suite.addTestSuite( MavenITmng5382Jsr330Plugin.class );
         suite.addTestSuite( MavenITmng5338FileOptionToDirectory.class );
         suite.addTestSuite( MavenITmng5280SettingsProfilesRepositoriesOrderTest.class );
