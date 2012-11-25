@@ -37,7 +37,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @author Jason van Zyl
  * @todo this should probably be a component with some dynamic control of filtering
  */
-@Component(role = ArtifactFilterManager.class)
+@Component( role = ArtifactFilterManager.class )
 public class DefaultArtifactFilterManager 
     implements ArtifactFilterManager
 {
@@ -90,7 +90,7 @@ public class DefaultArtifactFilterManager
          * wagon from their plugin realm.
          */
 
-        DEFAULT_EXCLUSIONS = Collections.unmodifiableSet( artifacts);
+        DEFAULT_EXCLUSIONS = Collections.unmodifiableSet( artifacts );
     }
 
     protected Set<String> excludedArtifacts = new HashSet<String>( DEFAULT_EXCLUSIONS );

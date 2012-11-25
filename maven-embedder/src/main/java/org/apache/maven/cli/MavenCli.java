@@ -283,7 +283,7 @@ public class MavenCli
 
         if ( cliRequest.commandLine.hasOption( CLIManager.VERSION ) )
         {
-            System.out.println(CLIReportingUtils.showVersion());
+            System.out.println( CLIReportingUtils.showVersion() );
             throw new ExitException( 0 );
         }
     }    
@@ -417,7 +417,7 @@ public class MavenCli
         eventSpyDispatcher.init( eventSpyContext );
 
         // refresh logger in case container got customized by spy
-        slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
+        slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
 
         maven = container.lookup( Maven.class );
 

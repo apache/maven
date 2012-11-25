@@ -42,7 +42,7 @@ import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-@Component(role = ProjectDependenciesResolver.class)
+@Component( role = ProjectDependenciesResolver.class )
 public class DefaultProjectDependenciesResolver
     implements ProjectDependenciesResolver
 {
@@ -97,8 +97,8 @@ public class DefaultProjectDependenciesResolver
             return resolved;
         }
 
-        if ( ( scopesToCollect == null || scopesToCollect.isEmpty() ) &&
-            ( scopesToResolve == null || scopesToResolve.isEmpty() ) )
+        if ( ( scopesToCollect == null || scopesToCollect.isEmpty() )
+            && ( scopesToResolve == null || scopesToResolve.isEmpty() ) )
         {
             return resolved;
         }

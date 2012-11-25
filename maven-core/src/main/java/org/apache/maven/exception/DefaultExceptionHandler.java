@@ -179,9 +179,11 @@ public class DefaultExceptionHandler
                 reference = MojoExecutionException.class.getSimpleName();
 
                 Throwable cause = exception.getCause();
-                if ( cause instanceof IOException ) {
+                if ( cause instanceof IOException )
+                {
                     cause = cause.getCause();
-                    if ( cause instanceof ConnectException ) {
+                    if ( cause instanceof ConnectException )
+                    {
                         reference = ConnectException.class.getSimpleName();
                     }
                 }

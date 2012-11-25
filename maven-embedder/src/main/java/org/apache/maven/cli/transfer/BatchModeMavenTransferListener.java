@@ -1,7 +1,5 @@
 package org.apache.maven.cli.transfer;
 
-import java.io.PrintStream;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +18,8 @@ import java.io.PrintStream;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import java.io.PrintStream;
 
 public class BatchModeMavenTransferListener
     extends AbstractMavenTransferListener
