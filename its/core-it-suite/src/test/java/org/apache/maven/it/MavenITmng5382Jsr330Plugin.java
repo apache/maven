@@ -36,7 +36,7 @@ public class MavenITmng5382Jsr330Plugin
 
     public MavenITmng5382Jsr330Plugin()
     {
-        super( "[3.1,)" );
+        super( "[3.1-alpha,)" );
     }
 
     public void setUp()
