@@ -15,22 +15,6 @@ package org.apache.maven.project;
  * the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -74,6 +58,22 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.aether.graph.DependencyFilter;
 import org.sonatype.aether.repository.RemoteRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * The concern of the project is provide runtime values based on the model.
@@ -1449,19 +1449,46 @@ public class MavenProject
         return this.injectedProfileIds;
     }
 
+    private String logStringForArtifactFile( Artifact a )
+    {
+        if ( a.getFile() != null )
+        {
+            return a.getFile().getAbsolutePath();
+        }
+        else
+        {
+            return "(no path)";
+        }
+    }
+
+    /**
+     * Add or replace an artifact.
+     * In spite of the 'throws' declaration on this API, this method has never thrown an exception since Maven 3.0.x.
+     * Historically, it logged and ignored a second addition of the same g/a/v/c/t. Now it replaces the file for
+     * the artifact, so that plugins (e.g. shade) can change the pathname of the file for a particular set of
+     * coordinates.
+     * @param artifact the artifact to add or replace.
+     * @throws DuplicateArtifactAttachmentException
+     */
     public void addAttachedArtifact( Artifact artifact )
         throws DuplicateArtifactAttachmentException
     {
         List<Artifact> attachedArtifacts = getAttachedArtifacts();
-
-        if ( attachedArtifacts.contains( artifact ) )
+        for ( int ax = 0; ax < attachedArtifacts.size(); ax++ )
         {
-            if ( logger != null )
+            Artifact a = attachedArtifacts.get( ax );
+            if ( a.equals( artifact ))
             {
-                logger.warn( "Artifact " + artifact + " already attached to project, ignoring duplicate" );
+                if ( logger != null )
+                {
+                    logger.debug( String.format( "Replacing attached artifact %s. Old path %s, new path %s. ",
+                                                 a,
+                                                 logStringForArtifactFile( a ),
+                                                 logStringForArtifactFile( artifact ) ) );
+                }
+                attachedArtifacts.set( ax, artifact );
+                return;
             }
-            return;
-            //throw new DuplicateArtifactAttachmentException( this, artifact );
         }
 
         getAttachedArtifacts().add( artifact );
