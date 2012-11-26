@@ -49,7 +49,7 @@ under the License.
   </scm>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://builds.apache.org/hudson/view/M-R/view/Maven/job/core-integration-testing-maven-3-trunk/</url>
+    <url>https://builds.apache.org/view/M-R/view/Maven/job/core-integration-testing-maven-3/</url>
   </ciManagement>
 
   <build>
