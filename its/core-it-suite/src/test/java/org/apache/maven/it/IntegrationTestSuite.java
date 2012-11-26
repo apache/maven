@@ -425,7 +425,7 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng3679PluginExecIdInterpolationTest.class );
         suite.addTestSuite( MavenITmng3671PluginLevelDepInterpolationTest.class );
         suite.addTestSuite( MavenITmng3667ResolveDepsWithBadPomVersionTest.class );
-        //suite.addTestSuite( MavenITmng3652UserAgentHeaderTest.class );
+        suite.addTestSuite( MavenITmng3652UserAgentHeaderTest.class );
         suite.addTestSuite( MavenITmng3645POMSyntaxErrorTest.class );
         suite.addTestSuite( MavenITmng3642DynamicResourcesTest.class );
         suite.addTestSuite( MavenITmng3641ProfileActivationWarningTest.class );
