@@ -35,9 +35,7 @@ public class CoreItMojoWithSetters
     extends AbstractMojo
 {
     /**
-     * @parameter
-     *   property="outputDirectory"
-     *   expression="${project.build.directory}"
+     * @parameter expression="${project.build.directory}"
      * @required
      */
     private String outputDirectoryValue;
@@ -65,6 +63,9 @@ public class CoreItMojoWithSetters
 
     public void setFoo( String fooValue )
     {
+
+        getLog().info( "setFoo: " + fooValue );
+
         this.fooValue = fooValue;
 
         setFooSetterExecuted = true;
@@ -74,6 +75,9 @@ public class CoreItMojoWithSetters
 
     public void setBar( String barValue )
     {
+
+        getLog().info( "setBar: " + barValue );
+
         this.bar = barValue + ".baz";
 
         setBarSetterExecuted = true;
@@ -94,18 +98,27 @@ public class CoreItMojoWithSetters
         // Test parameter setting
         if ( fooValue != null && setFooSetterExecuted )
         {
+
+            getLog().info( "fooValue != null && setFooSetterExecuted" );
+
             touch( outDir, fooValue );
         }
 
         if ( bar != null && setBarSetterExecuted )
         {
+
+            getLog().info( "bar != null && setBarSetterExecuted" );
+
             touch( outDir, bar );
         }
     }
 
-    private static void touch( File dir, String file )
+    private void touch( File dir, String file )
         throws MojoExecutionException
     {
+
+        getLog().info( "touch: " + dir.getPath() + ":" + file );
+
         try
         {
              if ( !dir.exists() )
