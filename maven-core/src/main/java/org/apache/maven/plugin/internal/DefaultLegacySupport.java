@@ -43,14 +43,15 @@ public class DefaultLegacySupport
 
     public void setSession( MavenSession session )
     {
-        if ( session == null )
+        AtomicReference<MavenSession> reference = DefaultLegacySupport.session.get();
+        if ( reference != null )
         {
-            AtomicReference<MavenSession> oldSession = DefaultLegacySupport.session.get();
-            if ( oldSession != null )
-            {
-                oldSession.set( null);
-                DefaultLegacySupport.session.remove();
-            }
+            reference.set( null);
+        }
+
+        if ( session == null && reference != null)
+        {
+            DefaultLegacySupport.session.remove();
         }
         else
         {
