@@ -24,7 +24,7 @@
     <version>22</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
-<!-- foo -->
+
   <artifactId>maven</artifactId>
   <version>3.1-SNAPSHOT</version>
   <packaging>pom</packaging>
