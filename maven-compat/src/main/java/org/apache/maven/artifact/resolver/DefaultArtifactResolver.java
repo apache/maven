@@ -574,6 +574,7 @@ public class DefaultArtifactResolver
 
         public void run()
         {
+            ClassLoader old = Thread.currentThread().getContextClassLoader();
             try
             {
                 Thread.currentThread().setContextClassLoader( classLoader );
@@ -602,6 +603,8 @@ public class DefaultArtifactResolver
             finally
             {
                 latch.countDown();
+                Thread.currentThread().setContextClassLoader( old );
+
             }
         }
 
