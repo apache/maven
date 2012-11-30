@@ -489,13 +489,6 @@
             </configuration>
             <reportSets>
               <reportSet>
-                <id>non-aggregate</id>
-                <reports>
-                  <report>javadoc</report>
-                  <report>test-javadoc</report>
-                </reports>
-              </reportSet>
-              <reportSet>
                 <id>aggregate</id>
                 <inherited>false</inherited>
                 <reports>
@@ -509,13 +502,6 @@
             <artifactId>maven-jxr-plugin</artifactId>
             <version>2.3</version>
             <reportSets>
-              <reportSet>
-                <id>non-aggregate</id>
-                <reports>
-                  <report>jxr</report>
-                  <report>test-jxr</report>
-                </reports>
-              </reportSet>
               <reportSet>
                 <id>aggregate</id>
                 <inherited>false</inherited>
