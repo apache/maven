@@ -40,6 +40,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
+import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -262,6 +263,12 @@ public class MavenCli
     private void cli( CliRequest cliRequest )
         throws Exception
     {
+        //
+        // Parsing errors can happen during the processing of the arguments and we prefer not having to check if the logger is null
+        // and make construct this so we can use an SLF4J logger everywhere
+        //
+        slf4jLogger = new Slf4jStdoutLogger();
+
         CLIManager cliManager = new CLIManager();
 
         try
