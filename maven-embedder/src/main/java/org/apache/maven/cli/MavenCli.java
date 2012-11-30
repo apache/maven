@@ -265,7 +265,7 @@ public class MavenCli
     {
         //
         // Parsing errors can happen during the processing of the arguments and we prefer not having to check if the logger is null
-        // and make construct this so we can use an SLF4J logger everywhere
+        // and construct this so we can use an SLF4J logger everywhere.
         //
         slf4jLogger = new Slf4jStdoutLogger();
 
