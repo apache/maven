@@ -42,7 +42,7 @@
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <classWorldsVersion>2.4</classWorldsVersion>
+    <classWorldsVersion>2.4.1</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
