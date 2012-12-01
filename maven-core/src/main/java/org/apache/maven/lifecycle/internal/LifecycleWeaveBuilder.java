@@ -277,8 +277,8 @@ public class LifecycleWeaveBuilder
                 }
                 catch ( Exception e )
                 {
-                    builderCommon.handleBuildError( reactorContext, rootSession, projectBuild.getProject(), e,
-                                                    buildStartTime );
+                    builderCommon.handleBuildError( reactorContext, rootSession, projectBuild.getSession(),
+                                                    projectBuild.getProject(), e, buildStartTime );
                 }
                 finally
                 {
