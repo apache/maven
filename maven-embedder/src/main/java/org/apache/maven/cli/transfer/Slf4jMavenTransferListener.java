@@ -24,6 +24,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.transfer.AbstractTransferListener;
 import org.sonatype.aether.transfer.TransferCancelledException;
 import org.sonatype.aether.transfer.TransferEvent;
@@ -33,8 +34,14 @@ public class Slf4jMavenTransferListener
     extends AbstractTransferListener
 {
 
-    protected Logger out;
+    protected final Logger out;
 
+    public Slf4jMavenTransferListener()
+    {
+        this.out = LoggerFactory.getLogger( Slf4jMavenTransferListener.class );
+    }
+
+    // TODO should we deprecate?
     public Slf4jMavenTransferListener( Logger out )
     {
         this.out = out;

@@ -894,7 +894,7 @@ public class MavenCli
             transferListener = getBatchTransferListener();
         }
 
-        ExecutionListener executionListener = new ExecutionEventLogger( slf4jLogger );
+        ExecutionListener executionListener = new ExecutionEventLogger();
         executionListener = eventSpyDispatcher.chainListener( executionListener );
 
         String alternatePomFile = null;
@@ -1160,7 +1160,7 @@ public class MavenCli
     
     protected TransferListener getBatchTransferListener()
     {
-        return new Slf4jMavenTransferListener( slf4jLogger );
+        return new Slf4jMavenTransferListener();
     }
     
     protected void customizeContainer( PlexusContainer container )

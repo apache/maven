@@ -31,9 +31,10 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Logs execution events to a user-supplied logger.
+ * Logs execution events to logger, eventually user-supplied.
  *
  * @author Benjamin Bentmann
  */
@@ -44,6 +45,12 @@ public class ExecutionEventLogger
 
     private static final int LINE_LENGTH = 72;
 
+    public ExecutionEventLogger()
+    {
+        logger = LoggerFactory.getLogger( ExecutionEventLogger.class );
+    }
+
+    // TODO should we deprecate?
     public ExecutionEventLogger( Logger logger )
     {
         if ( logger == null )
