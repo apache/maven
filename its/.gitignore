@@ -8,3 +8,5 @@ bin
 *.iml
 *.iws
 .DS_Store
+.idea
+
