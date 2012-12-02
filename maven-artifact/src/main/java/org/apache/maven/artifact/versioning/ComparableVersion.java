@@ -69,9 +69,9 @@ public class ComparableVersion
 
     private interface Item
     {
-        final int INTEGER_ITEM = 0;
-        final int STRING_ITEM = 1;
-        final int LIST_ITEM = 2;
+        int INTEGER_ITEM = 0;
+        int STRING_ITEM = 1;
+        int LIST_ITEM = 2;
 
         int compareTo( Item item );
 
@@ -86,7 +86,7 @@ public class ComparableVersion
     private static class IntegerItem
         implements Item
     {
-    	private static final BigInteger BigInteger_ZERO = new BigInteger( "0" );
+    	private static final BigInteger BIG_INTEGER_ZERO = new BigInteger( "0" );
 
         private final BigInteger value;
 
@@ -94,7 +94,7 @@ public class ComparableVersion
 
         private IntegerItem()
         {
-            this.value = BigInteger_ZERO;
+            this.value = BIG_INTEGER_ZERO;
         }
 
         public IntegerItem( String str )
@@ -109,14 +109,14 @@ public class ComparableVersion
 
         public boolean isNull()
         {
-            return BigInteger_ZERO.equals( value );
+            return BIG_INTEGER_ZERO.equals( value );
         }
 
         public int compareTo( Item item )
         {
             if ( item == null )
             {
-                return BigInteger_ZERO.equals( value ) ? 0 : 1; // 1.0 == 1, 1.1 > 1
+                return BIG_INTEGER_ZERO.equals( value ) ? 0 : 1; // 1.0 == 1, 1.1 > 1
             }
 
             switch ( item.getType() )
@@ -266,7 +266,7 @@ public class ComparableVersion
 
         void normalize()
         {
-            for( ListIterator<Item> iterator = listIterator( size() ); iterator.hasPrevious(); )
+            for ( ListIterator<Item> iterator = listIterator( size() ); iterator.hasPrevious(); )
             {
                 Item item = iterator.previous();
                 if ( item.isNull() )
@@ -327,7 +327,7 @@ public class ComparableVersion
         public String toString()
         {
             StringBuilder buffer = new StringBuilder( "(" );
-            for( Iterator<Item> iter = iterator(); iter.hasNext(); )
+            for ( Iterator<Item> iter = iterator(); iter.hasNext(); )
             {
                 buffer.append( iter.next() );
                 if ( iter.hasNext() )

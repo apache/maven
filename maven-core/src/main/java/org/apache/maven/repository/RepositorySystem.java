@@ -42,17 +42,17 @@ import org.sonatype.aether.RepositorySystemSession;
  */
 public interface RepositorySystem
 {
-    final String DEFAULT_LOCAL_REPO_ID = "local";
+    String DEFAULT_LOCAL_REPO_ID = "local";
 
-    final String userHome = System.getProperty( "user.home" );
+    String userHome = System.getProperty( "user.home" );
 
-    final File userMavenConfigurationHome = new File( userHome, ".m2" );
+    File userMavenConfigurationHome = new File( userHome, ".m2" );
 
-    final File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
+    File defaultUserLocalRepository = new File( userMavenConfigurationHome, "repository" );
 
-    final String DEFAULT_REMOTE_REPO_ID = "central";
+    String DEFAULT_REMOTE_REPO_ID = "central";
 
-    final String DEFAULT_REMOTE_REPO_URL = "http://repo.maven.apache.org/maven2";
+    String DEFAULT_REMOTE_REPO_URL = "http://repo.maven.apache.org/maven2";
 
     Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
 

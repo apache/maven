@@ -62,7 +62,7 @@ public class MetadataResolution
         return artifactMetadata;
     }
 
-    public void setArtifactMetadata(ArtifactMetadata artifactMetadata)
+    public void setArtifactMetadata( ArtifactMetadata artifactMetadata )
     {
         this.artifactMetadata = artifactMetadata;
     }

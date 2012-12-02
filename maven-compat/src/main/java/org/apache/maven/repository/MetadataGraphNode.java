@@ -41,8 +41,8 @@ public class MetadataGraphNode
 
     public MetadataGraphNode()
     {
-        inNodes = new ArrayList<MetadataGraphNode>(4);
-        exNodes = new ArrayList<MetadataGraphNode>(8);
+        inNodes = new ArrayList<MetadataGraphNode>( 4 );
+        exNodes = new ArrayList<MetadataGraphNode>( 8 );
     }
 
     public MetadataGraphNode( MavenArtifactMetadata metadata )

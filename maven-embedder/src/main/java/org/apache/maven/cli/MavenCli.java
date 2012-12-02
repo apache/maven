@@ -233,7 +233,7 @@ public class MavenCli
         }
         finally
         {
-            if (localContainer != null)
+            if ( localContainer != null )
             {
                 localContainer.dispose();
             }
