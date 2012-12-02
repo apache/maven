@@ -133,8 +133,10 @@ public class BuilderCommon
         return executionPlan;
     }
 
-    public void handleBuildError(final ReactorContext buildContext, final MavenSession rootSession, final MavenSession currentSession,
-                                  final MavenProject mavenProject, Exception e, final long buildStartTime) {
+    public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
+                                  final MavenSession currentSession, final MavenProject mavenProject, Exception e,
+                                  final long buildStartTime )
+    {
         if ( e instanceof RuntimeException )
         {
             e = new InternalErrorException( "Internal error: " + e, e );
@@ -184,6 +186,5 @@ public class BuilderCommon
     {
         return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
     }
-
 
 }

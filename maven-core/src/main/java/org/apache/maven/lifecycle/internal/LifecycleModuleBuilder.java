@@ -92,7 +92,7 @@ public class LifecycleModuleBuilder
         }
         catch ( Exception e )
         {
-            builderCommon.handleBuildError(reactorContext, rootSession, session, currentProject, e, buildStartTime);
+            builderCommon.handleBuildError( reactorContext, rootSession, session, currentProject, e, buildStartTime );
         }
         finally
         {
