@@ -19,9 +19,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.util.List;
-import org.apache.maven.model.InputLocation;
-
 /**
  * Collects problems that are encountered during model building. The primary purpose of this component is to account for
  * the fact that the problem reporter has/should not have information about the calling context and hence cannot provide

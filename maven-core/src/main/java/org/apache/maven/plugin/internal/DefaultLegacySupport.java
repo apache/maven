@@ -39,29 +39,29 @@ public class DefaultLegacySupport
     implements LegacySupport
 {
 
-    private static final ThreadLocal<AtomicReference<MavenSession>> session = new InheritableThreadLocal<AtomicReference<MavenSession>>();
+    private static final ThreadLocal<AtomicReference<MavenSession>> SESSION = new InheritableThreadLocal<AtomicReference<MavenSession>>();
 
     public void setSession( MavenSession session )
     {
-        AtomicReference<MavenSession> reference = DefaultLegacySupport.session.get();
+        AtomicReference<MavenSession> reference = DefaultLegacySupport.SESSION.get();
         if ( reference != null )
         {
-            reference.set( null);
+            reference.set( null );
         }
 
-        if ( session == null && reference != null)
+        if ( session == null && reference != null )
         {
-            DefaultLegacySupport.session.remove();
+            DefaultLegacySupport.SESSION.remove();
         }
         else
         {
-            DefaultLegacySupport.session.set( new AtomicReference<MavenSession>( session ));
+            DefaultLegacySupport.SESSION.set( new AtomicReference<MavenSession>( session ) );
         }
     }
 
     public MavenSession getSession()
     {
-        AtomicReference<MavenSession> currentSession = DefaultLegacySupport.session.get();
+        AtomicReference<MavenSession> currentSession = DefaultLegacySupport.SESSION.get();
         return currentSession != null ? currentSession.get() : null;
     }
 

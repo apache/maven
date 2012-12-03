@@ -62,7 +62,7 @@ public class DefaultModelValidator
     implements ModelValidator
 {
 
-    private static final Pattern ID_REGEX = Pattern.compile("[A-Za-z0-9_\\-.]+");
+    private static final Pattern ID_REGEX = Pattern.compile( "[A-Za-z0-9_\\-.]+" );
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
@@ -230,8 +230,9 @@ public class DefaultModelValidator
         {
             if ( !"pom".equals( model.getPackaging() ) )
             {
-                addViolation( problems, Severity.ERROR, Version.BASE,"packaging", null, "with value '" + model.getPackaging()
-                    + "' is invalid. Aggregator projects " + "require 'pom' as packaging.", model );
+                addViolation( problems, Severity.ERROR, Version.BASE, "packaging", null,
+                              "with value '" + model.getPackaging() + "' is invalid. Aggregator projects "
+                                  + "require 'pom' as packaging.", model );
             }
 
             for ( int i = 0, n = model.getModules().size(); i < n; i++ )
@@ -850,7 +851,8 @@ public class DefaultModelValidator
 
         buffer.append( ' ' ).append( message );
 
-        problems.add( new ModelProblemCollectorRequest( severity, version ).setMessage( buffer.toString() ).setLocation( getLocation( fieldName, tracker )));
+        problems.add( new ModelProblemCollectorRequest( severity, version )
+            .setMessage( buffer.toString() ).setLocation( getLocation( fieldName, tracker ) ) );
     }
 
     private static InputLocation getLocation( String fieldName, InputLocationTracker tracker )

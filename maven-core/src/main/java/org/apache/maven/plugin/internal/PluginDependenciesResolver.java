@@ -50,7 +50,7 @@ public interface PluginDependenciesResolver
      * @return The resolved plugin artifact, never {@code null}.
      * @throws PluginResolutionException If the plugin artifact could not be resolved.
      */
-    public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
+    Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException;
 
     /**

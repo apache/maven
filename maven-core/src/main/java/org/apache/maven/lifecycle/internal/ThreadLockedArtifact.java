@@ -52,8 +52,8 @@ class ThreadLockedArtifact
 
     public boolean hasReal()
     {
-        return real != null &&
-            ( !( real instanceof ThreadLockedArtifact ) || ( (ThreadLockedArtifact) real ).hasReal() );
+        return real != null
+            && ( !( real instanceof ThreadLockedArtifact ) || ( (ThreadLockedArtifact) real ).hasReal() );
     }
 
     public String getGroupId()
@@ -96,17 +96,17 @@ class ThreadLockedArtifact
         return real.hasClassifier();
     }
 
-    private static final InheritableThreadLocal<ThreadLockedArtifact> threadArtifact =
+    private static final InheritableThreadLocal<ThreadLockedArtifact> THREAD_ARTIFACT =
         new InheritableThreadLocal<ThreadLockedArtifact>();
 
     public void attachToThread()
     {
-        threadArtifact.set( this );
+        THREAD_ARTIFACT.set( this );
     }
 
     public File getFile()
     {
-        final ThreadLockedArtifact lockedArtifact = threadArtifact.get();
+        final ThreadLockedArtifact lockedArtifact = THREAD_ARTIFACT.get();
         if ( lockedArtifact != null && this != lockedArtifact && mustLock() )
         {
             try

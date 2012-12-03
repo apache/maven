@@ -115,10 +115,10 @@ public class DefaultProfileSelector
             }
             catch ( RuntimeException e )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
-                        .setMessage( "Failed to determine activation for profile " + profile.getId())
-                        .setLocation( profile.getLocation( "" ))
-                        .setException( e ));
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Failed to determine activation for profile " + profile.getId() )
+                        .setLocation( profile.getLocation( "" ) )
+                        .setException( e ) );
                 return false;
             }
         }

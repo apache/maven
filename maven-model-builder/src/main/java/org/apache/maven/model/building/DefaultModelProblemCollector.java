@@ -23,10 +23,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.io.ModelParseException;
 
 /**
@@ -174,7 +171,9 @@ class DefaultModelProblemCollector
             column = e.getColumnNumber();
         }
 
-        ModelProblem problem = new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source, line, column, modelId, req.getException() );
+        ModelProblem problem =
+            new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source, line, column,
+                                     modelId, req.getException() );
 
         add( problem );
     }
