@@ -40,12 +40,15 @@ public class MavenIT0009GoalConfigurationTest
     public void testit0009()
         throws Exception
     {
+
+        boolean supportSpaceInXml = matchesVersionRange( "[3.1.0,)");
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0009" );
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
-        verifier.assertFilePresent( "target/  pluginItem  " );
+        verifier.assertFilePresent( supportSpaceInXml ? "target/  pluginItem  " : "target/pluginItem");
         verifier.assertFilePresent( "target/goalItem" );
         verifier.assertFileNotPresent( "target/bad-item" );
         verifier.verifyErrorFreeLog();
