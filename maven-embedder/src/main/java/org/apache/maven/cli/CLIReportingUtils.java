@@ -83,7 +83,7 @@ public final class CLIReportingUtils
         if ( rev != null || timestamp != null )
         {
             msg += " (";
-            msg += ( rev != null ? "r" + rev : "" );
+            msg += ( rev != null ? rev : "" );
             if ( timestamp != null )
             {
                 SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );
