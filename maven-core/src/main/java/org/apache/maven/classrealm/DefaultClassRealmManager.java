@@ -127,7 +127,7 @@ public class DefaultClassRealmManager
         return mavenRealm;
     }
 
-    private void importMavenApi( Map<String, ClassLoader> imports, boolean importSlf4japi )
+    private void importMavenApi( Map<String, ClassLoader> imports )
     {
         ClassRealm coreRealm = getCoreRealm();
 
@@ -219,10 +219,7 @@ public class DefaultClassRealmManager
         // imports.put( "com.google.inject.util.*", coreRealm );
 
         // SLF4J
-        if ( importSlf4japi )
-        {
-            imports.put( "org.slf4j.*", coreRealm );
-        }
+        imports.put( "org.slf4j.*", coreRealm );
     }
 
     /**
