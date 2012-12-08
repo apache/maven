@@ -108,7 +108,10 @@ public class MojoDescriptor
     /** Specify the required dependencies in a specified scope */
     private String dependencyResolutionRequired = null;
 
-    /** The scope of (transitive) dependencies that should be collected but not resolved. */
+    /**
+     * The scope of (transitive) dependencies that should be collected but not resolved.
+     * @since 3.0-alpha-3
+     */
     private String dependencyCollectionRequired;
 
     /**  By default, the Mojo needs a Maven project to be executed */
@@ -132,7 +135,10 @@ public class MojoDescriptor
     /**  By default, the Mojo don't need reports to run */
     private boolean requiresReports = false;
 
-    /** By default, mojos are not threadsafe */
+    /**
+     * By default, mojos are not threadsafe
+     * @since 3.0-beta-2
+     */
     private boolean threadSafe = false;
 
     /**
@@ -271,6 +277,9 @@ public class MojoDescriptor
         return dependencyResolutionRequired;
     }
 
+    /**
+     * @since 3.0-alpha-3
+     */
     public void setDependencyCollectionRequired( String requiresDependencyCollection )
     {
         this.dependencyCollectionRequired = requiresDependencyCollection;
@@ -284,6 +293,7 @@ public class MojoDescriptor
      * full dependency resolution might fail due to projects which haven't been built yet.
      * 
      * @return The scope of (transitive) dependencies that should be collected or {@code null} if none.
+     * @since 3.0-alpha-3
      */
     public String getDependencyCollectionRequired()
     {
@@ -664,6 +674,7 @@ public class MojoDescriptor
 
     /**
      * @return True if the <code>Mojo</code> is thread-safe and can be run safely in parallel
+     * @since 3.0-beta-2
      */
     public boolean isThreadSafe()
     {
@@ -672,6 +683,7 @@ public class MojoDescriptor
 
     /**
      * @param threadSafe indicates that the mojo is thread-safe and can be run safely in parallel
+     * @since 3.0-beta-2
      */
     public void setThreadSafe( boolean threadSafe )
     {
