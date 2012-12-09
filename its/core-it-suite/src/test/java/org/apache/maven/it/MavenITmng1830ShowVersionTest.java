@@ -62,7 +62,9 @@ public class MavenITmng1830ShowVersionTest
         for( Iterator i = lines.iterator(); i.hasNext(); )
         {
             String line = (String) i.next();
-            if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) )
+            if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) 
+             ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) 
+             ||  line.matches( "^Apache Maven (.*?) \\([0-9a-f]{5,40}; .*\\)$" ) )
             {
                 apacheVersionInTheRightFormatWasFound = true;
                 // check timestamp parses
@@ -75,5 +77,5 @@ public class MavenITmng1830ShowVersionTest
         }
         
         assertTrue( apacheVersionInTheRightFormatWasFound );
-    }
+    }    
 }
