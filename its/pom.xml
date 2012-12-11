@@ -37,11 +37,6 @@ under the License.
   <name>Maven Core ITs</name>
   <description>Maven Core Integration Tests provide tooling to test every aspect of Maven functionalities with any Maven version.</description>
 
-  <modules>
-    <module>core-it-support</module>
-    <module>core-it-suite</module>
-  </modules>
-
   <scm>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git</developerConnection>
@@ -68,6 +63,24 @@ under the License.
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>core-it-setup</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>      
+      <modules>
+        <module>core-it-support</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>run-its</id>
+      <modules>
+        <module>core-it-suite</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>
