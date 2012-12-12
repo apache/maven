@@ -31,4 +31,5 @@ Maven Core
  * {{{/guides/mini/guide-maven-classloading.html}classloader hierarchy}} done by <<<ClassRealmManager>>> component
  ({{{./apidocs/org/apache/maven/classrealm/ClassRealmManager.html}javadoc}}),
  with its <<<DefaultClassRealmManager>>> implementation
- ({{{./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html}source}}).
+ ({{{./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html}source}}), using
+ {{{http://plexus.codehaus.org/plexus-classworlds/}Plexus Classworlds}}.
