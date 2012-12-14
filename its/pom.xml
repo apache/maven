@@ -47,6 +47,11 @@ under the License.
     <url>https://builds.apache.org/view/M-R/view/Maven/job/core-integration-testing-maven-3/</url>
   </ciManagement>
 
+  <modules>
+    <module>core-it-support</module>
+    <module>core-it-suite</module>
+  </modules>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -63,24 +68,6 @@ under the License.
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>core-it-setup</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>      
-      <modules>
-        <module>core-it-support</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>run-its</id>
-      <modules>
-        <module>core-it-suite</module>
-      </modules>
-    </profile>
-  </profiles>
 
   <repositories>
     <repository>
