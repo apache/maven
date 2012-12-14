@@ -247,8 +247,9 @@ Do you want to continue?</input>
   </target>
 
   <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
-    <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true" timeout="600000" maxmemory="512m">
+    <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true" timeout="600000"> <!-- maxmemory="512m"> -->
       <!--jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/-->
+      <jvmarg value="-Xmx512m -Xms512m"/>
       <classpath refid="maven.classpath" />
       <arg value="${maven.debug}" />
       <arg value="-B" />
