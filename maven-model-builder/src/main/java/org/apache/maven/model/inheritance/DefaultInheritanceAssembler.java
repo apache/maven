@@ -58,12 +58,17 @@ public class DefaultInheritanceAssembler
 
     /**
      * Calculates the relative path from the base directory of the parent to the parent directory of the base directory
-     * of the child. The general idea is to adjust inherited URLs to match the project layout (in SCM). This calculation
-     * is only a heuristic based on our conventions. In detail, the algo relies on the following assumptions. The parent
-     * uses aggregation and refers to the child via the modules section. The module path to the child is considered to
-     * point at the POM rather than its base directory if the path ends with ".xml" (ignoring case). The name of the
-     * child's base directory matches the artifact id of the child. Note that for the sake of independence from the user
-     * environment, the filesystem is intentionally not used for the calculation.
+     * of the child. The general idea is to adjust inherited URLs to match the project layout (in SCM).
+     * 
+     * <p>This calculation is only a heuristic based on our conventions.
+     * In detail, the algo relies on the following assumptions: <ul>
+     * <li>The parent uses aggregation and refers to the child via the modules section</li>
+     * <li>The module path to the child is considered to
+     * point at the POM rather than its base directory if the path ends with ".xml" (ignoring case)</li>
+     * <li>The name of the child's base directory matches the artifact id of the child.</li>
+     * </ul>
+     * Note that for the sake of independence from the user
+     * environment, the filesystem is intentionally not used for the calculation.</p>
      *
      * @param child The child model, must not be <code>null</code>.
      * @param parent The parent model, may be <code>null</code>.
