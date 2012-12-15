@@ -124,7 +124,7 @@ public class DefaultInheritanceAssembler
         return adjustment;
     }
 
-    private static class InheritanceModelMerger
+    protected static class InheritanceModelMerger
         extends MavenModelMerger
     {
 

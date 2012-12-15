@@ -80,7 +80,7 @@ public class DefaultLifecycleBindingsInjector
         }
     }
 
-    private static class LifecycleBindingsMerger
+    protected static class LifecycleBindingsMerger
         extends MavenModelMerger
     {
 

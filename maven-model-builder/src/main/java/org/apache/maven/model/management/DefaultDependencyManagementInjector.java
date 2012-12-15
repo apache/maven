@@ -50,7 +50,7 @@ public class DefaultDependencyManagementInjector
         merger.mergeManagedDependencies( model );
     }
 
-    private static class ManagementModelMerger
+    protected static class ManagementModelMerger
         extends MavenModelMerger
     {
 
