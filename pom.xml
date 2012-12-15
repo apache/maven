@@ -38,7 +38,7 @@
     number of other development tools for reporting or the build
     process.
   </description>
-  <url>${siteUrl}</url>
+  <url>http://maven.apache.org/ref/${project.version}</url>
   <inceptionYear>2001</inceptionYear>
 
   <properties>
@@ -62,10 +62,7 @@
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
-
-    <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
-    <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
-
+    <maven.site.cache>${user.home}/maven-sites</maven.site.cache><!-- TODO remove when upgrading parent to 23 -->
   </properties>
 
   <modules>
@@ -100,7 +97,7 @@
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>${siteDeployUrl}</url>
+      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/ref/${project.version}</url>
     </site>
   </distributionManagement>
 
@@ -411,6 +408,15 @@
               <version>1.3</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-publish-plugin</artifactId>
+          <version>1.0-beta-2</version>
+          <configuration>
+            <checkoutDirectory>${maven.site.cache}/ref/${project.version}</checkoutDirectory>
+            <tryUpdate>true</tryUpdate>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
