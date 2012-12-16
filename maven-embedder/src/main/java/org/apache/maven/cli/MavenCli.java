@@ -39,8 +39,10 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
+import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
+import org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -130,6 +132,8 @@ public class MavenCli
     private SettingsBuilder settingsBuilder;
 
     private DefaultSecDispatcher dispatcher;
+
+    private Slf4jConfiguration slf4jConfiguration = new Slf4jSimpleConfiguration();
 
     public MavenCli()
     {
@@ -306,24 +310,24 @@ public class MavenCli
         if ( cliRequest.debug )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
-            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "debug" );            
+            slf4jConfiguration.setRootLoggerLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
         }
         else if ( cliRequest.quiet )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
-            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "error" );            
+            slf4jConfiguration.setRootLoggerLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
         }
         else
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
-            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "info" );
+            slf4jConfiguration.setRootLoggerLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-            System.setProperty( "org.slf4j.simpleLogger.logFile", logFile.getAbsolutePath() );
+            slf4jConfiguration.setLoggerFile( logFile );
             try
             {
                 PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
