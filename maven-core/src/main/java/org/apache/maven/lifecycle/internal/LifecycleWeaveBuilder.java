@@ -212,7 +212,8 @@ public class LifecycleWeaveBuilder
             {
                 Iterator<ExecutionPlanItem> planItems = executionPlan.iterator();
                 ExecutionPlanItem current = planItems.hasNext() ? planItems.next() : null;
-                ThreadLockedArtifact threadLockedArtifact = (ThreadLockedArtifact)projectBuild.getProject().getArtifact();
+                ThreadLockedArtifact threadLockedArtifact =
+                    (ThreadLockedArtifact) projectBuild.getProject().getArtifact();
                 if ( threadLockedArtifact != null )
                 {
                     threadLockedArtifact.attachToThread();

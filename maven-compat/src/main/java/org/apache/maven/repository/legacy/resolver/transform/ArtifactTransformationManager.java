@@ -40,7 +40,6 @@ public interface ArtifactTransformationManager
      *
      * @param artifact           Artifact to be transformed.
      * @param request the repositories to check
-     * @param localRepository    the local repository
      */
     void transformForResolve( Artifact artifact, RepositoryRequest request )
         throws ArtifactResolutionException, ArtifactNotFoundException;

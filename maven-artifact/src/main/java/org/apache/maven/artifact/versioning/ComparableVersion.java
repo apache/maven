@@ -86,7 +86,7 @@ public class ComparableVersion
     private static class IntegerItem
         implements Item
     {
-    	private static final BigInteger BIG_INTEGER_ZERO = new BigInteger( "0" );
+        private static final BigInteger BIG_INTEGER_ZERO = new BigInteger( "0" );
 
         private final BigInteger value;
 

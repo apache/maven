@@ -19,7 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -39,7 +38,7 @@ public class DefaultMavenExecutionResult
 
     private DependencyResolutionResult dependencyResolutionResult;
 
-    private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>(  );
+    private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
     private Map<MavenProject, BuildSummary> buildSummaries;
 

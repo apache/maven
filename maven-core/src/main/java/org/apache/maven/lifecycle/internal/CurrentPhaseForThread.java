@@ -29,17 +29,16 @@ package org.apache.maven.lifecycle.internal;
  */
 class CurrentPhaseForThread
 {
-    private static final InheritableThreadLocal<String> threadPhase = new InheritableThreadLocal<String>();
-
+    private static final InheritableThreadLocal<String> THREAD_PHASE = new InheritableThreadLocal<String>();
 
     public static void setPhase( String phase )
     {
-        threadPhase.set( phase );
+        THREAD_PHASE.set( phase );
     }
 
     public static boolean isPhase( String phase )
     {
-        return phase.equals( threadPhase.get() );
+        return phase.equals( THREAD_PHASE.get() );
     }
 
 }

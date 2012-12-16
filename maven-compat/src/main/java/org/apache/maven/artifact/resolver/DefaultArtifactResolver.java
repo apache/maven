@@ -557,18 +557,18 @@ public class DefaultArtifactResolver
     /**
      * ThreadCreator for creating daemon threads with fixed ThreadGroup-name.
      */
-    final static class DaemonThreadCreator
+    static final class DaemonThreadCreator
         implements ThreadFactory
     {
         static final String THREADGROUP_NAME = "org.apache.maven.artifact.resolver.DefaultArtifactResolver";
 
-        final static ThreadGroup group = new ThreadGroup( THREADGROUP_NAME );
+        static final ThreadGroup GROUP = new ThreadGroup( THREADGROUP_NAME );
 
-        final static AtomicInteger threadNumber = new AtomicInteger( 1 );
+        static final AtomicInteger THREAD_NUMBER = new AtomicInteger( 1 );
 
         public Thread newThread( Runnable r )
         {
-            Thread newThread = new Thread( group, r, "resolver-" + threadNumber.getAndIncrement() );
+            Thread newThread = new Thread( GROUP, r, "resolver-" + THREAD_NUMBER.getAndIncrement() );
             newThread.setDaemon( true );
             return newThread;
         }

@@ -80,8 +80,8 @@ public class DefaultLifecyclePluginAnalyzer
     {
         if ( logger.isDebugEnabled() )
         {
-            logger.debug( "Looking up lifecyle mappings for packaging " + packaging + " from " +
-                Thread.currentThread().getContextClassLoader() );
+            logger.debug( "Looking up lifecyle mappings for packaging " + packaging + " from "
+                + Thread.currentThread().getContextClassLoader() );
         }
 
         LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get( packaging );
