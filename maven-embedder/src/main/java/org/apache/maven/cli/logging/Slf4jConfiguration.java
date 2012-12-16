@@ -34,7 +34,7 @@ public interface Slf4jConfiguration
     /**
      * Set root logging level.
      *
-     * @param level the level as defined in Plexus Logger <code>LEVEL_*</code> and equivalent 
+     * @param level the level as defined in Plexus <code>Logger.LEVEL_*</code> and equivalent 
      * <code>MavenExecutionRequest.LOGGING_LEVEL_*</code> constants.
      * @see Logger
      * @see MavenExecutionRequest
