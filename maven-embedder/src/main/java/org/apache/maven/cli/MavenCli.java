@@ -387,29 +387,27 @@ public class MavenCli
 
         DefaultPlexusContainer container = null;
 
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld( cliRequest.classWorld )
-                .setRealm( setupContainerRealm( cliRequest ) )
-                .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
-                .setAutoWiring( true )
-                .setName( "maven" );
+        ContainerConfiguration cc = new DefaultContainerConfiguration()
+            .setClassWorld( cliRequest.classWorld )
+            .setRealm( setupContainerRealm( cliRequest ) )
+            .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
+            .setAutoWiring( true )
+            .setName( "maven" );
 
-            container = new DefaultPlexusContainer( cc, new AbstractModule()
+        container = new DefaultPlexusContainer( cc, new AbstractModule()
+        {
+            protected void configure()
             {
+                bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
+            }
+        } );
 
-                protected void configure()
-                {
-                    bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
-                }
+        // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
+        container.setLookupRealm( null );
 
-            } );
+        container.setLoggerManager( plexusLoggerManager );
 
-            // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
-            container.setLookupRealm( null );
-
-            container.setLoggerManager( plexusLoggerManager );
-
-            customizeContainer( container );
+        customizeContainer( container );
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
