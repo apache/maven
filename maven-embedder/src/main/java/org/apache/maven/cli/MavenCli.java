@@ -298,9 +298,9 @@ public class MavenCli
         }
     }    
 
-    //
-    // All logging is handled by SFL4J
-    //
+    /**
+     * configure logging
+     */
     private void logging( CliRequest cliRequest )
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
@@ -327,7 +327,8 @@ public class MavenCli
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-            slf4jConfiguration.setLoggerFile( logFile );
+
+            // redirect stdout and stderr to file
             try
             {
                 PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
@@ -340,6 +341,8 @@ public class MavenCli
                 // Ignore
                 //
             }
+
+            slf4jConfiguration.setLoggerFile( logFile ); // is it really useful? redirecting stdout/stderr isn't sufficient in all cases?
         }
 
         plexusLoggerManager = new Slf4jLoggerManager();
