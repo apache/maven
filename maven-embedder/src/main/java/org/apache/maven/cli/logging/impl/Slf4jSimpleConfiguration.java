@@ -31,6 +31,7 @@ import org.apache.maven.cli.logging.AbstractSlf4jConfiguration;
 public class Slf4jSimpleConfiguration
     extends AbstractSlf4jConfiguration
 {
+    @Override
     public void setRootLoggerLevel( Level level )
     {
         String value = "info";
@@ -51,6 +52,7 @@ public class Slf4jSimpleConfiguration
         System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", value );
     }
 
+    @Override
     public void setLoggerFile( File output )
     {
         System.setProperty( "org.slf4j.simpleLogger.logFile", output.getAbsolutePath() );
