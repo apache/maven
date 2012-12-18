@@ -40,9 +40,9 @@ import org.apache.maven.Maven;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
+import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
-import org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -132,8 +132,6 @@ public class MavenCli
     private SettingsBuilder settingsBuilder;
 
     private DefaultSecDispatcher dispatcher;
-
-    private Slf4jConfiguration slf4jConfiguration = new Slf4jSimpleConfiguration();
 
     public MavenCli()
     {
@@ -307,6 +305,9 @@ public class MavenCli
         cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
         cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
 
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
+
         if ( cliRequest.debug )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
@@ -346,7 +347,6 @@ public class MavenCli
         }
 
         plexusLoggerManager = new Slf4jLoggerManager();
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
     }
 

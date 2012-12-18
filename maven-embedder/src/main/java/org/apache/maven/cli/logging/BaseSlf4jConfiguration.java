@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Hervé Boutemy
  */
-public class AbstractSlf4jConfiguration
+public class BaseSlf4jConfiguration
     implements Slf4jConfiguration
 {
-    private final Logger logger = LoggerFactory.getLogger( AbstractSlf4jConfiguration.class );
+    private final Logger logger = LoggerFactory.getLogger( BaseSlf4jConfiguration.class );
 
     public void setRootLoggerLevel( Level level )
     {

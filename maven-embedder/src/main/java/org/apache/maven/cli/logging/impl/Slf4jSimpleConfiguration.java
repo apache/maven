@@ -21,7 +21,7 @@ package org.apache.maven.cli.logging.impl;
 
 import java.io.File;
 
-import org.apache.maven.cli.logging.AbstractSlf4jConfiguration;
+import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 
 /**
  * Configuration for slf4j-simple.
@@ -29,7 +29,7 @@ import org.apache.maven.cli.logging.AbstractSlf4jConfiguration;
  * @author Hervé Boutemy
  */
 public class Slf4jSimpleConfiguration
-    extends AbstractSlf4jConfiguration
+    extends BaseSlf4jConfiguration
 {
     @Override
     public void setRootLoggerLevel( Level level )
