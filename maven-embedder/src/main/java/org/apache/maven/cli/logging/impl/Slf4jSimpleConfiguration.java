@@ -22,15 +22,12 @@ package org.apache.maven.cli.logging.impl;
 import java.io.File;
 
 import org.apache.maven.cli.logging.AbstractSlf4jConfiguration;
-import org.apache.maven.cli.logging.Slf4jConfiguration;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Configuration for slf4j-simple.
  * 
  * @author Hervé Boutemy
  */
-@Component( role = Slf4jConfiguration.class )
 public class Slf4jSimpleConfiguration
     extends AbstractSlf4jConfiguration
 {
