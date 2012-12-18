@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.apache.maven.cli.logging.AbstractSlf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -35,20 +34,20 @@ import org.codehaus.plexus.component.annotations.Component;
 public class Slf4jSimpleConfiguration
     extends AbstractSlf4jConfiguration
 {
-    public void setRootLoggerLevel( int level )
+    public void setRootLoggerLevel( Level level )
     {
         String value = "info";
         switch ( level )
         {
-            case MavenExecutionRequest.LOGGING_LEVEL_DEBUG:
+            case DEBUG:
                 value = "debug";
                 break;
             
-            case MavenExecutionRequest.LOGGING_LEVEL_INFO:
+            case INFO:
                 value = "info";
                 break;
 
-            case MavenExecutionRequest.LOGGING_LEVEL_ERROR:
+            case ERROR:
                 value = "error";
                 break;
         }

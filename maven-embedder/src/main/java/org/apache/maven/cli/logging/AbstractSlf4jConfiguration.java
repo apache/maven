@@ -34,7 +34,7 @@ public class AbstractSlf4jConfiguration
 {
     private final Logger logger = LoggerFactory.getLogger( AbstractSlf4jConfiguration.class );
 
-    public void setRootLoggerLevel( int level )
+    public void setRootLoggerLevel( Level level )
     {
         logger.warn( "setRootLoggerLevel: operation not supported" );
     }

@@ -20,8 +20,6 @@ package org.apache.maven.cli.logging;
  */
 
 import java.io.File;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.codehaus.plexus.logging.Logger;
 
 /**
  * Interface for configuration operations on loggers, which are not available in slf4j, then require per-slf4f-binding
@@ -31,15 +29,14 @@ import org.codehaus.plexus.logging.Logger;
  */
 public interface Slf4jConfiguration
 {
+    public static enum Level { DEBUG, INFO, ERROR }
+
     /**
      * Set root logging level.
      *
-     * @param level the level as defined in Plexus <code>Logger.LEVEL_*</code> and equivalent 
-     * <code>MavenExecutionRequest.LOGGING_LEVEL_*</code> constants.
-     * @see Logger
-     * @see MavenExecutionRequest
+     * @param level the level
      */
-    void setRootLoggerLevel( int level );
+    void setRootLoggerLevel( Level level );
 
     void setLoggerFile( File output );
 }

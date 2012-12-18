@@ -310,17 +310,17 @@ public class MavenCli
         if ( cliRequest.debug )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
-            slf4jConfiguration.setRootLoggerLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.DEBUG );
         }
         else if ( cliRequest.quiet )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
-            slf4jConfiguration.setRootLoggerLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.ERROR );
         }
         else
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
-            slf4jConfiguration.setRootLoggerLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.INFO );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
