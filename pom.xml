@@ -162,11 +162,6 @@
         <artifactId>maven-repository-metadata</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>1.0.7</version>
-      </dependency>
       <!--bootstrap-end-comment-->
       <!--  Plexus -->
       <dependency>
@@ -217,6 +212,11 @@
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4jVersion}</version>
         <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.0.7</version>
       </dependency>
       <!--  Wagon -->
       <dependency>
