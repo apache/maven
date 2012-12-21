@@ -55,6 +55,6 @@ public class Slf4jSimpleConfiguration
     @Override
     public void setLoggerFile( File output )
     {
-        System.setProperty( "org.slf4j.simpleLogger.logFile", output.getAbsolutePath() );
+        //System.setProperty( "org.slf4j.simpleLogger.logFile", output.getAbsolutePath() );
     }
 }
