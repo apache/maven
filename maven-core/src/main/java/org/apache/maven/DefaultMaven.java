@@ -93,10 +93,11 @@ import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.eclipse.aether.util.graph.transformer.NearestVersionConflictResolver;
-import org.eclipse.aether.util.graph.transformer.ConflictMarker;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.eclipse.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
@@ -456,9 +457,8 @@ public class DefaultMaven
         session.setDependencySelector( depFilter );
 
         DependencyGraphTransformer transformer =
-            new ChainedDependencyGraphTransformer( new ConflictMarker(), new JavaEffectiveScopeCalculator(),
-                                                   new NearestVersionConflictResolver(),
-                                                   new JavaDependencyContextRefiner() );
+            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(), new JavaScopeDeriver() );
+        transformer = new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
         session.setDependencyGraphTransformer( transformer );
 
         session.setTransferListener( request.getTransferListener() );
