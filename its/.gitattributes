@@ -1,2 +1,1 @@
-*.java             ident
 *.jar              -text -crlf
