@@ -21,13 +21,15 @@ package org.apache.maven.model.profile;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 /**
  * Describes the environmental context used to determine the activation status of profiles.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultProfileActivationContext
@@ -42,6 +44,8 @@ public class DefaultProfileActivationContext
 
     private Map<String, String> userProperties = Collections.emptyMap();
 
+    private Map<String, String> projectProperties = Collections.emptyMap();
+
     private File projectDirectory;
 
     public List<String> getActiveProfileIds()
@@ -51,7 +55,7 @@ public class DefaultProfileActivationContext
 
     /**
      * Sets the identifiers of those profiles that should be activated by explicit demand.
-     * 
+     *
      * @param activeProfileIds The identifiers of those profiles to activate, may be {@code null}.
      * @return This context, never {@code null}.
      */
@@ -76,7 +80,7 @@ public class DefaultProfileActivationContext
 
     /**
      * Sets the identifiers of those profiles that should be deactivated by explicit demand.
-     * 
+     *
      * @param inactiveProfileIds The identifiers of those profiles to deactivate, may be {@code null}.
      * @return This context, never {@code null}.
      */
@@ -102,11 +106,11 @@ public class DefaultProfileActivationContext
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public DefaultProfileActivationContext setSystemProperties( Properties systemProperties )
     {
         if ( systemProperties != null )
@@ -124,7 +128,7 @@ public class DefaultProfileActivationContext
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
@@ -151,11 +155,11 @@ public class DefaultProfileActivationContext
      * Sets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @param userProperties The user properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public DefaultProfileActivationContext setUserProperties( Properties userProperties )
     {
         if ( userProperties != null )
@@ -174,7 +178,7 @@ public class DefaultProfileActivationContext
      * Sets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     * 
+     *
      * @param userProperties The user properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
@@ -199,9 +203,9 @@ public class DefaultProfileActivationContext
 
     /**
      * Sets the base directory of the current project.
-     * 
+     *
      * @param projectDirectory The base directory of the current project, may be {@code null} if profile activation
-     *            happens in the context of metadata retrieval rather than project building.
+     *                         happens in the context of metadata retrieval rather than project building.
      * @return This context, never {@code null}.
      */
     public DefaultProfileActivationContext setProjectDirectory( File projectDirectory )
@@ -211,4 +215,39 @@ public class DefaultProfileActivationContext
         return this;
     }
 
+    public Map<String, String> getProjectProperties()
+    {
+        return projectProperties;
+    }
+
+    public DefaultProfileActivationContext setProjectProperties( Properties projectProperties )
+    {
+        if ( projectProperties != null )
+        {
+
+            this.projectProperties = Collections.unmodifiableMap( toMap( projectProperties ) );
+        }
+        else
+        {
+            this.projectProperties = Collections.emptyMap();
+        }
+
+        return this;
+    }
+
+    private Map<String, String> toMap( Properties properties )
+    {
+        if ( properties == null )
+        {
+            return Collections.emptyMap();
+        }
+        Map<String, String> map = new HashMap<String, String>();
+        Enumeration keys = properties.keys();
+        while ( keys.hasMoreElements() )
+        {
+            String key = (String) keys.nextElement();
+            map.put( key, properties.getProperty( key ) );
+        }
+        return map;
+    }
 }

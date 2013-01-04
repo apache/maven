@@ -278,6 +278,8 @@ public class DefaultModelBuilder
 
             modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
+            profileActivationContext.setProjectProperties( tmpModel.getProperties() );
+
             List<Profile> activePomProfiles =
                 profileSelector.getActiveProfiles( rawModel.getProfiles(), profileActivationContext, problems );
             currentData.setActiveProfiles( activePomProfiles );
