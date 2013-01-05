@@ -91,9 +91,9 @@ Maven Model Builder
  | | <<<$\{project.build.artifactId\}>>>\
  | | <<<$\{project.build.directory\}>>> |
 *----+------+------+
-| <<<basedir>>>\
-<<<project.basedir>>>\
-<<<pom.basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |
+| <<<project.basedir>>>\
+<<<pom.basedir>>> (<deprecated>)\
+<<<basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |
 *----+------+------+
 | <<<project.baseUri>>>\
 <<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |
