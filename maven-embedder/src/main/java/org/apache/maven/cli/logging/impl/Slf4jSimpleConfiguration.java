@@ -19,9 +19,9 @@ package org.apache.maven.cli.logging.impl;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
+import org.slf4j.MavenSlf4jFriend;
+import org.slf4j.impl.MavenSlf4jSimpleFriend;
 
 /**
  * Configuration for slf4j-simple.
@@ -53,8 +53,10 @@ public class Slf4jSimpleConfiguration
     }
 
     @Override
-    public void setLoggerFile( File output )
+    public void activate()
     {
-        //System.setProperty( "org.slf4j.simpleLogger.logFile", output.getAbsolutePath() );
+        // property for root logger level or System.out redirection need to be taken into account
+        MavenSlf4jFriend.reset();
+        MavenSlf4jSimpleFriend.init();
     }
 }

@@ -342,9 +342,9 @@ public class MavenCli
                 // Ignore
                 //
             }
-
-            slf4jConfiguration.setLoggerFile( logFile ); // is it really useful? redirecting stdout/stderr isn't sufficient in all cases?
         }
+
+        slf4jConfiguration.activate();
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );

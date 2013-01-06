@@ -211,12 +211,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4jVersion}</version>
-        <scope>runtime</scope>
+        <optional>true</optional>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>1.0.7</version>
+        <optional>true</optional>
       </dependency>
       <!--  Wagon -->
       <dependency>

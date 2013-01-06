@@ -1,4 +1,4 @@
-package org.apache.maven.cli.logging;
+package org.slf4j.impl;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,24 +20,13 @@ package org.apache.maven.cli.logging;
  */
 
 /**
- * Interface for configuration operations on loggers, which are not available in slf4j, then require per-slf4f-binding
- * implementation.
- * 
- * @author Hervé Boutemy
+ * Utility for Maven to access Slf4j-Simple internals through package access.
+ * Use with precaution, since this is not normally intended for production use.
  */
-public interface Slf4jConfiguration
+public class MavenSlf4jSimpleFriend
 {
-    public static enum Level { DEBUG, INFO, ERROR }
-
-    /**
-     * Set root logging level.
-     *
-     * @param level the level
-     */
-    void setRootLoggerLevel( Level level );
-
-    /**
-     * Activate logging implementation configuration (if necessary).
-     */
-    void activate();
+    public static void init()
+    {
+        SimpleLogger.init();
+    }
 }

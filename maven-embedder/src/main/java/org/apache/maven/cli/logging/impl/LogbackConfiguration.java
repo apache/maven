@@ -19,8 +19,6 @@ package org.apache.maven.cli.logging.impl;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +53,7 @@ public class LogbackConfiguration
     }
 
     @Override
-    public void setLoggerFile( File output )
+    public void activate()
     {
         // no op
     }

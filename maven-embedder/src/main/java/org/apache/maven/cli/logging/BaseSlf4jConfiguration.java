@@ -19,8 +19,6 @@ package org.apache.maven.cli.logging;
  * under the License.
  */
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +37,8 @@ public class BaseSlf4jConfiguration
         logger.warn( "setRootLoggerLevel: operation not supported" );
     }
 
-    public void setLoggerFile( File output )
+    public void activate()
     {
-        logger.warn( "setLoggerFile: operation not supported" );
+        logger.warn( "reset(): operation not supported" );
     }
 }

@@ -19,8 +19,6 @@ package org.apache.maven.cli.logging.impl;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 
 /**
@@ -53,7 +51,7 @@ public class Log4j2Configuration
     }
 
     @Override
-    public void setLoggerFile( File output )
+    public void activate()
     {
         // no op
     }
