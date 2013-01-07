@@ -88,7 +88,7 @@ Maven Model Builder
 <<<pom.*>>> (<deprecated>)\
 <<<*>>> (<deprecated>) | POM content (see {{{../maven-model/maven.html}POM reference}}) | <<<$\{project.version\}>>>\
  | | <<<$\{project.build.finalName\}>>>\
- | | <<<$\{project.build.artifactId\}>>>\
+ | | <<<$\{project.artifactId\}>>>\
  | | <<<$\{project.build.directory\}>>> |
 *----+------+------+
 | <<<project.basedir>>>\
