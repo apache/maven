@@ -175,134 +175,133 @@ public class DefaultVersionResolver
             }
         }
 
-        Metadata metadata;
-
         if ( RELEASE.equals( version ) )
         {
-            metadata =
-                new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                     Metadata.Nature.RELEASE );
+            Map<String, VersionInfo> infos = readVersionInfoMap( session, result, Metadata.Nature.RELEASE, null );
+
+            resolve( result, infos, RELEASE );
         }
         else if ( LATEST.equals( version ) )
         {
-            metadata =
-                new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                     Metadata.Nature.RELEASE_OR_SNAPSHOT );
+            Map<String, VersionInfo> infos =
+                readVersionInfoMap( session, result, Metadata.Nature.RELEASE_OR_SNAPSHOT, null );
+
+            if ( !resolve( result, infos, LATEST ) )
+            {
+                resolve( result, infos, RELEASE );
+            }
+
+            if ( result.getVersion() != null && result.getVersion().endsWith( SNAPSHOT ) )
+            {
+                VersionRequest subRequest = new VersionRequest();
+                subRequest.setArtifact( artifact.setVersion( result.getVersion() ) );
+                if ( result.getRepository() instanceof RemoteRepository )
+                {
+                    subRequest.setRepositories( Collections.singletonList( (RemoteRepository) result.getRepository() ) );
+                }
+                else
+                {
+                    subRequest.setRepositories( request.getRepositories() );
+                }
+                VersionResult subResult = resolveVersion( session, subRequest );
+                result.setVersion( subResult.getVersion() );
+                result.setRepository( subResult.getRepository() );
+                for ( Exception exception : subResult.getExceptions() )
+                {
+                    result.addException( exception );
+                }
+            }
         }
         else if ( version.endsWith( SNAPSHOT ) )
         {
             WorkspaceReader workspace = session.getWorkspaceReader();
             if ( workspace != null && workspace.findVersions( artifact ).contains( version ) )
             {
-                metadata = null;
+                result.setVersion( version );
                 result.setRepository( workspace.getRepository() );
+
+                return result;
             }
             else
             {
-                metadata =
-                    new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version, MAVEN_METADATA_XML,
-                                         Metadata.Nature.SNAPSHOT );
-            }
-        }
-        else
-        {
-            metadata = null;
-        }
+                Map<String, VersionInfo> infos =
+                                readVersionInfoMap( session, result, Metadata.Nature.SNAPSHOT, version );
 
-        if ( metadata == null )
-        {
-            result.setVersion( version );
-        }
-        else
-        {
-            List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
-
-            metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
-
-            RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
-
-            for ( RemoteRepository repository : request.getRepositories() )
-            {
-                MetadataRequest metadataRequest =
-                    new MetadataRequest( metadata, repository, request.getRequestContext() );
-                metadataRequest.setDeleteLocalCopyIfMissing( true );
-                metadataRequest.setFavorLocalRepository( true );
-                metadataRequest.setTrace( trace );
-                metadataRequests.add( metadataRequest );
-            }
-
-            List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
-
-            Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
-
-            for ( MetadataResult metadataResult : metadataResults )
-            {
-                result.addException( metadataResult.getException() );
-
-                ArtifactRepository repository = metadataResult.getRequest().getRepository();
-                if ( repository == null )
-                {
-                    repository = session.getLocalRepository();
-                }
-
-                Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
-                merge( artifact, infos, versioning, repository );
-            }
-
-            if ( RELEASE.equals( version ) )
-            {
-                resolve( result, infos, RELEASE );
-            }
-            else if ( LATEST.equals( version ) )
-            {
-                if ( !resolve( result, infos, LATEST ) )
-                {
-                    resolve( result, infos, RELEASE );
-                }
-
-                if ( result.getVersion() != null && result.getVersion().endsWith( SNAPSHOT ) )
-                {
-                    VersionRequest subRequest = new VersionRequest();
-                    subRequest.setArtifact( artifact.setVersion( result.getVersion() ) );
-                    if ( result.getRepository() instanceof RemoteRepository )
-                    {
-                        subRequest.setRepositories( Collections.singletonList( (RemoteRepository) result.getRepository() ) );
-                    }
-                    else
-                    {
-                        subRequest.setRepositories( request.getRepositories() );
-                    }
-                    VersionResult subResult = resolveVersion( session, subRequest );
-                    result.setVersion( subResult.getVersion() );
-                    result.setRepository( subResult.getRepository() );
-                    for ( Exception exception : subResult.getExceptions() )
-                    {
-                        result.addException( exception );
-                    }
-                }
-            }
-            else
-            {
                 String key = SNAPSHOT + getKey( artifact.getClassifier(), artifact.getExtension() );
+
                 merge( infos, SNAPSHOT, key );
+
                 if ( !resolve( result, infos, key ) )
                 {
                     result.setVersion( version );
                 }
             }
+        }
+        else
+        {
+            result.setVersion( version );
 
-            if ( StringUtils.isEmpty( result.getVersion() ) )
-            {
-                throw new VersionResolutionException( result );
-            }
+            return result;
+        }
 
-            if ( cacheKey != null && isSafelyCacheable( session, artifact ) )
-            {
-                cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
-            }
+        if ( StringUtils.isEmpty( result.getVersion() ) )
+        {
+            throw new VersionResolutionException( result );
+        }
+
+        if ( cacheKey != null && isSafelyCacheable( session, artifact ) )
+        {
+            cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
         }
 
         return result;
+    }
+
+    private Map<String, VersionInfo> readVersionInfoMap( RepositorySystemSession session, VersionResult result,
+                                                         Metadata.Nature nature, String version )
+    {
+        VersionRequest request = result.getRequest();
+        Artifact artifact = request.getArtifact();
+
+        Metadata metadata =
+            new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version, MAVEN_METADATA_XML, nature );
+
+        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+
+        List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() + 1 );
+
+        metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+
+        for ( RemoteRepository repository : request.getRepositories() )
+        {
+            MetadataRequest metadataRequest = new MetadataRequest( metadata, repository, request.getRequestContext() );
+            metadataRequest.setDeleteLocalCopyIfMissing( true );
+            metadataRequest.setFavorLocalRepository( true );
+            metadataRequest.setTrace( trace );
+
+            metadataRequests.add( metadataRequest );
+        }
+
+        List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
+
+        Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
+
+        for ( MetadataResult metadataResult : metadataResults )
+        {
+            result.addException( metadataResult.getException() );
+
+            ArtifactRepository repository = metadataResult.getRequest().getRepository();
+            if ( repository == null )
+            {
+                repository = session.getLocalRepository();
+            }
+
+            Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+
+            merge( request.getArtifact(), infos, versioning, repository );
+        }
+
+        return infos;
     }
 
     private boolean resolve( VersionResult result, Map<String, VersionInfo> infos, String key )
