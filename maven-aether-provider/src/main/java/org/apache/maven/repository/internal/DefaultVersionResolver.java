@@ -365,7 +365,7 @@ public class DefaultVersionResolver
         return ( versioning != null ) ? versioning : new Versioning();
     }
 
-    private Versioning readMavenRepositoryMetadataVersioning( File metadataFile )
+    static Versioning readMavenRepositoryMetadataVersioning( File metadataFile )
         throws IOException, XmlPullParserException
     {
         if ( metadataFile == null ||! metadataFile.exists() )
