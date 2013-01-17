@@ -68,7 +68,7 @@ import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 
 /**
- * Maven version resolver: supports <code>*-SNAPSHOT</code>, <code>RELEASE</code> and <code>LATEST</code>
+ * Maven meta-version resolver: supports <code>*-SNAPSHOT</code>, <code>RELEASE</code> and <code>LATEST</code>
  * meta-version resolution from
  * <a href="../maven-repository-metadata/repository-metadata.html#class_versioning"><code>versioning</code>
  * element in repositories' <code>maven-metadata.xml</code></a>.
@@ -293,11 +293,11 @@ public class DefaultVersionResolver
             {
                 throw new VersionResolutionException( result );
             }
-        }
 
-        if ( cacheKey != null && metadata != null && isSafelyCacheable( session, artifact ) )
-        {
-            cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
+            if ( cacheKey != null && isSafelyCacheable( session, artifact ) )
+            {
+                cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
+            }
         }
 
         return result;
