@@ -22,6 +22,7 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.aether.RepositoryCache;
 import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositorySystemSession;
@@ -149,8 +151,6 @@ public class DefaultVersionResolver
     public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         throws VersionResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
-
         Artifact artifact = request.getArtifact();
 
         String version = artifact.getVersion();
@@ -218,6 +218,8 @@ public class DefaultVersionResolver
             List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
 
             metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+
+            RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
 
             for ( RemoteRepository repository : request.getRepositories() )
             {
@@ -319,50 +321,35 @@ public class DefaultVersionResolver
     {
         Versioning versioning = null;
 
-        FileInputStream fis = null;
+        SyncContext syncContext = syncContextFactory.newInstance( session, true );
+
         try
         {
-            if ( metadata != null )
+            syncContext.acquire( null, Collections.singleton( metadata ) );
+
+            versioning = readMavenRepositoryMetadataVersioning( metadata.getFile() );
+
+            /*
+             * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
+             * of the local repository. This is especially troublesome during snapshot resolution so we try
+             * to handle that gracefully.
+             */
+            if ( versioning != null && repository instanceof LocalRepository )
             {
-                SyncContext syncContext = syncContextFactory.newInstance( session, true );
-
-                try
+                Snapshot snapshot = versioning.getSnapshot();
+                if ( snapshot != null && snapshot.getBuildNumber() > 0 )
                 {
-                    syncContext.acquire( null, Collections.singleton( metadata ) );
+                    Versioning repaired = new Versioning();
+                    repaired.setLastUpdated( versioning.getLastUpdated() );
+                    snapshot = new Snapshot();
+                    snapshot.setLocalCopy( true );
+                    repaired.setSnapshot( snapshot );
 
-                    if ( metadata.getFile() != null && metadata.getFile().exists() )
-                    {
-                        fis = new FileInputStream( metadata.getFile() );
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-                        versioning = m.getVersioning();
+                    versioning = repaired;
 
-                        /*
-                         * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
-                         * of the local repository. This is especially troublesome during snapshot resolution so we try
-                         * to handle that gracefully.
-                         */
-                        if ( versioning != null && repository instanceof LocalRepository )
-                        {
-                            if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
-                            {
-                                Versioning repaired = new Versioning();
-                                repaired.setLastUpdated( versioning.getLastUpdated() );
-                                Snapshot snapshot = new Snapshot();
-                                snapshot.setLocalCopy( true );
-                                repaired.setSnapshot( snapshot );
-                                versioning = repaired;
-
-                                throw new IOException( "Snapshot information corrupted with remote repository data"
-                                    + ", please verify that no remote repository uses the id '" + repository.getId()
-                                    + "'" );
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    syncContext.release();
+                    throw new IOException( "Snapshot information corrupted with remote repository data"
+                        + ", please verify that no remote repository uses the id '" + repository.getId()
+                        + "'" );
                 }
             }
         }
@@ -373,10 +360,34 @@ public class DefaultVersionResolver
         }
         finally
         {
-            IOUtil.close( fis );
+            syncContext.release();
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
+    }
+
+    private Versioning readMavenRepositoryMetadataVersioning( File metadataFile )
+        throws IOException, XmlPullParserException
+    {
+        if ( metadataFile == null ||! metadataFile.exists() )
+        {
+            return null;
+        }
+
+        InputStream is = null;
+        try
+        {
+            is = new FileInputStream( metadataFile );
+
+            MetadataXpp3Reader reader = new MetadataXpp3Reader();
+            org.apache.maven.artifact.repository.metadata.Metadata m = reader.read( is, false );
+
+            return m.getVersioning();
+        }
+        finally
+        {
+            IOUtil.close( is );
+        }
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
