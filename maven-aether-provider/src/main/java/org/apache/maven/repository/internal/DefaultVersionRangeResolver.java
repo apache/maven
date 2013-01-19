@@ -66,9 +66,6 @@ public class DefaultVersionRangeResolver
     implements VersionRangeResolver, Service
 {
 
-    private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
-
-    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
@@ -187,7 +184,7 @@ public class DefaultVersionRangeResolver
 
         Metadata metadata =
             new DefaultMetadata( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
-                                 MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
+                                 MavenMetadata.MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
 
         List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
 

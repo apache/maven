@@ -83,15 +83,12 @@ public class DefaultVersionResolver
     implements VersionResolver, Service
 {
 
-    private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
-
     private static final String RELEASE = "RELEASE";
 
     private static final String LATEST = "LATEST";
 
     private static final String SNAPSHOT = "SNAPSHOT";
 
-    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
@@ -264,7 +261,8 @@ public class DefaultVersionResolver
         Artifact artifact = request.getArtifact();
 
         Metadata metadata =
-            new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version, MAVEN_METADATA_XML, nature );
+            new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version,
+                                 MavenMetadata.MAVEN_METADATA_XML, nature );
 
         RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
 
