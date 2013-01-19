@@ -246,7 +246,7 @@ public class DefaultVersionRangeResolver
             {
                 syncContext.acquire( null, Collections.singleton( metadata ) );
 
-                versioning = DefaultVersionResolver.readMavenRepositoryMetadataVersioning( metadata.getFile() );
+                versioning = MavenMetadata.read( metadata.getFile() ).getVersioning();
             }
             catch ( Exception e )
             {

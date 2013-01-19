@@ -84,7 +84,7 @@ abstract class MavenMetadata
 
     protected abstract void merge( Metadata recessive );
 
-    private Metadata read( File metadataFile )
+    static Metadata read( File metadataFile )
         throws RepositoryException
     {
         if ( metadataFile.length() <= 0 )

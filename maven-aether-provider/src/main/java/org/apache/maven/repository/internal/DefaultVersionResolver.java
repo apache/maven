@@ -20,9 +20,7 @@ package org.apache.maven.repository.internal;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,12 +30,9 @@ import java.util.Map;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.aether.RepositoryCache;
 import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositorySystemSession;
@@ -324,7 +319,7 @@ public class DefaultVersionResolver
         {
             syncContext.acquire( null, Collections.singleton( metadata ) );
 
-            versioning = readMavenRepositoryMetadataVersioning( metadata.getFile() );
+            versioning = MavenMetadata.read( metadata.getFile() ).getVersioning();
 
             /*
              * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
@@ -361,30 +356,6 @@ public class DefaultVersionResolver
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
-    }
-
-    static Versioning readMavenRepositoryMetadataVersioning( File metadataFile )
-        throws IOException, XmlPullParserException
-    {
-        if ( metadataFile == null ||! metadataFile.exists() )
-        {
-            return null;
-        }
-
-        InputStream is = null;
-        try
-        {
-            is = new FileInputStream( metadataFile );
-
-            MetadataXpp3Reader reader = new MetadataXpp3Reader();
-            org.apache.maven.artifact.repository.metadata.Metadata m = reader.read( is, false );
-
-            return m.getVersioning();
-        }
-        finally
-        {
-            IOUtil.close( is );
-        }
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
