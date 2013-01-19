@@ -21,7 +21,6 @@ package org.apache.maven.repository.internal;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,64 +34,36 @@ import org.sonatype.aether.artifact.Artifact;
  * @author Benjamin Bentmann
  */
 final class LocalSnapshotMetadata
-    extends MavenMetadata
+    extends MavenSnapshotMetadata
 {
-
-    private final Collection<Artifact> artifacts = new ArrayList<Artifact>();
-
-    private final boolean legacyFormat;
 
     public LocalSnapshotMetadata( Artifact artifact, boolean legacyFormat )
     {
-        super( createMetadata( artifact, legacyFormat ), null );
-        this.legacyFormat = legacyFormat;
+        super( createLocalMetadata( artifact, legacyFormat ), null, legacyFormat );
     }
 
     public LocalSnapshotMetadata( Metadata metadata, File file, boolean legacyFormat )
     {
-        super( metadata, file );
-        this.legacyFormat = legacyFormat;
+        super( metadata, file, legacyFormat );
     }
 
-    private static Metadata createMetadata( Artifact artifact, boolean legacyFormat )
+    private static Metadata createLocalMetadata( Artifact artifact, boolean legacyFormat )
     {
+        Metadata metadata = createRepositoryMetadata( artifact, legacyFormat );
+
         Snapshot snapshot = new Snapshot();
         snapshot.setLocalCopy( true );
         Versioning versioning = new Versioning();
         versioning.setSnapshot( snapshot );
 
-        Metadata metadata = new Metadata();
         metadata.setVersioning( versioning );
-        metadata.setGroupId( artifact.getGroupId() );
-        metadata.setArtifactId( artifact.getArtifactId() );
-        metadata.setVersion( artifact.getBaseVersion() );
-
-        if ( !legacyFormat )
-        {
-            metadata.setModelVersion( "1.1.0" );
-        }
 
         return metadata;
-    }
-
-    public void bind( Artifact artifact )
-    {
-        artifacts.add( artifact );
     }
 
     public MavenMetadata setFile( File file )
     {
         return new LocalSnapshotMetadata( metadata, file, legacyFormat );
-    }
-
-    public Object getKey()
-    {
-        return getGroupId() + ':' + getArtifactId() + ':' + getVersion();
-    }
-
-    public static Object getKey( Artifact artifact )
-    {
-        return artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getBaseVersion();
     }
 
     @Override
@@ -133,31 +104,6 @@ final class LocalSnapshotMetadata
         }
 
         artifacts.clear();
-    }
-
-    private String getKey( String classifier, String extension )
-    {
-        return classifier + ':' + extension;
-    }
-
-    public String getGroupId()
-    {
-        return metadata.getGroupId();
-    }
-
-    public String getArtifactId()
-    {
-        return metadata.getArtifactId();
-    }
-
-    public String getVersion()
-    {
-        return metadata.getVersion();
-    }
-
-    public Nature getNature()
-    {
-        return Nature.SNAPSHOT;
     }
 
 }

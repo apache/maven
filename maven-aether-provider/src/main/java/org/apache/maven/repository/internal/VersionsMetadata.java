@@ -40,18 +40,22 @@ final class VersionsMetadata
 
     public VersionsMetadata( Artifact artifact )
     {
-        super( createMetadata( artifact ), null );
+        super( createRepositoryMetadata( artifact ), null );
         this.artifact = artifact;
     }
 
     public VersionsMetadata( Artifact artifact, File file )
     {
-        super( createMetadata( artifact ), file );
+        super( createRepositoryMetadata( artifact ), file );
         this.artifact = artifact;
     }
 
-    private static Metadata createMetadata( Artifact artifact )
+    private static Metadata createRepositoryMetadata( Artifact artifact )
     {
+        Metadata metadata = new Metadata();
+        metadata.setGroupId( artifact.getGroupId() );
+        metadata.setArtifactId( artifact.getArtifactId() );
+
         Versioning versioning = new Versioning();
         versioning.addVersion( artifact.getBaseVersion() );
         if ( !artifact.isSnapshot() )
@@ -63,10 +67,7 @@ final class VersionsMetadata
             versioning.setLatest( artifact.getBaseVersion() );
         }
 
-        Metadata metadata = new Metadata();
         metadata.setVersioning( versioning );
-        metadata.setGroupId( artifact.getGroupId() );
-        metadata.setArtifactId( artifact.getArtifactId() );
 
         return metadata;
     }
