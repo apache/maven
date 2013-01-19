@@ -88,7 +88,6 @@ public class DefaultArtifactDescriptorReader
     implements ArtifactDescriptorReader, Service
 {
 
-    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
