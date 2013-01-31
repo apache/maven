@@ -313,6 +313,12 @@ public class DefaultVersionResolver
     {
         Versioning versioning = null;
 
+
+        if (metadata == null)
+        {
+            return new Versioning();
+        }
+
         SyncContext syncContext = syncContextFactory.newInstance( session, true );
 
         try
