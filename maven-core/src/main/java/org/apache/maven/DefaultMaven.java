@@ -85,8 +85,10 @@ import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.Authentication;
 import org.sonatype.aether.repository.LocalRepository;
+import org.sonatype.aether.repository.NoLocalRepositoryManagerException;
 import org.sonatype.aether.repository.RepositoryPolicy;
 import org.sonatype.aether.repository.WorkspaceReader;
+import org.sonatype.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.sonatype.aether.util.DefaultRepositorySystemSession;
 import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
 import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
@@ -127,6 +129,9 @@ public class DefaultMaven
 
     @Requirement
     private RepositorySystem repoSystem;
+
+    @Requirement (optional = true, hint = "simple")
+    private LocalRepositoryManagerFactory simpleLocalRepositoryManagerFactory;
 
     @Requirement
     private SettingsDecrypter settingsDecrypter;
@@ -352,7 +357,23 @@ public class DefaultMaven
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
-        session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+
+        if (request.isUseSimpleLocalRepostoryManager())
+        {
+            try
+            {
+                session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( localRepo ) );
+            }
+            catch ( NoLocalRepositoryManagerException e )
+            {
+
+                logger.warn( "fail to configure simple local repository manager back to default" );
+                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+            }
+        }
+        else {
+            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+        }
 
         if ( request.getWorkspaceReader() != null )
         {

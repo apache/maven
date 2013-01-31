@@ -210,6 +210,7 @@ public class MavenCli
             settings( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
+            repository( cliRequest );
             return execute( cliRequest );
         }
         catch ( ExitException e )
@@ -535,6 +536,15 @@ public class MavenCli
             System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
 
             throw new ExitException( 0 );
+        }
+    }
+
+    private void repository( CliRequest cliRequest )
+        throws Exception
+    {
+        if ( cliRequest.commandLine.hasOption( CLIManager.SIMPLE_LOCAL_REPOSITORY_MANAGER ) )
+        {
+           cliRequest.request.setUseSimpleLocalRepostoryManager( true );
         }
     }
 

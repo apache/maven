@@ -97,6 +97,8 @@ public class CLIManager
 
     public static final String THREADS = "T";
 
+    public static final String SIMPLE_LOCAL_REPOSITORY_MANAGER ="slrm";
+
     protected Options options;
 
     @SuppressWarnings( "static-access" )
@@ -134,6 +136,7 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
 
+        options.addOption( OptionBuilder.withLongOpt( "simple-local-repository-manager" ).withDescription( "Use a simple local Repository Manager (no use of _maven.repositories)" ).create( SIMPLE_LOCAL_REPOSITORY_MANAGER ) );
         // Adding this back in for compatibility with the verifier that hard codes this option.
 
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );

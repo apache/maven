@@ -283,4 +283,14 @@ public interface MavenExecutionRequest
 
     ProjectBuildingRequest getProjectBuildingRequest();
 
+    /**
+     * @since 3.1
+     */
+    boolean isUseSimpleLocalRepostoryManager();
+
+    /**
+     * @since 3.1
+     */
+    MavenExecutionRequest setUseSimpleLocalRepostoryManager(boolean useSimpleLocalRepostoryManager);
+
 }
