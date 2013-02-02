@@ -97,7 +97,7 @@
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/ref/${project.version}</url>
+      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/ref/3-latest</url>
     </site>
   </distributionManagement>
 
