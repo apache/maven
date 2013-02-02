@@ -314,7 +314,7 @@ public class DefaultVersionResolver
         Versioning versioning = null;
 
 
-        if (metadata == null)
+        if ( metadata == null )
         {
             return new Versioning();
         }
