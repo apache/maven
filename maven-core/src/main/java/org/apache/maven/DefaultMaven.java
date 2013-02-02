@@ -358,7 +358,7 @@ public class DefaultMaven
 
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
 
-        if ( request.isUseSimpleLocalRepostoryManager() )
+        if ( request.isUseSimpleLocalRepositoryManager() )
         {
             try
             {

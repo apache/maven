@@ -544,7 +544,7 @@ public class MavenCli
     {
         if ( cliRequest.commandLine.hasOption( CLIManager.SIMPLE_LOCAL_REPOSITORY_MANAGER ) || Boolean.getBoolean( "maven.simpleLocalRepoMan" ) )
         {
-           cliRequest.request.setUseSimpleLocalRepostoryManager( true );
+           cliRequest.request.setUseSimpleLocalRepositoryManager( true );
         }
     }
 
