@@ -291,6 +291,6 @@ public interface MavenExecutionRequest
     /**
      * @since 3.1
      */
-    MavenExecutionRequest setUseSimpleLocalRepostoryManager(boolean useSimpleLocalRepostoryManager);
+    MavenExecutionRequest setUseSimpleLocalRepostoryManager( boolean useSimpleLocalRepostoryManager );
 
 }

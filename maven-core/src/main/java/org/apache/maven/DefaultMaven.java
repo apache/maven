@@ -130,7 +130,7 @@ public class DefaultMaven
     @Requirement
     private RepositorySystem repoSystem;
 
-    @Requirement (optional = true, hint = "simple")
+    @Requirement( optional = true, hint = "simple" )
     private LocalRepositoryManagerFactory simpleLocalRepositoryManagerFactory;
 
     @Requirement
@@ -358,7 +358,7 @@ public class DefaultMaven
 
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
 
-        if (request.isUseSimpleLocalRepostoryManager())
+        if ( request.isUseSimpleLocalRepostoryManager() )
         {
             try
             {
@@ -367,11 +367,12 @@ public class DefaultMaven
             catch ( NoLocalRepositoryManagerException e )
             {
 
-                logger.warn( "fail to configure simple local repository manager back to default" );
+                logger.warn( "Failed to configure simple local repository manager: back to default" );
                 session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
             }
         }
-        else {
+        else
+        {
             session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
         }
 
