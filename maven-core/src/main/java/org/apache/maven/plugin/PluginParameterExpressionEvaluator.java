@@ -53,8 +53,8 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>mojo.*</code></td>            <td>(since Maven 3)</td><td></td></tr>
  * <tr><td><code>plugin</code></td>            <td>(since Maven 3)</td><td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor() getPluginDescriptor()}</td></tr>
  * <tr><td><code>plugin.*</code></td>          <td></td>               <td></td></tr>
- * <tr><td>system properties</td>              <td></td>               <td></td></tr>
- * <tr><td>project properties</td>             <td></td>               <td></td></tr>
+ * <tr><td><code>*</code></td>                 <td></td>               <td>system properties</td></tr>
+ * <tr><td><code>*</code></td>                 <td></td>               <td>project properties</td></tr>
  * </table>
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
  * 
