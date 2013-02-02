@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>22</version>
+    <version>23</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -62,7 +62,6 @@
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
-    <maven.site.cache>${user.home}/maven-sites</maven.site.cache><!-- TODO remove when upgrading parent to 23 -->
   </properties>
 
   <modules>
@@ -451,16 +450,6 @@
     </plugins>
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin><!-- TODO remove when upgrading parent to 23 -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.6</version>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <profiles>
     <profile>
       <id>apache-release</id>
@@ -485,11 +474,6 @@
       <id>reporting</id>
       <reporting>
         <plugins>
-          <plugin><!-- TODO remove when upgrading parent to 23 -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.6</version>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
