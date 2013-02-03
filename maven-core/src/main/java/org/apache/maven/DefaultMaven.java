@@ -98,6 +98,7 @@ import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
 import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
@@ -457,7 +458,8 @@ public class DefaultMaven
         session.setDependencySelector( depFilter );
 
         DependencyGraphTransformer transformer =
-            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(), new JavaScopeDeriver() );
+            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
+                                  new SimpleOptionalitySelector(), new JavaScopeDeriver() );
         transformer = new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
         session.setDependencyGraphTransformer( transformer );
 
