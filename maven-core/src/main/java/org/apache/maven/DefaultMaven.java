@@ -360,6 +360,7 @@ public class DefaultMaven
 
         if ( request.isUseSimpleLocalRepositoryManager() )
         {
+            logger.warn( "Disabling enhanced local repository manager: this is stronlgy discouraged to ensure build reproducibility." );
             try
             {
                 session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( localRepo ) );
