@@ -30,7 +30,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
 {
     public MavenITmng5214DontMapWsdlToJar()
     {
-        super( "[3.0.5,)" );
+        super( "[3.1,)" );
     }
     
     /**

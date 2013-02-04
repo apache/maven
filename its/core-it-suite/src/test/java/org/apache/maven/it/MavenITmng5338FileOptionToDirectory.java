@@ -36,7 +36,7 @@ public class MavenITmng5338FileOptionToDirectory
 
     public MavenITmng5338FileOptionToDirectory()
     {
-        super( "(3.0.4,)" );
+        super( "(3.1,)" );
     }
 
     public void setUp()
