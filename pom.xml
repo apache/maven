@@ -96,7 +96,7 @@
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/ref/3-latest</url>
+      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/ref/3-LATEST</url>
     </site>
   </distributionManagement>
 
@@ -419,7 +419,7 @@
           <artifactId>maven-scm-publish-plugin</artifactId>
           <version>1.0-beta-2</version>
           <configuration>
-            <checkoutDirectory>${maven.site.cache}/ref/${project.version}</checkoutDirectory>
+            <checkoutDirectory>${maven.site.cache}/ref/3-LATEST</checkoutDirectory>
             <tryUpdate>true</tryUpdate>
           </configuration>
         </plugin>
