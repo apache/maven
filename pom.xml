@@ -419,6 +419,7 @@
           <artifactId>maven-scm-publish-plugin</artifactId>
           <version>1.0-beta-2</version>
           <configuration>
+            <content>${project.build.directory}/staging/ref/3-LATEST</content>
             <checkoutDirectory>${maven.site.cache}/ref/3-LATEST</checkoutDirectory>
             <tryUpdate>true</tryUpdate>
           </configuration>
