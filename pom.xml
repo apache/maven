@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>21</version>
+    <version>23</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -64,6 +64,8 @@
 
     <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
     <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
+
+    <maven.site.path>ref/${project.version}</maven.site.path>
 
   </properties>
 
@@ -174,7 +176,7 @@
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>${siteDeployUrl}</url>
+      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</url>
     </site>
   </distributionManagement>
 
@@ -456,6 +458,16 @@
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
           <version>1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-publish-plugin</artifactId>
+          <version>1.0-beta-2</version>
+          <configuration>
+            <content>${project.build.directory}/staging/${maven.site.path}</content>
+            <checkoutDirectory>${maven.site.cache}/${maven.site.path}</checkoutDirectory>
+            <tryUpdate>true</tryUpdate>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
