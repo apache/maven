@@ -542,9 +542,9 @@ public class MavenCli
     private void repository( CliRequest cliRequest )
         throws Exception
     {
-        if ( cliRequest.commandLine.hasOption( CLIManager.SIMPLE_LOCAL_REPOSITORY_MANAGER ) || Boolean.getBoolean( "maven.simpleLocalRepoMan" ) )
+        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY ) || Boolean.getBoolean( "maven.legacyLocalRepo" ) )
         {
-           cliRequest.request.setUseSimpleLocalRepositoryManager( true );
+           cliRequest.request.setUseLegacyLocalRepository( true );
         }
     }
 

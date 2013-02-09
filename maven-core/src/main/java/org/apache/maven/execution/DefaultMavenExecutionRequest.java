@@ -1078,12 +1078,12 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public boolean isUseSimpleLocalRepositoryManager()
+    public boolean isUseLegacyLocalRepository()
     {
         return this.useSimpleLocalRepositoryManager;
     }
 
-    public MavenExecutionRequest setUseSimpleLocalRepositoryManager( boolean useSimpleLocalRepositoryManager )
+    public MavenExecutionRequest setUseLegacyLocalRepository( boolean useSimpleLocalRepositoryManager )
     {
         this.useSimpleLocalRepositoryManager = useSimpleLocalRepositoryManager;
         return this;

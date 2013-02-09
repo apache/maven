@@ -358,9 +358,9 @@ public class DefaultMaven
 
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
 
-        if ( request.isUseSimpleLocalRepositoryManager() )
+        if ( request.isUseLegacyLocalRepository() )
         {
-            logger.warn( "Disabling enhanced local repository manager: this is stronlgy discouraged to ensure build reproducibility." );
+            logger.warn( "Disabling enhanced local repository: using legacy is stronlgy discouraged to ensure build reproducibility." );
             try
             {
                 session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( localRepo ) );
@@ -368,7 +368,7 @@ public class DefaultMaven
             catch ( NoLocalRepositoryManagerException e )
             {
 
-                logger.warn( "Failed to configure simple local repository manager: back to default" );
+                logger.warn( "Failed to configure legacy local repository: back to default" );
                 session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
             }
         }

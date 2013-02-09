@@ -286,11 +286,11 @@ public interface MavenExecutionRequest
     /**
      * @since 3.1
      */
-    boolean isUseSimpleLocalRepositoryManager();
+    boolean isUseLegacyLocalRepository();
 
     /**
      * @since 3.1
      */
-    MavenExecutionRequest setUseSimpleLocalRepositoryManager( boolean useSimpleLocalRepositoryManager );
+    MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepository );
 
 }
