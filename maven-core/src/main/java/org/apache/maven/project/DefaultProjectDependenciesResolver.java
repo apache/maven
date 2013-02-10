@@ -34,6 +34,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
@@ -49,6 +50,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 
 /**
  * @author Benjamin Bentmann
@@ -73,11 +75,19 @@ public class DefaultProjectDependenciesResolver
 
         MavenProject project = request.getMavenProject();
         RepositorySystemSession session = request.getRepositorySession();
+        if ( logger.isDebugEnabled()
+            && session.getConfigProperties().get( DependencyManagerUtils.CONFIG_PROP_VERBOSE ) == null )
+        {
+            DefaultRepositorySystemSession verbose = new DefaultRepositorySystemSession( session );
+            verbose.setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, Boolean.TRUE );
+            session = verbose;
+        }
         DependencyFilter filter = request.getResolutionFilter();
 
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
 
         CollectRequest collect = new CollectRequest();
+        collect.setRootArtifact( RepositoryUtils.toArtifact( project.getArtifact() ) );
         collect.setRequestContext( "project" );
         collect.setRepositories( project.getRemoteProjectRepositories() );
 
@@ -235,16 +245,18 @@ public class DefaultProjectDependenciesResolver
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );
 
-                if ( node.getPremanagedScope() != null && !node.getPremanagedScope().equals( dep.getScope() ) )
+                String premanagedScope = DependencyManagerUtils.getPremanagedScope( node );
+                if ( premanagedScope != null && !premanagedScope.equals( dep.getScope() ) )
                 {
-                    buffer.append( " (scope managed from " ).append( node.getPremanagedScope() );
+                    buffer.append( " (scope managed from " ).append( premanagedScope );
                     appendManagementSource( buffer, art, "scope" );
                     buffer.append( ")" );
                 }
 
-                if ( node.getPremanagedVersion() != null && !node.getPremanagedVersion().equals( art.getVersion() ) )
+                String premanagedVersion = DependencyManagerUtils.getPremanagedVersion( node );
+                if ( premanagedVersion != null && !premanagedVersion.equals( art.getVersion() ) )
                 {
-                    buffer.append( " (version managed from " ).append( node.getPremanagedVersion() );
+                    buffer.append( " (version managed from " ).append( premanagedVersion );
                     appendManagementSource( buffer, art, "version" );
                     buffer.append( ")" );
                 }

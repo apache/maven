@@ -228,16 +228,6 @@ public class DefaultPluginDependenciesResolver
 
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );
-
-                if ( node.getPremanagedScope() != null && !node.getPremanagedScope().equals( dep.getScope() ) )
-                {
-                    buffer.append( " (scope managed from " ).append( node.getPremanagedScope() ).append( ")" );
-                }
-
-                if ( node.getPremanagedVersion() != null && !node.getPremanagedVersion().equals( art.getVersion() ) )
-                {
-                    buffer.append( " (version managed from " ).append( node.getPremanagedVersion() ).append( ")" );
-                }
             }
 
             logger.debug( buffer.toString() );
