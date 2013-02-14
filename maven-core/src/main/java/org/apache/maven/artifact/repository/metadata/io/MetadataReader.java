@@ -39,7 +39,7 @@ public interface MetadataReader
      * The key for the option to enable strict parsing. This option is of type {@link Boolean} and defaults to {@code
      * true}. If {@code false}, unknown elements will be ignored instead of causing a failure.
      */
-    final String IS_STRICT = "org.apache.maven.artifact.repository.metadata.io.isStrict";
+    String IS_STRICT = "org.apache.maven.artifact.repository.metadata.io.isStrict";
 
     /**
      * Reads the metadata from the specified file.

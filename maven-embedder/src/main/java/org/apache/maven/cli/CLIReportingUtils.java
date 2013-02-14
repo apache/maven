@@ -21,8 +21,6 @@ package org.apache.maven.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -51,7 +49,7 @@ public final class CLIReportingUtils
 
     public static String showVersion()
     {
-        String LS = System.getProperty("line.separator");
+        final String LS = System.getProperty( "line.separator" );
         Properties properties = getBuildProperties();
         StringBuffer version = new StringBuffer();
         version.append( createMavenVersionString( properties ) ).append( LS );

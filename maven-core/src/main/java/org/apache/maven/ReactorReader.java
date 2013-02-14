@@ -43,9 +43,9 @@ import java.util.Map;
 class ReactorReader
     implements WorkspaceReader
 {
-    private final static Collection<String> JAR_LIKE_TYPES = Arrays.asList( "jar", "test-jar", "ejb-client" );
+    private static final Collection<String> JAR_LIKE_TYPES = Arrays.asList( "jar", "test-jar", "ejb-client" );
 
-    private final static Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
+    private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
 
@@ -103,7 +103,7 @@ class ReactorReader
             }
             else
             {
-                String type = artifact.getProperty( "type", "");
+                String type = artifact.getProperty( "type", "" );
                 if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );

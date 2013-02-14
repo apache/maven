@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -379,6 +380,16 @@ public class MavenSession
     public RepositorySystemSession getRepositorySession()
     {
         return repositorySession;
+    }
+
+    @Deprecated
+    //
+    // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
+    // this here, possibly indefinitely.
+    //
+    public RepositoryCache getRepositoryCache()
+    {
+        return null;
     }
 
 }

@@ -183,6 +183,12 @@ public class DefaultClassRealmManager
         // classworlds (for legacy code)
         imports.put( "org.codehaus.classworlds", coreRealm );
 
+        // plexus-utils (for DOM-type fields in maven-model)
+        imports.put( "org.codehaus.plexus.util.xml.Xpp3Dom", coreRealm );
+        imports.put( "org.codehaus.plexus.util.xml.pull.XmlPullParser", coreRealm );
+        imports.put( "org.codehaus.plexus.util.xml.pull.XmlPullParserException", coreRealm );
+        imports.put( "org.codehaus.plexus.util.xml.pull.XmlSerializer", coreRealm );
+
         // plexus-container, plexus-component-annotations
         imports.put( "org.codehaus.plexus.*", coreRealm );
         imports.put( "org.codehaus.plexus.component", coreRealm );
@@ -193,17 +199,10 @@ public class DefaultClassRealmManager
         imports.put( "org.codehaus.plexus.logging", coreRealm );
         imports.put( "org.codehaus.plexus.personality", coreRealm );
 
-        // plexus-utils (for maven-model)
-        imports.put( "org.codehaus.plexus.util.xml.Xpp3Dom", coreRealm );
-        imports.put( "org.codehaus.plexus.util.xml.pull.XmlPullParser", coreRealm );
-        imports.put( "org.codehaus.plexus.util.xml.pull.XmlPullParserException", coreRealm );
-        imports.put( "org.codehaus.plexus.util.xml.pull.XmlSerializer", coreRealm );
-
         // javax.inject, sisu-inject (JSR-330)
         imports.put( "javax.inject.*", coreRealm );
         imports.put( "javax.enterprise.inject.*", coreRealm );
         imports.put( "org.sonatype.inject.*", coreRealm );
-        imports.put( "org.slf4j.*", coreRealm );
         
         // com.google
         //
@@ -218,6 +217,9 @@ public class DefaultClassRealmManager
         // imports.put( "com.google.inject.name.*", coreRealm );
         // imports.put( "com.google.inject.spi.*", coreRealm );
         // imports.put( "com.google.inject.util.*", coreRealm );
+
+        // SLF4J
+        imports.put( "org.slf4j.*", coreRealm );
     }
 
     /**

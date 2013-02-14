@@ -19,9 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import java.io.File;
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -30,6 +27,9 @@ import org.apache.maven.project.artifact.AttachedArtifact;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+
+import java.io.File;
+import java.util.List;
 
 @SuppressWarnings( "deprecation" )
 @Component( role = MavenProjectHelper.class )
@@ -90,20 +90,15 @@ public class DefaultMavenProjectHelper
         attachArtifact( project, artifact );
     }
 
+    /**
+     * Add an attached artifact or replace the file for an existing artifact.
+     * @see MavenProject#addAttachedArtifact(org.apache.maven.artifact.Artifact)
+     * @param project project reference.
+     * @param artifact artifact to add or replace.
+     */
     public void attachArtifact( MavenProject project, Artifact artifact )
     {
-        try
-        {
-            project.addAttachedArtifact( artifact );
-        }
-        catch ( DuplicateArtifactAttachmentException dae )
-        {
-            getLogger().warn( dae.getMessage() );
-
-            // We can throw this because it's unchecked, and won't change the MavenProjectHelper API, which would break
-            // backward compat if it did.
-            throw dae;
-        }
+        project.addAttachedArtifact( artifact );
     }
 
     public void addResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes )
