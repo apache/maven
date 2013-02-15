@@ -62,7 +62,6 @@ import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -80,18 +79,38 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.aether.ConfigurationProperties;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.Authentication;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.repository.ChainedWorkspaceReader;
-import org.sonatype.aether.util.repository.DefaultAuthenticationSelector;
-import org.sonatype.aether.util.repository.DefaultMirrorSelector;
-import org.sonatype.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencyManager;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.resolution.ResolutionErrorPolicy;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
+import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
+import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
+import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
+import org.eclipse.aether.util.repository.DefaultMirrorSelector;
+import org.eclipse.aether.util.repository.DefaultProxySelector;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 
 /**
  * @author Jason van Zyl
@@ -254,6 +273,8 @@ public class DefaultMaven
             return processResult( result, e );
         }
 
+        repoSession.setReadOnly();
+
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
         {
@@ -321,9 +342,11 @@ public class DefaultMaven
 
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession( false );
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
 
         session.setCache( request.getRepositoryCache() );
+
+        session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
         Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
@@ -346,8 +369,11 @@ public class DefaultMaven
             session.setUpdatePolicy( null );
         }
 
-        session.setNotFoundCachingEnabled( request.isCacheNotFound() );
-        session.setTransferErrorCachingEnabled( request.isCacheTransferError() );
+        int errorPolicy = 0;
+        errorPolicy |= request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND : 0;
+        errorPolicy |= request.isCacheTransferError() ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR : 0;
+        session.setResolutionErrorPolicy( new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy
+            | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
@@ -387,19 +413,21 @@ public class DefaultMaven
         DefaultProxySelector proxySelector = new DefaultProxySelector();
         for ( Proxy proxy : decrypted.getProxies() )
         {
-            Authentication proxyAuth = new Authentication( proxy.getUsername(), proxy.getPassword() );
-            proxySelector.add( new org.sonatype.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
-                                                                proxyAuth ), proxy.getNonProxyHosts() );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername( proxy.getUsername() ).addPassword( proxy.getPassword() );
+            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
+                                                                        proxy.getPort(), authBuilder.build() ),
+                               proxy.getNonProxyHosts() );
         }
         session.setProxySelector( proxySelector );
 
         DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
         for ( Server server : decrypted.getServers() )
         {
-            Authentication auth =
-                new Authentication( server.getUsername(), server.getPassword(), server.getPrivateKey(),
-                                    server.getPassphrase() );
-            authSelector.add( server.getId(), auth );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername( server.getUsername() ).addPassword( server.getPassword() );
+            authBuilder.addPrivateKey( server.getPrivateKey(), server.getPassphrase() );
+            authSelector.add( server.getId(), authBuilder.build() );
 
             if ( server.getConfiguration() != null )
             {
@@ -422,13 +450,30 @@ public class DefaultMaven
         }
         session.setAuthenticationSelector( authSelector );
 
+        DependencyTraverser depTraverser = new FatArtifactTraverser();
+        session.setDependencyTraverser( depTraverser );
+
+        DependencyManager depManager = new ClassicDependencyManager();
+        session.setDependencyManager( depManager );
+
+        DependencySelector depFilter =
+            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ), new OptionalDependencySelector(),
+                                     new ExclusionDependencySelector() );
+        session.setDependencySelector( depFilter );
+
+        DependencyGraphTransformer transformer =
+            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
+                                  new SimpleOptionalitySelector(), new JavaScopeDeriver() );
+        transformer = new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
+        session.setDependencyGraphTransformer( transformer );
+
         session.setTransferListener( request.getTransferListener() );
 
         session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
 
-        session.setUserProps( request.getUserProperties() );
-        session.setSystemProps( request.getSystemProperties() );
-        session.setConfigProps( configProps );
+        session.setUserProperties( request.getUserProperties() );
+        session.setSystemProperties( request.getSystemProperties() );
+        session.setConfigProperties( configProps );
 
         return session;
     }

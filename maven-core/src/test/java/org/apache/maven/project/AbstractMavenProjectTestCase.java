@@ -27,8 +27,10 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 
 /**
  * @author Jason van Zyl
@@ -39,7 +41,14 @@ public abstract class AbstractMavenProjectTestCase
     protected ProjectBuilder projectBuilder;
 
     protected RepositorySystem repositorySystem;
-    
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+    }
+
     protected void setUp()
         throws Exception
     {
@@ -170,7 +179,7 @@ public abstract class AbstractMavenProjectTestCase
     protected void initRepoSession( ProjectBuildingRequest request )
     {
         File localRepo = new File( request.getLocalRepository().getBasedir() );
-        MavenRepositorySystemSession repoSession = new MavenRepositorySystemSession( true );
+        DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
         repoSession.setLocalRepositoryManager( new LegacyLocalRepositoryManager( localRepo ) );
         request.setRepositorySession( repoSession );
     }

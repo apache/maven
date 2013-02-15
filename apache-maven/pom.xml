@@ -80,7 +80,7 @@
       <artifactId>wagon-file</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.aether</groupId>
+      <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-connector-wagon</artifactId>
     </dependency>
     <dependency>

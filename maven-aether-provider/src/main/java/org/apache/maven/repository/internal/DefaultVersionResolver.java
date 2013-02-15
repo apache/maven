@@ -28,6 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -36,40 +39,41 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.SyncContext;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.impl.MetadataResolver;
-import org.sonatype.aether.impl.RepositoryEventDispatcher;
-import org.sonatype.aether.impl.SyncContextFactory;
-import org.sonatype.aether.impl.VersionResolver;
-import org.sonatype.aether.impl.internal.CacheUtils;
-import org.sonatype.aether.metadata.Metadata;
-import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.repository.WorkspaceRepository;
-import org.sonatype.aether.resolution.MetadataRequest;
-import org.sonatype.aether.resolution.MetadataResult;
-import org.sonatype.aether.resolution.VersionRequest;
-import org.sonatype.aether.resolution.VersionResolutionException;
-import org.sonatype.aether.resolution.VersionResult;
-import org.sonatype.aether.spi.locator.Service;
-import org.sonatype.aether.spi.locator.ServiceLocator;
-import org.sonatype.aether.spi.log.Logger;
-import org.sonatype.aether.spi.log.NullLogger;
-import org.sonatype.aether.util.ConfigUtils;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.util.metadata.DefaultMetadata;
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.SyncContext;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.impl.MetadataResolver;
+import org.eclipse.aether.impl.RepositoryEventDispatcher;
+import org.eclipse.aether.impl.SyncContextFactory;
+import org.eclipse.aether.impl.VersionResolver;
+import org.eclipse.aether.internal.impl.CacheUtils;
+import org.eclipse.aether.metadata.DefaultMetadata;
+import org.eclipse.aether.metadata.Metadata;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.aether.resolution.MetadataRequest;
+import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.resolution.VersionRequest;
+import org.eclipse.aether.resolution.VersionResolutionException;
+import org.eclipse.aether.resolution.VersionResult;
+import org.eclipse.aether.spi.locator.Service;
+import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.eclipse.aether.spi.log.Logger;
+import org.eclipse.aether.spi.log.LoggerFactory;
+import org.eclipse.aether.spi.log.NullLoggerFactory;
+import org.eclipse.aether.util.ConfigUtils;
 
 /**
  * @author Benjamin Bentmann
  */
+@Named
 @Component( role = VersionResolver.class )
 public class DefaultVersionResolver
     implements VersionResolver, Service
@@ -84,8 +88,8 @@ public class DefaultVersionResolver
     private static final String SNAPSHOT = "SNAPSHOT";
 
     @SuppressWarnings( "unused" )
-    @Requirement
-    private Logger logger = NullLogger.INSTANCE;
+    @Requirement( role = LoggerFactory.class )
+    private Logger logger = NullLoggerFactory.LOGGER;
 
     @Requirement
     private MetadataResolver metadataResolver;
@@ -96,18 +100,39 @@ public class DefaultVersionResolver
     @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
+    public DefaultVersionResolver()
+    {
+        // enable no-arg constructor
+    }
+
+    @Inject
+    DefaultVersionResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
+                            RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+    {
+        setMetadataResolver( metadataResolver );
+        setSyncContextFactory( syncContextFactory );
+        setLoggerFactory( loggerFactory );
+        setRepositoryEventDispatcher( repositoryEventDispatcher );
+    }
+
     public void initService( ServiceLocator locator )
     {
-        setLogger( locator.getService( Logger.class ) );
+        setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
     }
 
-    public DefaultVersionResolver setLogger( Logger logger )
+    public DefaultVersionResolver setLoggerFactory( LoggerFactory loggerFactory )
     {
-        this.logger = ( logger != null ) ? logger : NullLogger.INSTANCE;
+        this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
         return this;
+    }
+
+    void setLogger( LoggerFactory loggerFactory )
+    {
+        // plexus support
+        setLoggerFactory( loggerFactory );
     }
 
     public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )
@@ -143,7 +168,7 @@ public class DefaultVersionResolver
     public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         throws VersionResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
         Artifact artifact = request.getArtifact();
 
@@ -153,7 +178,6 @@ public class DefaultVersionResolver
 
         Key cacheKey = null;
         RepositoryCache cache = session.getCache();
-
         if ( cache != null && !ConfigUtils.getBoolean( session, false, "aether.versionResolver.noCache" ) )
         {
             cacheKey = new Key( session, request );
@@ -356,7 +380,7 @@ public class DefaultVersionResolver
                 }
                 finally
                 {
-                    syncContext.release();
+                    syncContext.close();
                 }
             }
         }
@@ -376,12 +400,13 @@ public class DefaultVersionResolver
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
                                   ArtifactRepository repository, Exception exception )
     {
-        DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+        event.setTrace( trace );
         event.setMetadata( metadata );
         event.setException( exception );
         event.setRepository( repository );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
     }
 
     private void merge( Artifact artifact, Map<String, VersionInfo> infos, Versioning versioning,

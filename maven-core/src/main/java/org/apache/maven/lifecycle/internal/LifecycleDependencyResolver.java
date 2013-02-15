@@ -31,11 +31,11 @@ import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.util.filter.AndDependencyFilter;
-import org.sonatype.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.util.filter.AndDependencyFilter;
+import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 
 import java.util.*;
 
@@ -227,7 +227,7 @@ public class LifecycleDependencyResolver
 
         for ( Dependency dependency : dependencies )
         {
-            org.sonatype.aether.artifact.Artifact a = dependency.getArtifact();
+            org.eclipse.aether.artifact.Artifact a = dependency.getArtifact();
             String key = ArtifactUtils.key( a.getGroupId(), a.getArtifactId(), a.getVersion() );
             if ( !projectKeys.contains( key ) )
             {
@@ -309,7 +309,7 @@ public class LifecycleDependencyResolver
             Dependency dependency = node.getDependency();
             if ( dependency != null )
             {
-                org.sonatype.aether.artifact.Artifact a = dependency.getArtifact();
+                org.eclipse.aether.artifact.Artifact a = dependency.getArtifact();
                 String key = ArtifactUtils.key( a.getGroupId(), a.getArtifactId(), a.getVersion() );
                 return !keys.contains( key );
             }

@@ -51,15 +51,14 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.Os;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.impl.RemoteRepositoryManager;
-import org.sonatype.aether.repository.LocalRepositoryManager;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.WorkspaceRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.util.DefaultRequestTrace;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResult;
 
 /**
  */
@@ -84,7 +83,7 @@ public class DefaultProjectBuilder
     private RepositorySystem repositorySystem;
 
     @Requirement
-    private org.sonatype.aether.RepositorySystem repoSystem;
+    private org.eclipse.aether.RepositorySystem repoSystem;
 
     @Requirement
     private RemoteRepositoryManager repositoryManager;
@@ -241,7 +240,7 @@ public class DefaultProjectBuilder
 
         ModelBuildingRequest request = new DefaultModelBuildingRequest();
 
-        RequestTrace trace = DefaultRequestTrace.newChild( null, configuration ).newChild( request );
+        RequestTrace trace = RequestTrace.newChild( null, configuration ).newChild( request );
 
         ModelResolver resolver =
             new ProjectModelResolver( config.session, trace, repoSystem, repositoryManager, config.repositories,
@@ -270,7 +269,7 @@ public class DefaultProjectBuilder
     public ProjectBuildingResult build( Artifact artifact, boolean allowStubModel, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        org.sonatype.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
+        org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact( artifact );
         pomArtifact = ArtifactDescriptorUtils.toPomArtifact( pomArtifact );
 
         InternalConfig config = new InternalConfig( request, null );
@@ -287,7 +286,7 @@ public class DefaultProjectBuilder
             pomArtifact = pomResult.getArtifact();
             localProject = pomResult.getRepository() instanceof WorkspaceRepository;
         }
-        catch ( org.sonatype.aether.resolution.ArtifactResolutionException e )
+        catch ( org.eclipse.aether.resolution.ArtifactResolutionException e )
         {
             if ( e.getResults().get( 0 ).isMissing() && allowStubModel )
             {

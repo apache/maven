@@ -19,7 +19,7 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * @author Kristian Rosenvold

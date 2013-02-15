@@ -45,7 +45,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
@@ -163,19 +163,19 @@ public class DefaultClassRealmManager
         imports.put( "org.apache.maven.wagon.resource", coreRealm );
 
         // aether-api, aether-spi, aether-impl
-        imports.put( "org.sonatype.aether.*", coreRealm );
-        imports.put( "org.sonatype.aether.artifact", coreRealm );
-        imports.put( "org.sonatype.aether.collection", coreRealm );
-        imports.put( "org.sonatype.aether.deployment", coreRealm );
-        imports.put( "org.sonatype.aether.graph", coreRealm );
-        imports.put( "org.sonatype.aether.impl", coreRealm );
-        imports.put( "org.sonatype.aether.installation", coreRealm );
-        imports.put( "org.sonatype.aether.metadata", coreRealm );
-        imports.put( "org.sonatype.aether.repository", coreRealm );
-        imports.put( "org.sonatype.aether.resolution", coreRealm );
-        imports.put( "org.sonatype.aether.spi", coreRealm );
-        imports.put( "org.sonatype.aether.transfer", coreRealm );
-        imports.put( "org.sonatype.aether.version", coreRealm );
+        imports.put( "org.eclipse.aether.*", coreRealm );
+        imports.put( "org.eclipse.aether.artifact", coreRealm );
+        imports.put( "org.eclipse.aether.collection", coreRealm );
+        imports.put( "org.eclipse.aether.deployment", coreRealm );
+        imports.put( "org.eclipse.aether.graph", coreRealm );
+        imports.put( "org.eclipse.aether.impl", coreRealm );
+        imports.put( "org.eclipse.aether.installation", coreRealm );
+        imports.put( "org.eclipse.aether.metadata", coreRealm );
+        imports.put( "org.eclipse.aether.repository", coreRealm );
+        imports.put( "org.eclipse.aether.resolution", coreRealm );
+        imports.put( "org.eclipse.aether.spi", coreRealm );
+        imports.put( "org.eclipse.aether.transfer", coreRealm );
+        imports.put( "org.eclipse.aether.version", coreRealm );
 
         // plexus-classworlds
         imports.put( "org.codehaus.plexus.classworlds", coreRealm );

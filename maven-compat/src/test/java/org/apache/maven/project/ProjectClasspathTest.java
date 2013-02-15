@@ -25,8 +25,8 @@ import java.util.Iterator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.DefaultArtifactDescriptorReader;
-import org.sonatype.aether.impl.ArtifactDescriptorReader;
-import org.sonatype.aether.impl.ArtifactResolver;
+import org.eclipse.aether.impl.ArtifactDescriptorReader;
+import org.eclipse.aether.impl.ArtifactResolver;
 
 public class ProjectClasspathTest
     extends AbstractMavenProjectTestCase

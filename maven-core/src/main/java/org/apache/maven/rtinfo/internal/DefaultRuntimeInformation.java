@@ -29,11 +29,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.InvalidVersionSpecificationException;
-import org.sonatype.aether.version.Version;
-import org.sonatype.aether.version.VersionConstraint;
-import org.sonatype.aether.version.VersionScheme;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionConstraint;
+import org.eclipse.aether.version.VersionScheme;
 
 /**
  * Provides information about the current Maven runtime.
@@ -139,7 +139,7 @@ public class DefaultRuntimeInformation
             throw new IllegalStateException( "Could not parse current Maven version: " + e.getMessage(), e );
         }
 
-        if ( constraint.getRanges().isEmpty() )
+        if ( constraint.getRange() == null )
         {
             return constraint.getVersion().compareTo( current ) <= 0;
         }

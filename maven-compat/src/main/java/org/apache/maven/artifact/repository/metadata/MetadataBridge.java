@@ -20,14 +20,18 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.aether.RepositoryException;
-import org.sonatype.aether.metadata.MergeableMetadata;
+import org.eclipse.aether.RepositoryException;
+import org.eclipse.aether.metadata.AbstractMetadata;
+import org.eclipse.aether.metadata.MergeableMetadata;
+import org.eclipse.aether.metadata.Metadata;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -36,6 +40,7 @@ import org.sonatype.aether.metadata.MergeableMetadata;
  * @author Benjamin Bentmann
  */
 public final class MetadataBridge
+    extends AbstractMetadata
     implements MergeableMetadata
 {
 
@@ -125,6 +130,17 @@ public final class MetadataBridge
         {
             return Nature.RELEASE;
         }
+    }
+
+    public Map<String, String> getProperties()
+    {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Metadata setProperties( Map<String, String> properties )
+    {
+        return this;
     }
 
     @SuppressWarnings( "deprecation" )

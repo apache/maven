@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -31,13 +33,15 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.aether.RepositoryException;
-import org.sonatype.aether.metadata.MergeableMetadata;
+import org.eclipse.aether.RepositoryException;
+import org.eclipse.aether.metadata.AbstractMetadata;
+import org.eclipse.aether.metadata.MergeableMetadata;
 
 /**
  * @author Benjamin Bentmann
  */
 abstract class MavenMetadata
+    extends AbstractMetadata
     implements MergeableMetadata
 {
 
@@ -130,24 +134,15 @@ abstract class MavenMetadata
         }
     }
 
-    @Override
-    public String toString()
+    public Map<String, String> getProperties()
     {
-        StringBuilder buffer = new StringBuilder( 128 );
-        if ( getGroupId().length() > 0 )
-        {
-            buffer.append( getGroupId() );
-        }
-        if ( getArtifactId().length() > 0 )
-        {
-            buffer.append( ':' ).append( getArtifactId() );
-        }
-        if ( getVersion().length() > 0 )
-        {
-            buffer.append( ':' ).append( getVersion() );
-        }
-        buffer.append( '/' ).append( getType() );
-        return buffer.toString();
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public org.eclipse.aether.metadata.Metadata setProperties( Map<String, String> properties )
+    {
+        return this;
     }
 
 }

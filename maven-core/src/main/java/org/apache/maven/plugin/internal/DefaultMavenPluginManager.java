@@ -87,12 +87,12 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.util.filter.AndDependencyFilter;
-import org.sonatype.aether.util.graph.PreorderNodeListGenerator;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.filter.AndDependencyFilter;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
@@ -139,7 +139,7 @@ public class DefaultMavenPluginManager
 
         if ( pluginDescriptor == null )
         {
-            org.sonatype.aether.artifact.Artifact artifact =
+            org.eclipse.aether.artifact.Artifact artifact =
                 pluginDependenciesResolver.resolve( plugin, repositories, session );
 
             Artifact pluginArtifact = RepositoryUtils.toArtifact( artifact );
@@ -369,7 +369,7 @@ public class DefaultMavenPluginManager
             }
         }
 
-        List<org.sonatype.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
+        List<org.eclipse.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
 
         ClassRealm pluginRealm =
             classRealmManager.createPluginRealm( plugin, parent, null, foreignImports, pluginArtifacts );

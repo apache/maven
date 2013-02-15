@@ -21,8 +21,8 @@ package org.apache.maven.plugin.prefix;
 
 import java.util.List;
 
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 
 public class NoPluginFoundForPrefixException
     extends Exception

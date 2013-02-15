@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyFilter;
 
 /**
  * Default project realm cache implementation. Assumes cached data does not change.

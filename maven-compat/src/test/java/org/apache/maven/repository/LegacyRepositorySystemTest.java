@@ -32,9 +32,11 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.RepositoryPolicy;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.repository.RepositorySystem;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -47,7 +49,14 @@ public class LegacyRepositorySystemTest
     private RepositorySystem repositorySystem;
 
     private ResolutionErrorHandler resolutionErrorHandler;
-    
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+    }
+
     @Override
     protected void setUp()
         throws Exception
@@ -114,7 +123,8 @@ public class LegacyRepositorySystemTest
             .setLocalRepository( getLocalRepository() );            
                             
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManager( request.getLocalRepository().getBasedir() ) );
+        LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( localRepo ) );
         LegacySupport legacySupport = lookup( LegacySupport.class );
         legacySupport.setSession( new MavenSession( getContainer(), session, new DefaultMavenExecutionRequest(),
                                                     new DefaultMavenExecutionResult() ) );

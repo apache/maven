@@ -73,10 +73,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.AuthenticationSelector;
-import org.sonatype.aether.repository.ProxySelector;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.AuthenticationContext;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.ProxySelector;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * @author Jason van Zyl
@@ -478,7 +479,7 @@ public class LegacyRepositorySystem
     {
         if ( session != null )
         {
-            org.sonatype.aether.repository.MirrorSelector selector = session.getMirrorSelector();
+            org.eclipse.aether.repository.MirrorSelector selector = session.getMirrorSelector();
             if ( selector != null )
             {
                 RemoteRepository repo = selector.getMirror( RepositoryUtils.toRepo( repository ) );
@@ -583,13 +584,18 @@ public class LegacyRepositorySystem
             AuthenticationSelector selector = session.getAuthenticationSelector();
             if ( selector != null )
             {
-                org.sonatype.aether.repository.Authentication auth =
-                    selector.getAuthentication( RepositoryUtils.toRepo( repository ) );
+                RemoteRepository repo = RepositoryUtils.toRepo( repository );
+                org.eclipse.aether.repository.Authentication auth = selector.getAuthentication( repo );
                 if ( auth != null )
                 {
-                    Authentication result = new Authentication( auth.getUsername(), auth.getPassword() );
-                    result.setPrivateKey( auth.getPrivateKeyFile() );
-                    result.setPassphrase( auth.getPassphrase() );
+                    repo = new RemoteRepository.Builder( repo ).setAuthentication( auth ).build();
+                    AuthenticationContext authCtx = AuthenticationContext.forRepository( session, repo );
+                    Authentication result =
+                        new Authentication( authCtx.get( AuthenticationContext.USERNAME ),
+                                            authCtx.get( AuthenticationContext.PASSWORD ) );
+                    result.setPrivateKey( authCtx.get( AuthenticationContext.PRIVATE_KEY_PATH ) );
+                    result.setPassphrase( authCtx.get( AuthenticationContext.PRIVATE_KEY_PASSPHRASE ) );
+                    authCtx.close();
                     return result;
                 }
             }
@@ -688,7 +694,8 @@ public class LegacyRepositorySystem
             ProxySelector selector = session.getProxySelector();
             if ( selector != null )
             {
-                org.sonatype.aether.repository.Proxy proxy = selector.getProxy( RepositoryUtils.toRepo( repository ) );
+                RemoteRepository repo = RepositoryUtils.toRepo( repository );
+                org.eclipse.aether.repository.Proxy proxy = selector.getProxy( repo );
                 if ( proxy != null )
                 {
                     Proxy p = new Proxy();
@@ -697,8 +704,13 @@ public class LegacyRepositorySystem
                     p.setPort( proxy.getPort() );
                     if ( proxy.getAuthentication() != null )
                     {
-                        p.setUserName( proxy.getAuthentication().getUsername() );
-                        p.setPassword( proxy.getAuthentication().getPassword() );
+                        repo = new RemoteRepository.Builder( repo ).setProxy( proxy ).build();
+                        AuthenticationContext authCtx = AuthenticationContext.forProxy( session, repo );
+                        p.setUserName( authCtx.get( AuthenticationContext.USERNAME ) );
+                        p.setPassword( authCtx.get( AuthenticationContext.PASSWORD ) );
+                        p.setNtlmDomain( authCtx.get( AuthenticationContext.NTLM_DOMAIN ) );
+                        p.setNtlmHost( authCtx.get( AuthenticationContext.NTLM_WORKSTATION ) );
+                        authCtx.close();
                     }
                     return p;
                 }

@@ -21,12 +21,16 @@ package org.apache.maven.repository.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
@@ -45,52 +49,55 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositoryException;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.artifact.ArtifactType;
-import org.sonatype.aether.artifact.ArtifactTypeRegistry;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.Exclusion;
-import org.sonatype.aether.impl.ArtifactDescriptorReader;
-import org.sonatype.aether.impl.ArtifactResolver;
-import org.sonatype.aether.impl.RemoteRepositoryManager;
-import org.sonatype.aether.impl.RepositoryEventDispatcher;
-import org.sonatype.aether.impl.VersionResolver;
-import org.sonatype.aether.transfer.ArtifactNotFoundException;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.ArtifactProperties;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.DefaultArtifactType;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.repository.WorkspaceRepository;
-import org.sonatype.aether.resolution.ArtifactDescriptorException;
-import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
-import org.sonatype.aether.resolution.ArtifactDescriptorResult;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.VersionRequest;
-import org.sonatype.aether.resolution.VersionResolutionException;
-import org.sonatype.aether.resolution.VersionResult;
-import org.sonatype.aether.spi.locator.Service;
-import org.sonatype.aether.spi.locator.ServiceLocator;
-import org.sonatype.aether.spi.log.Logger;
-import org.sonatype.aether.spi.log.NullLogger;
+import org.eclipse.aether.RepositoryException;
+import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactProperties;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.impl.ArtifactDescriptorReader;
+import org.eclipse.aether.impl.ArtifactResolver;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.aether.impl.RepositoryEventDispatcher;
+import org.eclipse.aether.impl.VersionResolver;
+import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
+import org.eclipse.aether.resolution.ArtifactDescriptorPolicyRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.VersionRequest;
+import org.eclipse.aether.resolution.VersionResolutionException;
+import org.eclipse.aether.resolution.VersionResult;
+import org.eclipse.aether.spi.locator.Service;
+import org.eclipse.aether.spi.locator.ServiceLocator;
+import org.eclipse.aether.spi.log.Logger;
+import org.eclipse.aether.spi.log.LoggerFactory;
+import org.eclipse.aether.spi.log.NullLoggerFactory;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
 
 /**
  * @author Benjamin Bentmann
  */
+@Named
 @Component( role = ArtifactDescriptorReader.class )
 public class DefaultArtifactDescriptorReader
     implements ArtifactDescriptorReader, Service
 {
 
     @SuppressWarnings( "unused" )
-    @Requirement
-    private Logger logger = NullLogger.INSTANCE;
+    @Requirement( role = LoggerFactory.class )
+    private Logger logger = NullLoggerFactory.LOGGER;
 
     @Requirement
     private RemoteRepositoryManager remoteRepositoryManager;
@@ -107,9 +114,27 @@ public class DefaultArtifactDescriptorReader
     @Requirement
     private ModelBuilder modelBuilder;
 
+    public DefaultArtifactDescriptorReader()
+    {
+        // enable no-arg constructor
+    }
+
+    @Inject
+    DefaultArtifactDescriptorReader( RemoteRepositoryManager remoteRepositoryManager, VersionResolver versionResolver,
+                                     ArtifactResolver artifactResolver, ModelBuilder modelBuilder,
+                                     RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+    {
+        setRemoteRepositoryManager( remoteRepositoryManager );
+        setVersionResolver( versionResolver );
+        setArtifactResolver( artifactResolver );
+        setModelBuilder( modelBuilder );
+        setLoggerFactory( loggerFactory );
+        setRepositoryEventDispatcher( repositoryEventDispatcher );
+    }
+
     public void initService( ServiceLocator locator )
     {
-        setLogger( locator.getService( Logger.class ) );
+        setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setRemoteRepositoryManager( locator.getService( RemoteRepositoryManager.class ) );
         setVersionResolver( locator.getService( VersionResolver.class ) );
         setArtifactResolver( locator.getService( ArtifactResolver.class ) );
@@ -121,10 +146,16 @@ public class DefaultArtifactDescriptorReader
         }
     }
 
-    public DefaultArtifactDescriptorReader setLogger( Logger logger )
+    public DefaultArtifactDescriptorReader setLoggerFactory( LoggerFactory loggerFactory )
     {
-        this.logger = ( logger != null ) ? logger : NullLogger.INSTANCE;
+        this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
         return this;
+    }
+
+    void setLogger( LoggerFactory loggerFactory )
+    {
+        // plexus support
+        setLoggerFactory( loggerFactory );
     }
 
     public DefaultArtifactDescriptorReader setRemoteRepositoryManager( RemoteRepositoryManager remoteRepositoryManager )
@@ -228,6 +259,8 @@ public class DefaultArtifactDescriptorReader
             }
 
             result.setProperties( properties );
+
+            setArtifactProperties( result, model );
         }
 
         return result;
@@ -237,7 +270,7 @@ public class DefaultArtifactDescriptorReader
                            ArtifactDescriptorResult result )
         throws ArtifactDescriptorException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+        RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
         Set<String> visited = new LinkedHashSet<String>();
         for ( Artifact artifact = request.getArtifact();; )
@@ -262,7 +295,7 @@ public class DefaultArtifactDescriptorReader
                 RepositoryException exception =
                     new RepositoryException( "Artifact relocations form a cycle: " + visited );
                 invalidDescriptor( session, trace, artifact, exception );
-                if ( session.isIgnoreInvalidArtifactDescriptor() )
+                if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
                 {
                     return null;
                 }
@@ -287,7 +320,7 @@ public class DefaultArtifactDescriptorReader
                 if ( e.getCause() instanceof ArtifactNotFoundException )
                 {
                     missingDescriptor( session, trace, artifact, (Exception) e.getCause() );
-                    if ( session.isIgnoreMissingArtifactDescriptor() )
+                    if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
                     {
                         return null;
                     }
@@ -332,7 +365,7 @@ public class DefaultArtifactDescriptorReader
                     }
                 }
                 invalidDescriptor( session, trace, artifact, e );
-                if ( session.isIgnoreInvalidArtifactDescriptor() )
+                if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
                 {
                     return null;
                 }
@@ -382,6 +415,23 @@ public class DefaultArtifactDescriptorReader
         return relocation;
     }
 
+    private void setArtifactProperties( ArtifactDescriptorResult result, Model model )
+    {
+        String downloadUrl = null;
+        DistributionManagement distMngt = model.getDistributionManagement();
+        if ( distMngt != null )
+        {
+            downloadUrl = distMngt.getDownloadUrl();
+        }
+        if ( downloadUrl != null && downloadUrl.length() > 0 )
+        {
+            Artifact artifact = result.getArtifact();
+            Map<String, String> props = new HashMap<String, String>( artifact.getProperties() );
+            props.put( ArtifactProperties.DOWNLOAD_URL, downloadUrl );
+            result.setArtifact( artifact.setProperties( props ) );
+        }
+    }
+
     private Dependency convert( org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes )
     {
         ArtifactType stereotype = stereotypes.get( dependency.getType() );
@@ -421,23 +471,33 @@ public class DefaultArtifactDescriptorReader
     private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
                                     Exception exception )
     {
-        DefaultRepositoryEvent event =
-            new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_MISSING, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.ARTIFACT_DESCRIPTOR_MISSING );
+        event.setTrace( trace );
         event.setArtifact( artifact );
         event.setException( exception );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
     }
 
     private void invalidDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
                                     Exception exception )
     {
-        DefaultRepositoryEvent event =
-            new DefaultRepositoryEvent( EventType.ARTIFACT_DESCRIPTOR_INVALID, session, trace );
+        RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.ARTIFACT_DESCRIPTOR_INVALID );
+        event.setTrace( trace );
         event.setArtifact( artifact );
         event.setException( exception );
 
-        repositoryEventDispatcher.dispatch( event );
+        repositoryEventDispatcher.dispatch( event.build() );
+    }
+
+    private int getPolicy( RepositorySystemSession session, Artifact artifact, ArtifactDescriptorRequest request )
+    {
+        ArtifactDescriptorPolicy policy = session.getArtifactDescriptorPolicy();
+        if ( policy == null )
+        {
+            return ArtifactDescriptorPolicy.STRICT;
+        }
+        return policy.getPolicy( session, new ArtifactDescriptorPolicyRequest( artifact, request.getRequestContext() ) );
     }
 
 }

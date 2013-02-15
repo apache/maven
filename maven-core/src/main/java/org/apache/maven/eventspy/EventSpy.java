@@ -62,7 +62,7 @@ public interface EventSpy
      * @see org.apache.maven.project.DependencyResolutionRequest
      * @see org.apache.maven.project.DependencyResolutionResultt
      * @see org.apache.maven.execution.ExecutionEvent
-     * @see org.sonatype.aether.RepositoryEvent
+     * @see org.eclipse.aether.RepositoryEvent
      */
     void onEvent( Object event )
         throws Exception;

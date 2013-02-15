@@ -35,7 +35,11 @@ under the License.
   <skin>
     <groupId>org.apache.maven.skins</groupId>
     <artifactId>maven-fluido-skin</artifactId>
+<<<<<<< HEAD
     <version>1.3.0</version>
+=======
+    <version>1.0</version>
+>>>>>>> 4fdcdbd26244ff81e242054fd38cf415d92499be
   </skin>
 
   <body>

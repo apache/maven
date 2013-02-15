@@ -7,6 +7,9 @@ bin/
 # Intellij
 *.ipr
 *.iml
+<<<<<<< HEAD
 .idea
+=======
+>>>>>>> 4fdcdbd26244ff81e242054fd38cf415d92499be
 
 .DS_Store

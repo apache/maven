@@ -31,15 +31,15 @@ import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.impl.ArtifactResolver;
-import org.sonatype.aether.impl.RemoteRepositoryManager;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.impl.ArtifactResolver;
+import org.eclipse.aether.impl.RemoteRepositoryManager;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 
 /**
  * A model resolver to assist building of dependency POMs. This resolver gives priority to those repositories that have
@@ -93,7 +93,7 @@ class DefaultModelResolver
     public void addRepository( Repository repository )
         throws InvalidRepositoryException
     {
-        if ( !repositoryIds.add( repository.getId() ) )
+        if ( session.isIgnoreArtifactDescriptorRepositories() || !repositoryIds.add( repository.getId() ) )
         {
             return;
         }

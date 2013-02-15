@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility interface that is only

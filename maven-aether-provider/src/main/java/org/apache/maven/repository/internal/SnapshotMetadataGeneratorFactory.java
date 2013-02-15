@@ -20,11 +20,11 @@ package org.apache.maven.repository.internal;
  */
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.impl.MetadataGenerator;
-import org.sonatype.aether.impl.MetadataGeneratorFactory;
-import org.sonatype.aether.installation.InstallRequest;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.impl.MetadataGenerator;
+import org.eclipse.aether.impl.MetadataGeneratorFactory;
+import org.eclipse.aether.installation.InstallRequest;
 
 /**
  * @author Benjamin Bentmann
@@ -44,7 +44,7 @@ public class SnapshotMetadataGeneratorFactory
         return new RemoteSnapshotMetadataGenerator( session, request );
     }
 
-    public int getPriority()
+    public float getPriority()
     {
         return 10;
     }

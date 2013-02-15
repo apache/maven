@@ -36,12 +36,12 @@ import org.apache.maven.project.artifact.ProjectArtifactMetadata;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.installation.InstallRequest;
-import org.sonatype.aether.installation.InstallationException;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.artifact.SubArtifact;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.installation.InstallationException;
+import org.eclipse.aether.util.artifact.SubArtifact;
 
 /**
  * @author Jason van Zyl
@@ -77,9 +77,9 @@ public class DefaultArtifactInstaller
 
         InstallRequest request = new InstallRequest();
 
-        request.setTrace( DefaultRequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
+        request.setTrace( RequestTrace.newChild( null, legacySupport.getSession().getCurrentProject() ) );
 
-        org.sonatype.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
+        org.eclipse.aether.artifact.Artifact mainArtifact = RepositoryUtils.toArtifact( artifact );
         mainArtifact = mainArtifact.setFile( source );
         request.addArtifact( mainArtifact );
 
@@ -87,7 +87,7 @@ public class DefaultArtifactInstaller
         {
             if ( metadata instanceof ProjectArtifactMetadata )
             {
-                org.sonatype.aether.artifact.Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
+                org.eclipse.aether.artifact.Artifact pomArtifact = new SubArtifact( mainArtifact, "", "pom" );
                 pomArtifact = pomArtifact.setFile( ( (ProjectArtifactMetadata) metadata ).getFile() );
                 request.addArtifact( pomArtifact );
             }
