@@ -88,9 +88,11 @@ import org.eclipse.aether.collection.DependencyManager;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.collection.DependencyTraverser;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
+import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
 import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
@@ -146,6 +148,9 @@ public class DefaultMaven
 
     @Requirement
     private RepositorySystem repoSystem;
+
+    @Requirement( optional = true, hint = "simple" )
+    private LocalRepositoryManagerFactory simpleLocalRepositoryManagerFactory;
 
     @Requirement
     private SettingsDecrypter settingsDecrypter;
@@ -378,7 +383,25 @@ public class DefaultMaven
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
-        session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+
+        if ( request.isUseLegacyLocalRepository() )
+        {
+            logger.warn( "Disabling enhanced local repository: using legacy is stronlgy discouraged to ensure build reproducibility." );
+            try
+            {
+                session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( localRepo ) );
+            }
+            catch ( NoLocalRepositoryManagerException e )
+            {
+
+                logger.warn( "Failed to configure legacy local repository: back to default" );
+                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+            }
+        }
+        else
+        {
+            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+        }
 
         if ( request.getWorkspaceReader() != null )
         {

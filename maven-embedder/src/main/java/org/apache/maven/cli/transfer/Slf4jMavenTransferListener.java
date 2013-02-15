@@ -28,13 +28,20 @@ import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Slf4jMavenTransferListener
     extends AbstractTransferListener
 {
 
-    protected Logger out;
+    protected final Logger out;
 
+    public Slf4jMavenTransferListener()
+    {
+        this.out = LoggerFactory.getLogger( Slf4jMavenTransferListener.class );
+    }
+
+    // TODO should we deprecate?
     public Slf4jMavenTransferListener( Logger out )
     {
         this.out = out;

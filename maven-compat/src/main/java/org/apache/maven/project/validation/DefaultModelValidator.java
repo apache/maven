@@ -19,15 +19,11 @@ package org.apache.maven.project.validation;
  * under the License.
  */
 
-import java.util.List;
-import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;

@@ -63,7 +63,7 @@ public class SystemPropertyProfileActivator
                     + profile.getId() + "'" );
             }
 
-            if ( name.startsWith("!") )
+            if ( name.startsWith( "!" ) )
             {
                 reverseName = true;
                 name = name.substring( 1 );

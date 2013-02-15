@@ -41,7 +41,8 @@ public interface ModelProblem
 
     }
 
-    enum Version {
+    enum Version
+    {
         //based on ModeBuildingResult.validationLevel
         BASE,
         V20,

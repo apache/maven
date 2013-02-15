@@ -143,6 +143,8 @@ public class DefaultMavenExecutionRequest
      */
     private boolean noSnapshotUpdates;
 
+    private boolean useSimpleLocalRepositoryManager = false;
+
     public DefaultMavenExecutionRequest()
     {
     }
@@ -1076,4 +1078,14 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
+    public boolean isUseLegacyLocalRepository()
+    {
+        return this.useSimpleLocalRepositoryManager;
+    }
+
+    public MavenExecutionRequest setUseLegacyLocalRepository( boolean useSimpleLocalRepositoryManager )
+    {
+        this.useSimpleLocalRepositoryManager = useSimpleLocalRepositoryManager;
+        return this;
+    }
 }

@@ -63,10 +63,10 @@ import org.codehaus.plexus.logging.Logger;
 public class DefaultLegacyArtifactCollector
     implements LegacyArtifactCollector
 {
-	@Requirement(hint="nearest")
+    @Requirement( hint = "nearest" )
     private ConflictResolver defaultConflictResolver;
 
-	@Requirement
+    @Requirement
     private Logger logger;
 
     @Requirement

@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
@@ -244,7 +243,8 @@ public abstract class AbstractStringBasedModelInterpolator
                 }
                 catch ( InterpolationException e )
                 {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( e.getMessage() ).setException( e ));
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( e.getMessage() ).setException( e ) );
                 }
 
                 interpolator.clearFeedback();

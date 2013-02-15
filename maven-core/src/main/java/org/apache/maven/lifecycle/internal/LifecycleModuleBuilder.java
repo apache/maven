@@ -32,7 +32,7 @@ import java.util.HashSet;
 
 /**
  * Builds one or more lifecycles for a full module
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
@@ -92,7 +92,7 @@ public class LifecycleModuleBuilder
         }
         catch ( Exception e )
         {
-            builderCommon.handleBuildError( reactorContext, rootSession, currentProject, e, buildStartTime );
+            builderCommon.handleBuildError( reactorContext, rootSession, session, currentProject, e, buildStartTime );
         }
         finally
         {

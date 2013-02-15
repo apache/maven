@@ -53,11 +53,15 @@ public final class CLIReportingUtils
         Properties properties = getBuildProperties();
         StringBuffer version = new StringBuffer();
         version.append( createMavenVersionString( properties ) ).append( LS );
-        version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: " + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( LS );
-        version.append( "Java version: " + System.getProperty( "java.version", "<unknown java version>" ) + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( LS );
+        version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: "
+                            + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( LS );
+        version.append( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
+                            + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( LS );
         version.append( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) ).append( LS );
-        version.append( "Default locale: " + Locale.getDefault() + ", platform encoding: " + System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( LS );
-        version.append( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH + "\", family: \"" + Os.OS_FAMILY + "\"" );
+        version.append( "Default locale: " + Locale.getDefault() + ", platform encoding: "
+                            + System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( LS );
+        version.append( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH
+            + "\", family: \"" + Os.OS_FAMILY + "\"" );
         return version.toString();
     }
 
@@ -79,7 +83,7 @@ public final class CLIReportingUtils
         if ( rev != null || timestamp != null )
         {
             msg += " (";
-            msg += ( rev != null ? "r" + rev : "" );
+            msg += ( rev != null ? rev : "" );
             if ( timestamp != null )
             {
                 SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );

@@ -36,6 +36,9 @@ END SNIPPET: ant-bootstrap -->
   <property name="distributionShortName" value="Maven"/>
   <property name="distributionName" value="Apache Maven"/>
   <property name="it.workdir.version" value="3.0.x" />
+  <property name="maven-compile.jvmargs" value="-Xmx512m -Xms512m"/>
+  <property name="maven-compile.fork" value="true"/>
+  <property name="maven-compile.maxmemory" value="512m"/>
 
   <target name="initTaskDefs">
     <echo>Building ${distributionName} ...</echo>
@@ -247,8 +250,9 @@ Do you want to continue?</input>
   </target>
 
   <target name="maven-compile" depends="compile-boot,process-classes" description="compiles Maven using the bootstrap Maven, skipping automated tests">
-    <java fork="true" classname="org.apache.maven.cli.MavenCli" failonerror="true">
+    <java fork="${maven-compile.fork}" classname="org.apache.maven.cli.MavenCli" failonerror="true" timeout="600000"  maxmemory="${maven-compile.maxmemory}">
       <!--jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000"/-->
+      <!--jvmarg value="${maven-compile.jvmargs}"/-->
       <classpath refid="maven.classpath" />
       <arg value="${maven.debug}" />
       <arg value="-B" />

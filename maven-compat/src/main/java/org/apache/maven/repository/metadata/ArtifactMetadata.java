@@ -28,7 +28,6 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
  * Artifact Metadata that is resolved independent of Artifact itself.
  *
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
  */
 public class ArtifactMetadata
 {
@@ -291,7 +290,7 @@ public class ArtifactMetadata
         return artifactExists;
     }
 
-    public void setArtifactExists(boolean artifactExists)
+    public void setArtifactExists( boolean artifactExists )
     {
         this.artifactExists = artifactExists;
     }
@@ -302,7 +301,7 @@ public class ArtifactMetadata
         return dependencies;
     }
 
-    public void setDependencies(Collection<ArtifactMetadata> dependencies)
+    public void setDependencies( Collection<ArtifactMetadata> dependencies )
     {
         this.dependencies = dependencies;
     }
@@ -312,7 +311,7 @@ public class ArtifactMetadata
         return artifactUri;
     }
 
-    public void setArtifactUri(String artifactUri)
+    public void setArtifactUri( String artifactUri )
     {
         this.artifactUri = artifactUri;
     }
@@ -322,23 +321,28 @@ public class ArtifactMetadata
     {
         return why;
     }
-    public void setWhy(String why)
+
+    public void setWhy( String why )
     {
         this.why = why;
     }
+
     //-------------------------------------------------------------------
     public String getError()
     {
         return error;
     }
-    public void setError(String error)
+
+    public void setError( String error )
     {
         this.error = error;
     }
+
     public boolean isError()
     {
         return error == null;
     }
+
     //------------------------------------------------------------------
     public String getDependencyConflictId()
     {

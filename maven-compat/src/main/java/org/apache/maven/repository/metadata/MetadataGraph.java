@@ -294,7 +294,7 @@ public class MetadataGraph
     //------------------------------------------------------------------------
     public List<MetadataGraphEdge> getEdgesBetween( MetadataGraphVertex vFrom, MetadataGraphVertex vTo )
     {
-        List<MetadataGraphEdge> edges = getIncidentEdges(vTo);
+        List<MetadataGraphEdge> edges = getIncidentEdges( vTo );
         if ( edges == null || edges.isEmpty() )
         {
             return null;

@@ -19,6 +19,7 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import java.util.concurrent.atomic.AtomicReference;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.LegacySupport;
 import org.codehaus.plexus.component.annotations.Component;
@@ -37,29 +38,30 @@ public class DefaultLegacySupport
     implements LegacySupport
 {
 
-    private static final ThreadLocal<MavenSession[]> session = new InheritableThreadLocal<MavenSession[]>();
+    private static final ThreadLocal<AtomicReference<MavenSession>> SESSION = new InheritableThreadLocal<AtomicReference<MavenSession>>();
 
     public void setSession( MavenSession session )
     {
-        if ( session == null )
+        AtomicReference<MavenSession> reference = DefaultLegacySupport.SESSION.get();
+        if ( reference != null )
         {
-            MavenSession[] oldSession = DefaultLegacySupport.session.get();
-            if ( oldSession != null )
-            {
-                oldSession[0] = null;
-                DefaultLegacySupport.session.remove();
-            }
+            reference.set( null );
+        }
+
+        if ( session == null && reference != null )
+        {
+            DefaultLegacySupport.SESSION.remove();
         }
         else
         {
-            DefaultLegacySupport.session.set( new MavenSession[] { session } );
+            DefaultLegacySupport.SESSION.set( new AtomicReference<MavenSession>( session ) );
         }
     }
 
     public MavenSession getSession()
     {
-        MavenSession[] currentSession = DefaultLegacySupport.session.get();
-        return currentSession != null ? currentSession[0] : null;
+        AtomicReference<MavenSession> currentSession = DefaultLegacySupport.SESSION.get();
+        return currentSession != null ? currentSession.get() : null;
     }
 
     public RepositorySystemSession getRepositorySession()

@@ -283,7 +283,7 @@ public abstract class AbstractStringBasedModelInterpolator
                                                                                                          pathTranslator ) );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     protected String interpolateInternal( String src, List<ValueSource> valueSources,
                                           List<InterpolationPostProcessor> postProcessors, boolean debug )
         throws ModelInterpolationException
@@ -296,7 +296,7 @@ public abstract class AbstractStringBasedModelInterpolator
         Logger logger = getLogger();
 
         String result = src;
-        synchronized( this )
+        synchronized ( this )
         {
 
             for ( ValueSource vs : valueSources )
@@ -315,7 +315,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 {
                     result = interpolator.interpolate( result, recursionInterceptor );
                 }
-                catch( InterpolationException e )
+                catch ( InterpolationException e )
                 {
                     throw new ModelInterpolationException( e.getMessage(), e );
                 }

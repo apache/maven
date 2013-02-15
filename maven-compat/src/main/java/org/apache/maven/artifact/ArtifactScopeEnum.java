@@ -108,7 +108,7 @@ public enum ArtifactScopeEnum
     {
         final ArtifactScopeEnum s = checkScope( scope );
 
-    	// system scope is historic only - and simple
+        // system scope is historic only - and simple
         if ( id == system.id )
         {
             return scope.id == system.id;

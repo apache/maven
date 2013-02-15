@@ -32,6 +32,10 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 
+/**
+ * Maven Artifact interface. Notice that it mixes artifact definition concepts (groupId, artifactId, version)
+ * with dependency information (version range, scope). 
+ */
 public interface Artifact
     extends Comparable<Artifact>
 {

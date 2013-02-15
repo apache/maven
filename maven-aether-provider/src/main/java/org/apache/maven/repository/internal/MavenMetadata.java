@@ -45,6 +45,8 @@ abstract class MavenMetadata
     implements MergeableMetadata
 {
 
+    static final String MAVEN_METADATA_XML = "maven-metadata.xml";
+
     private final File file;
 
     protected Metadata metadata;
@@ -59,7 +61,7 @@ abstract class MavenMetadata
 
     public String getType()
     {
-        return "maven-metadata.xml";
+        return MAVEN_METADATA_XML;
     }
 
     public File getFile()
@@ -86,7 +88,7 @@ abstract class MavenMetadata
 
     protected abstract void merge( Metadata recessive );
 
-    private Metadata read( File metadataFile )
+    static Metadata read( File metadataFile )
         throws RepositoryException
     {
         if ( metadataFile.length() <= 0 )

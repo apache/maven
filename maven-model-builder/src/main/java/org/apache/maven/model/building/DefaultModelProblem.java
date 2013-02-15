@@ -146,7 +146,8 @@ public class DefaultModelProblem
         return severity;
     }
 
-    public Version getVersion() {
+    public Version getVersion()
+    {
         return version;
     }
     
