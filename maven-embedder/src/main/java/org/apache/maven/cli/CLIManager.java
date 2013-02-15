@@ -97,6 +97,8 @@ public class CLIManager
 
     public static final String THREADS = "T";
 
+    public static final String LEGACY_LOCAL_REPOSITORY ="llr";
+
     protected Options options;
 
     @SuppressWarnings( "static-access" )
@@ -133,9 +135,9 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
+        options.addOption( OptionBuilder.withLongOpt( "legacy-local-repository" ).withDescription( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _maven.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).create( LEGACY_LOCAL_REPOSITORY ) );
 
         // Adding this back in for compatibility with the verifier that hard codes this option.
-
         options.addOption( OptionBuilder.withLongOpt( "no-plugin-registry" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "npr" ) );
         options.addOption( OptionBuilder.withLongOpt( "check-plugin-updates" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "cpu" ) );
         options.addOption( OptionBuilder.withLongOpt( "update-plugins" ).withDescription( "Ineffective, only kept for backward compatibility" ).create( "up" ) );

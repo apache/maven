@@ -43,7 +43,7 @@ public class DefaultArtifactRepositoryFactory
     private String globalChecksumPolicy;
 
     @Requirement( role = ArtifactRepositoryLayout.class )
-    private Map<String,ArtifactRepositoryLayout> repositoryLayouts;
+    private Map<String, ArtifactRepositoryLayout> repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )
         throws UnknownRepositoryLayoutException

@@ -83,6 +83,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
@@ -109,6 +110,9 @@ public class DefaultMavenPluginManager
 
     @Requirement
     private Logger logger;
+
+    @Requirement
+    private LoggerManager loggerManager;
 
     @Requirement
     private PlexusContainer container;
@@ -508,7 +512,8 @@ public class DefaultMavenPluginManager
 
             if ( mojo instanceof Mojo )
             {
-                ( (Mojo) mojo ).setLog( new DefaultLog( logger ) );
+                Logger mojoLogger = loggerManager.getLoggerForComponent( mojoDescriptor.getImplementation() );
+                ( (Mojo) mojo ).setLog( new DefaultLog( mojoLogger ) );
             }
 
             Xpp3Dom dom = mojoExecution.getConfiguration();

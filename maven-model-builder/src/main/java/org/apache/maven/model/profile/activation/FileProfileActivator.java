@@ -118,6 +118,8 @@ public class FileProfileActivator
             return false;
         }
 
+        interpolator.addValueSource( new MapBasedValueSource( context.getProjectProperties() ) );
+
         interpolator.addValueSource( new MapBasedValueSource( context.getUserProperties() ) );
 
         interpolator.addValueSource( new MapBasedValueSource( context.getSystemProperties() ) );

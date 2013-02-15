@@ -21,7 +21,6 @@ package org.apache.maven.artifact.repository;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * Describes a set of policies for a repository to use under certain conditions.

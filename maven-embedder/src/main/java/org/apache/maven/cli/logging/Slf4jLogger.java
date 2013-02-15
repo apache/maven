@@ -114,7 +114,7 @@ public class Slf4jLogger
     }
 
     /**
-     * <b>Warning</b>: ignored (always return <code>0</code>).
+     * <b>Warning</b>: ignored (always return <code>0 == Logger.LEVEL_DEBUG</code>).
      */
     public int getThreshold()
     {
@@ -129,7 +129,7 @@ public class Slf4jLogger
     }
 
     /**
-     * <b>Warning</b>: ignored (always return <code>0</code>).
+     * <b>Warning</b>: ignored (always return <code>null</code>).
      */
     public Logger getChildLogger( String name )
     {

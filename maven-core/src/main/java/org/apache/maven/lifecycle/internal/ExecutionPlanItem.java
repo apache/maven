@@ -94,8 +94,8 @@ public class ExecutionPlanItem
     @Override
     public String toString()
     {
-        return "ExecutionPlanItem{" + ", mojoExecution=" + mojoExecution + ", schedule=" + schedule + '}' +
-            super.toString();
+        return "ExecutionPlanItem{" + ", mojoExecution=" + mojoExecution + ", schedule=" + schedule + '}'
+            + super.toString();
     }
 
 }

@@ -49,7 +49,7 @@ public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
 
-    private static final Map<Class<?>, InterpolateObjectAction.CacheItem> cachedEntries =
+    private static final Map<Class<?>, InterpolateObjectAction.CacheItem> CACHED_ENTRIES =
         new ConcurrentHashMap<Class<?>, InterpolateObjectAction.CacheItem>( 80, 0.75f, 2 );
     // Empirical data from 3.x, actual =40
 
@@ -161,11 +161,11 @@ public class StringSearchModelInterpolator
 
         private CacheItem getCacheEntry( Class<?> cls )
         {
-            CacheItem cacheItem = cachedEntries.get( cls );
+            CacheItem cacheItem = CACHED_ENTRIES.get( cls );
             if ( cacheItem == null )
             {
                 cacheItem = new CacheItem( cls );
-                cachedEntries.put( cls, cacheItem );
+                CACHED_ENTRIES.put( cls, cacheItem );
             }
             return cacheItem;
         }
@@ -247,7 +247,7 @@ public class StringSearchModelInterpolator
                         }
                         else if ( Collection.class.isAssignableFrom( type ) )
                         {
-                            throw new RuntimeException("We dont interpolate into collections, use a list instead");
+                            throw new RuntimeException( "We dont interpolate into collections, use a list instead" );
                         }
                         else if ( Map.class.isAssignableFrom( type ) )
                         {
@@ -278,7 +278,7 @@ public class StringSearchModelInterpolator
             }
         }
 
-        static abstract class CacheField
+        abstract static class CacheField
         {
             protected final Field field;
 

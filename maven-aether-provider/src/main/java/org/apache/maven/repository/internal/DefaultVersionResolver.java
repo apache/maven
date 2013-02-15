@@ -20,7 +20,6 @@ package org.apache.maven.repository.internal;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,10 +30,8 @@ import java.util.Map;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.RepositoryCache;
 import org.sonatype.aether.RepositoryEvent.EventType;
@@ -68,14 +65,18 @@ import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
 import org.sonatype.aether.util.metadata.DefaultMetadata;
 
 /**
+ * Maven meta-version resolver: supports <code>*-SNAPSHOT</code>, <code>RELEASE</code> and <code>LATEST</code>
+ * meta-version resolution from
+ * <a href="../maven-repository-metadata/repository-metadata.html#class_versioning"><code>versioning</code>
+ * element in repositories' <code>maven-metadata.xml</code></a>.
+ * 
  * @author Benjamin Bentmann
+ * @see Versioning
  */
 @Component( role = VersionResolver.class )
 public class DefaultVersionResolver
     implements VersionResolver, Service
 {
-
-    private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
 
     private static final String RELEASE = "RELEASE";
 
@@ -83,7 +84,6 @@ public class DefaultVersionResolver
 
     private static final String SNAPSHOT = "SNAPSHOT";
 
-    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
@@ -143,8 +143,6 @@ public class DefaultVersionResolver
     public VersionResult resolveVersion( RepositorySystemSession session, VersionRequest request )
         throws VersionResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
-
         Artifact artifact = request.getArtifact();
 
         String version = artifact.getVersion();
@@ -169,132 +167,134 @@ public class DefaultVersionResolver
             }
         }
 
-        Metadata metadata;
-
         if ( RELEASE.equals( version ) )
         {
-            metadata =
-                new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                     Metadata.Nature.RELEASE );
+            Map<String, VersionInfo> infos = readVersionInfoMap( session, result, Metadata.Nature.RELEASE, null );
+
+            resolve( result, infos, RELEASE );
         }
         else if ( LATEST.equals( version ) )
         {
-            metadata =
-                new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                     Metadata.Nature.RELEASE_OR_SNAPSHOT );
+            Map<String, VersionInfo> infos =
+                readVersionInfoMap( session, result, Metadata.Nature.RELEASE_OR_SNAPSHOT, null );
+
+            if ( !resolve( result, infos, LATEST ) )
+            {
+                resolve( result, infos, RELEASE );
+            }
+
+            if ( result.getVersion() != null && result.getVersion().endsWith( SNAPSHOT ) )
+            {
+                VersionRequest subRequest = new VersionRequest();
+                subRequest.setArtifact( artifact.setVersion( result.getVersion() ) );
+                if ( result.getRepository() instanceof RemoteRepository )
+                {
+                    subRequest.setRepositories( Collections.singletonList( (RemoteRepository) result.getRepository() ) );
+                }
+                else
+                {
+                    subRequest.setRepositories( request.getRepositories() );
+                }
+                VersionResult subResult = resolveVersion( session, subRequest );
+                result.setVersion( subResult.getVersion() );
+                result.setRepository( subResult.getRepository() );
+                for ( Exception exception : subResult.getExceptions() )
+                {
+                    result.addException( exception );
+                }
+            }
         }
         else if ( version.endsWith( SNAPSHOT ) )
         {
             WorkspaceReader workspace = session.getWorkspaceReader();
             if ( workspace != null && workspace.findVersions( artifact ).contains( version ) )
             {
-                metadata = null;
+                result.setVersion( version );
                 result.setRepository( workspace.getRepository() );
+
+                return result;
             }
             else
             {
-                metadata =
-                    new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version, MAVEN_METADATA_XML,
-                                         Metadata.Nature.SNAPSHOT );
-            }
-        }
-        else
-        {
-            metadata = null;
-        }
+                Map<String, VersionInfo> infos =
+                                readVersionInfoMap( session, result, Metadata.Nature.SNAPSHOT, version );
 
-        if ( metadata == null )
-        {
-            result.setVersion( version );
-        }
-        else
-        {
-            List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
-
-            metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
-
-            for ( RemoteRepository repository : request.getRepositories() )
-            {
-                MetadataRequest metadataRequest =
-                    new MetadataRequest( metadata, repository, request.getRequestContext() );
-                metadataRequest.setDeleteLocalCopyIfMissing( true );
-                metadataRequest.setFavorLocalRepository( true );
-                metadataRequest.setTrace( trace );
-                metadataRequests.add( metadataRequest );
-            }
-
-            List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
-
-            Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
-
-            for ( MetadataResult metadataResult : metadataResults )
-            {
-                result.addException( metadataResult.getException() );
-
-                ArtifactRepository repository = metadataResult.getRequest().getRepository();
-                if ( repository == null )
-                {
-                    repository = session.getLocalRepository();
-                }
-
-                Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
-                merge( artifact, infos, versioning, repository );
-            }
-
-            if ( RELEASE.equals( version ) )
-            {
-                resolve( result, infos, RELEASE );
-            }
-            else if ( LATEST.equals( version ) )
-            {
-                if ( !resolve( result, infos, LATEST ) )
-                {
-                    resolve( result, infos, RELEASE );
-                }
-
-                if ( result.getVersion() != null && result.getVersion().endsWith( SNAPSHOT ) )
-                {
-                    VersionRequest subRequest = new VersionRequest();
-                    subRequest.setArtifact( artifact.setVersion( result.getVersion() ) );
-                    if ( result.getRepository() instanceof RemoteRepository )
-                    {
-                        subRequest.setRepositories( Collections.singletonList( (RemoteRepository) result.getRepository() ) );
-                    }
-                    else
-                    {
-                        subRequest.setRepositories( request.getRepositories() );
-                    }
-                    VersionResult subResult = resolveVersion( session, subRequest );
-                    result.setVersion( subResult.getVersion() );
-                    result.setRepository( subResult.getRepository() );
-                    for ( Exception exception : subResult.getExceptions() )
-                    {
-                        result.addException( exception );
-                    }
-                }
-            }
-            else
-            {
                 String key = SNAPSHOT + getKey( artifact.getClassifier(), artifact.getExtension() );
+
                 merge( infos, SNAPSHOT, key );
+
                 if ( !resolve( result, infos, key ) )
                 {
                     result.setVersion( version );
                 }
             }
+        }
+        else
+        {
+            result.setVersion( version );
 
-            if ( StringUtils.isEmpty( result.getVersion() ) )
-            {
-                throw new VersionResolutionException( result );
-            }
+            return result;
         }
 
-        if ( cacheKey != null && metadata != null && isSafelyCacheable( session, artifact ) )
+        if ( StringUtils.isEmpty( result.getVersion() ) )
+        {
+            throw new VersionResolutionException( result );
+        }
+
+        if ( cacheKey != null && isSafelyCacheable( session, artifact ) )
         {
             cache.put( session, cacheKey, new Record( result.getVersion(), result.getRepository() ) );
         }
 
         return result;
+    }
+
+    private Map<String, VersionInfo> readVersionInfoMap( RepositorySystemSession session, VersionResult result,
+                                                         Metadata.Nature nature, String version )
+    {
+        VersionRequest request = result.getRequest();
+        Artifact artifact = request.getArtifact();
+
+        Metadata metadata =
+            new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), version,
+                                 MavenMetadata.MAVEN_METADATA_XML, nature );
+
+        RequestTrace trace = DefaultRequestTrace.newChild( request.getTrace(), request );
+
+        List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() + 1 );
+
+        metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+
+        for ( RemoteRepository repository : request.getRepositories() )
+        {
+            MetadataRequest metadataRequest = new MetadataRequest( metadata, repository, request.getRequestContext() );
+            metadataRequest.setDeleteLocalCopyIfMissing( true );
+            metadataRequest.setFavorLocalRepository( true );
+            metadataRequest.setTrace( trace );
+
+            metadataRequests.add( metadataRequest );
+        }
+
+        List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
+
+        Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
+
+        for ( MetadataResult metadataResult : metadataResults )
+        {
+            result.addException( metadataResult.getException() );
+
+            ArtifactRepository repository = metadataResult.getRequest().getRepository();
+            if ( repository == null )
+            {
+                repository = session.getLocalRepository();
+            }
+
+            Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+
+            merge( request.getArtifact(), infos, versioning, repository );
+        }
+
+        return infos;
     }
 
     private boolean resolve( VersionResult result, Map<String, VersionInfo> infos, String key )
@@ -313,50 +313,41 @@ public class DefaultVersionResolver
     {
         Versioning versioning = null;
 
-        FileInputStream fis = null;
+
+        if ( metadata == null )
+        {
+            return new Versioning();
+        }
+
+        SyncContext syncContext = syncContextFactory.newInstance( session, true );
+
         try
         {
-            if ( metadata != null )
+            syncContext.acquire( null, Collections.singleton( metadata ) );
+
+            versioning = MavenMetadata.read( metadata.getFile() ).getVersioning();
+
+            /*
+             * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
+             * of the local repository. This is especially troublesome during snapshot resolution so we try
+             * to handle that gracefully.
+             */
+            if ( versioning != null && repository instanceof LocalRepository )
             {
-                SyncContext syncContext = syncContextFactory.newInstance( session, true );
-
-                try
+                Snapshot snapshot = versioning.getSnapshot();
+                if ( snapshot != null && snapshot.getBuildNumber() > 0 )
                 {
-                    syncContext.acquire( null, Collections.singleton( metadata ) );
+                    Versioning repaired = new Versioning();
+                    repaired.setLastUpdated( versioning.getLastUpdated() );
+                    snapshot = new Snapshot();
+                    snapshot.setLocalCopy( true );
+                    repaired.setSnapshot( snapshot );
 
-                    if ( metadata.getFile() != null && metadata.getFile().exists() )
-                    {
-                        fis = new FileInputStream( metadata.getFile() );
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-                        versioning = m.getVersioning();
+                    versioning = repaired;
 
-                        /*
-                         * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
-                         * of the local repository. This is especially troublesome during snapshot resolution so we try
-                         * to handle that gracefully.
-                         */
-                        if ( versioning != null && repository instanceof LocalRepository )
-                        {
-                            if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
-                            {
-                                Versioning repaired = new Versioning();
-                                repaired.setLastUpdated( versioning.getLastUpdated() );
-                                Snapshot snapshot = new Snapshot();
-                                snapshot.setLocalCopy( true );
-                                repaired.setSnapshot( snapshot );
-                                versioning = repaired;
-
-                                throw new IOException( "Snapshot information corrupted with remote repository data"
-                                    + ", please verify that no remote repository uses the id '" + repository.getId()
-                                    + "'" );
-                            }
-                        }
-                    }
-                }
-                finally
-                {
-                    syncContext.release();
+                    throw new IOException( "Snapshot information corrupted with remote repository data"
+                        + ", please verify that no remote repository uses the id '" + repository.getId()
+                        + "'" );
                 }
             }
         }
@@ -367,7 +358,7 @@ public class DefaultVersionResolver
         }
         finally
         {
-            IOUtil.close( fis );
+            syncContext.release();
         }
 
         return ( versioning != null ) ? versioning : new Versioning();

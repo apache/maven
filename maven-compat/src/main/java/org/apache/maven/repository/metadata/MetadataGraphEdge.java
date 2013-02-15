@@ -125,10 +125,10 @@ public class MetadataGraphEdge
         this.depth = depth;
     }
 
-	public boolean isResolved()
-	{
-		return resolved;
-	}
+    public boolean isResolved()
+    {
+        return resolved;
+    }
 
     public void setResolved( boolean resolved )
     {
@@ -175,7 +175,7 @@ public class MetadataGraphEdge
         this.target = target;
     }
 
-	@Override
+    @Override
     public String toString()
     {
         return "[ " + "FROM:("

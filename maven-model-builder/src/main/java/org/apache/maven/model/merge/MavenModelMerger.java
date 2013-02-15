@@ -52,7 +52,8 @@ import org.apache.maven.model.Scm;
 import org.apache.maven.model.Site;
 
 /**
- * The domain-specific model merger for the Maven POM.
+ * The domain-specific model merger for the Maven POM, overriding generic code from parent class when necessary with
+ * more adapted algorithms.
  *
  * @author Benjamin Bentmann
  */
@@ -631,45 +632,45 @@ public class MavenModelMerger
     }
 
     @Override
-    protected Object getPluginKey( Plugin object )
+    protected Object getPluginKey( Plugin plugin )
     {
-        return object.getKey();
+        return plugin.getKey();
     }
 
     @Override
-    protected Object getPluginExecutionKey( PluginExecution object )
+    protected Object getPluginExecutionKey( PluginExecution pluginExecution )
     {
-        return object.getId();
+        return pluginExecution.getId();
     }
 
     @Override
-    protected Object getReportPluginKey( ReportPlugin object )
+    protected Object getReportPluginKey( ReportPlugin reportPlugin )
     {
-        return object.getKey();
+        return reportPlugin.getKey();
     }
 
     @Override
-    protected Object getReportSetKey( ReportSet object )
+    protected Object getReportSetKey( ReportSet reportSet )
     {
-        return object.getId();
+        return reportSet.getId();
     }
 
     @Override
-    protected Object getRepositoryBaseKey( RepositoryBase object )
+    protected Object getRepositoryBaseKey( RepositoryBase repositoryBase )
     {
-        return object.getId();
+        return repositoryBase.getId();
     }
 
     @Override
-    protected Object getExtensionKey( Extension object )
+    protected Object getExtensionKey( Extension extension )
     {
-        return object.getGroupId() + ':' + object.getArtifactId();
+        return extension.getGroupId() + ':' + extension.getArtifactId();
     }
 
     @Override
-    protected Object getExclusionKey( Exclusion object )
+    protected Object getExclusionKey( Exclusion exclusion )
     {
-        return object.getGroupId() + ':' + object.getArtifactId();
+        return exclusion.getGroupId() + ':' + exclusion.getArtifactId();
     }
 
     private String appendPath( String parentPath, Map<Object, Object> context )

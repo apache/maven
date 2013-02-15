@@ -20,13 +20,10 @@ package org.apache.maven.profiles;
  */
 
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
-import org.apache.maven.model.profile.ProfileActivationContext;
 import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.profiles.activation.ProfileActivationException;
 import org.codehaus.plexus.MutablePlexusContainer;
@@ -36,13 +33,11 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 
 @Deprecated

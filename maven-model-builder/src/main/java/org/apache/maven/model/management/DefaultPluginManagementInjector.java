@@ -53,7 +53,7 @@ public class DefaultPluginManagementInjector
         merger.mergeManagedBuildPlugins( model );
     }
 
-    private static class ManagementModelMerger
+    protected static class ManagementModelMerger
         extends MavenModelMerger
     {
 

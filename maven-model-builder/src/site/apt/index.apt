@@ -24,23 +24,31 @@ Maven Model Builder
 
    ** profile activation (see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}})
 
-   ** model normalization
+   ** model normalization: <<<ModelNormalizer>>> ({{{./apidocs/org/apache/maven/model/normalization/ModelNormalizer.html}javadoc}}),
+   with its <<<DefaultModelNormalizer>>> implementation
+   ({{{./xref/org/apache/maven/model/normalization/DefaultModelNormalizer.html}source}})
 
    ** profile injection
 
    ** parent resolution until {{{./super-pom.html}super-pom}}
 
-   ** inheritance assembly
+   ** inheritance assembly: <<<InheritanceAssembler>>> ({{{./apidocs/org/apache/maven/model/inheritance/InheritanceAssembler.html}javadoc}}),
+   with its <<<DefaultInheritanceAssembler>>> implementation
+   ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}})
 
    ** model interpolation (see below)
 
-   ** url normalization
+   ** url normalization: <<<UrlNormalizer>>> ({{{./apidocs/org/apache/maven/model/path/UrlNormalizer.html}javadoc}}),
+   with its <<<DefaultUrlNormalizer>>> implementation
+   ({{{./xref/org/apache/maven/model/path/DefaultUrlNormalizer.html}source}})
 
    []
 
  * phase 2
 
-   ** model path translation
+   ** model path translation: <<<ModelPathTranslator>>> ({{{./apidocs/org/apache/maven/model/path/ModelPathTranslator.html}javadoc}}),
+   with its <<<DefaultModelPathTranslator>>> implementation
+   ({{{./xref/org/apache/maven/model/path/DefaultModelPathTranslator.html}source}})
 
    ** plugin management injection
 
@@ -56,7 +64,9 @@ Maven Model Builder
 
    ** <(optional)> plugins configuration
 
-   ** effective model validation
+   ** effective model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
+   with its <<<DefaultModelValidator>>> implementation
+   ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
 
    []
 
@@ -78,12 +88,12 @@ Maven Model Builder
 <<<pom.*>>> (<deprecated>)\
 <<<*>>> (<deprecated>) | POM content (see {{{../maven-model/maven.html}POM reference}}) | <<<$\{project.version\}>>>\
  | | <<<$\{project.build.finalName\}>>>\
- | | <<<$\{project.build.artifactId\}>>>\
+ | | <<<$\{project.artifactId\}>>>\
  | | <<<$\{project.build.directory\}>>> |
 *----+------+------+
-| <<<basedir>>>\
-<<<project.basedir>>>\
-<<<pom.basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |
+| <<<project.basedir>>>\
+<<<pom.basedir>>> (<deprecated>)\
+<<<basedir>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file | <<<$\{project.basedir\}>>> |
 *----+------+------+
 | <<<project.baseUri>>>\
 <<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |

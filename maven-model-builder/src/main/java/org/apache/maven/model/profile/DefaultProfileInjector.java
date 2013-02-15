@@ -71,7 +71,7 @@ public class DefaultProfileInjector
         }
     }
 
-    private static class ProfileModelMerger
+    protected static class ProfileModelMerger
         extends MavenModelMerger
     {
 

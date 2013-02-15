@@ -66,9 +66,9 @@ public class DefaultLifecycleBindingsInjector
 
         if ( defaultPlugins == null )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                     .setMessage( "Unknown packaging: " + packaging )
-                    .setLocation( model.getLocation( "packaging" )));
+                    .setLocation( model.getLocation( "packaging" ) ) );
         }
         else if ( !defaultPlugins.isEmpty() )
         {
@@ -80,7 +80,7 @@ public class DefaultLifecycleBindingsInjector
         }
     }
 
-    private static class LifecycleBindingsMerger
+    protected static class LifecycleBindingsMerger
         extends MavenModelMerger
     {
 

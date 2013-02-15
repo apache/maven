@@ -26,4 +26,10 @@ Maven Core
  ({{{./xref/org/apache/maven/plugin/internal/DefaultMavenPluginManager.html}source}}),
 
  * {{{./apidocs/org/apache/maven/plugin/PluginParameterExpressionEvaluator.html}PluginParameterExpressionEvaluator}}, used to
- evaluate plugin parameters values during Mojo configuration.
+ evaluate plugin parameters values during Mojo configuration,
+
+ * {{{/guides/mini/guide-maven-classloading.html}classloader hierarchy}} done by <<<ClassRealmManager>>> component
+ ({{{./apidocs/org/apache/maven/classrealm/ClassRealmManager.html}javadoc}}),
+ with its <<<DefaultClassRealmManager>>> implementation
+ ({{{./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html}source}}), using
+ {{{http://plexus.codehaus.org/plexus-classworlds/}Plexus Classworlds}}.

@@ -72,7 +72,7 @@ public class DefaultArtifactVersion
     {
         if ( otherVersion instanceof DefaultArtifactVersion )
         {
-            return this.comparable.compareTo( ( (DefaultArtifactVersion) otherVersion).comparable );
+            return this.comparable.compareTo( ( (DefaultArtifactVersion) otherVersion ).comparable );
         }
         else
         {

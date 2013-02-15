@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>22</version>
+    <version>23</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -30,7 +30,7 @@
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
-  <description>Maven is a project development management and
+  <description>Maven is a software build management and
     comprehension tool. Based on the concept of a project object model:
     builds, dependency management, documentation creation, site
     publication, and distribution publication are all controlled from
@@ -38,19 +38,19 @@
     number of other development tools for reporting or the build
     process.
   </description>
-  <url>${siteUrl}</url>
+  <url>http://maven.apache.org/ref/${project.version}</url>
   <inceptionYear>2001</inceptionYear>
 
   <properties>
-    <classWorldsVersion>2.4</classWorldsVersion>
+    <classWorldsVersion>2.4.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
-    <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.0.9</plexusUtilsVersion>
+    <plexusInterpolationVersion>1.16</plexusInterpolationVersion>
+    <plexusUtilsVersion>3.0.10</plexusUtilsVersion>
     <sisuInjectVersion>2.3.0</sisuInjectVersion>
-    <wagonVersion>2.3</wagonVersion>
+    <wagonVersion>2.4</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
     <modelloVersion>1.6</modelloVersion>
@@ -62,10 +62,7 @@
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
-
-    <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
-    <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
-
+    <maven.site.path>ref/3-LATEST</maven.site.path>
   </properties>
 
   <modules>
@@ -84,9 +81,10 @@
   </modules>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/maven-3/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-3/trunk</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/maven-3/trunk</url>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
+    <url>https://git-wip-us.apache.org/repos/asf?p=maven.git</url>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -94,12 +92,12 @@
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://builds.apache.org/job/maven-3.0.x/</url>
+    <url>https://builds.apache.org/job/maven-3.x/</url>
   </ciManagement>
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>${siteDeployUrl}</url>
+      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</url>
     </site>
   </distributionManagement>
 
@@ -213,7 +211,13 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4jVersion}</version>
-        <scope>runtime</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.0.7</version>
+        <optional>true</optional>
       </dependency>
       <!--  Wagon -->
       <dependency>
@@ -392,12 +396,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2-beta-5</version>
+          <version>2.4</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.0</version>
+          <version>1.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -410,6 +414,16 @@
               <version>1.3</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-publish-plugin</artifactId>
+          <version>1.0-beta-2</version>
+          <configuration>
+            <content>${project.build.directory}/staging/${maven.site.path}</content>
+            <checkoutDirectory>${maven.site.cache}/${maven.site.path}</checkoutDirectory>
+            <tryUpdate>true</tryUpdate>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -438,16 +452,6 @@
     </plugins>
   </build>
 
-  <reporting>
-    <plugins>
-      <plugin><!-- TODO remove when upgrading parent to 23 -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.6</version>
-      </plugin>
-    </plugins>
-  </reporting>
-
   <profiles>
     <profile>
       <id>apache-release</id>
@@ -472,29 +476,18 @@
       <id>reporting</id>
       <reporting>
         <plugins>
-          <plugin><!-- TODO remove when upgrading parent to 23 -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.6</version>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
               <linksource>true</linksource>
+              <notimestamp>true</notimestamp>
               <links combine.children="append">
                 <link>http://sonatype.github.com/sonatype-aether/apidocs/</link>
                 <link>http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/</link>
               </links>
             </configuration>
             <reportSets>
-              <reportSet>
-                <id>non-aggregate</id>
-                <reports>
-                  <report>javadoc</report>
-                  <report>test-javadoc</report>
-                </reports>
-              </reportSet>
               <reportSet>
                 <id>aggregate</id>
                 <inherited>false</inherited>
@@ -509,13 +502,6 @@
             <artifactId>maven-jxr-plugin</artifactId>
             <version>2.3</version>
             <reportSets>
-              <reportSet>
-                <id>non-aggregate</id>
-                <reports>
-                  <report>jxr</report>
-                  <report>test-jxr</report>
-                </reports>
-              </reportSet>
               <reportSet>
                 <id>aggregate</id>
                 <inherited>false</inherited>

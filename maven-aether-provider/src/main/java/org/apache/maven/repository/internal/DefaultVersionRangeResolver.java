@@ -19,7 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,10 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.aether.RepositoryEvent.EventType;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
@@ -69,9 +66,6 @@ public class DefaultVersionRangeResolver
     implements VersionRangeResolver, Service
 {
 
-    private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
-
-    @SuppressWarnings( "unused" )
     @Requirement
     private Logger logger = NullLogger.INSTANCE;
 
@@ -190,7 +184,7 @@ public class DefaultVersionRangeResolver
 
         Metadata metadata =
             new DefaultMetadata( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
-                                 MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
+                                 MavenMetadata.MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
 
         List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
 
@@ -244,39 +238,25 @@ public class DefaultVersionRangeResolver
     {
         Versioning versioning = null;
 
-        FileInputStream fis = null;
-        try
+        if ( metadata != null )
         {
-            if ( metadata != null )
+            SyncContext syncContext = syncContextFactory.newInstance( session, true );
+
+            try
             {
-                SyncContext syncContext = syncContextFactory.newInstance( session, true );
+                syncContext.acquire( null, Collections.singleton( metadata ) );
 
-                try
-                {
-                    syncContext.acquire( null, Collections.singleton( metadata ) );
-
-                    if ( metadata.getFile() != null && metadata.getFile().exists() )
-                    {
-                        fis = new FileInputStream( metadata.getFile() );
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-                        versioning = m.getVersioning();
-                    }
-                }
-                finally
-                {
-                    syncContext.release();
-                }
+                versioning = MavenMetadata.read( metadata.getFile() ).getVersioning();
             }
-        }
-        catch ( Exception e )
-        {
-            invalidMetadata( session, trace, metadata, repository, e );
-            result.addException( e );
-        }
-        finally
-        {
-            IOUtil.close( fis );
+            catch ( Exception e )
+            {
+                invalidMetadata( session, trace, metadata, repository, e );
+                result.addException( e );
+            }
+            finally
+            {
+                syncContext.release();
+            }
         }
 
         return ( versioning != null ) ? versioning : new Versioning();

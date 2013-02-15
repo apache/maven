@@ -69,4 +69,11 @@ public interface ProfileActivationContext
      */
     File getProjectDirectory();
 
+    /**
+     * Gets current calculated project properties
+     *
+     * @return The project properties, never {@code null}.
+     */
+    Map<String, String> getProjectProperties();
+
 }

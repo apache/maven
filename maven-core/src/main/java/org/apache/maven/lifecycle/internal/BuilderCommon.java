@@ -48,7 +48,7 @@ import java.util.Set;
 
 /**
  * Common code that is shared by the LifecycleModuleBuilder and the LifeCycleWeaveBuilder
- * 
+ *
  * @since 3.0
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
@@ -134,7 +134,8 @@ public class BuilderCommon
     }
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
-                                  final MavenProject mavenProject, Exception e, final long buildStartTime )
+                                  final MavenSession currentSession, final MavenProject mavenProject, Exception e,
+                                  final long buildStartTime )
     {
         if ( e instanceof RuntimeException )
         {
@@ -147,7 +148,7 @@ public class BuilderCommon
 
         buildContext.getResult().addBuildSummary( new BuildFailure( mavenProject, buildEndTime - buildStartTime, e ) );
 
-        eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, rootSession, null, e );
+        eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, currentSession, null, e );
 
         if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( rootSession.getReactorFailureBehavior() ) )
         {
@@ -185,6 +186,5 @@ public class BuilderCommon
     {
         return project.getGroupId() + ':' + project.getArtifactId() + ':' + project.getVersion();
     }
-
 
 }

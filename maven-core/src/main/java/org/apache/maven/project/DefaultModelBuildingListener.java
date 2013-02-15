@@ -97,9 +97,9 @@ class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                     .setMessage( "Invalid plugin repository: " + e.getMessage() )
-                    .setException( e ));
+                    .setException( e ) );
         }
         project.setPluginArtifactRepositories( pluginRepositories );
 
@@ -115,15 +115,15 @@ class DefaultModelBuildingListener
             }
             catch ( PluginResolutionException e )
             {
-                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
-                        .setMessage( "Unresolveable build extension: " + e.getMessage())
-                        .setException( e ));
+                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Unresolveable build extension: " + e.getMessage() )
+                        .setException( e ) );
             }
             catch ( PluginVersionResolutionException e )
             {
-                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                         .setMessage( "Unresolveable build extension: " + e.getMessage() )
-                        .setException( e ));
+                        .setException( e ) );
             }
 
             projectBuildingHelper.selectProjectRealm( project );
@@ -138,9 +138,9 @@ class DefaultModelBuildingListener
         }
         catch ( Exception e )
         {
-            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE)
+            event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                     .setMessage( "Invalid artifact repository: " + e.getMessage() )
-                    .setException( e ));
+                    .setException( e ) );
         }
         project.setRemoteArtifactRepositories( remoteRepositories );
     }

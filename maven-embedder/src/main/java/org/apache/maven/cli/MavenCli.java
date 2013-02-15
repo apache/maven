@@ -39,7 +39,10 @@ import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
+import org.apache.maven.cli.logging.Slf4jConfiguration;
+import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
+import org.apache.maven.cli.logging.Slf4jStdoutLogger;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
@@ -55,7 +58,6 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
-import org.apache.maven.plugin.PluginRealmCache;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
@@ -208,6 +210,7 @@ public class MavenCli
             settings( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
+            repository( cliRequest );
             return execute( cliRequest );
         }
         catch ( ExitException e )
@@ -233,7 +236,7 @@ public class MavenCli
         }
         finally
         {
-            if (localContainer != null)
+            if ( localContainer != null )
             {
                 localContainer.dispose();
             }
@@ -262,6 +265,12 @@ public class MavenCli
     private void cli( CliRequest cliRequest )
         throws Exception
     {
+        //
+        // Parsing errors can happen during the processing of the arguments and we prefer not having to check if the logger is null
+        // and construct this so we can use an SLF4J logger everywhere.
+        //
+        slf4jLogger = new Slf4jStdoutLogger();
+
         CLIManager cliManager = new CLIManager();
 
         try
@@ -288,36 +297,40 @@ public class MavenCli
         }
     }    
 
-    //
-    // All logging is handled by SFL4J
-    //
+    /**
+     * configure logging
+     */
     private void logging( CliRequest cliRequest )
     {
         cliRequest.debug = cliRequest.commandLine.hasOption( CLIManager.DEBUG );
         cliRequest.quiet = !cliRequest.debug && cliRequest.commandLine.hasOption( CLIManager.QUIET );
         cliRequest.showErrors = cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.ERRORS );
 
+        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
+        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration( slf4jLoggerFactory );
+
         if ( cliRequest.debug )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_DEBUG );
-            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "debug" );            
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.DEBUG );
         }
         else if ( cliRequest.quiet )
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_ERROR );
-            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "error" );            
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.ERROR );
         }
         else
         {
             cliRequest.request.setLoggingLevel( MavenExecutionRequest.LOGGING_LEVEL_INFO );
-            System.setProperty( "org.slf4j.simpleLogger.defaultLogLevel", "info" );
+            slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.INFO );
         }
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
-            System.setProperty( "org.slf4j.simpleLogger.logFile", logFile.getAbsolutePath() );
+
+            // redirect stdout and stderr to file
             try
             {
                 PrintStream ps = new PrintStream( new FileOutputStream( logFile ) );
@@ -332,8 +345,9 @@ public class MavenCli
             }
         }
 
+        slf4jConfiguration.activate();
+
         plexusLoggerManager = new Slf4jLoggerManager();
-        slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
         slf4jLogger = slf4jLoggerFactory.getLogger( this.getClass().getName() );
     }
 
@@ -377,29 +391,27 @@ public class MavenCli
 
         DefaultPlexusContainer container = null;
 
-            ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld( cliRequest.classWorld )
-                .setRealm( setupContainerRealm( cliRequest ) )
-                .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
-                .setAutoWiring( true )
-                .setName( "maven" );
+        ContainerConfiguration cc = new DefaultContainerConfiguration()
+            .setClassWorld( cliRequest.classWorld )
+            .setRealm( setupContainerRealm( cliRequest ) )
+            .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
+            .setAutoWiring( true )
+            .setName( "maven" );
 
-            container = new DefaultPlexusContainer( cc, new AbstractModule()
+        container = new DefaultPlexusContainer( cc, new AbstractModule()
+        {
+            protected void configure()
             {
+                bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
+            }
+        } );
 
-                protected void configure()
-                {
-                    bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
-                }
+        // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
+        container.setLookupRealm( null );
 
-            } );
+        container.setLoggerManager( plexusLoggerManager );
 
-            // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
-            container.setLookupRealm( null );
-
-            container.setLoggerManager( plexusLoggerManager );
-
-            customizeContainer( container );
+        customizeContainer( container );
 
         container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
 
@@ -524,6 +536,15 @@ public class MavenCli
             System.out.println( cipher.encryptAndDecorate( passwd, masterPasswd ) );
 
             throw new ExitException( 0 );
+        }
+    }
+
+    private void repository( CliRequest cliRequest )
+        throws Exception
+    {
+        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY ) || Boolean.getBoolean( "maven.legacyLocalRepo" ) )
+        {
+           cliRequest.request.setUseLegacyLocalRepository( true );
         }
     }
 
@@ -888,7 +909,7 @@ public class MavenCli
             transferListener = getBatchTransferListener();
         }
 
-        ExecutionListener executionListener = new ExecutionEventLogger( slf4jLogger );
+        ExecutionListener executionListener = new ExecutionEventLogger();
         executionListener = eventSpyDispatcher.chainListener( executionListener );
 
         String alternatePomFile = null;
@@ -1154,7 +1175,7 @@ public class MavenCli
     
     protected TransferListener getBatchTransferListener()
     {
-        return new Slf4jMavenTransferListener( slf4jLogger );
+        return new Slf4jMavenTransferListener();
     }
     
     protected void customizeContainer( PlexusContainer container )

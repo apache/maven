@@ -79,7 +79,7 @@ public interface ProjectBuildingRequest
      */
     Properties getUserProperties();
 
-    void setProject(MavenProject mavenProject);
+    void setProject( MavenProject mavenProject );
 
     MavenProject getProject();
 

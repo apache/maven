@@ -108,9 +108,9 @@ public class DefaultReportingConverter
             && request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 )
         {
 
-            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V31)
-                    .setMessage( "The <reporting> section is deprecated, please move the reports to the <configuration> section of the new Maven Site Plugin.")
-                    .setLocation( reporting.getLocation( "" ) ));
+            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V31 )
+                    .setMessage( "The <reporting> section is deprecated, please move the reports to the <configuration> section of the new Maven Site Plugin." )
+                    .setLocation( reporting.getLocation( "" ) ) );
         }
 
         for ( ReportPlugin plugin : reporting.getPlugins() )

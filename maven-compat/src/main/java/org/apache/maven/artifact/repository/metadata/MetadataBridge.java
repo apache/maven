@@ -24,7 +24,6 @@ import java.io.File;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.aether.RepositoryException;
 import org.sonatype.aether.metadata.MergeableMetadata;
