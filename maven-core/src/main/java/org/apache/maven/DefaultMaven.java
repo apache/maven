@@ -389,18 +389,18 @@ public class DefaultMaven
             logger.warn( "Disabling enhanced local repository: using legacy is stronlgy discouraged to ensure build reproducibility." );
             try
             {
-                session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( localRepo ) );
+                session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( session, localRepo ) );
             }
             catch ( NoLocalRepositoryManagerException e )
             {
 
                 logger.warn( "Failed to configure legacy local repository: back to default" );
-                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
             }
         }
         else
         {
-            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( localRepo ) );
+            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
         }
 
         if ( request.getWorkspaceReader() != null )

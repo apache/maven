@@ -1853,7 +1853,7 @@ public class PomConstructionTest
 
         DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
         LocalRepository localRepo = new LocalRepository( config.getLocalRepository().getBasedir() );
-        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( localRepo ) );
+        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
         config.setRepositorySession( repoSession );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );

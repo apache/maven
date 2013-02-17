@@ -361,7 +361,7 @@ public abstract class AbstractArtifactComponentTestCase
         session.setDependencyGraphTransformer( transformer );
 
         LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( localRepo ) );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
 
         return session;
     }

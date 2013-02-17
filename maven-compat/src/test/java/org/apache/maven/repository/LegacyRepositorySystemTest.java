@@ -124,7 +124,7 @@ public class LegacyRepositorySystemTest
                             
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( localRepo ) );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
         LegacySupport legacySupport = lookup( LegacySupport.class );
         legacySupport.setSession( new MavenSession( getContainer(), session, new DefaultMavenExecutionRequest(),
                                                     new DefaultMavenExecutionResult() ) );
