@@ -31,7 +31,7 @@ import org.apache.maven.it.util.ResourceExtractor;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1830">MNG-1830</a>.
  * 
  * @author Brett Porter
- * @version $Id$
+ * @version $Id: ba3c28edf533dba3dfa60e384a670575e0cd6901 $
  */
 public class MavenITmng1830ShowVersionTest
     extends AbstractMavenIntegrationTestCase
@@ -56,15 +56,15 @@ public class MavenITmng1830ShowVersionTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-                       
+
         boolean apacheVersionInTheRightFormatWasFound = false;
-        List lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        for( Iterator i = lines.iterator(); i.hasNext(); )
+        List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        for( Iterator<String> i = lines.iterator(); i.hasNext(); )
         {
-            String line = (String) i.next();
+            String line = i.next();
             if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) 
              ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) 
-             ||  line.matches( "^Apache Maven (.*?) \\([0-9a-f]{5,40}; .*\\)$" ) )
+             ||  line.matches( "^Apache Maven (.*?) \\([0-9a-z]{5,41}; .*\\)$" ) )
             {
                 apacheVersionInTheRightFormatWasFound = true;
                 // check timestamp parses
