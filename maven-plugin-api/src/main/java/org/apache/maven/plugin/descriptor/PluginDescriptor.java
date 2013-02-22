@@ -249,6 +249,12 @@ public class PluginDescriptor
         artifactMap = null;
     }
 
+    /**
+     * The map of artifacts accessible by the versionlessKey, i.e. groupId:artifactId
+     * 
+     * @return a Map of artifacts, never {@code null}
+     * @see #getArtifacts()
+     */
     public Map<String, Artifact> getArtifactMap()
     {
         if ( artifactMap == null )
