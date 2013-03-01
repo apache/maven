@@ -109,8 +109,12 @@ public class DefaultModelBuildingRequest
         return this;
     }
 
-    public ModelSource getModelSource()
+    public synchronized ModelSource getModelSource()
     {
+        if ( modelSource == null && pomFile != null )
+        {
+            modelSource = new FileModelSource( pomFile );
+        }
         return modelSource;
     }
 

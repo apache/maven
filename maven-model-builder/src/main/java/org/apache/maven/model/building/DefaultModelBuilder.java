@@ -257,8 +257,8 @@ public class DefaultModelBuilder
 
         problems.setRootModel( inputModel );
 
-        ModelData resultData = new ModelData( inputModel );
-        ModelData superData = new ModelData( getSuperModel() );
+        ModelData resultData = new ModelData( request.getModelSource(), inputModel );
+        ModelData superData = new ModelData( null, getSuperModel() );
 
         Collection<String> parentIds = new LinkedHashSet<String>();
         parentIds.add( ModelProblemUtils.toId( inputModel ) );
@@ -304,7 +304,7 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            currentData = readParent( tmpModel, request, problems );
+            currentData = readParent( tmpModel, currentData.getSource(), request, problems );
 
             if ( currentData == null )
             {
@@ -644,7 +644,7 @@ public class DefaultModelBuilder
         return result;
     }
 
-    private ModelData readParent( Model childModel, ModelBuildingRequest request,
+    private ModelData readParent( Model childModel, ModelSource childSource, ModelBuildingRequest request,
                                   DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
@@ -662,7 +662,7 @@ public class DefaultModelBuilder
 
             if ( parentData == null )
             {
-                parentData = readParentLocally( childModel, request, problems );
+                parentData = readParentLocally( childModel, childSource, request, problems );
 
                 if ( parentData == null )
                 {
@@ -683,9 +683,10 @@ public class DefaultModelBuilder
                 File pomFile = parentData.getModel().getPomFile();
                 if ( pomFile != null )
                 {
-                    File expectedParentFile = getParentPomFile( childModel );
+                    ModelSource expectedParentSource = getParentPomFile( childModel, childSource );
 
-                    if ( !pomFile.equals( expectedParentFile ) )
+                    if ( expectedParentSource instanceof ModelSource2
+                        && !pomFile.toURI().equals( ( (ModelSource2) expectedParentSource ).getLocationURI() ) )
                     {
                         parentData = readParentExternally( childModel, request, problems );
                     }
@@ -710,18 +711,24 @@ public class DefaultModelBuilder
         return parentData;
     }
 
-    private ModelData readParentLocally( Model childModel, ModelBuildingRequest request,
+    private ModelData readParentLocally( Model childModel, ModelSource childSource, ModelBuildingRequest request,
                                          DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        File pomFile = getParentPomFile( childModel );
+        ModelSource candidateSource = getParentPomFile( childModel, childSource );
 
-        if ( pomFile == null || !pomFile.isFile() )
+        if ( candidateSource == null )
         {
             return null;
         }
 
-        Model candidateModel = readModel( null, pomFile, request, problems );
+        File pomFile = null;
+        if ( candidateSource instanceof FileModelSource )
+        {
+            pomFile = ( (FileModelSource) candidateSource ).getPomFile();
+        }
+
+        Model candidateModel = readModel( candidateSource, pomFile, request, problems );
 
         String groupId = candidateModel.getGroupId();
         if ( groupId == null && candidateModel.getParent() != null )
@@ -761,16 +768,14 @@ public class DefaultModelBuilder
             return null;
         }
 
-        ModelData parentData = new ModelData( candidateModel, groupId, artifactId, version );
+        ModelData parentData = new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
 
         return parentData;
     }
 
-    private File getParentPomFile( Model childModel )
+    private ModelSource getParentPomFile( Model childModel, ModelSource source )
     {
-        File projectDirectory = childModel.getProjectDirectory();
-
-        if ( projectDirectory == null )
+        if ( !( source instanceof ModelSource2 ) )
         {
             return null;
         }
@@ -782,16 +787,7 @@ public class DefaultModelBuilder
             return null;
         }
 
-        parentPath = parentPath.replace( '\\', File.separatorChar ).replace( '/', File.separatorChar );
-
-        File pomFile = new File( new File( projectDirectory, parentPath ).toURI().normalize() );
-
-        if ( pomFile.isDirectory() )
-        {
-            pomFile = modelProcessor.locatePom( pomFile );
-        }
-
-        return pomFile;
+        return ( (ModelSource2) source ).getRelatedSource( parentPath );
     }
 
     private ModelData readParentExternally( Model childModel, ModelBuildingRequest request,
@@ -867,7 +863,7 @@ public class DefaultModelBuilder
 
         Model parentModel = readModel( modelSource, null, lenientRequest, problems );
 
-        ModelData parentData = new ModelData( parentModel, groupId, artifactId, version );
+        ModelData parentData = new ModelData( modelSource, parentModel, groupId, artifactId, version );
 
         return parentData;
     }

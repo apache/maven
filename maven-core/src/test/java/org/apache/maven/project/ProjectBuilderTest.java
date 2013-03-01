@@ -24,6 +24,8 @@ import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelSource;
 
 public class ProjectBuilderTest
     extends AbstractCoreMavenComponentTestCase
@@ -48,5 +50,19 @@ public class ProjectBuilderTest
         // right now it's not valid to ask for artifacts unless plugins require the artifacts.
         
         project.getCompileClasspathElements();
+    }
+
+    public void testBuildFromModelSource()
+        throws Exception
+    {
+        File pomFile = new File( "src/test/resources/projects/modelsource/module01/pom.xml" );
+        MavenSession mavenSession = createMavenSession( pomFile );
+        ProjectBuildingRequest configuration = new DefaultProjectBuildingRequest();
+        configuration.setRepositorySession( mavenSession.getRepositorySession() );
+        ModelSource modelSource = new FileModelSource( pomFile );
+        ProjectBuildingResult result =
+            lookup( org.apache.maven.project.ProjectBuilder.class ).build( modelSource, configuration );
+
+        assertNotNull( result.getProject().getParentFile() );
     }
 }

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.ModelSource2;
 
 /**
  * Builds in-memory descriptions of projects.
@@ -74,6 +75,8 @@ public interface ProjectBuilder
      * @param request The project building request that holds further parameters, must not be {@code null}.
      * @return The result of the project building, never {@code null}.
      * @throws ProjectBuildingException If the project descriptor could not be successfully built.
+     * 
+     * @see ModelSource2
      */
     ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException;

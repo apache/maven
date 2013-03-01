@@ -32,6 +32,7 @@ import org.apache.maven.model.Profile;
  */
 class ModelData
 {
+    private final ModelSource source;
 
     private Model model;
 
@@ -50,8 +51,9 @@ class ModelData
      * 
      * @param model The model to wrap, may be {@code null}.
      */
-    public ModelData( Model model )
+    public ModelData( ModelSource source, Model model )
     {
+        this.source = source;
         this.model = model;
     }
 
@@ -63,12 +65,18 @@ class ModelData
      * @param artifactId The effective artifact identifier of the model, may be {@code null}.
      * @param version The effective version of the model, may be {@code null}.
      */
-    public ModelData( Model model, String groupId, String artifactId, String version )
+    public ModelData( ModelSource source, Model model, String groupId, String artifactId, String version )
     {
+        this.source = source;
         this.model = model;
         setGroupId( groupId );
         setArtifactId( artifactId );
         setVersion( version );
+    }
+
+    public ModelSource getSource()
+    {
+        return source;
     }
 
     /**

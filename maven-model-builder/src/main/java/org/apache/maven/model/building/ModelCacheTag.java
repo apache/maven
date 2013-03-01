@@ -83,7 +83,7 @@ interface ModelCacheTag<T>
         public ModelData intoCache( ModelData data )
         {
             Model model = ( data.getModel() != null ) ? data.getModel().clone() : null;
-            return new ModelData( model, data.getGroupId(), data.getArtifactId(), data.getVersion() );
+            return new ModelData( data.getSource(), model, data.getGroupId(), data.getArtifactId(), data.getVersion() );
         }
 
         public ModelData fromCache( ModelData data )
