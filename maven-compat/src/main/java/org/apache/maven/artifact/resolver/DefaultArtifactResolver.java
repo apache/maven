@@ -115,7 +115,7 @@ public class DefaultArtifactResolver
         else
         {
             executor =
-                new ThreadPoolExecutor( 0, threads, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+                new ThreadPoolExecutor( threads, threads, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
                                         new DaemonThreadCreator() );
         }
     }
