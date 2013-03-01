@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
@@ -83,6 +84,7 @@ public class PluginParameterException
             boolean isArray = param.getType().endsWith( "[]" );
             boolean isCollection = false;
             boolean isMap = false;
+            boolean isProperties = false;
             if ( !isArray )
             {
                 try
@@ -90,6 +92,7 @@ public class PluginParameterException
                     //assuming Type is available in current ClassLoader
                     isCollection = Collection.class.isAssignableFrom( Class.forName( param.getType() ) );
                     isMap = Map.class.isAssignableFrom( Class.forName( param.getType() ) );
+                    isProperties = Properties.class.isAssignableFrom( Class.forName( param.getType() ) );
                 }
                 catch ( ClassNotFoundException e )
                 {
@@ -106,6 +109,13 @@ public class PluginParameterException
                 messageBuffer.append(  '\n' );
                 messageBuffer.append( "    <item>" );
             }
+            else if ( isProperties )
+            {
+                messageBuffer.append(  '\n' );
+                messageBuffer.append( "    <property>\n" );
+                messageBuffer.append( "      <name>KEY</name>\n" );
+                messageBuffer.append( "      <value>" );
+            }
             else if ( isMap )
             {
                 messageBuffer.append(  '\n' );
@@ -116,7 +126,13 @@ public class PluginParameterException
             {
                 messageBuffer.append( "</item>\n" );
                 messageBuffer.append( "  " );
-            }    
+            }
+            else if ( isProperties )
+            {
+                messageBuffer.append( "</value>\n" );
+                messageBuffer.append( "    </property>\n" );
+                messageBuffer.append( "  " );
+            }
             else if ( isMap )
             {
                 messageBuffer.append( "</KEY>\n" );
