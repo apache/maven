@@ -60,7 +60,7 @@ under the License.
           <characterParam>X</characterParam>
           <stringParam>Hello World!</stringParam>
           <fileParam>pom.xml</fileParam>
-          <dateParam>2008-11-09 11:59:03.0 PM</dateParam>
+          <dateParam>2008-11-09 11:59:03.0 AM</dateParam>
           <urlParam>http://maven.apache.org/</urlParam>
           <stringParams>
             <stringParam>one</stringParam>
