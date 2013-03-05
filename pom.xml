@@ -101,6 +101,12 @@
     </site>
   </distributionManagement>
 
+  <contributors>
+    <contributor>
+      <name>Stuart McCulloch</name>
+    </contributor>
+  </contributors>
+
   <!--bootstrap-start-comment-->
   <dependencyManagement>
     <!--bootstrap-end-comment-->
