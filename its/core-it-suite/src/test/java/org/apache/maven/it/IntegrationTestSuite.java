@@ -107,6 +107,7 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
         //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
+        suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
         suite.addTestSuite( MavenITmng5387ArtifactReplacementPlugin.class );
         suite.addTestSuite( MavenITmng5382Jsr330Plugin.class );
         suite.addTestSuite( MavenITmng5338FileOptionToDirectory.class );
