@@ -6,43 +6,30 @@
   <artifactId>mng5445-it</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
-  <name>Test legacy StringSearchModelInterpolator</name>
+  <name>Test StringSearchModelInterpolator with path-based properties</name>
   <url>http://maven.apache.org</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <myDirectory>${project.build.sourceDirectory}/foo</myDirectory>
   </properties>
-
-  <prerequisites>
-    <maven>2.2.1</maven>
-  </prerequisites>
 
   <build>
     <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>0.1-stub-SNAPSHOT</version>
-        <configuration>
-          <testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>
-          <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>versions-maven-plugin</artifactId>
-        <version>2.0</version>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-model-interpolation</artifactId>
+        <version>2.1-SNAPSHOT</version>
         <executions>
           <execution>
-            <id>test-display-plugin-updates</id>
-            <phase>validate</phase>
             <goals>
-              <goal>display-plugin-updates</goal>
+              <goal>path-interpolation</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

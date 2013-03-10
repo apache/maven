@@ -19,10 +19,9 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.util.ResourceExtractor;
-
 import java.io.File;
-import java.util.Properties;
+
+import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5445">MNG-5445</a>.
@@ -33,7 +32,7 @@ public class MavenITmng5445LegacyStringSearchModelInterpolatorTest
 
     public MavenITmng5445LegacyStringSearchModelInterpolatorTest()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.1,)" );
     }
 
     /**
