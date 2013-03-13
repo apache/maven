@@ -49,7 +49,10 @@
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.16</plexusInterpolationVersion>
     <plexusUtilsVersion>3.0.10</plexusUtilsVersion>
-    <sisuInjectVersion>2.3.0</sisuInjectVersion>
+    <!-- last Java5 release of Guava -->
+    <guavaVersion>11.0.2</guavaVersion>
+    <guiceVersion>3.1.3</guiceVersion>
+    <sisuInjectVersion>0.0.0.M2</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
@@ -176,16 +179,25 @@
         <version>${plexusUtilsVersion}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guavaVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-plexus</artifactId>
+        <artifactId>sisu-guice</artifactId>
+        <version>${guiceVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-guice</artifactId>
+        <version>${guiceVersion}</version>
+        <classifier>no_aop</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>org.eclipse.sisu.plexus</artifactId>
         <version>${sisuInjectVersion}</version>
-        <exclusions>
-          <exclusion>
-            <!-- Decouple build from MNG-3443 and ensure optional/unused dependency from sisu-guice stays out -->
-            <groupId>org.sonatype.sisu.inject</groupId>
-            <artifactId>cglib</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -277,6 +289,10 @@
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
