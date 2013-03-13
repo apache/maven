@@ -199,11 +199,10 @@ public class DefaultClassRealmManager
         imports.put( "org.codehaus.plexus.logging", coreRealm );
         imports.put( "org.codehaus.plexus.personality", coreRealm );
 
-        // javax.inject, sisu-inject (JSR-330)
+        // javax.inject (JSR-330)
         imports.put( "javax.inject.*", coreRealm );
         imports.put( "javax.enterprise.inject.*", coreRealm );
-        imports.put( "org.sonatype.inject.*", coreRealm );
-        
+
         // com.google
         //
         // We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
