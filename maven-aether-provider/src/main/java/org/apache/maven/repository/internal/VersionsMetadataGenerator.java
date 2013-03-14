@@ -25,12 +25,12 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.deployment.DeployRequest;
-import org.sonatype.aether.impl.MetadataGenerator;
-import org.sonatype.aether.installation.InstallRequest;
-import org.sonatype.aether.metadata.Metadata;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.deployment.DeployRequest;
+import org.eclipse.aether.impl.MetadataGenerator;
+import org.eclipse.aether.installation.InstallRequest;
+import org.eclipse.aether.metadata.Metadata;
 
 /**
  * @author Benjamin Bentmann

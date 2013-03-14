@@ -19,7 +19,7 @@ import org.apache.maven.plugin.version.PluginVersionRequest;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * @author Kristian Rosenvold

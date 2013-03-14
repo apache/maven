@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.repository.RemoteRepository;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Caches raw plugin descriptors. A raw plugin descriptor is a descriptor that has just been extracted from the plugin

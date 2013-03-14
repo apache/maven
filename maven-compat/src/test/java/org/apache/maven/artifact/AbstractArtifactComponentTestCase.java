@@ -36,26 +36,30 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.collection.DependencyManager;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.collection.DependencyTraverser;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.graph.manager.ClassicDependencyManager;
-import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-import org.sonatype.aether.util.graph.selector.ExclusionDependencySelector;
-import org.sonatype.aether.util.graph.selector.OptionalDependencySelector;
-import org.sonatype.aether.util.graph.selector.ScopeDependencySelector;
-import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
-import org.sonatype.aether.util.graph.transformer.NearestVersionConflictResolver;
-import org.sonatype.aether.util.graph.transformer.ConflictMarker;
-import org.sonatype.aether.util.graph.transformer.JavaDependencyContextRefiner;
-import org.sonatype.aether.util.graph.transformer.JavaEffectiveScopeCalculator;
-import org.sonatype.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencyManager;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.collection.DependencyTraverser;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
+import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
+import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -66,7 +70,14 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactFactory artifactFactory;
 
     protected ArtifactRepositoryFactory artifactRepositoryFactory;
-    
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+    }
+
     @Override
     protected void setUp()
         throws Exception
@@ -331,8 +342,7 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
-        session.setIgnoreMissingArtifactDescriptor( true );
-        session.setIgnoreInvalidArtifactDescriptor( true );
+        session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
         DependencyTraverser depTraverser = new FatArtifactTraverser();
         session.setDependencyTraverser( depTraverser );
 
@@ -345,12 +355,13 @@ public abstract class AbstractArtifactComponentTestCase
         session.setDependencySelector( depFilter );
 
         DependencyGraphTransformer transformer =
-            new ChainedDependencyGraphTransformer( new ConflictMarker(), new JavaEffectiveScopeCalculator(),
-                                                   new NearestVersionConflictResolver(),
-                                                   new JavaDependencyContextRefiner() );
+            new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
+                                  new SimpleOptionalitySelector(), new JavaScopeDeriver() );
+        new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
         session.setDependencyGraphTransformer( transformer );
 
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepository().getBasedir() ) );
+        LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
 
         return session;
     }

@@ -22,6 +22,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -33,6 +34,13 @@ public class LegacyRepositorySystemTest
     extends PlexusTestCase
 {
     private RepositorySystem repositorySystem;
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    {
+        super.customizeContainerConfiguration( containerConfiguration );
+        containerConfiguration.setAutoWiring( true );
+    }
 
     @Override
     protected void setUp()

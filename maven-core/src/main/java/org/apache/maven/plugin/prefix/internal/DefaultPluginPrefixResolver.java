@@ -38,20 +38,19 @@ import org.apache.maven.plugin.prefix.PluginPrefixResult;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
-import org.sonatype.aether.resolution.MetadataRequest;
-import org.sonatype.aether.resolution.MetadataResult;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.util.metadata.DefaultMetadata;
+import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.metadata.DefaultMetadata;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.resolution.MetadataRequest;
+import org.eclipse.aether.resolution.MetadataResult;
 
 /**
  * Resolves a plugin prefix.
@@ -163,13 +162,13 @@ public class DefaultPluginPrefixResolver
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request )
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+        RequestTrace trace = RequestTrace.newChild( null, request );
 
         List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
 
         for ( String pluginGroup : request.getPluginGroups() )
         {
-            org.sonatype.aether.metadata.Metadata metadata =
+            org.eclipse.aether.metadata.Metadata metadata =
                 new DefaultMetadata( pluginGroup, "maven-metadata.xml", DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT );
 
             requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ).setTrace( trace ) );
@@ -213,7 +212,7 @@ public class DefaultPluginPrefixResolver
     {
         for ( MetadataResult res : results )
         {
-            org.sonatype.aether.metadata.Metadata metadata = res.getMetadata();
+            org.eclipse.aether.metadata.Metadata metadata = res.getMetadata();
 
             if ( metadata != null )
             {
@@ -243,7 +242,7 @@ public class DefaultPluginPrefixResolver
 
     private PluginPrefixResult resolveFromRepository( PluginPrefixRequest request, RequestTrace trace,
                                                       String pluginGroup,
-                                                      org.sonatype.aether.metadata.Metadata metadata,
+                                                      org.eclipse.aether.metadata.Metadata metadata,
                                                       ArtifactRepository repository )
     {
         if ( metadata != null && metadata.getFile() != null && metadata.getFile().isFile() )
@@ -277,17 +276,18 @@ public class DefaultPluginPrefixResolver
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace,
-                                  org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository,
+                                  org.eclipse.aether.metadata.Metadata metadata, ArtifactRepository repository,
                                   Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+            RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+            event.setTrace( trace );
             event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );
-            listener.metadataInvalid( event );
+            listener.metadataInvalid( event.build() );
         }
     }
 

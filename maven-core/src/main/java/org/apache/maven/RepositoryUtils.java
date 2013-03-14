@@ -30,20 +30,21 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.artifact.ArtifactType;
-import org.sonatype.aether.artifact.ArtifactTypeRegistry;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.graph.Exclusion;
-import org.sonatype.aether.repository.Authentication;
-import org.sonatype.aether.repository.Proxy;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
-import org.sonatype.aether.util.artifact.ArtifactProperties;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.DefaultArtifactType;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactProperties;
+import org.eclipse.aether.artifact.ArtifactType;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.DefaultArtifactType;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.Exclusion;
+import org.eclipse.aether.repository.Authentication;
+import org.eclipse.aether.repository.Proxy;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -197,12 +198,14 @@ public class RepositoryUtils
         RemoteRepository result = null;
         if ( repo != null )
         {
-            result = new RemoteRepository( repo.getId(), getLayout( repo ), repo.getUrl() );
-            result.setPolicy( true, toPolicy( repo.getSnapshots() ) );
-            result.setPolicy( false, toPolicy( repo.getReleases() ) );
-            result.setAuthentication( toAuthentication( repo.getAuthentication() ) );
-            result.setProxy( toProxy( repo.getProxy() ) );
-            result.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
+            RemoteRepository.Builder builder =
+                new RemoteRepository.Builder( repo.getId(), getLayout( repo ), repo.getUrl() );
+            builder.setSnapshotPolicy( toPolicy( repo.getSnapshots() ) );
+            builder.setReleasePolicy( toPolicy( repo.getReleases() ) );
+            builder.setAuthentication( toAuthentication( repo.getAuthentication() ) );
+            builder.setProxy( toProxy( repo.getProxy() ) );
+            builder.setMirroredRepositories( toRepos( repo.getMirroredRepositories() ) );
+            result = builder.build();
         }
         return result;
     }
@@ -247,8 +250,10 @@ public class RepositoryUtils
         Authentication result = null;
         if ( auth != null )
         {
-            result =
-                new Authentication( auth.getUsername(), auth.getPassword(), auth.getPrivateKey(), auth.getPassphrase() );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername( auth.getUsername() ).addPassword( auth.getPassword() );
+            authBuilder.addPrivateKey( auth.getPrivateKey(), auth.getPassphrase() );
+            result = authBuilder.build();
         }
         return result;
     }
@@ -258,8 +263,9 @@ public class RepositoryUtils
         Proxy result = null;
         if ( proxy != null )
         {
-            Authentication auth = new Authentication( proxy.getUserName(), proxy.getPassword() );
-            result = new Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), auth );
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername( proxy.getUserName() ).addPassword( proxy.getPassword() );
+            result = new Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build() );
         }
         return result;
     }

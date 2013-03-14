@@ -21,9 +21,9 @@ package org.apache.maven;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.project.MavenProject;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.repository.WorkspaceRepository;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.repository.WorkspaceRepository;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,9 +43,9 @@ import java.util.Map;
 class ReactorReader
     implements WorkspaceReader
 {
-    private static final Collection<String> JAR_LIKE_TYPES = Arrays.asList( "jar", "test-jar", "ejb-client" );
+    private final static Collection<String> JAR_LIKE_TYPES = Arrays.asList( "jar", "test-jar", "ejb-client" );
 
-    private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
+    private final static Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
 
@@ -103,7 +103,7 @@ class ReactorReader
             }
             else
             {
-                String type = artifact.getProperty( "type", "" );
+                String type = artifact.getProperty( "type", "");
                 if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );

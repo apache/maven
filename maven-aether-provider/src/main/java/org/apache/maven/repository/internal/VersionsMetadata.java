@@ -26,8 +26,8 @@ import java.util.LinkedHashSet;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.util.artifact.ArtifactProperties;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.ArtifactProperties;
 
 /**
  * @author Benjamin Bentmann

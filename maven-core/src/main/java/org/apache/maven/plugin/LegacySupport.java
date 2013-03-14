@@ -20,7 +20,7 @@ package org.apache.maven.plugin;
  */
 
 import org.apache.maven.execution.MavenSession;
-import org.sonatype.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * Helps to provide backward-compatibility with plugins that use legacy components. <strong>Warning:</strong> This is an

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.sonatype.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.Artifact;
 
 /**
  * @author Hervé Boutemy

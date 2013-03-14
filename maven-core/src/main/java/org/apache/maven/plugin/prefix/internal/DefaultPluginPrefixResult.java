@@ -21,7 +21,7 @@ package org.apache.maven.plugin.prefix.internal;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin prefix resolution request.

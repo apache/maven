@@ -19,7 +19,7 @@ package org.apache.maven.plugin.prefix;
  * under the License.
  */
 
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin prefix resolution request.

@@ -26,15 +26,15 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.spi.connector.ArtifactDownload;
-import org.sonatype.aether.spi.connector.ArtifactUpload;
-import org.sonatype.aether.spi.connector.MetadataDownload;
-import org.sonatype.aether.spi.connector.MetadataUpload;
-import org.sonatype.aether.spi.connector.RepositoryConnector;
-import org.sonatype.aether.transfer.ArtifactNotFoundException;
-import org.sonatype.aether.transfer.ArtifactTransferException;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.spi.connector.ArtifactDownload;
+import org.eclipse.aether.spi.connector.ArtifactUpload;
+import org.eclipse.aether.spi.connector.MetadataDownload;
+import org.eclipse.aether.spi.connector.MetadataUpload;
+import org.eclipse.aether.spi.connector.RepositoryConnector;
+import org.eclipse.aether.transfer.ArtifactNotFoundException;
+import org.eclipse.aether.transfer.ArtifactTransferException;
 
 /**
  * @author Benjamin Bentmann

@@ -20,10 +20,10 @@ package org.apache.maven.repository.internal;
  */
 
 import org.apache.maven.model.Repository;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.repository.RepositoryPolicy;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.RepositoryPolicy;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -49,11 +49,11 @@ public class ArtifactDescriptorUtils
 
     public static RemoteRepository toRemoteRepository( Repository repository )
     {
-        RemoteRepository result =
-            new RemoteRepository( repository.getId(), repository.getLayout(), repository.getUrl() );
-        result.setPolicy( true, toRepositoryPolicy( repository.getSnapshots() ) );
-        result.setPolicy( false, toRepositoryPolicy( repository.getReleases() ) );
-        return result;
+        RemoteRepository.Builder builder =
+            new RemoteRepository.Builder( repository.getId(), repository.getLayout(), repository.getUrl() );
+        builder.setSnapshotPolicy( toRepositoryPolicy( repository.getSnapshots() ) );
+        builder.setReleasePolicy( toRepositoryPolicy( repository.getReleases() ) );
+        return builder.build();
     }
 
     public static RepositoryPolicy toRepositoryPolicy( org.apache.maven.model.RepositoryPolicy policy )

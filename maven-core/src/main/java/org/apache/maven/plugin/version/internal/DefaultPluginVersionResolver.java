@@ -43,22 +43,21 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.aether.RepositoryEvent.EventType;
-import org.sonatype.aether.RepositoryListener;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.repository.ArtifactRepository;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.MetadataRequest;
-import org.sonatype.aether.resolution.MetadataResult;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.listener.DefaultRepositoryEvent;
-import org.sonatype.aether.util.metadata.DefaultMetadata;
-import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.InvalidVersionSpecificationException;
-import org.sonatype.aether.version.Version;
-import org.sonatype.aether.version.VersionScheme;
+import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.metadata.DefaultMetadata;
+import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.MetadataRequest;
+import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.util.version.GenericVersionScheme;
+import org.eclipse.aether.version.InvalidVersionSpecificationException;
+import org.eclipse.aether.version.Version;
+import org.eclipse.aether.version.VersionScheme;
 
 /**
  * Resolves a version for a plugin.
@@ -114,11 +113,11 @@ public class DefaultPluginVersionResolver
     private PluginVersionResult resolveFromRepository( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, request );
+        RequestTrace trace = RequestTrace.newChild( null, request );
 
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
 
-        org.sonatype.aether.metadata.Metadata metadata =
+        org.eclipse.aether.metadata.Metadata metadata =
             new DefaultMetadata( request.getGroupId(), request.getArtifactId(), "maven-metadata.xml",
                                  DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT );
 
@@ -280,7 +279,7 @@ public class DefaultPluginVersionResolver
     }
 
     private void mergeMetadata( RepositorySystemSession session, RequestTrace trace, Versions versions,
-                                org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository )
+                                org.eclipse.aether.metadata.Metadata metadata, ArtifactRepository repository )
     {
         if ( metadata != null && metadata.getFile() != null && metadata.getFile().isFile() )
         {
@@ -300,17 +299,18 @@ public class DefaultPluginVersionResolver
     }
 
     private void invalidMetadata( RepositorySystemSession session, RequestTrace trace,
-                                  org.sonatype.aether.metadata.Metadata metadata, ArtifactRepository repository,
+                                  org.eclipse.aether.metadata.Metadata metadata, ArtifactRepository repository,
                                   Exception exception )
     {
         RepositoryListener listener = session.getRepositoryListener();
         if ( listener != null )
         {
-            DefaultRepositoryEvent event = new DefaultRepositoryEvent( EventType.METADATA_INVALID, session, trace );
+            RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+            event.setTrace( trace );
             event.setMetadata( metadata );
             event.setException( exception );
             event.setRepository( repository );
-            listener.metadataInvalid( event );
+            listener.metadataInvalid( event.build() );
         }
     }
 

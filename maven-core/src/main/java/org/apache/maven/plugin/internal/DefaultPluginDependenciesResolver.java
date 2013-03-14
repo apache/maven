@@ -31,35 +31,34 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.RequestTrace;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.collection.DependencyCollectionException;
-import org.sonatype.aether.collection.DependencyGraphTransformer;
-import org.sonatype.aether.collection.DependencySelector;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.graph.DependencyNode;
-import org.sonatype.aether.graph.DependencyVisitor;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.resolution.ArtifactDescriptorException;
-import org.sonatype.aether.resolution.ArtifactDescriptorRequest;
-import org.sonatype.aether.resolution.ArtifactDescriptorResult;
-import org.sonatype.aether.resolution.ArtifactRequest;
-import org.sonatype.aether.resolution.ArtifactResolutionException;
-import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.DefaultRequestTrace;
-import org.sonatype.aether.util.FilterRepositorySystemSession;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.JavaScopes;
-import org.sonatype.aether.util.filter.AndDependencyFilter;
-import org.sonatype.aether.util.filter.ExclusionsDependencyFilter;
-import org.sonatype.aether.util.filter.ScopeDependencyFilter;
-import org.sonatype.aether.util.graph.selector.AndDependencySelector;
-import org.sonatype.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.RequestTrace;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
+import org.eclipse.aether.collection.DependencySelector;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.DependencyVisitor;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
+import org.eclipse.aether.resolution.ArtifactDescriptorResult;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.filter.AndDependencyFilter;
+import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
+import org.eclipse.aether.util.filter.ScopeDependencyFilter;
+import org.eclipse.aether.util.graph.selector.AndDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 
 /**
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility class that
@@ -94,20 +93,14 @@ public class DefaultPluginDependenciesResolver
     public Artifact resolve( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, plugin );
+        RequestTrace trace = RequestTrace.newChild( null, plugin );
 
         Artifact pluginArtifact = toArtifact( plugin, session );
 
         try
         {
-            RepositorySystemSession pluginSession = new FilterRepositorySystemSession( session )
-            {
-                @Override
-                public boolean isIgnoreMissingArtifactDescriptor()
-                {
-                    return false;
-                }
-            };
+            DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
+            pluginSession.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, false ) );
 
             ArtifactDescriptorRequest request =
                 new ArtifactDescriptorRequest( pluginArtifact, repositories, REPOSITORY_CONTEXT );
@@ -147,7 +140,7 @@ public class DefaultPluginDependenciesResolver
                                    List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        RequestTrace trace = DefaultRequestTrace.newChild( null, plugin );
+        RequestTrace trace = RequestTrace.newChild( null, plugin );
 
         if ( pluginArtifact == null )
         {
@@ -179,10 +172,10 @@ public class DefaultPluginDependenciesResolver
             CollectRequest request = new CollectRequest();
             request.setRequestContext( REPOSITORY_CONTEXT );
             request.setRepositories( repositories );
-            request.setRoot( new org.sonatype.aether.graph.Dependency( pluginArtifact, null ) );
+            request.setRoot( new org.eclipse.aether.graph.Dependency( pluginArtifact, null ) );
             for ( Dependency dependency : plugin.getDependencies() )
             {
-                org.sonatype.aether.graph.Dependency pluginDep =
+                org.eclipse.aether.graph.Dependency pluginDep =
                     RepositoryUtils.toDependency( dependency, session.getArtifactTypeRegistry() );
                 if ( !JavaScopes.SYSTEM.equals( pluginDep.getScope() ) )
                 {
@@ -194,7 +187,7 @@ public class DefaultPluginDependenciesResolver
             DependencyRequest depRequest = new DependencyRequest( request, resolutionFilter );
             depRequest.setTrace( trace );
 
-            request.setTrace( DefaultRequestTrace.newChild( trace, depRequest ) );
+            request.setTrace( RequestTrace.newChild( trace, depRequest ) );
 
             node = repoSystem.collectDependencies( pluginSession, request ).getRoot();
 
@@ -228,23 +221,13 @@ public class DefaultPluginDependenciesResolver
         {
             StringBuilder buffer = new StringBuilder( 128 );
             buffer.append( indent );
-            org.sonatype.aether.graph.Dependency dep = node.getDependency();
+            org.eclipse.aether.graph.Dependency dep = node.getDependency();
             if ( dep != null )
             {
-                org.sonatype.aether.artifact.Artifact art = dep.getArtifact();
+                org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
 
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );
-
-                if ( node.getPremanagedScope() != null && !node.getPremanagedScope().equals( dep.getScope() ) )
-                {
-                    buffer.append( " (scope managed from " ).append( node.getPremanagedScope() ).append( ")" );
-                }
-
-                if ( node.getPremanagedVersion() != null && !node.getPremanagedVersion().equals( art.getVersion() ) )
-                {
-                    buffer.append( " (version managed from " ).append( node.getPremanagedVersion() ).append( ")" );
-                }
             }
 
             logger.debug( buffer.toString() );

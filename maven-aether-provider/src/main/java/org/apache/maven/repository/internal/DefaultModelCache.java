@@ -20,8 +20,8 @@ package org.apache.maven.repository.internal;
  */
 
 import org.apache.maven.model.building.ModelCache;
-import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.RepositorySystemSession;
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * A model builder cache backed by the repository system cache.

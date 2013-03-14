@@ -42,12 +42,14 @@ import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.aether.impl.internal.SimpleLocalRepositoryManager;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
+import org.eclipse.aether.repository.LocalRepository;
 
 public abstract class AbstractCoreMavenComponentTestCase
     extends PlexusTestCase
@@ -96,8 +98,7 @@ public abstract class AbstractCoreMavenComponentTestCase
      */
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-//        containerConfiguration.addComponentDiscoverer( PluginManager.class );
-//        containerConfiguration.addComponentDiscoveryListener( PluginManager.class );
+        containerConfiguration.setAutoWiring( true );
     }
 
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
@@ -160,10 +161,12 @@ public abstract class AbstractCoreMavenComponentTestCase
     }
 
     protected void initRepoSession( ProjectBuildingRequest request )
+        throws Exception
     {
-        File localRepo = new File( request.getLocalRepository().getBasedir() );
-        MavenRepositorySystemSession session = new MavenRepositorySystemSession( true );
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManager( localRepo ) );
+        File localRepoDir = new File( request.getLocalRepository().getBasedir() );
+        LocalRepository localRepo = new LocalRepository( localRepoDir );
+        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
+        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
         request.setRepositorySession( session );
     }
 

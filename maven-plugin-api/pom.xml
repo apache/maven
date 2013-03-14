@@ -62,6 +62,7 @@ under the License.
         <configuration>
           <models>
             <model>src/main/mdo/lifecycle.mdo</model>
+            <model>src/main/mdo/plugin.mdo</model>
           </models>
           <version>1.0.0</version>
         </configuration>
@@ -75,6 +76,15 @@ under the License.
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+         <excludes>
+           <exclude>org/apache/maven/plugin/descriptor/model</exclude>
+           <exclude>org/apache/maven/plugin/descriptor/model/**/*</exclude>
+         </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

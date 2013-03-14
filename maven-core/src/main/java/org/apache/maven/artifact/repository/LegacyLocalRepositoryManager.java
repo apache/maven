@@ -29,21 +29,20 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 import org.apache.maven.repository.Proxy;
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.metadata.Metadata;
-import org.sonatype.aether.repository.LocalArtifactRegistration;
-import org.sonatype.aether.repository.LocalArtifactRequest;
-import org.sonatype.aether.repository.LocalArtifactResult;
-import org.sonatype.aether.repository.LocalMetadataRegistration;
-import org.sonatype.aether.repository.LocalMetadataRequest;
-import org.sonatype.aether.repository.LocalMetadataResult;
-import org.sonatype.aether.repository.LocalRepository;
-import org.sonatype.aether.repository.LocalRepositoryManager;
-import org.sonatype.aether.repository.RemoteRepository;
-import org.sonatype.aether.util.DefaultRepositorySystemSession;
-import org.sonatype.aether.util.FilterRepositorySystemSession;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.metadata.Metadata;
+import org.eclipse.aether.repository.LocalArtifactRegistration;
+import org.eclipse.aether.repository.LocalArtifactRequest;
+import org.eclipse.aether.repository.LocalArtifactResult;
+import org.eclipse.aether.repository.LocalMetadataRegistration;
+import org.eclipse.aether.repository.LocalMetadataRequest;
+import org.eclipse.aether.repository.LocalMetadataResult;
+import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
@@ -84,14 +83,7 @@ public class LegacyLocalRepositoryManager
 
         final LocalRepositoryManager llrm = new LegacyLocalRepositoryManager( repository );
 
-        return new FilterRepositorySystemSession( session )
-        {
-            @Override
-            public LocalRepositoryManager getLocalRepositoryManager()
-            {
-                return llrm;
-            }
-        };
+        return new DefaultRepositorySystemSession( session ).setLocalRepositoryManager( llrm );
     }
 
     private LegacyLocalRepositoryManager( ArtifactRepository delegate )

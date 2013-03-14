@@ -27,7 +27,7 @@ import org.apache.maven.execution.ExecutionListener;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.aether.RepositoryListener;
+import org.eclipse.aether.RepositoryListener;
 
 /**
  * Dispatches callbacks to all registered eventspies.

@@ -61,7 +61,7 @@ under the License.
           <field-name>legacySupport</field-name>
         </requirement>
         <requirement>
-          <role>org.sonatype.aether.RepositorySystem</role>
+          <role>org.eclipse.aether.RepositorySystem</role>
           <role-hint>default</role-hint>
           <field-name>repoSystem</field-name>
         </requirement>

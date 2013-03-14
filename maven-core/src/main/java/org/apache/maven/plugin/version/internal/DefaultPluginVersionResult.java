@@ -20,7 +20,7 @@ package org.apache.maven.plugin.version.internal;
  */
 
 import org.apache.maven.plugin.version.PluginVersionResult;
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin version resolution request.

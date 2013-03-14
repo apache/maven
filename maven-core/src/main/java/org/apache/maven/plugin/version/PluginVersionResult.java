@@ -19,7 +19,7 @@ package org.apache.maven.plugin.version;
  * under the License.
  */
 
-import org.sonatype.aether.repository.ArtifactRepository;
+import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin version resolution request.

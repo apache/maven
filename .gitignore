@@ -9,7 +9,6 @@ bin/
 *.iml
 .idea
 out/
-
 .DS_Store
 /bootstrap
 /dependencies.xml

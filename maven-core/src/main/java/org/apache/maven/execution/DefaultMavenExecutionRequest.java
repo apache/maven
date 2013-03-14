@@ -32,10 +32,10 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
-import org.sonatype.aether.RepositoryCache;
-import org.sonatype.aether.repository.WorkspaceReader;
-import org.sonatype.aether.transfer.TransferListener;
-import org.sonatype.aether.util.DefaultRepositoryCache;
+import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.RepositoryCache;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.transfer.TransferListener;
 
 /**
  * @author Jason van Zyl
