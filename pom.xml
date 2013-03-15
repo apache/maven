@@ -52,19 +52,21 @@
     <!-- last Java5 release of Guava -->
     <guavaVersion>11.0.2</guavaVersion>
     <guiceVersion>3.1.3</guiceVersion>
-    <sisuInjectVersion>0.0.0.M2</sisuInjectVersion>
+    <sisuInjectVersion>0.0.0-SNAPSHOT</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
     <modelloVersion>1.7</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <aetherVersion>1.13.1</aetherVersion>
     <slf4jVersion>1.7.2</slf4jVersion>
+    <aetherVersion>0.9.0.M2</aetherVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- Control the name of the distribution and information output by mvn -->
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
+    <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
+    <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
     <maven.site.path>ref/3-LATEST</maven.site.path>
   </properties>
 
@@ -262,39 +264,29 @@
       </dependency>
       <!--  Repository -->
       <dependency>
-        <groupId>org.sonatype.aether</groupId>
+        <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-api</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.aether</groupId>
+        <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-spi</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.aether</groupId>
+        <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-impl</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.aether</groupId>
+        <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-util</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.aether</groupId>
+        <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-connector-wagon</artifactId>
         <version>${aetherVersion}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-inject-plexus</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <!--  Commons -->
       <dependency>
@@ -572,4 +564,13 @@
       </build>
     </profile>
   </profiles>
+  <repositories>  
+    <repository>  
+      <id>ossrh</id>  
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>  
+      <snapshots>  
+        <enabled>true</enabled>  
+      </snapshots>          
+    </repository>  
+  </repositories>  
 </project>
