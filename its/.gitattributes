@@ -1,9 +1,2 @@
 # Auto detect text files and perform LF normalization
 *.jar    -text -crlf
-*        text=auto
-
-*.java   text diff=java
-*.html   text diff=html
-*.css    text
-*.js     text
-*.sql    text
