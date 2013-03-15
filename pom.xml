@@ -52,7 +52,7 @@
     <!-- last Java5 release of Guava -->
     <guavaVersion>11.0.2</guavaVersion>
     <guiceVersion>3.1.3</guiceVersion>
-    <sisuInjectVersion>0.0.0.M2</sisuInjectVersion>
+    <sisuInjectVersion>0.0.0-SNAPSHOT</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
@@ -564,5 +564,13 @@
       </build>
     </profile>
   </profiles>
-
+  <repositories>  
+    <repository>  
+      <id>ossrh</id>  
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>  
+      <snapshots>  
+        <enabled>true</enabled>  
+      </snapshots>          
+    </repository>  
+  </repositories>  
 </project>
