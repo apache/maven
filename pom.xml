@@ -65,8 +65,6 @@
     <distributionId>apache-maven</distributionId>
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
-    <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
-    <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
     <maven.site.path>ref/3-LATEST</maven.site.path>
   </properties>
 
