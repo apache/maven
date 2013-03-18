@@ -28,5 +28,6 @@ public class MavenSlf4jSimpleFriend
     public static void init()
     {
         SimpleLogger.init();
+        SimpleLoggerFactory.INSTANCE.reset();
     }
 }

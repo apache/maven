@@ -58,5 +58,20 @@ public class Slf4jSimpleConfiguration
         // property for root logger level or System.out redirection need to be taken into account
         MavenSlf4jFriend.reset();
         MavenSlf4jSimpleFriend.init();
+        
+        try
+        {
+             org.slf4j.ILoggerFactory loggerFactory = org.slf4j.LoggerFactory.getILoggerFactory();
+             synchronized ( loggerFactory )
+             {
+                 java.lang.reflect.Field loggerMap = loggerFactory.getClass().getDeclaredField( "loggerMap" );
+                 loggerMap.setAccessible( true );
+                 ( (java.util.Map) loggerMap.get( loggerFactory ) ).clear();
+             }
+        }
+        catch ( Exception e )
+        {
+            // ignore for now...
+        }        
     }
 }
