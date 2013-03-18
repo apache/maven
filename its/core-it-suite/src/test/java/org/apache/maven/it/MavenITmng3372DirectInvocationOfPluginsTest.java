@@ -36,7 +36,7 @@ public class MavenITmng3372DirectInvocationOfPluginsTest
 
     public MavenITmng3372DirectInvocationOfPluginsTest()
     {
-        super( "(2.0.5,)" );
+        super( "(2.0.5,3.1-SNAPSHOT)" );
     }
 
     public void testitMNG3372()

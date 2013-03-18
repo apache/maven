@@ -33,7 +33,7 @@ public class MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest
 
     public MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest()
     {
-        super( "[3.0.3,)" );
+        super( "[3.0.3,3.1-SNAPSHOT)" );
     }
 
     /**
