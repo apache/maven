@@ -19,6 +19,9 @@ package org.slf4j.impl;
  * under the License.
  */
 
+import org.slf4j.ILoggerFactory;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility for Maven to access Slf4j-Simple internals through package access.
  * Use with precaution, since this is not normally intended for production use.
@@ -28,6 +31,10 @@ public class MavenSlf4jSimpleFriend
     public static void init()
     {
         SimpleLogger.init();
-        SimpleLoggerFactory.INSTANCE.reset();
+        ILoggerFactory loggerFactory = LoggerFactory.getILoggerFactory();
+        if ( loggerFactory instanceof SimpleLoggerFactory )
+        {
+            ( (SimpleLoggerFactory) loggerFactory ).reset();
+        }
     }
 }
