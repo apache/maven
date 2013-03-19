@@ -88,9 +88,8 @@ under the License.
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>3.0</version>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
       <classifier>no_aop</classifier>
       <optional>true</optional>
       <exclusions>
