@@ -3,7 +3,7 @@
  -----
  Hervé Boutemy
  -----
- 2011-09-03
+ 2013-03-19
  -----
 
 Maven Model Builder
@@ -120,6 +120,23 @@ Maven Model Builder
 | <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.xml/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
 *----+------+------+
 
-  Notice that after model interpolation, <<<$\{...\}>>> content can remain in the model that will be evaluated later
+**  Notice
+
+  * after model interpolation, <<<$\{...\}>>> content can remain in the model that will be evaluated later
   when setting plugin parameters. This happens in particular with <<<settings.*>>> values for
-  {{{../maven-settings/settings.html}Settings Model}}.
+  {{{../maven-settings/settings.html}Settings Model}},
+
+  * encoding configuration have been defined as POM properties looking like POM content but not added to POM model to maintain
+  compatibility with previous Maven versions: 
+
+    * <<<$\{project.build.sourceEncoding\}>>> for
+    {{{http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding}source files encoding}}
+    (defaults to platform encoding)
+
+    * <<<$\{project.reporting.outputEncoding\}>>> for
+    {{{https://cwiki.apache.org/confluence/display/MAVENOLD/Reporting+Encoding+Configuration}reporting output files encoding}}
+    (defaults to <<<UTF-8>>>)
+
+    []
+
+  []
