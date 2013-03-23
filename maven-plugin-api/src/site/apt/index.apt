@@ -3,35 +3,20 @@
  -----
  Hervé Boutemy
  -----
-<<<<<<< HEAD
  2012-06-02
-=======
- 2011-10-16
->>>>>>> 4fdcdbd26244ff81e242054fd38cf415d92499be
  -----
 
 Maven Plugin API
 
-<<<<<<< HEAD
  The API for plugins - composed of goals implemented by Mojos - development.
 
  A plugin is described in a {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
  generally generated from plugin sources using {{{/plugin-tools/maven-plugin-plugin/}maven-plugin-plugin}}.
-=======
- The API for plugins - Mojos - development.
-
- A plugin is described in a {{{./plugin.html}<<<META-INF/maven/plugin.xml>>> plugin descriptor}},
- generally generated from plugin sources using {{{/plugins/maven-plugin-plugin/}maven-plugin-plugin}}.
->>>>>>> 4fdcdbd26244ff81e242054fd38cf415d92499be
 
 * See Also
 
  * {{{/developers/mojo-api-specification.html}Mojo API Specification}}
 
-<<<<<<< HEAD
  * {{{/plugin-tools/}plugin-tools}}
 
  * {{{/plugin-testing/}plugin-testing}}
-=======
- * {{{/plugin-tools/}plugin-tools}}, containing {{{/plugins/maven-plugin-plugin/}maven-plugin-plugin}}
->>>>>>> 4fdcdbd26244ff81e242054fd38cf415d92499be
