@@ -74,7 +74,9 @@ public class DefaultVersionRangeResolver
 {
 
     private static final String MAVEN_METADATA_XML = "maven-metadata.xml";
-
+	
+	private static final String SNAPSHOT = "SNAPSHOT";
+	
     @SuppressWarnings( "unused" )
     @Requirement( role = LoggerFactory.class )
     private Logger logger = NullLoggerFactory.LOGGER;
@@ -254,10 +256,20 @@ public class DefaultVersionRangeResolver
             Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
             for ( String version : versioning.getVersions() )
             {
-                if ( !versionIndex.containsKey( version ) )
-                {
-                    versionIndex.put( version, repository );
-                }
+                if(request.getArtifact().getVersion().toUpperCase().contains(SNAPSHOT)){            		
+            		if ( !versionIndex.containsKey( version ) )
+	                {
+	                    versionIndex.put( version, repository );
+	                }
+            	}
+            	else{
+            		if(!version.toUpperCase().contains(SNAPSHOT)){
+            			if ( !versionIndex.containsKey( version ) )
+    	                {
+    	                    versionIndex.put( version, repository );
+    	                }
+            		}
+            	}
             }
         }
 
