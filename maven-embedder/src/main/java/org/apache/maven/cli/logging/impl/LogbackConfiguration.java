@@ -45,7 +45,7 @@ public class LogbackConfiguration
                 value = ch.qos.logback.classic.Level.INFO;
                 break;
 
-            case ERROR:
+            default:
                 value = ch.qos.logback.classic.Level.ERROR;
                 break;
         }

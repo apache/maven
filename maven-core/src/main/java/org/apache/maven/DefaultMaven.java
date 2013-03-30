@@ -171,17 +171,17 @@ public class DefaultMaven
         }
         catch ( OutOfMemoryError e )
         {
-            result = addExceptionToResult(new DefaultMavenExecutionResult(), e);
+            result = addExceptionToResult( new DefaultMavenExecutionResult(), e );
         }
         catch ( MavenExecutionRequestPopulationException e )
         {
-            result = addExceptionToResult(new DefaultMavenExecutionResult(), e);
+            result = addExceptionToResult( new DefaultMavenExecutionResult(), e );
         }
         catch ( RuntimeException e )
         {
             result =
-                addExceptionToResult(new DefaultMavenExecutionResult(),
-                        new InternalErrorException("Internal error: " + e, e));
+                addExceptionToResult( new DefaultMavenExecutionResult(),
+                                      new InternalErrorException( "Internal error: " + e, e ) );
         }
         finally
         {
@@ -191,7 +191,6 @@ public class DefaultMaven
         return result;
     }
 
-    @SuppressWarnings({"ThrowableInstanceNeverThrown", "ThrowableResultOfMethodCallIgnored"})
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
         //TODO: Need a general way to inject standard properties
@@ -211,7 +210,7 @@ public class DefaultMaven
         }
         catch ( LocalRepositoryNotAccessibleException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
 
         DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
@@ -233,7 +232,7 @@ public class DefaultMaven
         }
         catch ( MavenExecutionException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
 
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
@@ -249,7 +248,7 @@ public class DefaultMaven
         }
         catch ( ProjectBuildingException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
 
         session.setProjects( projects );
@@ -275,7 +274,7 @@ public class DefaultMaven
         }
         catch ( org.apache.maven.DuplicateProjectException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
 
         repoSession.setReadOnly();
@@ -292,7 +291,7 @@ public class DefaultMaven
         }
         catch ( MavenExecutionException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
         finally
         {
@@ -315,15 +314,15 @@ public class DefaultMaven
 
             ProjectCycleException error = new ProjectCycleException( message, e );
 
-            return addExceptionToResult(result, error);
+            return addExceptionToResult( result, error );
         }
         catch ( DuplicateProjectException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
         catch ( MavenExecutionException e )
         {
-            return addExceptionToResult(result, e);
+            return addExceptionToResult( result, e );
         }
 
         result.setTopologicallySortedProjects( session.getProjects() );
@@ -339,7 +338,7 @@ public class DefaultMaven
 
         if ( session.getResult().hasExceptions() )
         {
-            return addExceptionToResult(result, session.getResult().getExceptions().get(0));
+            return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
         }
 
         return result;
@@ -592,7 +591,7 @@ public class DefaultMaven
         return lifecycleListeners;
     }
 
-    private MavenExecutionResult addExceptionToResult(MavenExecutionResult result, Throwable e)
+    private MavenExecutionResult addExceptionToResult( MavenExecutionResult result, Throwable e )
     {
         if ( !result.getExceptions().contains( e ) )
         {

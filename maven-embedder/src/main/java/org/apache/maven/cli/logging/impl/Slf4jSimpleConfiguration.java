@@ -45,7 +45,7 @@ public class Slf4jSimpleConfiguration
                 value = "info";
                 break;
 
-            case ERROR:
+            default:
                 value = "error";
                 break;
         }

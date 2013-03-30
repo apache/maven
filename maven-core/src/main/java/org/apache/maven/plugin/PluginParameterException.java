@@ -100,29 +100,29 @@ public class PluginParameterException
                 }
             }
             
-            messageBuffer.append( "Inside the definition for plugin \'");
+            messageBuffer.append( "Inside the definition for plugin \'" );
             messageBuffer.append( mojo.getPluginDescriptor().getArtifactId() );
             messageBuffer.append( "\', specify the following:\n\n<configuration>\n  ...\n" );
             messageBuffer.append( "  <" ).append( param.getName() ).append( '>' );
-            if( isArray || isCollection )
+            if ( isArray || isCollection )
             {
-                messageBuffer.append(  '\n' );
+                messageBuffer.append( '\n' );
                 messageBuffer.append( "    <item>" );
             }
             else if ( isProperties )
             {
-                messageBuffer.append(  '\n' );
+                messageBuffer.append( '\n' );
                 messageBuffer.append( "    <property>\n" );
                 messageBuffer.append( "      <name>KEY</name>\n" );
                 messageBuffer.append( "      <value>" );
             }
             else if ( isMap )
             {
-                messageBuffer.append(  '\n' );
+                messageBuffer.append( '\n' );
                 messageBuffer.append( "    <KEY>" );
             }
             messageBuffer.append( "VALUE" );
-            if( isArray || isCollection )
+            if ( isArray || isCollection )
             {
                 messageBuffer.append( "</item>\n" );
                 messageBuffer.append( "  " );

@@ -43,7 +43,7 @@ public class Log4j2Configuration
                 value = "info";
                 break;
 
-            case ERROR:
+            default:
                 value = "error";
                 break;
         }

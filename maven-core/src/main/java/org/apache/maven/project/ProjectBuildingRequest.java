@@ -122,8 +122,9 @@ public interface ProjectBuildingRequest
     List<String> getInactiveProfileIds();
     
     /**
-     * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom configuration
-     * like the MavenCLI settings.xml file, or from a custom dialog in an IDE integration like M2Eclipse.
+     * Add a {@link org.apache.maven.model.Profile} that has come from an external source. This may be from a custom
+     * configuration like the MavenCLI settings.xml file, or from a custom dialog in an IDE integration like M2Eclipse.
+     * 
      * @param profile
      */
     void addProfile( Profile profile );
@@ -143,7 +144,6 @@ public interface ProjectBuildingRequest
      * Sets the start time of the build.
      * 
      * @param buildStartTime The start time of the build, may be {@code null}.
-     * @return This request, never {@code null}.
      */
     void setBuildStartTime( Date buildStartTime );
 

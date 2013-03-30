@@ -110,7 +110,7 @@ public class DefaultProfileActivationContext
      * @param systemProperties The system properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public DefaultProfileActivationContext setSystemProperties( Properties systemProperties )
     {
         if ( systemProperties != null )
@@ -159,7 +159,7 @@ public class DefaultProfileActivationContext
      * @param userProperties The user properties, may be {@code null}.
      * @return This context, never {@code null}.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public DefaultProfileActivationContext setUserProperties( Properties userProperties )
     {
         if ( userProperties != null )

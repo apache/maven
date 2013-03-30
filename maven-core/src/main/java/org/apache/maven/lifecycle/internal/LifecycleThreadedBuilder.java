@@ -67,20 +67,20 @@ public class LifecycleThreadedBuilder
         for ( TaskSegment taskSegment : currentTaskSegment )
         {
             Map<MavenProject, ProjectSegment> projectBuildMap = projectBuilds.selectSegment( taskSegment );
-                try
-                {
+            try
+            {
                 multiThreadedProjectTaskSegmentBuild( analyzer, reactorContext, session, service, taskSegment,
                                                       projectBuildMap, muxer );
-                    if ( reactorContext.getReactorBuildStatus().isHalted( ) )
-                    {
-                        break;
-                    }
-                }
-                catch ( Exception e )
+                if ( reactorContext.getReactorBuildStatus().isHalted() )
                 {
-                    session.getResult().addException(e);
                     break;
                 }
+            }
+            catch ( Exception e )
+            {
+                session.getResult().addException( e );
+                break;
+            }
 
         }
     }
@@ -126,12 +126,12 @@ public class LifecycleThreadedBuilder
             }
             catch ( InterruptedException e )
             {
-                rootSession.getResult().addException(e);
+                rootSession.getResult().addException( e );
                 break;
             }
             catch ( ExecutionException e )
             {
-                rootSession.getResult().addException(e);
+                rootSession.getResult().addException( e );
                 break;
             }
         }

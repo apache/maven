@@ -97,7 +97,7 @@ public class CLIManager
 
     public static final String THREADS = "T";
 
-    public static final String LEGACY_LOCAL_REPOSITORY ="llr";
+    public static final String LEGACY_LOCAL_REPOSITORY = "llr";
 
     protected Options options;
 
