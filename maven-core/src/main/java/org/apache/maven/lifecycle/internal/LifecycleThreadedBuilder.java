@@ -78,7 +78,8 @@ public class LifecycleThreadedBuilder
                 }
                 catch ( Exception e )
                 {
-                    break;  // Why are we just ignoring this exception? Are exceptions are being used for flow control
+                    session.getResult().addException(e);
+                    break;
                 }
 
         }
@@ -125,10 +126,12 @@ public class LifecycleThreadedBuilder
             }
             catch ( InterruptedException e )
             {
+                rootSession.getResult().addException(e);
                 break;
             }
             catch ( ExecutionException e )
             {
+                rootSession.getResult().addException(e);
                 break;
             }
         }
