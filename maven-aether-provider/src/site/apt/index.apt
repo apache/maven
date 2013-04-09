@@ -8,12 +8,9 @@
 
 Maven Aether Provider
 
- Maven Aether Provider is an Aether extension to support Maven POMs and local+remote repositories.
+ Maven Aether Provider is an {{{http://www.eclipse.org/aether/}Aether}} extension to support
+ Maven POMs and local+remote repositories.
 
- Main component is <<<MavenRepositorySystemSession>>>
- ({{{./apidocs/org/apache/maven/repository/internal/MavenRepositorySystemSession.html}javadoc}},
- {{{./xref/org/apache/maven/repository/internal/MavenRepositorySystemSession.html}source}}).
-
- If used outside Maven runtime context, another useful entry point is <<<MavenServiceLocator>>>
- ({{{./apidocs/org/apache/maven/repository/internal/MavenServiceLocator.html}javadoc}},
- {{{./xref/org/apache/maven/repository/internal/MavenServiceLocator.html}source}}).
+ Main component is <<<MavenRepositorySystemUtils>>>
+ ({{{./apidocs/org/apache/maven/repository/internal/MavenRepositorySystemUtils.html}javadoc}},
+ {{{./xref/org/apache/maven/repository/internal/MavenRepositorySystemUtils.html}source}}).
