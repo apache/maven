@@ -109,13 +109,14 @@ public class IntegrationTestSuite
         //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
         
         
+        // -------------------------------------------------------------------------------------------------------------
         // These do not work as a result of the Eclipse Aether change. They are directly using the Site and Dependency plugins
-        // 
-        //MavenITmng3743ForkWithPluginManagementTest>AbstractMavenIntegrationTestCase.runTest:220->testitMNG3743:58 » Verification
-        //MavenITmng3703ExecutionProjectWithRelativePathsTest>AbstractMavenIntegrationTestCase.runTest:220->testForkFromReport:86 » Verification
-        //MavenITmng3684BuildPluginParameterTest>AbstractMavenIntegrationTestCase.runTest:220->testitMNG3684:63 » Verification
+        // -------------------------------------------------------------------------------------------------------------
         //MavenITmng3372DirectInvocationOfPluginsTest>AbstractMavenIntegrationTestCase.runTest:220->testDependencyTreeInvocation:83 » Verification
+        //suite.addTestSuite( MavenITmng3372DirectInvocationOfPluginsTest.class ); dependency:tree requires maven-dependency-tree 2.1
         //MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest>AbstractMavenIntegrationTestCase.runTest:220->testit:56 ? Verification
+        //suite.addTestSuite( MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest.class );
+
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
         suite.addTestSuite( MavenITmng5387ArtifactReplacementPlugin.class );
         suite.addTestSuite( MavenITmng5382Jsr330Plugin.class );

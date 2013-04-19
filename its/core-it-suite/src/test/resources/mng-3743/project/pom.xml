@@ -24,6 +24,17 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.2</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.reporting</groupId>
+              <artifactId>maven-reporting-exec</artifactId>
+              <version>1.1</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.its.mng3743</groupId>
           <artifactId>mavenit-mng3743-check-plugin</artifactId>
           <configuration>

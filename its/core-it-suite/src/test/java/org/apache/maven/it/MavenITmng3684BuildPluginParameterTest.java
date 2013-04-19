@@ -36,7 +36,7 @@ public class MavenITmng3684BuildPluginParameterTest
 {
     public MavenITmng3684BuildPluginParameterTest()
     {
-        super( "(2.0.9,3.1-SNAPSHOT)" );
+        super( "(2.0.9,)" );
     }
     
     public void testitMNG3684 ()
