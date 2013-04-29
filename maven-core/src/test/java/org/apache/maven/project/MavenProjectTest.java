@@ -23,7 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.maven.lifecycle.internal.stub.LoggerStub;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
@@ -175,6 +177,32 @@ public class MavenProjectTest
 
         assertNotSame( "The list of active profiles should have been cloned too but is same", activeProfilesOrig,
                        activeProfilesClone );
+    }
+
+    public void testInvalidParent() throws Exception
+    {
+        Parent parent = new Parent();
+        parent.setGroupId( "test-group" );
+        parent.setArtifactId( "parent-artifact" );
+        parent.setVersion( "1.0" );
+        Model model = new Model();
+        model.setParent( parent );
+        model.setArtifactId( "child-artifact" );
+        final AtomicInteger logged = new AtomicInteger();
+        class L extends LoggerStub
+        {
+            @Override
+            public void error( String s, Throwable throwable )
+            {
+                logged.incrementAndGet();
+            }
+        }
+        MavenProject project = new MavenProject( repositorySystem, projectBuilder, newBuildingRequest(), new L() );
+        project.setModel( model );
+        assertNull( project.getParent() );
+        assertEquals( 1, logged.get() );
+        assertNull( project.getParent() );
+        assertEquals( 1, logged.get() );
     }
 
     public void testUndefinedOutputDirectory()

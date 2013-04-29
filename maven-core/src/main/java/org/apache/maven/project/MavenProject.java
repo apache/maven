@@ -102,6 +102,8 @@ public class MavenProject
 
     public static final String EMPTY_PROJECT_VERSION = "0";
 
+    private static final MavenProject ERROR_BUILDING_PARENT = new MavenProject();
+
     private Model model;
 
     private MavenProject parent;
@@ -343,6 +345,10 @@ public class MavenProject
         return model;
     }
 
+    /**
+     * Returns the project corresponding to a declared parent.
+     * @return the parent, or null if no parent is declared or there was an error building it
+     */
     public MavenProject getParent()
     {
         if ( parent == null )
@@ -363,7 +369,11 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new IllegalStateException( "Failed to build parent project for " + getId(), e );
+                    if ( logger != null )
+                    {
+                        logger.error( "Failed to build parent project for " + getId(), e );
+                    }
+                    parent = ERROR_BUILDING_PARENT;
                 }
             }
             else if ( model.getParent() != null )
@@ -378,11 +388,15 @@ public class MavenProject
                 }
                 catch ( ProjectBuildingException e )
                 {
-                    throw new IllegalStateException( "Failed to build parent project for " + getId(), e );
+                    if ( logger != null )
+                    {
+                        logger.error( "Failed to build parent project for " + getId(), e );
+                    }
+                    parent = ERROR_BUILDING_PARENT;
                 }
             }
         }
-        return parent;
+        return parent == ERROR_BUILDING_PARENT ? null : parent;
     }
 
     public void setParent( MavenProject parent )
