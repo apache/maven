@@ -112,8 +112,6 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // These do not work as a result of the Eclipse Aether change. They are directly using the Site and Dependency plugins
         // -------------------------------------------------------------------------------------------------------------
-        //MavenITmng3372DirectInvocationOfPluginsTest>AbstractMavenIntegrationTestCase.runTest:220->testDependencyTreeInvocation:83 » Verification
-        //suite.addTestSuite( MavenITmng3372DirectInvocationOfPluginsTest.class ); dependency:tree requires maven-dependency-tree 2.1
         //MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest>AbstractMavenIntegrationTestCase.runTest:220->testit:56 ? Verification
         //suite.addTestSuite( MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest.class );
 
