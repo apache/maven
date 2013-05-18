@@ -61,7 +61,12 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
-      <version>1.0-alpha-11</version>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.reporting</groupId>
+      <artifactId>maven-reporting-exec</artifactId>
+      <version>1.1</version>
     </dependency>
   </dependencies>
 </project>
