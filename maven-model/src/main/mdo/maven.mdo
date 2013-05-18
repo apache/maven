@@ -96,7 +96,7 @@
         </field>
         <field>
           <name>modelVersion</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>Declares to which version of project descriptor this POM conforms.</description>
           <type>String</type>
@@ -122,7 +122,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>parent</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The location of the parent project, if one exists. Values from the parent
             project will be the default for this project if they are left unspecified. The location
             is given as a group ID, artifact ID and version.</description>
@@ -179,7 +179,7 @@
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>The current version of the artifact produced by this project.</description>
           <type>String</type>
@@ -195,7 +195,7 @@
         </field>
         <field>
           <name>packaging</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The type of artifact this project produces, for example <code>jar</code>
@@ -350,7 +350,7 @@
 
         <field xdoc.separator="blank">
           <name>prerequisites</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Describes the prerequisites in the build environment for this project.</description>
           <association>
             <type>Prerequisites</type>
@@ -384,7 +384,7 @@
         </field>
         <field xdoc.separator="blank" xml.insertParentFieldsUpTo="modules">
           <name>scm</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Specification for the SCM used by the project, such as CVS, Subversion, etc.</description>
           <association>
             <type>Scm</type>
@@ -403,7 +403,7 @@
         </field>
         <field>
           <name>issueManagement</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The project's issue management system information.</description>
           <association>
             <type>IssueManagement</type>
@@ -422,7 +422,7 @@
         </field>
         <field>
           <name>ciManagement</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The project's continuous integration information.</description>
           <association>
             <type>CiManagement</type>
@@ -526,7 +526,7 @@
 
         <field xdoc.separator="blank" xml.insertParentFieldsUpTo="reporting">
           <name>profiles</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>A listing of project-local build profiles which will modify the build process
             when activated.</description>
           <association>
@@ -564,7 +564,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     private void cloneHook( Model copy )
@@ -643,7 +643,7 @@
       <fields>
         <field xdoc.separator="blank">
           <name>modules</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The modules (sometimes called subprojects) to build as a part of this
             project. Each module listed is a relative path to the directory containing the module.</description>
           <association>
@@ -653,7 +653,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>distributionManagement</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Distribution information for a project that enables deployment of the site
             and artifacts to remote web servers and repositories respectively.</description>
           <association>
@@ -662,7 +662,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>properties</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Properties that can be used throughout the POM as a substitution, and
@@ -678,7 +678,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>dependencyManagement</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>false</required>
           <description>Default dependency information for projects that inherit from this one. The
             dependencies in this section are not immediately resolved. Instead, when a POM derived
@@ -710,7 +710,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>repositories</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The lists of the remote repositories for discovering dependencies and
             extensions.</description>
           <association>
@@ -720,7 +720,7 @@
         </field>
         <field>
           <name>pluginRepositories</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The lists of the remote repositories for discovering plugins for builds and
             reports.</description>
           <association>
@@ -730,7 +730,7 @@
         </field>
         <field xdoc.separator="blank">
           <name>reports</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             <b>Deprecated</b>. Now ignored by Maven.
@@ -740,7 +740,7 @@
         </field>
         <field>
           <name>reporting</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             This element includes the specification of report plugins to use
@@ -777,7 +777,7 @@
       <fields>
         <field>
           <name>plugins</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The list of plugins to use.</description>
           <association>
             <type>Plugin</type>
@@ -787,7 +787,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     java.util.Map<String, Plugin> pluginMap;
@@ -836,7 +836,7 @@
           | plugins to be used in sub-projects. -->
         <field>
           <name>pluginManagement</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>false</required>
           <description>Default plugin information to be made available for reference by projects
             derived from this one. This plugin configuration will not be resolved or bound to the
@@ -876,7 +876,7 @@
         </field>
         <field>
           <name>testResources</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>This element describes all of the classpath resources such as properties
             files associated with a project's unit tests.</description>
           <association>
@@ -886,13 +886,13 @@
         </field>
         <field>
           <name>directory</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The directory where all files generated by the build are placed.</description>
           <type>String</type>
         </field>
         <field>
           <name>finalName</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The filename (excluding the extension, and with no path information) that
@@ -904,7 +904,7 @@
         </field>
         <field>
           <name>filters</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The list of filter properties files that are used when filtering is enabled.</description>
           <association>
             <type>String</type>
@@ -942,7 +942,7 @@
         </field>
         <field>
           <name>scriptSourceDirectory</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>This element specifies a directory containing the script sources of the
             project. This directory is meant to be different from the sourceDirectory, in that its
@@ -961,7 +961,7 @@
         </field>
         <field>
           <name>testSourceDirectory</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>This element specifies a directory containing the unit test source of the
             project. The generated build system will compile these directories when the project is
@@ -1016,19 +1016,19 @@
         </field>
         <field>
           <name>outputDirectory</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The directory where compiled application classes are placed.</description>
           <type>String</type>
         </field>
         <field>
           <name>testOutputDirectory</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The directory where compiled test classes are placed.</description>
           <type>String</type>
         </field>
         <field>
           <name>extensions</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>A set of build extensions to use from this project.</description>
           <association>
             <type>Extension</type>
@@ -1039,7 +1039,7 @@
     </class>
     <class java.clone="deep">
       <name>CiManagement</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>
         <![CDATA[
         The <code>&lt;CiManagement&gt;</code> element contains informations required to the
@@ -1049,7 +1049,7 @@
       <fields>
         <field>
           <name>system</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The name of the continuous integration system, e.g. <code>continuum</code>.
@@ -1059,14 +1059,14 @@
         </field>
         <field>
           <name>url</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>URL for the continuous integration system used by the project if it has a web
             interface.</description>
           <type>String</type>
         </field>
         <field>
           <name>notifiers</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Configuration for notifying developers/users when a build is unsuccessful,
             including user information and notification mode.</description>
           <association>
@@ -1079,39 +1079,39 @@
     <class java.clone="deep">
       <name>Notifier</name>
       <description>Configures one method for notifying users/developers when a build breaks.</description>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <fields>
         <field>
           <name>type</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <defaultValue>mail</defaultValue>
           <type>String</type>
           <description>The mechanism used to deliver notifications.</description>
         </field>
         <field>
           <name>sendOnError</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
           <description>Whether to send notifications on error.</description>
         </field>
         <field>
           <name>sendOnFailure</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
           <description>Whether to send notifications on failure.</description>
         </field>
         <field>
           <name>sendOnSuccess</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
           <description>Whether to send notifications on success.</description>
         </field>
         <field>
           <name>sendOnWarning</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <defaultValue>true</defaultValue>
           <type>boolean</type>
           <description>Whether to send notifications on warning.</description>
@@ -1119,7 +1119,7 @@
         <!-- TODO: Remove it after continuum alpha-3 release -->
         <field>
           <name>address</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -1305,7 +1305,7 @@
         </field>
         <field>
           <name>type</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The type of dependency. While it
@@ -1326,7 +1326,7 @@
         </field>
         <field>
           <name>classifier</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The classifier of the dependency. It is appended to
@@ -1362,7 +1362,7 @@
         </field>
         <field>
           <name>scope</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The scope of the dependency - <code>compile</code>, <code>runtime</code>,
@@ -1383,7 +1383,7 @@
         </field>
         <field>
           <name>systemPath</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             FOR SYSTEM SCOPE ONLY. Note that use of this property is <b>discouraged</b>
@@ -1398,7 +1398,7 @@
         </field>
         <field>
           <name>exclusions</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Lists a set of artifacts that should be excluded from this dependency's
             artifact list when it comes to calculating transitive dependencies.</description>
           <association>
@@ -1408,7 +1408,7 @@
         </field>
         <field>
           <name>optional</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Indicates the dependency is optional for use of this library. While the
@@ -1437,7 +1437,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     public boolean isOptional()
@@ -1461,7 +1461,7 @@
           </code>
         </codeSegment>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     /**
@@ -1597,7 +1597,7 @@
     </class>
     <class java.clone="deep">
       <name>Exclusion</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>
         <![CDATA[
         The <code>&lt;exclusion&gt;</code> element contains informations required to exclude
@@ -1607,14 +1607,14 @@
       <fields>
         <field>
           <name>artifactId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The artifact ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
           <name>groupId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The group ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
@@ -1625,17 +1625,17 @@
       <name>IssueManagement</name>
       <description>Information about the issue tracking (or bug tracking) system used to manage this
         project.</description>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <fields>
         <field>
           <name>system</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The name of the issue management system, e.g. Bugzilla</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>URL for the issue management system used by the project.</description>
           <type>String</type>
         </field>
@@ -1643,13 +1643,13 @@
     </class>
     <class java.clone="deep">
       <name>DistributionManagement</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>This elements describes all that pertains to distribution for a project. It is
         primarily used for deployment of artifacts and the site produced by the build.</description>
       <fields>
         <field>
           <name>repository</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Information needed to deploy the artifacts generated by the project to a
             remote repository.</description>
           <association>
@@ -1658,7 +1658,7 @@
         </field>
         <field>
           <name>snapshotRepository</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Where to deploy snapshots of artifacts to. If not given, it defaults to the
@@ -1672,7 +1672,7 @@
         <field>
           <name>site</name>
           <description>Information needed for deploying the web site of the project.</description>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <association>
             <type>Site</type>
           </association>
@@ -1692,7 +1692,7 @@
         </field>
         <field>
           <name>relocation</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Relocation information of the artifact if it has been moved to a new group ID
             and/or artifact ID.</description>
           <association>
@@ -1701,7 +1701,7 @@
         </field>
         <field>
           <name>status</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Gives the status of this artifact in the remote repository.
@@ -1923,7 +1923,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     /**
@@ -1959,7 +1959,7 @@
     </class>
     <class java.clone="deep">
       <name>Parent</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>
         <![CDATA[
         The <code>&lt;parent&gt;</code> element contains information required to locate the parent project from which
@@ -1970,27 +1970,27 @@
       <fields>
         <field>
           <name>groupId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The group id of the parent project to inherit from.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The artifact id of the parent project to inherit from.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The version of the parent project to inherit.</description>
           <type>String</type>
         </field>
         <field>
           <name>relativePath</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The relative path of the parent <code>pom.xml</code> file within the check out.
@@ -2012,7 +2012,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     /**
@@ -2090,7 +2090,7 @@
     </class>
     <class java.clone="deep">
       <name>Scm</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>
         <![CDATA[
         The <code>&lt;scm&gt;</code> element contains informations required to the SCM
@@ -2100,7 +2100,7 @@
       <fields>
         <field>
           <name>connection</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The source control management system URL
@@ -2116,7 +2116,7 @@
         </field>
         <field>
           <name>developerConnection</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
@@ -2128,14 +2128,14 @@
         </field>
         <field>
           <name>tag</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The tag of current code. By default, it's set to HEAD during development.</description>
           <type>String</type>
           <defaultValue>HEAD</defaultValue>
         </field>
         <field>
           <name>url</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
@@ -2162,7 +2162,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     /**
@@ -2231,7 +2231,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     private static int mergeIdCounter = 0;
@@ -2376,13 +2376,13 @@
 
     <class java.clone="deep">
       <name>RepositoryBase</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>A repository contains the information needed for establishing connections with
         remote repository.</description>
       <fields>
         <field>
           <name>id</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <identifier>true</identifier>
           <description>
@@ -2396,13 +2396,13 @@
         </field>
         <field>
           <name>name</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Human readable name of the repository.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>
             <![CDATA[
@@ -2413,7 +2413,7 @@
         </field>
         <field>
           <name>layout</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The type of layout this repository uses for locating and storing artifacts -
@@ -2429,13 +2429,13 @@
     <class>
       <name>Repository</name>
       <superClass>RepositoryBase</superClass>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>A repository contains the information needed for establishing connections with
         remote repository.</description>
       <fields>
         <field>
           <name>releases</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>How to handle downloading of releases from this repository.</description>
           <association>
             <type>RepositoryPolicy</type>
@@ -2443,7 +2443,7 @@
         </field>
         <field>
           <name>snapshots</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>How to handle downloading of snapshots from this repository.</description>
           <association>
             <type>RepositoryPolicy</type>
@@ -2455,7 +2455,7 @@
     <class>
       <name>DeploymentRepository</name>
       <superClass>Repository</superClass>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Repository contains the information needed for deploying to the remote
         repository.</description>
       <fields>
@@ -2465,19 +2465,19 @@
             build number, or to use the same version each time</description>
           <type>boolean</type>
           <defaultValue>true</defaultValue>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
         </field>
       </fields>
     </class>
 
     <class java.clone="deep">
       <name>RepositoryPolicy</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Download policy.</description>
       <fields>
         <field>
           <name>enabled</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Whether to use this repository for downloading this type of artifact. Note: While the type
@@ -2489,7 +2489,7 @@
         </field>
         <field>
           <name>updatePolicy</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The frequency for downloading updates - can be
@@ -2506,7 +2506,7 @@
         </field>
         <field>
           <name>checksumPolicy</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             What to do when verification of an artifact checksum fails. Valid values are
@@ -2523,7 +2523,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
 
@@ -2546,12 +2546,12 @@
     <!--@todo find better solution for management of site deployments -->
     <class java.clone="deep">
       <name>Site</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Contains the information needed for deploying websites.</description>
       <fields>
         <field>
           <name>id</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             A unique identifier for a deployment location. This is used to match the
@@ -2562,13 +2562,13 @@
         </field>
         <field>
           <name>name</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Human readable name of the deployment location.</description>
           <type>String</type>
         </field>
         <field>
           <name>url</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
@@ -2582,12 +2582,12 @@
 
     <class java.clone="deep">
       <name>ConfigurationContainer</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Contains the configuration information of the container like Plugin.</description>
       <fields>
         <field>
           <name>inherited</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Whether any configuration should be propagated to child POMs. Note: While the type
@@ -2620,7 +2620,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     public boolean isInherited()
@@ -2651,7 +2651,7 @@
     </class>
     <class>
       <name>Plugin</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
@@ -2662,26 +2662,26 @@
         <field>
           <name>groupId</name>
           <description>The group ID of the plugin in the repository.</description>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>org.apache.maven.plugins</defaultValue>
         </field>
         <field>
           <name>artifactId</name>
           <description>The artifact ID of the plugin in the repository.</description>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <required>true</required>
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The version (or valid range of versions) of the plugin to be used.</description>
           <type>String</type>
         </field>
         <field>
           <name>extensions</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -2694,7 +2694,7 @@
         </field>
         <field>
           <name>executions</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Multiple specifications of a set of goals to execute during the build
             lifecycle, each having (possibly) a different configuration.</description>
           <association>
@@ -2706,7 +2706,7 @@
           <name>dependencies</name>
           <description>Additional dependencies that this project needs to introduce to the plugin's
             classloader.</description>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <association>
             <type>Dependency</type>
             <multiplicity>*</multiplicity>
@@ -2714,7 +2714,7 @@
         </field>
         <field>
           <name>goals</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             <b>Deprecated</b>. Unused by Maven.
@@ -2725,7 +2725,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     public boolean isExtensions()
@@ -2855,7 +2855,7 @@
     </class>
     <class>
       <name>PluginExecution</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
@@ -2866,7 +2866,7 @@
       <fields>
         <field>
           <name>id</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
           <description>The identifier of this execution for labelling the goals during the build,
@@ -2874,14 +2874,14 @@
         </field>
         <field>
           <name>phase</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The build lifecycle phase to bind the goals in this execution to. If omitted,
             the goals will be bound to the default phase specified in their metadata. </description>
         </field>
         <field xml.transient="true">
           <name>priority</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>int</type>
           <description>
             <![CDATA[
@@ -2894,7 +2894,7 @@
         </field>
         <field>
           <name>goals</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The goals to execute with the given configuration.</description>
           <association>
             <type>String</type>
@@ -2904,7 +2904,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     public static final String DEFAULT_EXECUTION_ID = "default";
@@ -2921,13 +2921,13 @@
     </class>
     <class java.clone="deep">
       <name>DependencyManagement</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Section for management of default dependency information for use in a group of
         POMs.</description>
       <fields>
         <field>
           <name>dependencies</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The dependencies specified here are not used until they are referenced in a
             POM within the group. This allows the specification of a "standard" version for a
             particular dependency.</description>
@@ -2940,19 +2940,19 @@
     </class>
     <class>
       <name>PluginManagement</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <superClass>PluginContainer</superClass>
       <description>Section for management of default plugin information for use in a group of POMs.
       </description>
     </class>
     <class java.clone="deep">
       <name>Reporting</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Section for management of reports and their configuration.</description>
       <fields>
         <field>
           <name>excludeDefaults</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -2965,7 +2965,7 @@
         </field>
         <field>
           <name>outputDirectory</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -2978,7 +2978,7 @@
         </field>
         <field>
           <name>plugins</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The reporting plugins to use and their configuration.</description>
           <association>
             <type>ReportPlugin</type>
@@ -2988,7 +2988,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     public boolean isExcludeDefaults()
@@ -3041,14 +3041,14 @@
     <class>
       <name>Profile</name>
       <superClass>ModelBase</superClass>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Modifications to the build process which is activated based on environmental
         parameters or command line arguments.</description>
       <fields>
         <field>
           <name>id</name>
           <required>true</required>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
           <description>The identifier of this build profile. This is used for command line
@@ -3057,7 +3057,7 @@
         </field>
         <field>
           <name>activation</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The conditional logic which will automatically trigger the inclusion of this
             profile.</description>
           <association>
@@ -3066,7 +3066,7 @@
         </field>
         <field xml.tagName="build">
           <name>build</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>Information required to build the project.</description>
           <association>
@@ -3076,7 +3076,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     public static final String SOURCE_POM = "pom";
@@ -3111,13 +3111,13 @@
     </class>
     <class java.clone="deep">
       <name>Activation</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>The conditions within the build runtime environment which will trigger the
         automatic inclusion of the build profile.</description>
       <fields>
         <field>
           <name>activeByDefault</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>boolean</type>
           <description>If set to true, this profile will be active unless another profile in this
             pom is activated using the command line -P option or by one of that profile's
@@ -3125,7 +3125,7 @@
         </field>
         <field>
           <name>jdk</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -3137,7 +3137,7 @@
         </field>
         <field>
           <name>os</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Specifies that this profile will be activated when matching operating system
             attributes are detected.</description>
           <association>
@@ -3146,7 +3146,7 @@
         </field>
         <field>
           <name>property</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Specifies that this profile will be activated when this system property is
             specified.</description>
           <association>
@@ -3155,7 +3155,7 @@
         </field>
         <field>
           <name>file</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Specifies that this profile will be activated based on existence of a file.</description>
           <association>
             <type>ActivationFile</type>
@@ -3165,7 +3165,7 @@
         This could be included once we teach Maven to deal with multiple versions of the model
         <field>
           <name>custom</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>Describes a custom profile activation trigger, brought in via build
             extension.</description>
           <association>
@@ -3177,21 +3177,21 @@
     </class>
     <class java.clone="deep">
       <name>ActivationProperty</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>This is the property specification used to activate a profile. If the value field
         is empty, then the existence of the named property will activate the profile, otherwise it
         does a case-sensitive match against the property value as well.</description>
       <fields>
         <field>
           <name>name</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The name of the property to be used to activate a profile.</description>
         </field>
         <field>
           <name>value</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The value of the property required to activate a profile.</description>
         </field>
@@ -3199,13 +3199,13 @@
     </class>
     <class java.clone="deep">
       <name>ActivationOS</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>This is an activator which will detect an operating system's attributes in order
         to activate its profile.</description>
       <fields>
         <field>
           <name>name</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -3216,7 +3216,7 @@
         </field>
         <field>
           <name>family</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>
             <![CDATA[
@@ -3227,14 +3227,14 @@
         </field>
         <field>
           <name>arch</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The architecture of the operating system to be used to activate the
           profile.</description>
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The version of the operating system to be used to activate the
           profile.</description>
@@ -3243,7 +3243,7 @@
     </class>
     <class java.clone="deep">
       <name>ActivationFile</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>This is the file specification used to activate the profile. The missing value
         will be the location of a file that needs to exist, and if it doesn't the profile will be
         activated. On the other hand exists will test for the existence of the file and if it is
@@ -3251,14 +3251,14 @@
       <fields>
         <field>
           <name>missing</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The name of the file that must be missing to activate the
           profile.</description>
         </field>
         <field>
           <name>exists</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The name of the file that must exist to activate the profile.</description>
         </field>
@@ -3268,19 +3268,19 @@
     This can be put back in when we figure out how to have multiple model versions
     <class>
       <name>ActivationCustom</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>This activation allows users to specify their own custom trigger for a profile.</description>
       <fields>
         <field>
           <name>configuration</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>DOM</type>
           <description>The specification for triggering the profile according to the rules of the
             custom activation type.</description>
         </field>
         <field>
           <name>type</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <description>The type (role-hint) of activation which is to be used to activate the
             profile.</description>
@@ -3291,7 +3291,7 @@
     <!-- /BuildProfile support -->
     <class xml.tagName="plugin" java.clone="deep">
       <name>ReportPlugin</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
@@ -3301,7 +3301,7 @@
       <fields>
         <field>
           <name>groupId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
@@ -3309,20 +3309,20 @@
         </field>
         <field>
           <name>artifactId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The artifact ID of the reporting plugin in the repository.</description>
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The version of the reporting plugin to be used.</description>
           <type>String</type>
         </field>
         <field>
           <name>reportSets</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>
             <![CDATA[
             Multiple specifications of a set of reports, each having (possibly) different
@@ -3337,7 +3337,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     private java.util.Map<String, ReportSet> reportSetMap = null;
@@ -3396,7 +3396,7 @@
     </class>
     <class java.clone="deep">
       <name>ReportSet</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>Represents a set of reports and configuration to be used to generate them.</description>
       <fields>
@@ -3411,7 +3411,7 @@
         </field>
         <field>
           <name>reports</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <required>true</required>
           <description>The list of reports from this plugin which should be generated from this set.</description>
           <association>
@@ -3422,7 +3422,7 @@
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     @Override
@@ -3437,12 +3437,12 @@
     </class>
     <class java.clone="deep">
       <name>Prerequisites</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Describes the prerequisites a project can have.</description>
       <fields>
         <field>
           <name>maven</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>2.0</defaultValue>
           <description>The minimum version of Maven required to build the project, or to use this
@@ -3453,31 +3453,31 @@
     </class>
     <class java.clone="deep">
       <name>Relocation</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Describes where an artifact has moved to. If any of the values are omitted, it is
         assumed to be the same as it was before.</description>
       <fields>
         <field>
           <name>groupId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The group ID the artifact has moved to.</description>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The new artifact ID of the artifact.</description>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The new version of the artifact.</description>
           <type>String</type>
         </field>
         <field>
           <name>message</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>An additional message to show the user about the move, such as the reason.</description>
           <type>String</type>
         </field>
@@ -3485,33 +3485,33 @@
     </class>
     <class java.clone="deep">
       <name>Extension</name>
-      <version>4.0.0</version>
+      <version>4.0.0+</version>
       <description>Describes a build extension to utilise.</description>
       <fields>
         <field>
           <name>groupId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The group ID of the extension's artifact.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>artifactId</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The artifact ID of the extension.</description>
           <required>true</required>
           <type>String</type>
         </field>
         <field>
           <name>version</name>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <description>The version of the extension.</description>
           <type>String</type>
         </field>
       </fields>
       <codeSegments>
         <codeSegment>
-          <version>4.0.0</version>
+          <version>4.0.0+</version>
           <code>
             <![CDATA[
     /**
