@@ -645,7 +645,9 @@
           <name>modules</name>
           <version>4.0.0+</version>
           <description>The modules (sometimes called subprojects) to build as a part of this
-            project. Each module listed is a relative path to the directory containing the module.</description>
+            project. Each module listed is a relative path to the directory containing the module.
+            To be consistent with the way default urls are calculated from parent, it is recommended
+            to have module names match artifact ids.</description>
           <association>
             <type>String</type>
             <multiplicity>*</multiplicity>
