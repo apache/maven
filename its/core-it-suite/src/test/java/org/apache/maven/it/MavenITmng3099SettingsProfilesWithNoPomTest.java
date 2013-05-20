@@ -53,8 +53,8 @@ public class MavenITmng3099SettingsProfilesWithNoPomTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3099" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.mng3099:maven-mng3099-plugin:0.1:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

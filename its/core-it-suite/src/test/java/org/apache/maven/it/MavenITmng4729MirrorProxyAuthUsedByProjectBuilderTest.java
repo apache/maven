@@ -23,8 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.mortbay.jetty.Server;
@@ -97,8 +95,8 @@ public class MavenITmng4729MirrorProxyAuthUsedByProjectBuilderTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();

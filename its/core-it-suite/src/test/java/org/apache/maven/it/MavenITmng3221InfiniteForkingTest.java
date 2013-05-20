@@ -60,7 +60,7 @@ public class MavenITmng3221InfiniteForkingTest
 
             verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
-            verifier.getCliOptions().add( "-Psite" );
+            verifier.addCliOption( "-Psite" );
 
             verifier.setLogFileName( "mng-3221-a-log.txt" );
             verifier.executeGoal( "site" );
@@ -98,7 +98,7 @@ public class MavenITmng3221InfiniteForkingTest
 
             verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
-            verifier.getCliOptions().add( "-Pplugin" );
+            verifier.addCliOption( "-Pplugin" );
 
             verifier.setLogFileName( "mng-3221-b-log.txt" );
             verifier.executeGoal( "package" );

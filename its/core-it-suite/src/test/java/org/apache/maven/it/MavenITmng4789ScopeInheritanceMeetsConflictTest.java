@@ -24,7 +24,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4789">MNG-4789</a>.
@@ -53,24 +52,24 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4789" );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertFalse( compile.toString(), compile.contains( "a-0.1.jar" ) );
         assertTrue( compile.toString(), compile.contains( "b-0.1.jar" ) );
         assertFalse( compile.toString(), compile.contains( "x-0.1.jar" ) );
 
-        List runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
+        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
         assertFalse( runtime.toString(), runtime.contains( "a-0.1.jar" ) );
         assertTrue( runtime.toString(), runtime.contains( "b-0.1.jar" ) );
         assertFalse( runtime.toString(), runtime.contains( "x-0.1.jar" ) );
 
-        List test = verifier.loadLines( "target/test.txt", "UTF-8" );
+        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
         assertTrue( test.toString(), test.contains( "a-0.1.jar" ) );
         assertTrue( test.toString(), test.contains( "b-0.1.jar" ) );
         assertTrue( test.toString(), test.contains( "x-0.1.jar" ) );

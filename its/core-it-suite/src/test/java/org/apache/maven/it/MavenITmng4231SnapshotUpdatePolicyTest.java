@@ -50,8 +50,8 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4231" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "always" );
@@ -87,8 +87,8 @@ public class MavenITmng4231SnapshotUpdatePolicyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4231" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "never" );

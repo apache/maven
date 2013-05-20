@@ -53,8 +53,8 @@ public class MavenITmng4086ExplicitPluginMetaversionTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4086" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-release.txt" );
         verifier.executeGoal( "org.apache.maven.its.mng4086:maven-it-plugin-a:RELEASE:touch" );
         verifier.verifyErrorFreeLog();
@@ -78,8 +78,8 @@ public class MavenITmng4086ExplicitPluginMetaversionTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4086" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-latest.txt" );
         verifier.executeGoal( "org.apache.maven.its.mng4086:maven-it-plugin-a:LATEST:touch" );
         verifier.verifyErrorFreeLog();

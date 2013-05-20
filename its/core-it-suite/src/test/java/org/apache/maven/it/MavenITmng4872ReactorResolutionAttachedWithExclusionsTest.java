@@ -55,7 +55,7 @@ public class MavenITmng4872ReactorResolutionAttachedWithExclusionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );
 
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4872:producer:jar:0.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4872:producer:jar:shaded:0.1" ) );

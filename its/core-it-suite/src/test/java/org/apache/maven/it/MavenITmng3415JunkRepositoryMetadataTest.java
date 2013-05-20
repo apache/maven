@@ -96,9 +96,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         filterProps.put( "@port@", "0" );
         File settings = verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
 
-        verifier.getCliOptions().add( "-X" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( settings.getName() );
+        verifier.addCliOption( "-X" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( settings.getName() );
 
         verifier.setLogFileName( "log-" + methodName + "-firstBuild.txt" );
         verifier.executeGoal( "validate" );
@@ -188,9 +188,9 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             filterProps.put( "@port@", Integer.toString( port ) );
             File settings = verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
 
-            verifier.getCliOptions().add( "-X" );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( settings.getName() );
+            verifier.addCliOption( "-X" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( settings.getName() );
 
             setupDummyDependency( verifier, testDir, true );
 

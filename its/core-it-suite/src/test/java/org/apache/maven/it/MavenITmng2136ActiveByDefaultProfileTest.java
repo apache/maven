@@ -53,8 +53,8 @@ public class MavenITmng2136ActiveByDefaultProfileTest
 
         verifier.setSystemProperty( "expression.outputFile", new File( testDir, "target/expression.properties" ).getPath() );
         verifier.setSystemProperty( "expression.expressions", "project/properties" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-expression:2.1-SNAPSHOT:eval" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

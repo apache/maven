@@ -51,7 +51,7 @@ public class MavenITmng4009InheritProfileEffectsTest
         Verifier verifier = newVerifier( new File( testDir, "sub" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Pparent-profile" );
+        verifier.addCliOption( "-Pparent-profile" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

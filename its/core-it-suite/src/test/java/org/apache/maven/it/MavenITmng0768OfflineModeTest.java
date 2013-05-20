@@ -116,8 +116,8 @@ public class MavenITmng0768OfflineModeTest
                 Properties props = new Properties();
                 props.put( "@port@", Integer.toString( port ) );
                 verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", props );
-                verifier.getCliOptions().add( "--settings" );
-                verifier.getCliOptions().add( "settings.xml" );
+                verifier.addCliOption( "--settings" );
+                verifier.addCliOption( "settings.xml" );
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
                 verifier.assertFilePresent( "target/compile.txt" );
                 verifier.verifyErrorFreeLog();
@@ -131,9 +131,9 @@ public class MavenITmng0768OfflineModeTest
                 Verifier verifier = newVerifier( testDir.getAbsolutePath() );
                 verifier.setAutoclean( false );
                 verifier.deleteDirectory( "target" );
-                verifier.getCliOptions().add( "-o" );
-                verifier.getCliOptions().add( "--settings" );
-                verifier.getCliOptions().add( "settings.xml" );
+                verifier.addCliOption( "-o" );
+                verifier.addCliOption( "--settings" );
+                verifier.addCliOption( "settings.xml" );
                 verifier.setLogFileName( "log2.txt" );
                 verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
                 verifier.assertFilePresent( "target/compile.txt" );
@@ -150,9 +150,9 @@ public class MavenITmng0768OfflineModeTest
                 verifier.setAutoclean( false );
                 verifier.deleteDirectory( "target" );
                 verifier.deleteArtifacts( "org.apache.maven.its.mng0768" );
-                verifier.getCliOptions().add( "-o" );
-                verifier.getCliOptions().add( "--settings" );
-                verifier.getCliOptions().add( "settings.xml" );
+                verifier.addCliOption( "-o" );
+                verifier.addCliOption( "--settings" );
+                verifier.addCliOption( "settings.xml" );
                 verifier.setLogFileName( "log3.txt" );
                 try
                 {

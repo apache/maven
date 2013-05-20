@@ -58,7 +58,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4555" );
 
-        final List uris = new ArrayList();
+        final List<String> uris = new ArrayList<String>();
 
         Handler repoHandler = new AbstractHandler()
         {
@@ -90,9 +90,9 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "--offline" );
-            verifier.getCliOptions().add( "--settings" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "--offline" );
+            verifier.addCliOption( "--settings" );
+            verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
         }
         catch ( VerificationException e )

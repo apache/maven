@@ -60,7 +60,7 @@ public class MavenITmng5137ReactorResolutionInForkedBuildTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
 
         assertTrue( compile.toString(), compile.contains( "producer/pom.xml" ) );
     }

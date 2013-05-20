@@ -49,8 +49,8 @@ public class MavenITmng4189UniqueVersionSnapshotTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4189" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-1:jar 
         verifier.setLogFileName( "log-1.txt" );
@@ -62,8 +62,8 @@ public class MavenITmng4189UniqueVersionSnapshotTest
 
         // depend on org.apache.maven.its.mng4189:dep:1.0-20090608.090416-2:jar 
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-f" );
-        verifier.getCliOptions().add( "dependent-on-newer-timestamp-pom.xml" );
+        verifier.addCliOption( "-f" );
+        verifier.addCliOption( "dependent-on-newer-timestamp-pom.xml" );
         verifier.setLogFileName( "log-2.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

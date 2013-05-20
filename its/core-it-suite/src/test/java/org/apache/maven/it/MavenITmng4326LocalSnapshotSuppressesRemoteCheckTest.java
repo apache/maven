@@ -144,8 +144,8 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "--settings" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "--settings" );
+            verifier.addCliOption( "settings.xml" );
             verifier.setLogFileName( "log-daily.txt" );
             verifier.deleteDirectory( "target" );
             verifier.executeGoal( "validate" );
@@ -160,7 +160,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             uris.clear();
 
             // test 2: force snapshot updates, remote metadata and artifacts should be fetched
-            verifier.getCliOptions().add( "-U" );
+            verifier.addCliOption( "-U" );
             verifier.setLogFileName( "log-force.txt" );
             verifier.deleteDirectory( "target" );
             verifier.executeGoal( "validate" );

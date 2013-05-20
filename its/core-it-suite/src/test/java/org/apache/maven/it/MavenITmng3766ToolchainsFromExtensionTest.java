@@ -50,8 +50,8 @@ public class MavenITmng3766ToolchainsFromExtensionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--toolchains" );
-        verifier.getCliOptions().add( "toolchains.xml" );
+        verifier.addCliOption( "--toolchains" );
+        verifier.addCliOption( "toolchains.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

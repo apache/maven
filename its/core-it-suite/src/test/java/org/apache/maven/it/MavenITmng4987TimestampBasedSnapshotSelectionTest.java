@@ -52,14 +52,14 @@ public class MavenITmng4987TimestampBasedSnapshotSelectionTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4987" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
 
         assertTrue( compile.toString(), compile.get( 1 ).toString().startsWith( "dep-0.1-" ) );
     }

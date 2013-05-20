@@ -51,8 +51,8 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.setAutoclean( false );
         verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "always" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
@@ -84,8 +84,8 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.setAutoclean( false );
         verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "never" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
@@ -117,9 +117,9 @@ public class MavenITmng4745PluginVersionUpdateTest
         verifier.setAutoclean( false );
         verifier.setForkJvm( true );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4745" );
-        verifier.getCliOptions().add( "-U" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-U" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@updates@", "never" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );

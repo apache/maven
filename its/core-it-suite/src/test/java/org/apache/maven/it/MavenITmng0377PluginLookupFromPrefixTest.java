@@ -52,8 +52,8 @@ public class MavenITmng0377PluginLookupFromPrefixTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng0377" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.setSystemProperty( "touch.outputFile", "target/file.txt" );
         verifier.executeGoal( "itprefix:touch" );
         verifier.verifyErrorFreeLog();

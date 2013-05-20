@@ -56,8 +56,8 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
         Verifier verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.getCliOptions().add( "-pl" );
-        verifier.getCliOptions().add( "." );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "." );
         verifier.setLogFileName( "log-root.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -78,8 +78,8 @@ public class MavenITmng4262MakeLikeReactorDottedPathTest
         Verifier verifier = newVerifier( new File( testDir, "parent" ).getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.getCliOptions().add( "-pl" );
-        verifier.getCliOptions().add( "../sub-a" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "../sub-a" );
         verifier.setLogFileName( "log-module.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

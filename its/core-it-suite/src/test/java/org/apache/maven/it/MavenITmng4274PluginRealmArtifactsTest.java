@@ -57,8 +57,8 @@ public class MavenITmng4274PluginRealmArtifactsTest
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "1.1.4274", "jar" );
         verifier.deleteArtifact( "org.codehaus.plexus", "plexus-utils", "1.1.4274", "pom" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

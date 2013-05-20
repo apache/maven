@@ -52,8 +52,8 @@ public class MavenITmng2972OverridePluginDependencyTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "0.2-mng-2972", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -81,8 +81,8 @@ public class MavenITmng2972OverridePluginDependencyTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifact( "org.apache.maven.its.plugins.class-loader", "dep-b", "9.9-MNG-2972", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

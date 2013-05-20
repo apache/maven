@@ -55,7 +55,7 @@ public class MavenITmng3853ProfileInjectedDistReposTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Pcoreit" );
+        verifier.addCliOption( "-Pcoreit" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

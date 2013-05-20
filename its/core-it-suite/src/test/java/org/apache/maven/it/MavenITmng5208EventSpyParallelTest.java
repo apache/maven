@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.List;
 import org.apache.maven.it.util.ResourceExtractor;
 
 public class MavenITmng5208EventSpyParallelTest
@@ -48,8 +47,8 @@ public class MavenITmng5208EventSpyParallelTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setSystemProperty( "maven.ext.class.path", "../spy/target/event-spy-0.0.1-SNAPSHOT.jar" );
-        verifier.getCliOptions().add( "-X" );
-        verifier.getCliOptions().add( "-T 2" );
+        verifier.addCliOption( "-X" );
+        verifier.addCliOption( "-T 2" );
         verifier.addCliOption( "-fn" );
         verifier.executeGoal( "compile" );
         verifier.verifyTextInLog( "ProjectFailed/org.apache.maven.its.mng5208:sub-2" );

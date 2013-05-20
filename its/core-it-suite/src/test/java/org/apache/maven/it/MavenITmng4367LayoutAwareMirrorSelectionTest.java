@@ -57,8 +57,8 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         filterProps.setProperty( "@mirrorurl@", filterProps.getProperty( "@baseurl@" ) + "/repo" );
         filterProps.setProperty( "@layouts@", "" );
 
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings-a.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings-a.xml" );
         verifier.filterFile( "settings-template.xml", "settings-a.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-a.txt" );
         verifier.executeGoal( "validate" );
@@ -85,8 +85,8 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         filterProps.setProperty( "@mirrorurl@", filterProps.getProperty( "@baseurl@" ) + "/repo" );
         filterProps.setProperty( "@layouts@", "default,legacy" );
 
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings-b.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings-b.xml" );
         verifier.filterFile( "settings-template.xml", "settings-b.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-b.txt" );
         verifier.executeGoal( "validate" );
@@ -113,8 +113,8 @@ public class MavenITmng4367LayoutAwareMirrorSelectionTest
         filterProps.setProperty( "@mirrorurl@", filterProps.getProperty( "@baseurl@" ) + "/void" );
         filterProps.setProperty( "@layouts@", "foo" );
 
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings-c.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings-c.xml" );
         verifier.filterFile( "settings-template.xml", "settings-c.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-c.txt" );
         verifier.executeGoal( "validate" );

@@ -61,7 +61,7 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4772" );
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -88,9 +88,9 @@ public class MavenITmng4772PluginVersionResolutionDoesntTouchDisabledRepoTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-U" );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-U" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "org.apache.maven.its.mng4772:maven-it-plugin:touch" );
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve version for unknown plugin" );

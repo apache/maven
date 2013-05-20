@@ -50,9 +50,9 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
 
     private int port;
 
-    private List requestedUris = Collections.synchronizedList( new ArrayList() );
+    private List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
-    private List deployedUris = Collections.synchronizedList( new ArrayList() );
+    private List<String> deployedUris = Collections.synchronizedList( new ArrayList<String>() );
 
     public MavenITmng4781DeploymentToNexusStagingRepoTest()
     {
@@ -132,7 +132,7 @@ public class MavenITmng4781DeploymentToNexusStagingRepoTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.getCliOptions().add( "-DdeploymentPort=" + port );
+        verifier.addCliOption( "-DdeploymentPort=" + port );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

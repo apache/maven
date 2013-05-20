@@ -95,8 +95,8 @@ public class MavenITmng4489MirroringOfExtensionRepoTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();

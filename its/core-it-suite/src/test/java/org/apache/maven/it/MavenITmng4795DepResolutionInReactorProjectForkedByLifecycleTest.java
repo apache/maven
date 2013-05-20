@@ -24,7 +24,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4795">MNG-4795</a>.
@@ -57,10 +56,10 @@ public class MavenITmng4795DepResolutionInReactorProjectForkedByLifecycleTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile0 = verifier.loadLines( "sub/target/compile-0.txt", "UTF-8" );
+        List<String> compile0 = verifier.loadLines( "sub/target/compile-0.txt", "UTF-8" );
         assertTrue( compile0.toString(), compile0.contains( "maven-core-it-support-1.0.jar" ) );
 
-        List compile1 = verifier.loadLines( "sub/target/compile-1.txt", "UTF-8" );
+        List<String> compile1 = verifier.loadLines( "sub/target/compile-1.txt", "UTF-8" );
         assertTrue( compile1.toString(), compile1.contains( "maven-core-it-support-1.0.jar" ) );
     }
 

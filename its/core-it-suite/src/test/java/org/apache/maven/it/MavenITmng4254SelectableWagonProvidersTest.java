@@ -50,8 +50,8 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.getCliOptions().add( "-Dmaven.wagon.provider.http=coreit" );
-        verifier.getCliOptions().add( "-V" );
+        verifier.addCliOption( "-Dmaven.wagon.provider.http=coreit" );
+        verifier.addCliOption( "-V" );
 
         verifier.setLogFileName( "log-cli.txt" );
         verifier.executeGoal( "validate" );
@@ -72,9 +72,9 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.getCliOptions().add( "-V" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
+        verifier.addCliOption( "-V" );
         
         verifier.setLogFileName( "log-settings.txt" );
         verifier.executeGoal( "validate" );
@@ -95,7 +95,7 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.getCliOptions().add( "-V" );
+        verifier.addCliOption( "-V" );
         
         verifier.setLogFileName( "log-default-http.txt" );
         verifier.executeGoal( "validate" );
@@ -116,8 +116,8 @@ public class MavenITmng4254SelectableWagonProvidersTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
 
-        verifier.getCliOptions().add( "-V" );
-        verifier.getCliOptions().add( "-DwagonProtocol=https" );
+        verifier.addCliOption( "-V" );
+        verifier.addCliOption( "-DwagonProtocol=https" );
         
         verifier.setLogFileName( "log-default-https.txt" );
         verifier.executeGoal( "validate" );

@@ -56,8 +56,8 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setLogFileName( "log1.txt" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -70,8 +70,8 @@ public class MavenITmng3139UseCachedMetadataOfBlacklistedRepoTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
             Collections.singletonMap( "@baseurl@", "http://localhost:63412" ) );
         verifier.setLogFileName( "log2.txt" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

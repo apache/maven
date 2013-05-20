@@ -50,7 +50,7 @@ public class MavenITmng2738ProfileIdCollidesWithCliOptionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Pe" );
+        verifier.addCliOption( "-Pe" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

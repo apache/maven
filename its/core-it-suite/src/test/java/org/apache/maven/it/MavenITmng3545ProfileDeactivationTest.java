@@ -79,8 +79,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log2.txt" );
 
         // Deactivate active by default profiles
-        verifier.getCliOptions().add( "-P-profile1" );
-        verifier.getCliOptions().add( "-P -profile2" );
+        verifier.addCliOption( "-P-profile1" );
+        verifier.addCliOption( "-P -profile2" );
 
         verifier.executeGoal( "validate" );
 
@@ -101,8 +101,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log3.txt" );
 
         // Deactivate active by default profiles
-        verifier.getCliOptions().add( "-P!profile1" );
-        verifier.getCliOptions().add( "-P !profile2" );
+        verifier.addCliOption( "-P!profile1" );
+        verifier.addCliOption( "-P !profile2" );
 
         verifier.executeGoal( "validate" );
 
@@ -128,8 +128,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log4.txt" );
 
         // Activate with a prop, then deactivate
-        verifier.getCliOptions().add( "-Dprofile3-active-by-property=true" );
-        verifier.getCliOptions().add( "-P-profile3" );
+        verifier.addCliOption( "-Dprofile3-active-by-property=true" );
+        verifier.addCliOption( "-P-profile3" );
 
         verifier.executeGoal( "validate" );
 
@@ -158,8 +158,8 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log5.txt" );
 
         // Activate then deactivate
-        verifier.getCliOptions().add( "-Pprofile4" );
-        verifier.getCliOptions().add( "-P-profile4" );
+        verifier.addCliOption( "-Pprofile4" );
+        verifier.addCliOption( "-P-profile4" );
 
         verifier.executeGoal( "validate" );
 
@@ -188,7 +188,7 @@ public class MavenITmng3545ProfileDeactivationTest
         verifier.setLogFileName( "log6.txt" );
 
         // Activate
-        verifier.getCliOptions().add( "-Pprofile4" );
+        verifier.addCliOption( "-Pprofile4" );
 
         verifier.executeGoal( "validate" );
 

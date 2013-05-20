@@ -64,7 +64,7 @@ public class MavenITmng5338FileOptionToDirectory
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng5338" );
 
-        verifier.getCliOptions().add( "-f project" );
+        verifier.addCliOption( "-f project" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

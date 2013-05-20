@@ -55,9 +55,9 @@ public class MavenITmng3732ActiveProfilesTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.getCliOptions().add( "-Ppom,profiles,settings" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
+        verifier.addCliOption( "-Ppom,profiles,settings" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

@@ -51,13 +51,13 @@ public class MavenITmng4975ProfileInjectedPluginExecutionOrderTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Pprofile2,profile1" );
+        verifier.addCliOption( "-Pprofile2,profile1" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/exec.log", "UTF-8" );
-        List expected = Arrays.asList( new String[] { "1", "2", "3", "4", "5" } );
+        List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> expected = Arrays.asList( new String[] { "1", "2", "3", "4", "5" } );
         assertEquals( expected, lines );
     }
 

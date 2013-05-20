@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.mortbay.jetty.Server;
 
 import java.io.File;
 import java.io.FileReader;
@@ -38,10 +37,6 @@ import java.util.List;
 public class MavenITmng5224InjectedSettings
     extends AbstractMavenIntegrationTestCase
 {
-    private Server server;
-
-    private int port;
-
     public MavenITmng5224InjectedSettings()
     {
         // olamy probably doesn't work with 3.x before 3.0.4
@@ -59,8 +54,8 @@ public class MavenITmng5224InjectedSettings
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         //verifier.
         verifier.executeGoal( "validate" );
 

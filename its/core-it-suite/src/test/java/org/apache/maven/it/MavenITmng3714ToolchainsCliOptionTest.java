@@ -61,7 +61,7 @@ public class MavenITmng3714ToolchainsCliOptionTest
 
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--toolchains toolchains.xml" );
+        verifier.addCliOption( "--toolchains toolchains.xml" );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

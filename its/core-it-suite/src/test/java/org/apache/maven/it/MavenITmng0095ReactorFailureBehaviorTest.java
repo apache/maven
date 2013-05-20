@@ -53,7 +53,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-fast" );
+        verifier.addCliOption( "--fail-fast" );
         verifier.setLogFileName( "log-ff.txt" );
         try
         {
@@ -87,7 +87,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-never" );
+        verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn.txt" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.resetStreams();
@@ -114,7 +114,7 @@ public class MavenITmng0095ReactorFailureBehaviorTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-at-end" );
+        verifier.addCliOption( "--fail-at-end" );
         verifier.setLogFileName( "log-fae.txt" );
         try
         {

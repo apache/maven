@@ -57,7 +57,7 @@ public class MavenITmng4677DisabledPluginConfigInheritanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List log = verifier.loadLines( "target/log.txt", "UTF-8" );
+        List<String> log = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "parent-only" } ), log );
 
         log = verifier.loadLines( "child-1/target/log.txt", "UTF-8" );

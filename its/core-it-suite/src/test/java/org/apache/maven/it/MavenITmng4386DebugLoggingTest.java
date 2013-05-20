@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -51,7 +50,7 @@ public class MavenITmng4386DebugLoggingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
         verifier.setLogFileName( "log.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

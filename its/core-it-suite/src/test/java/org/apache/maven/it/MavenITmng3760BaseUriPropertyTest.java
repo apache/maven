@@ -71,7 +71,7 @@ public class MavenITmng3760BaseUriPropertyTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-DbaseUri=myBaseUri" );
+        verifier.addCliOption( "-DbaseUri=myBaseUri" );
         verifier.setLogFileName( "log-sysprop.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

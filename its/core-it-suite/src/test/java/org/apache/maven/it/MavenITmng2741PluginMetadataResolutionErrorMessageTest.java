@@ -65,8 +65,8 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.setLogFileName( "log-" + test + ".txt" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         try
         {
             verifier.executeGoal( goal );

@@ -54,17 +54,17 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4814" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        List goals = new ArrayList();
+        List<String> goals = new ArrayList<String>();
         goals.add( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test" );
         goals.add( "validate" );
         verifier.executeGoals( goals );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
 
         assertFalse( compile.toString(), compile.contains( "0.1-SNAPSHOT/producer-0.1-SNAPSHOT.jar" ) );
         assertTrue( compile.toString(), compile.contains( "producer/pom.xml" ) );

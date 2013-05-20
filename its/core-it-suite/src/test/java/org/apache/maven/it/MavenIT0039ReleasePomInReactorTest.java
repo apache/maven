@@ -52,7 +52,7 @@ public class MavenIT0039ReleasePomInReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "project/target" );
         verifier.deleteDirectory( "project2/target" );
-        verifier.getCliOptions().add( "-r" );
+        verifier.addCliOption( "-r" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

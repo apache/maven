@@ -66,8 +66,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         new File( testDir, "wagon.properties" ).delete();
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings-server-defaults.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings-server-defaults.xml" );
         verifier.setLogFileName( "log-server-defaults.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -87,8 +87,8 @@ public class MavenITmng3600DeploymentModeDefaultsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
         new File( testDir, "wagon.properties" ).delete();
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings-modes-set.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings-modes-set.xml" );
         verifier.setLogFileName( "log-modes-set.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

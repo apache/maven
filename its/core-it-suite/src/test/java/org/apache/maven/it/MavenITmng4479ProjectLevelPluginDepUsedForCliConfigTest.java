@@ -53,8 +53,8 @@ public class MavenITmng4479ProjectLevelPluginDepUsedForCliConfigTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4479" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-parameter-implementation:2.1-SNAPSHOT:param-implementation" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

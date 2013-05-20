@@ -52,14 +52,14 @@ public class MavenITmng4913UserPropertyVsDependencyPomPropertyTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4913" );
         verifier.setSystemProperty( "mng4913.version", "98.76" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
 
         assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "b-0.1.jar" ) );

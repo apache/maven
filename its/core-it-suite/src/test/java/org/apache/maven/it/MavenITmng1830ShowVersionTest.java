@@ -51,7 +51,7 @@ public class MavenITmng1830ShowVersionTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

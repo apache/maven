@@ -52,7 +52,7 @@ public class MavenITmng4328PrimitiveMojoParameterConfigurationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--offline" );
+        verifier.addCliOption( "--offline" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

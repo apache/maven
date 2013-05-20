@@ -61,7 +61,7 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4771" );
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -88,9 +88,9 @@ public class MavenITmng4771PluginPrefixResolutionDoesntTouchDisabledRepoTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-U" );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-U" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
             verifier.executeGoal( "mng4771:touch" );
             verifier.verifyErrorFreeLog();
             fail( "Build should have failed to resolve unknown prefix" );

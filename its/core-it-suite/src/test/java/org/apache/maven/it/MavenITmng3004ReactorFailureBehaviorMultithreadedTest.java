@@ -53,7 +53,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-fast" );
+        verifier.addCliOption( "--fail-fast" );
         verifier.setLogFileName( "log-ff-mt1.txt" );
         verifier.setSystemProperty( "maven.threads.experimental", "1" );
 
@@ -89,7 +89,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-never" );
+        verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn-mt1.txt" );
         verifier.setSystemProperty( "maven.threads.experimental", "1" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
@@ -117,7 +117,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-at-end" );
+        verifier.addCliOption( "--fail-at-end" );
         verifier.setLogFileName( "log-fae-mt1.txt" );
         verifier.setSystemProperty( "maven.threads.experimental", "1" );
         try
@@ -152,7 +152,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-never" );
+        verifier.addCliOption( "--fail-never" );
         verifier.setLogFileName( "log-fn-mt2.txt" );
         verifier.setSystemProperty( "maven.threads.experimental", "2" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
@@ -180,7 +180,7 @@ public class MavenITmng3004ReactorFailureBehaviorMultithreadedTest
         verifier.deleteDirectory( "subproject1/target" );
         verifier.deleteDirectory( "subproject2/target" );
         verifier.deleteDirectory( "subproject3/target" );
-        verifier.getCliOptions().add( "--fail-at-end" );
+        verifier.addCliOption( "--fail-at-end" );
         verifier.setLogFileName( "log-fae-mt2.txt" );
         verifier.setSystemProperty( "maven.threads.experimental", "2" );
         try

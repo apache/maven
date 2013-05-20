@@ -62,8 +62,8 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest
         Properties filterProps = verifier.newDefaultFilterProperties();
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", filterProps );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

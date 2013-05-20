@@ -56,8 +56,8 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
 
         verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
 
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "deploy" );
 
         verifier.verifyErrorFreeLog();

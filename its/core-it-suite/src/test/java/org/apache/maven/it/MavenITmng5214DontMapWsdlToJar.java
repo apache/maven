@@ -60,8 +60,8 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         verifier.setLogFileName( "log-test.txt" );
         verifier.executeGoal( "test" );
         verifier.verifyErrorFreeLog();
-        List lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        Iterator lineIt = lines.iterator();
+        List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        Iterator<String> lineIt = lines.iterator();
         // RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT $ /tmp/it.repo/org/apache/maven/its/mng5214/dependency/1.0-SNAPSHOT/dependency-1.0-SNAPSHOT.wsdl
         while ( lineIt.hasNext() )
         {

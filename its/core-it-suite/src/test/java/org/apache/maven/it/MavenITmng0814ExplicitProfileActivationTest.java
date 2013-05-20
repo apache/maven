@@ -50,8 +50,8 @@ public class MavenITmng0814ExplicitProfileActivationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-P" );
-        verifier.getCliOptions().add( "test-profile" );
+        verifier.addCliOption( "-P" );
+        verifier.addCliOption( "test-profile" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

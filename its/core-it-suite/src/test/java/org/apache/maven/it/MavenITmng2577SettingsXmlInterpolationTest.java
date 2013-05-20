@@ -50,8 +50,8 @@ public class MavenITmng2577SettingsXmlInterpolationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings-env.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings-env.xml" );
         verifier.setEnvironmentVariable( "MNGIT", "env-var-test" );
         verifier.setLogFileName( "log-env.txt" );
         verifier.executeGoal( "validate" );
@@ -75,8 +75,8 @@ public class MavenITmng2577SettingsXmlInterpolationTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings-sys.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings-sys.xml" );
         verifier.setSystemProperty( "usr.MNGIT", "usr-prop-test" );
         verifier.setLogFileName( "log-sys.txt" );
         verifier.executeGoal( "validate" );

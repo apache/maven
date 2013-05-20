@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -52,21 +51,19 @@ public class MavenITmng4829ChecksumFailureWarningTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4829" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
         boolean foundWarningJar = false, foundWarningPom = false;
 
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            
             if ( line.matches( "(?i)\\[WARNING\\].*Checksum.*failed.*fa23720355eead3906fdf4ffd2a1a5f5.*" ) )
             {
                 foundWarningPom = true;

@@ -86,8 +86,8 @@ public class MavenITmng2865MirrorWildcardTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng2865" );
         Properties filterProps = verifier.newDefaultFilterProperties();
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

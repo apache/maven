@@ -46,7 +46,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
 
         verifier.setAutoclean( false );
         verifier.executeGoal( "verify" );
@@ -63,7 +63,7 @@ public class MavenITmng3535SelfReferentialPropertiesTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
 
         verifier.setAutoclean( false );
 

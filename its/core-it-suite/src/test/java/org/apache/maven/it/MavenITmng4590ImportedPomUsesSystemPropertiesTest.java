@@ -54,8 +54,8 @@ public class MavenITmng4590ImportedPomUsesSystemPropertiesTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.setEnvironmentVariable( "MAVEN_OPTS", "-Dtest.file=pom.xml" );
         verifier.setSystemProperty( "test.dir", testDir.getAbsolutePath() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

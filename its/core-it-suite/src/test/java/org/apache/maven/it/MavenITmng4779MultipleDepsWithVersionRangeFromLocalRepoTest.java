@@ -56,7 +56,7 @@ public class MavenITmng4779MultipleDepsWithVersionRangeFromLocalRepoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "test/target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "test/target/classpath.txt", "UTF-8" );
 
         assertEquals( classpath.toString(), 4, classpath.size() );
     }

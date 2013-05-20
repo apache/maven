@@ -55,8 +55,8 @@ public class MavenITmng4166HideCoreCommonsCliTest
         verifier.deleteArtifact( "commons-cli", "commons-cli", "0.1.4166", "jar" );
         verifier.deleteArtifact( "commons-cli", "commons-cli", "0.1.4166", "pom" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

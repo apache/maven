@@ -74,14 +74,14 @@ public class MavenITmng4666CoreRealmImportTest
         verifier.deleteArtifacts( "org.sonatype.spice", "spice-inject-plexus", "0.1-stub" );
         verifier.deleteArtifacts( "classworlds", "classworlds", "0.1-stub" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/type.properties" );
-        List types = getTypes( props );
+        List<String> types = getTypes( props );
         if ( !matchesVersionRange( "[3.0-beta-4,)" ) )
         {
             // MNG-4725, MNG-4807
@@ -89,17 +89,16 @@ public class MavenITmng4666CoreRealmImportTest
             types.remove( "org.codehaus.plexus.logging.Logger" );
         }
         assertFalse( types.isEmpty() );
-        for ( Iterator it = types.iterator(); it.hasNext(); )
+        for ( String type : types )
         {
-            String type = it.next().toString();
             assertEquals( type, props.get( "plugin." + type ), props.get( "core." + type ) );
         }
     }
 
-    private List getTypes( Properties props )
+    private List<String> getTypes( Properties props )
     {
-        List types = new ArrayList();
-        for ( Iterator it = props.keySet().iterator(); it.hasNext(); )
+        List<String> types = new ArrayList<String>();
+        for ( Iterator<?> it = props.keySet().iterator(); it.hasNext(); )
         {
             String key = it.next().toString();
             if ( key.startsWith( "core." ) )

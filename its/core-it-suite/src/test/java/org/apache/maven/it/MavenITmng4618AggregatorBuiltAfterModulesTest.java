@@ -55,7 +55,7 @@ public class MavenITmng4618AggregatorBuiltAfterModulesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List mods = verifier.loadLines( "target/log.txt", "UTF-8" );
+        List<String> mods = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "mod-a", "mod-b", "mod-c", "aggregator" } ), mods );
     }
 

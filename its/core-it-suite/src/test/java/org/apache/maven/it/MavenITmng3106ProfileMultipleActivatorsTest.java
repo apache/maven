@@ -54,7 +54,7 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Dprofile1.on=true" );
+        verifier.addCliOption( "-Dprofile1.on=true" );
         verifier.executeGoal( "validate" );
 
         verifier.verifyErrorFreeLog();

@@ -47,8 +47,8 @@ public class MavenITBootstrapTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "test-compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

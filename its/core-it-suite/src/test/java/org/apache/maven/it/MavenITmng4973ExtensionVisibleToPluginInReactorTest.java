@@ -53,8 +53,8 @@ public class MavenITmng4973ExtensionVisibleToPluginInReactorTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "sub-b/target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4973" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

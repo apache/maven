@@ -124,8 +124,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         setUserHome( verifier, new File( testDir, "userhome" ) );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -159,8 +159,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
 
         verifier.getSystemProperties().setProperty( "settings.security", 
             new File( testDir, "settings~security.xml" ).getAbsolutePath() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
         verifier.executeGoal( "validate", Collections.singletonMap( "MAVEN_OPTS", "-Duser.language=tr" ) );
         verifier.verifyErrorFreeLog();
@@ -182,8 +182,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
-        verifier.getCliOptions().add( "--encrypt-master-password" );
-        verifier.getCliOptions().add( "test" );
+        verifier.addCliOption( "--encrypt-master-password" );
+        verifier.addCliOption( "test" );
         verifier.setLogFileName( "log-emp.txt" );
         verifier.executeGoal( "-e" );
         verifier.verifyErrorFreeLog();
@@ -195,8 +195,8 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         setUserHome( verifier, new File( testDir, "userhome" ) );
-        verifier.getCliOptions().add( "--encrypt-password" );
-        verifier.getCliOptions().add( "testpass" );
+        verifier.addCliOption( "--encrypt-password" );
+        verifier.addCliOption( "testpass" );
         verifier.setLogFileName( "log-ep.txt" );
         verifier.executeGoal( "-e" );
         verifier.verifyErrorFreeLog();

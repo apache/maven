@@ -116,8 +116,8 @@ public class MavenITmng3652UserAgentHeaderTest
 
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
-        verifier.getCliOptions().add( "-DtestPort=" + port );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-DtestPort=" + port );
+        verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-unConfiguredHttp.txt" );
         verifier.executeGoal( "validate" );
@@ -167,9 +167,9 @@ public class MavenITmng3652UserAgentHeaderTest
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
 
         // test webdav
-        verifier.getCliOptions().add( "-DtestPort=" + port );
-        verifier.getCliOptions().add( "-DtestProtocol=dav:http" );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-DtestPort=" + port );
+        verifier.addCliOption( "-DtestProtocol=dav:http" );
+        verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-unConfiguredDAV.txt" );
         verifier.executeGoal( "validate" );
@@ -220,10 +220,10 @@ public class MavenITmng3652UserAgentHeaderTest
 
         // test settings with no config
 
-        verifier.getCliOptions().add( "-DtestPort=" + port );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings-no-config.xml" );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-DtestPort=" + port );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings-no-config.xml" );
+        verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-configWithoutUserAgent.txt" );
         verifier.executeGoal( "validate" );
@@ -278,10 +278,10 @@ public class MavenITmng3652UserAgentHeaderTest
 
         // test settings with config
 
-        verifier.getCliOptions().add( "-DtestPort=" + port );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-DtestPort=" + port );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
+        verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
         verifier.executeGoal( "validate" );
@@ -314,10 +314,10 @@ public class MavenITmng3652UserAgentHeaderTest
 
         // test settings with config
 
-        verifier.getCliOptions().add( "-DtestPort=" + port );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-DtestPort=" + port );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
+        verifier.addCliOption( "-X" );
 
         verifier.setLogFileName( "log-configWithUserAgent.txt" );
         verifier.executeGoal( "validate" );

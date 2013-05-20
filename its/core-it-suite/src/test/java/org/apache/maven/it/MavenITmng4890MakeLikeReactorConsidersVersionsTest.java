@@ -52,9 +52,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.getCliOptions().add( "--projects" );
-        verifier.getCliOptions().add( "mod-b" );
-        verifier.getCliOptions().add( "--also-make" );
+        verifier.addCliOption( "--projects" );
+        verifier.addCliOption( "mod-b" );
+        verifier.addCliOption( "--also-make" );
         verifier.setLogFileName( "log-am.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -79,9 +79,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.getCliOptions().add( "--projects" );
-        verifier.getCliOptions().add( "mod-a" );
-        verifier.getCliOptions().add( "--also-make-dependents" );
+        verifier.addCliOption( "--projects" );
+        verifier.addCliOption( "mod-a" );
+        verifier.addCliOption( "--also-make-dependents" );
         verifier.setLogFileName( "log-amd.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

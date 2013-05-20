@@ -51,8 +51,8 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4361" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
 
         Properties filterProps = verifier.newDefaultFilterProperties();
 
@@ -68,7 +68,7 @@ public class MavenITmng4361ForceDependencySnapshotUpdateTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.setLogFileName( "log-force-2.txt" );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-U" );
+        verifier.addCliOption( "-U" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 

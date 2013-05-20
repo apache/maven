@@ -53,8 +53,8 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4696" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "initialize" );
         verifier.verifyErrorFreeLog();
@@ -63,7 +63,7 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest
         Properties props = verifier.loadProperties( "target/artifact.properties" );
         assertEquals( "3", props.getProperty( "project.dependencyArtifacts.size" ) );
 
-        HashSet ids = new HashSet();
+        HashSet<String> ids = new HashSet<String>();
         ids.add( props.getProperty( "project.dependencyArtifacts.0.artifactId" ) );
         ids.add( props.getProperty( "project.dependencyArtifacts.1.artifactId" ) );
         ids.add( props.getProperty( "project.dependencyArtifacts.2.artifactId" ) );

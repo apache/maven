@@ -95,12 +95,12 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
 
         verifier.deleteArtifacts( "org.apache.maven.its.it0146" );
 
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
 
         verifier.deleteDirectory( "target" );
 
@@ -119,8 +119,8 @@ public class MavenIT0146InstallerSnapshotNaming
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteArtifacts( "org.apache.maven.its.it0146" );
-        verifier.getCliOptions().add( "-f" );
-        verifier.getCliOptions().add( "project/pom.xml" );
+        verifier.addCliOption( "-f" );
+        verifier.addCliOption( "project/pom.xml" );
         verifier.deleteDirectory( "project/target" );
         verifier.setLogFileName( "log2.txt" );
 
@@ -136,12 +136,12 @@ public class MavenIT0146InstallerSnapshotNaming
 
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", properties );
 
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log3.txt" );
 
 
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
 
         verifier.deleteDirectory( "target" );
 

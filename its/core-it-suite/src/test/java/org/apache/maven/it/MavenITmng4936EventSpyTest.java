@@ -52,12 +52,12 @@ public class MavenITmng4936EventSpyTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.setSystemProperty( "maven.ext.class.path", "spy-0.1.jar" );
-        verifier.getCliOptions().add( "-X" );
+        verifier.addCliOption( "-X" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/spy.log", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/spy.log", "UTF-8" );
         assertTrue( lines.toString(), lines.get( 0 ).toString().startsWith( "init" ) );
         assertTrue( lines.toString(), lines.get( lines.size() - 1 ).toString().startsWith( "close" ) );
         assertTrue( lines.toString(), 

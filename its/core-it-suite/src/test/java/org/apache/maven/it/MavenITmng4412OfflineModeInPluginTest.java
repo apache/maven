@@ -52,10 +52,10 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-Presolver" );
-        verifier.getCliOptions().add( "--offline" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-Presolver" );
+        verifier.addCliOption( "--offline" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-resolver.txt" );
         try
         {
@@ -87,10 +87,10 @@ public class MavenITmng4412OfflineModeInPluginTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4412" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-Pcollector" );
-        verifier.getCliOptions().add( "--offline" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-Pcollector" );
+        verifier.addCliOption( "--offline" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.setLogFileName( "log-collector.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

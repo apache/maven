@@ -63,7 +63,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -104,8 +104,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-1" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-cached-1.txt" );
             verifier.executeGoal( "a:touch" );
@@ -140,7 +140,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         String metadataUri = "/repo-1/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -181,9 +181,9 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-1" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-U" );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-U" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-forced-1.txt" );
             verifier.executeGoal( "a:touch" );
@@ -220,7 +220,7 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
 
         String metadataUri = "/repo-it/org/apache/maven/its/mng4554/maven-metadata.xml";
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -261,8 +261,8 @@ public class MavenITmng4554PluginPrefixMappingUpdateTest
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             filterProps.setProperty( "@repo@", "repo-it" );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
 
             FileUtils.copyDirectoryStructure( new File( testDir, "repo-1" ), new File( testDir, "repo-it" ) );
 

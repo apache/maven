@@ -51,7 +51,7 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Pmng3208" );
+        verifier.addCliOption( "-Pmng3208" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

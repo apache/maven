@@ -49,8 +49,8 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
         verifier.setAutoclean( false );
-        verifier.getCliOptions().add( "-T" );
-        verifier.getCliOptions().add( "2W" );
+        verifier.addCliOption( "-T" );
+        verifier.addCliOption( "2W" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

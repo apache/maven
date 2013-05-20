@@ -50,8 +50,8 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
         verifier.setAutoclean( false );
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -74,8 +74,8 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest
         verifier.setAutoclean( false );
         verifier.filterFile( "settings.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4036" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

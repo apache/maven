@@ -65,14 +65,14 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4800" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines( "target/compile.txt", "UTF-8" );
 
         assertTrue( test + " > " + compile.toString(), compile.contains( "b-0.1.jar" ) );
         assertTrue( test + " > " + compile.toString(), compile.contains( "c-0.1.jar" ) );
@@ -82,7 +82,7 @@ public class MavenITmng4800NearestWinsVsScopeWideningTest
         assertFalse( test + " > " + compile.toString(), compile.contains( "s-0.2.jar" ) );
         assertFalse( test + " > " + compile.toString(), compile.contains( "y-0.1.jar" ) );
 
-        List runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
+        List<String> runtime = verifier.loadLines( "target/runtime.txt", "UTF-8" );
 
         assertTrue( test + " > " + runtime.toString(), runtime.contains( "b-0.1.jar" ) );
         assertTrue( test + " > " + runtime.toString(), runtime.contains( "c-0.1.jar" ) );

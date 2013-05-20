@@ -55,8 +55,8 @@ public class MavenITmng3586SystemScopePluginDependencyTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng3586" );
         verifier.getSystemProperties().setProperty( "test.home", testDir.getAbsolutePath() );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

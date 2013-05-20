@@ -53,8 +53,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1895" );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -216,8 +216,8 @@ public class MavenITmng1895ScopeConflictResolutionTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng1895" );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
         Properties props = verifier.newDefaultFilterProperties();
         props.setProperty( "@scope.a@", scopeA );
         props.setProperty( "@scope.b@", scopeB );

@@ -50,13 +50,13 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         Verifier verifier = new Verifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "user-settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "user-settings.xml" );
         if ( matchesVersionRange( "[2.1.0-M2,)" ) )
         {
             // dedicated CLI option only available since MNG-3914
-            verifier.getCliOptions().add( "--global-settings" );
-            verifier.getCliOptions().add( "global-settings.xml" );
+            verifier.addCliOption( "--global-settings" );
+            verifier.addCliOption( "global-settings.xml" );
         }
         else
         {

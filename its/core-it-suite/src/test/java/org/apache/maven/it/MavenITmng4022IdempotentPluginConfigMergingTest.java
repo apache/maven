@@ -51,7 +51,7 @@ public class MavenITmng4022IdempotentPluginConfigMergingTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.getCliOptions().add( "-Pmng4022a,mng4022b" );
+        verifier.addCliOption( "-Pmng4022a,mng4022b" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

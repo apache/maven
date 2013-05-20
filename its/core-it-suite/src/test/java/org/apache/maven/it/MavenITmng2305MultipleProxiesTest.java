@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
@@ -92,8 +91,8 @@ public class MavenITmng2305MultipleProxiesTest
             filterProps.setProperty( "@proxy.http@", Integer.toString( httpPort ) );
             filterProps.setProperty( "@proxy.https@", Integer.toString( proxyPort ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "--settings" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "--settings" );
+            verifier.addCliOption( "settings.xml" );
             verifier.setSystemProperty( "javax.net.ssl.trustStore", storePath );
             verifier.setSystemProperty( "javax.net.ssl.trustStorePassword", storePwd );
             // disable concurrent downloading as not all wagons (e.g. wagon-lightweight-http) are thread-safe regarding proxy settings

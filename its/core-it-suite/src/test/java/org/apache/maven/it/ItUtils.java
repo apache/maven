@@ -36,9 +36,10 @@ class ItUtils
         MessageDigest digester = MessageDigest.getInstance( algo );
 
         FileInputStream is = new FileInputStream( file );
+        DigestInputStream dis;
         try
         {
-            DigestInputStream dis = new DigestInputStream( is, digester );
+            dis = new DigestInputStream( is, digester );
 
             for ( byte[] buffer = new byte[1024 * 4]; dis.read( buffer ) >= 0; )
             {

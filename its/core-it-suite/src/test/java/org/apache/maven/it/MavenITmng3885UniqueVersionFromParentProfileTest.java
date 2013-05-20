@@ -54,7 +54,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-f" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-Pnon-unique-version" );
+        verifier.addCliOption( "-Pnon-unique-version" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -76,7 +76,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-f" );
         verifier.filterFile( "../pom-template.xml", "../pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-Pnon-unique-version" );
+        verifier.addCliOption( "-Pnon-unique-version" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -98,7 +98,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-t" );
         verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-Punique-version" );
+        verifier.addCliOption( "-Punique-version" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -121,7 +121,7 @@ public class MavenITmng3885UniqueVersionFromParentProfileTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "repo-t" );
         verifier.filterFile( "../pom-template.xml", "../pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "-Punique-version" );
+        verifier.addCliOption( "-Punique-version" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();

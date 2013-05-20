@@ -68,9 +68,9 @@ public class MavenITmng3057VersionExprTransformationsTest
 
         verifier.filterFile( "pom.xml", "pom-filtered.xml", "UTF-8", properties );
 
-        verifier.getCliOptions().add( "-V" );
-        verifier.getCliOptions().add( "-DtestVersion=1" );
-        verifier.getCliOptions().add( "-f pom-filtered.xml" );
+        verifier.addCliOption( "-V" );
+        verifier.addCliOption( "-DtestVersion=1" );
+        verifier.addCliOption( "-f pom-filtered.xml" );
 
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();

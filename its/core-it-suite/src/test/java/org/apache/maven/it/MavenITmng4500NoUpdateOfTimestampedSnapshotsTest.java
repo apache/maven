@@ -65,7 +65,7 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
         String pomUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.pom";
         String jarUri = "/repo/org/apache/maven/its/mng4500/dep/0.1-SNAPSHOT/dep-0.1-20091219.230823-1.jar";
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         AbstractHandler logHandler = new AbstractHandler()
         {
@@ -97,14 +97,14 @@ public class MavenITmng4500NoUpdateOfTimestampedSnapshotsTest
             Properties filterProps = verifier.newDefaultFilterProperties();
             filterProps.setProperty( "@port@", Integer.toString( server.getConnectors()[0].getLocalPort() ) );
             verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-            verifier.getCliOptions().add( "-s" );
-            verifier.getCliOptions().add( "settings.xml" );
+            verifier.addCliOption( "-s" );
+            verifier.addCliOption( "settings.xml" );
 
             verifier.setLogFileName( "log-1.txt" );
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
 
-            List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+            List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
             assertTrue( classpath.toString(), classpath.contains( "dep-0.1-SNAPSHOT.jar" ) );
             assertTrue( requestedUris.toString(), requestedUris.contains( pomUri ) );
             assertTrue( requestedUris.toString(), requestedUris.contains( jarUri ) );

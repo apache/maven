@@ -97,8 +97,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@httpserver.port@", Integer.toString( httpPort ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:compile" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
@@ -124,8 +124,8 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
         Properties filterProps = verifier.newDefaultFilterProperties();
         filterProps.setProperty( "@httpserver.port@", Integer.toString( httpPort ) );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "org.apache.maven.its.mng5280:fake-maven-plugin:1.0:fake" );
         verifier.resetStreams();
 

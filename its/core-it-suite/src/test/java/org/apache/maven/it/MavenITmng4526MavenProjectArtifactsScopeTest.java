@@ -53,13 +53,13 @@ public class MavenITmng4526MavenProjectArtifactsScopeTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng4526" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "generate-sources" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts;
+        List<String> artifacts;
         
         artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4526:a:jar:0.1" ) );

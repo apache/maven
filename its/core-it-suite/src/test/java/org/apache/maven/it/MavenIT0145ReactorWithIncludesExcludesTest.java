@@ -23,9 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 
@@ -54,7 +51,7 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.getCliOptions().add( "-r" );
+        verifier.addCliOption( "-r" );
         verifier.setLogFileName( "log-defaults.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -78,8 +75,8 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.getCliOptions().add( "-r" );
-        verifier.getCliOptions().add( "-Dmaven.reactor.includes=mod-a/pom.xml" );
+        verifier.addCliOption( "-r" );
+        verifier.addCliOption( "-Dmaven.reactor.includes=mod-a/pom.xml" );
         verifier.setLogFileName( "log-includes.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
@@ -103,8 +100,8 @@ public class MavenIT0145ReactorWithIncludesExcludesTest
         verifier.deleteDirectory( "target" );
         verifier.deleteDirectory( "mod-a/target" );
         verifier.deleteDirectory( "mod-b/target" );
-        verifier.getCliOptions().add( "-r" );
-        verifier.getCliOptions().add( "-Dmaven.reactor.excludes=mod-a/pom.xml" );
+        verifier.addCliOption( "-r" );
+        verifier.addCliOption( "-Dmaven.reactor.excludes=mod-a/pom.xml" );
         verifier.setLogFileName( "log-excludes.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();

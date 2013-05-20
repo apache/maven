@@ -51,8 +51,8 @@ public class MavenITmng3748BadSettingsXmlTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );     
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "-s" );
+        verifier.addCliOption( "settings.xml" );
 
         // Maven 3.x will only print warnings (see MNG-4390)
         if ( matchesVersionRange( "(,3.0-alpha-3)" ) )

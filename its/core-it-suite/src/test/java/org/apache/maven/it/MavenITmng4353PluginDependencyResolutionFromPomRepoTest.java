@@ -55,8 +55,8 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
         verifier.filterFile( "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/template.pom", 
             "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1.pom", "UTF-8", filterProps );
-        verifier.getCliOptions().add( "--settings" );
-        verifier.getCliOptions().add( "settings.xml" );
+        verifier.addCliOption( "--settings" );
+        verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
