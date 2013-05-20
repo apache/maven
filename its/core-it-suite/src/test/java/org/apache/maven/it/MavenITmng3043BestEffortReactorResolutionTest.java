@@ -60,7 +60,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath;
+        List<String> classpath;
 
         classpath = verifier.loadLines( "consumer-a/target/compile.txt", "UTF-8" );
         assertContains( classpath, new String[] { "classes-test" } );
@@ -114,7 +114,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath;
+        List<String> classpath;
 
         classpath = verifier.loadLines( "consumer-a/target/compile.txt", "UTF-8" );
         assertContains( classpath, new String[] { "tests.jar" } );
@@ -147,28 +147,28 @@ public class MavenITmng3043BestEffortReactorResolutionTest
         assertContains( classpath, new String[] { "tests.jar" } );
     }
 
-    private void assertContains( List collection, Object[] items )
+    private void assertContains( List<String> collection, String[] items )
     {
-        for ( int i = 0; i < items.length; i++ )
+        for ( String item : items )
         {
-            assertContains( collection, items[i] );
+            assertContains( collection, item );
         }
     }
 
-    private void assertContains( List collection, Object item )
+    private void assertContains( List<String> collection, String item )
     {
         assertTrue( item + " missing in " + collection, collection.contains( item ) );
     }
 
-    private void assertNotContains( List collection, Object[] items )
+    private void assertNotContains( List<String> collection, String[] items )
     {
-        for ( int i = 0; i < items.length; i++ )
+        for ( String item : items )
         {
-            assertNotContains( collection, items[i] );
+            assertNotContains( collection, item );
         }
     }
 
-    private void assertNotContains( List collection, Object item )
+    private void assertNotContains( List<String> collection, String item )
     {
         assertFalse( item + " present in " + collection, collection.contains( item ) );
     }

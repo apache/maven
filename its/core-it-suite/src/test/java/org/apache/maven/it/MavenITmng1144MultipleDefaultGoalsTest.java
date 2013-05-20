@@ -50,7 +50,7 @@ public class MavenITmng1144MultipleDefaultGoalsTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.executeGoals( Collections.EMPTY_LIST );
+        verifier.executeGoals( Collections.<String> emptyList() );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 

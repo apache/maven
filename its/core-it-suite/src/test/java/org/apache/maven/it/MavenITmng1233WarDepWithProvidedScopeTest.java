@@ -58,13 +58,13 @@ public class MavenITmng1233WarDepWithProvidedScopeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection compileArtifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        Collection<String> compileArtifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(), 
             compileArtifacts.contains( "org.apache.maven.its.it0083:direct-dep:jar:0.1" ) );
         assertTrue( compileArtifacts.toString(), 
             compileArtifacts.contains( "org.apache.maven.its.it0083:trans-dep:jar:0.1" ) );
 
-        Collection runtimeArtifacts = verifier.loadLines( "target/runtime.txt", "UTF-8" );
+        Collection<String> runtimeArtifacts = verifier.loadLines( "target/runtime.txt", "UTF-8" );
         assertTrue( runtimeArtifacts.toString(), 
             runtimeArtifacts.contains( "org.apache.maven.its.it0083:direct-dep:jar:0.1" ) );
         assertFalse( runtimeArtifacts.toString(), 

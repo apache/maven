@@ -56,7 +56,7 @@ public class MavenITmng2103PluginExecutionInheritanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List execs = verifier.loadLines( "child-1/target/log.txt", "UTF-8" );
+        List<String> execs = verifier.loadLines( "child-1/target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "inherited" } ), execs );
 
         execs = verifier.loadLines( "child-2/target/log.txt", "UTF-8" );

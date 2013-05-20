@@ -56,7 +56,7 @@ public class MavenITmng4341PluginExecutionOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/log.txt", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/log.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "first", "second" } ), lines );
     }
 

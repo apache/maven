@@ -73,9 +73,9 @@ public class MavenITmng3925MergedPluginExecutionOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );
         // Order is parent first and child appended, unless child overrides parent execution via equal id
-        List expected = Arrays.asList( new String[] { "parent-1", "parent-2", "child-default", "child-1", "child-2" } );
+        List<String> expected = Arrays.asList( new String[] { "parent-1", "parent-2", "child-default", "child-1", "child-2" } );
         assertEquals( expected, lines );
     }
 

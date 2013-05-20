@@ -59,7 +59,7 @@ public class MavenITmng4320AggregatorAndDependenciesTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath;
+        List<String> classpath;
 
         classpath = verifier.loadLines( "target/sub-1.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );

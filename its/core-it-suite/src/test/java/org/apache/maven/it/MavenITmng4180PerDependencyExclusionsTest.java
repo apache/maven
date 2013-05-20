@@ -61,10 +61,10 @@ public class MavenITmng4180PerDependencyExclusionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         Collections.sort( artifacts );
 
-        List expected = new ArrayList();
+        List<String> expected = new ArrayList();
         expected.add( "org.apache.maven.its.mng4180:a:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4180:b:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4180:c:jar:0.1" );

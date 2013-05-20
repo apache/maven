@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -60,14 +59,13 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
         assertEquals( "0.1", props.getProperty( "project.properties.property1" ) );
         assertEquals( "0.1", props.getProperty( "project.properties.property2" ) );
 
-        List lines = verifier.loadLines( "log.txt", null );
+        List<String> lines = verifier.loadLines( "log.txt", null );
         
         boolean warnedPomPrefix = false;
         boolean warnedEmptyPrefix = false;
         
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
             if ( line.startsWith( "[WARN" ) )
             {
                 if ( line.indexOf( "${pom.version}" ) >= 0 )

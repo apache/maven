@@ -57,26 +57,26 @@ public class MavenITmng1412DependenciesOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
+        List<String> compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
         assertArtifactOrder( compileArtifacts );
 
-        List compileClassPath = verifier.loadLines( "target/compile-classpath.txt", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "target/compile-classpath.txt", "UTF-8" );
         assertClassPathOrder( compileClassPath.subList( 1, compileClassPath.size() ) );
 
-        List runtimeArtifacts = verifier.loadLines( "target/runtime-artifacts.txt", "UTF-8" );
+        List<String> runtimeArtifacts = verifier.loadLines( "target/runtime-artifacts.txt", "UTF-8" );
         assertArtifactOrder( runtimeArtifacts );
 
-        List runtimeClassPath = verifier.loadLines( "target/runtime-classpath.txt", "UTF-8" );
+        List<String> runtimeClassPath = verifier.loadLines( "target/runtime-classpath.txt", "UTF-8" );
         assertClassPathOrder( runtimeClassPath.subList( 1, runtimeClassPath.size() ) );
 
-        List testArtifacts = verifier.loadLines( "target/test-artifacts.txt", "UTF-8" );
+        List<String> testArtifacts = verifier.loadLines( "target/test-artifacts.txt", "UTF-8" );
         assertArtifactOrder( testArtifacts );
 
-        List testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );
+        List<String> testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );
         assertClassPathOrder( testClassPath.subList( 2, testClassPath.size() ) );
     }
 
-    private void assertArtifactOrder( List artifacts )
+    private void assertArtifactOrder( List<String> artifacts )
     {
         assertEquals( 4, artifacts.size() );
         assertEquals( "org.apache.maven.its.mng1412:a:jar:0.1", artifacts.get( 0 ) );
@@ -85,7 +85,7 @@ public class MavenITmng1412DependenciesOrderTest
         assertEquals( "org.apache.maven.its.mng1412:d:jar:0.1", artifacts.get( 3 ) );
     }
 
-    private void assertClassPathOrder( List classpath )
+    private void assertClassPathOrder( List<String> classpath )
     {
         assertEquals( 4, classpath.size() );
         assertEquals( "a-0.1.jar", classpath.get( 0 ) );

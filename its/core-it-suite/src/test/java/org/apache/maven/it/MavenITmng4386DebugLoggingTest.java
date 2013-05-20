@@ -57,12 +57,11 @@ public class MavenITmng4386DebugLoggingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "log.txt", "UTF-8" );
+        List<String> lines = verifier.loadLines( "log.txt", "UTF-8" );
 
         boolean debug = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = it.next().toString();
             if ( line.startsWith( "[DEBUG" ) )
             {
                 debug = true;

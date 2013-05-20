@@ -59,7 +59,7 @@ public class MavenITmng4070WhitespaceTrimmingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( Collections.singletonList( "org.apache.maven.its.mng4070:a:jar:0.1" ), artifacts );
     }
 

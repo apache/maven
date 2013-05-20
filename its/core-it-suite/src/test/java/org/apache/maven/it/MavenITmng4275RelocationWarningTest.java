@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -58,12 +57,10 @@ public class MavenITmng4275RelocationWarningTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
         boolean foundWarning = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            
             if ( foundWarning )
             {
                 assertTrue(

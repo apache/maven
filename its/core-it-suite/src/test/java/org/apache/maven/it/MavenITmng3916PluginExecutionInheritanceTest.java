@@ -58,10 +58,10 @@ public class MavenITmng3916PluginExecutionInheritanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List executions = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
         // NOTE: Ordering of executions is another issue (MNG-3887), so ignore/normalize order
         Collections.sort( executions );
-        List expected = Arrays.asList( new String[] { "child-1", "child-default", "parent-1" } );
+        List<String> expected = Arrays.asList( new String[] { "child-1", "child-default", "parent-1" } );
         assertEquals( expected, executions );
     }
 

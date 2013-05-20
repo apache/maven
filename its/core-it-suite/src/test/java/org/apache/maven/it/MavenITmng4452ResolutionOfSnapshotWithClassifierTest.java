@@ -82,7 +82,7 @@ public class MavenITmng4452ResolutionOfSnapshotWithClassifierTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), 
             artifacts.contains( "org.apache.maven.its.mng4452:producer:jar:unix:0.1-SNAPSHOT" ) );
         assertTrue( artifacts.toString(), 

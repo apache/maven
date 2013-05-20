@@ -56,7 +56,7 @@ public class MavenIT0085TransitiveSystemScopeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection lines = verifier.loadLines( "target/test.txt", "UTF-8" );
+        Collection<String> lines = verifier.loadLines( "target/test.txt", "UTF-8" );
         assertTrue( lines.toString(), lines.contains( "system.jar" ) );
     }
 

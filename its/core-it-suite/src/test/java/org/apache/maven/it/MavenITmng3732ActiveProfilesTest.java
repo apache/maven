@@ -63,7 +63,7 @@ public class MavenITmng3732ActiveProfilesTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
-        List ids = new ArrayList();
+        List<String> ids = new ArrayList<String>();
 
         // support for profiles.xml removed from 3.x (see MNG-4060)
         if ( matchesVersionRange( "[2.0,3.0-alpha-1)" ) )

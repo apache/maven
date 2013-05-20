@@ -77,11 +77,11 @@ public class MavenITmng0187CollectedProjectsTest
         assertEquals( Arrays.asList( new String[] {} ), getProjects( props ) );
     }
 
-    private List getProjects( Properties props )
+    private List<String> getProjects( Properties props )
     {
-        List projects = new ArrayList();
+        List<String> projects = new ArrayList<String>();
 
-        for ( Iterator it = props.keySet().iterator(); it.hasNext(); )
+        for ( Iterator<?> it = props.keySet().iterator(); it.hasNext(); )
         {
             String key = it.next().toString();
             if ( key.startsWith( "project.collectedProjects." ) && !key.endsWith( ".size" ) )

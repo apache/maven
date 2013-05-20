@@ -195,7 +195,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
 
                 OutputStream os = resource.getOutputStream();
 
-                int contentLength = request.getContentLength();
+                request.getContentLength();
 
                 try
                 {

@@ -87,14 +87,13 @@ public class MavenITmng3220ImportScopeTest
 
         verifier.resetStreams();
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
         boolean found = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            if ( line.indexOf( "\'dependencies.dependency.version\' is missing for junit:junit") > -1 ||
-                line.indexOf( "\'dependencies.dependency.version\' for junit:junit:jar is missing") > -1 )
+            if ( line.indexOf( "\'dependencies.dependency.version\' is missing for junit:junit" ) > -1
+                || line.indexOf( "\'dependencies.dependency.version\' for junit:junit:jar is missing" ) > -1 )
             {
                 found = true;
                 break;

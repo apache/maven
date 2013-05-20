@@ -100,7 +100,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
     }
@@ -133,7 +133,7 @@ public class MavenITmng3023ReactorDependencyResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.classpath", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "dependency-1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "dependency-classes" ) );
 

@@ -23,7 +23,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -70,7 +69,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
             verifier.resetStreams();
         }
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
         int msg = indexOf( lines, "(?i).*required class is missing.*" );
         assertTrue( "User-friendly message was not found in output.", msg >= 0 );
@@ -102,7 +101,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
             verifier.resetStreams();
         }
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
         int msg = indexOf( lines, "(?i).*required class (i|wa)s missing( during (mojo )?configuration)?.*" );
         assertTrue( "User-friendly message was not found in output.", msg >= 0 );
@@ -134,7 +133,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
             verifier.resetStreams();
         }
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
         String compLookupMsg =
             "(?i).*unable to .* mojo 'mojo-component-lookup-exception' .* plugin "
@@ -166,7 +165,7 @@ public class MavenITmng2690MojoLoadingErrorsTest
             verifier.resetStreams();
         }
 
-        List lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
 
         String compLookupMsg =
             "(?i).*unable to .* mojo 'requirement-component-lookup-exception' .* plugin "
@@ -175,13 +174,13 @@ public class MavenITmng2690MojoLoadingErrorsTest
         assertTrue( "User-friendly message was not found in output.", indexOf( lines, compLookupMsg ) > 0 );
     }
 
-    private int indexOf( List logLines, String regex )
+    private int indexOf( List<String> logLines, String regex )
     {
         Pattern pattern = Pattern.compile( regex );
 
         for ( int i = 0; i < logLines.size(); i++ )
         {
-            String logLine = (String) logLines.get( i );
+            String logLine = logLines.get( i );
 
             if ( pattern.matcher( logLine ).matches() )
             {

@@ -24,7 +24,6 @@ import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -190,7 +189,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List log = verifier.loadLines( verifier.getLogFileName(), null );
+        List<String> log = verifier.loadLines( verifier.getLogFileName(), null );
         assertNotNull( findPassword( log ) );
 
         verifier = newVerifier( testDir.getAbsolutePath() );
@@ -207,12 +206,10 @@ public class MavenITmng0553SettingsAuthzEncryptionTest
         assertNotNull( findPassword( log ) );
     }
 
-    private String findPassword( List log )
+    private String findPassword( List<String> log )
     {
-        for ( Iterator it = log.iterator(); it.hasNext(); )
+        for ( String line : log )
         {
-            String line = (String) it.next();
-
             if ( line.matches( ".*\\{[A-Za-z0-9+/=]+\\}.*" ) )
             {
                 return line;

@@ -60,10 +60,10 @@ public class MavenITmng4203TransitiveDependencyExclusionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         Collections.sort( artifacts );
 
-        List expected = new ArrayList();
+        List<String> expected = new ArrayList<String>();
         expected.add( "org.apache.maven.its.mng4203:b:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4203:c:jar:0.1" );
 

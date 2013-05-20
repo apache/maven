@@ -85,7 +85,7 @@ public class MavenITmng2486TimestampedDependencyVersionInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List files = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> files = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( files.toString(), files.contains( "dep-a-0.1-SNAPSHOT.jar" ) );
     }
 

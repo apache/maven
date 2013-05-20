@@ -57,7 +57,7 @@ public class MavenITmng4359LocallyReachableParentOutsideOfReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List cp = verifier.loadLines( "mod-c/target/classpath.txt", "UTF-8" );
+        List<String> cp = verifier.loadLines( "mod-c/target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "mod-b/pom.xml" ) );
         assertTrue( cp.toString(), cp.contains( "mod-a/pom.xml" ) );
     }

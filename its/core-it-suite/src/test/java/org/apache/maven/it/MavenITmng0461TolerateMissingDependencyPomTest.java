@@ -59,7 +59,7 @@ public class MavenITmng0461TolerateMissingDependencyPomTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "dep-0.1.jar" ) );
     }
 

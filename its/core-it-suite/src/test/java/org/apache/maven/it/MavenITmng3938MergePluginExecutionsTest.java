@@ -75,7 +75,7 @@ public class MavenITmng3938MergePluginExecutionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/default.log", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/default.log", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "child" } ), lines );
 
         lines = verifier.loadLines( "target/non-default.log", "UTF-8" );

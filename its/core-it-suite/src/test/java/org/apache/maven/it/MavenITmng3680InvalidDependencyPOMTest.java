@@ -58,7 +58,7 @@ public class MavenITmng3680InvalidDependencyPOMTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3680:direct:jar:0.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3680:transitive:jar:0.1" ) );
     }

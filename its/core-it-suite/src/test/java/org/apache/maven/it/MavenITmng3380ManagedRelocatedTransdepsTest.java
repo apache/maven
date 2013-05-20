@@ -43,7 +43,7 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
 
     public MavenITmng3380ManagedRelocatedTransdepsTest()
     {
-        super("(2.0.9,)");
+        super( "(2.0.9,)" );
     }
 
     /**
@@ -65,14 +65,14 @@ public class MavenITmng3380ManagedRelocatedTransdepsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( 4, artifacts.size() );
         assertEquals( "org.apache.maven.its.mng3380:direct:jar:1", artifacts.get( 0 ) );
         assertEquals( "org.apache.maven.its.mng3380.new:transitive:jar:2", artifacts.get( 1 ) );
         assertEquals( "org.apache.maven.its.mng3380.other:a:jar:1", artifacts.get( 2 ) );
         assertEquals( "org.apache.maven.its.mng3380.other:b:jar:1", artifacts.get( 3 ) );
 
-        List paths = verifier.loadLines( "target/test.txt", "UTF-8" );
+        List<String> paths = verifier.loadLines( "target/test.txt", "UTF-8" );
         assertEquals( 6, paths.size() );
         assertEquals( "direct-1.jar", paths.get( 2 ) );
         assertEquals( "transitive-2.jar", paths.get( 3 ) );

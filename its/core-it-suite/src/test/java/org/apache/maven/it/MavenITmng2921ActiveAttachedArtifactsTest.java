@@ -61,7 +61,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection compileArtifacts = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        Collection<String> compileArtifacts = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(),
             compileArtifacts.contains( "org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT" ) );
         assertTrue( compileArtifacts.toString(),
@@ -71,7 +71,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
         assertFalse( compileArtifacts.toString(),
             compileArtifacts.contains( "org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT" ) );
 
-        Collection testArtifacts = verifier.loadLines( "consumer/target/test.txt", "UTF-8" );
+        Collection<String> testArtifacts = verifier.loadLines( "consumer/target/test.txt", "UTF-8" );
         assertTrue( testArtifacts.toString(),
             testArtifacts.contains( "org.apache.maven.its.mng2921:ejbs:ejb-client:client:1.0-SNAPSHOT" ) );
         assertTrue( testArtifacts.toString(),
@@ -81,7 +81,7 @@ public class MavenITmng2921ActiveAttachedArtifactsTest
         assertTrue( testArtifacts.toString(),
             testArtifacts.contains( "org.apache.maven.its.mng2921:producer:test-jar:tests:1.0-SNAPSHOT" ) );
 
-        Collection testClassPath = verifier.loadLines( "consumer/target/test-classpath.txt", "UTF-8" );
+        Collection<String> testClassPath = verifier.loadLines( "consumer/target/test-classpath.txt", "UTF-8" );
         assertTrue( testClassPath.toString(), testClassPath.contains( "ejbs/attached.jar" ) );
         assertTrue( testClassPath.toString(), testClassPath.contains( "tests/attached.jar" ) );
         assertTrue( testClassPath.toString(), testClassPath.contains( "producer/client.jar" ) );

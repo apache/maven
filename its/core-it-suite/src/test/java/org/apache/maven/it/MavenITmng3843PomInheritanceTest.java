@@ -239,22 +239,22 @@ public class MavenITmng3843PomInheritanceTest
             assertEquals( "1", props.getProperty( "project.build.plugins" ) );
         }
         assertEquals( "4", props.getProperty( "project.dependencies" ) );
-        Collection actualDeps = new TreeSet();
+        Collection<String> actualDeps = new TreeSet<String>();
         actualDeps.add( props.getProperty( "project.dependencies.0.artifactId" ) );
         actualDeps.add( props.getProperty( "project.dependencies.1.artifactId" ) );
         actualDeps.add( props.getProperty( "project.dependencies.2.artifactId" ) );
         actualDeps.add( props.getProperty( "project.dependencies.3.artifactId" ) );
-        Collection expectedDeps = new TreeSet();
+        Collection<String> expectedDeps = new TreeSet<String>();
         expectedDeps.add( "parent-dep-b" );
         expectedDeps.add( "child-dep-b" );
         expectedDeps.add( "child-dep-c" );
         expectedDeps.add( "child-dep-d" );
         assertEquals( expectedDeps, actualDeps );
         assertEquals( "2", props.getProperty( "project.dependencyManagement.dependencies" ) );
-        Collection actualMngtDeps = new TreeSet();
+        Collection<String> actualMngtDeps = new TreeSet<String>();
         actualMngtDeps.add( props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
         actualMngtDeps.add( props.getProperty( "project.dependencyManagement.dependencies.1.artifactId" ) );
-        Collection expectedMngtDeps = new TreeSet();
+        Collection<String> expectedMngtDeps = new TreeSet<String>();
         expectedMngtDeps.add( "parent-dep-a" );
         expectedMngtDeps.add( "child-dep-a" );
         assertEquals( expectedMngtDeps, actualMngtDeps );
@@ -286,7 +286,7 @@ public class MavenITmng3843PomInheritanceTest
 
     private void assertMissing( Properties props, String prefix )
     {
-        for ( Iterator it = props.keySet().iterator(); it.hasNext(); )
+        for ( Iterator<?> it = props.keySet().iterator(); it.hasNext(); )
         {
             String key = it.next().toString();
             assertFalse( "Found unexpected key: " + key, key.startsWith( prefix ) );

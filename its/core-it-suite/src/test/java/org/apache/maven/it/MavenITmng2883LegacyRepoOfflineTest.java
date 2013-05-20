@@ -97,18 +97,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
             // expected
         }
 
-        List missingMessages = new ArrayList();
+        List<String> missingMessages = new ArrayList<String>();
         missingMessages.add( " is offline" );
         missingMessages.add( "org.apache.maven.its.mng2883:parent:pom:1.0-SNAPSHOT" );
 
-        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            for ( Iterator messageIt = missingMessages.iterator(); messageIt.hasNext(); )
+            for ( Iterator<String> messageIt = missingMessages.iterator(); messageIt.hasNext(); )
             {
-                String message = (String) messageIt.next();
+                String message = messageIt.next();
 
                 if ( line.indexOf( message ) > -1 )
                 {
@@ -123,9 +122,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
             buffer.append( "The following key messages were missing from build output:\n\n" );
 
-            for ( Iterator it = missingMessages.iterator(); it.hasNext(); )
+            for ( String message : missingMessages )
             {
-                String message = (String) it.next();
                 if ( buffer.length() < 1 )
                 {
                     buffer.append( "\n" );
@@ -191,18 +189,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
             // expected
         }
 
-        List missingMessages = new ArrayList();
+        List<String> missingMessages = new ArrayList<String>();
 
         // FIXME: We need a more prominent diagnosis including system being in offline mode for 2.0.x.
         missingMessages.add( "offline mode." );
         missingMessages.add( "org.apache.maven.its.mng2883:dep:jar:1.0-SNAPSHOT" );
 
-        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            for ( Iterator messageIt = missingMessages.iterator(); messageIt.hasNext(); )
+            for ( Iterator<String> messageIt = missingMessages.iterator(); messageIt.hasNext(); )
             {
                 String message = (String) messageIt.next();
 
@@ -219,9 +216,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
             buffer.append( "The following key messages were missing from build output:\n\n" );
 
-            for ( Iterator it = missingMessages.iterator(); it.hasNext(); )
+            for ( String message : missingMessages )
             {
-                String message = (String) it.next();
                 if ( buffer.length() < 1 )
                 {
                     buffer.append( "\n" );
@@ -245,8 +241,6 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
-
-        List cliOptions = new ArrayList();
 
         File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
                                              verifier.newDefaultFilterProperties() );
@@ -280,18 +274,17 @@ public class MavenITmng2883LegacyRepoOfflineTest
             // expected
         }
 
-        List missingMessages = new ArrayList();
+        List<String> missingMessages = new ArrayList<String>();
         missingMessages.add( " is offline" );
         missingMessages.add( "org.apache.maven.its.mng2883:plugin" );
 
-        List lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
+        List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
 
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            for ( Iterator messageIt = missingMessages.iterator(); messageIt.hasNext(); )
+            for ( Iterator<String> messageIt = missingMessages.iterator(); messageIt.hasNext(); )
             {
-                String message = (String) messageIt.next();
+                String message = messageIt.next();
 
                 if ( line.indexOf( message ) > -1 )
                 {
@@ -306,9 +299,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
             buffer.append( "The following key messages were missing from build output:\n\n" );
 
-            for ( Iterator it = missingMessages.iterator(); it.hasNext(); )
+            for ( String message : missingMessages )
             {
-                String message = (String) it.next();
                 if ( buffer.length() < 1 )
                 {
                     buffer.append( "\n" );

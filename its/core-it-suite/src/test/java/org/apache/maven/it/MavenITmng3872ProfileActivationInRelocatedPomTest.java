@@ -60,7 +60,7 @@ public class MavenITmng3872ProfileActivationInRelocatedPomTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileClassPath = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "a-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "b-0.1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "c-0.1.jar" ) );

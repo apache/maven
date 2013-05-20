@@ -57,10 +57,10 @@ public class MavenITmng3998PluginExecutionConfigTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List executions = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
         // NOTE: Ordering of executions is another issue (MNG-3887), so ignore/normalize order
         Collections.sort( executions );
-        List expected = Arrays.asList( new String[] { "exec-1", "exec-2" } );
+        List<String> expected = Arrays.asList( new String[] { "exec-1", "exec-2" } );
         assertEquals( expected, executions );
     }
 

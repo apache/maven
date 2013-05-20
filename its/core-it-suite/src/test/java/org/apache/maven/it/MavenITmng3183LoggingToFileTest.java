@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3183">MNG-3183</a>.
@@ -61,11 +60,11 @@ public class MavenITmng3183LoggingToFileTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List stdout = verifier.loadLines( "stdout.txt", "UTF-8" );
+        List<String> stdout = verifier.loadLines( "stdout.txt", "UTF-8" );
 
-        for ( Iterator it = stdout.iterator(); it.hasNext(); )
+        for ( Iterator<String> it = stdout.iterator(); it.hasNext(); )
         {
-            String line = it.next().toString();
+            String line = it.next();
             if ( line.startsWith( "+" ) || line.startsWith( "EMMA" ) )
             {
                 it.remove();
@@ -74,7 +73,7 @@ public class MavenITmng3183LoggingToFileTest
 
         assertEquals( Collections.EMPTY_LIST, stdout );
 
-        List log = verifier.loadLines( "maven.log", "UTF-8" );
+        List<String> log = verifier.loadLines( "maven.log", "UTF-8" );
 
         assertFalse( log.isEmpty() );
     }

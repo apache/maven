@@ -57,7 +57,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath1 = verifier.loadLines( "consumer/target/classpath-1.txt", "UTF-8" );
+        List<String> classpath1 = verifier.loadLines( "consumer/target/classpath-1.txt", "UTF-8" );
         assertEquals( 5, classpath1.size() );
         assertEquals( "consumer/classes", classpath1.get( 0 ) );
         assertEquals( "dep-1/pom.xml", classpath1.get( 1 ) );
@@ -65,7 +65,7 @@ public class MavenITmng4026ReactorDependenciesOrderTest
         assertEquals( "dep-2/pom.xml", classpath1.get( 3 ) );
         assertEquals( "dep-4/pom.xml", classpath1.get( 4 ) );
 
-        List classpath2 = verifier.loadLines( "consumer/target/classpath-2.txt", "UTF-8" );
+        List<String> classpath2 = verifier.loadLines( "consumer/target/classpath-2.txt", "UTF-8" );
         assertEquals( classpath1, classpath2 );
     }
 

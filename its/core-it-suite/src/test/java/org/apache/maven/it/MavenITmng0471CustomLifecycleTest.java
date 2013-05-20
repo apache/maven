@@ -51,7 +51,7 @@ public class MavenITmng0471CustomLifecycleTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        List goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
+        List<String> goals = Arrays.asList( new String[]{"org.apache.maven.its.plugins:maven-it-plugin-fork:fork",
             "org.apache.maven.its.plugins:maven-it-plugin-fork:fork-goal"} );
         verifier.executeGoals( goals );
         verifier.verifyErrorFreeLog();

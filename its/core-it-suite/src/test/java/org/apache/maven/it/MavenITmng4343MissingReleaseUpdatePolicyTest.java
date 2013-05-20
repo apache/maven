@@ -51,7 +51,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
 
     private Server server;
 
-    private List requestedUris;
+    private List<String> requestedUris;
 
     private volatile boolean blockAccess;
 
@@ -112,7 +112,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         server.setHandler( repoHandler );
         server.start();
 
-        requestedUris = Collections.synchronizedList( new ArrayList() );
+        requestedUris = Collections.synchronizedList( new ArrayList<String>() );
     }
 
     protected void tearDown()
@@ -230,7 +230,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
             // expected
         }
 
-        assertEquals( new ArrayList(), requestedUris );
+        assertEquals( new ArrayList<String>(), requestedUris );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "jar" );
         verifier.assertArtifactNotPresent( "org.apache.maven.its.mng4343", "dep", "0.1", "pom" );
 
@@ -251,7 +251,7 @@ public class MavenITmng4343MissingReleaseUpdatePolicyTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        assertEquals( new ArrayList(), requestedUris );
+        assertEquals( new ArrayList<String>(), requestedUris );
 
         verifier.resetStreams();
     }

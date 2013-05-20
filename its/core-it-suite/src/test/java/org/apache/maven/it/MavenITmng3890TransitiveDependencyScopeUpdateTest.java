@@ -58,7 +58,7 @@ public class MavenITmng3890TransitiveDependencyScopeUpdateTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3890:c:jar:0.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3890:b:jar:0.1" ) );
         assertFalse( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng3890:a:jar:0.1" ) );

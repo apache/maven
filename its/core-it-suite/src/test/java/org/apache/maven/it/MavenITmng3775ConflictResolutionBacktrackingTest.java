@@ -96,7 +96,7 @@ public class MavenITmng3775ConflictResolutionBacktrackingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List test = verifier.loadLines( "target/test.txt", "UTF-8" );
+        List<String> test = verifier.loadLines( "target/test.txt", "UTF-8" );
 
         assertTrue( project + " > " + test.toString(), test.contains( "a-0.1.jar" ) );
         assertTrue( project + " > " + test.toString(), test.contains( "b-0.1.jar" ) );

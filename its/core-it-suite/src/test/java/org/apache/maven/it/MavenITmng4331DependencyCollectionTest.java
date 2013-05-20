@@ -58,7 +58,7 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "sub-2/target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4331:sub-1:jar:0.1" ) );
         assertEquals( 1, artifacts.size() );
     }
@@ -82,7 +82,7 @@ public class MavenITmng4331DependencyCollectionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/sub-2.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/sub-2.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4331:sub-1:jar:0.1" ) );
         assertEquals( 1, artifacts.size() );
 

@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.it.util.ResourceExtractor;
@@ -59,9 +58,8 @@ public class MavenITmng1830ShowVersionTest
 
         boolean apacheVersionInTheRightFormatWasFound = false;
         List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        for( Iterator<String> i = lines.iterator(); i.hasNext(); )
+        for( String line : lines )
         {
-            String line = i.next();
             if ( line.matches( "^Apache Maven (.*?) \\(r[0-9]+; .*\\)$" ) 
              ||  line.matches( "^Apache Maven (.*?) \\(rNON-CANONICAL_[-_0-9]+.+?; .*\\)$" ) 
              ||  line.matches( "^Apache Maven (.*?) \\([0-9a-z]{5,41}; .*\\)$" ) )

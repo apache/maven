@@ -58,7 +58,7 @@ public class MavenITmng2222OutputDirectoryReactorResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "mod-b/target/compile.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "mod-b/target/compile.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "mod-a/target/classes" ) );
     }
 

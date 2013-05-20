@@ -56,7 +56,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "consumer/target/artifacts.txt", "UTF-8" );
         if ( matchesVersionRange( "[3.0-alpha-3,)" ) )
         {
             // artifact type unchanged to match type as declared in dependency
@@ -84,7 +84,7 @@ public class MavenITmng4056ClassifierBasedDepResolutionFromReactorTest
                 artifacts.contains( "org.apache.maven.its.mng4056:producer:ejb-client:client:0.1" ) );
         }
 
-        List classpath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "producer/test.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "producer/client.jar" ) );
     }

@@ -54,8 +54,9 @@ public class MavenITmng2054PluginExecutionInheritanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List executions = verifier.loadLines( "project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8" );
-        List expected = Arrays.asList( new String[] { "once" } );
+        List<String> executions =
+            verifier.loadLines( "project/project-level2/project-level3/project-jar/target/exec.log", "UTF-8" );
+        List<String> expected = Arrays.asList( new String[] { "once" } );
         assertEquals( expected, executions );
     }
 

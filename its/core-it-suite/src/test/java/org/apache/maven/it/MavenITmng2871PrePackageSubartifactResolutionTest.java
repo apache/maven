@@ -55,7 +55,7 @@ public class MavenITmng2871PrePackageSubartifactResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileClassPath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "consumer/target/compile.txt", "UTF-8" );
         assertEquals( 2, compileClassPath.size() );
         assertEquals( new File( testDir, "ejbs/target/classes" ).getCanonicalFile(), 
             new File( compileClassPath.get( 1 ).toString() ).getCanonicalFile() );

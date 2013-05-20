@@ -108,7 +108,7 @@ public class MavenITmng2305MultipleProxiesTest
             server.stop();
         }
 
-        List cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "http-0.1.jar" ) );
         assertTrue( cp.toString(), cp.contains( "https-0.1.jar" ) );
     }

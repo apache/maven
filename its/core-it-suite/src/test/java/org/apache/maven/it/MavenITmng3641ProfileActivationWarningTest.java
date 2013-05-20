@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -58,7 +57,7 @@ public class MavenITmng3641ProfileActivationWarningTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
 
         // (2) make sure the profile was not found and a warning was printed.
@@ -119,14 +118,12 @@ public class MavenITmng3641ProfileActivationWarningTest
         assertNull( findWarning( logFile, "mng-3641-it-provided-profile" ) );
     }
 
-    private String findWarning( List logLines, String profileId )
+    private String findWarning( List<String> logLines, String profileId )
     {
         Pattern pattern = Pattern.compile( "(?i).*profile\\s.*\\Q" + profileId + "\\E.*\\snot\\s.*activated.*" );
 
-        for ( Iterator it = logLines.iterator(); it.hasNext(); )
+        for ( String logLine : logLines )
         {
-            String logLine = (String) it.next();
-
             if ( pattern.matcher( logLine ).matches() )
             {
                 return logLine;

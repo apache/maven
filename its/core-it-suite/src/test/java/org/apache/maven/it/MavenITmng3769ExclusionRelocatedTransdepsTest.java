@@ -60,10 +60,10 @@ public class MavenITmng3769ExclusionRelocatedTransdepsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( Collections.singletonList( "org.apache.maven.its.mng3769:dependency:jar:1.0" ), artifacts );
 
-        List paths = verifier.loadLines( "target/test.txt", "UTF-8" );
+        List<String> paths = verifier.loadLines( "target/test.txt", "UTF-8" );
         assertEquals( 3, paths.size() );
         assertEquals( "dependency-1.0.jar", paths.get( 2 ) );
     }

@@ -56,7 +56,7 @@ public class MavenITmng3208ProfileAwareReactorSortingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List order = verifier.loadLines( "target/order.txt", "UTF-8" );
+        List<String> order = verifier.loadLines( "target/order.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "mod-b", "mod-a" } ), order );
     }
 

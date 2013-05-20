@@ -26,7 +26,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4387">MNG-4387</a>.
@@ -58,11 +57,11 @@ public class MavenITmng4387QuietLoggingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "log.txt", "UTF-8" );
+        List<String> lines = verifier.loadLines( "log.txt", "UTF-8" );
         
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( Iterator<String> it = lines.iterator(); it.hasNext(); )
         {
-            String line = it.next().toString();
+            String line = it.next();
             if ( line.startsWith( "+" ) || line.startsWith( "EMMA" ) )
             {
                 it.remove();

@@ -73,9 +73,9 @@ public class MavenITmng3937MergedPluginExecutionGoalsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/exec.log", "UTF-8" );
         // Order is child first and parent appended but without duplicate goals
-        List expected = Arrays.asList( new String[] { "child", "----" } );
+        List<String> expected = Arrays.asList( new String[] { "child", "----" } );
         assertEquals( expected, lines );
     }
 

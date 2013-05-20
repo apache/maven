@@ -73,7 +73,7 @@ public class MavenITmng3886ExecutionGoalsOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/it.log", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/it.log", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "test", "----" } ), lines );
     }
 

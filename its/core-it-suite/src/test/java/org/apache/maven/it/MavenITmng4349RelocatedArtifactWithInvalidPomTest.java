@@ -60,7 +60,7 @@ public class MavenITmng4349RelocatedArtifactWithInvalidPomTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "new-0.1.jar" ) );
     }
 

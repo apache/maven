@@ -59,7 +59,7 @@ public class MavenITmng0818WarDepsNotTransitiveTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        Collection<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( Collections.singletonList( "org.apache.maven.its.it0080:war:war:0.1" ), artifacts );
     }
 

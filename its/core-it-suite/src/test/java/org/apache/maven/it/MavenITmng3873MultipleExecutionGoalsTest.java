@@ -75,7 +75,7 @@ public class MavenITmng3873MultipleExecutionGoalsTest
         /*
          * NOTE: We deliberately don't check the exact order here, that's another issue.
          */
-        List lines = verifier.loadLines( "target/it.log", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/it.log", "UTF-8" );
         assertTrue( lines.toString(), lines.contains( "test" ) );
         assertTrue( lines.toString(), lines.contains( "----" ) );
     }

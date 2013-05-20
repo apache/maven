@@ -63,10 +63,10 @@ public class MavenITmng4190MirrorRepoMergingTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         Collections.sort( artifacts );
 
-        List expected = new ArrayList();
+        List<String> expected = new ArrayList();
         expected.add( "org.apache.maven.its.mng4190:a:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4190:b:jar:0.1-SNAPSHOT" );
 

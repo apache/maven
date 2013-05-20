@@ -49,7 +49,7 @@ public class MavenIT0063SystemScopeDependencyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertEquals( 2, lines.size() );
         assertEquals( new File( testDir, "jdk/lib/tools.jar").getCanonicalFile(), 
                       new File( (String) lines.get(1) ).getCanonicalFile() );

@@ -60,7 +60,7 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "pom.xml" ) );
     }
 

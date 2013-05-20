@@ -55,7 +55,7 @@ public class MavenITmng4327ExcludeForkingMojoFromForkedLifecycleTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List log = verifier.loadLines( "target/fork-lifecycle.txt", "UTF-8" );
+        List<String> log = verifier.loadLines( "target/fork-lifecycle.txt", "UTF-8" );
         assertEquals( 1, log.size() );
         assertTrue( log.toString(), log.contains( "fork-lifecycle.txt" ) );
     }

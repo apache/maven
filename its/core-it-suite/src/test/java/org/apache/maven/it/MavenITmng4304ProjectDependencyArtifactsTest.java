@@ -55,7 +55,7 @@ public class MavenITmng4304ProjectDependencyArtifactsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its:maven-core-it-support:jar:1.4" ) );
         assertEquals( 1, artifacts.size() );
     }

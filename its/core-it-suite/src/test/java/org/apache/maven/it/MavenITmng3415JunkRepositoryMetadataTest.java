@@ -159,7 +159,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        final List requestUris = new ArrayList();
+        final List<String> requestUris = new ArrayList<String>();
 
         Handler repoHandler = new AbstractHandler()
         {

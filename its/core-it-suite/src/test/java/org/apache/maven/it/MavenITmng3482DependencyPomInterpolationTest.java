@@ -56,7 +56,7 @@ public class MavenITmng3482DependencyPomInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "dep2-1.jar" ) );
     }
 

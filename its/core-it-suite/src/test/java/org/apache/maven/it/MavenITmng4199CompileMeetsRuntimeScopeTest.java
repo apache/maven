@@ -68,28 +68,28 @@ public class MavenITmng4199CompileMeetsRuntimeScopeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
+        List<String> compileArtifacts = verifier.loadLines( "target/compile-artifacts.txt", "UTF-8" );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.mng4199:system:jar:0.1" ) );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.mng4199:provided:jar:0.1" ) );
         assertTrue( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.mng4199:compile:jar:0.1" ) );
         assertFalse( compileArtifacts.toString(), compileArtifacts.contains( "org.apache.maven.its.mng4199:runtime:jar:0.1" ) );
         assertEquals( 3, compileArtifacts.size() );
 
-        List compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "system-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "provided-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "compile-0.1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "runtime-0.1.jar" ) );
         assertEquals( 4, compileClassPath.size() );
 
-        List runtimeArtifacts = verifier.loadLines( "target/runtime-artifacts.txt", "UTF-8" );
+        List<String> runtimeArtifacts = verifier.loadLines( "target/runtime-artifacts.txt", "UTF-8" );
         assertFalse( runtimeArtifacts.toString(), runtimeArtifacts.contains( "org.apache.maven.its.mng4199:system:jar:0.1" ) );
         assertFalse( runtimeArtifacts.toString(), runtimeArtifacts.contains( "org.apache.maven.its.mng4199:provided:jar:0.1" ) );
         assertTrue( runtimeArtifacts.toString(), runtimeArtifacts.contains( "org.apache.maven.its.mng4199:compile:jar:0.1" ) );
         assertTrue( runtimeArtifacts.toString(), runtimeArtifacts.contains( "org.apache.maven.its.mng4199:runtime:jar:0.1" ) );
         assertEquals( 2, runtimeArtifacts.size() );
 
-        List runtimeClassPath = verifier.loadLines( "target/runtime-cp.txt", "UTF-8" );
+        List<String> runtimeClassPath = verifier.loadLines( "target/runtime-cp.txt", "UTF-8" );
         assertFalse( runtimeClassPath.toString(), runtimeClassPath.contains( "system-0.1.jar" ) );
         assertFalse( runtimeClassPath.toString(), runtimeClassPath.contains( "provided-0.1.jar" ) );
         assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "compile-0.1.jar" ) );

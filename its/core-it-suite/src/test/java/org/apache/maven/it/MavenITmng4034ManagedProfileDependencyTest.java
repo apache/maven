@@ -58,7 +58,7 @@ public class MavenITmng4034ManagedProfileDependencyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[0] ), artifacts );
 
         artifacts = verifier.loadLines( "target/runtime.txt", "UTF-8" );

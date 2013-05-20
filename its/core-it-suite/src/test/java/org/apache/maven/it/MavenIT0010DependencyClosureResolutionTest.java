@@ -58,7 +58,7 @@ public class MavenIT0010DependencyClosureResolutionTest
         verifier.assertArtifactPresent( "org.apache.maven.its.it0010", "b", "0.2", "jar" );
         verifier.assertArtifactPresent( "org.apache.maven.its.it0010", "parent", "1.0", "pom" );
 
-        List artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/compile.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0010:a:jar:0.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0010:b:jar:0.2" ) );
     }

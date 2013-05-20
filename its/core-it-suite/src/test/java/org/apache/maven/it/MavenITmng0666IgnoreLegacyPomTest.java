@@ -61,7 +61,7 @@ public class MavenITmng0666IgnoreLegacyPomTest
 
         verifier.assertArtifactPresent( "org.apache.maven.its.it0059", "test", "3.8.1", "jar" );
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.it0059:test:jar:3.8.1" ) );
     }
 

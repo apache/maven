@@ -56,7 +56,7 @@ public class MavenIT0144LifecycleExecutionOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List expected = new ArrayList();
+        List<String> expected = new ArrayList<String>();
 
         expected.add( "pre-clean" );
         expected.add( "clean" );
@@ -105,7 +105,7 @@ public class MavenIT0144LifecycleExecutionOrderTest
         expected.add( "post-site" );
         expected.add( "site-deploy" );
 
-        List phases = verifier.loadLines( "target/phases.log", "UTF-8" );
+        List<String> phases = verifier.loadLines( "target/phases.log", "UTF-8" );
         assertEquals( expected, phases );
     }
 

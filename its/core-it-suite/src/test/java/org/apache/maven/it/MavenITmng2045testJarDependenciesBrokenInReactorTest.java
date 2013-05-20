@@ -56,20 +56,20 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compile = verifier.loadLines( "test-user/target/compile.txt", "UTF-8" );
+        List<String> compile = verifier.loadLines( "test-user/target/compile.txt", "UTF-8" );
         assertTestClasses( compile );
         assertNotMainClasses( compile );
 
-        List runtime = verifier.loadLines( "test-user/target/runtime.txt", "UTF-8" );
+        List<String> runtime = verifier.loadLines( "test-user/target/runtime.txt", "UTF-8" );
         assertTestClasses( runtime );
         assertNotMainClasses( runtime );
 
-        List test = verifier.loadLines( "test-user/target/test.txt", "UTF-8" );
+        List<String> test = verifier.loadLines( "test-user/target/test.txt", "UTF-8" );
         assertTestClasses( test );
         assertNotMainClasses( test );
     }
 
-    private void assertTestClasses( List classpath )
+    private void assertTestClasses( List<String> classpath )
     {
         /*
          * Different Maven versions use the test-classes directory or the assembled test JAR but all that matters here
@@ -80,7 +80,7 @@ public class MavenITmng2045testJarDependenciesBrokenInReactorTest
                 || classpath.contains( "test-jar-0.1-SNAPSHOT-tests.jar" ) );
     }
 
-    private void assertNotMainClasses( List classpath )
+    private void assertNotMainClasses( List<String> classpath )
     {
         // When depending on the test JAR of some module, we shouldn't get its main classes
         assertFalse( "main classes present in " + classpath, 

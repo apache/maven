@@ -71,7 +71,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        final List uris = new ArrayList();
+        final List<String> uris = new ArrayList<String>();
 
         Handler repoHandler = new AbstractHandler()
         {
@@ -151,7 +151,7 @@ public class MavenITmng4326LocalSnapshotSuppressesRemoteCheckTest
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
 
-            List cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+            List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
             assertTrue( cp.toString(), cp.contains( "dep-0.1-SNAPSHOT.jar" ) );
 
             assertFalse( uris.toString(), uris.contains( "/dep/0.1-SNAPSHOT/maven-metadata.xml" ) );

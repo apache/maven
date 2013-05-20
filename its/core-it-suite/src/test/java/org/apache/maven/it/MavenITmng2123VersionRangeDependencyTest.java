@@ -53,7 +53,7 @@ public class MavenITmng2123VersionRangeDependencyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2123:fixed:jar:0.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2123:common:jar:3.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2123:range:jar:0.1" ) );

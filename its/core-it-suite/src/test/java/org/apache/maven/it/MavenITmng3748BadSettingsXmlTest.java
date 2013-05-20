@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.it.VerificationException;
@@ -75,11 +74,10 @@ public class MavenITmng3748BadSettingsXmlTest
             verifier.executeGoal( "validate" );
             verifier.verifyErrorFreeLog();
 
-            List lines = verifier.loadLines( verifier.getLogFileName(), null );
+            List<String> lines = verifier.loadLines( verifier.getLogFileName(), null );
             boolean foundWarning = false;
-            for ( Iterator it = lines.iterator(); it.hasNext(); )
+            for ( String line : lines )
             {
-                String line = it.next().toString();
                 if ( line.matches( "(?i)\\[WARNING\\].*unrecognised tag.+repositories.+2.*" ) )
                 {
                     foundWarning = true;

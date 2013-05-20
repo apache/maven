@@ -63,7 +63,7 @@ public class MavenITmng0507ArtifactRelocationTest
         verifier.assertArtifactPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "pom" );
         verifier.assertArtifactNotPresent( "org.apache.maven", "maven-core-it-support-old-location", "1.1", "jar" );
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven:maven-core-it-support:jar:1.1" ) );
     }
 

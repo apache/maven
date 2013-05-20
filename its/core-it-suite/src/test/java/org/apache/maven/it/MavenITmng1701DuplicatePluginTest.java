@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -53,14 +52,12 @@ public class MavenITmng1701DuplicatePluginTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        List lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+        List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
         boolean foundWarning = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            
-            if ( line.startsWith( "[WARNING]" ) && 
-                line.indexOf( "duplicate declaration of plugin org.apache.maven.its.plugins:maven-it-plugin-expression" ) > 0 )
+            if ( line.startsWith( "[WARNING]" )
+                && line.indexOf( "duplicate declaration of plugin org.apache.maven.its.plugins:maven-it-plugin-expression" ) > 0 )
             {
                 foundWarning = true;
             }

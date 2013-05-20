@@ -24,7 +24,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -68,11 +67,10 @@ public class MavenITmng2739RequiredRepositoryElementsTest
 
         verifier.resetStreams();
 
-        List listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
         boolean foundNpe = false;
-        for ( Iterator it = listing.iterator(); it.hasNext(); )
+        for ( String line : listing )
         {
-            String line = (String) it.next();
             if ( line.indexOf( "NullPointerException" ) > -1 )
             {
                 foundNpe = true;
@@ -109,11 +107,10 @@ public class MavenITmng2739RequiredRepositoryElementsTest
 
         verifier.resetStreams();
 
-        List listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
+        List<String> listing = verifier.loadFile( new File( testDir, "log.txt" ), false );
         boolean foundNpe = false;
-        for ( Iterator it = listing.iterator(); it.hasNext(); )
+        for ( String line : listing )
         {
-            String line = (String) it.next();
             if ( line.indexOf( "NullPointerException" ) > -1 )
             {
                 foundNpe = true;

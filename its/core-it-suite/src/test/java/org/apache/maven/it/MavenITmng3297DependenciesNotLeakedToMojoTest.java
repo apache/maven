@@ -56,7 +56,7 @@ public class MavenITmng3297DependenciesNotLeakedToMojoTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( artifacts.toString(), 1, artifacts.size() );
 
         Properties props = verifier.loadProperties( "target/artifact.properties" );

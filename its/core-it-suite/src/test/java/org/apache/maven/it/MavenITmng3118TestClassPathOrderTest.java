@@ -55,7 +55,7 @@ public class MavenITmng3118TestClassPathOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );
+        List<String> testClassPath = verifier.loadLines( "target/test-classpath.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "test-classes", "classes" } ), testClassPath );
     }
 

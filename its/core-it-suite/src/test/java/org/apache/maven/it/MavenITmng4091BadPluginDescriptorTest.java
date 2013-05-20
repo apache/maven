@@ -20,7 +20,6 @@ package org.apache.maven.it;
  */
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
@@ -63,14 +62,13 @@ public class MavenITmng4091BadPluginDescriptorTest
         }
 
 
-        List logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
 
         String msg = "Plugin's descriptor contains the wrong version: 2.0-SNAPSHOT";
 
         boolean foundMessage = false;
-        for ( Iterator it = logFile.iterator(); it.hasNext(); )
+        for ( String line : logFile )
         {
-            String line = (String) it.next();
             if ( line.indexOf( msg ) > -1 )
             {
                 foundMessage = true;

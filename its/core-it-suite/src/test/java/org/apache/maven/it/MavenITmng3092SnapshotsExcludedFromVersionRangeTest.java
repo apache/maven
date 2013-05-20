@@ -59,7 +59,7 @@ public class MavenITmng3092SnapshotsExcludedFromVersionRangeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "a-1.1.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "b-1.0-SNAPSHOT.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "c-1.1-SNAPSHOT.jar" ) );

@@ -53,17 +53,17 @@ public class MavenITmng0249ResolveDepsFromReactorTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List ccp = verifier.loadLines( "test-component-c/target/compile.txt", "UTF-8" );
+        List<String> ccp = verifier.loadLines( "test-component-c/target/compile.txt", "UTF-8" );
         assertTrue( ccp.toString(), ccp.contains( "test-component-c/classes" ) );
         assertTrue( ccp.toString(), ccp.contains( "test-component-b/classes" ) );
         assertTrue( ccp.toString(), ccp.contains( "test-component-a/classes" ) );
 
-        List rcp = verifier.loadLines( "test-component-c/target/runtime.txt", "UTF-8" );
+        List<String> rcp = verifier.loadLines( "test-component-c/target/runtime.txt", "UTF-8" );
         assertTrue( rcp.toString(), rcp.contains( "test-component-c/classes" ) );
         assertTrue( rcp.toString(), rcp.contains( "test-component-b/classes" ) );
         assertTrue( rcp.toString(), rcp.contains( "test-component-a/classes" ) );
 
-        List tcp = verifier.loadLines( "test-component-c/target/test.txt", "UTF-8" );
+        List<String> tcp = verifier.loadLines( "test-component-c/target/test.txt", "UTF-8" );
         assertTrue( tcp.toString(), tcp.contains( "test-component-c/classes" ) );
         assertTrue( tcp.toString(), tcp.contains( "test-component-b/classes" ) );
         assertTrue( tcp.toString(), tcp.contains( "test-component-a/classes" ) );

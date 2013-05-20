@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
@@ -155,7 +154,7 @@ public class MavenITmng4428FollowHttpRedirectTest
             server.stop();
         }
 
-        List cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> cp = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( cp.toString(), cp.contains( "dep-0.1.jar" ) );
     }
 

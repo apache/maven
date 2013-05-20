@@ -59,14 +59,14 @@ public class MavenITmng4129PluginExecutionInheritanceTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List executions = verifier.loadLines( "target/executions.txt", "UTF-8" );
+        List<String> executions = verifier.loadLines( "target/executions.txt", "UTF-8" );
         Collections.sort( executions );
         assertEquals( Arrays.asList( new String[] { "inherited-execution", "non-inherited-execution" } ), executions );
 
-        List executions1 = verifier.loadLines( "child-1/target/executions.txt", "UTF-8" );
+        List<String> executions1 = verifier.loadLines( "child-1/target/executions.txt", "UTF-8" );
         assertEquals( Collections.singletonList( "inherited-execution" ), executions1 );
 
-        List executions2 = verifier.loadLines( "child-2/target/executions.txt", "UTF-8" );
+        List<String> executions2 = verifier.loadLines( "child-2/target/executions.txt", "UTF-8" );
         assertEquals( Collections.singletonList( "inherited-execution" ), executions2 );
     }
 

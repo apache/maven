@@ -75,7 +75,7 @@ public class MavenITmng1142VersionRangeIntersectionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
 
         assertFalse( classpath.toString(), classpath.contains( "a-1.1.2.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "a-1.1.1.jar" ) );

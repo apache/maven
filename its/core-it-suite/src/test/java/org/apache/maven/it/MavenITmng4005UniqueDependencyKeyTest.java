@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -88,12 +87,10 @@ public class MavenITmng4005UniqueDependencyKeyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+        List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
         boolean foundWarning = false;
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        for ( String line : lines )
         {
-            String line = (String) it.next();
-            
             if ( line.startsWith( "[WARNING]" ) && line.indexOf( "must be unique: junit:junit:jar" ) > 0 )
             {
                 foundWarning = true;

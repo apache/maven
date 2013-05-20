@@ -76,10 +76,9 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest
         {
             boolean foundCause = false;
             StringBuilder sb = new StringBuilder(  );
-            List lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
-            for ( int i = 0; i < lines.size(); i++ )
+            List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+            for ( String line : lines )
             {
-                String line = lines.get( i ).toString();
                 sb.append( line ).append( System.getProperty( "line.separator" ) );
                 if ( line.matches( ".*Connection refused.*" ) )
                 {

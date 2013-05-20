@@ -57,7 +57,7 @@ public class MavenITmng4332DefaultPluginExecutionOrderTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List lines = verifier.loadLines( "target/resources-resources.txt", "UTF-8" );
+        List<String> lines = verifier.loadLines( "target/resources-resources.txt", "UTF-8" );
         assertEquals( Arrays.asList( new String[] { "default", "test-1", "test-2" } ), lines );
     }
 

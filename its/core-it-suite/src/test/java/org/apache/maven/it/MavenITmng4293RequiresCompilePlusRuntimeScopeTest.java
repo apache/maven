@@ -65,13 +65,13 @@ public class MavenITmng4293RequiresCompilePlusRuntimeScopeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
+        List<String> compileClassPath = verifier.loadLines( "target/compile-cp.txt", "UTF-8" );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "system-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "provided-0.1.jar" ) );
         assertTrue( compileClassPath.toString(), compileClassPath.contains( "compile-0.1.jar" ) );
         assertFalse( compileClassPath.toString(), compileClassPath.contains( "test-0.1.jar" ) );
 
-        List runtimeClassPath = verifier.loadLines( "target/runtime-cp.txt", "UTF-8" );
+        List<String> runtimeClassPath = verifier.loadLines( "target/runtime-cp.txt", "UTF-8" );
         assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "compile-0.1.jar" ) );
         assertTrue( runtimeClassPath.toString(), runtimeClassPath.contains( "runtime-0.1.jar" ) );
         assertFalse( runtimeClassPath.toString(), runtimeClassPath.contains( "test-0.1.jar" ) );

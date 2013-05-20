@@ -55,8 +55,8 @@ public class MavenITmng4172EmptyDependencySetTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
-        assertEquals( new ArrayList(), artifacts );
+        List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        assertEquals( new ArrayList<String>(), artifacts );
     }
 
 }

@@ -62,7 +62,7 @@ public class MavenITmng0768OfflineModeTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-0768" );
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         Handler repoHandler = new AbstractHandler()
         {

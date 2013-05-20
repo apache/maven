@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.io.FileReader;
 import java.util.Properties;
 
 public class MavenITmng4112MavenVersionPropertyTest

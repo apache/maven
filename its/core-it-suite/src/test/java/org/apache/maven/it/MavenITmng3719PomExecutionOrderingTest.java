@@ -59,7 +59,7 @@ public class MavenITmng3719PomExecutionOrderingTest
         Pattern pattern = Pattern.compile( ".*step-([0-9])\\.properties.*" );
 
         int[] stepLines = new int[3];
-        List content = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
+        List<String> content = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         for ( int i = 0; i < content.size(); i++ )
         {
             String line = (String) content.get( i );

@@ -130,7 +130,7 @@ public class MavenITmng3652UserAgentHeaderTest
         File touchFile = new File( projectDir, "target/touch.txt" );
         assertTrue( touchFile.exists() );
 
-        List lines = verifier.loadFile( touchFile, false );
+        List<String> lines = verifier.loadFile( touchFile, false );
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -179,7 +179,7 @@ public class MavenITmng3652UserAgentHeaderTest
         File touchFile = new File( projectDir, "target/touch.txt" );
         assertTrue( touchFile.exists() );
 
-        List lines = verifier.loadFile( touchFile, false );
+        List<String> lines = verifier.loadFile( touchFile, false );
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes
@@ -233,7 +233,7 @@ public class MavenITmng3652UserAgentHeaderTest
         File touchFile = new File( projectDir, "target/touch.txt" );
         assertTrue( touchFile.exists() );
 
-        List lines = verifier.loadFile( touchFile, false );
+        List<String> lines = verifier.loadFile( touchFile, false );
 
         // NOTE: system property for maven.version may not exist if you use -Dtest
         // surefire parameter to run this single test. Therefore, the plugin writes

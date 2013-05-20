@@ -54,7 +54,7 @@ public class MavenITmng2861RelocationsAndRangesTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
 
-        List artifacts = verifier.loadLines( "A/target/artifacts.txt", "UTF-8" );
+        List<String> artifacts = verifier.loadLines( "A/target/artifacts.txt", "UTF-8" );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2861:B:jar:1.0-SNAPSHOT" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2861.new:project:jar:2.0" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng2861:C:jar:1.0-SNAPSHOT" ) );

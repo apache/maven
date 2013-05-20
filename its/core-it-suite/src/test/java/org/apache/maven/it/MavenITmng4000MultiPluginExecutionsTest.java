@@ -57,8 +57,8 @@ public class MavenITmng4000MultiPluginExecutionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List executions = verifier.loadLines( "target/exec.log", "UTF-8" );
-        List expected = Arrays.asList( new String[] { "exec", "exec" } );
+        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> expected = Arrays.asList( new String[] { "exec", "exec" } );
         assertEquals( expected, executions );
     }
 
@@ -78,8 +78,8 @@ public class MavenITmng4000MultiPluginExecutionsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List executions = verifier.loadLines( "target/exec.log", "UTF-8" );
-        List expected = Arrays.asList( new String[] { "exec", "exec" } );
+        List<String> executions = verifier.loadLines( "target/exec.log", "UTF-8" );
+        List<String> expected = Arrays.asList( new String[] { "exec", "exec" } );
         assertEquals( expected, executions );
     }
 

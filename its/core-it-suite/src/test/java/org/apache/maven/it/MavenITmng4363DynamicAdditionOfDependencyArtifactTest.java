@@ -59,7 +59,7 @@ public class MavenITmng4363DynamicAdditionOfDependencyArtifactTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
+        List<String> classpath = verifier.loadLines( "target/classpath.txt", "UTF-8" );
         assertTrue( classpath.toString(), classpath.contains( "a-0.1.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "b-0.1.jar" ) );
         assertTrue( classpath.toString(), classpath.contains( "c-0.1.jar" ) );

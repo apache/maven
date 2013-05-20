@@ -64,7 +64,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
 
-        final List requestedUris = Collections.synchronizedList( new ArrayList() );
+        final List<String> requestedUris = Collections.synchronizedList( new ArrayList<String>() );
 
         Handler repoHandler = new AbstractHandler()
         {
@@ -111,7 +111,7 @@ public class MavenITmng4348NoUnnecessaryRepositoryAccessTest
         }
 
         verifier.assertFilePresent( "target/touch.txt" );
-        assertEquals( new ArrayList(), requestedUris );
+        assertEquals( new ArrayList<String>(), requestedUris );
     }
 
 }

@@ -22,7 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -60,7 +59,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
         
-        List classPath;
+        List<String> classPath;
 
         classPath = verifier.loadLines( "child2/target/compile.txt", "UTF-8" );
         assertMainJar( classPath );
@@ -81,7 +80,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
         assertTestJar( classPath );
     }
 
-    private void assertMainJar( List classPath )
+    private void assertMainJar( List<String> classPath )
     {
         assertTrue( classPath.toString(), classPath.contains( "main.jar" ) );
         assertFalse( classPath.toString(), classPath.contains( "main" ) );
@@ -89,7 +88,7 @@ public class MavenITmng2720SiblingClasspathArtifactsTest
         assertFalse( classPath.toString(), classPath.contains( "test" ) );
     }
 
-    private void assertTestJar( List classPath )
+    private void assertTestJar( List<String> classPath )
     {
         assertFalse( classPath.toString(), classPath.contains( "main.jar" ) );
         assertFalse( classPath.toString(), classPath.contains( "main" ) );

@@ -92,7 +92,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
         
-        List goals = new ArrayList();
+        List<String> goals = new ArrayList<String>();
         goals.add( "org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run" );
         goals.add( "validate" );
         

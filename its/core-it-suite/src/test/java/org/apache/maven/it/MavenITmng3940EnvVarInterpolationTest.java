@@ -51,7 +51,7 @@ public class MavenITmng3940EnvVarInterpolationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3940" );
 
-        Map envVars = new HashMap();
+        Map<String, String> envVars = new HashMap<String, String>();
         /*
          * NOTE: The POM is using MAVEN_MNG_3940 to reference the var (just as one would refer to PATH). On Windows,
          * this must resolve case-insensitively so we use different character casing for the variable here.

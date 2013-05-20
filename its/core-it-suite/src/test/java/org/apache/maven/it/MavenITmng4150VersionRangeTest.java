@@ -58,7 +58,7 @@ public class MavenITmng4150VersionRangeTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        Collection<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( 4, artifacts.size() );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4150:a:jar:1.1" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng4150:b:jar:1.0" ) );

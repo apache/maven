@@ -23,7 +23,6 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -65,10 +64,9 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
 
         boolean foundError = false;
 
-        List lines = verifier.loadLines( verifier.getLogFileName(), null );
-        for ( Iterator it = lines.iterator(); it.hasNext(); )
+        List<String> lines = verifier.loadLines( verifier.getLogFileName(), null );
+        for ( String line : lines )
         {
-            String line = it.next().toString();
             if ( line.indexOf( ":bad/id:" ) >= 0 )
             {
                 assertTrue( "Line number not found in: " + line, line.indexOf( "38" ) > 0 );

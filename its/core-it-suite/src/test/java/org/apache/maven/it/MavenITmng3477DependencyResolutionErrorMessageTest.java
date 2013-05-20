@@ -60,10 +60,9 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
         catch ( VerificationException e )
         {
             boolean foundCause = false;
-            List lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
-            for ( int i = 0; i < lines.size(); i++ )
+            List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
+            for ( String line : lines )
             {
-                String line = lines.get( i ).toString();
                 if ( line.matches( ".*org.apache.maven.its.mng3477:dep:jar:1.0.*Connection refused.*" ) )
                 {
                     foundCause = true;

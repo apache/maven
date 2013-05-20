@@ -58,7 +58,7 @@ public class MavenITmng0820ConflictResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Collection artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
+        Collection<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         assertEquals( 3, artifacts.size() );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0820:d:jar:2.0" ) );
         assertTrue( artifacts.toString(), artifacts.contains( "org.apache.maven.its.mng0820:c:jar:1.4" ) );

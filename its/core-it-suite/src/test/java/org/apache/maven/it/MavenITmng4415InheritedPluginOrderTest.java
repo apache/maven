@@ -62,7 +62,7 @@ public class MavenITmng4415InheritedPluginOrderTest
         Properties props = verifier.loadProperties( "target/it.properties" );
         assertNotNull( props.getProperty( "project.build.plugins" ) );
 
-        List expected = new ArrayList();
+        List<String> expected = new ArrayList<String>();
         expected.add( "maven-it-plugin-error" );
         expected.add( "maven-it-plugin-configuration" );
         expected.add( "maven-it-plugin-dependency-resolution" );
@@ -72,7 +72,7 @@ public class MavenITmng4415InheritedPluginOrderTest
         expected.add( "maven-it-plugin-fork" );
         expected.add( "maven-it-plugin-touch" );
 
-        List actual = new ArrayList();
+        List<String> actual = new ArrayList<String>();
 
         int count = Integer.parseInt( props.getProperty( "project.build.plugins" ) );
         for ( int i = 0; i < count; i++ )
