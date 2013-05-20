@@ -613,4 +613,15 @@ public class DefaultModelValidatorTest
             + "should not point at files within the project directory" );
     }
 
+    public void testMissingReportPluginVersion()
+        throws Exception
+    {
+        SimpleProblemCollector result = validate( "missing-report-version-pom.xml" );
+
+        assertViolations( result, 0, 0, 3 );
+
+        assertContains( result.getWarnings().get( 0 ), "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-noversion-plugin is missing." );
+        assertContains( result.getWarnings().get( 1 ), "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-from-plugins-plugin is missing." );
+        assertContains( result.getWarnings().get( 2 ), "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-from-pluginManagement-plugin is missing." );
+    }
 }
