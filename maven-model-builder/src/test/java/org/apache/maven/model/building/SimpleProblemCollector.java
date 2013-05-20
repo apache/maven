@@ -22,6 +22,8 @@ package org.apache.maven.model.building;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.model.Model;
+
 
 /**
  * A simple model problem collector for testing the model building components.
@@ -31,12 +33,27 @@ import java.util.List;
 public class SimpleProblemCollector
     implements ModelProblemCollector
 {
+    private Model model;
 
     private List<String> warnings = new ArrayList<String>();
 
     private List<String> errors = new ArrayList<String>();
 
     private List<String> fatals = new ArrayList<String>();
+
+    public SimpleProblemCollector()
+    {
+    }
+
+    public SimpleProblemCollector( Model model )
+    {
+        this.model = model;
+    }
+
+    public Model getModel()
+    {
+        return model;
+    }
 
     public List<String> getWarnings()
     {

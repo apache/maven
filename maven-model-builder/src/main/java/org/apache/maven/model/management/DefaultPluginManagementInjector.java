@@ -31,6 +31,8 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.ReportPlugin;
+import org.apache.maven.model.Reporting;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
@@ -66,6 +68,12 @@ public class DefaultPluginManagementInjector
                 if ( pluginManagement != null )
                 {
                     mergePluginContainer_Plugins( build, pluginManagement );
+                }
+
+                mergeReporting_Plugins( model.getReporting(), build );
+                if ( pluginManagement != null )
+                {
+                    mergeReporting_Plugins( model.getReporting(), pluginManagement );
                 }
             }
         }
@@ -132,6 +140,35 @@ public class DefaultPluginManagementInjector
             }
         }
 
+        /**
+         * merge plugin version to reporting if report plugin version not set
+         */
+        private void mergeReporting_Plugins( Reporting target, PluginContainer source )
+        {
+            List<Plugin> src = source.getPlugins();
+            if ( !src.isEmpty() )
+            {
+                List<ReportPlugin> tgt = target.getPlugins();
+
+                Map<Object, Plugin> managedPlugins = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
+
+                for ( Plugin element : src )
+                {
+                    Object key = getPluginKey( element );
+                    managedPlugins.put( key, element );
+                }
+
+                for ( ReportPlugin element : tgt )
+                {
+                    Object key = getReportPluginKey( element );
+                    Plugin managedPlugin = managedPlugins.get( key );
+                    if ( managedPlugin != null && element.getVersion() == null )
+                    {
+                        element.setVersion( managedPlugin.getVersion() );
+                    }
+                }
+            }
+        }
     }
 
 }
