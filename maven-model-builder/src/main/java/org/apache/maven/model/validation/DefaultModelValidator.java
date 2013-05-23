@@ -316,9 +316,6 @@ public class DefaultModelValidator
 
                     validateStringNotEmpty( "reporting.plugins.plugin.groupId", problems, Severity.ERROR, Version.V20,
                                             p.getGroupId(), p );
-
-                    validateStringNotEmpty( "reporting.plugins.plugin.version", problems, errOn31, Version.V20, p.getVersion(),
-                                            p.getKey(), p );
                 }
             }
 

@@ -27,7 +27,6 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.model.management.PluginManagementInjector;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -38,8 +37,6 @@ public class DefaultModelValidatorTest
 {
 
     private ModelValidator validator;
-
-    private PluginManagementInjector pluginManagementInjector;
 
     private Model read( String pom )
         throws Exception
@@ -74,19 +71,6 @@ public class DefaultModelValidatorTest
         return problems;
     }
 
-    private SimpleProblemCollector validateEffective( Model model )
-        throws Exception
-    {
-        ModelBuildingRequest request =
-            new DefaultModelBuildingRequest().setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
-
-        SimpleProblemCollector problems = new SimpleProblemCollector( model );
-
-        validator.validateEffectiveModel( problems.getModel(), request, problems );
-
-        return problems;
-    }
-
     private SimpleProblemCollector validateRaw( String pom, int level )
         throws Exception
     {
@@ -111,14 +95,12 @@ public class DefaultModelValidatorTest
         super.setUp();
 
         validator = lookup( ModelValidator.class );
-        pluginManagementInjector = lookup( PluginManagementInjector.class );
     }
 
     @Override
     protected void tearDown()
         throws Exception
     {
-        this.pluginManagementInjector = null;
         this.validator = null;
 
         super.tearDown();
@@ -636,28 +618,6 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "missing-report-version-pom.xml" );
 
-        assertViolations( result, 0, 0, 3 );
-
-        assertContains( result.getWarnings().get( 0 ),
-                        "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-noversion-plugin is missing." );
-        assertContains( result.getWarnings().get( 1 ),
-                        "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-from-plugins-plugin is missing." );
-        assertContains( result.getWarnings().get( 2 ),
-                        "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-from-pluginManagement-plugin is missing." );
-
-        // after pluginManagement injection
-        ModelBuildingRequest request =
-                        new DefaultModelBuildingRequest().setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_STRICT );
-
-        SimpleProblemCollector problems = new SimpleProblemCollector();
-
-        pluginManagementInjector.injectManagement( result.getModel(), request, problems );
-
-        result = validateEffective( result.getModel() );
-
-        assertViolations( result, 0, 0, 1 );
-
-        assertContains( result.getWarnings().get( 0 ),
-                        "'reporting.plugins.plugin.version' for org.apache.maven.plugins:maven-noversion-plugin is missing." );
+        assertViolations( result, 0, 0, 0 );
     }
 }
