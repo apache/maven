@@ -431,6 +431,21 @@
             <tryUpdate>true</tryUpdate>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <version>0.8</version>
+          <configuration>
+            <excludes>
+              <exclude>**/.git*</exclude>
+              <exclude>.git/**</exclude>
+              <exclude>.idea/**</exclude>
+              <exclude>src/test/resources*/**</exclude>
+              <exclude>src/test/projects/**</exclude>
+              <exclude>src/test/remote-repo/**</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -454,6 +469,17 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <excludes combine.children="append">
+            <exclude>bootstrap/**</exclude>
+            <exclude>README.bootstrap.txt</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
