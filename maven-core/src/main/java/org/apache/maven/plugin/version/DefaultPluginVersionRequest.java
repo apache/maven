@@ -61,7 +61,7 @@ public class DefaultPluginVersionRequest
      * has a current project, its plugin repositories will be used as well.
      * 
      * @param plugin The plugin for which to resolve a version, must not be {@code null}.
-     * @param repositoryRequest The repository request to copy from, must not be {@code null}.
+     * @param session The Maven session to use, must not be {@code null}.
      */
     public DefaultPluginVersionRequest( Plugin plugin, MavenSession session )
     {

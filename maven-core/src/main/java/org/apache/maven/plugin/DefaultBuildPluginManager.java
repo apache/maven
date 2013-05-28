@@ -51,7 +51,8 @@ public class DefaultBuildPluginManager
     /**
      * 
      * @param plugin
-     * @param repositoryRequest
+     * @param repositories
+     * @param session
      * @return PluginDescriptor The component descriptor for the Maven plugin.
      * @throws PluginNotFoundException The plugin could not be found in any repositories.
      * @throws PluginResolutionException The plugin could be found but could not be resolved.

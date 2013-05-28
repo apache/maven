@@ -48,7 +48,7 @@ public final class SettingsUtils
     }
 
     /**
-     * @param settingsProfile
+     * @param modelProfile
      * @return a profile
      */
     public static Profile convertToSettingsProfile( org.apache.maven.model.Profile modelProfile )

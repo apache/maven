@@ -64,7 +64,7 @@ public interface ClassRealmManager
     /**
      * Creates a new class realm for the specified build extension.
      * 
-     * @param plugin The extension plugin for which to create a realm, must not be {@code null}.
+     * @param extension The extension plugin for which to create a realm, must not be {@code null}.
      * @param artifacts The artifacts to add to the class realm, may be {@code null}. Unresolved artifacts (i.e. with a
      *            missing file) will automatically be excluded from the realm.
      * @return The new extension realm, never {@code null}.

@@ -261,7 +261,7 @@ public interface MavenExecutionRequest
      * mirrors then it's easier to just replace the whole list with a new list of transformed repositories.
      *
      * @param repositories
-     * @return
+     * @return This request, never {@code null}.
      */
     MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> repositories );
     List<ArtifactRepository> getRemoteRepositories();

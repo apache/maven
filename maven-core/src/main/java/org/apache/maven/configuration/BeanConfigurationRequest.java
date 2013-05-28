@@ -74,7 +74,7 @@ public interface BeanConfigurationRequest
     /**
      * Returns configuration element name or {@code null}. 
      * 
-     * @see {@link #setConfiguration(Object, String)}
+     * @see #setConfiguration(Object, String)
      * 
      * @return Configuration element name or {@code null}
      */

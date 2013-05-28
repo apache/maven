@@ -65,7 +65,7 @@ public interface ArtifactMetadataSource
      *            needed, for instance the following code will work
      *            <code>artifactFactory.createProjectArtifact( "org.apache.maven", "maven", "" )</code>
      * @param localRepository    local repository
-     * @param deploymentRepository remote repository
+     * @param remoteRepository   remote repository
      * @return {@link List} $lt; {@link ArtifactVersion} >
      * @throws ArtifactMetadataRetrievalException
      *          in case of error while retrieving repository metadata from the repository.

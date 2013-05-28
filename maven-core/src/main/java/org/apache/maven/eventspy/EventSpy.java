@@ -54,13 +54,13 @@ public interface EventSpy
     /**
      * Notifies the spy of some build event/operation.
      * 
-     * @param event The event, never {@@code null}.
+     * @param event The event, never {@code null}.
      * @see org.apache.maven.settings.building.SettingsBuildingRequest
      * @see org.apache.maven.settings.building.SettingsBuildingResult
      * @see org.apache.maven.execution.MavenExecutionRequest
      * @see org.apache.maven.execution.MavenExecutionResult
      * @see org.apache.maven.project.DependencyResolutionRequest
-     * @see org.apache.maven.project.DependencyResolutionResultt
+     * @see org.apache.maven.project.DependencyResolutionResult
      * @see org.apache.maven.execution.ExecutionEvent
      * @see org.eclipse.aether.RepositoryEvent
      */
