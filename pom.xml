@@ -98,6 +98,7 @@
     <url>https://builds.apache.org/job/maven-3.x/</url>
   </ciManagement>
   <distributionManagement>
+    <downloadUrl>http://maven.apache.org/download.html</downloadUrl>
     <site>
       <id>apache.website</id>
       <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</url>
@@ -469,6 +470,20 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-doap-plugin</artifactId>
+        <version>1.1</version>        
+        <configuration>
+          <asfExtOptions>
+            <charter>The mission of the Apache Maven project is to create and maintain software
+            libraries that provide a widely-used project build tool, targeting mainly Java 
+            development. Apache Maven promotes the use of dependencies via a 
+            standardized coordinate system, binary plugins, and a standard build 
+            lifecycle.</charter>
+          </asfExtOptions>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
