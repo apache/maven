@@ -31,6 +31,7 @@ import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
@@ -198,7 +199,23 @@ public class DefaultExceptionHandler
             }
             else if ( exception instanceof PluginExecutionException )
             {
-                reference = getReference( exception.getCause() );
+                Throwable cause = exception.getCause();
+
+                if ( cause instanceof PluginContainerException )
+                {
+                    Throwable cause2 = cause.getCause();
+
+                    if ( cause2 instanceof NoClassDefFoundError
+                        && cause2.getMessage().contains( "org/sonatype/aether/" ) )
+                    {
+                        reference = "AetherClassNotFound";
+                    }
+                }
+
+                if ( StringUtils.isEmpty( reference ) )
+                {
+                    reference = getReference( cause );
+                }
 
                 if ( StringUtils.isEmpty( reference ) )
                 {
