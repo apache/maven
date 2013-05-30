@@ -52,7 +52,7 @@ public class MavenITmng5280SettingsProfilesRepositoriesOrderTest
 
     public MavenITmng5280SettingsProfilesRepositoriesOrderTest()
     {
-        super( "(3.1,)" );
+        super( "[3.1-A,)" );
     }
 
     public void setUp()
