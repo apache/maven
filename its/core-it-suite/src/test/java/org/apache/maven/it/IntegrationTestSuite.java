@@ -109,6 +109,7 @@ public class IntegrationTestSuite
         //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
         
         
+        suite.addTestSuite( MavenITmng5482AetherNotFoundTest.class );
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
         suite.addTestSuite( MavenITmng5387ArtifactReplacementPlugin.class );
         suite.addTestSuite( MavenITmng5382Jsr330Plugin.class );
