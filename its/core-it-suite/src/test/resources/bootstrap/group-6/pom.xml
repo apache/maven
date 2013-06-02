@@ -67,5 +67,11 @@ under the License.
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency><!-- IT MNG-5482 -->
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-site-plugin</artifactId>
+      <version>3.2</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>
