@@ -355,7 +355,7 @@ public class MavenCli
     {
         if ( cliRequest.debug || cliRequest.commandLine.hasOption( CLIManager.SHOW_VERSION ) )
         {
-            System.out.print( CLIReportingUtils.showVersion() );
+            System.out.println( CLIReportingUtils.showVersion() );
         }
     }
 
