@@ -129,10 +129,10 @@ under the License.
         </phases>
         <default-phases>
           <site>
-            org.apache.maven.plugins:maven-site-plugin:3.2:site
+            org.apache.maven.plugins:maven-site-plugin:3.3:site
           </site>
           <site-deploy>
-            org.apache.maven.plugins:maven-site-plugin:3.2:deploy
+            org.apache.maven.plugins:maven-site-plugin:3.3:deploy
           </site-deploy>
         </default-phases>
         <!-- END SNIPPET: site -->
