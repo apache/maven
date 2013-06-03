@@ -72,6 +72,11 @@ under the License.
               </exclusion>
             </exclusions>
           </dependency>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-io</artifactId>
+            <version>1.0</version>
+          </dependency>
         </dependencies>
       </plugin>
     </plugins>
