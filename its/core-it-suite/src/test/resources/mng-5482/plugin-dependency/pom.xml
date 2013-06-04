@@ -20,18 +20,6 @@
             </goals>
           </execution>
         </executions>
-        <dependencies><!-- force components versions from group-6: Doxia version from maven-site-plugin 3.2 -->
-          <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-sink-api</artifactId>
-            <version>1.3</version>
-          </dependency>
-          <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-site-renderer</artifactId>
-            <version>1.3</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
