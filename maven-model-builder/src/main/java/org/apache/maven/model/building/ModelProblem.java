@@ -37,7 +37,7 @@ public interface ModelProblem
 
         FATAL, //
         ERROR, //
-        WARNING; //
+        WARNING //
 
     }
 

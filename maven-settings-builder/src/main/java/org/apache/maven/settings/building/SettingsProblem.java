@@ -37,7 +37,7 @@ public interface SettingsProblem
 
         FATAL, //
         ERROR, //
-        WARNING; //
+        WARNING //
 
     }
 

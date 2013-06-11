@@ -112,12 +112,12 @@ interface ModelCacheTag<T>
         public DependencyManagement intoCache( DependencyManagement data )
         {
             return ( data != null ) ? data.clone() : null;
-        };
+        }
 
         public DependencyManagement fromCache( DependencyManagement data )
         {
             return intoCache( data );
-        };
+        }
 
     };
 
