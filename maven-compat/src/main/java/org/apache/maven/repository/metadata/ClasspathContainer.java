@@ -129,12 +129,12 @@ implements Iterable<ArtifactMetadata>
     public String toString()
     {
         StringBuilder sb = new StringBuilder( 256 );
-        sb.append( "[scope=" + scope.getScope() );
+        sb.append( "[scope=" ).append( scope.getScope() );
         if ( classpath != null )
         {
             for ( ArtifactMetadata md : classpath )
             {
-                sb.append( ": " + md.toString() + '{' + md.getArtifactUri() + '}' );
+                sb.append( ": " ).append( md.toString() ).append( '{' ).append( md.getArtifactUri() ).append( '}' );
             }
         }
         sb.append( ']' );

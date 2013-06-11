@@ -55,13 +55,14 @@ public final class CLIReportingUtils
         version.append( createMavenVersionString( properties ) ).append( LS );
         version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: "
                             + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( LS );
-        version.append( "Java version: " + System.getProperty( "java.version", "<unknown java version>" )
-                            + ", vendor: " + System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( LS );
-        version.append( "Java home: " + System.getProperty( "java.home", "<unknown java home>" ) ).append( LS );
-        version.append( "Default locale: " + Locale.getDefault() + ", platform encoding: "
-                            + System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( LS );
-        version.append( "OS name: \"" + Os.OS_NAME + "\", version: \"" + Os.OS_VERSION + "\", arch: \"" + Os.OS_ARCH
-            + "\", family: \"" + Os.OS_FAMILY + "\"" );
+        version.append( "Java version: " ).append(
+            System.getProperty( "java.version", "<unknown java version>" ) ).append( ", vendor: " ).append(
+            System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( LS );
+        version.append( "Java home: " ).append( System.getProperty( "java.home", "<unknown java home>" ) ).append( LS );
+        version.append( "Default locale: " ).append( Locale.getDefault() ).append( ", platform encoding: " ).append(
+            System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( LS );
+        version.append( "OS name: \"" ).append( Os.OS_NAME ).append( "\", version: \"" ).append( Os.OS_VERSION ).append(
+            "\", arch: \"" ).append( Os.OS_ARCH ).append( "\", family: \"" ).append( Os.OS_FAMILY ).append( "\"" );
         return version.toString();
     }
 
