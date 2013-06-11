@@ -219,7 +219,7 @@ public class DefaultLegacyArtifactCollector
         }
 
         /* remove the originating artifact if it is also in managed versions to avoid being modified during resolution */
-        Artifact managedOriginatingArtifact = (Artifact) versionMap.get( originatingArtifact.getDependencyConflictId() );
+        Artifact managedOriginatingArtifact = versionMap.get( originatingArtifact.getDependencyConflictId() );
 
         if ( managedOriginatingArtifact != null )
         {
@@ -465,7 +465,7 @@ public class DefaultLegacyArtifactCollector
                                     // added to the artifact before we retrive the metadata
                                     // for the artifact; otherwise we may end up with unwanted
                                     // dependencies.
-                                    Artifact ma = (Artifact) managedVersions.get( childKey );
+                                    Artifact ma = managedVersions.get( childKey );
                                     ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
                                     if ( null != managedExclusionFilter )
                                     {
@@ -602,7 +602,7 @@ public class DefaultLegacyArtifactCollector
     private void manageArtifact( ResolutionNode node, ManagedVersionMap managedVersions,
                                  List<ResolutionListener> listeners )
     {
-        Artifact artifact = (Artifact) managedVersions.get( node.getKey() );
+        Artifact artifact = managedVersions.get( node.getKey() );
 
         // Before we update the version of the artifact, we need to know
         // whether we are working on a transitive dependency or not. This

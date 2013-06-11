@@ -86,9 +86,9 @@ public class CanonicalProjectBuilderTest
 
         List<PluginExecution> executions = plugin.getExecutions();
 
-        PluginExecution execution = (PluginExecution) executions.get( 0 );
+        PluginExecution execution = executions.get( 0 );
 
-        String g0 = (String) execution.getGoals().get( 0 );
+        String g0 = execution.getGoals().get( 0 );
 
         assertEquals( "plexus:runtime", g0 );
 

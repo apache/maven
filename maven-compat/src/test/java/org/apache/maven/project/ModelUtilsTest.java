@@ -54,7 +54,7 @@ public class ModelUtilsTest
 
         ModelUtils.mergePluginDefinitions( plugin, mgtPlugin, false );
 
-        assertEquals( dep.getVersion(), ((Dependency) plugin.getDependencies().get( 0 ) ).getVersion() );
+        assertEquals( dep.getVersion(), plugin.getDependencies().get( 0 ).getVersion() );
     }
 
     private Dependency createDependency( String gid,

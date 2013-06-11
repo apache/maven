@@ -95,7 +95,7 @@ public class ProjectInheritanceTest
         // Value taken from p2
         // ----------------------------------------------------------------------
 
-        assertEquals( "mailing-list", ( (MailingList) project4.getMailingLists().get( 0 ) ).getName() );
+        assertEquals( "mailing-list", project4.getMailingLists().get( 0 ).getName() );
 
         // ----------------------------------------------------------------------
         // Value taken from p1

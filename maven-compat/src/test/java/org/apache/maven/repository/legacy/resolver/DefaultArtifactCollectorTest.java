@@ -76,7 +76,7 @@ public class DefaultArtifactCollectorTest
 
         source = new Source();
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        artifactCollector = (LegacyArtifactCollector) lookup( LegacyArtifactCollector.class );
+        artifactCollector = lookup( LegacyArtifactCollector.class );
 
         projectArtifact = createArtifactSpec( "project", "1.0", null );
     }

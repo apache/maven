@@ -63,8 +63,8 @@ public class MetadataResolutionResult
     public void initTreeProcessing( PlexusContainer plexus )
         throws ComponentLookupException
     {
-        classpathTransformation = (ClasspathTransformation) plexus.lookup( ClasspathTransformation.class );
-        conflictResolver = (GraphConflictResolver) plexus.lookup( GraphConflictResolver.class );
+        classpathTransformation = plexus.lookup( ClasspathTransformation.class );
+        conflictResolver = plexus.lookup( GraphConflictResolver.class );
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph()

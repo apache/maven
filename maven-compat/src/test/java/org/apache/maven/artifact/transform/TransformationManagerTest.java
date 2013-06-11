@@ -30,7 +30,7 @@ public class TransformationManagerTest
     public void testTransformationManager()
         throws Exception
     {
-        ArtifactTransformationManager tm = (ArtifactTransformationManager) lookup( ArtifactTransformationManager.class );
+        ArtifactTransformationManager tm = lookup( ArtifactTransformationManager.class );
 
         List tms = tm.getArtifactTransformations();
 
