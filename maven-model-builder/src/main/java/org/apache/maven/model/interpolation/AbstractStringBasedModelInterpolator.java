@@ -216,7 +216,7 @@ public abstract class AbstractStringBasedModelInterpolator
                                           List<? extends InterpolationPostProcessor> postProcessors,
                                           ModelProblemCollector problems )
     {
-        if ( src.indexOf( "${" ) < 0 )
+        if ( !src.contains( "${" ) )
         {
             return src;
         }

@@ -113,7 +113,7 @@ public class FileProfileActivator
                 }
             } );
         }
-        else if ( path.indexOf( "${basedir}" ) >= 0 )
+        else if ( path.contains( "${basedir}" ) )
         {
             return false;
         }

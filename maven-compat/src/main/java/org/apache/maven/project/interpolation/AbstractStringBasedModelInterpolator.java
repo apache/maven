@@ -290,7 +290,7 @@ public abstract class AbstractStringBasedModelInterpolator
                                           List<InterpolationPostProcessor> postProcessors, boolean debug )
         throws ModelInterpolationException
     {
-        if ( src.indexOf( "${" ) < 0 )
+        if ( !src.contains( "${" ) )
         {
             return src;
         }

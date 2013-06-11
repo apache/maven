@@ -69,6 +69,6 @@ public class ConcurrentBuildLoggerTest
         b1.addWait( A, aPlan.next(), System.currentTimeMillis() );
         b2.addWait( A, aPlan.next(), System.currentTimeMillis() );
         final String response = concurrentBuildLogger.toGraph();
-        assertTrue( response.indexOf( "digraph" ) >= 0 );
+        assertTrue( response.contains( "digraph" ) );
     }
 }

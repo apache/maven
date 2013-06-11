@@ -143,7 +143,7 @@ public class DefaultArtifactVersion
             }
         }
 
-        if ( ( part1.indexOf( "." ) < 0 ) && !part1.startsWith( "0" ) )
+        if ( ( !part1.contains( "." ) ) && !part1.startsWith( "0" ) )
         {
             try
             {
@@ -178,7 +178,7 @@ public class DefaultArtifactVersion
                 }
 
                 // string tokenzier won't detect these and ignores them
-                if ( part1.indexOf( ".." ) >= 0 || part1.startsWith( "." ) || part1.endsWith( "." ) )
+                if ( part1.contains( ".." ) || part1.startsWith( "." ) || part1.endsWith( "." ) )
                 {
                     fallback = true;
                 }

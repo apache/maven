@@ -172,7 +172,7 @@ public class PluginParameterExpressionEvaluator
             }
 
             // Was not an expression
-            if ( expression.indexOf( "$$" ) > -1 )
+            if ( expression.contains( "$$" ) )
             {
                 return expression.replaceAll( "\\$\\$", "\\$" );
             }

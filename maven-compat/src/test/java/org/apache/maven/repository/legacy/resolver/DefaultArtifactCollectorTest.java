@@ -712,8 +712,8 @@ public class DefaultArtifactCollectorTest
         }
         catch ( OverConstrainedVersionException e )
         {
-            assertTrue( "Versions unordered", e.getMessage().indexOf( "[3.2.1-v3235e, 3.3.0-v3346]" ) != -1 );
-            assertTrue( "DependencyTrail unresolved", e.getMessage().indexOf( "Path to dependency:" ) != -1 );
+            assertTrue( "Versions unordered", e.getMessage().contains( "[3.2.1-v3235e, 3.3.0-v3346]" ) );
+            assertTrue( "DependencyTrail unresolved", e.getMessage().contains( "Path to dependency:" ) );
         }
     }
 
