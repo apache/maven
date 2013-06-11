@@ -87,7 +87,7 @@ public final class CLIReportingUtils
             if ( timestamp != null )
             {
                 SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );
-                String ts = fmt.format( new Date( Long.valueOf( timestamp ).longValue() ) );
+                String ts = fmt.format( new Date( Long.valueOf( timestamp ) ) );
                 msg += ( rev != null ? "; " : "" ) + ts;
             }
             msg += ")";

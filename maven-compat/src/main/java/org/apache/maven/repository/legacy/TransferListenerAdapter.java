@@ -74,7 +74,7 @@ public class TransferListenerAdapter
         }
         if ( transferred != null )
         {
-            event.setTransferredBytes( transferred.longValue() );
+            event.setTransferredBytes( transferred );
         }
 
         synchronized ( artifacts )

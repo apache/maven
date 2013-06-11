@@ -75,7 +75,7 @@ public final class ModelUtils
 
                     String inherited = plugin.getInherited();
 
-                    if ( ( inherited != null ) && !Boolean.valueOf( inherited ).booleanValue() )
+                    if ( ( inherited != null ) && !Boolean.valueOf( inherited ) )
                     {
                         it.remove();
                     }
@@ -96,7 +96,7 @@ public final class ModelUtils
                 // 2. the parent's <inherited/> flag is not set
                 // 3. the parent's <inherited/> flag is set to true
                 if ( !handleAsInheritance || ( parentInherited == null )
-                    || Boolean.valueOf( parentInherited ).booleanValue() )
+                    || Boolean.valueOf( parentInherited ) )
                 {
                     Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
 
@@ -216,7 +216,7 @@ public final class ModelUtils
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
-        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
+        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited );
 
         List<PluginExecution> parentExecutions = parent.getExecutions();
 
@@ -233,7 +233,7 @@ public final class ModelUtils
                 String inherited = parentExecution.getInherited();
 
                 boolean parentExecInherited =
-                    parentIsInherited && ( ( inherited == null ) || Boolean.valueOf( inherited ).booleanValue() );
+                    parentIsInherited && ( ( inherited == null ) || Boolean.valueOf( inherited ) );
 
                 if ( !handleAsInheritance || parentExecInherited )
                 {

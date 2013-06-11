@@ -69,7 +69,7 @@ public class ConsoleTransferListener
         for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
         {
             long total = entry.getKey().getContentLength();
-            long complete = entry.getValue().longValue();
+            long complete = entry.getValue();
 
             buffer.append( getStatus( complete, total ) ).append( "  " );
         }

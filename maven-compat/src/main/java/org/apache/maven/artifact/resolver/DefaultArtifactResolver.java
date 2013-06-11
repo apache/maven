@@ -101,7 +101,7 @@ public class DefaultArtifactResolver
 
     public DefaultArtifactResolver()
     {
-        int threads = Integer.getInteger( "maven.artifact.threads", 5 ).intValue();
+        int threads = Integer.getInteger( "maven.artifact.threads", 5 );
         if ( threads <= 1 )
         {
             executor = new Executor()

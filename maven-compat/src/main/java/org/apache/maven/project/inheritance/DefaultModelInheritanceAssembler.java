@@ -389,7 +389,7 @@ public class DefaultModelInheritanceAssembler
                 String parentInherited = parentPlugin.getInherited();
 
                 if ( !handleAsInheritance || ( parentInherited == null )
-                    || Boolean.valueOf( parentInherited ).booleanValue() )
+                    || Boolean.valueOf( parentInherited ) )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;
@@ -481,7 +481,7 @@ public class DefaultModelInheritanceAssembler
         // from here to the end of the method is dealing with merging of the <executions/> section.
         String parentInherited = parent.getInherited();
 
-        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited ).booleanValue();
+        boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited );
 
         List parentReportSets = parent.getReportSets();
 
