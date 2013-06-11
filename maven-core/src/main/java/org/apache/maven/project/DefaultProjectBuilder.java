@@ -651,7 +651,7 @@ public class DefaultProjectBuilder
             Boolean profilesXml = profilesXmls.get( basedir );
             if ( profilesXml == null )
             {
-                profilesXml = Boolean.valueOf( new File( basedir, "profiles.xml" ).exists() );
+                profilesXml = new File( basedir, "profiles.xml" ).exists();
                 profilesXmls.put( basedir, profilesXml );
             }
             if ( profilesXml.booleanValue() )

@@ -248,7 +248,7 @@ public class DefaultArtifactDescriptorReader
             }
 
             List<License> licenses = model.getLicenses();
-            properties.put( "license.count", Integer.valueOf( licenses.size() ) );
+            properties.put( "license.count", licenses.size() );
             for ( int i = 0; i < licenses.size(); i++ )
             {
                 License license = licenses.get( i );

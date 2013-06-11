@@ -444,7 +444,7 @@ public class DefaultModelBuilder
             InputSource source = request.isLocationTracking() ? new InputSource() : null;
 
             Map<String, Object> options = new HashMap<String, Object>();
-            options.put( ModelProcessor.IS_STRICT, Boolean.valueOf( strict ) );
+            options.put( ModelProcessor.IS_STRICT, strict );
             options.put( ModelProcessor.INPUT_SOURCE, source );
             options.put( ModelProcessor.SOURCE, modelSource );
 

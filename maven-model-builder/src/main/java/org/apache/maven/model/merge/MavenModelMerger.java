@@ -252,7 +252,7 @@ public class MavenModelMerger
             merged.addAll( tgt );
             for ( int i = 0, n = tgt.size(); i < n; i++ )
             {
-                indices.add( Integer.valueOf( i ) );
+                indices.add( i );
             }
             for ( int i = 0, n = src.size(); i < n; i++ )
             {
@@ -260,7 +260,7 @@ public class MavenModelMerger
                 if ( !excludes.contains( s ) )
                 {
                     merged.add( s );
-                    indices.add( Integer.valueOf( ~i ) );
+                    indices.add( ~i );
                 }
             }
             target.setModules( merged );

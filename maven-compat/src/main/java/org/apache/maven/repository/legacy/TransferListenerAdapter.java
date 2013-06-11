@@ -110,11 +110,11 @@ public class TransferListenerAdapter
             transferred = transfers.get( transferEvent.getResource() );
             if ( transferred == null )
             {
-                transferred = Long.valueOf( length );
+                transferred = (long) length;
             }
             else
             {
-                transferred = Long.valueOf( transferred.longValue() + length );
+                transferred = transferred.longValue() + length;
             }
             transfers.put( transferEvent.getResource(), transferred );
         }

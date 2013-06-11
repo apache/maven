@@ -50,7 +50,7 @@ public class ConsoleMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
+        downloads.put( resource, event.getTransferredBytes() );
 
         StringBuilder buffer = new StringBuilder( 64 );
 

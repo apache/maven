@@ -62,7 +62,7 @@ public class ConsoleTransferListener
     public void transferProgressed( TransferEvent event )
     {
         TransferResource resource = event.getResource();
-        downloads.put( resource, Long.valueOf( event.getTransferredBytes() ) );
+        downloads.put( resource, event.getTransferredBytes() );
 
         StringBuilder buffer = new StringBuilder( 64 );
 

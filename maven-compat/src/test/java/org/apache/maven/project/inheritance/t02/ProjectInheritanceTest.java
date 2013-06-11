@@ -123,12 +123,12 @@ public class ProjectInheritanceTest
         String testPluginArtifactId = "maven-compiler-plugin";
         
         // this is the plugin we're looking for.
-        validPluginCounts.put( testPluginArtifactId, new Integer( 0 ) );
+        validPluginCounts.put( testPluginArtifactId, 0 );
         
         // these are injected if -DperformRelease=true
-        validPluginCounts.put( "maven-deploy-plugin", new Integer( 0 ) );
-        validPluginCounts.put( "maven-javadoc-plugin", new Integer( 0 ) );
-        validPluginCounts.put( "maven-source-plugin", new Integer( 0 ) );
+        validPluginCounts.put( "maven-deploy-plugin", 0 );
+        validPluginCounts.put( "maven-javadoc-plugin", 0 );
+        validPluginCounts.put( "maven-source-plugin", 0 );
         
         Plugin testPlugin = null;
         
@@ -157,7 +157,7 @@ public class ProjectInheritanceTest
                 }
                 else
                 {
-                    count = new Integer( count.intValue() + 1 );
+                    count = count.intValue() + 1;
                     
                     validPluginCounts.put( pluginArtifactId, count );
                 }

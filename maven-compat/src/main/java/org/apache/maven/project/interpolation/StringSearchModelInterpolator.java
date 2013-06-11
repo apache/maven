@@ -354,7 +354,7 @@ public class StringSearchModelInterpolator
         {
             if ( !fieldIsPrimitiveByClass.containsKey( fieldType ) )
             {
-                fieldIsPrimitiveByClass.put( fieldType, Boolean.valueOf( fieldType.isPrimitive() ) );
+                fieldIsPrimitiveByClass.put( fieldType, fieldType.isPrimitive() );
             }
 
             if ( fieldIsPrimitiveByClass.get( fieldType ).booleanValue() )
