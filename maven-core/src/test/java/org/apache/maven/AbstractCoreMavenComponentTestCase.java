@@ -108,11 +108,11 @@ public abstract class AbstractCoreMavenComponentTestCase
             .setPom( pom )
             .setProjectPresent( true )
             .setShowErrors( true )
-            .setPluginGroups( Arrays.asList( new String[] { "org.apache.maven.plugins" } ) )
+            .setPluginGroups( Arrays.asList( "org.apache.maven.plugins" ) )
             .setLocalRepository( getLocalRepository() )
             .setRemoteRepositories( getRemoteRepositories() )
             .setPluginArtifactRepositories( getPluginArtifactRepositories() )
-            .setGoals( Arrays.asList( new String[] { "package" } ) );
+            .setGoals( Arrays.asList( "package" ) );
 
         return request;
     }

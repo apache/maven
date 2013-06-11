@@ -65,7 +65,7 @@ public abstract class AbstractStringBasedModelInterpolator
     extends AbstractLogEnabled
     implements ModelInterpolator, Initializable
 {
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( new String[]{ "pom.", "project." } );
+    private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
 
     private static final List<String> TRANSLATED_PATH_EXPRESSIONS;
 

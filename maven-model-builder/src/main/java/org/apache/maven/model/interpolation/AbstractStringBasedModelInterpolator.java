@@ -68,7 +68,7 @@ public abstract class AbstractStringBasedModelInterpolator
      */
     private static final String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
 
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( new String[]{ "pom.", "project." } );
+    private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
 

@@ -173,7 +173,7 @@ public class RepositorySystemTest
         req3.setArtifact( new DefaultArtifact( "ut.simple:artifact:zip:classifier:1.0" ) );
         req3.addRepository( newTestRepository() );
 
-        List<ArtifactRequest> requests = Arrays.asList( new ArtifactRequest[] { req1, req2, req3 } );
+        List<ArtifactRequest> requests = Arrays.asList( req1, req2, req3 );
 
         List<ArtifactResult> results = system.resolveArtifacts( session, requests );
 
