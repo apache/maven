@@ -291,9 +291,8 @@ public class MavenProject
             List<String> modules = getModules();
             if ( modules != null )
             {
-                for ( Iterator<String> it = modules.iterator(); it.hasNext(); )
+                for ( String modulePath : modules )
                 {
-                    String modulePath = it.next();
                     String moduleName = modulePath;
 
                     if ( moduleName.endsWith( "/" ) || moduleName.endsWith( "\\" ) )
@@ -1248,10 +1247,8 @@ public class MavenProject
         List<Extension> extensions = getBuildExtensions();
         if ( extensions != null )
         {
-            for ( Iterator<Extension> i = extensions.iterator(); i.hasNext(); )
+            for ( Extension ext : extensions )
             {
-                Extension ext = i.next();
-
                 String version;
                 if ( StringUtils.isEmpty( ext.getVersion() ) )
                 {
@@ -1262,7 +1259,8 @@ public class MavenProject
                     version = ext.getVersion();
                 }
 
-                Artifact artifact = repositorySystem.createArtifact( ext.getGroupId(), ext.getArtifactId(), version, null, "jar" );
+                Artifact artifact =
+                    repositorySystem.createArtifact( ext.getGroupId(), ext.getArtifactId(), version, null, "jar" );
 
                 if ( artifact != null )
                 {
@@ -1556,10 +1554,8 @@ public class MavenProject
 
         if ( getReportPlugins() != null )
         {
-            for ( Iterator<ReportPlugin> iterator = getReportPlugins().iterator(); iterator.hasNext(); )
+            for ( ReportPlugin plugin : getReportPlugins() )
             {
-                ReportPlugin plugin = iterator.next();
-
                 if ( pluginGroupId.equals( plugin.getGroupId() ) && pluginArtifactId.equals( plugin.getArtifactId() ) )
                 {
                     dom = (Xpp3Dom) plugin.getConfiguration();
@@ -1668,10 +1664,8 @@ public class MavenProject
             if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null ) && ( deps.size() > 0 ) )
             {
                 map = new HashMap<String, Artifact>();
-                for ( Iterator<Dependency> i = dependencyManagement.getDependencies().iterator(); i.hasNext(); )
+                for ( Dependency d : dependencyManagement.getDependencies() )
                 {
-                    Dependency d = i.next();
-
                     Artifact artifact = repositorySystem.createDependencyArtifact( d );
 
                     if ( artifact == null )

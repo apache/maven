@@ -157,9 +157,9 @@ public class ModelUtilsTest
 
         if( configuration != null )
         {
-            for ( Iterator it = configuration.entrySet().iterator(); it.hasNext(); )
+            for ( Object o : configuration.entrySet() )
             {
-                Map.Entry entry = (Map.Entry) it.next();
+                Map.Entry entry = (Map.Entry) o;
 
                 Xpp3Dom param = new Xpp3Dom( String.valueOf( entry.getKey() ) );
                 param.setValue( String.valueOf( entry.getValue() ) );

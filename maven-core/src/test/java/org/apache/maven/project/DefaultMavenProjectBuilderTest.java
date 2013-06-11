@@ -59,10 +59,8 @@ public class DefaultMavenProjectBuilderTest
 
         if ( !filesToDelete.isEmpty() )
         {
-            for ( Iterator<File> it = filesToDelete.iterator(); it.hasNext(); )
+            for ( File file : filesToDelete )
             {
-                File file = it.next();
-
                 if ( file.exists() )
                 {
                     if ( file.isDirectory() )

@@ -64,14 +64,15 @@ public class ProjectInheritanceTest
         Set set = project1.getArtifacts();
         assertNotNull( "No artifacts", set );
         assertTrue( "No Artifacts", set.size() > 0 );
-        Iterator iter = set.iterator();
 
-        while ( iter.hasNext() )
+        for ( Object aSet : set )
         {
-            Artifact artifact = (Artifact) iter.next();
-            System.out.println( "Artifact: " + artifact.getDependencyConflictId() + " "
-                    + artifact.getVersion() + " Scope: " + artifact.getScope() );
-            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(), artifact.getVersion().equals( "1.0" ) );
+            Artifact artifact = (Artifact) aSet;
+            System.out.println(
+                "Artifact: " + artifact.getDependencyConflictId() + " " + artifact.getVersion() + " Scope: "
+                    + artifact.getScope() );
+            assertTrue( "Incorrect version for " + artifact.getDependencyConflictId(),
+                        artifact.getVersion().equals( "1.0" ) );
         }
 
     }

@@ -168,33 +168,35 @@ public class StringSearchModelInterpolator
                     fieldsByClass.put( cls, fields );
                 }
 
-                for ( int i = 0; i < fields.length; i++ )
+                for ( Field field : fields )
                 {
-                    Class<?> type = fields[i].getType();
-                    if ( isQualifiedForInterpolation( fields[i], type ) )
+                    Class<?> type = field.getType();
+                    if ( isQualifiedForInterpolation( field, type ) )
                     {
-                        boolean isAccessible = fields[i].isAccessible();
-                        fields[i].setAccessible( true );
+                        boolean isAccessible = field.isAccessible();
+                        field.setAccessible( true );
                         try
                         {
                             try
                             {
                                 if ( String.class == type )
                                 {
-                                    String value = (String) fields[i].get( target );
+                                    String value = (String) field.get( target );
                                     if ( value != null )
                                     {
-                                        String interpolated = modelInterpolator.interpolateInternal( value, valueSources, postProcessors, debugEnabled );
+                                        String interpolated =
+                                            modelInterpolator.interpolateInternal( value, valueSources, postProcessors,
+                                                                                   debugEnabled );
 
                                         if ( !interpolated.equals( value ) )
                                         {
-                                            fields[i].set( target, interpolated );
+                                            field.set( target, interpolated );
                                         }
                                     }
                                 }
                                 else if ( Collection.class.isAssignableFrom( type ) )
                                 {
-                                    Collection<Object> c = (Collection<Object>) fields[i].get( target );
+                                    Collection<Object> c = (Collection<Object>) field.get( target );
                                     if ( c != null && !c.isEmpty() )
                                     {
                                         List<Object> originalValues = new ArrayList<Object>( c );
@@ -206,8 +208,9 @@ public class StringSearchModelInterpolator
                                         {
                                             if ( debugEnabled && logger != null )
                                             {
-                                                logger.debug( "Skipping interpolation of field: " + fields[i] + " in: "
-                                                    + cls.getName() + "; it is an unmodifiable collection." );
+                                                logger.debug( "Skipping interpolation of field: " + field + " in: "
+                                                                  + cls.getName()
+                                                                  + "; it is an unmodifiable collection." );
                                             }
                                             continue;
                                         }
@@ -256,7 +259,7 @@ public class StringSearchModelInterpolator
                                 }
                                 else if ( Map.class.isAssignableFrom( type ) )
                                 {
-                                    Map<Object, Object> m = (Map<Object, Object>) fields[i].get( target );
+                                    Map<Object, Object> m = (Map<Object, Object>) field.get( target );
                                     if ( m != null && !m.isEmpty() )
                                     {
                                         for ( Map.Entry<Object, Object> entry : m.entrySet() )
@@ -283,10 +286,11 @@ public class StringSearchModelInterpolator
                                                         {
                                                             if ( debugEnabled && logger != null )
                                                             {
-                                                                logger.debug( "Skipping interpolation of field: "
-                                                                    + fields[i] + " (key: " + entry.getKey() + ") in: "
-                                                                    + cls.getName()
-                                                                    + "; it is an unmodifiable collection." );
+                                                                logger.debug(
+                                                                    "Skipping interpolation of field: " + field
+                                                                        + " (key: " + entry.getKey() + ") in: "
+                                                                        + cls.getName()
+                                                                        + "; it is an unmodifiable collection." );
                                                             }
                                                         }
                                                     }
@@ -308,10 +312,10 @@ public class StringSearchModelInterpolator
                                 }
                                 else
                                 {
-                                    Object value = fields[i].get( target );
+                                    Object value = field.get( target );
                                     if ( value != null )
                                     {
-                                        if ( fields[i].getType().isArray() )
+                                        if ( field.getType().isArray() )
                                         {
                                             evaluateArray( value );
                                         }
@@ -324,18 +328,18 @@ public class StringSearchModelInterpolator
                             }
                             catch ( IllegalArgumentException e )
                             {
-                                throw new ModelInterpolationException( "Failed to interpolate field: " + fields[i]
-                                    + " on class: " + cls.getName(), e );
+                                throw new ModelInterpolationException(
+                                    "Failed to interpolate field: " + field + " on class: " + cls.getName(), e );
                             }
                             catch ( IllegalAccessException e )
                             {
-                                throw new ModelInterpolationException( "Failed to interpolate field: " + fields[i]
-                                    + " on class: " + cls.getName(), e );
+                                throw new ModelInterpolationException(
+                                    "Failed to interpolate field: " + field + " on class: " + cls.getName(), e );
                             }
                         }
                         finally
                         {
-                            fields[i].setAccessible( isAccessible );
+                            field.setAccessible( isAccessible );
                         }
                     }
                 }

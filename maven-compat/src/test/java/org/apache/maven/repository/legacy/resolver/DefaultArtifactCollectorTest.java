@@ -719,9 +719,9 @@ public class DefaultArtifactCollectorTest
 
     private Artifact getArtifact( String id, Set artifacts )
     {
-        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
+        for ( Object artifact : artifacts )
         {
-            Artifact a = (Artifact) i.next();
+            Artifact a = (Artifact) artifact;
             if ( a.getArtifactId().equals( id ) && a.getGroupId().equals( GROUP_ID ) )
             {
                 return a;
@@ -886,9 +886,9 @@ public class DefaultArtifactCollectorTest
         {
             Set projectArtifacts = new HashSet();
 
-            for ( Iterator i = dependencies.iterator(); i.hasNext(); )
+            for ( Object dependency : dependencies )
             {
-                Artifact d = (Artifact) i.next();
+                Artifact d = (Artifact) dependency;
 
                 VersionRange versionRange;
                 if ( d.getVersionRange() != null )
@@ -904,8 +904,8 @@ public class DefaultArtifactCollectorTest
                 {
                     /* don't call createDependencyArtifact as it'll ignore test and provided scopes */
                     artifact =
-                        artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(),
-                                                        d.getScope(), d.getType() );
+                        artifactFactory.createArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getScope(),
+                                                        d.getType() );
                 }
                 else
                 {

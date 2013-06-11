@@ -127,12 +127,12 @@ public class ReactorManager
 
             if ( dependents != null && !dependents.isEmpty() )
             {
-                for ( Iterator it = dependents.iterator(); it.hasNext(); )
+                for ( Object dependent : dependents )
                 {
-                    String dependentId = (String) it.next();
+                    String dependentId = (String) dependent;
 
-                    if ( !buildSuccessesByProject.containsKey( dependentId )
-                        && !buildFailuresByProject.containsKey( dependentId ) )
+                    if ( !buildSuccessesByProject.containsKey( dependentId ) && !buildFailuresByProject.containsKey(
+                        dependentId ) )
                     {
                         blackList( dependentId );
                     }

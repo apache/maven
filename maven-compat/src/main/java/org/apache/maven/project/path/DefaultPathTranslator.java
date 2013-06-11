@@ -125,9 +125,9 @@ public class DefaultPathTranslator
         if ( s != null )
         {
             String basedirExpr = null;
-            for ( int i = 0; i < BASEDIR_EXPRESSIONS.length; i++ )
+            for ( String BASEDIR_EXPRESSION : BASEDIR_EXPRESSIONS )
             {
-                basedirExpr = BASEDIR_EXPRESSIONS[i];
+                basedirExpr = BASEDIR_EXPRESSION;
                 if ( s.startsWith( basedirExpr ) )
                 {
                     break;

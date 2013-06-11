@@ -161,10 +161,8 @@ public class CLIManager
 
         StringBuilder currentArg = null;
 
-        for ( int i = 0; i < args.length; i++ )
+        for ( String arg : args )
         {
-            String arg = args[i];
-
             boolean addedToBuffer = false;
 
             if ( arg.startsWith( "\"" ) )

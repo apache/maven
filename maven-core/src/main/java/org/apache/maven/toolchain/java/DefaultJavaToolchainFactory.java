@@ -78,23 +78,22 @@ public class DefaultJavaToolchainFactory
         //TODO possibly move at least parts to a utility method or abstract implementation.
         dom = (Xpp3Dom) model.getProvides();
         Xpp3Dom[] provides = dom.getChildren();
-        for ( int i = 0; i < provides.length; i++ )
+        for ( Xpp3Dom provide : provides )
         {
-            String key = provides[i].getName();
-            String value = provides[i].getValue();
+            String key = provide.getName();
+            String value = provide.getValue();
             if ( value == null )
             {
-                throw new MisconfiguredToolchainException( "Provides token '" + key + "' doesn't have any value configured." );
+                throw new MisconfiguredToolchainException(
+                    "Provides token '" + key + "' doesn't have any value configured." );
             }
             if ( "version".equals( key ) )
             {
-                jtc.addProvideToken( key,
-                    RequirementMatcherFactory.createVersionMatcher( value ) );
+                jtc.addProvideToken( key, RequirementMatcherFactory.createVersionMatcher( value ) );
             }
             else
             {
-                jtc.addProvideToken( key,
-                    RequirementMatcherFactory.createExactMatcher( value ) );
+                jtc.addProvideToken( key, RequirementMatcherFactory.createExactMatcher( value ) );
             }
         }
         return jtc;

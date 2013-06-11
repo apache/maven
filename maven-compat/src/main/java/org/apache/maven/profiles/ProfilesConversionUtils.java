@@ -100,21 +100,19 @@ public class ProfilesConversionUtils
         List repos = profileXmlProfile.getRepositories();
         if ( repos != null )
         {
-            for ( Iterator it = repos.iterator(); it.hasNext(); )
+            for ( Object repo : repos )
             {
-                profile
-                    .addRepository(
-                        convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) it.next() ) );
+                profile.addRepository( convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) repo ) );
             }
         }
 
         List pluginRepos = profileXmlProfile.getPluginRepositories();
         if ( pluginRepos != null )
         {
-            for ( Iterator it = pluginRepos.iterator(); it.hasNext(); )
+            for ( Object pluginRepo : pluginRepos )
             {
-                profile.addPluginRepository( convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) it
-                    .next() ) );
+                profile.addPluginRepository(
+                    convertFromProfileXmlRepository( (org.apache.maven.profiles.Repository) pluginRepo ) );
             }
         }
 

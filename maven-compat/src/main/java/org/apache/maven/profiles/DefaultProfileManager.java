@@ -141,9 +141,9 @@ public class DefaultProfileManager
     */
     public void explicitlyActivate( List profileIds )
     {
-        for ( Iterator it = profileIds.iterator(); it.hasNext(); )
+        for ( Object profileId1 : profileIds )
         {
-            String profileId = (String) it.next();
+            String profileId = (String) profileId1;
 
             explicitlyActivate( profileId );
         }
@@ -167,9 +167,9 @@ public class DefaultProfileManager
     */
     public void explicitlyDeactivate( List profileIds )
     {
-        for ( Iterator it = profileIds.iterator(); it.hasNext(); )
+        for ( Object profileId1 : profileIds )
         {
-            String profileId = (String) it.next();
+            String profileId = (String) profileId1;
 
             explicitlyDeactivate( profileId );
         }
@@ -215,9 +215,9 @@ public class DefaultProfileManager
      */
     public void addProfiles( List profiles )
     {
-        for ( Iterator it = profiles.iterator(); it.hasNext(); )
+        for ( Object profile1 : profiles )
         {
-            Profile profile = (Profile) it.next();
+            Profile profile = (Profile) profile1;
 
             addProfile( profile );
         }

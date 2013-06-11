@@ -110,18 +110,16 @@ public class DefaultLifecycleBindingsInjector
 
                 Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
 
-                for ( Iterator<Plugin> it = tgt.iterator(); it.hasNext(); )
+                for ( Plugin element : tgt )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     merged.put( key, element );
                 }
 
                 Map<Object, Plugin> unmanaged = new LinkedHashMap<Object, Plugin>();
 
-                for ( Iterator<Plugin> it = src.iterator(); it.hasNext(); )
+                for ( Plugin element : src )
                 {
-                    Plugin element = it.next();
                     Object key = getPluginKey( element );
                     Plugin existing = merged.get( key );
                     if ( existing != null )
@@ -140,9 +138,8 @@ public class DefaultLifecycleBindingsInjector
                     PluginManagement pluginMgmt = (PluginManagement) context.get( PLUGIN_MANAGEMENT );
                     if ( pluginMgmt != null )
                     {
-                        for ( Iterator<Plugin> it = pluginMgmt.getPlugins().iterator(); it.hasNext(); )
+                        for ( Plugin managedPlugin : pluginMgmt.getPlugins() )
                         {
-                            Plugin managedPlugin = it.next();
                             Object key = getPluginKey( managedPlugin );
                             Plugin unmanagedPlugin = unmanaged.get( key );
                             if ( unmanagedPlugin != null )

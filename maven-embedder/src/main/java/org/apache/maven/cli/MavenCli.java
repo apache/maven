@@ -865,9 +865,9 @@ public class MavenCli
             String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
             if ( profileOptionValues != null )
             {
-                for ( int i = 0; i < profileOptionValues.length; ++i )
+                for ( String profileOptionValue : profileOptionValues )
                 {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValues[i], "," );
+                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
 
                     while ( profileTokens.hasMoreTokens() )
                     {
@@ -978,9 +978,9 @@ public class MavenCli
         {
             String[] values = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
             List<String> projects = new ArrayList<String>();
-            for ( int i = 0; i < values.length; i++ )
+            for ( String value : values )
             {
-                String[] tmp = StringUtils.split( values[i], "," );
+                String[] tmp = StringUtils.split( value, "," );
                 projects.addAll( Arrays.asList( tmp ) );
             }
             request.setSelectedProjects( projects );
@@ -1076,9 +1076,9 @@ public class MavenCli
 
             if ( defStrs != null )
             {
-                for ( int i = 0; i < defStrs.length; ++i )
+                for ( String defStr : defStrs )
                 {
-                    setCliProperty( defStrs[i], userProperties );
+                    setCliProperty( defStr, userProperties );
                 }
             }
         }

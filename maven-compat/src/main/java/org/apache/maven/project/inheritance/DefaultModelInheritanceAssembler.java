@@ -323,15 +323,13 @@ public class DefaultModelInheritanceAssembler
                 List<Dependency> childDeps = childDepMgmt.getDependencies();
 
                 Map<String, Dependency> mappedChildDeps = new TreeMap<String, Dependency>();
-                for ( Iterator<Dependency> it = childDeps.iterator(); it.hasNext(); )
+                for ( Dependency dep : childDeps )
                 {
-                    Dependency dep = it.next();
                     mappedChildDeps.put( dep.getManagementKey(), dep );
                 }
 
-                for ( Iterator<Dependency> it = parentDepMgmt.getDependencies().iterator(); it.hasNext(); )
+                for ( Dependency dep : parentDepMgmt.getDependencies() )
                 {
-                    Dependency dep = it.next();
                     if ( !mappedChildDeps.containsKey( dep.getManagementKey() ) )
                     {
                         childDepMgmt.addDependency( dep );
@@ -382,14 +380,13 @@ public class DefaultModelInheritanceAssembler
 
             Map childPlugins = child.getReportPluginsAsMap();
 
-            for ( Iterator it = parentPlugins.iterator(); it.hasNext(); )
+            for ( Object parentPlugin1 : parentPlugins )
             {
-                ReportPlugin parentPlugin = (ReportPlugin) it.next();
+                ReportPlugin parentPlugin = (ReportPlugin) parentPlugin1;
 
                 String parentInherited = parentPlugin.getInherited();
 
-                if ( !handleAsInheritance || ( parentInherited == null )
-                    || Boolean.valueOf( parentInherited ) )
+                if ( !handleAsInheritance || ( parentInherited == null ) || Boolean.valueOf( parentInherited ) )
                 {
 
                     ReportPlugin assembledPlugin = parentPlugin;

@@ -55,13 +55,13 @@ public class ExpressionDocumenter
 
             ClassLoader docLoader = initializeDocLoader();
 
-            for ( int i = 0; i < EXPRESSION_ROOTS.length; i++ )
+            for ( String EXPRESSION_ROOT : EXPRESSION_ROOTS )
             {
                 InputStream docStream = null;
                 try
                 {
-                    docStream = docLoader
-                        .getResourceAsStream( EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOTS[i] + ".paramdoc.xml" );
+                    docStream =
+                        docLoader.getResourceAsStream( EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOT + ".paramdoc.xml" );
 
                     if ( docStream != null )
                     {
@@ -72,13 +72,13 @@ public class ExpressionDocumenter
                 }
                 catch ( IOException e )
                 {
-                    throw new ExpressionDocumentationException( "Failed to read documentation for expression root: "
-                        + EXPRESSION_ROOTS[i], e );
+                    throw new ExpressionDocumentationException(
+                        "Failed to read documentation for expression root: " + EXPRESSION_ROOT, e );
                 }
                 catch ( XmlPullParserException e )
                 {
-                    throw new ExpressionDocumentationException( "Failed to parse documentation for expression root: "
-                        + EXPRESSION_ROOTS[i], e );
+                    throw new ExpressionDocumentationException(
+                        "Failed to parse documentation for expression root: " + EXPRESSION_ROOT, e );
                 }
                 finally
                 {
@@ -130,9 +130,9 @@ public class ExpressionDocumenter
 
         if ( expressions != null && !expressions.isEmpty() )
         {
-            for ( Iterator it = expressions.iterator(); it.hasNext(); )
+            for ( Object expression : expressions )
             {
-                Expression expr = (Expression) it.next();
+                Expression expr = (Expression) expression;
 
                 bySyntax.put( expr.getSyntax(), expr );
             }

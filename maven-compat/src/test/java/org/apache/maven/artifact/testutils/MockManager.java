@@ -37,20 +37,20 @@ public class MockManager
     
     public void replayAll()
     {
-        for ( Iterator it = mockControls.iterator(); it.hasNext(); )
+        for ( Object mockControl : mockControls )
         {
-            MockControl control = ( MockControl ) it.next();
-            
+            MockControl control = (MockControl) mockControl;
+
             control.replay();
         }
     }
     
     public void verifyAll()
     {
-        for ( Iterator it = mockControls.iterator(); it.hasNext(); )
+        for ( Object mockControl : mockControls )
         {
-            MockControl control = ( MockControl ) it.next();
-            
+            MockControl control = (MockControl) mockControl;
+
             control.verify();
         }
     }

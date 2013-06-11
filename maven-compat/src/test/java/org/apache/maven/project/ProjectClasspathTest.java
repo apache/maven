@@ -133,9 +133,8 @@ public class ProjectClasspathTest
     private Artifact getArtifact( MavenProject project, String groupId, String artifactId )
     {
         System.out.println( "[ Looking for " + groupId + ":" + artifactId + " ]" );
-        for ( Iterator<Artifact> i = project.getArtifacts().iterator(); i.hasNext(); )
+        for ( Artifact a : project.getArtifacts() )
         {
-            Artifact a = i.next();
             System.out.println( a.toString() );
             if ( artifactId.equals( a.getArtifactId() ) && a.getGroupId().equals( groupId ) )
             {
