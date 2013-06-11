@@ -366,7 +366,7 @@ public class DefaultMaven
 
         if ( request.isUseLegacyLocalRepository() )
         {
-            logger.warn( "Disabling enhanced local repository: using legacy is stronlgy discouraged to ensure build reproducibility." );
+            logger.warn( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure build reproducibility." );
             try
             {
                 session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( session, localRepo ) );
