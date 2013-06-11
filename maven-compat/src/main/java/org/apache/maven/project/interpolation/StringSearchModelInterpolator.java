@@ -288,7 +288,6 @@ public class StringSearchModelInterpolator
                                                                     + cls.getName()
                                                                     + "; it is an unmodifiable collection." );
                                                             }
-                                                            continue;
                                                         }
                                                     }
                                                 }

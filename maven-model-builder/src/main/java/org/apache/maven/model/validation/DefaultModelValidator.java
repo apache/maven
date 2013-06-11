@@ -781,13 +781,9 @@ public class DefaultModelValidator
             return false;
         }
 
-        if ( !validateBannedCharacters( fieldName, problems, severity, version, string, sourceHint, tracker,
-                                        ILLEGAL_VERSION_CHARS ) )
-        {
-            return false;
-        }
+        return validateBannedCharacters( fieldName, problems, severity, version, string, sourceHint, tracker,
+                                         ILLEGAL_VERSION_CHARS );
 
-        return true;
     }
 
     private boolean validate20ProperSnapshotVersion( String fieldName, ModelProblemCollector problems, Severity severity, Version version,

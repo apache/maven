@@ -545,12 +545,8 @@ public class MojoDescriptor
                 return false;
             }
 
-            if ( !compareObjects( getGoal(), other.getGoal() ) )
-            {
-                return false;
-            }
+            return compareObjects( getGoal(), other.getGoal() );
 
-            return true;
         }
 
         return false;

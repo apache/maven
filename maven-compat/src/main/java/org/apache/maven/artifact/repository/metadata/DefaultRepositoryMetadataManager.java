@@ -122,14 +122,7 @@ public class DefaultRepositoryMetadataManager
                                                + ") in favor of local copy" );
                     }
                 }
-                else if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
-                {
-                    update = true;
-                }
-                else
-                {
-                    update = false;
-                }
+                else update = updateCheckManager.isUpdateRequired( metadata, repository, file );
 
                 if ( update )
                 {

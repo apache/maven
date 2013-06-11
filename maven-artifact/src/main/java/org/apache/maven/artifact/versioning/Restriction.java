@@ -170,12 +170,8 @@ public class Restriction
             return false;
         }
 
-        if ( upperBoundInclusive != restriction.upperBoundInclusive )
-        {
-            return false;
-        }
+        return upperBoundInclusive == restriction.upperBoundInclusive;
 
-        return true;
     }
 
     public String toString()

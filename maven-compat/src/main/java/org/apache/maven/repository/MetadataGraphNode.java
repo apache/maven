@@ -80,7 +80,7 @@ public class MetadataGraphNode
                 return metadata == null;
             }
 
-            return metadata == null ? false : metadata.toString().equals( node2.metadata.toString() );
+            return metadata != null && metadata.toString().equals( node2.metadata.toString() );
         }
         else
         {

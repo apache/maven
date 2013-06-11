@@ -68,7 +68,7 @@ public class DefaultArtifactResolverTest
 
         // we want to see all top-level thread groups
         ThreadGroup tg = Thread.currentThread().getThreadGroup();
-        while ( !( tg.getParent() != null ) )
+        while ( tg.getParent() == null )
         {
             tg = tg.getParent();
         }

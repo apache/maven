@@ -54,12 +54,8 @@ public class ExclusionSetFilter
 
         id = artifact.getGroupId() + ':' + id;
 
-        if ( excludes.contains( id ) )
-        {
-            return false;
-        }
+        return !excludes.contains( id );
 
-        return true;
     }
 
     @Override

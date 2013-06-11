@@ -734,12 +734,8 @@ public class MavenMetadataSource
         {
             return true;
         }
-        if ( e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
-            && e.getCause().getCause() instanceof ArtifactNotFoundException )
-        {
-            return true;
-        }
-        return false;
+        return e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
+            && e.getCause().getCause() instanceof ArtifactNotFoundException;
     }
 
     private boolean isNonTransferrablePom( Exception e )
@@ -748,12 +744,8 @@ public class MavenMetadataSource
         {
             return true;
         }
-        if ( e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
-            && !( e.getCause().getCause() instanceof ArtifactNotFoundException ) )
-        {
-            return true;
-        }
-        return false;
+        return e.getCause() instanceof org.eclipse.aether.resolution.ArtifactResolutionException
+            && !( e.getCause().getCause() instanceof ArtifactNotFoundException );
     }
 
     private Properties getSystemProperties()
