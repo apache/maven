@@ -85,7 +85,7 @@ public class ModelValidationResult
 //
         for ( int i = 0; i < messages.size(); i++ )
         {
-            message.append( indentation + "[" + i + "]  " + messages.get( i ).toString() + NEWLINE );
+            message.append( indentation + "[" + i + "]  " + messages.get( i ) + NEWLINE );
         }
 
         return message.toString();
