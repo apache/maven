@@ -199,14 +199,13 @@ public class AbstractArtifactResolutionException
         if ( message == null || !message.contains( "from the specified remote repositories:" ) )
         {
             sb.append( LS );
-            sb.append( "  " ).append( groupId ).append( ":" ).append( artifactId ).append( ":" ).append( type ).append(
-                ":" ).append( version );
+            sb.append( "  " + groupId + ":" + artifactId + ":" + type + ":" + version );
             sb.append( LS );
             if ( remoteRepositories != null )
             {
                 sb.append( LS );
                 sb.append( "from the specified remote repositories:" );
-                sb.append( LS ).append( "  " );
+                sb.append( LS + "  " );
 
                 if ( remoteRepositories.isEmpty() )
                 {

@@ -70,7 +70,7 @@ public class CLIManagerTest
         for ( Option option : new CLIManagerExtension().getOptions() )
         {
             a = !a;
-            sb.append( "<tr class='" ).append( a ? 'a' : 'b' ).append( "'><td><code>-<a name='" );
+            sb.append( "<tr class='" + ( a ? 'a' : 'b' ) + "'><td><code>-<a name='" );
             sb.append( option.getOpt() );
             sb.append( "'>" );
             sb.append( option.getOpt() );

@@ -192,17 +192,17 @@ public class MetadataGraphVertex
             return super.hashCode();
         }
         StringBuilder hashString = new StringBuilder( 128 );
-        hashString.append( md.groupId ).append( "|" );
-        hashString.append( md.artifactId ).append( "|" );
+        hashString.append( md.groupId + "|" );
+        hashString.append( md.artifactId + "|" );
 
         if ( compareVersion )
         {
-            hashString.append( md.version ).append( "|" );
+            hashString.append( md.version + "|" );
         }
 
         if ( compareScope )
         {
-            hashString.append( md.getArtifactScope() ).append( "|" );
+            hashString.append( md.getArtifactScope() + "|" );
         }
 
         return hashString.toString().hashCode();
