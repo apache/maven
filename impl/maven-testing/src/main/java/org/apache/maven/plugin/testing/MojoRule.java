@@ -76,38 +76,46 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
- * TODO: add a way to use the plugin POM for the lookup so that the user doesn't have to provide the a:g:v:goal
- * as the role hint for the mojo lookup.
- * TODO: standardize the execution of the mojo and looking at the results, but could simply have a template method
- * for verifying the state of the mojo post execution
- * TODO: need a way to look at the state of the mojo without adding getters, this could be where we finally specify
- * the expressions which extract values from the mojo.
- * TODO: create a standard directory structure for picking up POMs to make this even easier, we really just need a testing
- * descriptor and make this entirely declarative!
+ * {@link TestRule} for usage with Junit-4.10ff. This is just a wrapper for an embedded 
+ * {@link AbstractMojoTestCase}, so all <tt>protected</tt> methods of the TestCase are 
+ * exhibited as <tt>public</tt> in the rule. You may annotate single tests methods with 
+ * {@link WithoutMojo} to prevent the rule from firing.
  *
- * @author jesse
+ * @author Mirko Friedenhagen
  * @version $Id$
+ * @since 2.2
  */
 public class MojoRule
     implements TestRule
 {
-    private final AbstractMojoTestCase testCase = new AbstractMojoTestCase() {
-    };
+    private final AbstractMojoTestCase testCase;
     
+    public MojoRule() 
+    {
+        this( new AbstractMojoTestCase() {} );
+    }
+
+    public MojoRule(AbstractMojoTestCase testCase)
+    {
+        this.testCase = testCase;
+    }
+
     /**
-     * May be overridden in the implementation to do stuff after the test case is set up
-     * but before the current test is run.
+     * May be overridden in the implementation to do stuff <em>after</em> the embedded test case 
+     * is set up but <em>before</em> the current test is actually run.
      *
      * @throws Throwable
      */
-    protected void before() throws Throwable {
+    protected void before() throws Throwable
+    {
         
     }
     
     /**
      * May be overridden in the implementation to do stuff after the current test was run.
      */
-    protected void after() {
+    protected void after() 
+    {
         
     }
 
@@ -198,17 +206,6 @@ public class MojoRule
         return testCase.lookupEmptyMojo( goal, pom );
     }
 
-    /**
-     * lookup the mojo while we have all of the relavent information
-     *
-     * @param groupId
-     * @param artifactId
-     * @param version
-     * @param goal
-     * @param pluginConfiguration
-     * @return a Mojo instance
-     * @throws Exception
-     */
     public Mojo lookupMojo( String groupId, String artifactId, String version, String goal,
                                PlexusConfiguration pluginConfiguration )
         throws Exception
@@ -216,105 +213,47 @@ public class MojoRule
         return testCase.lookupMojo( groupId, artifactId, version, goal, pluginConfiguration );
     }
 
-    /**
-     * 
-     * @param project
-     * @param goal
-     * @return
-     * @throws Exception
-     * @since 2.0
-     */
     public Mojo lookupConfiguredMojo( MavenProject project, String goal )
         throws Exception
     {
         return testCase.lookupConfiguredMojo( project, goal );
     }
 
-    /**
-     * 
-     * @param session
-     * @param execution
-     * @return
-     * @throws Exception
-     * @throws ComponentConfigurationException
-     * @since 2.0
-     */
     public Mojo lookupConfiguredMojo( MavenSession session, MojoExecution execution )
         throws Exception, ComponentConfigurationException
     {
         return testCase.lookupConfiguredMojo( session, execution );
     }
 
-    /**
-     * 
-     * @param project
-     * @return
-     * @since 2.0
-     */
     public MavenSession newMavenSession( MavenProject project )
     {
         return testCase.newMavenSession( project );
     }
 
-    /**
-     * 
-     * @param goal
-     * @return
-     * @since 2.0
-     */
     public MojoExecution newMojoExecution( String goal )
     {
         return testCase.newMojoExecution( goal );
     }
 
-    /**
-     * @param artifactId
-     * @param pom
-     * @return the plexus configuration
-     * @throws Exception
-     */
     public PlexusConfiguration extractPluginConfiguration( String artifactId, File pom )
         throws Exception
     {
         return testCase.extractPluginConfiguration( artifactId, pom );
     }
 
-    /**
-     * @param artifactId
-     * @param pomDom
-     * @return the plexus configuration
-     * @throws Exception
-     */
     public PlexusConfiguration extractPluginConfiguration( String artifactId, Xpp3Dom pomDom )
         throws Exception
     {
         return testCase.extractPluginConfiguration( artifactId, pomDom );
     }
 
-    /**
-     * Configure the mojo
-     *
-     * @param mojo
-     * @param artifactId
-     * @param pom
-     * @return a Mojo instance
-     * @throws Exception
-     */
     public Mojo configureMojo( Mojo mojo, String artifactId, File pom )
         throws Exception
     {
         return testCase.configureMojo( mojo, artifactId, pom );
     }
 
-    /**
-     * Configure the mojo with the given plexus configuration
-     *
-     * @param mojo
-     * @param pluginConfiguration
-     * @return a Mojo instance
-     * @throws Exception
-     */
-    protected Mojo configureMojo( Mojo mojo, PlexusConfiguration pluginConfiguration )
+    public Mojo configureMojo( Mojo mojo, PlexusConfiguration pluginConfiguration )
         throws Exception
     {
         return testCase.configureMojo( mojo, pluginConfiguration );
@@ -381,18 +320,23 @@ public class MojoRule
 
     @Override
     public Statement apply(final Statement base, Description description) {
-        if (description.getAnnotation(WithoutMojo.class) != null) {
+        if (description.getAnnotation(WithoutMojo.class) != null) // skip.
+        {
             return base;
         }
-        return new Statement() {
+        return new Statement() 
+        {
             @Override
-            public void evaluate() throws Throwable {
+            public void evaluate() throws Throwable 
+            {
                 testCase.setUp();
                 before();
                 try 
                 {
                     base.evaluate();
-                } finally {
+                } 
+                finally 
+                {
                     after();
                 }
             }            
