@@ -32,12 +32,6 @@ under the License.
   <name>Maven Plugin Testing Mechanism</name>
   <description>The Maven Plugin Testing Harness provides mechanisms to manage tests on Mojo.</description>
 
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/plugin-testing/trunk/maven-plugin-testing-harness/</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/plugin-testing/trunk/maven-plugin-testing-harness/</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/plugin-testing/trunk/maven-plugin-testing-harness/</url>
-  </scm>
-
   <dependencies>
     <!-- maven -->
     <dependency>
