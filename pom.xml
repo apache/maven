@@ -549,7 +549,7 @@
               <linksource>true</linksource>
               <notimestamp>true</notimestamp>
               <links combine.children="append">
-                <link>http://sonatype.github.com/sonatype-aether/apidocs/</link>
+                <link>http://download.eclipse.org/aether/aether-core/${aetherVersion}/apidocs/</link>
                 <link>http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/</link>
               </links>
             </configuration>
