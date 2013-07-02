@@ -28,7 +28,7 @@
   <packaging>pom</packaging>
 
   <name>Apache Maven Distribution</name>
-  <description>The Maven distribution, source and binary, in zip and tar.gz formats.</description>
+  <description>The Apache Maven distribution, source and binary, in zip and tar.gz formats.</description>
 
   <properties>
     <distributionFileName>${distributionId}-${project.version}</distributionFileName>
