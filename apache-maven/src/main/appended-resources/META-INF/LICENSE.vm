@@ -28,9 +28,20 @@ subject to the terms and conditions of the following licenses.
 #foreach ( $project in $projects )
 #foreach ( $license in $project.licenses)
 #if ( ! ($apacheTxt == $license.name) ) 
+#set ( $artId = $project.artifact.artifactId)
+#set ( $lf = $locator )
+#set ( $url = $license.url )
+## glass fish URL is now invalid, use a fixed one
+#if ($url == "https://glassfish.dev.java.net/public/CDDLv1.0.html")
+#set ( $url = 'https://glassfish.java.net/public/CDDLv1.0.html' )
+#end
+#if ($url) 
+#set ( $licFile = 'lib/' + $artId + '.license' )
+#set ( $downloaded = $lf.getResourceAsFile($url, "licenses/${licFile}") )
+#end
 
 $project.name #if ($project.url)($project.url)#end $project.artifact
-    License: $license.name #if ($license.url) ($license.url)#end
+    License: $license.name #if ($url) $url ($licFile)#end
 
 #end
 #end

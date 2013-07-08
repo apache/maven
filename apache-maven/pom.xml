@@ -94,6 +94,11 @@
     <pluginManagement>
       <plugins>
         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-remote-resources-plugin</artifactId>
+            <version>1.5-SNAPSHOT</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
@@ -157,6 +162,19 @@
       </plugin>
     </plugins>
   </build>
+
+    <pluginRepositories>
+         <pluginRepository>
+             <id>apache.snapshots</id>
+             <url>http://repository.apache.org/snapshots/</url>
+             <snapshots>
+                 <enabled>true</enabled>
+             </snapshots>
+             <releases>
+                 <enabled>false</enabled>
+             </releases>
+         </pluginRepository>
+     </pluginRepositories>
 
   <profiles>
     <profile>
