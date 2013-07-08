@@ -435,12 +435,9 @@
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
-          <version>0.8</version>
+          <version>0.9</version>
           <configuration>
             <excludes>
-              <exclude>**/.git*</exclude>
-              <exclude>.git/**</exclude>
-              <exclude>.idea/**</exclude>
               <exclude>src/test/resources*/**</exclude>
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
@@ -494,6 +491,8 @@
             <exclude>bootstrap/**</exclude>
             <exclude>README.bootstrap.txt</exclude>
           </excludes>
+          <!-- maven-parent:24 sets ignore errors, but core is ahead -->
+          <ignoreErrors>false</ignoreErrors>
         </configuration>
       </plugin>
     </plugins>
