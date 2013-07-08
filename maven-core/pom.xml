@@ -119,7 +119,7 @@
               <exclude>lifecycle-executor.txt</exclude>
               <exclude>plugin-manager.txt</exclude>
               <exclude>project-builder.txt</exclude>
-              <exclude>src/site/resources/**</exclude>
+              <exclude>src/site/resources/design/**</exclude>
             </excludes>
           </configuration>
         </plugin>
