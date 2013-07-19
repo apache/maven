@@ -25,7 +25,8 @@
 
 Default Artifact Handlers Reference
 
-  Some artifact handlers are defined by default:
+  Some artifact handlers (see {{{../maven-artifact/apidocs/org/apache/maven/artifact/handler/ArtifactHandler.html} API}})
+  are defined by default:
 
 *--------------------+------------+------------+---------------+-----------+---------------------+-----------------------+
 || type              || extension || packaging || classifier   || language || added to classpath || includesDependencies ||
