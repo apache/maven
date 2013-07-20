@@ -27,6 +27,7 @@ import java.util.Map;
  * looks up all implementators of this interface and calls their {@link #init(Context)} method. <em>Note:</em>
  * Implementors are strongly advised to inherit from {@link AbstractEventSpy} instead of directly implementing this
  * interface.
+ * @since 3.0.2
  */
 public interface EventSpy
 {

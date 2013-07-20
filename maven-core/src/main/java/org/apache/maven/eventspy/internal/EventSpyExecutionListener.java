@@ -25,6 +25,7 @@ import org.apache.maven.execution.ExecutionListener;
 
 /**
  * Forwards execution events to eventspies.
+ * @since 3.0.2
  */
 class EventSpyExecutionListener
     extends AbstractExecutionListener
