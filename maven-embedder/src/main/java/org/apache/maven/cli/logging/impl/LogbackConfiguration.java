@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * Configuration for slf4j-logback.
  * 
  * @author Hervé Boutemy
+ * @since 3.1.0
  */
 public class LogbackConfiguration
     extends BaseSlf4jConfiguration

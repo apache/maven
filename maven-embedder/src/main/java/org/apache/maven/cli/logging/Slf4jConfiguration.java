@@ -24,6 +24,7 @@ package org.apache.maven.cli.logging;
  * implementation.
  * 
  * @author Hervé Boutemy
+ * @since 3.1.0
  */
 public interface Slf4jConfiguration
 {
