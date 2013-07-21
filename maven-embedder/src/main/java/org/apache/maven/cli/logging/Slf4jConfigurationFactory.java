@@ -32,6 +32,7 @@ import org.slf4j.ILoggerFactory;
  * configuration files in class loader.
  *
  * @author Hervé Boutemy
+ * @since 3.1.0
  */
 public class Slf4jConfigurationFactory
 {

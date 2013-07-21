@@ -27,6 +27,7 @@ import org.slf4j.impl.MavenSlf4jSimpleFriend;
  * Configuration for slf4j-simple.
  * 
  * @author Hervé Boutemy
+ * @since 3.1.0
  */
 public class Slf4jSimpleConfiguration
     extends BaseSlf4jConfiguration

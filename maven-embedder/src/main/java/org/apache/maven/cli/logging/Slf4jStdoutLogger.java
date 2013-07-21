@@ -24,6 +24,9 @@ import java.io.PrintStream;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 
+/**
+ * @since 3.1.0
+ */
 public class Slf4jStdoutLogger
     implements Logger
 {

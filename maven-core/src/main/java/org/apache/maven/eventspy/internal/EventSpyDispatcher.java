@@ -31,6 +31,7 @@ import org.eclipse.aether.RepositoryListener;
 
 /**
  * Dispatches callbacks to all registered eventspies.
+ * @since 3.0.2
  */
 @Component( role = EventSpyDispatcher.class )
 public class EventSpyDispatcher
