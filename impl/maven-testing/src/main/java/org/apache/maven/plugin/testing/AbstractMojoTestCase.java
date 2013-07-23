@@ -50,10 +50,12 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenRepositorySystemSession;
+import org.apache.maven.repository.internal.MavenAetherModule;
+import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.PlexusTestCase;
@@ -169,7 +171,13 @@ public abstract class AbstractMojoTestCase
     {
         ClassWorld classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
 
-        return new DefaultContainerConfiguration().setClassWorld( classWorld ).setName( "embedder" );
+        ContainerConfiguration cc = new DefaultContainerConfiguration()
+          .setClassWorld( classWorld )
+          .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
+          .setAutoWiring( true )
+          .setName( "maven" );      
+
+        return cc;
     }
     
     protected PlexusContainer getContainer()
@@ -373,7 +381,7 @@ public abstract class AbstractMojoTestCase
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
-        MavenSession session = new MavenSession( container, new MavenRepositorySystemSession(), request, result );
+        MavenSession session = new MavenSession( container, MavenRepositorySystemUtils.newSession(), request, result );
         session.setCurrentProject( project );
         session.setProjects( Arrays.asList( project ) );
         return session;
