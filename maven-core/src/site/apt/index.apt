@@ -20,19 +20,23 @@
  -----
  Hervé Boutemy
  -----
- 2012-09-29
+ 2013-07-27
  -----
 
 Maven Core
 
- Maven Core classes, providing <<<Maven>>> component ({{{./apidocs/org/apache/maven/Maven.html}javadoc}}),
- with its <<<DefaultMaven>>> implementation ({{{./xref/org/apache/maven/DefaultMaven.html}source}}).
+ Maven Core classes managing the whole build process.
 
 * Useful entry points
 
  * {{{./lifecycles.html}lifecycles}} and {{{./default-bindings.html}plugin bindings to <<<default>>> lifecycle}},
 
  * {{{./artifact-handlers.html}default artifact handlers}},
+
+ * {{{./toolchains.html}Toolchains descriptor reference}},
+
+ * <<<Maven>>> component ({{{./apidocs/org/apache/maven/Maven.html}javadoc}}),
+ with its <<<DefaultMaven>>> implementation ({{{./xref/org/apache/maven/DefaultMaven.html}source}}),
 
  * <<<ProjectBuilder>>> component ({{{./apidocs/org/apache/maven/project/ProjectBuilder.html}javadoc}}),
  with its <<<DefaultProjectBuilder>>> implementation

@@ -54,6 +54,7 @@ under the License.
     <menu name="Descriptors Reference">
       <item name="POM" href="./maven-model/maven.html"/>
       <item name="Settings" href="./maven-settings/settings.html"/>
+      <item name="Toolchains" href="./maven-core/toolchains.html"/>
     </menu>
 
     <menu name="Reference">
