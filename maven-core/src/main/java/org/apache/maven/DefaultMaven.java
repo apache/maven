@@ -53,7 +53,6 @@ import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
@@ -255,7 +254,7 @@ public class DefaultMaven
             repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorRepository,
                                                                                 repoSession.getWorkspaceReader() ) );
         }
-        catch ( org.apache.maven.DuplicateProjectException e )
+        catch ( DuplicateProjectException e )
         {
             return addExceptionToResult( result, e );
         }
@@ -299,7 +298,7 @@ public class DefaultMaven
 
             return addExceptionToResult( result, error );
         }
-        catch ( DuplicateProjectException e )
+        catch ( org.apache.maven.project.DuplicateProjectException e )
         {
             return addExceptionToResult( result, e );
         }
@@ -589,7 +588,7 @@ public class DefaultMaven
     }
 
     private Map<String, MavenProject> getProjectMap( List<MavenProject> projects )
-        throws org.apache.maven.DuplicateProjectException
+        throws DuplicateProjectException
     {
         Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
         Map<String, List<File>> collisions = new LinkedHashMap<String, List<File>>();
@@ -622,7 +621,7 @@ public class DefaultMaven
 
         if ( !collisions.isEmpty() )
         {
-            throw new org.apache.maven.DuplicateProjectException( "Two or more projects in the reactor"
+            throw new DuplicateProjectException( "Two or more projects in the reactor"
                 + " have the same identifier, please make sure that <groupId>:<artifactId>:<version>"
                 + " is unique for each project: " + collisions, collisions );
         }
