@@ -22,13 +22,16 @@ package org.apache.maven.exception;
 import java.util.Collections;
 import java.util.List;
 
-// provide a
-// - the exception
-// - useful message
-// - useful reference to a solution, or set of solutions
-// - the configuration gleaned for examination
-// - plugin repositories
-
+/**
+ * Provide a summary of the exception, containing:<ul>
+ * <li>the exception itself,</li>
+ * <li>useful end-user message,</li>
+ * <li>useful reference to a solution, or set of solutions: this is usually a wiki page url in
+ * <a href="http://cwiki.apache.org/confluence/display/MAVEN/">http://cwiki.apache.org/confluence/display/MAVEN/</a>,
+ * </li>
+ * <li>child exception summaries.</li>
+ * </ul>
+ */
 public class ExceptionSummary
 {
 

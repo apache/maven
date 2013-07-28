@@ -19,6 +19,11 @@ package org.apache.maven.exception;
  * under the License.
  */
 
+/**
+ * Transform an exception into useful end-user message.
+ *
+ * @since 3.0-alpha-3
+ */
 public interface ExceptionHandler    
 {
     ExceptionSummary handleException( Throwable e );
