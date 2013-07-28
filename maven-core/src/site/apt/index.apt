@@ -53,4 +53,9 @@ Maven Core
  ({{{./apidocs/org/apache/maven/classrealm/ClassRealmManager.html}javadoc}}),
  with its <<<DefaultClassRealmManager>>> implementation
  ({{{./xref/org/apache/maven/classrealm/DefaultClassRealmManager.html}source}}), using
- {{{http://plexus.codehaus.org/plexus-classworlds/}Plexus Classworlds}}.
+ {{{http://plexus.codehaus.org/plexus-classworlds/}Plexus Classworlds}},
+
+ * <<<ExceptionHandler>>> component ({{{./apidocs/org/apache/maven/exception/ExceptionHandler.html}javadoc}}),
+ with its <<<DefaultExceptionHandler>>> implementation
+ ({{{./xref/org/apache/maven/exception/DefaultExceptionHandler.html}source}}), use to transform exception into useful end-user messages.
+ 
