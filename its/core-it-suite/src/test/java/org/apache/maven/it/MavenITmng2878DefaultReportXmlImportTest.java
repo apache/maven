@@ -55,7 +55,8 @@ public class MavenITmng2878DefaultReportXmlImportTest
         verifier.resetStreams();
 
         Properties pclProps = verifier.loadProperties( "target/pcl.properties" );
-        assertNotNull( pclProps.getProperty( "default-report.xml" ) );
+        assertNotNull( "target/pcl.properties does not contain 'default-report.xml' property",
+                       pclProps.getProperty( "default-report.xml" ) );
 
         Properties tcclProps = verifier.loadProperties( "target/tccl.properties" );
         assertEquals( pclProps, tcclProps );
