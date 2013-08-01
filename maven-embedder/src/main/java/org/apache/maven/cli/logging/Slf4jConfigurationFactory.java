@@ -29,7 +29,8 @@ import org.slf4j.ILoggerFactory;
 
 /**
  * Slf4jConfiguration factory, loading implementations from <code>META-INF/maven/slf4j-configuration.properties</code>
- * configuration files in class loader.
+ * configuration files in class loader: key is the class name of the ILoggerFactory, value is the class name of
+ * the corresponding Slf4jConfiguration.
  *
  * @author Hervé Boutemy
  * @since 3.1.0
