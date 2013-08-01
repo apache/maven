@@ -20,10 +20,15 @@
  -----
  Hervé Boutemy
  -----
- 2012-04-29
+ 2013-08-02
  -----
 
 Maven Logging
+
+ End-user logging documentation is available {{{/maven-logging.html}in Maven site}}.
+ This documentation is focused on internal implementation details.
+
+* Logging API
 
  Maven uses
  {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
@@ -31,11 +36,23 @@ Maven Logging
  {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
  / {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
 
- Starting with Maven 3.1.0, instead of implementing the API itself,
- Maven maps to {{{http://slf4j.org/apidocs/}SLF4J API}}'s {{{http://slf4j.org/apidocs/org/slf4j/ILoggerFactory.html}ILoggerFactory}}
- / {{{http://slf4j.org/apidocs/org/slf4j/Logger.html}Logger}} through
- {{{./apidocs/org/apache/maven/cli/logging/Slf4jLoggerManager.html}Slf4jLoggerManager}}
- / {{{./apidocs/org/apache/maven/cli/logging/Slf4jLogger.html}Slf4jLogger}}.
+ Starting with Maven 3.1.0:
+ 
+  *  Maven supports SLF4J API logging API too, ie {{{http://slf4j.org/apidocs/org/slf4j/LoggerFactory.html}LoggerFactory}} /
+     {{{http://slf4j.org/apidocs/org/slf4j/Logger.html}Logger}},
+
+  *  instead of implementing Plexus logging API itself with basic output to console, Maven implements it using SLF4J API in
+     {{{./apidocs/org/apache/maven/cli/logging/Slf4jLoggerManager.html}Slf4jLoggerManager}}
+     / {{{./apidocs/org/apache/maven/cli/logging/Slf4jLogger.html}Slf4jLogger}}.
+
+
+* Logging Implementation
+
+ Maven 3.1.0 ships bundled with {{{http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html}SLF4J simple logger}},
+ but is ready to use other logging implementations:
+ {{{./apidocs/org/apache/maven/cli/logging/Slf4jConfigurationFactory.html}Slf4jConfigurationFactory}} /
+ {{{./apidocs/org/apache/maven/cli/logging/Slf4jConfiguration.html}Slf4jConfiguration}} brings extensions to slf4j API
+ necessary to Maven.
 
 * Getting Logger Instance
 
@@ -59,7 +76,8 @@ public class DefaultMyComponent
 +------+
 
  Starting with Maven 3.1.0, SLF4J Logger can be used directly too, without Plexus. Of course, this will only work when run under
- Maven 3.1.0, then this technique can be used safely only in Maven core components.
+ Maven 3.1.0, then this technique can be used safely only in Maven core components or in plugins/component not requiring
+ compatibility with previous Maven versions.
  
 +-----+
 import org.slf4j.Logger;
