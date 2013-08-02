@@ -49,11 +49,13 @@ Maven Logging
 * Logging Implementation
 
  Maven 3.1.0 ships bundled with {{{http://www.slf4j.org/apidocs/org/slf4j/impl/SimpleLogger.html}SLF4J simple logger}},
- but is ready to use other logging implementations.
+ but is ready to use other logging implementations: SLF4J is responsible for loading the implementation, referred to as
+ {{{http://www.slf4j.org/manual.html#swapping}"SLF4J bindings"}}.
 
  Logging configuration loading is actually done by logging implementation, without any Maven extensions to support merging
  Maven installation configuration with per-user configuration for example:
- `${maven.home}/conf/logging` directory was added to core's classpath (see `${maven.home}/bin/m2.conf`).
+ `${maven.home}/conf/logging` directory was added to core's classpath (see `${maven.home}/bin/m2.conf`). See your implementation
+ documentation for details on file names, formats, and so on.
 
  During Maven initialization, Maven tweaks default root logging level to match CLI verbosity choice. Since such feature isn't available
  in SLF4J API, logging implementation specific extensions need to be added into Maven to support these CLI options: see
