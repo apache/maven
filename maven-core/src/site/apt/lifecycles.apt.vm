@@ -20,12 +20,12 @@
  -----
  Hervé Boutemy
  -----
- 2011-09-12
+ 2013-08-02
  -----
   
 Lifecycles Reference
 
-  Maven defines 3 lifecycles:
+  Maven defines 3 lifecycles in <<<META-INF/plexus/components.xml>>>:
 
 %{toc|fromDepth=2}
 

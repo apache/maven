@@ -20,13 +20,13 @@
  ---
  Hervé Boutemy
  ---
- 2011-09-12
+ 2013-08-02
  ---
   
 Plugin Bindings for <<<default>>> Lifecycle Reference
 
   The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding; plugin bindings are defined separately
-  because they are specific for each packaging:
+  in <<<META-INF/plexus/default-bindings.xml>>> because they are specific for each packaging:
 
 %{toc|fromDepth=2}
 
