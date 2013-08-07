@@ -47,8 +47,8 @@
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
-    <plexusInterpolationVersion>1.18</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.0.13</plexusUtilsVersion>
+    <plexusInterpolationVersion>1.19</plexusInterpolationVersion>
+    <plexusUtilsVersion>3.0.14</plexusUtilsVersion>
     <!-- last Java5 release of Guava -->
     <guavaVersion>11.0.2</guavaVersion>
     <guiceVersion>3.1.3</guiceVersion>
