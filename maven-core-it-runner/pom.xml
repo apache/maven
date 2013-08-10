@@ -94,7 +94,7 @@ under the License.
           <execution>
             <configuration>
               <tasks>
-                <chmod file="${basedir}/target/maven-installation/apache-maven-${pom.version}/bin/mvn" perm="755"/>
+                <chmod file="${basedir}/target/maven-installation/apache-maven-${project.version}/bin/mvn" perm="755"/>
               </tasks>
             </configuration>
             <phase>process-sources</phase>
