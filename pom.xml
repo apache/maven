@@ -115,13 +115,13 @@ under the License.
   </mailingLists>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/maven-2/branches/maven-2.2.x</developerConnection>
-    <url>http://svn.apache.org/viewvc/maven/maven-2/branches/maven-2.2.x</url>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
+    <url>https://git-wip-us.apache.org/repos/asf?p=maven.git</url>
   </scm>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://builds.apache.org/hudson/job/maven-2.2.x/</url>
+    <url>https://builds.apache.org/job/maven-2.2.x/</url>
   </ciManagement>
 
   <build>
