@@ -56,7 +56,7 @@
     <wagonVersion>2.4</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
-    <modelloVersion>1.8</modelloVersion>
+    <modelloVersion>1.8.1</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <aetherVersion>0.9.0.M2</aetherVersion>
     <slf4jVersion>1.7.5</slf4jVersion>
