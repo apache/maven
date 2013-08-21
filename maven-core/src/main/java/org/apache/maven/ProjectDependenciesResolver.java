@@ -69,7 +69,6 @@ public interface ProjectDependenciesResolver
                            Collection<String> scopesToResolve, MavenSession session, Set<Artifact> ignoreableArtifacts )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-
     /**
      * Resolves the transitive dependencies of the specified projects. Note that dependencies which can't be resolved
      * from any repository but are present among the set of specified projects will not cause an exception. Instead,

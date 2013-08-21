@@ -350,12 +350,12 @@ public class RepositoryUtils
 
     }
 
-    public static Collection<Artifact> toArtifacts(Collection<org.apache.maven.artifact.Artifact> artifactsToConvert ) 
+    public static Collection<Artifact> toArtifacts( Collection<org.apache.maven.artifact.Artifact> artifactsToConvert )
     {
         List<Artifact> artifacts = new ArrayList<Artifact>();
-        for( org.apache.maven.artifact.Artifact a : artifactsToConvert )
+        for ( org.apache.maven.artifact.Artifact a : artifactsToConvert )
         {
-            artifacts.add(toArtifact(a));
+            artifacts.add( toArtifact( a ) );
         }
         return artifacts;
     }

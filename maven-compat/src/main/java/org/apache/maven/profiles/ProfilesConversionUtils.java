@@ -25,7 +25,6 @@ import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Deprecated

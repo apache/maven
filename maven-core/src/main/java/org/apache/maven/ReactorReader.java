@@ -51,7 +51,7 @@ class ReactorReader
     private Map<String, List<MavenProject>> projectsByGA;
 
     private WorkspaceRepository repository;
-        
+
     public ReactorReader( Map<String, MavenProject> reactorProjects )
     {
         projectsByGAV = reactorProjects;
@@ -210,18 +210,20 @@ class ReactorReader
 
         return null;
     }
-        
+
     private boolean attachedArtifactComparison( Artifact requested, Artifact attached )
     {
-          //
-          // We are taking as much as we can from the DefaultArtifact.equals(). The requested artifact has no file so
-          // we want to remove that from the comparision.          
-          //
-          return requested.getArtifactId().equals( attached.getArtifactId() ) && requested.getGroupId().equals( attached.getGroupId() )
-            && requested.getVersion().equals( attached.getVersion() ) && requested.getExtension().equals( attached.getExtension() )
+        //
+        // We are taking as much as we can from the DefaultArtifact.equals(). The requested artifact has no file so
+        // we want to remove that from the comparision.
+        //
+        return requested.getArtifactId().equals( attached.getArtifactId() )
+            && requested.getGroupId().equals( attached.getGroupId() )
+            && requested.getVersion().equals( attached.getVersion() )
+            && requested.getExtension().equals( attached.getExtension() )
             && requested.getClassifier().equals( attached.getClassifier() );
     }    
-       
+
     /**
      * Determines whether the specified artifact refers to test classes.
      * 

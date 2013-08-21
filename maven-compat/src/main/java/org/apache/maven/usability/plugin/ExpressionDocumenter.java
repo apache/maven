@@ -33,7 +33,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -164,9 +163,8 @@ public class ExpressionDocumenter
         }
         catch ( MalformedURLException e )
         {
-            throw new ExpressionDocumentationException(
-                                                        "Cannot construct expression documentation classpath resource base.",
-                                                        e );
+            throw new ExpressionDocumentationException( "Cannot construct expression documentation classpath"
+                + " resource base.", e );
         }
 
         return new URLClassLoader( new URL[] { docResource } );
