@@ -48,7 +48,7 @@
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.19</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.0.14</plexusUtilsVersion>
+    <plexusUtilsVersion>3.0.15</plexusUtilsVersion>
     <!-- last Java5 release of Guava -->
     <guavaVersion>11.0.2</guavaVersion>
     <guiceVersion>3.1.3</guiceVersion>
