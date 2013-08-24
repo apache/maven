@@ -64,8 +64,8 @@
           <area shape="rect" coords="639,411,724,444" alt="plexus-utils" href="http://plexus.codehaus.org/plexus-utils/" />
           <area shape="rect" coords="507,150,731,455" alt="plexus" href="http://plexus.codehaus.org/" />
           <area shape="rect" coords="65,306,225,436"  alt="aether" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.aether" />
-          <area shape="rect" coords="362,356,459,537" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
-          <area shape="rect" coords="459,469,580,500" alt="guice" href="http://code.google.com/p/google-guice/" />
+          <area shape="rect" coords="362,356,485,537" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
+          <area shape="rect" coords="485,469,580,500" alt="guice" href="http://code.google.com/p/google-guice/" />
         </map>
       </p>
 
