@@ -40,7 +40,7 @@
     process.</p>
 
       <p>
-        <img src="images/maven-deps.png" width="732" height="538" border="0" usemap="#Maven_dependencies" />
+        <img src="images/maven-deps.png" width="731" height="538" border="0" usemap="#Maven_dependencies" />
         <map name="Maven_dependencies">
           <area shape="rect" coords="213,0,338,32"    alt="apache-maven"  href="apache-maven/" />
           <area shape="rect" coords="213,52,338,85"   alt="maven-embedder" href="maven-embedder/" />
@@ -49,9 +49,9 @@
           <area shape="rect" coords="110,207,258,240" alt="maven-aether-provider" href="maven-aether-provider/" />
           <area shape="rect" coords="0,256,180,289"   alt="maven-repository-metadata" href="maven-repository-metadata/" />
           <area shape="rect" coords="230,309,321,342" alt="maven-plugin-api" href="maven-plugin-api/" />
-          <area shape="rect" coords="237,358,314,391" alt="maven-artifact" href="maven-artifact/" />
+          <area shape="rect" coords="237,362,314,395" alt="maven-artifact" href="maven-artifact/" />
           <area shape="rect" coords="357,158,494,191" alt="maven-settings-builder" href="maven-settings-builder/" />
-          <area shape="rect" coords="382,207,468,240" alt="maven-settings" href="maven-settings/" />
+          <area shape="rect" coords="382,211,468,244" alt="maven-settings" href="maven-settings/" />
           <area shape="rect" coords="363,256,487,289" alt="maven-model-builder" href="maven-model-builder/" />
           <area shape="rect" coords="383,310,468,342" alt="maven-model" href="maven-model/" />
           <area shape="rect" coords="514,52,660,85"   alt="commons-cli" href="http://commons.apache.org/cli/" />
@@ -64,7 +64,8 @@
           <area shape="rect" coords="639,411,724,444" alt="plexus-utils" href="http://plexus.codehaus.org/plexus-utils/" />
           <area shape="rect" coords="507,150,731,455" alt="plexus" href="http://plexus.codehaus.org/" />
           <area shape="rect" coords="65,306,225,436"  alt="aether" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.aether" />
-          <area shape="rect" coords="333,355,490,537" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
+          <area shape="rect" coords="362,356,459,537" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
+          <area shape="rect" coords="459,469,580,500" alt="guice" href="http://code.google.com/p/google-guice/" />
         </map>
       </p>
 
