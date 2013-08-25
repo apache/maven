@@ -44,7 +44,7 @@ public interface ArtifactResolver
     @Deprecated
     String ROLE = ArtifactResolver.class.getName();
 
-    // USED BY SUREFIRE
+    // USED BY SUREFIRE, DEPENDENCY PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
                                                   ArtifactRepository localRepository,
@@ -89,7 +89,7 @@ public interface ArtifactResolver
                                                   List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    // USED BY REMOTE RESOURCES PLUGIN
+    // USED BY REMOTE RESOURCES PLUGIN, DEPENDENCY PLUGIN
     @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
@@ -100,7 +100,7 @@ public interface ArtifactResolver
                   TransferListener downloadMonitor )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    // USED BY ARCHETYPE DOWNLOADER
+    // USED BY DEPENDENCY PLUGIN, ARCHETYPE DOWNLOADER
     @Deprecated
     void resolveAlways( Artifact artifact, List<ArtifactRepository> remoteRepositories,
                         ArtifactRepository localRepository )
