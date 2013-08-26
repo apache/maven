@@ -275,6 +275,7 @@ public class DefaultArtifactDescriptorReader
         Set<String> visited = new LinkedHashSet<String>();
         for ( Artifact artifact = request.getArtifact();; )
         {
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( artifact );
             try
             {
                 VersionRequest versionRequest =
@@ -283,6 +284,13 @@ public class DefaultArtifactDescriptorReader
                 VersionResult versionResult = versionResolver.resolveVersion( session, versionRequest );
 
                 artifact = artifact.setVersion( versionResult.getVersion() );
+
+                versionRequest =
+                    new VersionRequest( pomArtifact, request.getRepositories(), request.getRequestContext() );
+                versionRequest.setTrace( trace );
+                versionResult = versionResolver.resolveVersion( session, versionRequest );
+
+                pomArtifact = pomArtifact.setVersion( versionResult.getVersion() );
             }
             catch ( VersionResolutionException e )
             {
@@ -302,8 +310,6 @@ public class DefaultArtifactDescriptorReader
                 result.addException( exception );
                 throw new ArtifactDescriptorException( result );
             }
-
-            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( artifact );
 
             ArtifactResult resolveResult;
             try
