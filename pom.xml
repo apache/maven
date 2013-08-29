@@ -46,7 +46,6 @@
     <maven.compiler.target>1.6</maven.compiler.target>    
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
-    <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.19</plexusInterpolationVersion>
@@ -347,14 +346,6 @@
         <artifactId>plexus-cipher</artifactId>
         <version>${cipherVersion}</version>
       </dependency>
-      <!--bootstrap-start-comment-->
-      <dependency>
-        <groupId>easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>${easyMockVersion}</version>
-        <scope>test</scope>
-      </dependency>
-      <!--bootstrap-end-comment-->
     </dependencies>
     <!--bootstrap-start-comment-->
   </dependencyManagement>

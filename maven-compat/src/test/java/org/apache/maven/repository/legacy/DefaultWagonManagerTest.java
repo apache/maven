@@ -45,7 +45,6 @@ import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
-import org.easymock.MockControl;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -162,15 +161,10 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
-        MockControl control = MockControl.createControl( UpdateCheckManager.class );
-        control.replay();
-
         wagonManager.getArtifact( artifact, repo, null, false );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile(), "UTF-8" ) );
-
-        control.verify();
     }
 
     private Artifact createTestPomArtifact( String directory )
