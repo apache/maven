@@ -21,16 +21,19 @@ package org.apache.maven.repository.legacy;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -50,6 +53,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.util.ConfigUtils;
 
 //TODO: remove the update check manager
 //TODO: separate into retriever and publisher
@@ -72,6 +77,10 @@ public class DefaultWagonManager
     @Requirement
     private UpdateCheckManager updateCheckManager;
 
+    @Requirement
+    private LegacySupport legacySupport;
+    
+    
     //
     // Retriever
     //
@@ -226,6 +235,29 @@ public class DefaultWagonManager
     private void connectWagon( Wagon wagon, ArtifactRepository repository )
         throws ConnectionException, AuthenticationException
     {
+        // MNG-5509 
+        // See org.eclipse.aether.connector.wagon.WagonRepositoryConnector.connectWagon(Wagon)
+        if( legacySupport.getRepositorySession() != null )
+        {
+            Properties headers = new Properties();
+            
+            headers.put( "User-Agent", ConfigUtils.getString( legacySupport.getRepositorySession(), "Maven",
+                                                              ConfigurationProperties.USER_AGENT ) );
+            try
+            {
+                Method setHttpHeaders = wagon.getClass().getMethod( "setHttpHeaders", Properties.class );
+                setHttpHeaders.invoke( wagon, headers );
+            }
+            catch ( NoSuchMethodException e )
+            {
+                // normal for non-http wagons
+            }
+            catch ( Exception e )
+            {
+                logger.debug( "Could not set user agent for wagon " + wagon.getClass().getName() + ": " + e );
+            }
+        }
+        
         if ( repository.getProxy() != null && logger.isDebugEnabled() )
         {
             logger.debug( "Using proxy " + repository.getProxy().getHost() + ":" + repository.getProxy().getPort()
@@ -768,7 +800,7 @@ public class DefaultWagonManager
             throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: "
                 + protocol, e );
         }
-
+        
         return wagon;
     }
 
