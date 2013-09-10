@@ -163,8 +163,8 @@
   <scm>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <url>https://git-wip-us.apache.org/repos/asf?p=maven.git</url>
-    <tag>HEAD</tag>
+    <url>https://github.com/apache/maven/tree/maven-3.0.x</url>
+    <tag>maven-3.0.x</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -497,6 +497,16 @@
     </plugins>
   </build>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.8-SNAPSHOT</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <profiles>
     <profile>
       <id>apache-release</id>
@@ -521,6 +531,11 @@
       <id>reporting</id>
       <reporting>
         <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <version>2.8-SNAPSHOT</version>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
