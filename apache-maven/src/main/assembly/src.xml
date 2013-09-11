@@ -40,15 +40,7 @@ under the License.
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>DEPENDENCIES</include>
-        <!-- exclude the license and notice as they are not as accurate as the ones below -->
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>${project.basedir}</directory>
-      <outputDirectory>/</outputDirectory>
-      <includes>
-        <include>LICENSE.txt</include>
-        <include>NOTICE.txt</include>
+        <!-- exclude the license and notice as they are not as accurate as the ones from above -->
       </includes>
     </fileSet>
   </fileSets>
