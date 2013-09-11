@@ -80,9 +80,9 @@ public class DefaultArtifactFilterManager
         artifacts.add( "org.apache.maven:maven-settings-builder" );
         artifacts.add( "org.apache.maven:maven-toolchain" );
         artifacts.add( "org.apache.maven.wagon:wagon-provider-api" );
-        artifacts.add( "org.sonatype.aether:aether-api" );
-        artifacts.add( "org.sonatype.aether:aether-spi" );
-        artifacts.add( "org.sonatype.aether:aether-impl" );
+        artifacts.add( "org.eclipse.aether:aether-api" );
+        artifacts.add( "org.eclipse.aether:aether-spi" );
+        artifacts.add( "org.eclipse.aether:aether-impl" );
 
         /*
          * NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise
