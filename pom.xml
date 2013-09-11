@@ -58,7 +58,7 @@
     <cipherVersion>1.7</cipherVersion>
     <modelloVersion>1.8.1</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <aetherVersion>0.9.0.M2</aetherVersion>
+    <aetherVersion>0.9.0.M3</aetherVersion>
     <slf4jVersion>1.7.5</slf4jVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <!-- Control the name of the distribution and information output by mvn -->
@@ -279,12 +279,17 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.aether</groupId>
+        <artifactId>aether-connector-basic</artifactId>
+        <version>${aetherVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.aether</groupId>
         <artifactId>aether-util</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-connector-wagon</artifactId>
+        <artifactId>aether-transport-wagon</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <!--  Commons -->
