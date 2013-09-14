@@ -24,6 +24,11 @@
   <name>Maven Core</name>
   <description>Maven Core classes.</description>
 
+  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
+  </scm>
+
   <dependencies>
     <!--  Maven -->
     <dependency>

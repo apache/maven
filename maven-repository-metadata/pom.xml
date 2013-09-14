@@ -33,6 +33,11 @@ under the License.
   <name>Maven Repository Metadata Model</name>
   <description>Per-directory local and remote repository metadata.</description>
 
+  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
