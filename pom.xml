@@ -86,7 +86,8 @@
   <scm>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <url>https://github.com/apache/maven/tree/master</url>
+    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
+    <tag>HEAD</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
