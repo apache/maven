@@ -163,7 +163,7 @@
   <scm>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <url>https://github.com/apache/maven/tree/maven-3.0.x</url>
+    <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
     <tag>maven-3.0.x</tag>
   </scm>
   <issueManagement>
