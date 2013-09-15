@@ -83,6 +83,12 @@ public class DefaultArtifactFilterManager
         artifacts.add( "org.eclipse.aether:aether-api" );
         artifacts.add( "org.eclipse.aether:aether-spi" );
         artifacts.add( "org.eclipse.aether:aether-impl" );
+        //
+        // We must also filter out the old or NoClassDefFoundErrors will surface
+        //
+        artifacts.add( "org.sonatype.aether:aether-api" );
+        artifacts.add( "org.sonatype.aether:aether-spi" );
+        artifacts.add( "org.sonatype.aether:aether-impl" );
 
         /*
          * NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise
