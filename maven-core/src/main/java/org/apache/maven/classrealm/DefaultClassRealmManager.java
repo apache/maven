@@ -169,6 +169,7 @@ public class DefaultClassRealmManager
         imports.put( "org.eclipse.aether.deployment", coreRealm );
         imports.put( "org.eclipse.aether.graph", coreRealm );
         imports.put( "org.eclipse.aether.impl", coreRealm );
+        imports.put( "org.eclipse.aether.internal.impl", coreRealm );
         imports.put( "org.eclipse.aether.installation", coreRealm );
         imports.put( "org.eclipse.aether.metadata", coreRealm );
         imports.put( "org.eclipse.aether.repository", coreRealm );
