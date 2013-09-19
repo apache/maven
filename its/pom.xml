@@ -40,7 +40,7 @@ under the License.
   <scm>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git</developerConnection>
-    <url>https://git-wip-us.apache.org/repos/asf?p=maven-integration-testing.git</url>
+    <url>https://github.com/apache/maven-integration-testing/tree/${project.scm.tag}</url>
   </scm>
   <ciManagement>
     <system>Jenkins</system>
@@ -113,6 +113,12 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-project-info-reports-plugin</artifactId>
             <version>2.7</version>
+            <configuration>
+              <dependencyLocationsEnabled>false</dependencyLocationsEnabled><!-- waiting for MPIR-267 -->
+              <!-- pin down urls to to avoid interpolated values from the modules, waiting for  MPIR-290 -->
+              <anonymousConnection>${project.scm.connection}</anonymousConnection>
+              <developerConnection>${project.scm.developerConnection}</developerConnection>
+            </configuration>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
