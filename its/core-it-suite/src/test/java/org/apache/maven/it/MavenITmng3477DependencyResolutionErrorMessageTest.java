@@ -63,7 +63,7 @@ public class MavenITmng3477DependencyResolutionErrorMessageTest
             List<String> lines = verifier.loadLines( verifier.getLogFileName(), "UTF-8" );
             for ( String line : lines )
             {
-                if ( line.matches( ".*org.apache.maven.its.mng3477:dep:jar:1.0.*Connection to .* refused.*" ) )
+                if ( line.matches( ".*org.apache.maven.its.mng3477:dep:jar:1.0.*Connection refused.*" ) )
                 {
                     foundCause = true;
                     break;
