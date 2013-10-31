@@ -31,7 +31,7 @@ under the License.
   <build>
     <plugins>
       <plugin>
-        <groupId>io.tesla.its.mojoexecutionscope</groupId>
+        <groupId>org.apache.maven.its.mng5530.mojoexecutionscope</groupId>
         <artifactId>mng5530-mojo-execution-scope-plugin</artifactId>
         <version>0.1</version>
         <extensions>true</extensions>
