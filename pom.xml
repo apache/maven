@@ -423,6 +423,13 @@
           <configuration>
             <topSiteURL>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</topSiteURL>
           </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.doxia</groupId>
+              <artifactId>doxia-module-markdown</artifactId>
+              <version>1.5</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
