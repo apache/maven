@@ -26,8 +26,10 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.input.XmlStreamReader;
@@ -50,7 +52,6 @@ import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.repository.RepositorySystem;
-import org.apache.maven.repository.internal.MavenAetherModule;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -73,6 +74,8 @@ import org.codehaus.plexus.util.ReflectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+
+import com.google.inject.Module;
 
 /**
  * TODO: add a way to use the plugin POM for the lookup so that the user doesn't have to provide the a:g:v:goal
@@ -158,13 +161,23 @@ public abstract class AbstractMojoTestCase
         ContainerConfiguration cc = setupContainerConfiguration();
         try
         {
-            container = new DefaultPlexusContainer( cc );
+            List<Module> modules = new ArrayList<Module>();
+            addGuiceModules( modules );
+            container = new DefaultPlexusContainer( cc, modules.toArray( new Module[modules.size()] ) );
         }
         catch ( PlexusContainerException e )
         {
             e.printStackTrace();
             fail( "Failed to create plexus container." );
         }   
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected void addGuiceModules( List<Module> modules )
+    {
+        // no custom guice modules by default
     }
 
     protected ContainerConfiguration setupContainerConfiguration()
