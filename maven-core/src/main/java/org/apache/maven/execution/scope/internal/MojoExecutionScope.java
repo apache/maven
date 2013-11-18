@@ -22,6 +22,9 @@ package org.apache.maven.execution.scope.internal;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.MojoExecutionListener;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
@@ -40,11 +43,11 @@ import com.google.inject.Provider;
 import com.google.inject.Scope;
 import com.google.inject.util.Providers;
 
+@Named
+@Singleton
 public class MojoExecutionScope
     implements Scope
 {
-    public static final String SCOPE_NAME = "mojoExecution";
-
     private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>()
     {
         public Object get()

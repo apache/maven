@@ -49,7 +49,7 @@ public class DefaultBuildPluginManager
     @Requirement
     private LegacySupport legacySupport;
 
-    @Requirement( hint = MojoExecutionScope.SCOPE_NAME )
+    @Requirement
     private MojoExecutionScope scope;
 
     /**
