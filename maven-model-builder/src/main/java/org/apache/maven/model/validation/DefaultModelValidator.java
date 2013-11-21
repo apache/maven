@@ -64,6 +64,8 @@ public class DefaultModelValidator
 
     private static final Pattern ID_REGEX = Pattern.compile( "[A-Za-z0-9_\\-.]+" );
 
+    private static final Pattern ID_WITH_WILDCARDS_REGEX = Pattern.compile( "[A-Za-z0-9_\\-.?*]+" );
+
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
     private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
@@ -526,11 +528,22 @@ public class DefaultModelValidator
         {
             for ( Exclusion exclusion : d.getExclusions() )
             {
-                validateId( prefix + "exclusions.exclusion.groupId", problems, Severity.WARNING, Version.V20,
-                            exclusion.getGroupId(), d.getManagementKey(), exclusion );
+                if ( request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 )
+                {
+                    validateId( prefix + "exclusions.exclusion.groupId", problems, Severity.WARNING, Version.V20,
+                                exclusion.getGroupId(), d.getManagementKey(), exclusion );
 
-                validateId( prefix + "exclusions.exclusion.artifactId", problems, Severity.WARNING, Version.V20,
-                            exclusion.getArtifactId(), d.getManagementKey(), exclusion );
+                    validateId( prefix + "exclusions.exclusion.artifactId", problems, Severity.WARNING, Version.V20,
+                                exclusion.getArtifactId(), d.getManagementKey(), exclusion );
+                }
+                else
+                {
+                    validateIdWithWildcards( prefix + "exclusions.exclusion.groupId", problems, Severity.WARNING, Version.V30,
+                                exclusion.getGroupId(), d.getManagementKey(), exclusion );
+
+                    validateIdWithWildcards( prefix + "exclusions.exclusion.artifactId", problems, Severity.WARNING, Version.V30,
+                                exclusion.getArtifactId(), d.getManagementKey(), exclusion );
+                }
             }
         }
     }
@@ -634,6 +647,26 @@ public class DefaultModelValidator
         }
     }
 
+    private boolean validateIdWithWildcards( String fieldName, ModelProblemCollector problems, Severity severity, Version version, String id,
+                                String sourceHint, InputLocationTracker tracker )
+    {
+        if ( !validateStringNotEmpty( fieldName, problems, severity, version, id, sourceHint, tracker ) )
+        {
+            return false;
+        }
+        else
+        {
+            boolean match = ID_WITH_WILDCARDS_REGEX.matcher( id ).matches();
+            if ( !match )
+            {
+                addViolation( problems, severity, version, fieldName, sourceHint, "with value '" + id
+                    + "' does not match a valid id pattern.", tracker );
+            }
+            return match;
+        }
+    }
+
+    
     private boolean validateStringNoExpression( String fieldName, ModelProblemCollector problems, Severity severity, Version version,
                                                 String string, InputLocationTracker tracker )
     {
