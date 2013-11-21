@@ -409,7 +409,7 @@ public abstract class AbstractMojoTestCase
     protected MojoExecution newMojoExecution( String goal )
     {
         MojoDescriptor mojoDescriptor = mojoDescriptors.get( goal );
-        assertNotNull( mojoDescriptor );
+        assertNotNull(String.format("The MojoDescriptor for the goal %s cannot be null.", goal),  mojoDescriptor );
         MojoExecution execution = new MojoExecution( mojoDescriptor );
         finalizeMojoConfiguration( execution );
         return execution;
