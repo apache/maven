@@ -25,7 +25,9 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * 
+ * Core IT Bootstrapping: downloads from central repository every dependency (artifacts, plugins) required to let
+ * ITs run without downloading anything later.
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -38,7 +40,7 @@ public class MavenITBootstrapTest
     }
 
     /**
-     * Bootstraps the integration tests by downloading required artifacts.
+     * Bootstraps the integration tests by downloading required artifacts from central repository.
      */
     public void testBootstrap()
         throws Exception
