@@ -1,5 +1,3 @@
 Maven Core Integration Tests
 
 Maven Developers List: dev@maven.apache.org
-
-A little background to help understand things: A good IT does not depend on external repos like central, it uses dedicated test plugins and test repositories. The default settings.xml used by ITs helps to enforce this by pointing central at file:target/null which obviously can't resolve anything. This setup using a file-based dummy repo also helps execution time because this repo produces (expected) 404s much faster than a HTTP-based repo. The one place where access to central is desired is in the MavenITBootstrapTest which doesn't really test anything but just primes the local repo with any artifacts the ITs will need. So some care needs to be taken when introducing new dependencies into the ITs themselves or the support plugins. Many times the failures that we encounter are discrepancies between actual artifact consumption required and what is populated during bootstraping.
