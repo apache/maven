@@ -374,7 +374,7 @@ public abstract class AbstractMojoTestCase
         {
             configuration = new Xpp3Dom( "configuration" );
         }
-        configuration = Xpp3Dom.mergeXpp3Dom( execution.getConfiguration(), configuration );
+        configuration = Xpp3Dom.mergeXpp3Dom( configuration, execution.getConfiguration() );
 
         PlexusConfiguration pluginConfiguration = new XmlPlexusConfiguration( configuration );
 
