@@ -22,10 +22,13 @@ package org.apache.maven.plugin.testing;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -124,7 +127,8 @@ public abstract class AbstractMojoTestCase
             lookup( RepositorySystem.class ).createArtifact( pluginDescriptor.getGroupId(),
                                                              pluginDescriptor.getArtifactId(),
                                                              pluginDescriptor.getVersion(), ".jar" );
-        artifact.setFile( new File( getBasedir() ).getCanonicalFile() );
+
+        artifact.setFile( getPluginArtifactFile() );
         pluginDescriptor.setPluginArtifact( artifact );
         pluginDescriptor.setArtifacts( Arrays.asList( artifact ) );
 
@@ -138,6 +142,63 @@ public abstract class AbstractMojoTestCase
         {
             mojoDescriptors.put( mojoDescriptor.getGoal(), mojoDescriptor );
         }
+    }
+
+    /**
+     * Returns best-effort plugin artifact file.
+     * <p>
+     * First, attempts to determine parent directory of META-INF directory holding the plugin descriptor. If META-INF
+     * parent directory cannot be determined, falls back to test basedir.
+     */
+    private File getPluginArtifactFile()
+        throws IOException
+    {
+        final String pluginDescriptorLocation = getPluginDescriptorLocation();
+        final URL resource = getClass().getResource( "/" + pluginDescriptorLocation );
+
+        File file = null;
+
+        // attempt to resolve relative to META-INF/maven/plugin.xml first
+        if ( resource != null )
+        {
+            if ( "file".equalsIgnoreCase( resource.getProtocol() ) )
+            {
+                String path = resource.getPath();
+                if ( path.endsWith( pluginDescriptorLocation ) )
+                {
+                    file = new File( path.substring( 0, path.length() - pluginDescriptorLocation.length() ) );
+                }
+            }
+            else if ( "jar".equalsIgnoreCase( resource.getProtocol() ) )
+            {
+                // TODO is there a helper for this somewhere?
+                try
+                {
+                    URL jarfile = new URL( resource.getPath() );
+                    if ( "file".equalsIgnoreCase( jarfile.getProtocol() ) )
+                    {
+                        String path = jarfile.getPath();
+                        if ( path.endsWith( pluginDescriptorLocation ) )
+                        {
+                            file =
+                                new File( path.substring( 0, path.length() - pluginDescriptorLocation.length() - 2 ) );
+                        }
+                    }
+                }
+                catch ( MalformedURLException e )
+                {
+                    // not jar:file:/ URL, too bad
+                }
+            }
+        }
+
+        // fallback to test project basedir if couldn't resolve relative to META-INF/maven/plugin.xml
+        if ( file == null || ! file.exists() )
+        {
+            file = new File( getBasedir() );
+        }
+
+        return file.getCanonicalFile();
     }
 
     protected InputStream getPublicDescriptorStream()
