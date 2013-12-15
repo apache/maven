@@ -57,7 +57,7 @@ public class MojoExecution
         LIFECYCLE,
     }
 
-    private Source source;
+    private Source source = Source.LIFECYCLE;
 
     /**
      * The phase may or may not have been bound to a phase but once the plan has been calculated we know what phase
