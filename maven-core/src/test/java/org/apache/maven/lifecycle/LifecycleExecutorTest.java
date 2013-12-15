@@ -18,11 +18,15 @@ package org.apache.maven.lifecycle;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionListener;
+import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -31,9 +35,12 @@ import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -380,4 +387,124 @@ public class LifecycleExecutorTest
         assertEquals("1.0", execution.getConfiguration().getChild( "version" ).getAttribute( "default-value" ));
     }
 
+    public void testExecutionListeners()
+        throws Exception
+    {
+        final File pom = getProject( "project-basic" );
+        final MavenSession session = createMavenSession( pom );
+        session.setProjectDependencyGraph( new ProjectDependencyGraph()
+        {
+            public List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive )
+            {
+                return Collections.emptyList();
+            }
+
+            public List<MavenProject> getSortedProjects()
+            {
+                return Collections.singletonList( session.getCurrentProject() );
+            }
+
+            public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )
+            {
+                return Collections.emptyList();
+            }
+        } );
+
+        final List<String> log = new ArrayList<String>();
+
+        MojoExecutionListener mojoListener = new MojoExecutionListener()
+        {
+            public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution,
+                                             Mojo mojo )
+                throws MojoExecutionException
+            {
+                log.add( "beforeMojoExecution " + project.getArtifactId() + ":" + execution.getExecutionId() );
+            }
+
+            public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
+                                                   Mojo mojo )
+                throws MojoExecutionException
+            {
+                log.add( "afterMojoExecutionSuccess " + project.getArtifactId() + ":" + execution.getExecutionId() );
+            }
+
+            public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution,
+                                               Mojo mojo, Throwable cause )
+            {
+                log.add( "afterExecutionFailure " + project.getArtifactId() + ":" + execution.getExecutionId() );
+            }
+        };
+        ProjectExecutionListener projectListener = new ProjectExecutionListener()
+        {
+            public void beforeProjectExecution( MavenSession session, MavenProject project )
+                throws LifecycleExecutionException
+            {
+                log.add( "beforeProjectExecution " + project.getArtifactId() );
+            }
+
+            public void beforeProjectLifecycleExecution( MavenSession session, MavenProject project,
+                                                         List<MojoExecution> executionPlan )
+                throws LifecycleExecutionException
+            {
+                log.add( "beforeProjectLifecycleExecution " + project.getArtifactId() );
+            }
+
+            public void afterProjectExecutionSuccess( MavenSession session, MavenProject project )
+                throws LifecycleExecutionException
+            {
+                log.add( "afterProjectExecutionSuccess " + project.getArtifactId() );
+            }
+
+            public void afterProjectExecutionFailure( MavenSession session, MavenProject project, Throwable cause )
+            {
+                log.add( "afterProjectExecutionFailure " + project.getArtifactId() );
+            }
+        };
+        lookup( DelegatingProjectExecutionListener.class ).addProjectExecutionListener( projectListener );
+        lookup( DelegatingMojoExecutionListener.class ).addMojoExecutionListener( mojoListener );
+
+        try
+        {
+            lifecycleExecutor.execute( session );
+        }
+        finally
+        {
+            lookup( DelegatingProjectExecutionListener.class ).removeProjectExecutionListener( projectListener );
+            lookup( DelegatingMojoExecutionListener.class ).removeMojoExecutionListener( mojoListener );
+        }
+
+        List<String> expectedLog = Arrays.asList( "beforeProjectExecution project-basic", //
+                                                  "beforeProjectLifecycleExecution project-basic", //
+                                                  "beforeMojoExecution project-basic:default-resources", //
+                                                  "afterMojoExecutionSuccess project-basic:default-resources", //
+                                                  "beforeMojoExecution project-basic:default-compile", //
+                                                  "afterMojoExecutionSuccess project-basic:default-compile", //
+                                                  "beforeMojoExecution project-basic:default-testResources", //
+                                                  "afterMojoExecutionSuccess project-basic:default-testResources", //
+                                                  "beforeMojoExecution project-basic:default-testCompile", //
+                                                  "afterMojoExecutionSuccess project-basic:default-testCompile", //
+                                                  "beforeMojoExecution project-basic:default-test", //
+                                                  "afterMojoExecutionSuccess project-basic:default-test", //
+                                                  "beforeMojoExecution project-basic:default-jar", //
+                                                  "afterMojoExecutionSuccess project-basic:default-jar", //
+                                                  "afterProjectExecutionSuccess project-basic" //
+        );
+
+        assertEventLog( expectedLog, log );
+    }
+
+    private static void assertEventLog( List<String> expectedList, List<String> actualList )
+    {
+        assertEquals( toString( expectedList ), toString( actualList ) );
+    }
+
+    private static String toString( List<String> lines )
+    {
+        StringBuilder sb = new StringBuilder();
+        for ( String line : lines )
+        {
+            sb.append( line ).append( '\n' );
+        }
+        return sb.toString();
+    }
 }

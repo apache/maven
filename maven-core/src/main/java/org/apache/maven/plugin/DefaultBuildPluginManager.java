@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -51,6 +52,18 @@ public class DefaultBuildPluginManager
 
     @Requirement
     private MojoExecutionScope scope;
+
+    private MojoExecutionListener mojoExecutionListener;
+
+    // this tricks plexus-component-metadata generate required metadata
+    @Requirement( role = MojoExecutionListener.class )
+    private List<MojoExecutionListener> mojoExecutionListeners;
+
+    public void setMojoExecutionListeners( final List<MojoExecutionListener> listeners )
+    {
+        this.mojoExecutionListeners = listeners;
+        this.mojoExecutionListener = new CompoundMojoExecutionListener( listeners );
+    }
 
     /**
      * @param plugin
@@ -112,9 +125,11 @@ public class DefaultBuildPluginManager
             // MavenProjectHelper.attachArtifact(..).
             try
             {
+                mojoExecutionListener.beforeMojoExecution( oldSession, project, mojoExecution, mojo );
+
                 mojo.execute();
 
-                scope.afterExecutionSuccess();
+                mojoExecutionListener.afterMojoExecutionSuccess( oldSession, project, mojoExecution, mojo );
             }
             catch ( ClassCastException e )
             {
@@ -128,10 +143,14 @@ public class DefaultBuildPluginManager
         }
         catch ( PluginContainerException e )
         {
+            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( NoClassDefFoundError e )
         {
+            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "A required class was missing while executing " + mojoDescriptor.getId() + ": "
@@ -144,6 +163,8 @@ public class DefaultBuildPluginManager
         }
         catch ( LinkageError e )
         {
+            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
@@ -156,6 +177,8 @@ public class DefaultBuildPluginManager
         }
         catch ( ClassCastException e )
         {
+            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
             ps.println( "A type incompatibility occured while executing " + mojoDescriptor.getId() + ": "
@@ -164,10 +187,14 @@ public class DefaultBuildPluginManager
 
             throw new PluginExecutionException( mojoExecution, project, os.toString(), e );
         }
+        catch ( RuntimeException e )
+        {
+            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+
+            throw e;
+        }
         finally
         {
-            scope.afterExecutionAlways();
-
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
 
             scope.exit();

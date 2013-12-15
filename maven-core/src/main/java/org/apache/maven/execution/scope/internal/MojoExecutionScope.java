@@ -26,8 +26,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.scope.MojoExecutionListener;
+import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
+import org.apache.maven.execution.scope.WeakMojoExecutionListener;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -46,7 +48,7 @@ import com.google.inject.util.Providers;
 @Named
 @Singleton
 public class MojoExecutionScope
-    implements Scope
+    implements Scope, MojoExecutionListener
 {
     private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>()
     {
@@ -138,7 +140,7 @@ public class MojoExecutionScope
                 }
 
                 T provided = (T) state.provided.get( key );
-                if ( provided == null )
+                if ( provided == null && unscoped != null )
                 {
                     provided = unscoped.get();
                     state.provided.put( key, provided );
@@ -174,28 +176,40 @@ public class MojoExecutionScope
         };
     }
 
-    public void afterExecutionSuccess()
+    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
         throws MojoExecutionException
     {
         for ( Object provided : getScopeState().provided.values() )
         {
-            if ( provided instanceof MojoExecutionListener )
+            if ( provided instanceof WeakMojoExecutionListener )
             {
-                ( (MojoExecutionListener) provided ).afterMojoExecutionSuccess();
-                // TODO maybe deal with multiple MojoExecutionExceptions
+                ( (WeakMojoExecutionListener) provided ).beforeMojoExecution( session, project, execution, mojo );
             }
         }
     }
 
-    public void afterExecutionAlways()
+    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
+                                           Mojo mojo )
         throws MojoExecutionException
     {
         for ( Object provided : getScopeState().provided.values() )
         {
-            if ( provided instanceof MojoExecutionListener )
+            if ( provided instanceof WeakMojoExecutionListener )
             {
-                ( (MojoExecutionListener) provided ).afterMojoExecutionAlways();
-                // TODO maybe deal with multiple MojoExecutionExceptions
+                ( (WeakMojoExecutionListener) provided ).afterMojoExecutionSuccess( session, project, execution, mojo );
+            }
+        }
+    }
+
+    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
+                                       Throwable cause )
+    {
+        for ( Object provided : getScopeState().provided.values() )
+        {
+            if ( provided instanceof WeakMojoExecutionListener )
+            {
+                ( (WeakMojoExecutionListener) provided ).afterExecutionFailure( session, project, execution, mojo,
+                                                                                cause );
             }
         }
     }

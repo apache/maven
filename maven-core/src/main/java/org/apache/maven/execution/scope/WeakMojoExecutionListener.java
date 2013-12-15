@@ -19,30 +19,32 @@ package org.apache.maven.execution.scope;
  * under the License.
  */
 
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionListener;
+import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 /**
- * Helper interface that allows mojo execution scoped components to be notified before execution start and after
- * execution completion. The main purpose of this interface is to allow mojo execution scoped components perform setup
- * before and cleanup after mojo execution.
+ * Extension point that allows build extensions observe and possibly veto mojo executions.
  * <p>
- * TODO decide if Mojo should be passed as parameter of callback methods
+ * Unlike {@link MojoExecutionListener}, this extension point does not trigger instantiation of the component, hence
+ * "weak" class name prefix. Only applies to mojo execution scoped components.
  * 
- * @author igor
+ * @see MojoExecutionListener
  * @since 3.1.2
  * @provisional This interface is part of work in progress and can be changed or removed without notice.
  */
-public interface MojoExecutionListener
+public interface WeakMojoExecutionListener
 {
-    // TODO decide if this is needed
-    // public void beforeExecution() throws MojoExecutionException;
-
-    public void afterMojoExecutionSuccess()
+    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
         throws MojoExecutionException;
 
-    // TODO decide if this is needed.
-    // public void afterExecutionFailure(Throwable t) throws MojoExecutionException;
-
-    public void afterMojoExecutionAlways()
+    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
+                                           Mojo mojo )
         throws MojoExecutionException;
+
+    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
+                                       Throwable cause );
 }

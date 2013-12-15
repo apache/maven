@@ -19,20 +19,23 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.util.HashSet;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import java.util.HashSet;
-
 /**
  * Builds one or more lifecycles for a full module
- *
+ * 
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
@@ -52,6 +55,18 @@ public class LifecycleModuleBuilder
 
     @Requirement
     private ExecutionEventCatapult eventCatapult;
+
+    private ProjectExecutionListener projectExecutionListener;
+
+    // this tricks plexus-component-metadata generate required metadata
+    @Requirement
+    private List<ProjectExecutionListener> projectExecutionListeners;
+
+    public void setProjectExecutionListeners( final List<ProjectExecutionListener> listeners )
+    {
+        this.projectExecutionListeners = listeners;
+        this.projectExecutionListener = new CompoundProjectExecutionListener( listeners );
+    }
 
     public void buildProject( MavenSession session, ReactorContext reactorContext, MavenProject currentProject,
                               TaskSegment taskSegment )
@@ -75,15 +90,22 @@ public class LifecycleModuleBuilder
                 return;
             }
 
+            BuilderCommon.attachToThread( currentProject );
+
+            projectExecutionListener.beforeProjectExecution( rootSession, currentProject );
+
             eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
 
-            BuilderCommon.attachToThread( currentProject );
             MavenExecutionPlan executionPlan =
                 builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<Artifact>() );
+            List<MojoExecution> mojoExecutions = executionPlan.getMojoExecutions();
 
-            mojoExecutor.execute( session, executionPlan.getMojoExecutions(), reactorContext.getProjectIndex() );
+            projectExecutionListener.beforeProjectLifecycleExecution( rootSession, currentProject, mojoExecutions );
+            mojoExecutor.execute( session, mojoExecutions, reactorContext.getProjectIndex() );
 
             long buildEndTime = System.currentTimeMillis();
+
+            projectExecutionListener.afterProjectExecutionSuccess( rootSession, currentProject );
 
             reactorContext.getResult().addBuildSummary(
                 new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
@@ -93,6 +115,8 @@ public class LifecycleModuleBuilder
         catch ( Exception e )
         {
             builderCommon.handleBuildError( reactorContext, rootSession, session, currentProject, e, buildStartTime );
+
+            projectExecutionListener.afterProjectExecutionFailure( session, currentProject, e );
         }
         finally
         {
