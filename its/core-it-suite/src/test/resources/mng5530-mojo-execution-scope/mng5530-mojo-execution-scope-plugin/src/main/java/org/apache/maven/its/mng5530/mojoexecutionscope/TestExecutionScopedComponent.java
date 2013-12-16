@@ -27,15 +27,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.scope.MojoExecutionListener;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
+import org.apache.maven.execution.scope.WeakMojoExecutionListener;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
 @Named
 @MojoExecutionScoped
 public class TestExecutionScopedComponent
-    implements MojoExecutionListener
+    implements WeakMojoExecutionListener
 {
     private final File basedir;
 
@@ -69,13 +71,22 @@ public class TestExecutionScopedComponent
         }
     }
 
-    public void afterMojoExecutionAlways()
+    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
+                                       Throwable cause )
     {
-        touch( new File( basedir, "execution-disposed.txt" ) );
+        touch( new File( basedir, "execution-failure.txt" ) );
     }
 
-    public void afterMojoExecutionSuccess()
+    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
+                                           Mojo mojo )
+        throws MojoExecutionException
     {
-        touch( new File( basedir, "execution-committed.txt" ) );
+        touch( new File( basedir, "execution-success.txt" ) );
+    }
+
+    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
+        throws MojoExecutionException
+    {
+        touch( new File( basedir, "execution-before.txt" ) );
     }
 }

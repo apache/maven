@@ -52,8 +52,8 @@ public class MavenITmng5530MojoExecutionScopeTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        verifier.assertFilePresent( "target/execution-executed.txt" );
-        verifier.assertFilePresent( "target/execution-committed.txt" );
-        verifier.assertFilePresent( "target/execution-disposed.txt" );
+        //verifier.assertFilePresent( "target/execution-failure.txt" );
+        verifier.assertFilePresent( "target/execution-success.txt" );
+        verifier.assertFilePresent( "target/execution-before.txt" );
     }
 }
