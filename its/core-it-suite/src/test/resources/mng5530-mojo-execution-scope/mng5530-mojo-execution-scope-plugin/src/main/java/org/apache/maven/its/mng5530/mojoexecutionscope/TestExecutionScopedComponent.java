@@ -27,9 +27,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -71,20 +71,18 @@ public class TestExecutionScopedComponent
         }
     }
 
-    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
-                                       Throwable cause )
+    public void afterExecutionFailure( MojoExecutionEvent event )
     {
         touch( new File( basedir, "execution-failure.txt" ) );
     }
 
-    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
-                                           Mojo mojo )
+    public void afterMojoExecutionSuccess( MojoExecutionEvent event )
         throws MojoExecutionException
     {
         touch( new File( basedir, "execution-success.txt" ) );
     }
 
-    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
+    public void beforeMojoExecution( MojoExecutionEvent event )
         throws MojoExecutionException
     {
         touch( new File( basedir, "execution-before.txt" ) );
