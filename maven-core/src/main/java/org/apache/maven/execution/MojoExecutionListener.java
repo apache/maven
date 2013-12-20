@@ -20,10 +20,7 @@ package org.apache.maven.execution;
  */
 
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
-import org.apache.maven.plugin.Mojo;
-import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 
 /**
  * Extension point that allows build extensions observe and possibly veto mojo executions.
@@ -34,13 +31,11 @@ import org.apache.maven.project.MavenProject;
  */
 public interface MojoExecutionListener
 {
-    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
+    public void beforeMojoExecution( MojoExecutionEvent event )
         throws MojoExecutionException;
 
-    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
-                                           Mojo mojo )
+    public void afterMojoExecutionSuccess( MojoExecutionEvent event )
         throws MojoExecutionException;
 
-    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
-                                       Throwable cause );
+    public void afterExecutionFailure( MojoExecutionEvent event );
 }

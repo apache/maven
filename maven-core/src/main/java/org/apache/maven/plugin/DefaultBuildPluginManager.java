@@ -24,6 +24,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.model.Plugin;
@@ -125,11 +126,13 @@ public class DefaultBuildPluginManager
             // MavenProjectHelper.attachArtifact(..).
             try
             {
-                mojoExecutionListener.beforeMojoExecution( oldSession, project, mojoExecution, mojo );
+                MojoExecutionEvent mojoExecutionEvent = new MojoExecutionEvent( session, project, mojoExecution, mojo );
+
+                mojoExecutionListener.beforeMojoExecution( mojoExecutionEvent );
 
                 mojo.execute();
 
-                mojoExecutionListener.afterMojoExecutionSuccess( oldSession, project, mojoExecution, mojo );
+                mojoExecutionListener.afterMojoExecutionSuccess( mojoExecutionEvent );
             }
             catch ( ClassCastException e )
             {
@@ -143,13 +146,15 @@ public class DefaultBuildPluginManager
         }
         catch ( PluginContainerException e )
         {
-            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             throw new PluginExecutionException( mojoExecution, project, e );
         }
         catch ( NoClassDefFoundError e )
         {
-            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -163,7 +168,8 @@ public class DefaultBuildPluginManager
         }
         catch ( LinkageError e )
         {
-            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -177,7 +183,8 @@ public class DefaultBuildPluginManager
         }
         catch ( ClassCastException e )
         {
-            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
@@ -189,7 +196,8 @@ public class DefaultBuildPluginManager
         }
         catch ( RuntimeException e )
         {
-            mojoExecutionListener.afterExecutionFailure( oldSession, project, mojoExecution, mojo, e );
+            mojoExecutionListener.afterExecutionFailure( new MojoExecutionEvent( session, project, mojoExecution, mojo,
+                                                                                 e ) );
 
             throw e;
         }

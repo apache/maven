@@ -26,10 +26,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.execution.scope.WeakMojoExecutionListener;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -176,40 +176,37 @@ public class MojoExecutionScope
         };
     }
 
-    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
+    public void beforeMojoExecution( MojoExecutionEvent event )
         throws MojoExecutionException
     {
         for ( Object provided : getScopeState().provided.values() )
         {
             if ( provided instanceof WeakMojoExecutionListener )
             {
-                ( (WeakMojoExecutionListener) provided ).beforeMojoExecution( session, project, execution, mojo );
+                ( (WeakMojoExecutionListener) provided ).beforeMojoExecution( event );
             }
         }
     }
 
-    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
-                                           Mojo mojo )
+    public void afterMojoExecutionSuccess( MojoExecutionEvent event )
         throws MojoExecutionException
     {
         for ( Object provided : getScopeState().provided.values() )
         {
             if ( provided instanceof WeakMojoExecutionListener )
             {
-                ( (WeakMojoExecutionListener) provided ).afterMojoExecutionSuccess( session, project, execution, mojo );
+                ( (WeakMojoExecutionListener) provided ).afterMojoExecutionSuccess( event );
             }
         }
     }
 
-    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
-                                       Throwable cause )
+    public void afterExecutionFailure( MojoExecutionEvent event )
     {
         for ( Object provided : getScopeState().provided.values() )
         {
             if ( provided instanceof WeakMojoExecutionListener )
             {
-                ( (WeakMojoExecutionListener) provided ).afterExecutionFailure( session, project, execution, mojo,
-                                                                                cause );
+                ( (WeakMojoExecutionListener) provided ).afterExecutionFailure( event );
             }
         }
     }

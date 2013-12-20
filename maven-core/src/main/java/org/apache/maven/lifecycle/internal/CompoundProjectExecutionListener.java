@@ -20,13 +20,10 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import java.util.Collection;
-import java.util.List;
 
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 class CompoundProjectExecutionListener
     implements ProjectExecutionListener
@@ -38,39 +35,38 @@ class CompoundProjectExecutionListener
         this.listeners = listeners; // NB this is live injected collection
     }
 
-    public void beforeProjectExecution( MavenSession session, MavenProject project )
+    public void beforeProjectExecution( ProjectExecutionEvent event )
         throws LifecycleExecutionException
     {
         for ( ProjectExecutionListener listener : listeners )
         {
-            listener.beforeProjectExecution( session, project );
+            listener.beforeProjectExecution( event );
         }
     }
 
-    public void beforeProjectLifecycleExecution( MavenSession session, MavenProject project,
-                                                 List<MojoExecution> executionPlan )
+    public void beforeProjectLifecycleExecution( ProjectExecutionEvent event )
         throws LifecycleExecutionException
     {
         for ( ProjectExecutionListener listener : listeners )
         {
-            listener.beforeProjectLifecycleExecution( session, project, executionPlan );
+            listener.beforeProjectLifecycleExecution( event );
         }
     }
 
-    public void afterProjectExecutionSuccess( MavenSession session, MavenProject project )
+    public void afterProjectExecutionSuccess( ProjectExecutionEvent event )
         throws LifecycleExecutionException
     {
         for ( ProjectExecutionListener listener : listeners )
         {
-            listener.afterProjectExecutionSuccess( session, project );
+            listener.afterProjectExecutionSuccess( event );
         }
     }
 
-    public void afterProjectExecutionFailure( MavenSession session, MavenProject project, Throwable cause )
+    public void afterProjectExecutionFailure( ProjectExecutionEvent event )
     {
         for ( ProjectExecutionListener listener : listeners )
         {
-            listener.afterProjectExecutionFailure( session, project, cause );
+            listener.afterProjectExecutionFailure( event );
         }
     }
 }

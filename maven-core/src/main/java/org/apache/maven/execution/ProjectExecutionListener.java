@@ -19,11 +19,7 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import java.util.List;
-
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 /**
  * Extension point that allows build extensions observe and possibly veto project build execution.
@@ -35,15 +31,14 @@ import org.apache.maven.project.MavenProject;
  */
 public interface ProjectExecutionListener
 {
-    public void beforeProjectExecution( MavenSession session, MavenProject project )
+    public void beforeProjectExecution( ProjectExecutionEvent event )
         throws LifecycleExecutionException;
 
-    public void beforeProjectLifecycleExecution( MavenSession session, MavenProject project,
-                                                 List<MojoExecution> executionPlan )
+    public void beforeProjectLifecycleExecution( ProjectExecutionEvent event )
         throws LifecycleExecutionException;
 
-    public void afterProjectExecutionSuccess( MavenSession session, MavenProject project )
+    public void afterProjectExecutionSuccess( ProjectExecutionEvent event )
         throws LifecycleExecutionException;
 
-    public void afterProjectExecutionFailure( MavenSession session, MavenProject project, Throwable cause );
+    public void afterProjectExecutionFailure( ProjectExecutionEvent event );
 }

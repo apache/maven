@@ -21,9 +21,8 @@ package org.apache.maven.plugin;
 
 import java.util.Collection;
 
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
-import org.apache.maven.project.MavenProject;
 
 class CompoundMojoExecutionListener
     implements MojoExecutionListener
@@ -36,31 +35,29 @@ class CompoundMojoExecutionListener
         this.listeners = listeners; // NB this is live injected collection
     }
 
-    public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo )
+    public void beforeMojoExecution( MojoExecutionEvent event )
         throws MojoExecutionException
     {
         for ( MojoExecutionListener listener : listeners )
         {
-            listener.beforeMojoExecution( session, project, execution, mojo );
+            listener.beforeMojoExecution( event );
         }
     }
 
-    public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
-                                           Mojo mojo )
+    public void afterMojoExecutionSuccess( MojoExecutionEvent event )
         throws MojoExecutionException
     {
         for ( MojoExecutionListener listener : listeners )
         {
-            listener.afterMojoExecutionSuccess( session, project, execution, mojo );
+            listener.afterMojoExecutionSuccess( event );
         }
     }
 
-    public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution, Mojo mojo,
-                                       Throwable cause )
+    public void afterExecutionFailure( MojoExecutionEvent event )
     {
         for ( MojoExecutionListener listener : listeners )
         {
-            listener.afterExecutionFailure( session, project, execution, mojo, cause );
+            listener.afterExecutionFailure( event );
         }
     }
 

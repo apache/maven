@@ -24,8 +24,10 @@ import java.util.List;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
@@ -35,7 +37,6 @@ import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -414,50 +415,87 @@ public class LifecycleExecutorTest
 
         MojoExecutionListener mojoListener = new MojoExecutionListener()
         {
-            public void beforeMojoExecution( MavenSession session, MavenProject project, MojoExecution execution,
-                                             Mojo mojo )
+            public void beforeMojoExecution( MojoExecutionEvent event )
                 throws MojoExecutionException
             {
-                log.add( "beforeMojoExecution " + project.getArtifactId() + ":" + execution.getExecutionId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNotNull( event.getExecution() );
+                assertNotNull( event.getMojo() );
+                assertNull( event.getCause() );
+
+                log.add( "beforeMojoExecution " + event.getProject().getArtifactId() + ":"
+                    + event.getExecution().getExecutionId() );
             }
 
-            public void afterMojoExecutionSuccess( MavenSession session, MavenProject project, MojoExecution execution,
-                                                   Mojo mojo )
+            public void afterMojoExecutionSuccess( MojoExecutionEvent event )
                 throws MojoExecutionException
             {
-                log.add( "afterMojoExecutionSuccess " + project.getArtifactId() + ":" + execution.getExecutionId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNotNull( event.getExecution() );
+                assertNotNull( event.getMojo() );
+                assertNull( event.getCause() );
+
+                log.add( "afterMojoExecutionSuccess " + event.getProject().getArtifactId() + ":"
+                    + event.getExecution().getExecutionId() );
             }
 
-            public void afterExecutionFailure( MavenSession session, MavenProject project, MojoExecution execution,
-                                               Mojo mojo, Throwable cause )
+            public void afterExecutionFailure( MojoExecutionEvent event )
             {
-                log.add( "afterExecutionFailure " + project.getArtifactId() + ":" + execution.getExecutionId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNotNull( event.getExecution() );
+                assertNotNull( event.getMojo() );
+                assertNotNull( event.getCause() );
+
+                log.add( "afterExecutionFailure " + event.getProject().getArtifactId() + ":"
+                    + event.getExecution().getExecutionId() );
             }
         };
         ProjectExecutionListener projectListener = new ProjectExecutionListener()
         {
-            public void beforeProjectExecution( MavenSession session, MavenProject project )
+            public void beforeProjectExecution( ProjectExecutionEvent event )
                 throws LifecycleExecutionException
             {
-                log.add( "beforeProjectExecution " + project.getArtifactId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNull( event.getExecutionPlan() );
+                assertNull( event.getCause() );
+
+                log.add( "beforeProjectExecution " + event.getProject().getArtifactId() );
             }
 
-            public void beforeProjectLifecycleExecution( MavenSession session, MavenProject project,
-                                                         List<MojoExecution> executionPlan )
+            public void beforeProjectLifecycleExecution( ProjectExecutionEvent event )
                 throws LifecycleExecutionException
             {
-                log.add( "beforeProjectLifecycleExecution " + project.getArtifactId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNotNull( event.getExecutionPlan() );
+                assertNull( event.getCause() );
+
+                log.add( "beforeProjectLifecycleExecution " + event.getProject().getArtifactId() );
             }
 
-            public void afterProjectExecutionSuccess( MavenSession session, MavenProject project )
+            public void afterProjectExecutionSuccess( ProjectExecutionEvent event )
                 throws LifecycleExecutionException
             {
-                log.add( "afterProjectExecutionSuccess " + project.getArtifactId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNotNull( event.getExecutionPlan() );
+                assertNull( event.getCause() );
+
+                log.add( "afterProjectExecutionSuccess " + event.getProject().getArtifactId() );
             }
 
-            public void afterProjectExecutionFailure( MavenSession session, MavenProject project, Throwable cause )
+            public void afterProjectExecutionFailure( ProjectExecutionEvent event )
             {
-                log.add( "afterProjectExecutionFailure " + project.getArtifactId() );
+                assertNotNull( event.getSession() );
+                assertNotNull( event.getProject() );
+                assertNull( event.getExecutionPlan() );
+                assertNotNull( event.getCause() );
+
+                log.add( "afterProjectExecutionFailure " + event.getProject().getArtifactId() );
             }
         };
         lookup( DelegatingProjectExecutionListener.class ).addProjectExecutionListener( projectListener );

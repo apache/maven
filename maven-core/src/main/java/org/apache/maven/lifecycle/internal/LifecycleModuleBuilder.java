@@ -26,6 +26,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.plugin.MojoExecution;
@@ -92,7 +93,7 @@ public class LifecycleModuleBuilder
 
             BuilderCommon.attachToThread( currentProject );
 
-            projectExecutionListener.beforeProjectExecution( rootSession, currentProject );
+            projectExecutionListener.beforeProjectExecution( new ProjectExecutionEvent( session, currentProject ) );
 
             eventCatapult.fire( ExecutionEvent.Type.ProjectStarted, session, null );
 
@@ -100,12 +101,15 @@ public class LifecycleModuleBuilder
                 builderCommon.resolveBuildPlan( session, currentProject, taskSegment, new HashSet<Artifact>() );
             List<MojoExecution> mojoExecutions = executionPlan.getMojoExecutions();
 
-            projectExecutionListener.beforeProjectLifecycleExecution( rootSession, currentProject, mojoExecutions );
+            projectExecutionListener.beforeProjectLifecycleExecution( new ProjectExecutionEvent( session,
+                                                                                                 currentProject,
+                                                                                                 mojoExecutions ) );
             mojoExecutor.execute( session, mojoExecutions, reactorContext.getProjectIndex() );
 
             long buildEndTime = System.currentTimeMillis();
 
-            projectExecutionListener.afterProjectExecutionSuccess( rootSession, currentProject );
+            projectExecutionListener.afterProjectExecutionSuccess( new ProjectExecutionEvent( session, currentProject,
+                                                                                              mojoExecutions ) );
 
             reactorContext.getResult().addBuildSummary(
                 new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
@@ -116,7 +120,7 @@ public class LifecycleModuleBuilder
         {
             builderCommon.handleBuildError( reactorContext, rootSession, session, currentProject, e, buildStartTime );
 
-            projectExecutionListener.afterProjectExecutionFailure( session, currentProject, e );
+            projectExecutionListener.afterProjectExecutionFailure( new ProjectExecutionEvent( session, currentProject, e ) );
         }
         finally
         {
