@@ -109,13 +109,14 @@ public class IntegrationTestSuite
         suite.addTestSuite( MavenITmng5530MojoExecutionScopeTest.class );
         //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
         
-        
+
         suite.addTestSuite( MavenITmng5482AetherNotFoundTest.class );
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
         suite.addTestSuite( MavenITmng5387ArtifactReplacementPlugin.class );
         suite.addTestSuite( MavenITmng5382Jsr330Plugin.class );
         suite.addTestSuite( MavenITmng5338FileOptionToDirectory.class );
         suite.addTestSuite( MavenITmng5280SettingsProfilesRepositoriesOrderTest.class );
+        suite.addTestSuite( MavenITmng5230MakeReactorWithExcludesTest.class );
         suite.addTestSuite( MavenITmng5224InjectedSettings.class );
         suite.addTestSuite( MavenITmng5214DontMapWsdlToJar.class );
         suite.addTestSuite( MavenITmng5137ReactorResolutionInForkedBuildTest.class );
