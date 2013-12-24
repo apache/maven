@@ -48,9 +48,9 @@
     <junitVersion>3.8.2</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.19</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.0.16-SNAPSHOT</plexusUtilsVersion>
-    <!-- last Java5 release of Guava -->
-    <guavaVersion>11.0.2</guavaVersion>
+    <plexusUtilsVersion>3.0.16</plexusUtilsVersion>
+    <!-- Latest version of Guava that works with Sisu -->
+    <guavaVersion>14.0.1</guavaVersion>
     <guiceVersion>3.1.3</guiceVersion>
     <sisuInjectVersion>0.0.0.M5</sisuInjectVersion>
     <wagonVersion>2.4</wagonVersion>
