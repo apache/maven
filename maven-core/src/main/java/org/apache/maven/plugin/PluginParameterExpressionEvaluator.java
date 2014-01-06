@@ -108,7 +108,7 @@ public class PluginParameterExpressionEvaluator
             }
         }
 
-        if ( ( basedir == null ) && ( session != null ) )
+        if ( basedir == null )
         {
             basedir = session.getExecutionRootDirectory();
         }
