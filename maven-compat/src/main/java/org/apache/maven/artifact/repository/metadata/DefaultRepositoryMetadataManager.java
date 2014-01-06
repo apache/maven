@@ -141,7 +141,19 @@ public class DefaultRepositoryMetadataManager
                         // delete the local copy so the old details aren't used.
                         if ( file.exists() )
                         {
-                            file.delete();
+                            if ( !file.delete() )
+                            {
+                                // sleep for 10ms just in case this is windows holding a file lock
+                                try
+                                {
+                                    Thread.sleep( 10 );
+                                }
+                                catch ( InterruptedException ie )
+                                {
+                                    // ignore
+                                }
+                                file.delete(); // if this fails, forget about it
+                            }
                         }
                     }
                     catch ( TransferFailedException e )
@@ -448,7 +460,19 @@ public class DefaultRepositoryMetadataManager
             // delete the local copy so the old details aren't used.
             if ( file.exists() )
             {
-                file.delete();
+                if ( !file.delete() )
+                {
+                    // sleep for 10ms just in case this is windows holding a file lock
+                    try
+                    {
+                        Thread.sleep( 10 );
+                    }
+                    catch ( InterruptedException ie )
+                    {
+                        // ignore
+                    }
+                    file.delete(); // if this fails, forget about it
+                }
             }
         }
         finally

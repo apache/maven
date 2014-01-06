@@ -505,7 +505,10 @@ public class DefaultWagonManager
                 {
                     FileUtils.copyFile( temp, destination );
 
-                    temp.delete();
+                    if ( !temp.delete() )
+                    {
+                        temp.deleteOnExit();
+                    }
                 }
                 catch ( IOException e )
                 {
@@ -647,14 +650,10 @@ public class DefaultWagonManager
         for ( File file : files )
         {
             // really don't care if it failed here only log warning
-            try
+            if ( !file.delete() )
             {
-                file.delete();
-            }
-            catch ( Exception e )
-            {
-                logger.warn( "skip failed to delete temporary file : " + file.getAbsolutePath() + " , message "
-                    + e.getMessage() );
+                logger.warn( "skip failed to delete temporary file : " + file.getAbsolutePath() );
+                file.deleteOnExit();
             }
         }
 
@@ -730,10 +729,13 @@ public class DefaultWagonManager
                 File checksumFile = new File( destination + checksumFileExtension );
                 if ( checksumFile.exists() )
                 {
-                    checksumFile.delete();
+                    checksumFile.delete(); // ignore if failed as we will overwrite
                 }
                 FileUtils.copyFile( tempChecksumFile, checksumFile );
-                tempChecksumFile.delete();
+                if ( !tempChecksumFile.delete() )
+                {
+                    tempChecksumFile.deleteOnExit();
+                }
             }
             else
             {
