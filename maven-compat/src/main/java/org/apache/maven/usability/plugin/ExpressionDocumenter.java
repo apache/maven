@@ -147,6 +147,8 @@ public class ExpressionDocumenter
 
         URL myResource = ExpressionDocumenter.class.getClassLoader().getResource( myResourcePath );
 
+        assert myResource != null : "The resource is this class itself loaded by its own classloader and must exist";
+
         String myClasspathEntry = myResource.getPath();
 
         myClasspathEntry = myClasspathEntry.substring( 0, myClasspathEntry.length() - ( myResourcePath.length() + 2 ) );
