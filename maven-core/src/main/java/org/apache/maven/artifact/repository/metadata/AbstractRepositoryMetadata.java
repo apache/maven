@@ -91,7 +91,20 @@ public abstract class AbstractRepositoryMetadata
 
         if ( metadataFile.length() == 0 )
         {
-            metadataFile.delete();
+            if ( !metadataFile.delete() )
+            {
+                // sleep for 10ms just in case this is windows holding a file lock
+                try
+                {
+                    Thread.sleep( 10 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // ignore
+                }
+                metadataFile.delete(); // if this fails, forget about it, we'll try to overwrite it anyway so no need
+                                       // to delete on exit
+            }
         }
         else if ( metadataFile.exists() )
         {
