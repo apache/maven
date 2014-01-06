@@ -29,7 +29,7 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <properties>
-    <maven-version>3.1.2-SNAPSHOT</maven-version>
+    <maven-version>[3.1.2-SNAPSHOT,)</maven-version>
   </properties>
 
   <dependencies>

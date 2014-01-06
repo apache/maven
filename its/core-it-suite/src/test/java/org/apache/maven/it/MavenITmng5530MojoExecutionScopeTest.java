@@ -34,14 +34,15 @@ public class MavenITmng5530MojoExecutionScopeTest
     public void test_copyfiles()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng5530-mojo-execution-scope" );
-        File pluginDir = new File( testDir, "mng5530-mojo-execution-scope-plugin" );
-        File projectDir = new File( testDir, "mng5530-mojo-execution-scope-basic" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530");
+        File pluginDir = new File( testDir, "plugin" );
+        File projectDir = new File( testDir, "basic" );
 
         Verifier verifier;
 
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.setSystemProperty("mavenVersion", getMavenVersion());
         verifier.executeGoal( "install" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
