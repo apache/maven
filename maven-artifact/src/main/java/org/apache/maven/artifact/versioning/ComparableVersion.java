@@ -309,7 +309,7 @@ public class ComparableVersion
                         Item r = right.hasNext() ? right.next() : null;
 
                         // if this is shorter, then invert the compare and mul with -1
-                        int result = l == null ? -1 * r.compareTo( l ) : l.compareTo( r );
+                        int result = l == null ? ( r == null ? 0 : -1 * r.compareTo( l ) ) : l.compareTo( r );
 
                         if ( result != 0 )
                         {
