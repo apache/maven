@@ -42,7 +42,6 @@ public class MavenITmng5530MojoExecutionScopeTest
 
         // install the test plugin
         verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
-        verifier.setSystemProperty("mavenVersion", getMavenVersion());
         verifier.executeGoal( "install" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
