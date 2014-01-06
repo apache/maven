@@ -554,7 +554,12 @@ public class MojoDescriptor
 
     private boolean compareObjects( Object first, Object second )
     {
-        if ( ( first == null && second != null ) || ( first != null && second == null ) )
+        if ( first == second )
+        {
+            return true;
+        }
+
+        if ( first == null || second == null )
         {
             return false;
         }
