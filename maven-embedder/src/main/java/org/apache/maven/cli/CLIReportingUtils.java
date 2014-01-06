@@ -51,7 +51,7 @@ public final class CLIReportingUtils
     {
         final String LS = System.getProperty( "line.separator" );
         Properties properties = getBuildProperties();
-        StringBuffer version = new StringBuffer();
+        StringBuilder version = new StringBuilder();
         version.append( createMavenVersionString( properties ) ).append( LS );
         version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: "
                             + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( LS );
