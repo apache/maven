@@ -196,6 +196,7 @@ public class DefaultPluginVersionResolver
                 }
                 catch ( InvalidVersionSpecificationException e )
                 {
+                    // ignore
                 }
             }
 
