@@ -111,6 +111,10 @@
     </contributor>
   </contributors>
 
+  <prerequisites>
+    <maven>2.2.1</maven>
+  </prerequisites>
+
   <!--bootstrap-start-comment-->
   <dependencyManagement>
     <!--bootstrap-end-comment-->
