@@ -144,8 +144,8 @@ public class PluginParameterException
             String alias = param.getAlias();
             if ( StringUtils.isNotEmpty( alias ) && !alias.equals( param.getName() ) )
             {
-                messageBuffer.append(
-                    "\n\n-OR-\n\n<configuration>\n  ...\n  <" + alias + ">VALUE</" + alias + ">\n</configuration>\n" );
+                messageBuffer.append( "\n\n-OR-\n\n<configuration>\n  ...\n  <" ).append( alias ).append(
+                    ">VALUE</" ).append( alias ).append( ">\n</configuration>\n" );
             }
         }
 
