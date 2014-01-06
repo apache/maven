@@ -63,9 +63,10 @@ class Xpp3DomNodeIterator
         this.children = this.node.getChildren();
         if ( startWith != null )
         {
+            Xpp3Dom startWithNode = (Xpp3Dom) startWith.getNode();
             for ( ; filteredIndex < children.length; filteredIndex++ )
             {
-                if ( startWith.equals( children[filteredIndex] ) )
+                if ( startWithNode.equals( children[filteredIndex] ) )
                 {
                     filteredIndex++;
                     break;
