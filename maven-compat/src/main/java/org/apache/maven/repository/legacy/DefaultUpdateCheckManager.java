@@ -40,6 +40,7 @@ import org.apache.maven.repository.Proxy;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
 
 @Component( role = UpdateCheckManager.class )
 public class DefaultUpdateCheckManager
@@ -358,21 +359,27 @@ public class DefaultUpdateCheckManager
 
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
-            FileInputStream stream = null;
             FileLock lock = null;
             FileChannel channel = null;
             try
             {
                 Properties props = new Properties();
 
-                stream = new FileInputStream( touchfile );
-                channel = stream.getChannel();
-                lock = channel.lock( 0, channel.size(), true );
+                FileInputStream stream = new FileInputStream( touchfile );
+                try
+                {
+                    channel = stream.getChannel();
+                    lock = channel.lock( 0, channel.size(), true );
 
-                getLogger().debug( "Reading resolution-state from: " + touchfile );
-                props.load( stream );
+                    getLogger().debug( "Reading resolution-state from: " + touchfile );
+                    props.load( stream );
 
-                return props;
+                    return props;
+                }
+                finally
+                {
+                    IOUtil.close( stream );
+                }
             }
             catch ( IOException e )
             {
