@@ -34,7 +34,7 @@ public class MavenITmng5530MojoExecutionScopeTest
     public void test_copyfiles()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530");
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope");
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "basic" );
 
