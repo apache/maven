@@ -272,7 +272,7 @@ public class PluginDescriptor
             return true;
         }
 
-        return getId().equals( ( (PluginDescriptor) object ).getId() );
+        return object instanceof PluginDescriptor &&  getId().equals( ( (PluginDescriptor) object ).getId() );
     }
 
     public int hashCode()
