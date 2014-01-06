@@ -235,7 +235,7 @@ public class CLIManager
 
         int cleanedSz = cleaned.size();
 
-        String[] cleanArgs = null;
+        String[] cleanArgs;
 
         if ( cleanedSz == 0 )
         {

@@ -70,9 +70,8 @@ public class DefaultClasspathTransformation
             {
                 ClasspathGraphVisitor v = new ClasspathGraphVisitor( cleanGraph, cpc );
                 MetadataGraphVertex entry = cleanGraph.getEntry();
-                ArtifactMetadata md = entry.getMd();
                 // entry point
-                v.visit( entry ); // , md.getVersion(), md.getArtifactUri() );
+                v.visit( entry );
             }
 
             return cpc;

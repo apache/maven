@@ -87,11 +87,10 @@ implements Iterable<ArtifactMetadata>
 
         MetadataTreeNode tree = null;
         MetadataTreeNode parent = null;
-        MetadataTreeNode node = null;
 
         for ( ArtifactMetadata md : classpath )
         {
-            node = new MetadataTreeNode( md, parent, md.isResolved(), md.getArtifactScope() );
+            MetadataTreeNode node = new MetadataTreeNode( md, parent, md.isResolved(), md.getArtifactScope() );
             if ( tree == null )
             {
                 tree = node;

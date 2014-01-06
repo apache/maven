@@ -35,7 +35,7 @@ public class LogbackConfiguration
     @Override
     public void setRootLoggerLevel( Level level )
     {
-        ch.qos.logback.classic.Level value = ch.qos.logback.classic.Level.INFO;
+        ch.qos.logback.classic.Level value;
         switch ( level )
         {
             case DEBUG:

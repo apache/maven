@@ -191,7 +191,7 @@ public class DefaultProjectBuilder
 
     private DependencyResolutionResult resolveDependencies( MavenProject project, RepositorySystemSession session )
     {
-        DependencyResolutionResult resolutionResult = null;
+        DependencyResolutionResult resolutionResult;
 
         try
         {

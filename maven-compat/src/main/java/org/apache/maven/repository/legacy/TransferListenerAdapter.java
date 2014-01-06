@@ -67,7 +67,7 @@ public class TransferListenerAdapter
     {
         ArtifactTransferEvent event = wrap( transferEvent );
 
-        Long transferred = null;
+        Long transferred;
         synchronized ( transfers )
         {
             transferred = transfers.remove( transferEvent.getResource() );

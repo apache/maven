@@ -166,7 +166,7 @@ public class DefaultProjectBuildingHelper
                                                                           ProjectBuildingRequest request )
         throws PluginResolutionException, PluginVersionResolutionException
     {
-        ClassRealm projectRealm = null;
+        ClassRealm projectRealm;
 
         List<Plugin> extensionPlugins = new ArrayList<Plugin>();
 

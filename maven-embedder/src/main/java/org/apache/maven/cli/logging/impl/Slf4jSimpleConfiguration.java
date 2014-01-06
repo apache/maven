@@ -35,7 +35,7 @@ public class Slf4jSimpleConfiguration
     @Override
     public void setRootLoggerLevel( Level level )
     {
-        String value = "info";
+        String value;
         switch ( level )
         {
             case DEBUG:

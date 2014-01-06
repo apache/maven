@@ -68,7 +68,7 @@ final class RemoteSnapshotMetadata
     protected void merge( Metadata recessive )
     {
         Snapshot snapshot;
-        String lastUpdated = "";
+        String lastUpdated;
 
         if ( metadata.getVersioning() == null )
         {

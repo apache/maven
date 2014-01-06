@@ -389,7 +389,7 @@ public class MavenCli
             cliRequest.classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
         }
 
-        DefaultPlexusContainer container = null;
+        DefaultPlexusContainer container;
 
         ContainerConfiguration cc = new DefaultContainerConfiguration()
             .setClassWorld( cliRequest.classWorld )

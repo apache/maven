@@ -69,7 +69,7 @@ public class DefaultBeanConfigurator
             return;
         }
 
-        PlexusConfiguration plexusConfig = null;
+        PlexusConfiguration plexusConfig;
         if ( configuration instanceof PlexusConfiguration )
         {
             plexusConfig = (PlexusConfiguration) configuration;

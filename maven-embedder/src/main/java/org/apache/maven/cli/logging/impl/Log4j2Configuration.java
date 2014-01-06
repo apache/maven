@@ -33,7 +33,7 @@ public class Log4j2Configuration
     @Override
     public void setRootLoggerLevel( Level level )
     {
-        String value = "info";
+        String value;
         switch ( level )
         {
             case DEBUG:
