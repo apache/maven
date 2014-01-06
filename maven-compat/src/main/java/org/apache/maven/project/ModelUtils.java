@@ -98,7 +98,7 @@ public final class ModelUtils
                 if ( !handleAsInheritance || ( parentInherited == null )
                     || Boolean.valueOf( parentInherited ) )
                 {
-                    Plugin childPlugin = (Plugin) childPlugins.get( parentPlugin.getKey() );
+                    Plugin childPlugin = childPlugins.get( parentPlugin.getKey() );
 
                     if ( ( childPlugin != null ) && !assembledPlugins.contains( childPlugin ) )
                     {

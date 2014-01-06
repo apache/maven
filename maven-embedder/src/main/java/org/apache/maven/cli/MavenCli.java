@@ -464,7 +464,7 @@ public class MavenCli
                 ClassRealm coreRealm = cliRequest.classWorld.getClassRealm( "plexus.core" );
                 if ( coreRealm == null )
                 {
-                    coreRealm = (ClassRealm) cliRequest.classWorld.getRealms().iterator().next();
+                    coreRealm = cliRequest.classWorld.getRealms().iterator().next();
                 }
 
                 ClassRealm extRealm = cliRequest.classWorld.newRealm( "maven.ext", null );

@@ -432,7 +432,7 @@ public class ModelUtilsTest
 
         // this block prevents MNG-1703
         assertEquals( 1, child.getDependencies().size() );
-        Dependency dep2 = (Dependency) child.getDependencies().get( 0 );
+        Dependency dep2 = child.getDependencies().get( 0 );
         assertEquals( dep.getManagementKey(), dep2.getManagementKey() );
     }
 
