@@ -128,6 +128,7 @@ public class DefaultArtifactResolver
         {
             ( (ExecutorService) executor ).shutdown();
         }
+        super.finalize();
     }
 
     private RepositorySystemSession getSession( ArtifactRepository localRepository )
