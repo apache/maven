@@ -360,7 +360,7 @@ public class StringSearchModelInterpolator
                 fieldIsPrimitiveByClass.put( fieldType, fieldType.isPrimitive() );
             }
 
-            if ( fieldIsPrimitiveByClass.get( fieldType ).booleanValue() )
+            if ( fieldIsPrimitiveByClass.get( fieldType ) )
             {
                 return false;
             }

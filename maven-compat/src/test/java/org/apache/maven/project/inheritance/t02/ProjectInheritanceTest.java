@@ -149,13 +149,13 @@ public class ProjectInheritanceTest
 
                 Integer count = (Integer) validPluginCounts.get( pluginArtifactId );
 
-                if ( count.intValue() > 0 )
+                if ( count > 0 )
                 {
                     fail( "Multiple copies of plugin: " + pluginArtifactId + " found in POM." );
                 }
                 else
                 {
-                    count = count.intValue() + 1;
+                    count = count + 1;
 
                     validPluginCounts.put( pluginArtifactId, count );
                 }

@@ -61,7 +61,7 @@ public class ConsoleMavenTransferListener
             // NOTE: This null check guards against http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6312056
             if ( complete != null )
             {
-                buffer.append( getStatus( complete.longValue(), total ) ).append( "  " );
+                buffer.append( getStatus( complete, total ) ).append( "  " );
             }
         }
 

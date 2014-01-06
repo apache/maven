@@ -114,7 +114,7 @@ public class TransferListenerAdapter
             }
             else
             {
-                transferred = transferred.longValue() + length;
+                transferred = transferred + length;
             }
             transfers.put( transferEvent.getResource(), transferred );
         }
@@ -123,7 +123,7 @@ public class TransferListenerAdapter
         event.setDataBuffer( buffer );
         event.setDataOffset( 0 );
         event.setDataLength( length );
-        event.setTransferredBytes( transferred.longValue() );
+        event.setTransferredBytes( transferred );
 
         listener.transferProgress( event );
     }

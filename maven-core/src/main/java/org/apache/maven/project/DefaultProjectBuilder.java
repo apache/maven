@@ -654,7 +654,7 @@ public class DefaultProjectBuilder
                 profilesXml = new File( basedir, "profiles.xml" ).exists();
                 profilesXmls.put( basedir, profilesXml );
             }
-            if ( profilesXml.booleanValue() )
+            if ( profilesXml )
             {
                 return modelId;
             }
