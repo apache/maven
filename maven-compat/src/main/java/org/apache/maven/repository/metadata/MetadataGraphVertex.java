@@ -94,12 +94,12 @@ public class MetadataGraphVertex
             return 0;
         }
 
-        if ( s1 == null && s2 != null )
+        if ( s1 == null /* && s2 != null */ )
         {
             return -1;
         }
 
-        if ( s1 != null && s2 == null )
+        if ( /* s1 != null && */ s2 == null )
         {
             return 1;
         }
