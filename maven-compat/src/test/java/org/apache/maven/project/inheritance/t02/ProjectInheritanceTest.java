@@ -116,7 +116,7 @@ public class ProjectInheritanceTest
         assertEquals( "4.0.0", project4.getModelVersion() );
         
         Build build = project4.getBuild();
-        List plugins = build.getPlugins();
+        List<Plugin> plugins = build.getPlugins();
         
         Map validPluginCounts = new HashMap();
         
@@ -131,13 +131,11 @@ public class ProjectInheritanceTest
         validPluginCounts.put( "maven-source-plugin", 0 );
         
         Plugin testPlugin = null;
-        
-        for ( Iterator it = plugins.iterator(); it.hasNext(); )
+
+        for ( Plugin plugin : plugins )
         {
-            Plugin plugin = (Plugin) it.next();
-            
             String pluginArtifactId = plugin.getArtifactId();
-            
+
             if ( !validPluginCounts.containsKey( pluginArtifactId ) )
             {
                 fail( "Illegal plugin found: " + pluginArtifactId );
@@ -148,9 +146,9 @@ public class ProjectInheritanceTest
                 {
                     testPlugin = plugin;
                 }
-                
+
                 Integer count = (Integer) validPluginCounts.get( pluginArtifactId );
-                
+
                 if ( count.intValue() > 0 )
                 {
                     fail( "Multiple copies of plugin: " + pluginArtifactId + " found in POM." );
@@ -158,7 +156,7 @@ public class ProjectInheritanceTest
                 else
                 {
                     count = count.intValue() + 1;
-                    
+
                     validPluginCounts.put( pluginArtifactId, count );
                 }
             }

@@ -20,6 +20,7 @@ package org.apache.maven.project.inheritance;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -372,18 +373,16 @@ public class DefaultModelInheritanceAssembler
             return;
         }
 
-        List parentPlugins = parent.getPlugins();
+        List<ReportPlugin> parentPlugins = parent.getPlugins();
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            Map assembledPlugins = new TreeMap();
+            Map<String, ReportPlugin> assembledPlugins = new TreeMap<String, ReportPlugin>();
 
-            Map childPlugins = child.getReportPluginsAsMap();
+            Map<String, ReportPlugin> childPlugins = child.getReportPluginsAsMap();
 
-            for ( Object parentPlugin1 : parentPlugins )
+            for ( ReportPlugin parentPlugin : parentPlugins )
             {
-                ReportPlugin parentPlugin = (ReportPlugin) parentPlugin1;
-
                 String parentInherited = parentPlugin.getInherited();
 
                 if ( !handleAsInheritance || ( parentInherited == null ) || Boolean.valueOf( parentInherited ) )
@@ -391,7 +390,7 @@ public class DefaultModelInheritanceAssembler
 
                     ReportPlugin assembledPlugin = parentPlugin;
 
-                    ReportPlugin childPlugin = (ReportPlugin) childPlugins.get( parentPlugin.getKey() );
+                    ReportPlugin childPlugin = childPlugins.get( parentPlugin.getKey() );
 
                     if ( childPlugin != null )
                     {
@@ -409,17 +408,15 @@ public class DefaultModelInheritanceAssembler
                 }
             }
 
-            for ( Iterator it = childPlugins.values().iterator(); it.hasNext(); )
+            for ( ReportPlugin childPlugin : childPlugins.values() )
             {
-                ReportPlugin childPlugin = (ReportPlugin) it.next();
-
                 if ( !assembledPlugins.containsKey( childPlugin.getKey() ) )
                 {
                     assembledPlugins.put( childPlugin.getKey(), childPlugin );
                 }
             }
 
-            child.setPlugins( new ArrayList( assembledPlugins.values() ) );
+            child.setPlugins( new ArrayList<ReportPlugin>( assembledPlugins.values() ) );
 
             child.flushReportPluginMap();
         }
@@ -427,10 +424,10 @@ public class DefaultModelInheritanceAssembler
 
     private static void mergeReportSetDefinitions( ReportSet child, ReportSet parent )
     {
-        List parentReports = parent.getReports();
-        List childReports = child.getReports();
+        List<String> parentReports = parent.getReports();
+        List<String> childReports = child.getReports();
 
-        List reports = new ArrayList();
+        List<String> reports = new ArrayList<String>();
 
         if ( ( childReports != null ) && !childReports.isEmpty() )
         {
@@ -439,10 +436,8 @@ public class DefaultModelInheritanceAssembler
 
         if ( parentReports != null )
         {
-            for ( Iterator i = parentReports.iterator(); i.hasNext(); )
+            for ( String report : parentReports )
             {
-                String report = (String) i.next();
-
                 if ( !reports.contains( report ) )
                 {
                     reports.add( report );
@@ -480,23 +475,23 @@ public class DefaultModelInheritanceAssembler
 
         boolean parentIsInherited = ( parentInherited == null ) || Boolean.valueOf( parentInherited );
 
-        List parentReportSets = parent.getReportSets();
+        List<ReportSet> parentReportSets = parent.getReportSets();
 
         if ( ( parentReportSets != null ) && !parentReportSets.isEmpty() )
         {
-            Map assembledReportSets = new TreeMap();
+            Map<String, ReportSet> assembledReportSets = new TreeMap<String, ReportSet>();
 
-            Map childReportSets = child.getReportSetsAsMap();
+            Map<String, ReportSet> childReportSets = child.getReportSetsAsMap();
 
-            for ( Iterator it = parentReportSets.iterator(); it.hasNext(); )
+            for ( Object parentReportSet1 : parentReportSets )
             {
-                ReportSet parentReportSet = (ReportSet) it.next();
+                ReportSet parentReportSet = (ReportSet) parentReportSet1;
 
                 if ( !handleAsInheritance || parentIsInherited )
                 {
                     ReportSet assembledReportSet = parentReportSet;
 
-                    ReportSet childReportSet = (ReportSet) childReportSets.get( parentReportSet.getId() );
+                    ReportSet childReportSet = childReportSets.get( parentReportSet.getId() );
 
                     if ( childReportSet != null )
                     {
@@ -513,11 +508,9 @@ public class DefaultModelInheritanceAssembler
                 }
             }
 
-            for ( Iterator it = childReportSets.entrySet().iterator(); it.hasNext(); )
+            for ( Map.Entry<String, ReportSet> entry : childReportSets.entrySet() )
             {
-                Map.Entry entry = (Map.Entry) it.next();
-
-                String id = (String) entry.getKey();
+                String id = entry.getKey();
 
                 if ( !assembledReportSets.containsKey( id ) )
                 {
@@ -525,7 +518,7 @@ public class DefaultModelInheritanceAssembler
                 }
             }
 
-            child.setReportSets( new ArrayList( assembledReportSets.values() ) );
+            child.setReportSets( new ArrayList<ReportSet>( assembledReportSets.values() ) );
 
             child.flushReportSetMap();
         }

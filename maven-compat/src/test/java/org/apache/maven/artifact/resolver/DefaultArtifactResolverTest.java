@@ -78,16 +78,16 @@ public class DefaultArtifactResolverTest
 
         boolean seen = false;
 
-        for ( int i = 0; i < tgList.length; i++ )
+        for ( ThreadGroup aTgList : tgList )
         {
-            if ( !tgList[i].getName().equals( DaemonThreadCreator.THREADGROUP_NAME ) )
+            if ( !aTgList.getName().equals( DaemonThreadCreator.THREADGROUP_NAME ) )
             {
                 continue;
             }
 
             seen = true;
 
-            tg = tgList[i];
+            tg = aTgList;
             Thread[] ts = new Thread[tg.activeCount()];
             tg.enumerate( ts );
 
