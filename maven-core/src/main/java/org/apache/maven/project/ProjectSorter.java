@@ -20,6 +20,7 @@ package org.apache.maven.project;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -70,7 +71,7 @@ public class ProjectSorter
     // In this case, both the verify and the report goals are called
     // in a different lifecycle. Though the compiler-plugin has a valid usecase, although
     // that seems to work fine. We need to take versions and lifecycle into account.
-    public ProjectSorter( List<MavenProject> projects )
+    public ProjectSorter( Collection<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException
     {
         dag = new DAG();

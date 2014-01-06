@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -52,7 +53,7 @@ class ReactorReader
 
     private WorkspaceRepository repository;
 
-    public ReactorReader( Map<String, MavenProject> reactorProjects )
+    public ReactorReader( MavenSession session, Map<String, MavenProject> reactorProjects )
     {
         projectsByGAV = reactorProjects;
 
@@ -72,18 +73,18 @@ class ReactorReader
             projects.add( project );
         }
 
-        repository = new WorkspaceRepository( "reactor", new HashSet<String>( projectsByGAV.keySet() ) );        
+        repository = new WorkspaceRepository( "reactor", new HashSet<String>( projectsByGAV.keySet() ) );
     }
 
     //
     // Public API
     //
-    
+
     public WorkspaceRepository getRepository()
     {
         return repository;
     }
-    
+
     public File findArtifact( Artifact artifact )
     {
         String projectKey = ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
@@ -124,12 +125,12 @@ class ReactorReader
         }
 
         return Collections.unmodifiableList( versions );
-    }    
-    
+    }
+
     //
     // Implementation
     //
-    
+
     private File find( MavenProject project, Artifact artifact )
     {
         if ( "pom".equals( artifact.getExtension() ) )
@@ -143,7 +144,7 @@ class ReactorReader
         {
             return projectArtifact.getFile();
         }
-        else if ( !hasBeenPackaged( project ) ) 
+        else if ( !hasBeenPackaged( project ) )
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
             // and only for plain old jars. Not war files, not ear files, not anything else.
@@ -186,9 +187,7 @@ class ReactorReader
      * 
      * @param project The project to try to resolve the artifact from, must not be <code>null</code>.
      * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
-     * @return The matching artifact from the project or <code>null</code> if not found.
-     * 
-     * Note that this 
+     * @return The matching artifact from the project or <code>null</code> if not found. Note that this
      */
     private Artifact findMatchingArtifact( MavenProject project, Artifact requestedArtifact )
     {
@@ -202,7 +201,7 @@ class ReactorReader
 
         for ( Artifact attachedArtifact : RepositoryUtils.toArtifacts( project.getAttachedArtifacts() ) )
         {
-            if ( attachedArtifactComparison ( requestedArtifact, attachedArtifact ) )
+            if ( attachedArtifactComparison( requestedArtifact, attachedArtifact ) )
             {
                 return attachedArtifact;
             }
@@ -222,7 +221,7 @@ class ReactorReader
             && requested.getVersion().equals( attached.getVersion() )
             && requested.getExtension().equals( attached.getExtension() )
             && requested.getClassifier().equals( attached.getClassifier() );
-    }    
+    }
 
     /**
      * Determines whether the specified artifact refers to test classes.

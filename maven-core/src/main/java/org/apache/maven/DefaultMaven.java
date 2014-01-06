@@ -59,7 +59,6 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.project.ProjectSorter;
-import org.apache.maven.repository.DelegatingLocalArtifactRepository;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Mirror;
@@ -162,8 +161,8 @@ public class DefaultMaven
         catch ( RuntimeException e )
         {
             result =
-                addExceptionToResult( new DefaultMavenExecutionResult(),
-                                      new InternalErrorException( "Internal error: " + e, e ) );
+                addExceptionToResult( new DefaultMavenExecutionResult(), new InternalErrorException( "Internal error: "
+                    + e, e ) );
         }
         finally
         {
@@ -173,17 +172,42 @@ public class DefaultMaven
         return result;
     }
 
+    // 
+    // 1) Setup initial properties.
+    //
+    // 2) Validate local repository directory is accessible.
+    //
+    // 3) Create RepositorySystemSession.
+    //
+    // 4) Create MavenSession.
+    //
+    // 5) Execute AbstractLifecycleParticipant.afterSessionStart(session)
+    //
+    // 6) Get reactor projects looking for read errors, and duplicate declarations
+    //
+    // 7) Create ProjectDependencyGraph using trimming which takes into account --projects and reactor mode. This ensures
+    //    that the projects passed into the ReactorReader are only those specified.
+    //
+    // 8) Create ReactorReader with the project map created in 7)
+    //
+    // 9) Execute AbstractLifecycleParticipant.afterProjectsRead(session)
+    //
+    // 10) Create ProjectDependencyGraph without trimming (as trimming was done in 7). A new topological sort is required after
+    //     the execution of 9) as the AbstractLifecycleParticipants are free to mutate the MavenProject instances, which may change
+    //     dependencies which can, in turn, affect the build order.
+    // 
+    // 11) Execute LifecycleStarter.start()
+    //    
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
-        //TODO: Need a general way to inject standard properties
         if ( request.getStartTime() != null )
         {
             request.getSystemProperties().put( "${build.timestamp}",
                                                new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
-        }        
-        
+        }
+
         request.setStartTime( new Date() );
-        
+
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try
@@ -194,11 +218,6 @@ public class DefaultMaven
         {
             return addExceptionToResult( result, e );
         }
-
-        DelegatingLocalArtifactRepository delegatingLocalArtifactRepository =
-            new DelegatingLocalArtifactRepository( request.getLocalRepository() );
-        
-        request.setLocalRepository( delegatingLocalArtifactRepository );        
 
         DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
 
@@ -219,45 +238,49 @@ public class DefaultMaven
 
         eventCatapult.fire( ExecutionEvent.Type.ProjectDiscoveryStarted, session, null );
 
-        request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
-
-        //TODO: optimize for the single project or no project
-        
         List<MavenProject> projects;
         try
         {
-            projects = getProjectsForMavenReactor( request );                                                
+            projects = getProjectsForMavenReactor( session );
         }
         catch ( ProjectBuildingException e )
         {
             return addExceptionToResult( result, e );
         }
 
-        session.setProjects( projects );
+        //
+        // This creates the graph and trims the projects down based on the user request using something like:
+        //
+        // -pl project0,project2 eclipse:eclipse
+        //
+        ProjectDependencyGraph projectDependencyGraph = createProjectDependencyGraph( projects, request, result, true );
 
-        result.setTopologicallySortedProjects( session.getProjects() );
+        session.setProjects( projectDependencyGraph.getSortedProjects() );
         
-        result.setProject( session.getTopLevelProject() );
+        if ( result.hasExceptions() )
+        {
+            return result;
+        }
 
+        //
+        // Desired order of precedence for local artifact repositories
+        //
+        // Reactor
+        // Workspace
+        // User Local Repository
+        //        
+        ReactorReader reactorRepository = null;
         try
         {
-            Map<String, MavenProject> projectMap;
-            projectMap = getProjectMap( session.getProjects() );
-    
-            // Desired order of precedence for local artifact repositories
-            //
-            // Reactor
-            // Workspace
-            // User Local Repository
-            ReactorReader reactorRepository = new ReactorReader( projectMap );
-
-            repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorRepository,
-                                                                                repoSession.getWorkspaceReader() ) );
+            reactorRepository = new ReactorReader( session, getProjectMap( session.getProjects() ) );
         }
         catch ( DuplicateProjectException e )
         {
             return addExceptionToResult( result, e );
         }
+
+        repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorRepository,
+                                                                            repoSession.getWorkspaceReader() ) );
 
         repoSession.setReadOnly();
 
@@ -280,39 +303,28 @@ public class DefaultMaven
             Thread.currentThread().setContextClassLoader( originalClassLoader );
         }
 
-        try
-        {
-            ProjectSorter projectSorter = new ProjectSorter( session.getProjects() );
-
-            ProjectDependencyGraph projectDependencyGraph = createDependencyGraph( projectSorter, request );
-
-            session.setProjects( projectDependencyGraph.getSortedProjects() );
-
-            session.setProjectDependencyGraph( projectDependencyGraph );
-        }
-        catch ( CycleDetectedException e )
-        {            
-            String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
-
-            ProjectCycleException error = new ProjectCycleException( message, e );
-
-            return addExceptionToResult( result, error );
-        }
-        catch ( org.apache.maven.project.DuplicateProjectException e )
-        {
-            return addExceptionToResult( result, e );
-        }
-        catch ( MavenExecutionException e )
-        {
-            return addExceptionToResult( result, e );
-        }
-
-        result.setTopologicallySortedProjects( session.getProjects() );
+        //
+        // The projects need to be topologically after the participants have run their afterProjectsRead(session)
+        // because the participant is free to change the dependencies of a project which can potentially change the
+        // topological order of the projects, and therefore can potentially change the build order.
+        //
+        // Note that participants may affect the topological order of the projects but it is
+        // not expected that a participant will add or remove projects from the session.
+        //
+        projectDependencyGraph = createProjectDependencyGraph( session.getProjects(), request, result, false );
 
         if ( result.hasExceptions() )
         {
             return result;
         }
+        
+        session.setProjects( projectDependencyGraph.getSortedProjects() );
+
+        session.setProjectDependencyGraph( projectDependencyGraph );
+
+        result.setTopologicallySortedProjects( session.getProjects() );
+
+        result.setProject( session.getTopLevelProject() );
 
         lifecycleStarter.execute( session );
 
@@ -465,8 +477,7 @@ public class DefaultMaven
 
     private String getUserAgent()
     {
-        return "Apache-Maven/" + getMavenVersion()
-            + " (Java " + System.getProperty( "java.version" ) + "; "
+        return "Apache-Maven/" + getMavenVersion() + " (Java " + System.getProperty( "java.version" ) + "; "
             + System.getProperty( "os.name" ) + " " + System.getProperty( "os.version" ) + ")";
     }
 
@@ -563,11 +574,15 @@ public class DefaultMaven
 
         return result;
     }
-    
-    private List<MavenProject> getProjectsForMavenReactor( MavenExecutionRequest request )
+
+    private List<MavenProject> getProjectsForMavenReactor( MavenSession session )
         throws ProjectBuildingException
     {
-        List<MavenProject> projects =  new ArrayList<MavenProject>();
+        MavenExecutionRequest request = session.getRequest();
+        
+        request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
+
+        List<MavenProject> projects = new ArrayList<MavenProject>();
 
         // We have no POM file.
         //
@@ -582,12 +597,54 @@ public class DefaultMaven
             return projects;
         }
 
-        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );        
+        List<File> files = Arrays.asList( request.getPom().getAbsoluteFile() );
         collectProjects( projects, files, request );
         return projects;
     }
 
-    private Map<String, MavenProject> getProjectMap( List<MavenProject> projects )
+    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
+        throws ProjectBuildingException
+    {
+        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
+
+        List<ProjectBuildingResult> results =
+            projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
+
+        boolean problems = false;
+
+        for ( ProjectBuildingResult result : results )
+        {
+            projects.add( result.getProject() );
+
+            if ( !result.getProblems().isEmpty() && logger.isWarnEnabled() )
+            {
+                logger.warn( "" );
+                logger.warn( "Some problems were encountered while building the effective model for "
+                    + result.getProject().getId() );
+
+                for ( ModelProblem problem : result.getProblems() )
+                {
+                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
+                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
+                }
+
+                problems = true;
+            }
+        }
+
+        if ( problems )
+        {
+            logger.warn( "" );
+            logger.warn( "It is highly recommended to fix these problems"
+                + " because they threaten the stability of your build." );
+            logger.warn( "" );
+            logger.warn( "For this reason, future Maven versions might no"
+                + " longer support building such malformed projects." );
+            logger.warn( "" );
+        }
+    }
+
+    private Map<String, MavenProject> getProjectMap( Collection<MavenProject> projects )
         throws DuplicateProjectException
     {
         Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
@@ -629,47 +686,6 @@ public class DefaultMaven
         return index;
     }
 
-    private void collectProjects( List<MavenProject> projects, List<File> files, MavenExecutionRequest request )
-        throws ProjectBuildingException
-    {
-        ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
-
-        List<ProjectBuildingResult> results = projectBuilder.build( files, request.isRecursive(), projectBuildingRequest );
-
-        boolean problems = false;
-
-        for ( ProjectBuildingResult result : results )
-        {
-            projects.add( result.getProject() );
-
-            if ( !result.getProblems().isEmpty() && logger.isWarnEnabled() )
-            {
-                logger.warn( "" );
-                logger.warn( "Some problems were encountered while building the effective model for "
-                    + result.getProject().getId() );
-
-                for ( ModelProblem problem : result.getProblems() )
-                {
-                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
-                }
-
-                problems = true;
-            }
-        }
-
-        if ( problems )
-        {
-            logger.warn( "" );
-            logger.warn( "It is highly recommended to fix these problems"
-                + " because they threaten the stability of your build." );
-            logger.warn( "" );
-            logger.warn( "For this reason, future Maven versions might no"
-                + " longer support building such malformed projects." );
-            logger.warn( "" );
-        }
-    }
-
     private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
     {
         Collection<String> notActivatedProfileIds = new LinkedHashSet<String>( activeProfileIds );
@@ -689,27 +705,55 @@ public class DefaultMaven
         }
     }
 
+    @Deprecated // 5 January 2014
     protected Logger getLogger()
     {
         return logger;
     }
 
-    private ProjectDependencyGraph createDependencyGraph( ProjectSorter sorter, MavenExecutionRequest request )
-        throws MavenExecutionException
+    private ProjectDependencyGraph createProjectDependencyGraph( Collection<MavenProject> projects, MavenExecutionRequest request,
+                                                                 MavenExecutionResult result, boolean trimming )
     {
-        ProjectDependencyGraph graph = new DefaultProjectDependencyGraph( sorter );
+        ProjectDependencyGraph projectDependencyGraph = null;
 
-        List<MavenProject> activeProjects = sorter.getSortedProjects();
-
-        activeProjects = trimSelectedProjects( activeProjects, graph, request );
-        activeProjects = trimResumedProjects( activeProjects, request );
-
-        if ( activeProjects.size() != sorter.getSortedProjects().size() )
+        try
         {
-            graph = new FilteredProjectDependencyGraph( graph, activeProjects );
+            ProjectSorter projectSorter = new ProjectSorter( projects );
+
+            projectDependencyGraph = new DefaultProjectDependencyGraph( projectSorter );
+
+            if ( trimming )
+            {
+                List<MavenProject> activeProjects = projectSorter.getSortedProjects();
+
+                activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, request );
+                activeProjects = trimResumedProjects( activeProjects, request );
+
+                if ( activeProjects.size() != projectSorter.getSortedProjects().size() )
+                {
+                    projectDependencyGraph =
+                        new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );
+                }
+            }
+        }
+        catch ( CycleDetectedException e )
+        {
+            String message = "The projects in the reactor contain a cyclic reference: " + e.getMessage();
+
+            ProjectCycleException error = new ProjectCycleException( message, e );
+
+            addExceptionToResult( result, error );
+        }
+        catch ( org.apache.maven.project.DuplicateProjectException e )
+        {
+            addExceptionToResult( result, e );
+        }
+        catch ( MavenExecutionException e )
+        {
+            addExceptionToResult( result, e );
         }
 
-        return graph;
+        return projectDependencyGraph;
     }
 
     private List<MavenProject> trimSelectedProjects( List<MavenProject> projects, ProjectDependencyGraph graph,
