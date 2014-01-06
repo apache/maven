@@ -183,12 +183,14 @@ public class DefaultMaven
     //
     // 5) Execute AbstractLifecycleParticipant.afterSessionStart(session)
     //
-    // 6) Get reactor projects looking for read errors, and duplicate declarations
+    // 6) Get reactor projects looking for general POM errors
     //
     // 7) Create ProjectDependencyGraph using trimming which takes into account --projects and reactor mode. This ensures
     //    that the projects passed into the ReactorReader are only those specified.
     //
-    // 8) Create ReactorReader with the project map created in 7)
+    // 8) Create ReactorReader with the getProjectMap( projects ). NOTE that getProjectMap(projects) is the code that
+    //    checks for duplicate projects definitions in the build. Ideally this type of duplicate checking should be part of
+    //    getting the reactor projects in 6). The duplicate checking is conflated with getProjectMap(projects).
     //
     // 9) Execute AbstractLifecycleParticipant.afterProjectsRead(session)
     //
