@@ -99,7 +99,7 @@ public abstract class AbstractCoreMavenComponentTestCase
      */
     protected void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
     {
-        containerConfiguration.setAutoWiring( true ).setClassPathScanning( PlexusConstants.SCANNING_INDEX );;
+        containerConfiguration.setAutoWiring( true ).setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     protected MavenExecutionRequest createMavenExecutionRequest( File pom )
