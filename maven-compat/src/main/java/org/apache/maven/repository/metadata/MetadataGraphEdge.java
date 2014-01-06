@@ -69,9 +69,9 @@ public class MetadataGraphEdge
         {
             return true;
         }
-        if ( ( o1 == null && o2 != null ) || ( o1 != null && o2 == null ) )
+        if ( o1 == null || o2 == null )
         {
-            return false;
+            return false; // as they are not both null
         }
         return o1.equals( o2 );
     }
