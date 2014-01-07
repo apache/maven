@@ -71,6 +71,8 @@ public class DefaultArtifactVersionTest
         checkVersionParsing( "1.0.1b" , 0, 0, 0, 0, "1.0.1b" );
         checkVersionParsing( "1.0M2" , 0, 0, 0, 0, "1.0M2" );
         checkVersionParsing( "1.0RC2" , 0, 0, 0, 0, "1.0RC2" );
+        checkVersionParsing( "1.1.2.beta1", 1, 1, 2, 0, "beta1" );
+        checkVersionParsing( "1.7.3.beta1", 1, 7, 3, 0, "beta1" );
         checkVersionParsing( "1.7.3.0" , 0, 0, 0, 0, "1.7.3.0" );
         checkVersionParsing( "1.7.3.0-1" , 0, 0, 0, 0, "1.7.3.0-1" );
         checkVersionParsing( "PATCH-1193602" , 0, 0, 0, 0, "PATCH-1193602" );
@@ -96,6 +98,10 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.1", "1.2" );
         assertVersionOlder( "1.0.0", "1.1" );
         assertVersionOlder( "1.1", "1.2.0" );
+
+        assertVersionOlder( "1.1.2.alpha1", "1.1.2" );
+        assertVersionOlder( "1.1.2.alpha1", "1.1.2.beta1" );
+        assertVersionOlder( "1.1.2.beta1", "1.2" );
 
         assertVersionOlder( "1.0-alpha-1", "1.0" );
         assertVersionOlder( "1.0-alpha-1", "1.0-alpha-2" );

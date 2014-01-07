@@ -20,6 +20,7 @@ package org.apache.maven.artifact.versioning;
  */
 
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  * Default implementation of artifact versioning.
@@ -174,7 +175,8 @@ public class DefaultArtifactVersion
                 }
                 if ( tok.hasMoreTokens() )
                 {
-                    fallback = true;
+                    qualifier = tok.nextToken();
+                    fallback = Pattern.compile("\\d+").matcher( qualifier ).matches();
                 }
 
                 // string tokenzier won't detect these and ignores them
@@ -213,34 +215,6 @@ public class DefaultArtifactVersion
     @Override
     public String toString()
     {
-        StringBuilder buf = new StringBuilder();
-        if ( majorVersion != null )
-        {
-            buf.append( majorVersion );
-        }
-        if ( minorVersion != null )
-        {
-            buf.append( "." );
-            buf.append( minorVersion );
-        }
-        if ( incrementalVersion != null )
-        {
-            buf.append( "." );
-            buf.append( incrementalVersion );
-        }
-        if ( buildNumber != null )
-        {
-            buf.append( "-" );
-            buf.append( buildNumber );
-        }
-        else if ( qualifier != null )
-        {
-            if ( buf.length() > 0 )
-            {
-                buf.append( "-" );
-            }
-            buf.append( qualifier );
-        }
-        return buf.toString();
+        return comparable.toString();
     }
 }
