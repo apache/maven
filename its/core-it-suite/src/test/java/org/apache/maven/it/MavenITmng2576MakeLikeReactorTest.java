@@ -179,6 +179,34 @@ public class MavenITmng2576MakeLikeReactorTest
     }
 
     /**
+     * Verify that using the mere basedir in the project list properly matches projects with non-default POM files.
+     */
+    public void testitMatchesByBasedirPlus()
+        throws Exception
+    {
+        // as per MNG-5230
+        requiresMavenVersion( "[3.2,)" );
+        
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2576" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        clean( verifier );
+        verifier.assertFileNotPresent( "sub-d/pom.xml" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "+sub-d" );
+        verifier.setLogFileName( "log-basedir-plus.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFileNotPresent( "target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
+        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
+        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+    }
+    /**
      * Verify that the project list can also specify project ids.
      */
     public void testitMatchesById()

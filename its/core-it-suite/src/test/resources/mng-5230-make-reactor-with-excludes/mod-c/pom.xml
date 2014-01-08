@@ -29,16 +29,16 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven.its.mng5230</groupId>
-  <artifactId>sub-b</artifactId>
+  <artifactId>mod-c</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-5230 :: Project B</name>
+  <name>Maven Integration Test :: MNG-5230 :: Project C</name>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.its.mng5230</groupId>
-      <artifactId>sub-a</artifactId>
+      <artifactId>mod-b</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

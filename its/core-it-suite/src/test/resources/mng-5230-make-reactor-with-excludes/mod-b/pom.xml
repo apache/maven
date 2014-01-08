@@ -22,40 +22,24 @@ under the License.
 <project>
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.apache.maven.its.mng5230</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.apache.maven.its.mng5230</groupId>
-  <artifactId>parent</artifactId>
+  <artifactId>mod-b</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-5230</name>
-  <description>Test make-like reactor mode includes and excludes.</description>
+  <name>Maven Integration Test :: MNG-5230 :: Project B</name>
 
-  <modules>
-    <module>sub-a</module>
-    <module>sub-b</module>
-    <module>sub-c</module>
-    <module>sub-d/pom-special.xml</module>
-  </modules>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-log-file</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <configuration>
-          <logFile>target/touch.txt</logFile>
-        </configuration>
-        <executions>
-          <execution>
-            <id>test</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>reset</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng5230</groupId>
+      <artifactId>mod-a</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 </project>

@@ -34,17 +34,17 @@ public class MavenITmng5230MakeReactorWithExcludesTest
 
     public MavenITmng5230MakeReactorWithExcludesTest()
     {
-        super( "[2.1.0,)" ); 
+        super( "[3.2,)" ); 
     }
 
      private void clean( Verifier verifier )
         throws Exception
     {
         verifier.deleteDirectory( "target" );
-        verifier.deleteDirectory( "sub-a/target" );
-        verifier.deleteDirectory( "sub-b/target" );
-        verifier.deleteDirectory( "sub-c/target" );
-        verifier.deleteDirectory( "sub-d/target" );
+        verifier.deleteDirectory( "mod-a/target" );
+        verifier.deleteDirectory( "mod-b/target" );
+        verifier.deleteDirectory( "mod-c/target" );
+        verifier.deleteDirectory( "mod-d/target" );
     }
 
     /**
@@ -53,23 +53,24 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     public void testitMakeWithExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getAbsolutePath(), true );
+        verifier.setMavenDebug( true );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!sub-b" );
+        verifier.addCliOption( "!mod-b" );
         verifier.setLogFileName( "log-only.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+        verifier.assertFilePresent( "mod-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.assertFilePresent( "mod-c/target/touch.txt" );
+        verifier.assertFilePresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -78,13 +79,13 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     public void testitMakeUpstreamExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "sub-b,!sub-a" );
+        verifier.addCliOption( "mod-b,!mod-a" );
         verifier.addCliOption( "-am" );
         verifier.setLogFileName( "log-upstream.txt" );
         verifier.executeGoal( "validate" );
@@ -92,10 +93,10 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.assertFilePresent( "mod-b/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-c/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -104,13 +105,13 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     public void testitMakeDownstreamExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "sub-b,!sub-c" );
+        verifier.addCliOption( "mod-b,!mod-c" );
         verifier.addCliOption( "-amd" );
         verifier.setLogFileName( "log-downstream.txt" );
         verifier.executeGoal( "validate" );
@@ -118,10 +119,10 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.resetStreams();
 
         verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.assertFilePresent( "mod-b/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-c/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -130,13 +131,13 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     public void testitMakeBothExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "sub-b,!sub-a" );
+        verifier.addCliOption( "mod-b,!mod-a" );
         verifier.addCliOption( "-am" );
         verifier.addCliOption( "-amd" );
         verifier.setLogFileName( "log-both.txt" );
@@ -145,61 +146,88 @@ public class MavenITmng5230MakeReactorWithExcludesTest
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.assertFilePresent( "mod-b/target/touch.txt" );
+        verifier.assertFilePresent( "mod-c/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
     }
 
     /**
-     * Verify that using the basedir for exclusion in the project list  matches projects with non-default POM files.
+     * Verify that using the basedir for exclusion with an exclemation in the project list matches projects with non-default POM files.
      */
-    public void testitMatchesByBasedirExclude()
+    public void testitMatchesByBasedirExclamationExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
-        verifier.assertFileNotPresent( "sub-d/pom.xml" );
+        verifier.assertFileNotPresent( "mod-d/pom.xml" );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!sub-d" );
-        verifier.setLogFileName( "log-basedir.txt" );
+        verifier.addCliOption( "!mod-d" );
+        verifier.setLogFileName( "log-basedir-exclamation.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-d/target/touch.txt" );
+        verifier.assertFilePresent( "mod-a/target/touch.txt" );
+        verifier.assertFilePresent( "mod-b/target/touch.txt" );
+        verifier.assertFilePresent( "mod-c/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
     }
 
+    /**
+     * Verify that using the basedir for exclusion with a minus in the project list matches projects with non-default POM files.
+     */
+    public void testitMatchesByBasedirMinusExclude()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.setAutoclean( false );
+        clean( verifier );
+        verifier.assertFileNotPresent( "mod-d/pom.xml" );
+        verifier.addCliOption( "-pl" );
+        verifier.addCliOption( "-mod-d" );
+        verifier.setLogFileName( "log-basedir-minus.txt" );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/touch.txt" );
+        verifier.assertFilePresent( "mod-a/target/touch.txt" );
+        verifier.assertFilePresent( "mod-b/target/touch.txt" );
+        verifier.assertFilePresent( "mod-c/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-d/target/touch.txt" );
+    }
+
+    
     /**
      * Verify that the project list can also specify project ids for exclusion
      */
     public void testitMatchesByIdExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!org.apache.maven.its.mng5230:sub-b" );
+        verifier.addCliOption( "!org.apache.maven.its.mng5230:mod-b" );
         verifier.setLogFileName( "log-id.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+        verifier.assertFilePresent( "mod-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.assertFilePresent( "mod-c/target/touch.txt" );
+        verifier.assertFilePresent( "mod-d/target/touch.txt" );
     }
 
     /**
@@ -208,26 +236,23 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     public void testitMatchesByArtifactIdExclude()
         throws Exception
     {
-        // as per MNG-4244
-        requiresMavenVersion( "[3.0-alpha-3,)" );
-
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!:sub-b" );
+        verifier.addCliOption( "!:mod-b" );
         verifier.setLogFileName( "log-artifact-id.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/touch.txt" );
-        verifier.assertFilePresent( "sub-a/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-b/target/touch.txt" );
-        verifier.assertFilePresent( "sub-c/target/touch.txt" );
-        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+        verifier.assertFilePresent( "mod-a/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-b/target/touch.txt" );
+        verifier.assertFilePresent( "mod-c/target/touch.txt" );
+        verifier.assertFilePresent( "mod-d/target/touch.txt" );
     }
     
      /**
@@ -236,24 +261,24 @@ public class MavenITmng5230MakeReactorWithExcludesTest
     public void testitResumeFromExclude()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5230-make-reactor-with-excludes" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         clean( verifier );
         verifier.addCliOption( "-rf" );
-        verifier.addCliOption( "sub-b" );
+        verifier.addCliOption( "mod-b" );
         verifier.addCliOption( "-pl" );
-        verifier.addCliOption( "!sub-c" );
+        verifier.addCliOption( "!mod-c" );
         verifier.setLogFileName( "log-resume.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
         verifier.assertFileNotPresent( "target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-a/target/touch.txt" );
-        verifier.assertFilePresent( "sub-b/target/touch.txt" );
-        verifier.assertFileNotPresent( "sub-c/target/touch.txt" );
-        verifier.assertFilePresent( "sub-d/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-a/target/touch.txt" );
+        verifier.assertFilePresent( "mod-b/target/touch.txt" );
+        verifier.assertFileNotPresent( "mod-c/target/touch.txt" );
+        verifier.assertFilePresent( "mod-d/target/touch.txt" );
     }
 }

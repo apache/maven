@@ -29,17 +29,9 @@ under the License.
   </parent>
 
   <groupId>org.apache.maven.its.mng5230</groupId>
-  <artifactId>sub-c</artifactId>
+  <artifactId>mod-a</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-5230 :: Project C</name>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven.its.mng5230</groupId>
-      <artifactId>sub-b</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+  <name>Maven Integration Test :: MNG-5230 :: Project A</name>
 </project>
