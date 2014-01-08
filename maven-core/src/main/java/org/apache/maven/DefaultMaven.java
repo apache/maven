@@ -729,6 +729,7 @@ public class DefaultMaven
                 List<MavenProject> activeProjects = projectSorter.getSortedProjects();
 
                 activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, request );
+                activeProjects = trimExcludedProjects( activeProjects,  request );
                 activeProjects = trimResumedProjects( activeProjects, request );
 
                 if ( activeProjects.size() != projectSorter.getSortedProjects().size() )
@@ -840,6 +841,59 @@ public class DefaultMaven
             for ( MavenProject project : projects )
             {
                 if ( selectedProjects.contains( project ) )
+                {
+                    result.add( project );
+                }
+            }
+        }
+
+        return result;
+    }
+    
+    private List<MavenProject> trimExcludedProjects( List<MavenProject> projects, MavenExecutionRequest request )
+        throws MavenExecutionException
+    {
+        List<MavenProject> result = projects;
+
+        if ( !request.getExcludedProjects().isEmpty() )
+        {
+            File reactorDirectory = null;
+
+            if ( request.getBaseDirectory() != null )
+            {
+                reactorDirectory = new File( request.getBaseDirectory() );
+            }
+
+            Collection<MavenProject> excludedProjects = new LinkedHashSet<MavenProject>( projects.size() );
+
+            for ( String selector : request.getExcludedProjects() )
+            {
+                MavenProject excludedProject = null;
+
+                for ( MavenProject project : projects )
+                {
+                    if ( isMatchingProject( project, selector, reactorDirectory ) )
+                    {
+                        excludedProject = project;
+                        break;
+                    }
+                }
+
+                if ( excludedProject != null )
+                {
+                    excludedProjects.add( excludedProject );
+                }
+                else
+                {
+                    throw new MavenExecutionException( "Could not find the selected project in the reactor: "
+                        + selector, request.getPom() );
+                }
+            }
+
+            result = new ArrayList<MavenProject>( projects.size() );
+            for ( MavenProject project : projects )
+            {
+                if ( !excludedProjects.contains( project ) )
                 {
                     result.add( project );
                 }

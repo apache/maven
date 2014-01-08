@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -976,14 +975,39 @@ public class MavenCli
 
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
         {
-            String[] values = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
-            List<String> projects = new ArrayList<String>();
-            for ( String value : values )
+            String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
+            
+            List<String> inclProjects = new ArrayList<String>();
+            List<String> exclProjects = new ArrayList<String>();
+            
+            if ( projectOptionValues != null )
             {
-                String[] tmp = StringUtils.split( value, "," );
-                projects.addAll( Arrays.asList( tmp ) );
+                for ( String projectOptionValue : projectOptionValues )
+                {
+                    StringTokenizer projectTokens = new StringTokenizer( projectOptionValue, "," );
+
+                    while ( projectTokens.hasMoreTokens() )
+                    {
+                        String projectAction = projectTokens.nextToken().trim();
+
+                        if ( projectAction.startsWith( "-" ) || projectAction.startsWith( "!" ) )
+                        {
+                            exclProjects.add( projectAction.substring( 1 ) );
+                        }
+                        else if ( projectAction.startsWith( "+" ) )
+                        {
+                            inclProjects.add( projectAction.substring( 1 ) );
+                        }
+                        else
+                        {
+                            inclProjects.add( projectAction );
+                        }
+                    }
+                }
             }
-            request.setSelectedProjects( projects );
+            
+            request.setSelectedProjects( inclProjects );
+            request.setExcludedProjects( exclProjects );
         }
 
         if ( commandLine.hasOption( CLIManager.ALSO_MAKE )

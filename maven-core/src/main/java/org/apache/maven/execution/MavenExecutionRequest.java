@@ -145,6 +145,20 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setSelectedProjects( List<String> projects );
     List<String> getSelectedProjects();
+    
+    /**
+     * 
+     * @param projects the projects to exclude
+     * @return this MavenExecutionRequest
+     * @since 3.2
+     */
+    MavenExecutionRequest setExcludedProjects( List<String> projects );
+    /**
+     * 
+     * @return the excluded projects, never {@code null}
+     * @since 3.2
+     */
+    List<String> getExcludedProjects();
 
     MavenExecutionRequest setResumeFrom( String project );
     String getResumeFrom();

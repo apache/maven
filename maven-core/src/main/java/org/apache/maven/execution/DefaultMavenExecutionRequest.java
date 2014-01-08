@@ -101,6 +101,8 @@ public class DefaultMavenExecutionRequest
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
     private List<String> selectedProjects;
+    
+    private List<String> excludedProjects;
 
     private String resumeFrom;
 
@@ -257,6 +259,16 @@ public class DefaultMavenExecutionRequest
         }
 
         return selectedProjects;
+    }
+    
+    public List<String> getExcludedProjects()
+    {
+        if ( excludedProjects == null )
+        {
+            excludedProjects = new ArrayList<String>();
+        }
+
+        return excludedProjects;
     }
 
     public String getResumeFrom()
@@ -509,6 +521,20 @@ public class DefaultMavenExecutionRequest
         else
         {
             this.selectedProjects = null;
+        }
+
+        return this;
+    }
+
+    public MavenExecutionRequest setExcludedProjects( List<String> excludedProjects )
+    {
+        if ( excludedProjects != null )
+        {
+            this.excludedProjects = new ArrayList<String>( excludedProjects );
+        }
+        else
+        {
+            this.excludedProjects = null;
         }
 
         return this;
