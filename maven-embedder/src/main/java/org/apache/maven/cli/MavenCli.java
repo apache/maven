@@ -19,6 +19,7 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -497,6 +498,21 @@ public class MavenCli
         if ( cliRequest.commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
         {
             String passwd = cliRequest.commandLine.getOptionValue( CLIManager.ENCRYPT_MASTER_PASSWORD );
+            
+            if ( passwd == null )
+            {
+                Console cons;
+                char[] password;
+                if ( ( cons = System.console() ) != null
+                    && ( password = cons.readPassword( "Master password:") ) != null )
+                {
+                    // Cipher uses Strings
+                    passwd = String.copyValueOf( password );
+                    
+                    // Sun/Oracle advises to empty the char array
+                    java.util.Arrays.fill( password, ' ' );
+                }
+            }
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
@@ -507,6 +523,21 @@ public class MavenCli
         else if ( cliRequest.commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
         {
             String passwd = cliRequest.commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
+            
+            if ( passwd == null )
+            {
+                Console cons;
+                char[] password;
+                if ( ( cons = System.console() ) != null
+                    && ( password = cons.readPassword( "Password:" ) ) != null )
+                {
+                    // Cipher uses Strings
+                    passwd = String.copyValueOf( password );
+
+                    // Sun/Oracle advises to empty the char array
+                    java.util.Arrays.fill( password, ' ' );
+                }
+            }
 
             String configurationFile = dispatcher.getConfigurationFile();
 
