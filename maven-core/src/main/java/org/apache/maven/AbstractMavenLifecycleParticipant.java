@@ -57,4 +57,16 @@ public abstract class AbstractMavenLifecycleParticipant
         // do nothing
     }
 
+    /**
+     * Invoked after all projects were built.
+     *
+     * This callback is intended to allow extensions to perform cleanup of any
+     * allocated external resources after the build. It is invoked on best-effort
+     * basis and may be missed due to an Error or RuntimeException in Maven core
+     * code.
+     */
+    public void afterSessionEnd( MavenSession session )
+    {
+        // do nothing
+    }
 }

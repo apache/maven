@@ -317,6 +317,8 @@ public class DefaultMaven
 
         if ( result.hasExceptions() )
         {
+            afterSessionEnd( projects, session );
+
             return result;
         }
         
@@ -337,7 +339,27 @@ public class DefaultMaven
             return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
         }
 
+        afterSessionEnd( projects, session );
+
         return result;
+    }
+
+    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
+    {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try
+        {
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( projects ) )
+            {
+                Thread.currentThread().setContextClassLoader( listener.getClass().getClassLoader() );
+
+                listener.afterSessionEnd( session );
+            }
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( originalClassLoader );
+        }
     }
 
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
