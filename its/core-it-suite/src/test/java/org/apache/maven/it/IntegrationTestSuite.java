@@ -112,6 +112,7 @@ public class IntegrationTestSuite
 
         suite.addTestSuite( MavenITmng5482AetherNotFoundTest.class );
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
+        suite.addTestSuite( MavenITmng5389LifecycleParticipantAfterSessionEnd.class );
         suite.addTestSuite( MavenITmng5387ArtifactReplacementPlugin.class );
         suite.addTestSuite( MavenITmng5382Jsr330Plugin.class );
         suite.addTestSuite( MavenITmng5338FileOptionToDirectory.class );
