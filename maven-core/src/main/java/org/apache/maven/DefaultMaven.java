@@ -317,7 +317,14 @@ public class DefaultMaven
 
         if ( result.hasExceptions() )
         {
-            afterSessionEnd( projects, session );
+            try 
+            {
+                afterSessionEnd( projects, session );
+            } 
+            catch (MavenExecutionException e) 
+            {
+                return addExceptionToResult( result, e );
+            }
 
             return result;
         }
@@ -339,12 +346,20 @@ public class DefaultMaven
             return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
         }
 
-        afterSessionEnd( projects, session );
+        try 
+        {
+            afterSessionEnd( projects, session );
+        } 
+        catch (MavenExecutionException e) 
+        {
+            return addExceptionToResult( result, e );
+        }
 
         return result;
     }
 
-    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
+    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session ) 
+        throws MavenExecutionException
     {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try

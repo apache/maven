@@ -66,6 +66,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * code.
      */
     public void afterSessionEnd( MavenSession session )
+        throws MavenExecutionException    
     {
         // do nothing
     }
