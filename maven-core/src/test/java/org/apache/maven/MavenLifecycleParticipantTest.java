@@ -15,11 +15,11 @@ package org.apache.maven;
  * the License.
  */
 
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -71,6 +71,32 @@ public class MavenLifecycleParticipantTest
 
     }
 
+    public static class InjectReactorDependency
+        extends AbstractMavenLifecycleParticipant
+    {
+        @Override
+        public void afterProjectsRead( MavenSession session )
+        {
+            injectReactorDependency( session.getProjects(), "module-a", "module-b" );
+        }
+
+        private void injectReactorDependency( List<MavenProject> projects, String moduleFrom, String moduleTo )
+        {
+            for ( MavenProject project : projects )
+            {
+                if ( moduleFrom.equals( project.getArtifactId() ) )
+                {
+                    Dependency dependency = new Dependency();
+                    dependency.setArtifactId( moduleTo );
+                    dependency.setGroupId( project.getGroupId() );
+                    dependency.setVersion( project.getVersion() );
+
+                    project.getModel().addDependency( dependency );
+                }
+            }
+        }
+    }
+
     @Override
     protected void setupContainer()
     {
@@ -103,12 +129,45 @@ public class MavenLifecycleParticipantTest
         assertFalse( result.getExceptions().toString(), result.hasExceptions() );
 
         MavenProject project = result.getProject();
-        
+
         assertEquals( "bar", project.getProperties().getProperty( "foo" ) );
 
         ArrayList<Artifact> artifacts = new ArrayList<Artifact>( project.getArtifacts() );
 
         assertEquals( 1, artifacts.size() );
         assertEquals( INJECTED_ARTIFACT_ID, artifacts.get( 0 ).getArtifactId() );
+    }
+
+    public void testReactorDependencyInjection()
+        throws Exception
+    {
+        List<String> reactorOrder =
+            getReactorOrder( "lifecycle-participant-reactor-dependency-injection", InjectReactorDependency.class );
+        assertEquals( Arrays.asList( "parent", "module-b", "module-a" ), reactorOrder );
+    }
+
+    private <T> List<String> getReactorOrder( String testProject, Class<T> participant )
+        throws Exception
+    {
+        PlexusContainer container = getContainer();
+
+        ComponentDescriptor<T> cd = new ComponentDescriptor<T>( participant, container.getContainerRealm() );
+        cd.setRoleClass( AbstractMavenLifecycleParticipant.class );
+        container.addComponentDescriptor( cd );
+
+        Maven maven = container.lookup( Maven.class );
+        File pom = getProject( testProject );
+        MavenExecutionRequest request = createMavenExecutionRequest( pom );
+        request.setGoals( Arrays.asList( "validate" ) );
+        MavenExecutionResult result = maven.execute( request );
+
+        assertFalse( result.getExceptions().toString(), result.hasExceptions() );
+
+        List<String> order = new ArrayList<String>();
+        for ( MavenProject project : result.getTopologicallySortedProjects() )
+        {
+            order.add( project.getArtifactId() );
+        }
+        return order;
     }
 }
