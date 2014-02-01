@@ -23,15 +23,21 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Assert;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -303,4 +309,50 @@ public class MojoRule
             }            
         };       
     }
+
+    /**
+     * @since 3.1.0
+     */
+    public MavenProject readMavenProject( File basedir )
+        throws Exception
+    {
+        File pom = new File( basedir, "pom.xml" );
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setBaseDirectory( basedir );
+        ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
+        MavenProject project = lookup( ProjectBuilder.class ).build( pom, configuration ).getProject();
+        Assert.assertNotNull( project );
+        return project;
+    }
+
+    /**
+     * @since 3.1.0
+     */
+    public void executeMojo( File basedir, String goal )
+        throws Exception
+    {
+        lookupConfiguredMojo( basedir, goal ).execute();
+    }
+
+    /**
+     * @since 3.1.0
+     */
+    public Mojo lookupConfiguredMojo( File basedir, String goal )
+        throws Exception, ComponentConfigurationException
+    {
+        MavenProject project = readMavenProject( basedir );
+        MavenSession session = newMavenSession( project );
+        MojoExecution execution = newMojoExecution( goal );
+        return lookupConfiguredMojo( session, execution );
+    }
+
+    /**
+     * @since 3.1.0
+     */
+    public final <T> T lookup( final Class<T> role )
+        throws ComponentLookupException
+    {
+        return getContainer().lookup( role );
+    }
+
 }
