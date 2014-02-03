@@ -504,7 +504,7 @@ public class MavenCli
                 Console cons;
                 char[] password;
                 if ( ( cons = System.console() ) != null
-                    && ( password = cons.readPassword( "Master password:") ) != null )
+                    && ( password = cons.readPassword( "Master password: " ) ) != null )
                 {
                     // Cipher uses Strings
                     passwd = String.copyValueOf( password );
@@ -529,7 +529,7 @@ public class MavenCli
                 Console cons;
                 char[] password;
                 if ( ( cons = System.console() ) != null
-                    && ( password = cons.readPassword( "Password:" ) ) != null )
+                    && ( password = cons.readPassword( "Password: " ) ) != null )
                 {
                     // Cipher uses Strings
                     passwd = String.copyValueOf( password );
