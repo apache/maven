@@ -58,7 +58,6 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
-import org.apache.maven.project.ProjectSorter;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.settings.Mirror;
@@ -757,19 +756,17 @@ public class DefaultMaven
 
         try
         {
-            ProjectSorter projectSorter = new ProjectSorter( projects );
-
-            projectDependencyGraph = new DefaultProjectDependencyGraph( projectSorter );
+            projectDependencyGraph = new DefaultProjectDependencyGraph( projects );
 
             if ( trimming )
             {
-                List<MavenProject> activeProjects = projectSorter.getSortedProjects();
+                List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
 
                 activeProjects = trimSelectedProjects( activeProjects, projectDependencyGraph, request );
                 activeProjects = trimExcludedProjects( activeProjects,  request );
                 activeProjects = trimResumedProjects( activeProjects, request );
 
-                if ( activeProjects.size() != projectSorter.getSortedProjects().size() )
+                if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
                 {
                     projectDependencyGraph =
                         new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );

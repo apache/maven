@@ -25,8 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectSorter;
+import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * Describes the inter-dependencies between projects in the reactor.
@@ -40,18 +42,15 @@ class DefaultProjectDependencyGraph
     private ProjectSorter sorter;
 
     /**
-     * Creates a new project dependency graph based on the specified project sorting.
+     * Creates a new project dependency graph based on the specified projects.
      * 
-     * @param sorter The project sorter backing the graph, must not be {@code null}.
+     * @param projects The projects to create the dependency graph with
+     * @throws DuplicateProjectException 
+     * @throws CycleDetectedException 
      */
-    public DefaultProjectDependencyGraph( ProjectSorter sorter )
+    public DefaultProjectDependencyGraph( Collection<MavenProject> projects ) throws CycleDetectedException, DuplicateProjectException
     {
-        if ( sorter == null )
-        {
-            throw new IllegalArgumentException( "project sorter missing" );
-        }
-
-        this.sorter = sorter;
+        this.sorter = new ProjectSorter( projects );
     }
 
     public List<MavenProject> getSortedProjects()
