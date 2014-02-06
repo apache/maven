@@ -1087,14 +1087,7 @@ public class MavenCli
         
         if ( threadConfiguration != null )
         {
-            if ( threadConfiguration.contains( "W" ) )
-            {
-                request.setBuilderId( "weave" );
-            }
-            else 
-            {
-                request.setBuilderId( "multithreaded" );
-            }
+            request.setBuilderId( "multithreaded" );
             
             int threads =
                 threadConfiguration.contains( "C" ) ? Integer.valueOf( threadConfiguration.replace( "C", "" ) )
