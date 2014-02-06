@@ -15,13 +15,16 @@ package org.apache.maven.lifecycle.internal;
  * the License.
  */
 
+import java.util.Iterator;
+
 import junit.framework.TestCase;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.builder.weave.BuildLogItem;
+import org.apache.maven.lifecycle.internal.builder.weave.ConcurrentBuildLogger;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.project.MavenProject;
-
-import java.util.Iterator;
 
 /**
  * @author Kristian Rosenvold

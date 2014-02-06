@@ -16,6 +16,7 @@
 package org.apache.maven.lifecycle;
 
 import junit.framework.TestCase;
+
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
 import org.apache.maven.lifecycle.internal.stub.DefaultLifecyclesStub;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;

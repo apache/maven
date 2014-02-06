@@ -29,6 +29,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -111,8 +112,7 @@ public class LifecycleModuleBuilder
             projectExecutionListener.afterProjectExecutionSuccess( new ProjectExecutionEvent( session, currentProject,
                                                                                               mojoExecutions ) );
 
-            reactorContext.getResult().addBuildSummary(
-                new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
+            reactorContext.getResult().addBuildSummary( new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
 
             eventCatapult.fire( ExecutionEvent.Type.ProjectSucceeded, session, null );
         }
@@ -120,7 +120,8 @@ public class LifecycleModuleBuilder
         {
             builderCommon.handleBuildError( reactorContext, rootSession, session, currentProject, e, buildStartTime );
 
-            projectExecutionListener.afterProjectExecutionFailure( new ProjectExecutionEvent( session, currentProject, e ) );
+            projectExecutionListener.afterProjectExecutionFailure( new ProjectExecutionEvent( session, currentProject,
+                                                                                              e ) );
         }
         finally
         {

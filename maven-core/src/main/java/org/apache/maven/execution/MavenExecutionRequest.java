@@ -91,14 +91,17 @@ public interface MavenExecutionRequest
 
     // Base directory
     MavenExecutionRequest setBaseDirectory( File basedir );
+
     String getBaseDirectory();
 
     // Timing (remove this)
     MavenExecutionRequest setStartTime( Date start );
+
     Date getStartTime();
 
     // Goals
     MavenExecutionRequest setGoals( List<String> goals );
+
     List<String> getGoals();
 
     // Properties
@@ -106,7 +109,7 @@ public interface MavenExecutionRequest
     /**
      * Sets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     *
+     * 
      * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -115,7 +118,7 @@ public interface MavenExecutionRequest
     /**
      * Gets the system properties to use for interpolation and profile activation. The system properties are collected
      * from the runtime environment like {@link System#getProperties()} and environment variables.
-     *
+     * 
      * @return The system properties, never {@code null}.
      */
     Properties getSystemProperties();
@@ -124,7 +127,7 @@ public interface MavenExecutionRequest
      * Sets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     *
+     * 
      * @param userProperties The user properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -134,165 +137,219 @@ public interface MavenExecutionRequest
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
-     *
+     * 
      * @return The user properties, never {@code null}.
      */
     Properties getUserProperties();
 
     // Reactor
     MavenExecutionRequest setReactorFailureBehavior( String failureBehavior );
+
     String getReactorFailureBehavior();
 
     MavenExecutionRequest setSelectedProjects( List<String> projects );
+
     List<String> getSelectedProjects();
-    
+
     /**
-     * 
      * @param projects the projects to exclude
      * @return this MavenExecutionRequest
      * @since 3.2
      */
     MavenExecutionRequest setExcludedProjects( List<String> projects );
+
     /**
-     * 
      * @return the excluded projects, never {@code null}
      * @since 3.2
      */
     List<String> getExcludedProjects();
 
     MavenExecutionRequest setResumeFrom( String project );
+
     String getResumeFrom();
 
     MavenExecutionRequest setMakeBehavior( String makeBehavior );
+
     String getMakeBehavior();
 
-    void setThreadCount( String threadCount );
-    String getThreadCount();
-    boolean isThreadConfigurationPresent();
-    void setPerCoreThreadCount( boolean perCoreThreadCount );
-    boolean isPerCoreThreadCount();
+    /**
+     * Set's the parallel degree of concurrency used by the build.
+     * 
+     * @param degreeOfConcurrency
+     */
+    public void setDegreeOfConcurrency( final int degreeOfConcurrency );
+
+    /**
+     * @return the degree of concurrency for the build.
+     */
+    public int getDegreeOfConcurrency();
 
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
+
     boolean isRecursive();
 
     MavenExecutionRequest setPom( File pom );
+
     File getPom();
 
     // Errors
     MavenExecutionRequest setShowErrors( boolean showErrors );
+
     boolean isShowErrors();
 
     // Transfer listeners
     MavenExecutionRequest setTransferListener( TransferListener transferListener );
+
     TransferListener getTransferListener();
 
     // Logging
     MavenExecutionRequest setLoggingLevel( int loggingLevel );
+
     int getLoggingLevel();
 
     // Update snapshots
     MavenExecutionRequest setUpdateSnapshots( boolean updateSnapshots );
+
     boolean isUpdateSnapshots();
 
     MavenExecutionRequest setNoSnapshotUpdates( boolean noSnapshotUpdates );
+
     boolean isNoSnapshotUpdates();
 
     // Checksum policy
     MavenExecutionRequest setGlobalChecksumPolicy( String globalChecksumPolicy );
+
     String getGlobalChecksumPolicy();
 
     // Local repository
     MavenExecutionRequest setLocalRepositoryPath( String localRepository );
+
     MavenExecutionRequest setLocalRepositoryPath( File localRepository );
+
     File getLocalRepositoryPath();
+
     MavenExecutionRequest setLocalRepository( ArtifactRepository repository );
+
     ArtifactRepository getLocalRepository();
 
     // Interactive
     MavenExecutionRequest setInteractiveMode( boolean interactive );
+
     boolean isInteractiveMode();
 
     // Offline
     MavenExecutionRequest setOffline( boolean offline );
+
     boolean isOffline();
 
     boolean isCacheTransferError();
+
     MavenExecutionRequest setCacheTransferError( boolean cacheTransferError );
 
     boolean isCacheNotFound();
+
     MavenExecutionRequest setCacheNotFound( boolean cacheNotFound );
 
     // Profiles
     List<Profile> getProfiles();
+
     MavenExecutionRequest addProfile( Profile profile );
+
     MavenExecutionRequest setProfiles( List<Profile> profiles );
+
     MavenExecutionRequest addActiveProfile( String profile );
+
     MavenExecutionRequest addActiveProfiles( List<String> profiles );
+
     MavenExecutionRequest setActiveProfiles( List<String> profiles );
+
     List<String> getActiveProfiles();
+
     MavenExecutionRequest addInactiveProfile( String profile );
+
     MavenExecutionRequest addInactiveProfiles( List<String> profiles );
+
     MavenExecutionRequest setInactiveProfiles( List<String> profiles );
+
     List<String> getInactiveProfiles();
 
     // Proxies
     List<Proxy> getProxies();
+
     MavenExecutionRequest setProxies( List<Proxy> proxies );
+
     MavenExecutionRequest addProxy( Proxy proxy );
 
     // Servers
     List<Server> getServers();
+
     MavenExecutionRequest setServers( List<Server> servers );
+
     MavenExecutionRequest addServer( Server server );
 
     // Mirrors
     List<Mirror> getMirrors();
+
     MavenExecutionRequest setMirrors( List<Mirror> mirrors );
+
     MavenExecutionRequest addMirror( Mirror mirror );
 
     // Plugin groups
     List<String> getPluginGroups();
+
     MavenExecutionRequest setPluginGroups( List<String> pluginGroups );
+
     MavenExecutionRequest addPluginGroup( String pluginGroup );
+
     MavenExecutionRequest addPluginGroups( List<String> pluginGroups );
 
     boolean isProjectPresent();
+
     MavenExecutionRequest setProjectPresent( boolean isProjectPresent );
 
     File getUserSettingsFile();
+
     MavenExecutionRequest setUserSettingsFile( File userSettingsFile );
 
     File getGlobalSettingsFile();
+
     MavenExecutionRequest setGlobalSettingsFile( File globalSettingsFile );
 
     MavenExecutionRequest addRemoteRepository( ArtifactRepository repository );
+
     MavenExecutionRequest addPluginArtifactRepository( ArtifactRepository repository );
 
     /**
      * Set a new list of remote repositories to use the execution request. This is necessary if you perform
      * transformations on the remote repositories being used. For example if you replace existing repositories with
      * mirrors then it's easier to just replace the whole list with a new list of transformed repositories.
-     *
+     * 
      * @param repositories
      * @return This request, never {@code null}.
      */
     MavenExecutionRequest setRemoteRepositories( List<ArtifactRepository> repositories );
+
     List<ArtifactRepository> getRemoteRepositories();
 
     MavenExecutionRequest setPluginArtifactRepositories( List<ArtifactRepository> repositories );
+
     List<ArtifactRepository> getPluginArtifactRepositories();
 
     MavenExecutionRequest setRepositoryCache( RepositoryCache repositoryCache );
+
     RepositoryCache getRepositoryCache();
 
     WorkspaceReader getWorkspaceReader();
+
     MavenExecutionRequest setWorkspaceReader( WorkspaceReader workspaceReader );
 
     File getUserToolchainsFile();
+
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
     ExecutionListener getExecutionListener();
+
     MavenExecutionRequest setExecutionListener( ExecutionListener executionListener );
 
     ProjectBuildingRequest getProjectBuildingRequest();
@@ -306,5 +363,19 @@ public interface MavenExecutionRequest
      * @since 3.1
      */
     MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepository );
+
+    /**
+     * Controls the {@link Builder} used by Maven by specification of the builder's id.
+     * 
+     * @since 3.2.0
+     */
+    MavenExecutionRequest setBuilderId( String builderId );
+
+    /**
+     * Controls the {@link Builder} used by Maven by specification of the builders id.
+     * 
+     * @since 3.2.0
+     */
+    String getBuilderId();
 
 }

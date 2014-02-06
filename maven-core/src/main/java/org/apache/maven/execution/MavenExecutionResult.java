@@ -67,5 +67,4 @@ public interface MavenExecutionResult
      * @param summary The build summary to add, must not be {@code null}.
      */
     void addBuildSummary( BuildSummary summary );
-
 }

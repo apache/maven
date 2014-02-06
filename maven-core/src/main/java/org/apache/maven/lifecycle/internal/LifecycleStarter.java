@@ -19,25 +19,24 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.lifecycle.NoGoalSpecifiedException;
+import org.apache.maven.lifecycle.internal.builder.Builder;
+import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import java.util.List;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Starts the build life cycle
+ * 
  * @author Jason van Zyl
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
@@ -45,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 @Component( role = LifecycleStarter.class )
 public class LifecycleStarter
 {
-
     @Requirement
     private ExecutionEventCatapult eventCatapult;
 
@@ -54,15 +52,6 @@ public class LifecycleStarter
 
     @Requirement
     private Logger logger;
-
-    @Requirement
-    private LifecycleModuleBuilder lifecycleModuleBuilder;
-
-    @Requirement
-    private LifecycleWeaveBuilder lifeCycleWeaveBuilder;
-
-    @Requirement
-    private LifecycleThreadedBuilder lifecycleThreadedBuilder;
 
     @Requirement
     private BuildListCalculator buildListCalculator;
@@ -74,30 +63,27 @@ public class LifecycleStarter
     private LifecycleTaskSegmentCalculator lifecycleTaskSegmentCalculator;
 
     @Requirement
-    private ThreadConfigurationService threadConfigService;
+    private Map<String, Builder> builders;
 
     public void execute( MavenSession session )
     {
         eventCatapult.fire( ExecutionEvent.Type.SessionStarted, session, null );
 
+        ReactorContext reactorContext = null;
+        ProjectBuildList projectBuilds = null;
         MavenExecutionResult result = session.getResult();
 
         try
         {
-            if ( !session.isUsingPOMsFromFilesystem() && lifecycleTaskSegmentCalculator.requiresProject( session ) )
+            if ( buildExecutionRequiresProject( session ) && projectIsNotPresent( session ) )
             {
                 throw new MissingProjectException( "The goal you specified requires a project to execute"
                     + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
                     + " Please verify you invoked Maven from the correct directory." );
             }
 
-            final MavenExecutionRequest executionRequest = session.getRequest();
-            boolean isThreaded = executionRequest.isThreadConfigurationPresent();
-            session.setParallel( isThreaded );
-
             List<TaskSegment> taskSegments = lifecycleTaskSegmentCalculator.calculateTaskSegments( session );
-
-            ProjectBuildList projectBuilds = buildListCalculator.calculateProjectBuilds( session, taskSegments );
+            projectBuilds = buildListCalculator.calculateProjectBuilds( session, taskSegments );
 
             if ( projectBuilds.isEmpty() )
             {
@@ -115,51 +101,19 @@ public class LifecycleStarter
             }
 
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
-
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus( session.getProjectDependencyGraph() );
-            ReactorContext callableContext =
-                new ReactorContext( result, projectIndex, oldContextClassLoader, reactorBuildStatus );
+            reactorContext = new ReactorContext( result, projectIndex, oldContextClassLoader, reactorBuildStatus );
 
-            if ( isThreaded )
+            String builderId = session.getRequest().getBuilderId();
+            Builder builder = builders.get( builderId );
+            if ( builder == null )
             {
-                ExecutorService executor =
-                    threadConfigService.getExecutorService( executionRequest.getThreadCount(),
-                                                            executionRequest.isPerCoreThreadCount(),
-                                                            session.getProjects().size() );
-                try
-                {
-
-                    final boolean isWeaveMode = LifecycleWeaveBuilder.isWeaveMode( executionRequest );
-                    if ( isWeaveMode )
-                    {
-                        lifecycleDebugLogger.logWeavePlan( session );
-                        lifeCycleWeaveBuilder.build( projectBuilds, callableContext, taskSegments, session, executor,
-                                                     reactorBuildStatus );
-                    }
-                    else
-                    {
-                        ConcurrencyDependencyGraph analyzer =
-                            new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
-
-                        CompletionService<ProjectSegment> service =
-                            new ExecutorCompletionService<ProjectSegment>( executor );
-
-                        lifecycleThreadedBuilder.build( session, callableContext, projectBuilds, taskSegments, analyzer,
-                                                        service );
-                    }
-                }
-                finally
-                {
-                    executor.shutdown();
-                    // If the builder has terminated with an exception we want to catch any stray threads before going
-                    // to System.exit in the mavencli.
-                    executor.awaitTermination( 5, TimeUnit.SECONDS ) ;
-                }
+                throw new BuilderNotFoundException( String.format( "The builder requested using id = %s cannot be found", builderId ) );
             }
-            else
-            {
-                singleThreadedBuild( session, callableContext, projectBuilds, taskSegments, reactorBuildStatus );
-            }
+
+            logger.info( "" );
+            logger.info( String.format( "Using the builder %s", builder.getClass().getName() ) );
+            builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
 
         }
         catch ( Exception e )
@@ -170,29 +124,13 @@ public class LifecycleStarter
         eventCatapult.fire( ExecutionEvent.Type.SessionEnded, session, null );
     }
 
-    private void singleThreadedBuild( MavenSession session, ReactorContext callableContext,
-                                      ProjectBuildList projectBuilds, List<TaskSegment> taskSegments,
-                                      ReactorBuildStatus reactorBuildStatus )
+    private boolean buildExecutionRequiresProject( MavenSession session )
     {
-        for ( TaskSegment taskSegment : taskSegments )
-        {
-            for ( ProjectSegment projectBuild : projectBuilds.getByTaskSegment( taskSegment ) )
-            {
-                try
-                {
-                    lifecycleModuleBuilder.buildProject( session, callableContext, projectBuild.getProject(),
-                                                         taskSegment );
-                    if ( reactorBuildStatus.isHalted() )
-                    {
-                        break;
-                    }
-                }
-                catch ( Exception e )
-                {
-                    break;  // Why are we just ignoring this exception? Are exceptions are being used for flow control
-                }
+        return lifecycleTaskSegmentCalculator.requiresProject( session );
+    }
 
-            }
-        }
+    private boolean projectIsNotPresent( MavenSession session )
+    {
+        return !session.getRequest().isProjectPresent();
     }
 }

@@ -254,6 +254,7 @@ public class MavenSession
         return request.getBaseDirectory();
     }
 
+    @Deprecated
     public boolean isUsingPOMsFromFilesystem()
     {
         return request.isProjectPresent();

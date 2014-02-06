@@ -113,13 +113,15 @@ class DefaultProjectDependencyGraph
 
     private List<MavenProject> getProjects( Collection<String> projectIds )
     {
-        List<MavenProject> projects = new ArrayList<MavenProject>();
+        List<MavenProject> projects = new ArrayList<MavenProject>( projectIds.size() );
 
-        for ( MavenProject p : sorter.getSortedProjects() )
+        for ( String projectId : projectIds )
         {
-            if ( projectIds.contains( ProjectSorter.getId( p ) ) )
+            MavenProject project = sorter.getProjectMap().get( projectId );
+
+            if ( project != null )
             {
-                projects.add( p );
+                projects.add( project );
             }
         }
 

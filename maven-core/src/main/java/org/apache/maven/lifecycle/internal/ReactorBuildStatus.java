@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 
 import java.util.Collection;

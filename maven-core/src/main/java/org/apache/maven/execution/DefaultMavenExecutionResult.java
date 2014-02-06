@@ -28,6 +28,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 
+import com.google.common.collect.Maps;
+
 /** @author Jason van Zyl */
 public class DefaultMavenExecutionResult
     implements MavenExecutionResult
@@ -40,7 +42,7 @@ public class DefaultMavenExecutionResult
 
     private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
-    private Map<MavenProject, BuildSummary> buildSummaries;
+    private Map<MavenProject, BuildSummary> buildSummaries = Maps.newIdentityHashMap();
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -63,7 +65,8 @@ public class DefaultMavenExecutionResult
 
     public List<MavenProject> getTopologicallySortedProjects()
     {
-        return null == topologicallySortedProjects ? Collections.<MavenProject> emptyList() : topologicallySortedProjects;
+        return null == topologicallySortedProjects ? Collections.<MavenProject> emptyList()
+                        : topologicallySortedProjects;
     }
 
     public DependencyResolutionResult getDependencyResolutionResult()
@@ -108,5 +111,4 @@ public class DefaultMavenExecutionResult
         }
         buildSummaries.put( summary.getProject(), summary );
     }
-
 }

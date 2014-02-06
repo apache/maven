@@ -56,7 +56,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.lifecycle.internal.LifecycleWeaveBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
@@ -1068,25 +1067,47 @@ public class MavenCli
         {
             request.setLocalRepositoryPath( localRepoProperty );
         }
-
-        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
-            ? commandLine.getOptionValue( CLIManager.THREADS )
-            : request.getSystemProperties().getProperty(
-                MavenCli.THREADS_DEPRECATED ); // TODO: Remove this setting. Note that the int-tests use it
-
-        if ( threadConfiguration != null )
-        {
-            request.setPerCoreThreadCount( threadConfiguration.contains( "C" ) );
-            if ( threadConfiguration.contains( "W" ) )
-            {
-                LifecycleWeaveBuilder.setWeaveMode( request.getUserProperties() );
-            }
-            request.setThreadCount( threadConfiguration.replace( "C", "" ).replace( "W", "" ).replace( "auto", "" ) );
-        }
+        
 
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );
 
+        // 
+        // Builder, concurrency and parallelism
+        //
+        // We preserve the existing methods for builder selection which is to look for various inputs in the threading
+        // configuration. We don't have an easy way to allow a pluggable builder to provide its own configuration parameters
+        // but this is sufficient for now. Ultimately we want components like Builders to provide a way to extend the command
+        // line to accept its own configuration parameters. 
+        //
+        final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
+            ? commandLine.getOptionValue( CLIManager.THREADS )
+            : request.getSystemProperties().getProperty(
+                MavenCli.THREADS_DEPRECATED ); // TODO: Remove this setting. Note that the int-tests use it
+        
+        if ( threadConfiguration != null )
+        {
+            if ( threadConfiguration.contains( "W" ) )
+            {
+                request.setBuilderId( "weave" );
+            }
+            else 
+            {
+                request.setBuilderId( "multithreaded" );
+            }
+            
+            int threads =
+                threadConfiguration.contains( "C" ) ? Integer.valueOf( threadConfiguration.replace( "C", "" ) )
+                    * Runtime.getRuntime().availableProcessors() : Integer.valueOf( threadConfiguration );
+                    
+            request.setDegreeOfConcurrency(threads);
+        }         
+                
+        if ( commandLine.hasOption( CLIManager.BUILDER ) )
+        {          
+            request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
+        }        
+        
         return request;
     }
 

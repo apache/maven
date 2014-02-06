@@ -141,4 +141,16 @@ public class ProjectBuildList
     {
         return items.isEmpty();
     }
+
+    /**
+     * @return a set of all the projects managed by the build
+     */
+	public Set<MavenProject> getProjects() {
+		Set<MavenProject> projects = new HashSet<MavenProject>();
+		
+		for (ProjectSegment s : items) {
+			projects.add(s.getProject());
+		}
+		return projects;
+	}
 }

@@ -212,7 +212,7 @@ public class ExecutionEventLogger
 
         long time = finish.getTime() - session.getRequest().getStartTime().getTime();
 
-        String wallClock = session.getRequest().isThreadConfigurationPresent() ? " (Wall Clock)" : "";
+        String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
 
         logger.info( "Total time: " + getFormattedTime( time ) + wallClock );
 

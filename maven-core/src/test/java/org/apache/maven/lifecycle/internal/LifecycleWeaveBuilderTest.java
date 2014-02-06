@@ -16,11 +16,14 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
+import org.apache.maven.lifecycle.internal.builder.weave.WeaveBuilder;
 import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
 import org.apache.maven.lifecycle.internal.stub.LifecycleExecutionPlanCalculatorStub;
 import org.apache.maven.lifecycle.internal.stub.LifecycleTaskSegmentCalculatorStub;
@@ -93,10 +96,10 @@ public class LifecycleWeaveBuilderTest
             ProjectBuildList projectBuildList = buildListCalculator.calculateProjectBuilds( session, taskSegments );
 
             final MojoExecutorStub mojoExecutorStub = new MojoExecutorStub();
-            final LifecycleWeaveBuilder builder = getWeaveBuilder( mojoExecutorStub );
+            final WeaveBuilder builder = getWeaveBuilder( mojoExecutorStub );
             final ReactorContext buildContext = createBuildContext( session );
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus( session.getProjectDependencyGraph() );
-            builder.build( projectBuildList, buildContext, taskSegments, session, service, reactorBuildStatus );
+            builder.build( session, buildContext, projectBuildList, taskSegments, reactorBuildStatus );
 
             LifecycleExecutionPlanCalculatorStub lifecycleExecutionPlanCalculatorStub =
                 new LifecycleExecutionPlanCalculatorStub();
@@ -123,11 +126,11 @@ public class LifecycleWeaveBuilderTest
         return new ReactorContext( mavenExecutionResult, null, null, reactorBuildStatus );
     }
 
-    private LifecycleWeaveBuilder getWeaveBuilder( MojoExecutor mojoExecutor )
+    private WeaveBuilder getWeaveBuilder( MojoExecutor mojoExecutor )
     {
         final BuilderCommon builderCommon = getBuilderCommon();
         final LoggerStub loggerStub = new LoggerStub();
-        return new LifecycleWeaveBuilder( mojoExecutor, builderCommon, loggerStub, new ExecutionEventCatapultStub() );
+        return new WeaveBuilder( mojoExecutor, builderCommon, loggerStub, new ExecutionEventCatapultStub(), new LifecycleDebugLogger( loggerStub ) );
     }
 
     private BuilderCommon getBuilderCommon()

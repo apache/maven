@@ -101,7 +101,7 @@ public class DefaultMavenExecutionRequest
     private String reactorFailureBehavior = REACTOR_FAIL_FAST;
 
     private List<String> selectedProjects;
-    
+
     private List<String> excludedProjects;
 
     private String resumeFrom;
@@ -134,13 +134,13 @@ public class DefaultMavenExecutionRequest
 
     private ExecutionListener executionListener;
 
-    private String threadCount;
+    private int degreeOfConcurrency = 1;
 
-    private boolean perCoreThreadCount;
+    private String builderId = "singlethreaded";
 
     /**
      * Suppress SNAPSHOT updates.
-     *
+     * 
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;
@@ -169,8 +169,7 @@ public class DefaultMavenExecutionRequest
         copy.setUserSettingsFile( original.getUserSettingsFile() );
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
         copy.setUserToolchainsFile( original.getUserToolchainsFile() );
-        copy.setBaseDirectory( ( original.getBaseDirectory() != null )
-                               ? new File( original.getBaseDirectory() ) : null );
+        copy.setBaseDirectory( ( original.getBaseDirectory() != null ) ? new File( original.getBaseDirectory() ) : null );
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
         copy.setPom( original.getPom() );
@@ -260,7 +259,7 @@ public class DefaultMavenExecutionRequest
 
         return selectedProjects;
     }
-    
+
     public List<String> getExcludedProjects()
     {
         if ( excludedProjects == null )
@@ -981,7 +980,7 @@ public class DefaultMavenExecutionRequest
         return pluginArtifactRepositories;
     }
 
-    //TODO: this does not belong here.
+    // TODO: this does not belong here.
     public ProjectBuildingRequest getProjectBuildingRequest()
     {
         if ( projectBuildingRequest == null )
@@ -1046,29 +1045,14 @@ public class DefaultMavenExecutionRequest
         return this;
     }
 
-    public String getThreadCount()
+    public void setDegreeOfConcurrency( final int degreeOfConcurrency )
     {
-        return threadCount;
+        this.degreeOfConcurrency = degreeOfConcurrency;
     }
 
-    public void setThreadCount( String threadCount )
+    public int getDegreeOfConcurrency()
     {
-        this.threadCount = threadCount;
-    }
-
-    public boolean isThreadConfigurationPresent()
-    {
-        return getThreadCount() != null;
-    }
-
-    public boolean isPerCoreThreadCount()
-    {
-        return perCoreThreadCount;
-    }
-
-    public void setPerCoreThreadCount( boolean perCoreThreadCount )
-    {
-        this.perCoreThreadCount = perCoreThreadCount;
+        return degreeOfConcurrency;
     }
 
     public WorkspaceReader getWorkspaceReader()
@@ -1113,5 +1097,16 @@ public class DefaultMavenExecutionRequest
     {
         this.useSimpleLocalRepositoryManager = useSimpleLocalRepositoryManager;
         return this;
+    }
+
+    public MavenExecutionRequest setBuilderId( String builderId )
+    {
+        this.builderId = builderId;
+        return this;
+    }
+
+    public String getBuilderId()
+    {
+        return builderId;
     }
 }

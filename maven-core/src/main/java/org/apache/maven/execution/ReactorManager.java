@@ -176,11 +176,6 @@ public class ReactorManager
         return sorter.getSortedProjects();
     }
 
-    public MavenProject getTopLevelProject()
-    {
-        return sorter.getTopLevelProject();
-    }
-
     public boolean hasBuildSuccess( MavenProject project )
     {
         return buildSuccessesByProject.containsKey( getProjectKey( project ) );

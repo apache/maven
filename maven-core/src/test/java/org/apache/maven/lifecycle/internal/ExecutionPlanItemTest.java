@@ -16,6 +16,7 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.lifecycle.Schedule;
 import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
 import org.apache.maven.plugin.MojoExecution;

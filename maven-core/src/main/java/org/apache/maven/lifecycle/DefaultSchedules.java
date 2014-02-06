@@ -19,8 +19,8 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
-import org.apache.maven.lifecycle.internal.BuilderCommon;
 import org.apache.maven.lifecycle.internal.ExecutionPlanItem;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 

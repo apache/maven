@@ -19,6 +19,7 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
 
 import java.util.HashMap;
