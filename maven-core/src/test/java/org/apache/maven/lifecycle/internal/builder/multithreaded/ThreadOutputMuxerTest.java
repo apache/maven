@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.internal;
+package org.apache.maven.lifecycle.internal.builder.multithreaded;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -16,9 +16,13 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import junit.framework.TestCase;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+import org.apache.maven.lifecycle.internal.ProjectBuildList;
+import org.apache.maven.lifecycle.internal.ProjectSegment;
+import org.apache.maven.lifecycle.internal.builder.multithreaded.ThreadOutputMuxer;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoNotFoundException;

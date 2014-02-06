@@ -1,4 +1,4 @@
-package org.apache.maven.lifecycle.internal;
+package org.apache.maven.lifecycle.internal.builder.multithreaded;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -28,6 +28,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.lifecycle.internal.ProjectBuildList;
+import org.apache.maven.lifecycle.internal.ProjectSegment;
 
 /**
  * @since 3.0

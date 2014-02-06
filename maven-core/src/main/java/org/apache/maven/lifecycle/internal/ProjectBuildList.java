@@ -119,7 +119,7 @@ public class ProjectBuildList
         return items.size();
     }
 
-    ProjectSegment get( int index )
+    public ProjectSegment get( int index )
     {
         return items.get( index );
     }

@@ -37,7 +37,6 @@ import org.apache.maven.lifecycle.internal.ProjectSegment;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
-import org.apache.maven.lifecycle.internal.ThreadOutputMuxer;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
