@@ -104,12 +104,10 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // Tests that don't run stable and need to be fixed
         // -------------------------------------------------------------------------------------------------------------
-        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
-
+        // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137        
+        suite.addTestSuite( MavenITmng5576CdFriendlyVersions.class );
         suite.addTestSuite( MavenITmng5530MojoExecutionScopeTest.class );
         //suite.addTestSuite( MavenITmng5208EventSpyParallelTest.class );
-        
-
         suite.addTestSuite( MavenITmng5482AetherNotFoundTest.class );
         suite.addTestSuite( MavenITmng5445LegacyStringSearchModelInterpolatorTest.class );
         suite.addTestSuite( MavenITmng5389LifecycleParticipantAfterSessionEnd.class );
