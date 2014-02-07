@@ -120,8 +120,10 @@ public class LifecycleStarter
         {
             result.addException( e );
         }
-
-        eventCatapult.fire( ExecutionEvent.Type.SessionEnded, session, null );
+        finally
+        {
+            eventCatapult.fire( ExecutionEvent.Type.SessionEnded, session, null );
+        }
     }
 
     private boolean buildExecutionRequiresProject( MavenSession session )
