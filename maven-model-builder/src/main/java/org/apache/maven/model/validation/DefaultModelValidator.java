@@ -106,7 +106,7 @@ public class DefaultModelValidator
             validateStringNoExpression( "artifactId", problems, Severity.WARNING, Version.V20, model.getArtifactId(), model );
             validateStringNotEmpty( "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model );
 
-            validateStringNoExpression( "version", problems, Severity.WARNING, Version.V20, model.getVersion(), model );
+            validateVersionNoExpression( "version", problems, Severity.WARNING, Version.V20, model.getVersion(), model );
             if ( parent == null )
             {
                 validateStringNotEmpty( "version", problems, Severity.FATAL, Version.V20, model.getVersion(), model );
@@ -681,6 +681,32 @@ public class DefaultModelValidator
         return false;
     }
 
+    private boolean validateVersionNoExpression(String fieldName, ModelProblemCollector problems, Severity severity, Version version, 
+                                                String string, InputLocationTracker tracker) 
+    {
+      
+      if ( !hasExpression( string ) ) 
+      {
+          return true;
+      }
+  
+      //
+      // Acceptable versions for continuous delivery
+      //
+      // changelist
+      // revision
+      // sha1
+      //
+      if( string.trim().contains("${changelist}") || string.trim().contains("${revision}") || string.trim().contains("${sha1}") ) 
+      {
+          return true;  
+      }
+      
+      addViolation(problems, severity, version, fieldName, null, "contains an expression but should be a constant.", tracker);
+  
+      return false;
+    }    
+    
     private boolean hasExpression( String value )
     {
         return value != null && value.contains( "${" );
