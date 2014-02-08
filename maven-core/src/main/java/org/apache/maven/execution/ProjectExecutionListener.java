@@ -29,7 +29,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
  * @since 3.1.2
  * @provisional This interface is part of work in progress and can be changed or removed without notice.
  */
-interface ProjectExecutionListener
+public interface ProjectExecutionListener
 {
     void beforeProjectExecution( ProjectExecutionEvent event )
         throws LifecycleExecutionException;
