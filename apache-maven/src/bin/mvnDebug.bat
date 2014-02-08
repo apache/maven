@@ -60,9 +60,9 @@ set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,ad
 if not "%JAVA_HOME%" == "" goto OkJHome
 
 echo.
-echo ERROR: JAVA_HOME not found in your environment.
-echo Please set the JAVA_HOME variable in your environment to match the
-echo location of your Java installation
+echo Error: JAVA_HOME not found in your environment. >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation >&2
 echo.
 goto error
 
@@ -70,10 +70,10 @@ goto error
 if exist "%JAVA_HOME%\bin\java.exe" goto chkMHome
 
 echo.
-echo ERROR: JAVA_HOME is set to an invalid directory.
-echo JAVA_HOME = "%JAVA_HOME%"
-echo Please set the JAVA_HOME variable in your environment to match the
-echo location of your Java installation
+echo Error: JAVA_HOME is set to an invalid directory. >&2
+echo JAVA_HOME = "%JAVA_HOME%" >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation >&2
 echo.
 goto error
 
@@ -85,9 +85,9 @@ if "%OS%"=="WINNT" SET "M2_HOME=%~dp0.."
 if not "%M2_HOME%"=="" goto valMHome
 
 echo.
-echo ERROR: M2_HOME not found in your environment.
-echo Please set the M2_HOME variable in your environment to match the
-echo location of the Maven installation
+echo Error: M2_HOME not found in your environment. >&2
+echo Please set the M2_HOME variable in your environment to match the >&2
+echo location of the Maven installation >&2
 echo.
 goto error
 
@@ -102,10 +102,10 @@ goto stripMHome
 if exist "%M2_HOME%\bin\mvn.bat" goto init
 
 echo.
-echo ERROR: M2_HOME is set to an invalid directory.
-echo M2_HOME = "%M2_HOME%"
-echo Please set the M2_HOME variable in your environment to match the
-echo location of the Maven installation
+echo Error: M2_HOME is set to an invalid directory. >&2
+echo M2_HOME = "%M2_HOME%" >&2
+echo Please set the M2_HOME variable in your environment to match the >&2
+echo location of the Maven installation >&2
 echo.
 goto error
 @REM ==== END VALIDATION ====
