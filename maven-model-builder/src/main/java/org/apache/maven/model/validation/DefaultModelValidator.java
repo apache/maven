@@ -77,11 +77,14 @@ public class DefaultModelValidator
         Parent parent = model.getParent();
         if ( parent != null )
         {
-            validateStringNotEmpty( "parent.groupId", problems, Severity.FATAL, Version.BASE, parent.getGroupId(), parent );
+            validateStringNotEmpty( "parent.groupId", problems, Severity.FATAL, Version.BASE, parent.getGroupId(),
+                                    parent );
 
-            validateStringNotEmpty( "parent.artifactId", problems, Severity.FATAL, Version.BASE, parent.getArtifactId(), parent );
+            validateStringNotEmpty( "parent.artifactId", problems, Severity.FATAL, Version.BASE,
+                                    parent.getArtifactId(), parent );
 
-            validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(), parent );
+            validateStringNotEmpty( "parent.version", problems, Severity.FATAL, Version.BASE, parent.getVersion(),
+                                    parent );
 
             if ( equals( parent.getGroupId(), model.getGroupId() )
                 && equals( parent.getArtifactId(), model.getArtifactId() ) )
@@ -95,7 +98,8 @@ public class DefaultModelValidator
         {
             Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
 
-            validateEnum( "modelVersion", problems, Severity.ERROR, Version.V20, model.getModelVersion(), null, model, "4.0.0" );
+            validateEnum( "modelVersion", problems, Severity.ERROR, Version.V20, model.getModelVersion(), null, model,
+                          "4.0.0" );
 
             validateStringNoExpression( "groupId", problems, Severity.WARNING, Version.V20, model.getGroupId(), model );
             if ( parent == null )
@@ -103,7 +107,8 @@ public class DefaultModelValidator
                 validateStringNotEmpty( "groupId", problems, Severity.FATAL, Version.V20, model.getGroupId(), model );
             }
 
-            validateStringNoExpression( "artifactId", problems, Severity.WARNING, Version.V20, model.getArtifactId(), model );
+            validateStringNoExpression( "artifactId", problems, Severity.WARNING, Version.V20, model.getArtifactId(),
+                                        model );
             validateStringNotEmpty( "artifactId", problems, Severity.FATAL, Version.V20, model.getArtifactId(), model );
 
             validateVersionNoExpression( "version", problems, Severity.WARNING, Version.V20, model.getVersion(), model );
@@ -117,13 +122,13 @@ public class DefaultModelValidator
             if ( model.getDependencyManagement() != null )
             {
                 validate20RawDependencies( problems, model.getDependencyManagement().getDependencies(),
-                                      "dependencyManagement.dependencies.dependency", request );
+                                           "dependencyManagement.dependencies.dependency", request );
             }
 
             validateRawRepositories( problems, model.getRepositories(), "repositories.repository", request );
 
             validateRawRepositories( problems, model.getPluginRepositories(), "pluginRepositories.pluginRepository",
-                                  request );
+                                     request );
 
             Build build = model.getBuild();
             if ( build != null )
@@ -133,8 +138,7 @@ public class DefaultModelValidator
                 PluginManagement mngt = build.getPluginManagement();
                 if ( mngt != null )
                 {
-                    validate20RawPlugins( problems, mngt.getPlugins(), "build.pluginManagement.plugins.plugin",
-                                        request );
+                    validate20RawPlugins( problems, mngt.getPlugins(), "build.pluginManagement.plugins.plugin", request );
                 }
             }
 
@@ -681,32 +685,34 @@ public class DefaultModelValidator
         return false;
     }
 
-    private boolean validateVersionNoExpression(String fieldName, ModelProblemCollector problems, Severity severity, Version version, 
-                                                String string, InputLocationTracker tracker) 
+    private boolean validateVersionNoExpression( String fieldName, ModelProblemCollector problems, Severity severity,
+                                                 Version version, String string, InputLocationTracker tracker )
     {
-      
-      if ( !hasExpression( string ) ) 
-      {
-          return true;
-      }
-  
-      //
-      // Acceptable versions for continuous delivery
-      //
-      // changelist
-      // revision
-      // sha1
-      //
-      if( string.trim().contains("${changelist}") || string.trim().contains("${revision}") || string.trim().contains("${sha1}") ) 
-      {
-          return true;  
-      }
-      
-      addViolation(problems, severity, version, fieldName, null, "contains an expression but should be a constant.", tracker);
-  
-      return false;
-    }    
-    
+
+        if ( !hasExpression( string ) )
+        {
+            return true;
+        }
+
+        //
+        // Acceptable versions for continuous delivery
+        //
+        // changelist
+        // revision
+        // sha1
+        //
+        if ( string.trim().contains( "${changelist}" ) || string.trim().contains( "${revision}" )
+            || string.trim().contains( "${sha1}" ) )
+        {
+            return true;
+        }
+
+        addViolation( problems, severity, version, fieldName, null, "contains an expression but should be a constant.",
+                      tracker );
+
+        return false;
+    }
+
     private boolean hasExpression( String value )
     {
         return value != null && value.contains( "${" );
@@ -764,8 +770,8 @@ public class DefaultModelValidator
         return false;
     }
 
-    private boolean validateBoolean( String fieldName, ModelProblemCollector problems, Severity severity, Version version,
-                                     String string, String sourceHint, InputLocationTracker tracker )
+    private boolean validateBoolean( String fieldName, ModelProblemCollector problems, Severity severity,
+                                     Version version, String string, String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -777,14 +783,14 @@ public class DefaultModelValidator
             return true;
         }
 
-        addViolation( problems, severity, version, fieldName, sourceHint, "must be 'true' or 'false' but is '" + string + "'.",
-                      tracker );
+        addViolation( problems, severity, version, fieldName, sourceHint, "must be 'true' or 'false' but is '" + string
+            + "'.", tracker );
 
         return false;
     }
 
-    private boolean validateEnum( String fieldName, ModelProblemCollector problems, Severity severity, Version version, String string,
-                                  String sourceHint, InputLocationTracker tracker, String... validValues )
+    private boolean validateEnum( String fieldName, ModelProblemCollector problems, Severity severity, Version version,
+                                  String string, String sourceHint, InputLocationTracker tracker, String... validValues )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -804,9 +810,9 @@ public class DefaultModelValidator
         return false;
     }
 
-    private boolean validateBannedCharacters( String fieldName, ModelProblemCollector problems, Severity severity, Version version, 
-                                              String string, String sourceHint, InputLocationTracker tracker,
-                                              String banned )
+    private boolean validateBannedCharacters( String fieldName, ModelProblemCollector problems, Severity severity,
+                                              Version version, String string, String sourceHint,
+                                              InputLocationTracker tracker, String banned )
     {
         if ( string != null )
         {
@@ -825,8 +831,8 @@ public class DefaultModelValidator
         return true;
     }
 
-    private boolean validateVersion( String fieldName, ModelProblemCollector problems, Severity severity, Version version,
-                                     String string, String sourceHint, InputLocationTracker tracker )
+    private boolean validateVersion( String fieldName, ModelProblemCollector problems, Severity severity,
+                                     Version version, String string, String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -845,8 +851,9 @@ public class DefaultModelValidator
 
     }
 
-    private boolean validate20ProperSnapshotVersion( String fieldName, ModelProblemCollector problems, Severity severity, Version version,
-                                                   String string, String sourceHint, InputLocationTracker tracker )
+    private boolean validate20ProperSnapshotVersion( String fieldName, ModelProblemCollector problems,
+                                                     Severity severity, Version version, String string,
+                                                     String sourceHint, InputLocationTracker tracker )
     {
         if ( string == null || string.length() <= 0 )
         {
@@ -855,8 +862,8 @@ public class DefaultModelValidator
 
         if ( string.endsWith( "SNAPSHOT" ) && !string.endsWith( "-SNAPSHOT" ) )
         {
-            addViolation( problems, severity, version, fieldName, sourceHint, "uses an unsupported snapshot version format"
-                + ", should be '*-SNAPSHOT' instead.", tracker );
+            addViolation( problems, severity, version, fieldName, sourceHint,
+                          "uses an unsupported snapshot version format" + ", should be '*-SNAPSHOT' instead.", tracker );
             return false;
         }
 
@@ -864,8 +871,8 @@ public class DefaultModelValidator
     }
 
     private boolean validate20PluginVersion( String fieldName, ModelProblemCollector problems, String string,
-                                           String sourceHint, InputLocationTracker tracker,
-                                           ModelBuildingRequest request )
+                                             String sourceHint, InputLocationTracker tracker,
+                                             ModelBuildingRequest request )
     {
         if ( string == null )
         {
@@ -882,16 +889,16 @@ public class DefaultModelValidator
 
         if ( string.length() <= 0 || "RELEASE".equals( string ) || "LATEST".equals( string ) )
         {
-            addViolation( problems, errOn30, Version.V20, fieldName, sourceHint, "must be a valid version but is '" + string + "'.",
-                          tracker );
+            addViolation( problems, errOn30, Version.V20, fieldName, sourceHint, "must be a valid version but is '"
+                + string + "'.", tracker );
             return false;
         }
 
         return true;
     }
 
-    private static void addViolation( ModelProblemCollector problems, Severity severity, Version version, String fieldName,
-                                      String sourceHint, String message, InputLocationTracker tracker )
+    private static void addViolation( ModelProblemCollector problems, Severity severity, Version version,
+                                      String fieldName, String sourceHint, String message, InputLocationTracker tracker )
     {
         StringBuilder buffer = new StringBuilder( 256 );
         buffer.append( '\'' ).append( fieldName ).append( '\'' );

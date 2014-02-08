@@ -1093,7 +1093,7 @@ public class MavenCli
                 threadConfiguration.contains( "C" ) ? Integer.valueOf( threadConfiguration.replace( "C", "" ) )
                     * Runtime.getRuntime().availableProcessors() : Integer.valueOf( threadConfiguration );
                     
-            request.setDegreeOfConcurrency(threads);
+            request.setDegreeOfConcurrency( threads );
         }         
                 
         if ( commandLine.hasOption( CLIManager.BUILDER ) )
