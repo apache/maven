@@ -51,7 +51,7 @@ public class MavenITBootstrapTest
         verifier.setAutoclean( false );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.executeGoal( "test-compile" );
+        verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
