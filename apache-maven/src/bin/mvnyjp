@@ -191,7 +191,7 @@ if $cygwin; then
 fi
 
 if [ ! -f "$YJPLIB" ]; then
-  echo "Unable to autodetect the YJP library location. Please set YJPLIB variable"
+  echo "Error: Unable to autodetect the YJP library location. Please set YJPLIB variable"
   exit 1
 fi
 
