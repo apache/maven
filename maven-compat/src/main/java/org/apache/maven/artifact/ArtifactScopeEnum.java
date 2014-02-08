@@ -91,7 +91,7 @@ public enum ArtifactScopeEnum
         }
     }
 
-    private static final ArtifactScopeEnum [][][] _compliancySets = {
+    private static final ArtifactScopeEnum [][][] COMPLIANCY_SETS = {
           { { compile  }, { compile,                provided, system } }
         , { { test     }, { compile, test,          provided, system } }
         , { { runtime  }, { compile,       runtime,           system } }
@@ -114,7 +114,7 @@ public enum ArtifactScopeEnum
             return scope.id == system.id;
         }
 
-        for ( ArtifactScopeEnum[][] set : _compliancySets )
+        for ( ArtifactScopeEnum[][] set : COMPLIANCY_SETS )
         {
             if ( id == set[0][0].id )
             {

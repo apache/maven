@@ -19,7 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.DuplicateProjectException;
@@ -29,7 +28,6 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,9 +47,9 @@ public class ReactorManager
     // make projects that depend on me, and projects that I depend on
     public static final String MAKE_BOTH_MODE = "make-both";
 
-    private List blackList = new ArrayList();
+    private List<String> blackList = new ArrayList<String>();
 
-    private Map buildFailuresByProject = new HashMap();
+    private Map<String, BuildFailure> buildFailuresByProject = new HashMap<String, BuildFailure>();
 
     private Map pluginContextsByProjectAndPluginKey = new HashMap();
 
@@ -59,9 +57,9 @@ public class ReactorManager
 
     private final ProjectSorter sorter;
 
-    private Map buildSuccessesByProject = new HashMap();
+    private Map<String, BuildSuccess> buildSuccessesByProject = new HashMap<String, BuildSuccess>();
 
-    public ReactorManager( List projects )
+    public ReactorManager( List<MavenProject> projects )
         throws CycleDetectedException, DuplicateProjectException
     {
         this.sorter = new ProjectSorter( projects );
@@ -123,16 +121,14 @@ public class ReactorManager
         {
             blackList.add( id );
 
-            List dependents = sorter.getDependents( id );
+            List<String> dependents = sorter.getDependents( id );
 
             if ( dependents != null && !dependents.isEmpty() )
             {
-                for ( Object dependent : dependents )
+                for ( String dependentId : dependents )
                 {
-                    String dependentId = (String) dependent;
-
-                    if ( !buildSuccessesByProject.containsKey( dependentId ) && !buildFailuresByProject.containsKey(
-                        dependentId ) )
+                    if ( !buildSuccessesByProject.containsKey( dependentId )
+                        && !buildFailuresByProject.containsKey( dependentId ) )
                     {
                         blackList( dependentId );
                     }

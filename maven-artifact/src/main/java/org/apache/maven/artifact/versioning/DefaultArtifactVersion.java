@@ -176,7 +176,7 @@ public class DefaultArtifactVersion
                 if ( tok.hasMoreTokens() )
                 {
                     qualifier = tok.nextToken();
-                    fallback = Pattern.compile("\\d+").matcher( qualifier ).matches();
+                    fallback = Pattern.compile( "\\d+" ).matcher( qualifier ).matches();
                 }
 
                 // string tokenzier won't detect these and ignores them

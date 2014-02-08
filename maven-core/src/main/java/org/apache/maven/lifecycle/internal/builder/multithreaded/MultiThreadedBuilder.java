@@ -53,7 +53,8 @@ import org.codehaus.plexus.logging.Logger;
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
 @Component( role = Builder.class, hint = "multithreaded" )
-public class MultiThreadedBuilder implements Builder
+public class MultiThreadedBuilder
+    implements Builder
 {
 
     @Requirement
@@ -72,9 +73,12 @@ public class MultiThreadedBuilder implements Builder
                        List<TaskSegment> taskSegments, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException
     {
-        ExecutorService executor = Executors.newFixedThreadPool(Math.min(session.getRequest().getDegreeOfConcurrency(), session.getProjects().size()), new BuildThreadFactory());
-        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>(executor);
-        ConcurrencyDependencyGraph analyzer = new ConcurrencyDependencyGraph(projectBuilds, session.getProjectDependencyGraph());
+        ExecutorService executor =
+            Executors.newFixedThreadPool( Math.min( session.getRequest().getDegreeOfConcurrency(),
+                                                    session.getProjects().size() ), new BuildThreadFactory() );
+        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
+        ConcurrencyDependencyGraph analyzer =
+            new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
         
         // Currently disabled
         ThreadOutputMuxer muxer = null; // new ThreadOutputMuxer( analyzer.getProjectBuilds(), System.out );

@@ -31,11 +31,11 @@ import org.apache.maven.plugin.MojoExecutionException;
  */
 public interface MojoExecutionListener
 {
-    public void beforeMojoExecution( MojoExecutionEvent event )
+    void beforeMojoExecution( MojoExecutionEvent event )
         throws MojoExecutionException;
 
-    public void afterMojoExecutionSuccess( MojoExecutionEvent event )
+    void afterMojoExecutionSuccess( MojoExecutionEvent event )
         throws MojoExecutionException;
 
-    public void afterExecutionFailure( MojoExecutionEvent event );
+    void afterExecutionFailure( MojoExecutionEvent event );
 }

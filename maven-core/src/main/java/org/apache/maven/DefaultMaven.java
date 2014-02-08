@@ -320,7 +320,7 @@ public class DefaultMaven
             {
                 afterSessionEnd( projects, session );
             } 
-            catch (MavenExecutionException e) 
+            catch ( MavenExecutionException e )
             {
                 return addExceptionToResult( result, e );
             }
@@ -349,7 +349,7 @@ public class DefaultMaven
         {
             afterSessionEnd( projects, session );
         } 
-        catch (MavenExecutionException e) 
+        catch ( MavenExecutionException e )
         {
             return addExceptionToResult( result, e );
         }
