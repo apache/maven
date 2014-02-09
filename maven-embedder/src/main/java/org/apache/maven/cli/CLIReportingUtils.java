@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.Os;
@@ -41,10 +42,11 @@ public final class CLIReportingUtils
 
     public static final long MB = 1024 * 1024;
 
-    public static final int MS_PER_SEC = 1000;
+    private static final long ONE_SECOND = 1000L;
+    private static final long ONE_MINUTE = 60 * ONE_SECOND;
+    private static final long ONE_HOUR = 60 * ONE_MINUTE;
+    private static final long ONE_DAY = 24 * ONE_HOUR;
 
-    public static final int SEC_PER_MIN = 60;
-    
     public static final String BUILD_VERSION_PROPERTY = "version";
 
     public static String showVersion()
@@ -68,7 +70,7 @@ public final class CLIReportingUtils
 
     /**
      * Create a human readable string containing the Maven version, buildnumber, and time of build
-     * 
+     *
      * @param buildProperties The build properties
      * @return Readable build info
      */
@@ -87,8 +89,7 @@ public final class CLIReportingUtils
             msg += ( rev != null ? rev : "" );
             if ( timestamp != null )
             {
-                SimpleDateFormat fmt = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ssZ" );
-                String ts = fmt.format( new Date( Long.valueOf( timestamp ) ) );
+                String ts = formatTimestamp( Long.valueOf( timestamp ) );
                 msg += ( rev != null ? "; " : "" ) + ts;
             }
             msg += ")";
@@ -146,6 +147,49 @@ public final class CLIReportingUtils
                 }
             }
         }
+    }
+
+    public static String formatTimestamp( long timestamp )
+    {
+        // Manual construction of the tz offset because only Java 7 understands 'ZZ' replacement
+        TimeZone tz = TimeZone.getDefault();
+        int offset = tz.getRawOffset();
+
+        long m = Math.abs( ( offset / ONE_MINUTE ) % 60 );
+        long h = Math.abs( ( offset / ONE_HOUR ) % 24 );
+
+        int offsetDir = (int) Math.signum( (float) offset );
+        char offsetSign = offsetDir >= 0 ? '+' : '-';
+        return String.format( "%tFT%<tT%s%02d:%02d", timestamp, offsetSign, h, m );
+    }
+
+    public static String formatDuration( long duration )
+    {
+        long ms = duration % 1000;
+        long s = ( duration / ONE_SECOND ) % 60;
+        long m = ( duration / ONE_MINUTE ) % 60;
+        long h = ( duration / ONE_HOUR ) % 24;
+        long d = duration / ONE_DAY;
+
+        String format;
+        if ( d > 0 )
+        {
+            format = "%d d %02d:%02d h";
+        }
+        else if ( h > 0 )
+        {
+            format = "%2$02d:%3$02d h";
+        }
+        else if ( m > 0 )
+        {
+            format = "%3$02d:%4$02d min";
+        }
+        else
+        {
+            format = "%4$d.%5$03d s";
+        }
+
+        return String.format( format, d, h, m, s, ms );
     }
 
 }

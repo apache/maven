@@ -19,8 +19,8 @@ package org.apache.maven.cli.event;
  * under the License.
  */
 
-import java.util.Date;
-
+import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
+import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -44,6 +44,7 @@ public class ExecutionEventLogger
     private final Logger logger;
 
     private static final int LINE_LENGTH = 72;
+    private static final int BUILD_TIME_DURATION_LENGTH = 9;
 
     public ExecutionEventLogger()
     {
@@ -71,32 +72,6 @@ public class ExecutionEventLogger
         }
 
         return buffer.toString();
-    }
-
-    private static String getFormattedTime( long time )
-    {
-        // NOTE: DateFormat is not suitable to format timespans of 24h+
-
-        long h = time / ( 60 * 60 * 1000 );
-        long m = ( time - h * 60 * 60 * 1000 ) / ( 60 * 1000 );
-        long s = ( time - h * 60 * 60 * 1000 - m * 60 * 1000 ) / 1000;
-        long ms = time % 1000;
-
-        String format;
-        if ( h > 0 )
-        {
-            format = "%1$d:%2$02d:%3$02d.%4$03ds";
-        }
-        else if ( m > 0 )
-        {
-            format = "%2$d:%3$02d.%4$03ds";
-        }
-        else
-        {
-            format = "%3$d.%4$03ds";
-        }
-
-        return String.format( format, h, m, s, ms );
     }
 
     @Override
@@ -176,13 +151,17 @@ public class ExecutionEventLogger
             else if ( buildSummary instanceof BuildSuccess )
             {
                 buffer.append( "SUCCESS [" );
-                buffer.append( getFormattedTime( buildSummary.getTime() ) );
+                String buildTimeDuration = formatDuration( buildSummary.getTime() );
+                buffer.append( chars( ' ', BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length() ) );
+                buffer.append( buildTimeDuration );
                 buffer.append( "]" );
             }
             else if ( buildSummary instanceof BuildFailure )
             {
                 buffer.append( "FAILURE [" );
-                buffer.append( getFormattedTime( buildSummary.getTime() ) );
+                String buildTimeDuration = formatDuration( buildSummary.getTime() );
+                buffer.append( chars( ' ', BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length() ) );
+                buffer.append( buildTimeDuration );
                 buffer.append( "]" );
             }
 
@@ -208,15 +187,15 @@ public class ExecutionEventLogger
     {
         logger.info( chars( '-', LINE_LENGTH ) );
 
-        Date finish = new Date();
+        long finish = System.currentTimeMillis();
 
-        long time = finish.getTime() - session.getRequest().getStartTime().getTime();
+        long time = finish - session.getRequest().getStartTime().getTime();
 
         String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
 
-        logger.info( "Total time: " + getFormattedTime( time ) + wallClock );
+        logger.info( "Total time: " + formatDuration( time ) + wallClock );
 
-        logger.info( "Finished at: " + finish );
+        logger.info( "Finished at: " + formatTimestamp( finish ) );
 
         System.gc();
 
