@@ -47,7 +47,7 @@ public class InstanceofMojo
     /**
      * The path to the properties file used to track the results of the instanceof tests.
      * 
-     * @parameter expression="${clsldr.instanceofPropertiesFile}"
+     * @parameter property="clsldr.instanceofPropertiesFile"
      */
     private File instanceofPropertiesFile;
 
@@ -55,7 +55,7 @@ public class InstanceofMojo
      * The qualified name of the type to which the objects should be assignment-compatible. This type will be loaded
      * from the plugin class loader, just like as if it was imported in the plugin source code.
      * 
-     * @parameter expression="${clsldr.className}"
+     * @parameter property="clsldr.className"
      */
     private String className;
 

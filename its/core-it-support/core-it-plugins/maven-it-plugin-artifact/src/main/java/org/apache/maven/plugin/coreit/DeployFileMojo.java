@@ -47,42 +47,42 @@ public class DeployFileMojo
     /**
      * The file of the artifact to deploy.
      * 
-     * @parameter expression="${file}"
+     * @parameter property="file"
      */
     private File file;
 
     /**
      * The group id of the artifact.
      * 
-     * @parameter expression="${groupId}"
+     * @parameter property="groupId"
      */
     private String groupId;
 
     /**
      * The artifact id of the artifact.
      * 
-     * @parameter expression="${artifactId}"
+     * @parameter property="artifactId"
      */
     private String artifactId;
 
     /**
      * The version of the artifact.
      * 
-     * @parameter expression="${version}"
+     * @parameter property="version"
      */
     private String version;
 
     /**
      * The URL of the repository to deploy to.
      * 
-     * @parameter expression="${repositoryUrl}"
+     * @parameter property="repositoryUrl"
      */
     private String repositoryUrl;
 
     /**
      * The ID of the repository to deploy to.
      * 
-     * @parameter expression="${repositoryId}"
+     * @parameter property="repositoryId"
      */
     private String repositoryId;
 

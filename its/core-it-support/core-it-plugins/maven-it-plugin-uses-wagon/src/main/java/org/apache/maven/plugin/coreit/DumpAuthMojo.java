@@ -62,7 +62,7 @@ public class DumpAuthMojo
     /**
      * The path to the properties file used to dump the auth infos.
      * 
-     * @parameter expression="${wagon.propertiesFile}"
+     * @parameter property="wagon.propertiesFile"
      */
     private File propertiesFile;
 

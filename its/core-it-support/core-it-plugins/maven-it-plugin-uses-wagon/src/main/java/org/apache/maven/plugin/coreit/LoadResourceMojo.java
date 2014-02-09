@@ -58,7 +58,7 @@ public class LoadResourceMojo
     /**
      * The path to the properties file used to track the results of the resource loading via the wagon's class loader.
      * 
-     * @parameter expression="${wagon.wagonClassLoaderOutput}"
+     * @parameter property="wagon.wagonClassLoaderOutput"
      */
     private File wagonClassLoaderOutput;
 
@@ -66,14 +66,14 @@ public class LoadResourceMojo
      * The role hint for the wagon provider to load. The class loader of this provider will be used to load the
      * resources.
      * 
-     * @parameter expression="${wagon.wagonProtocol}"
+     * @parameter property="wagon.wagonProtocol"
      */
     private String wagonProtocol;
 
     /**
      * The repository to load the wagon for, if applicable.
      * 
-     * @parameter expression="${wagon.repositoryId}"
+     * @parameter property="wagon.repositoryId"
      */
     private String repositoryId;
 

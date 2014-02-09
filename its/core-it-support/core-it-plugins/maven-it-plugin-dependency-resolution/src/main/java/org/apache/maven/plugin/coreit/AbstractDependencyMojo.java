@@ -63,7 +63,7 @@ public abstract class AbstractDependencyMojo
      * as directory separator. For non-positive values, the full/absolute path is returned, using the platform-specific
      * separator.
      * 
-     * @parameter expression="${depres.significantPathLevels}"
+     * @parameter property="depres.significantPathLevels"
      */
     private int significantPathLevels;
 

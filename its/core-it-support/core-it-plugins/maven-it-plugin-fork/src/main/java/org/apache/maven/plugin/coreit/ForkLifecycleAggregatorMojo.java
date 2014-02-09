@@ -37,12 +37,12 @@ public class ForkLifecycleAggregatorMojo
 {
 
     /**
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
      */
     private MavenProject project;
 
     /**
-     * @parameter expression="${reactorProjects}"
+     * @parameter default-value="${reactorProjects}"
      */
     private List reactorProjects;
 

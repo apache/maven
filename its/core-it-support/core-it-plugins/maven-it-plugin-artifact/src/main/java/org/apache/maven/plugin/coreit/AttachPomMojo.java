@@ -54,7 +54,7 @@ public class AttachPomMojo
      * The path to the POM file to attach to the main artifact, relative to the project base directory. The plugin will
      * not validate this path.
      * 
-     * @parameter expression="${artifact.pomFile}" default-value="${project.file.path}"
+     * @parameter property="artifact.pomFile" default-value="${project.file.path}"
      * @required
      */
     private String pomFile;

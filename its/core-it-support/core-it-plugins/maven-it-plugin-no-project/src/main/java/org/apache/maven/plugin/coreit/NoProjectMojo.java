@@ -38,13 +38,13 @@ public class NoProjectMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${project.build.directory}"
+     * @parameter default-value="${project.build.directory}"
      * @required
      */
     private String outputDirectory;
 
     /**
-     * @parameter expression="target/test-basedir-alignment"
+     * @parameter default-value="target/test-basedir-alignment"
      */
     private File basedirAlignmentDirectory;
 

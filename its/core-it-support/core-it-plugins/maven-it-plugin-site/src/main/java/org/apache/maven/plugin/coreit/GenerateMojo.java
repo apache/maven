@@ -70,7 +70,7 @@ public class GenerateMojo
     /**
      * The reports configured for the current build.
      * 
-     * @parameter expression="${reports}"
+     * @parameter default-value="${reports}"
      * @required
      * @readonly
      */

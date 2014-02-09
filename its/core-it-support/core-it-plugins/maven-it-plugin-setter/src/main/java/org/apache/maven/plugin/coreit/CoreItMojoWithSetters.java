@@ -35,7 +35,7 @@ public class CoreItMojoWithSetters
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${project.build.directory}"
+     * @parameter default-value="${project.build.directory}"
      * @required
      */
     private String outputDirectoryValue;

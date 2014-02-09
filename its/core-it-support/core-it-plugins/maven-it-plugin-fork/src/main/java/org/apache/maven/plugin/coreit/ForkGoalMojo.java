@@ -32,12 +32,12 @@ public class ForkGoalMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
      */
     private MavenProject project;
 
     /**
-     * @parameter expression="${executedProject}"
+     * @parameter default-value="${executedProject}"
      */
     private MavenProject executedProject;
 

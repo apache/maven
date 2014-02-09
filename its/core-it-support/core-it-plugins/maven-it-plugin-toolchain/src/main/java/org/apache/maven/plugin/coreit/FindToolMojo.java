@@ -50,7 +50,7 @@ public class FindToolMojo
     /**
      * The current Maven session holding the selected toolchain.
      * 
-     * @parameter expression="${session}"
+     * @parameter default-value="${session}"
      * @required
      * @readonly
      */
@@ -59,21 +59,21 @@ public class FindToolMojo
     /**
      * The path to the output file for the properties.
      * 
-     * @parameter expression="${toolchain.outputFile}" default-value="${project.build.directory}/tool.properties"
+     * @parameter property="toolchain.outputFile" default-value="${project.build.directory}/tool.properties"
      */
     private File outputFile;
 
     /**
      * The type identifier of the toolchain, e.g. "jdk".
      * 
-     * @parameter expression="${toolchain.type}"
+     * @parameter property="toolchain.type"
      */
     private String type;
 
     /**
      * The name of the tool, e.g. "javac".
      * 
-     * @parameter expression="${toolchain.tool}"
+     * @parameter property="toolchain.tool"
      */
     private String tool;
 

@@ -56,7 +56,7 @@ public class LookupWagonMojo
     /**
      * The path to the properties file used to track the results of the wagon lookups.
      * 
-     * @parameter expression="${wagon.outputFile}"
+     * @parameter property="wagon.outputFile"
      */
     private File outputFile;
 

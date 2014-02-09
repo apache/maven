@@ -92,7 +92,7 @@ public class ResolveOneDependencyMojo
     private String scope;
 
     /**
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
      * @required
      */
     MavenProject project;
@@ -112,7 +112,7 @@ public class ResolveOneDependencyMojo
     /**
      * The Maven session.
      * 
-     * @parameter expression="${session}"
+     * @parameter default-value="${session}"
      * @readonly
      * @required
      */

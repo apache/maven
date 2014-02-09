@@ -54,7 +54,7 @@ public class SetMojo
      * The path to the file to set as the main artifact, relative to the project base directory. The plugin will not
      * validate this path.
      * 
-     * @parameter expression="${artifact.mainFile}"
+     * @parameter property="artifact.mainFile"
      * @required
      */
     private String mainFile;

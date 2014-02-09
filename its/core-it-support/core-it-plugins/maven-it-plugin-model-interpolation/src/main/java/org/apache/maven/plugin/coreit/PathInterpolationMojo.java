@@ -36,7 +36,7 @@ public class PathInterpolationMojo
     /** @component */
     private ModelInterpolator modelInterpolator;
 
-    /** @parameter expression="${project}" */
+    /** @parameter default-value="${project}" */
     private MavenProject project;
 
     public void execute()

@@ -37,7 +37,7 @@ public class LogSeparatorMojo
     /**
      * The length of the separator line.
      * 
-     * @parameter expression="${log.length}" default-value="80"
+     * @parameter property="log.length" default-value="80"
      */
     private int length;
 

@@ -69,7 +69,7 @@ public class CheckMojo
     /**
      * The path to the properties file to create.
      * 
-     * @parameter expression="${collections.outputFile}"
+     * @parameter property="collections.outputFile"
      */
     private File outputFile;
 

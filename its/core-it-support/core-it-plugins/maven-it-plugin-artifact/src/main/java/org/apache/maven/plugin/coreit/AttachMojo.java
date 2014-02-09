@@ -59,7 +59,7 @@ public class AttachMojo
     /**
      * The path to the file to attach, relative to the project base directory. The plugin will not validate this path.
      * 
-     * @parameter expression="${artifact.attachedFile}"
+     * @parameter property="artifact.attachedFile"
      * @required
      */
     private String attachedFile;
@@ -67,7 +67,7 @@ public class AttachMojo
     /**
      * The type of the artifact to attach.
      * 
-     * @parameter expression="${artifact.artifactType}"
+     * @parameter property="artifact.artifactType"
      */
     private String artifactType;
 
@@ -75,7 +75,7 @@ public class AttachMojo
      * The classifier for the attached artifact. If unspecified, the default classifier for the specified artifact type
      * is used.
      * 
-     * @parameter expression="${artifact.artifactClassifier}"
+     * @parameter property="artifact.artifactClassifier"
      */
     private String artifactClassifier;
 

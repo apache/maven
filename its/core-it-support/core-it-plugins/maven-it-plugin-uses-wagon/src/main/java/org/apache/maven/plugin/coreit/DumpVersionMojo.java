@@ -60,28 +60,28 @@ public class DumpVersionMojo
     /**
      * The path to the properties file used to dump the auth infos.
      * 
-     * @parameter expression="${wagon.propertiesFile}"
+     * @parameter property="wagon.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * The role hint for the provider of interest.
      * 
-     * @parameter expression="${wagon.providerHint}"
+     * @parameter property="wagon.providerHint"
      */
     private String providerHint;
 
     /**
      * The group id for the provider of interest.
      * 
-     * @parameter expression="${wagon.providerGroupId}"
+     * @parameter property="wagon.providerGroupId"
      */
     private String providerGroupId;
 
     /**
      * The artifact id for the provider of interest.
      * 
-     * @parameter expression="${wagon.providerArtifactId}"
+     * @parameter property="wagon.providerArtifactId"
      */
     private String providerArtifactId;
 

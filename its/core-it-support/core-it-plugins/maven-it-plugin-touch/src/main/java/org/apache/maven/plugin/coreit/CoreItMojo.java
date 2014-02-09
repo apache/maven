@@ -40,24 +40,24 @@ public class CoreItMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
      */
     private MavenProject project;
 
     /**
-     * @parameter expression="${project.build.directory}"
+     * @parameter default-value="${project.build.directory}"
      * @required
      */
     private String outputDirectory;
 
     /** Test setting of plugin-artifacts on the PluginDescriptor instance.
-     * @parameter expression="${plugin.artifactMap}"
+     * @parameter default-value="${plugin.artifactMap}"
      * @required
      */
     private Map pluginArtifacts;
 
     /**
-     * @parameter expression="target/test-basedir-alignment"
+     * @parameter default-value="target/test-basedir-alignment"
      */
     private File basedirAlignmentDirectory;
 
@@ -72,12 +72,12 @@ public class CoreItMojo
     private String goalItem = "bar";
 
     /**
-     * @parameter expression="${artifactToFile}"
+     * @parameter property="artifactToFile"
      */
     private String artifactToFile;
 
     /**
-     * @parameter expression="${fail}"
+     * @parameter property="fail"
      */
     private boolean fail = false;
 

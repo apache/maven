@@ -40,7 +40,7 @@ public class LoadMojo
      * The path to the properties file used to track the results of the class/resource loading via the plugin class
      * loader.
      * 
-     * @parameter expression="${clsldr.pluginClassLoaderOutput}"
+     * @parameter property="clsldr.pluginClassLoaderOutput"
      */
     private File pluginClassLoaderOutput;
 
@@ -48,7 +48,7 @@ public class LoadMojo
      * The path to the properties file used to track the results of the class/resource loading via the thread's context
      * class loader.
      * 
-     * @parameter expression="${clsldr.contextClassLoaderOutput}"
+     * @parameter property="clsldr.contextClassLoaderOutput"
      */
     private File contextClassLoaderOutput;
 

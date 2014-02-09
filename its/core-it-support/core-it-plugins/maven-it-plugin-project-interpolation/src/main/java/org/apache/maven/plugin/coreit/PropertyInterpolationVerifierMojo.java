@@ -32,38 +32,45 @@ import org.apache.maven.project.MavenProject;
  * @goal verify-property
  * @phase validate
  */
-public class PropertyInterpolationVerifierMojo extends AbstractMojo {
+public class PropertyInterpolationVerifierMojo
+    extends AbstractMojo
+{
 
     /**
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
      */
     private MavenProject project;
 
     /**
-     * @parameter expression="${properties}"
+     * @parameter property="properties"
      */
     private Properties properties;
 
-
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute()
+        throws MojoExecutionException, MojoFailureException
+    {
         Model model = project.getModel();
-        if (properties == null) {
+        if ( properties == null )
+        {
             return;
         }
 
         Enumeration e = properties.propertyNames();
-        while (e.hasMoreElements()) {
+        while ( e.hasMoreElements() )
+        {
             String name = (String) e.nextElement();
-            String value = properties.getProperty(name);
-            if(!value.equals(model.getProperties().getProperty(name))) {
-                throw new MojoExecutionException("Properties do not match: Name = " + name + ", Value = " + value);
+            String value = properties.getProperty( name );
+            if ( !value.equals( model.getProperties().getProperty( name ) ) )
+            {
+                throw new MojoExecutionException( "Properties do not match: Name = " + name + ", Value = " + value );
             }
 
-            if(value.indexOf("${") > -1) {
-                 throw new MojoExecutionException("Unresolved value: Name = " + name + ", Value = " + value);
+            if ( value.indexOf( "${" ) > -1 )
+            {
+                throw new MojoExecutionException( "Unresolved value: Name = " + name + ", Value = " + value );
             }
 
-            getLog().info("Property match: Name = " + name + ", Value = " + value);
+            getLog().info( "Property match: Name = " + name + ", Value = " + value );
         }
     }
 }

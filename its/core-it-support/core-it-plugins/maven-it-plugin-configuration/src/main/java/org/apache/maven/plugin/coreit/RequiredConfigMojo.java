@@ -48,14 +48,14 @@ public class RequiredConfigMojo
     /**
      * The path to the properties file into which to save the mojo configuration.
      * 
-     * @parameter expression="${config.propertiesFile}"
+     * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * A required parameter to be set via plugin configuration in POM or system property from CLI.
      * 
-     * @parameter expression="${config.requiredParam}"
+     * @parameter property="config.requiredParam"
      * @required
      */
     private String requiredParam;

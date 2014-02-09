@@ -54,7 +54,7 @@ public class LoadDependenciesMojo
      * The path to the properties file used to track the results of the class/resource loading via the project class
      * loader.
      * 
-     * @parameter expression="${clsldr.projectClassLoaderOutput}"
+     * @parameter property="clsldr.projectClassLoaderOutput"
      */
     private File projectClassLoaderOutput;
 

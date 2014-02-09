@@ -38,7 +38,7 @@ public class SettingsReadItMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${settings}"
+     * @parameter default-value="${settings}"
      * @required
      * @readonly
      */

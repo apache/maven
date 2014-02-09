@@ -69,7 +69,7 @@ public class DumpRepoLayoutsMojo
     /**
      * The path to the properties file used to dump the repository layouts.
      * 
-     * @parameter expression="${collections.layoutsFile}"
+     * @parameter property="collections.layoutsFile"
      */
     private File layoutsFile;
 

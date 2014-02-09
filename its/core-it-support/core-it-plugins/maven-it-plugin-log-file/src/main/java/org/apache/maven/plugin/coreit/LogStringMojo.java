@@ -37,7 +37,7 @@ public class LogStringMojo
     /**
      * The string to append to the log file.
      * 
-     * @parameter expression="${log.string}"
+     * @parameter property="log.string"
      */
     private String string;
 

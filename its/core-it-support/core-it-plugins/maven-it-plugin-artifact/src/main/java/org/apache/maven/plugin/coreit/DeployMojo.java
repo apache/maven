@@ -42,7 +42,7 @@ public class DeployMojo
     /**
      * The distribution repository.
      * 
-     * @parameter expression="${project.distributionManagementArtifactRepository}"
+     * @parameter default-value="${project.distributionManagementArtifactRepository}"
      * @readonly
      * @required
      */

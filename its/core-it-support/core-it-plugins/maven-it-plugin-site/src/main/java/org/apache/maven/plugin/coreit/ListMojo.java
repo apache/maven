@@ -49,14 +49,14 @@ public class ListMojo
      * <code>reports</code> that gives the total count of reports. The keys <code>reports.0</code>,
      * <code>reports.1</code> etc. will be used to denote the qualified class names of the reports.
      * 
-     * @parameter expression="${site.properties}" default-value="target/reports.properties"
+     * @parameter property="site.properties" default-value="target/reports.properties"
      */
     private File reportsFile;
 
     /**
      * The reports configured for the current build.
      * 
-     * @parameter expression="${reports}"
+     * @parameter default-value="${reports}"
      * @required
      * @readonly
      */

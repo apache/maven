@@ -30,7 +30,7 @@ public class MojoExecutionExceptionMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${error.message}" default-value="Planned MojoExecutionException."
+     * @parameter property="error.message" default-value="Planned MojoExecutionException."
      * @required
      */
     private String message;

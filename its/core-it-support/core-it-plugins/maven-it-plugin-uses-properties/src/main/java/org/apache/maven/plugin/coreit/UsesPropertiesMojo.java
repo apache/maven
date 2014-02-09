@@ -34,12 +34,12 @@ public class UsesPropertiesMojo
     extends AbstractMojo
 {
     /**
-     * @parameter expression="${basedir}"
+     * @parameter default-value="${basedir}"
      */
     private File basedir;
     
     /**
-     * @parameter expression="${project.properties}"
+     * @parameter default-value="${project.properties}"
      */
     private Properties properties;
 

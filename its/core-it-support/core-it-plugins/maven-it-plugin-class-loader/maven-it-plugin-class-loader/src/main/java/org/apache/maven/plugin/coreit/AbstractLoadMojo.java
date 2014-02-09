@@ -51,7 +51,7 @@ public abstract class AbstractLoadMojo
      * comma separated list of all public methods declared directly in that class, in alphabetic order and possibly with
      * duplicates to account for overloaded methods.
      * 
-     * @parameter expression="${clsldr.classNames}"
+     * @parameter property="clsldr.classNames"
      */
     protected String classNames;
 
@@ -61,7 +61,7 @@ public abstract class AbstractLoadMojo
      * the URL to the resource. In addition, the keys <code>ARP.count</code>, <code>ARP.0</code>, <code>ARP.1</code>
      * etc. will enumerate all URLs matching the resource name.
      * 
-     * @parameter expression="${clsldr.resourcePaths}"
+     * @parameter property="clsldr.resourcePaths"
      */
     protected String resourcePaths;
 

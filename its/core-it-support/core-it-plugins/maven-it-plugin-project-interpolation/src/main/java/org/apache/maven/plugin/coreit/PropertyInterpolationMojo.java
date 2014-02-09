@@ -34,7 +34,7 @@ public class PropertyInterpolationMojo
     extends AbstractMojo
 {
     
-    /** @parameter expression="${project}" */
+    /** @parameter default-value="${project}" */
     private MavenProject project;
 
     public void execute()

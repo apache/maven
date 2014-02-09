@@ -53,7 +53,7 @@ public class CustomConfigMojo
     /**
      * The path to the properties file into which to save the mojo configuration.
      * 
-     * @parameter expression="${config.propertiesFile}"
+     * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
@@ -75,14 +75,14 @@ public class CustomConfigMojo
     /**
      * A simple parameter of type {@link java.lang.String}.
      * 
-     * @parameter expression="${config.stringParam}"
+     * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
      * 
-     * @parameter expression="${config.fileParam}"
+     * @parameter property="config.fileParam"
      */
     private File fileParam;
 

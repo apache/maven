@@ -47,7 +47,7 @@ public class InstallArtifactsMojo
 
     /**
      * @readonly
-     * @parameter expression="${project.runtimeArtifacts}"
+     * @parameter default-value="${project.runtimeArtifacts}"
      */
     private List artifacts;
 
@@ -66,7 +66,7 @@ public class InstallArtifactsMojo
      * and place the bin scripts.
      *
      * @required
-     * @parameter expression="${assembleDirectory}" default-value="${project.build.directory}/appassembler"
+     * @parameter property="assembleDirectory" default-value="${project.build.directory}/appassembler"
      */
     private File assembleDirectory;
 

@@ -36,7 +36,7 @@ public class PluginParamInterpolationMojo
     /** @parameter */
     private String myDirectory;
 
-    /** @parameter expression="${project}" */
+    /** @parameter default-value="${project}" */
     private MavenProject project;
 
     public void execute()

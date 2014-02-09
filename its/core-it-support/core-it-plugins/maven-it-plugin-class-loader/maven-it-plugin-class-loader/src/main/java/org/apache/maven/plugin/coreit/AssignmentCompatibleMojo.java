@@ -42,7 +42,7 @@ public class AssignmentCompatibleMojo
     /**
      * The path to the properties file used to track the results of the assignment compatibility tests.
      * 
-     * @parameter expression="${clsldr.assigncompatPropertiesFile}"
+     * @parameter property="clsldr.assigncompatPropertiesFile"
      */
     private File assigncompatPropertiesFile;
 

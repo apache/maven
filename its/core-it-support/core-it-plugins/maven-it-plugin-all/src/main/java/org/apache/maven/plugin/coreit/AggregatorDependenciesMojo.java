@@ -38,7 +38,7 @@ public class AggregatorDependenciesMojo
     /**
      * The path to the touch file, relative to the project's base directory.
      * 
-     * @parameter expression="${aggregator.touchFile}" default-value="${project.build.directory}/touch.txt"
+     * @parameter property="aggregator.touchFile" default-value="${project.build.directory}/touch.txt"
      */
     private File touchFile;
 

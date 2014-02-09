@@ -41,7 +41,7 @@ public class TouchMojo
     /**
      * The path to the output file.
      * 
-     * @parameter expression="${touch.outputFile}" default-value="target/touch.txt"
+     * @parameter property="touch.outputFile" default-value="target/touch.txt"
      */
     private File outputFile;
 

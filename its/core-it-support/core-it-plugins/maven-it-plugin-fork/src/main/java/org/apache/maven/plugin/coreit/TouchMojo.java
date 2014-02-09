@@ -40,12 +40,12 @@ public class TouchMojo
     static final String FINAL_NAME = "coreitified";
 
     /**
-     * @parameter expression="${project}"
+     * @parameter default-value="${project}"
      */
     private MavenProject project;
 
     /**
-     * @parameter expression="${project.build.directory}"
+     * @parameter default-value="${project.build.directory}"
      * @required
      */
     private File outputDirectory;

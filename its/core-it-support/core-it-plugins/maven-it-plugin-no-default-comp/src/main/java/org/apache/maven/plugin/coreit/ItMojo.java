@@ -43,7 +43,7 @@ public class ItMojo
     /**
      * The path to the output file.
      * 
-     * @parameter expression="${touch.outputFile}" default-value="target/comp.properties"
+     * @parameter property="touch.outputFile" default-value="target/comp.properties"
      */
     private File outputFile;
 

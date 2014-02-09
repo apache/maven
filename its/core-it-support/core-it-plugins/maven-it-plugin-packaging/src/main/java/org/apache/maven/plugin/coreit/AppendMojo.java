@@ -38,7 +38,7 @@ public class AppendMojo
 {
 
     /**
-     * @parameter expression="${append.message}"
+     * @parameter property="append.message"
      */
     private String message;
 

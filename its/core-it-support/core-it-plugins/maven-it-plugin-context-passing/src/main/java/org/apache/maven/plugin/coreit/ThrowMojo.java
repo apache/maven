@@ -35,7 +35,7 @@ public class ThrowMojo
     public static final String THROWN_PARAMETER = "throw-parameter";
 
     /**
-     * @parameter expression="${value}" default-value="thrown"
+     * @parameter property="value" default-value="thrown"
      */
     private String value;
     

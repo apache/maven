@@ -53,7 +53,7 @@ public class AppendConfigMojo
      * The path to the properties file into which to save the mojo configuration. <em>Note:</em> This intentionally uses
      * another parameter name for the output file than {@link ConfigMojo}.
      * 
-     * @parameter expression="${config.outputFile}"
+     * @parameter property="config.outputFile"
      */
     private File outputFile;
 
@@ -68,14 +68,14 @@ public class AppendConfigMojo
     /**
      * A simple parameter of type {@link java.lang.String}.
      * 
-     * @parameter expression="${config.stringParam}"
+     * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
      * 
-     * @parameter expression="${config.fileParam}"
+     * @parameter property="config.fileParam"
      */
     private File fileParam;
 

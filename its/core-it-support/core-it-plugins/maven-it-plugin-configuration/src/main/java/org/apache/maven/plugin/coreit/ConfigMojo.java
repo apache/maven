@@ -56,7 +56,7 @@ public class ConfigMojo
     /**
      * The path to the properties file into which to save the mojo configuration.
      * 
-     * @parameter expression="${config.propertiesFile}"
+     * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
@@ -84,105 +84,105 @@ public class ConfigMojo
     /**
      * A parameter that combines all of the annotations.
      * 
-     * @parameter alias="fullyAnnotatedParam" expression="${config.aliasDefaultExpressionParam}" default-value="test"
+     * @parameter alias="fullyAnnotatedParam" property="config.aliasDefaultExpressionParam" default-value="test"
      */
     private String aliasDefaultExpressionParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean}.
      * 
-     * @parameter expression="${config.booleanParam}"
+     * @parameter property="config.booleanParam"
      */
     private Boolean booleanParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean#TYPE}.
      * 
-     * @parameter expression="${config.primitiveBooleanParam}"
+     * @parameter property="config.primitiveBooleanParam"
      */
     private boolean primitiveBooleanParam;
 
     /**
      * A simple parameter of type {@link java.lang.Byte}.
      * 
-     * @parameter expression="${config.byteParam}"
+     * @parameter property="config.byteParam"
      */
     private Byte byteParam;
 
     /**
      * A simple parameter of type {@link java.lang.Short}.
      * 
-     * @parameter expression="${config.shortParam}"
+     * @parameter property="config.shortParam"
      */
     private Short shortParam;
 
     /**
      * A simple parameter of type {@link java.lang.Integer}.
      * 
-     * @parameter expression="${config.intergerParam}"
+     * @parameter property="config.intergerParam"
      */
     private Integer integerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Integer#TYPE}.
      * 
-     * @parameter expression="${config.primitiveIntegerParam}"
+     * @parameter property="config.primitiveIntegerParam"
      */
     private int primitiveIntegerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Long}.
      * 
-     * @parameter expression="${config.longParam}"
+     * @parameter property="config.longParam"
      */
     private Long longParam;
 
     /**
      * A simple parameter of type {@link java.lang.Float}.
      * 
-     * @parameter expression="${config.floatParam}"
+     * @parameter property="config.floatParam"
      */
     private Float floatParam;
 
     /**
      * A simple parameter of type {@link java.lang.Double}.
      * 
-     * @parameter expression="${config.doubleParam}"
+     * @parameter property="config.doubleParam"
      */
     private Double doubleParam;
 
     /**
      * A simple parameter of type {@link java.lang.Character}.
      * 
-     * @parameter expression="${config.characterParam}"
+     * @parameter property="config.characterParam"
      */
     private Character characterParam;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
      * 
-     * @parameter expression="${config.stringParam}"
+     * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
      * 
-     * @parameter expression="${config.fileParam}"
+     * @parameter property="config.fileParam"
      */
     private File fileParam;
 
     /**
      * A simple parameter of type {@link java.util.Date}.
      * 
-     * @parameter expression="${config.dateParam}"
+     * @parameter property="config.dateParam"
      */
     private Date dateParam;
 
     /**
      * A simple parameter of type {@link java.net.URL}.
      * 
-     * @parameter expression="${config.urlParam}"
+     * @parameter property="config.urlParam"
      */
     private URL urlParam;
 

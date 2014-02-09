@@ -77,7 +77,7 @@ public class EvalMojo
      * parameter {@link #expressions} an similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
      * 
-     * @parameter expression="${expression.outputFile}"
+     * @parameter property="expression.outputFile"
      */
     private File outputFile;
 
@@ -91,7 +91,7 @@ public class EvalMojo
     /**
      * The comma separated set of expressions to evaluate.
      * 
-     * @parameter expression="${expression.expressions}"
+     * @parameter property="expression.expressions"
      */
     private String expressionList;
 

@@ -43,7 +43,7 @@ public class TestMojo
      * disk. Unlike the test artifacts, the collection of project artifacts additionally contains those artifacts that
      * do not contribute to the class path.
      * 
-     * @parameter expression="${depres.projectArtifacts}"
+     * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
 
@@ -53,7 +53,7 @@ public class TestMojo
      * written to disk. Unlike the test artifacts, the collection of direct project artifacts additionally contains
      * those artifacts that do not contribute to the class path.
      * 
-     * @parameter expression="${depres.dependencyArtifacts}"
+     * @parameter property="depres.dependencyArtifacts"
      */
     private String dependencyArtifacts;
 
@@ -62,7 +62,7 @@ public class TestMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
      * 
-     * @parameter expression="${depres.testArtifacts}"
+     * @parameter property="depres.testArtifacts"
      */
     private String testArtifacts;
 
@@ -71,7 +71,7 @@ public class TestMojo
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
      * 
-     * @parameter expression="${depres.testClassPath}"
+     * @parameter property="depres.testClassPath"
      */
     private String testClassPath;
 
@@ -80,7 +80,7 @@ public class TestMojo
      * directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of the
      * JAR. If not specified, the class path checksums will not be calculated.
      * 
-     * @parameter expression="${depres.testClassPathChecksums}"
+     * @parameter property="depres.testClassPathChecksums"
      */
     private String testClassPathChecksums;
 

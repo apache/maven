@@ -43,7 +43,7 @@ public class RuntimeMojo
      * disk. Unlike the runtime artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
      * 
-     * @parameter expression="${depres.projectArtifacts}"
+     * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
 
@@ -52,7 +52,7 @@ public class RuntimeMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
      * 
-     * @parameter expression="${depres.runtimeArtifacts}"
+     * @parameter property="depres.runtimeArtifacts"
      */
     private String runtimeArtifacts;
 
@@ -61,7 +61,7 @@ public class RuntimeMojo
      * this UTF-8 encoded file specifies the absolute path to a class path element. If not specified, the class path
      * will not be written to disk.
      * 
-     * @parameter expression="${depres.runtimeClassPath}"
+     * @parameter property="depres.runtimeClassPath"
      */
     private String runtimeClassPath;
 
@@ -70,7 +70,7 @@ public class RuntimeMojo
      * base directory. The (trimmed) path to a JAR is used as the property key, the property value is the SHA-1 hash of
      * the JAR. If not specified, the class path checksums will not be calculated.
      * 
-     * @parameter expression="${depres.runtimeClassPathChecksums}"
+     * @parameter property="depres.runtimeClassPathChecksums"
      */
     private String runtimeClassPathChecksums;
 

@@ -41,7 +41,7 @@ public class CompileMojo
      * disk. Unlike the compile artifacts, the collection of project artifacts additionally contains those artifacts
      * that do not contribute to the class path.
      * 
-     * @parameter expression="${depres.projectArtifacts}"
+     * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
 
@@ -50,7 +50,7 @@ public class CompileMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk.
      * 
-     * @parameter expression="${depres.compileArtifacts}"
+     * @parameter property="depres.compileArtifacts"
      */
     private String compileArtifacts;
 

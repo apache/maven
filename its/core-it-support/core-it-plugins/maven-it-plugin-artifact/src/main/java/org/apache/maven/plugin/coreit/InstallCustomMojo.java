@@ -44,7 +44,7 @@ public class InstallCustomMojo
     /**
      * The base directory of the local repository to install to.
      * 
-     * @parameter expression="${install.localRepoDir}"
+     * @parameter property="install.localRepoDir"
      */
     private File localRepoDir;
 

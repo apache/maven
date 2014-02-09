@@ -52,49 +52,49 @@ public class CliConfigMojo
     /**
      * The path to the properties file into which to save the mojo configuration.
      * 
-     * @parameter expression="${config.propertiesFile}"
+     * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
      * 
-     * @parameter expression="${config.stringParam}"
+     * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
      * 
-     * @parameter expression="${config.fileParam}"
+     * @parameter property="config.fileParam"
      */
     private File fileParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
      * 
-     * @parameter expression="${config.stringParams}"
+     * @parameter property="config.stringParams"
      */
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
      * 
-     * @parameter expression="${config.fileParams}"
+     * @parameter property="config.fileParams"
      */
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
      * 
-     * @parameter expression="${config.listParam}"
+     * @parameter property="config.listParam"
      */
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
      * 
-     * @parameter expression="${config.setParam}"
+     * @parameter property="config.setParam"
      */
     private Set setParam;
 

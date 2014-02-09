@@ -48,7 +48,7 @@ public class AggregateTestMojo
      * disk. Unlike the test artifacts, the collection of project artifacts additionally contains those artifacts that
      * do not contribute to the class path.
      * 
-     * @parameter expression="${depres.projectArtifacts}"
+     * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
 
