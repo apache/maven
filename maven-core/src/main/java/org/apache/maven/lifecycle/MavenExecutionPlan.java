@@ -139,28 +139,6 @@ public class MavenExecutionPlan
         return result;
     }
 
-    public void forceAllComplete()
-    {
-        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
-        {
-            executionPlanItem.forceComplete();
-        }
-    }
-
-    public void waitUntilAllDone()
-        throws InterruptedException
-    {
-        for ( ExecutionPlanItem executionPlanItem : getExecutionPlanItems() )
-        {
-            executionPlanItem.waitUntilDone();
-        }
-    }
-
-    public boolean containsPhase( String phase )
-    {
-        return phasesInExecutionPlan.contains( phase );
-    }
-
     public List<MojoExecution> getMojoExecutions()
     {
         List<MojoExecution> result = new ArrayList<MojoExecution>();

@@ -19,11 +19,14 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import org.apache.maven.lifecycle.Schedule;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.project.MavenProject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -38,15 +41,22 @@ public class ExecutionPlanItem
 {
     private final MojoExecution mojoExecution;
 
-    private final Schedule schedule;
-    // Completeness just indicates that it has been run or failed
-
-    private final CountDownLatch done = new CountDownLatch( 1 );
-
-    public ExecutionPlanItem( MojoExecution mojoExecution, Schedule schedule )
+    public ExecutionPlanItem( MojoExecution mojoExecution )
     {
         this.mojoExecution = mojoExecution;
-        this.schedule = schedule;
+    }
+
+    public static List<ExecutionPlanItem> createExecutionPlanItems( MavenProject mavenProject,
+                                                                    List<MojoExecution> executions )
+    {
+        BuilderCommon.attachToThread( mavenProject );
+
+        List<ExecutionPlanItem> result = new ArrayList<ExecutionPlanItem>();
+        for ( MojoExecution mojoExecution : executions )
+        {
+            result.add( new ExecutionPlanItem( mojoExecution ) );
+        }
+        return result;
     }
 
     public MojoExecution getMojoExecution()
@@ -59,32 +69,6 @@ public class ExecutionPlanItem
         return mojoExecution.getLifecyclePhase();
     }
 
-    public void setComplete()
-    {
-        done.countDown();
-    }
-
-    public boolean isDone()
-    {
-        return done.getCount() < 1;
-    }
-
-    public void forceComplete()
-    {
-        setComplete();
-    }
-
-    public void waitUntilDone()
-        throws InterruptedException
-    {
-        done.await();
-    }
-
-    public Schedule getSchedule()
-    {
-        return schedule;
-    }
-
     public Plugin getPlugin()
     {
         final MojoDescriptor mojoDescriptor = getMojoExecution().getMojoDescriptor();
@@ -94,7 +78,7 @@ public class ExecutionPlanItem
     @Override
     public String toString()
     {
-        return "ExecutionPlanItem{" + ", mojoExecution=" + mojoExecution + ", schedule=" + schedule + '}'
+        return "ExecutionPlanItem{" + ", mojoExecution=" + mojoExecution + '}'
             + super.toString();
     }
 

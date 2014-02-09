@@ -17,8 +17,6 @@ package org.apache.maven.lifecycle.internal.stub;
 
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.Schedule;
-import org.apache.maven.lifecycle.Scheduling;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,9 +60,4 @@ public class DefaultLifecyclesStub
         return new DefaultLifecycles( lifeCycles, new LoggerStub() );
     }
 
-    public static List<Scheduling> getSchedulingList()
-    {
-        return Arrays.asList( new Scheduling( "default", Arrays.asList( new Schedule( "compile", false, false ),
-                                                                        new Schedule( "test", false, true ) ) ) );
-    }
 }

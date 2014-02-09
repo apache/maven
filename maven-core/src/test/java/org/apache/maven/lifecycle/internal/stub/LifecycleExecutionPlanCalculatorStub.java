@@ -186,7 +186,7 @@ public class LifecycleExecutionPlanCalculatorStub
         LifecyclePhaseNotFoundException, LifecycleNotFoundException
     {
         final List<ExecutionPlanItem> planItemList =
-            DefaultSchedulesStub.createDefaultSchedules().createExecutionPlanItem( project, mojoExecutions );
+            ExecutionPlanItem.createExecutionPlanItems( project, mojoExecutions );
         return new MavenExecutionPlan( planItemList, DefaultLifecyclesStub.createDefaultLifecycles() );
     }
 

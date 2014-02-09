@@ -181,39 +181,4 @@ public class LifecycleDebugLogger
         logger.debug( "Dependencies (resolve): " + scopesToResolve );
     }
 
-    public void logWeavePlan( MavenSession session )
-    {
-        if ( !logger.isInfoEnabled() )
-        {
-            return;
-        }
-
-        final ProjectDependencyGraph dependencyGraph = session.getProjectDependencyGraph();
-        logger.info( "=== WEAVE CONCURRENCY BUILD PLAN ======================================" );
-        for ( MavenProject mavenProject : dependencyGraph.getSortedProjects() )
-        {
-
-            StringBuilder item = new StringBuilder();
-            item.append( "Project: " );
-            item.append( mavenProject.getArtifactId() );
-            final List<MavenProject> upstreamProjects = dependencyGraph.getUpstreamProjects( mavenProject, false );
-            if ( upstreamProjects.size() > 0 )
-            {
-                item.append( " ( " );
-                for ( Iterator<MavenProject> it = upstreamProjects.iterator(); it.hasNext(); )
-                {
-                    final MavenProject kid = it.next();
-                    item.append( kid.getArtifactId() );
-                    if ( it.hasNext() )
-                    {
-                        item.append( ", " );
-                    }
-                }
-                item.append( ")" );
-            }
-            logger.info( item.toString() );
-
-        }
-        logger.info( "=======================================================================" );
-    }
 }

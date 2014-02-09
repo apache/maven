@@ -31,7 +31,6 @@ import java.util.TreeMap;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
-import org.apache.maven.lifecycle.DefaultSchedules;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
@@ -82,9 +81,6 @@ public class DefaultLifecycleExecutionPlanCalculator
     private DefaultLifecycles defaultLifeCycles;
 
     @Requirement
-    private DefaultSchedules defaultSchedules;
-
-    @Requirement
     private MojoDescriptorCreator mojoDescriptorCreator;
 
     @Requirement
@@ -98,14 +94,12 @@ public class DefaultLifecycleExecutionPlanCalculator
     public DefaultLifecycleExecutionPlanCalculator( BuildPluginManager pluginManager,
                                                     DefaultLifecycles defaultLifeCycles,
                                                     MojoDescriptorCreator mojoDescriptorCreator,
-                                                    LifecyclePluginResolver lifecyclePluginResolver,
-                                                    DefaultSchedules defaultSchedules )
+                                                    LifecyclePluginResolver lifecyclePluginResolver )
     {
         this.pluginManager = pluginManager;
         this.defaultLifeCycles = defaultLifeCycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecyclePluginResolver = lifecyclePluginResolver;
-        this.defaultSchedules = defaultSchedules;
     }
 
     public MavenExecutionPlan calculateExecutionPlan( MavenSession session, MavenProject project, List<Object> tasks, boolean setup )
@@ -122,7 +116,7 @@ public class DefaultLifecycleExecutionPlanCalculator
             setupMojoExecutions( session, project, executions );
         }
 
-        final List<ExecutionPlanItem> planItem = defaultSchedules.createExecutionPlanItem( project, executions );
+        final List<ExecutionPlanItem> planItem = ExecutionPlanItem.createExecutionPlanItems( project, executions );
 
         return new MavenExecutionPlan( planItem, defaultLifeCycles );
     }

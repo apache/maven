@@ -20,7 +20,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.stub.BuildPluginManagerStub;
 import org.apache.maven.lifecycle.internal.stub.DefaultLifecyclesStub;
-import org.apache.maven.lifecycle.internal.stub.DefaultSchedulesStub;
 import org.apache.maven.lifecycle.internal.stub.PluginPrefixResolverStub;
 import org.apache.maven.lifecycle.internal.stub.PluginVersionResolverStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
@@ -64,8 +63,7 @@ public class LifecycleExecutionPlanCalculatorTest
         LifecyclePluginResolver lifecyclePluginResolver = new LifecyclePluginResolver( new PluginVersionResolverStub() );
         return new DefaultLifecycleExecutionPlanCalculator( new BuildPluginManagerStub(),
                                                             DefaultLifecyclesStub.createDefaultLifecycles(),
-                                                            mojoDescriptorCreator, lifecyclePluginResolver,
-                                                            DefaultSchedulesStub.createDefaultSchedules() );
+                                                            mojoDescriptorCreator, lifecyclePluginResolver );
     }
 
     public static MojoDescriptorCreator createMojoDescriptorCreator()

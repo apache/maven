@@ -26,34 +26,6 @@ under the License.
 -->
 <component-set>
   <components>
-    <component>
-      <role>org.apache.maven.lifecycle.DefaultSchedules</role>
-      <implementation>org.apache.maven.lifecycle.DefaultSchedules</implementation>
-      <configuration>
-        <schedules>
-          <scheduling>
-            <lifecycle>default</lifecycle>
-            <schedules>
-              <schedule>
-                <phase>test</phase>
-                <mojoSynchronized>false</mojoSynchronized>
-                <parallel>true</parallel>
-              </schedule>
-              <schedule>
-                <pluginKey>org.apache.maven.plugins:maven-assembly-plugin</pluginKey>
-                <mojoSynchronized>true</mojoSynchronized>
-              </schedule>
-              <schedule>
-                <pluginKey>org.apache.maven.plugins:maven-ear-plugin</pluginKey>
-                <mojoGoal>generate-application-xml</mojoGoal>
-                <upstreamPhase>package</upstreamPhase>
-              </schedule>
-            </schedules>
-          </scheduling>
-        </schedules>
-      </configuration>
-    </component>
-
     <!-- 'default' lifecycle, without any binding since it is dependent on packaging -->
     <component>
       <role>org.apache.maven.lifecycle.Lifecycle</role>

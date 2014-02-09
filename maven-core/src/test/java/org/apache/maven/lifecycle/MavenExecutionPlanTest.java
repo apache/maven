@@ -32,24 +32,6 @@ import java.util.Set;
 public class MavenExecutionPlanTest
     extends TestCase
 {
-    public void testFindFirstWithMatchingSchedule()
-        throws Exception
-    {
-        final List<Scheduling> cycles = DefaultLifecyclesStub.getSchedulingList();
-        final Schedule schedule = cycles.get( 0 ).getSchedules().get( 0 );
-        assertNotNull( schedule );
-
-    }
-
-    public void testForceAllComplete()
-        throws Exception
-    {
-        MavenExecutionPlan plan = LifecycleExecutionPlanCalculatorStub.getProjectAExceutionPlan();
-        plan.forceAllComplete();
-        final Iterator<ExecutionPlanItem> planItemIterator = plan.iterator();
-        assertTrue( planItemIterator.next().isDone() );
-        assertTrue( planItemIterator.next().isDone() );
-    }
 
     public void testFindLastInPhase()
         throws Exception
