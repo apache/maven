@@ -84,6 +84,7 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-scm-publish-plugin</artifactId>
+          <version>1.0</version>
           <configuration>
             <checkoutDirectory>${maven.site.cache}/${maven.site.path}</checkoutDirectory>
             <tryUpdate>true</tryUpdate>
