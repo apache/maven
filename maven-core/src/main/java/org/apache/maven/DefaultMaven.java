@@ -143,6 +143,9 @@ public class DefaultMaven
     @Requirement
     private EventSpyDispatcher eventSpyDispatcher;
 
+    @Requirement
+    private SessionScope sessionScope;
+        
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         MavenExecutionResult result;
@@ -267,6 +270,27 @@ public class DefaultMaven
             return result;
         }
 
+        try
+        {
+            session.setProjectMap( getProjectMap( session.getProjects() ) );
+        }
+        catch ( DuplicateProjectException e )
+        {
+            return addExceptionToResult( result, e );
+        }
+        
+        WorkspaceReader reactorWorkspace;
+        sessionScope.enter();
+        sessionScope.seed( MavenSession.class, session );
+        try
+        {
+            reactorWorkspace = container.lookup( WorkspaceReader.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            return addExceptionToResult( result, e );
+        }
+        
         //
         // Desired order of precedence for local artifact repositories
         //
@@ -274,17 +298,7 @@ public class DefaultMaven
         // Workspace
         // User Local Repository
         //        
-        ReactorReader reactorRepository = null;
-        try
-        {
-            reactorRepository = new ReactorReader( session, getProjectMap( session.getProjects() ) );
-        }
-        catch ( DuplicateProjectException e )
-        {
-            return addExceptionToResult( result, e );
-        }
-
-        repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorRepository,
+        repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorWorkspace,
                                                                             repoSession.getWorkspaceReader() ) );
 
         repoSession.setReadOnly();
@@ -357,6 +371,8 @@ public class DefaultMaven
         {
             return addExceptionToResult( result, e );
         }
+
+        sessionScope.exit();
 
         return result;
     }

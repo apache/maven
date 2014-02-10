@@ -393,4 +393,15 @@ public class MavenSession
         return null;
     }
 
+    private Map<String, MavenProject> projectMap;
+    
+    public void setProjectMap( Map<String, MavenProject> projectMap )
+    {
+        this.projectMap = projectMap;
+    }
+    
+    public Map<String, MavenProject> getProjectMap() 
+    {
+        return projectMap;
+    }
 }

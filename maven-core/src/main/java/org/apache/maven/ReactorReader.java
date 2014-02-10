@@ -29,6 +29,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
@@ -42,6 +46,8 @@ import org.eclipse.aether.util.artifact.ArtifactIdUtils;
  * 
  * @author Jason van Zyl
  */
+@Named
+@SessionScoped
 class ReactorReader
     implements WorkspaceReader
 {
@@ -53,12 +59,13 @@ class ReactorReader
 
     private WorkspaceRepository repository;
 
-    public ReactorReader( MavenSession session, Map<String, MavenProject> reactorProjects )
+    @Inject
+    public ReactorReader( MavenSession session )
     {
-        projectsByGAV = reactorProjects;
+        projectsByGAV = session.getProjectMap();
 
-        projectsByGA = new HashMap<String, List<MavenProject>>( reactorProjects.size() * 2 );
-        for ( MavenProject project : reactorProjects.values() )
+        projectsByGA = new HashMap<String, List<MavenProject>>( projectsByGAV.size() * 2 );
+        for ( MavenProject project : projectsByGAV.values() )
         {
             String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
 
