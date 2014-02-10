@@ -60,9 +60,16 @@ public class MavenSession
 
     /**
      * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
-     * being passed into the session.
+     * being passed into the session. This is also the potentially constrained set of projects by using --projects
+     * on the command line.
      */
     private List<MavenProject> projects;
+
+    /**
+     * The full set of projects before any potential constraining by --projects. Useful in the case where you want to
+     * build a smaller set of projects but perform other operations in the context of your reactor.
+     */
+    private List<MavenProject> allProjects;
 
     private MavenProject topLevelProject;
 
@@ -404,4 +411,18 @@ public class MavenSession
     {
         return projectMap;
     }
+
+    /** This is a provisional method and may be removed */
+    public List<MavenProject> getAllProjects()
+    {
+        return allProjects;
+    }
+
+    /** This is a provisional method and may be removed */
+    public void setAllProjects( List<MavenProject> allProjects )
+    {
+        this.allProjects = allProjects;
+    }
+    
+    
 }

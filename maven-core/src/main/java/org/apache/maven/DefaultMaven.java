@@ -248,6 +248,10 @@ public class DefaultMaven
         try
         {
             projects = getProjectsForMavenReactor( session );
+            //
+            // Capture the full set of projects before any potential constraining is performed by --projects
+            //
+            session.setAllProjects( projects );
         }
         catch ( ProjectBuildingException e )
         {
