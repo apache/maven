@@ -456,6 +456,7 @@
               <exclude>src/test/resources*/**</exclude>
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
+              <exclude>**/*.odg</exclude>
             </excludes>
           </configuration>
         </plugin>
