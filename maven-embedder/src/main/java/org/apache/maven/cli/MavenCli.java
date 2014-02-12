@@ -1087,15 +1087,24 @@ public class MavenCli
         
         if ( threadConfiguration != null )
         {
+            //
+            // Default to the standard multithreaded builder
+            //
             request.setBuilderId( "multithreaded" );
-            
-            int threads =
-                threadConfiguration.contains( "C" ) ? Integer.valueOf( threadConfiguration.replace( "C", "" ) )
-                    * Runtime.getRuntime().availableProcessors() : Integer.valueOf( threadConfiguration );
-                    
-            request.setDegreeOfConcurrency( threads );
-        }         
-                
+
+            if ( threadConfiguration.contains( "C" ) )
+            {
+                request.setDegreeOfConcurrency( (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * Runtime.getRuntime().availableProcessors() ) );
+            }
+            else
+            {
+                request.setDegreeOfConcurrency( Integer.valueOf( threadConfiguration ) );
+            }
+        }
+              
+        //
+        // Allow the builder to be overriden by the user if requested. The builders are now pluggable.
+        //
         if ( commandLine.hasOption( CLIManager.BUILDER ) )
         {          
             request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );

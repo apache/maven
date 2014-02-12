@@ -112,7 +112,7 @@ public class LifecycleStarter
             }
 
             logger.info( "" );
-            logger.info( String.format( "Using the builder %s", builder.getClass().getName() ) );
+            logger.info( String.format( "Using the builder %s with a thread count of %s", builder.getClass().getName(), session.getRequest().getDegreeOfConcurrency() ) );
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
 
         }
