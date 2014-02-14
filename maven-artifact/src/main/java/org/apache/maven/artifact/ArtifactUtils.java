@@ -68,15 +68,10 @@ public final class ArtifactUtils
 
     public static String versionlessKey( Artifact artifact )
     {
-        return versionlessKey( artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier() );
+        return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
     }
 
     public static String versionlessKey( String groupId, String artifactId )
-    {
-        return versionlessKey( groupId, artifactId, null );
-    }
-
-    public static String versionlessKey( String groupId, String artifactId, String classifier )
     {
         if ( groupId == null )
         {
@@ -86,13 +81,7 @@ public final class ArtifactUtils
         {
             throw new NullPointerException( "artifactId is null" );
         }
-        StringBuilder key = new StringBuilder();
-        key.append( groupId ).append( ':' ).append( artifactId );
-        if ( classifier != null && !"".equals( classifier.trim() ) )
-        {
-            key.append( ':' ).append( classifier );
-        }
-        return key.toString();
+        return groupId + ":" + artifactId;
     }
 
     public static String key( Artifact artifact )

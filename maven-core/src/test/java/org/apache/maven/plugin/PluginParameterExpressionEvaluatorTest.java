@@ -22,11 +22,9 @@ package org.apache.maven.plugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
@@ -382,28 +380,6 @@ public class PluginParameterExpressionEvaluatorTest
         assertEquals( "testGroup", result.getGroupId() );
     }
 
-    public void testProjectArtifactMap()
-        throws Exception
-    {
-        Model model = new Model();
-        MavenProject project = new MavenProject( model );
-        Set<Artifact> artifacts = new HashSet<Artifact>();
-        artifacts.add( createArtifact( "testGroup", "testArtifact", "1.0" ) );
-        artifacts.add( createArtifact( "testGroup", "testArtifact", "1.0", "testClassifier" ) );
-        project.setArtifacts( artifacts );
-        ExpressionEvaluator ee = createExpressionEvaluator( project, null, new Properties() );
-
-        @SuppressWarnings( "unchecked" )
-        Map<String, Artifact> depResults = (Map<String, Artifact>) ee.evaluate( "${project.artifactMap}" );
-        assertEquals( 2, depResults.size() );
-        assertNotNull( depResults.get( "testGroup:testArtifact" ) );
-        assertNotNull( depResults.get( "testGroup:testArtifact:testClassifier" ) );
-
-        assertNull( ( (Artifact) ee.evaluate( "${project.artifactMap(testGroup:testArtifact)}" ) ).getClassifier() );
-        assertEquals( "testClassifier",
-                      ( (Artifact) ee.evaluate( "${project.artifactMap(testGroup:testArtifact:testClassifier)}" ) ).getClassifier() );
-    }
-
     private MavenProject createDefaultProject()
     {
         return new MavenProject( new Model() );
@@ -434,20 +410,6 @@ public class PluginParameterExpressionEvaluatorTest
         dependency.setGroupId( groupId );
         dependency.setArtifactId( artifactId );
         dependency.setVersion( version );
-        dependency.setType( "jar" );
-        dependency.setScope( "compile" );
-
-        return factory.createDependencyArtifact( dependency );
-    }
-
-    protected Artifact createArtifact( String groupId, String artifactId, String version, String classifier )
-        throws Exception
-    {
-        Dependency dependency = new Dependency();
-        dependency.setGroupId( groupId );
-        dependency.setArtifactId( artifactId );
-        dependency.setVersion( version );
-        dependency.setClassifier( classifier );
         dependency.setType( "jar" );
         dependency.setScope( "compile" );
 
