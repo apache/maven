@@ -1094,7 +1094,7 @@ public class MavenCli
 
             if ( threadConfiguration.contains( "C" ) )
             {
-                request.setDegreeOfConcurrency( (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * Runtime.getRuntime().availableProcessors() ) );
+                request.setDegreeOfConcurrency( calculateDegreeOfConcurrencyWithCoreMultiplier( threadConfiguration ) );
             }
             else
             {
@@ -1113,6 +1113,11 @@ public class MavenCli
         return request;
     }
 
+    int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
+    {
+        return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * Runtime.getRuntime().availableProcessors() );
+    }
+    
     static File resolveFile( File file, String workingDirectory )
     {
         if ( file == null )
