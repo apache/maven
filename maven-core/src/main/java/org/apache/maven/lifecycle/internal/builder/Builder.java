@@ -29,10 +29,12 @@ import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 
 /**
- * This is provisional API and is very likely to change in the near future. If you implement a builder expect it to
- * change. 
+ * 
+ * A {@link Builder} encapsulates a strategy for building a set of Maven projects. The default strategy in Maven builds the
+ * the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
  * 
  * @author jvanzyl
+ * @provisional 
  *
  */
 public interface Builder
