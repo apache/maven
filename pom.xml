@@ -459,6 +459,14 @@
               <exclude>**/*.odg</exclude>
             </excludes>
           </configuration>
+          <executions>
+            <execution>
+              <id>check</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>          
         </plugin>
       </plugins>
     </pluginManagement>
@@ -500,8 +508,7 @@
       </plugin>
       <plugin>
         <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <inherited>false</inherited>
+        <artifactId>apache-rat-plugin</artifactId>        
         <configuration>
           <excludes combine.children="append">
             <exclude>bootstrap/**</exclude>
@@ -538,19 +545,6 @@
                   <!-- we have a dedicated distribution module -->
                   <skipAssembly>true</skipAssembly>
                 </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.rat</groupId>
-            <artifactId>apache-rat-plugin</artifactId>
-            <inherited>true</inherited>
-            <executions>
-              <execution>
-                <id>check</id>
-                <goals>
-                  <goal>check</goal>
-                </goals>
               </execution>
             </executions>
           </plugin>
