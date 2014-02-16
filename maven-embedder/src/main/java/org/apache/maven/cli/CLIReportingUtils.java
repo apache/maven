@@ -151,7 +151,7 @@ public final class CLIReportingUtils
 
     public static String formatTimestamp( long timestamp )
     {
-        // Manual construction of the tz offset because only Java 7 understands 'ZZ' replacement
+        // Manual construction of the tz offset because only Java 7 is aware of ISO 8601 time zones
         TimeZone tz = TimeZone.getDefault();
         int offset = tz.getRawOffset();
 
