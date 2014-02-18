@@ -33,7 +33,7 @@ under the License.
         <exclude>**/.gitignore</exclude>
         <exclude>**/.gitattributes</exclude>
         <exclude>init-git-svn.sh</exclude>
-        <exclude>.repository</exclude>
+        <exclude>**/.repository/**</exclude>
       </excludes>
     </fileSet>
     <fileSet>
