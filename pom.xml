@@ -538,6 +538,7 @@
           <excludes combine.children="append">
             <exclude>bootstrap/**</exclude>
             <exclude>README.bootstrap.txt</exclude>
+            <exclude>.repository/**</exclude> <!-- jenkins with local maven repository -->
           </excludes>
           <!-- maven-parent:24 sets ignore errors, but core is ahead -->
           <ignoreErrors>false</ignoreErrors>
