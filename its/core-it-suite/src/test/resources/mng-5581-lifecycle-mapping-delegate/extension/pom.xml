@@ -28,11 +28,7 @@ under the License.
   <version>0.1</version>
 
   <properties>
-    <!--
-      This extension uses new API introduced in Maven 3.2.0-SNAPSHOT.
-      TODO Change to 3.2.0 when it is released.
-     -->
-    <maven.version>3.2.0-SNAPSHOT</maven.version>
+    <maven.version>3.2.1</maven.version>
   </properties>
 
   <dependencies>
