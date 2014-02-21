@@ -441,6 +441,13 @@ public abstract class AbstractMavenIntegrationTestCase
                 {
                     settingsFile = new File( settingsDir, settingsFile.getPath() );
                 }
+                else
+                {
+                    //
+                    // Make is easier to run ITs from m2e in Maven IT mode without having to set any additional properties. 
+                    //
+                    settingsFile = new File( "target/test-classes", settingsFile.getPath() );                    
+                }
             }
 
             String path = settingsFile.getAbsolutePath();
