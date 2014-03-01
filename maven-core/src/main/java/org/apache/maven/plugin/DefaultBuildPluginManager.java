@@ -113,10 +113,9 @@ public class DefaultBuildPluginManager
 
         try
         {
-            scope.seed( MavenSession.class, session );
             scope.seed( MavenProject.class, project );
             scope.seed( MojoExecution.class, mojoExecution );
-            
+
             mojo = mavenPluginManager.getConfiguredMojo( Mojo.class, session, mojoExecution );
 
             legacySupport.setSession( session );

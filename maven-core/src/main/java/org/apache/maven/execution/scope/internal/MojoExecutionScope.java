@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
@@ -169,7 +168,6 @@ public class MojoExecutionScope
                 bindScope( MojoExecutionScoped.class, scope );
 
                 // standard scope bindings
-                bind( MavenSession.class ).toProvider( MojoExecutionScope.<MavenSession> seededKeyProvider() ).in( scope );
                 bind( MavenProject.class ).toProvider( MojoExecutionScope.<MavenProject> seededKeyProvider() ).in( scope );
                 bind( MojoExecution.class ).toProvider( MojoExecutionScope.<MojoExecution> seededKeyProvider() ).in( scope );
             }
