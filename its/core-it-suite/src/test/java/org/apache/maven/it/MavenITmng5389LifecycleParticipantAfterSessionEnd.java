@@ -28,17 +28,12 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd
 {
     public MavenITmng5389LifecycleParticipantAfterSessionEnd()
     {
-        super( "[3.1.2,)" );
+        super( "[3.2.1,)" );
     }
 
     public void test()
         throws Exception
     {
-        /*
-         * This test validates new API introduced in Maven 3.2.0-SNAPSHOT. Until 3.2.0 is released, it is necessary to
-         * "mvn install" maven core before running this test.
-         */
-
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-5389-lifecycleParticipant-afterSession" );
         File extensionDir = new File( testDir, "extension" );

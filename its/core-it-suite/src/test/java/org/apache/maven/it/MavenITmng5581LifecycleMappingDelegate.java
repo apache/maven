@@ -29,13 +29,9 @@ public class MavenITmng5581LifecycleMappingDelegate
 {
     public MavenITmng5581LifecycleMappingDelegate()
     {
-        super( "[3.2.0,)" );
+        super( "[3.2.1,)" );
     }
 
-    /**
-     * This test uses API introduced in Maven 3.2.0-SNAPSHOT. Until 3.2.0 is released, latest maven core must be
-     * installed in local repository before running this test.
-     */
     public void testCustomLifecycle()
         throws Exception
     {

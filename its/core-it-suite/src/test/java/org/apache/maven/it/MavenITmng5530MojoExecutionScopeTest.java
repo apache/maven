@@ -28,7 +28,7 @@ public class MavenITmng5530MojoExecutionScopeTest
 {
     public MavenITmng5530MojoExecutionScopeTest()
     {
-        super( "[3.1.2,)" );
+        super( "[3.2.1,)" );
     }
 
     public void test_copyfiles()
