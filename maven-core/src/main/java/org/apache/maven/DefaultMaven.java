@@ -288,7 +288,7 @@ public class DefaultMaven
         sessionScope.seed( MavenSession.class, session );
         try
         {
-            reactorWorkspace = container.lookup( WorkspaceReader.class );
+            reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
         }
         catch ( ComponentLookupException e )
         {

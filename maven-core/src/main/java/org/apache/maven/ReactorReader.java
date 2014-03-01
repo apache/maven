@@ -31,7 +31,6 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
@@ -46,11 +45,13 @@ import org.eclipse.aether.util.artifact.ArtifactIdUtils;
  * 
  * @author Jason van Zyl
  */
-@Named
+@Named( ReactorReader.HINT )
 @SessionScoped
 class ReactorReader
     implements WorkspaceReader
 {
+    public static final String HINT = "reactor";
+    
     private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
