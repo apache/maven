@@ -26,7 +26,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Creates text files that list the dependencies with scope compile in the order returned from the Maven core.
  * 
  * @goal compile
- * @requiresDependencyResolution compile
+ * @requiresDependencyCollection compile
  * 
  * @author Benjamin Bentmann
  * @version $Id$

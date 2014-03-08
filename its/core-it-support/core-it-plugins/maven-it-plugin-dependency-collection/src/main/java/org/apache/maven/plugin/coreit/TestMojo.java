@@ -26,7 +26,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Creates text files that list the dependencies with scope test in the order returned from the Maven core.
  * 
  * @goal test
- * @requiresDependencyResolution test
+ * @requiresDependencyCollection test
  * 
  * @author Benjamin Bentmann
  * @version $Id$

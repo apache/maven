@@ -26,7 +26,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Creates text files that list the dependencies with scope runtime in the order returned from the Maven core.
  * 
  * @goal runtime
- * @requiresDependencyResolution runtime
+ * @requiresDependencyCollection runtime
  * 
  * @author Benjamin Bentmann
  * @version $Id$

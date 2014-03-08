@@ -32,7 +32,7 @@ import org.apache.maven.project.MavenProject;
  * dependencies are dumped.
  * 
  * @goal aggregate-test
- * @requiresDependencyResolution test
+ * @requiresDependencyCollection test
  * @aggregator true
  * 
  * @author Benjamin Bentmann
