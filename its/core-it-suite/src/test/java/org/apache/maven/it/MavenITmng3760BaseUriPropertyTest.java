@@ -53,7 +53,7 @@ public class MavenITmng3760BaseUriPropertyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = testDir.getCanonicalFile();
+        //testDir = testDir.getCanonicalFile();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         // set via project
@@ -77,7 +77,7 @@ public class MavenITmng3760BaseUriPropertyTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = testDir.getCanonicalFile();
+        //testDir = testDir.getCanonicalFile();
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         // set via project

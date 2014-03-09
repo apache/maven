@@ -53,7 +53,7 @@ public class MavenITmng2201PluginConfigInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        testDir = testDir.getCanonicalFile();
+        //testDir = testDir.getCanonicalFile();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
         assertEquals( new File( testDir, "target" ), new File( props.getProperty( "stringParam" ) ) );

@@ -57,7 +57,7 @@ public class MavenITmng3827PluginConfigTest
 
         Properties props = verifier.loadProperties( "target/plugin-config.properties" );
 
-        testDir = testDir.getCanonicalFile();
+        //testDir = testDir.getCanonicalFile();
 
         assertEquals( new File( testDir, "pom.xml" ), new File( props.getProperty( "fileParam" ) ) );
         assertEquals( "true", props.getProperty( "booleanParam" ) );
