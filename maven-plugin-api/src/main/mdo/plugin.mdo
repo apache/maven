@@ -33,7 +33,7 @@ under the License.
   <defaults>
     <default>
       <key>package</key>
-      <value>org.apache.maven.plugin.descriptor.model</value>
+      <value>plugin descriptor XML documentation (no java generation)</value><!-- intentionally non-buildable value -->
     </default>
   </defaults>
   <classes>
