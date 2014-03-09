@@ -36,7 +36,7 @@ public class MavenITmng5576CdFriendlyVersions
 {
     public MavenITmng5576CdFriendlyVersions()
     {
-        super( ALL_MAVEN_VERSIONS );
+        super( "[3.2,)" );
     }
 
     /**
@@ -62,7 +62,7 @@ public class MavenITmng5576CdFriendlyVersions
         List<String> lines = verifier.loadFile( new File( testDir, "log.txt" ), false );
         for( String line : lines )
         {
-            assertFalse( line.contains( "WARNING" ) );
+            assertFalse( line, line.contains( "WARNING" ) );
         }
     }
 
