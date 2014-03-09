@@ -73,10 +73,14 @@ under the License.
         </configuration>
         <executions>
           <execution>
-            <id>site-docs</id>
+            <id>plugin-site-doc</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>xdoc</goal>
+            </goals>
             <configuration>
-              <models combine.children="append">
-                <model>src/main/mdo/plugin.mdo</model><!-- plugin.mdo is only for documentation, not used for code generation -->
+              <models>
+                <model>src/main/mdo/plugin.mdo</model>
               </models>
             </configuration>
           </execution>

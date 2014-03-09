@@ -18,17 +18,15 @@ under the License.
 -->
 
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/PLUGIN/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/plugin-${version}.xsd">
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd">
   <id>plugin</id>
   <name>PluginDescriptor</name>
   <description><![CDATA[
     Plugin descriptor, stored in <code>META-INF/maven/plugin.xml</code> in a plugin's jar artifact.
     This descriptor is generally generated from plugin sources, using
     <a href="/plugins/maven-plugin-plugin/">maven-plugin-plugin</a>.
-    <i>Notice:</i> this documentation is generated from a Modello model but the code executed is not generated
-    from this descriptor. Please report if you find anything wrong.
+    <p><i>Notice:</i> this documentation is generated from a Modello model but the code executed is not generated
+    from this descriptor. Please report if you find anything wrong.</p>
   ]]></description>
   <defaults>
     <default>
