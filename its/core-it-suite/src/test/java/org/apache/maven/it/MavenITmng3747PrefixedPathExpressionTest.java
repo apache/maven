@@ -47,7 +47,7 @@ public class MavenITmng3747PrefixedPathExpressionTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3747" );
 
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Verifier verifier = newVerifier( testDir.getCanonicalPath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.executeGoal( "validate" );
@@ -55,7 +55,7 @@ public class MavenITmng3747PrefixedPathExpressionTest
         verifier.resetStreams();
 
         Properties props = verifier.loadProperties( "target/config.properties" );
-        assertCanonicalFileEquals( "path is: " + new File( testDir, "relative" ).getAbsolutePath() + "/somepath", 
+        assertEquals( "path is: " + new File( testDir, "relative" ).getCanonicalPath() + "/somepath", 
             props.getProperty( "stringParam" ) );
     }
 

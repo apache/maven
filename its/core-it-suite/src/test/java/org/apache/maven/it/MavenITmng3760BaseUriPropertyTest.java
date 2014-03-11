@@ -43,7 +43,7 @@ public class MavenITmng3760BaseUriPropertyTest
     public void testitMNG3760()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3760" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3760" ).getCanonicalFile();
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
@@ -55,7 +55,7 @@ public class MavenITmng3760BaseUriPropertyTest
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         // set via project
-        assertCanonicalFileEquals( testDir.toURI().toString(), props.getProperty( "project.properties.pomProperty" ) );
+        assertEquals( testDir.toURI().toString(), props.getProperty( "project.properties.pomProperty" ) );
         // check that project prefix is required
         assertEquals( "${baseUri}", props.getProperty( "project.properties.baseUriProperty" ) );
     }
@@ -77,7 +77,7 @@ public class MavenITmng3760BaseUriPropertyTest
 
         Properties props = verifier.loadProperties( "target/profile.properties" );
         // set via project
-        assertCanonicalFileEquals( testDir.toURI().toString(), props.getProperty( "project.properties.pomProperty" ) );
+        assertEquals( testDir.toURI().toString(), props.getProperty( "project.properties.pomProperty" ) );
         // check that project prefix is required
         assertEquals( "myBaseUri", props.getProperty( "project.properties.baseUriProperty" ) );
     }
