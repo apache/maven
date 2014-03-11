@@ -23,6 +23,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -56,8 +57,6 @@ public class MavenITmng3475BaseAlignedDirTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        //testDir = testDir.getCanonicalFile();
-
         Properties configProps = verifier.loadProperties( "target/config.properties" );
 
         assertPathEquals( testDir, "target", configProps.getProperty( "mapParam.buildDirectory" ) );
@@ -84,10 +83,11 @@ public class MavenITmng3475BaseAlignedDirTest
     }
 
     private void assertPathEquals( File basedir, String expected, String actual )
+        throws IOException
     {
         File actualFile = new File( actual );
         assertTrue( "path not absolute: " + actualFile, actualFile.isAbsolute() );
-        assertEquals( new File( basedir, expected ), actualFile );
+        assertCanonicalFileEquals( new File( basedir, expected ), actualFile );
     }
 
 }

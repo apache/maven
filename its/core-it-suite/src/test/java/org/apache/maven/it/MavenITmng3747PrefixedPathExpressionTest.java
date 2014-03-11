@@ -54,10 +54,8 @@ public class MavenITmng3747PrefixedPathExpressionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        //testDir = testDir.getCanonicalFile();
-
         Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( "path is: " + new File( testDir, "relative" ).getAbsolutePath() + "/somepath", 
+        assertCanonicalFileEquals( "path is: " + new File( testDir, "relative" ).getAbsolutePath() + "/somepath", 
             props.getProperty( "stringParam" ) );
     }
 

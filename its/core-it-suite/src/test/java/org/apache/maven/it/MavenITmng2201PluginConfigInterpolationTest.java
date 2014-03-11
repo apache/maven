@@ -53,20 +53,18 @@ public class MavenITmng2201PluginConfigInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        //testDir = testDir.getCanonicalFile();
-
         Properties props = verifier.loadProperties( "target/config.properties" );
-        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "stringParam" ) ) );
-        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "propertiesParam.buildDir" ) ) );
-        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "mapParam.buildDir" ) ) );
+        assertCanonicalFileEquals( new File( testDir, "target" ), new File( props.getProperty( "stringParam" ) ) );
+        assertCanonicalFileEquals( new File( testDir, "target" ), new File( props.getProperty( "propertiesParam.buildDir" ) ) );
+        assertCanonicalFileEquals( new File( testDir, "target" ), new File( props.getProperty( "mapParam.buildDir" ) ) );
         assertEquals( "4.0.0", props.getProperty( "domParam.children.modelVersion.0.value" ) );
         assertEquals( "org.apache.maven.its.it0104", props.getProperty( "domParam.children.groupId.0.value" ) );
         assertEquals( "1.0-SNAPSHOT", props.getProperty( "domParam.children.version.0.value" ) );
         assertEquals( "jar", props.getProperty( "domParam.children.packaging.0.value" ) );
         assertEquals( "http://maven.apache.org", props.getProperty( "domParam.children.url.0.value" ) );
         assertEquals( "Apache", props.getProperty( "domParam.children.organization.0.children.name.0.value" ) );
-        assertEquals( new File( testDir, "target" ), new File( props.getProperty( "domParam.children.build.0.children.directory.0.value" ) ) );
-        assertEquals( new File( testDir, "target/classes" ), new File( props.getProperty( "domParam.children.build.0.children.outputDirectory.0.value" ) ) );
+        assertCanonicalFileEquals( new File( testDir, "target" ), new File( props.getProperty( "domParam.children.build.0.children.directory.0.value" ) ) );
+        assertCanonicalFileEquals( new File( testDir, "target/classes" ), new File( props.getProperty( "domParam.children.build.0.children.outputDirectory.0.value" ) ) );
     }
 
 }

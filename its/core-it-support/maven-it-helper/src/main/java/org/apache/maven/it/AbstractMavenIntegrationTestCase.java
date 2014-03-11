@@ -474,4 +474,27 @@ public abstract class AbstractMavenIntegrationTestCase
         return verifier;
     }
 
+    static public void assertCanonicalFileEquals( String message, File expected, File actual )
+        throws IOException
+    {
+        assertEquals( message, expected.getCanonicalFile(), actual.getCanonicalFile() );
+    }
+
+    static public void assertCanonicalFileEquals( File expected, File actual )
+        throws IOException
+    {
+        assertCanonicalFileEquals( null, expected, actual );
+    }
+
+    static public void assertCanonicalFileEquals( String message, String expected, String actual )
+        throws IOException
+    {
+        assertCanonicalFileEquals( message, new File( expected ), new File( actual ) );
+    }
+
+    static public void assertCanonicalFileEquals( String expected, String actual )
+        throws IOException
+    {
+        assertCanonicalFileEquals( null, new File( expected ), new File( actual ) );
+    }
 }

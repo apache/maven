@@ -56,14 +56,12 @@ public class MavenITmng3904NestedBuildDirInterpolationTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        //testDir = testDir.getCanonicalFile();
-
         Properties props = verifier.loadProperties( "target/pom.properties" );
-        assertEquals( new File( testDir, "target/classes/dir0" ), 
+        assertCanonicalFileEquals( new File( testDir, "target/classes/dir0" ), 
             new File( props.getProperty( "project.properties.dir0" ) ) );
-        assertEquals( new File( testDir, "src/test/dir1" ), 
+        assertCanonicalFileEquals( new File( testDir, "src/test/dir1" ), 
             new File( props.getProperty( "project.properties.dir1" ) ) );
-        assertEquals( new File( testDir, "target/site/dir2" ), 
+        assertCanonicalFileEquals( new File( testDir, "target/site/dir2" ), 
             new File( props.getProperty( "project.properties.dir2" ) ) );
     }
 
