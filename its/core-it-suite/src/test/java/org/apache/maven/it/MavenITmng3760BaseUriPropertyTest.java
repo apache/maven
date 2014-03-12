@@ -63,7 +63,7 @@ public class MavenITmng3760BaseUriPropertyTest
     public void testitMNG3760SystemPropertyOverride()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3760" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3760" ).getCanonicalFile();
 
         // check that setting baseUri doesn't override project value
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
