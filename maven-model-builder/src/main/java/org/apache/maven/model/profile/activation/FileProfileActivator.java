@@ -116,6 +116,14 @@ public class FileProfileActivator
                     return null;
                 }
             } );
+
+            if ( path.contains( "${project.basedir}" ) )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
+                        .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": ${project.basedir} expression not supported during profile activation, use ${basedir} instead" )
+                        .setLocation( file.getLocation( missing ? "missing" : "exists" ) ) );
+            }
+
         }
         else if ( path.contains( "${basedir}" ) )
         {
