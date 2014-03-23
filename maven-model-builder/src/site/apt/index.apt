@@ -25,7 +25,7 @@
 
 Maven Model Builder
 
- The effective model builder, with inheritance, profile activation, interpolation, ...
+ The effective model builder, with profile activation, inheritance, interpolation, ...
 
  The main component is <<<ModelBuilder>>>
  ({{{./apidocs/org/apache/maven/model/building/ModelBuilder.html}javadoc}},
@@ -39,7 +39,9 @@ Maven Model Builder
 
  * phase 1
 
-   ** profile activation (see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}})
+   ** profile activation: see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}}.
+   Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
+   <<<$\{basedir}>>>, System properties and request properties
 
    ** model normalization: <<<ModelNormalizer>>> ({{{./apidocs/org/apache/maven/model/normalization/ModelNormalizer.html}javadoc}}),
    with its <<<DefaultModelNormalizer>>> implementation
@@ -95,6 +97,10 @@ Maven Model Builder
   Model Interpolation consists in replacing <<<$\{...\}>>> with calculated value. It is done in <<<StringSearchModelInterpolator>>>
   ({{{./apidocs/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html}javadoc}},
   {{{./xref/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html}source}}).
+
+  Notice that model interpolation happens <after> profile activation, then profile activation doesn't benefit from every values:
+  interpolation for file-based activation is limited to <<<$\{basedir}>>> (which is not deprecated in this context),
+  System properties and request properties.
 
   Values are evaluated in sequence from different syntaxes:
 

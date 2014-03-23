@@ -3246,10 +3246,12 @@
     <class java.clone="deep">
       <name>ActivationFile</name>
       <version>4.0.0+</version>
-      <description>This is the file specification used to activate the profile. The missing value
-        will be the location of a file that needs to exist, and if it doesn't the profile will be
-        activated. On the other hand exists will test for the existence of the file and if it is
-        there the profile will be activated.</description>
+      <description><![CDATA[This is the file specification used to activate the profile. The <code>missing</code> value
+        is the location of a file that needs to exist, and if it doesn't, the profile will be
+        activated. On the other hand, <code>exists</code> will test for the existence of the file and if it is
+        there, the profile will be activated.<br/>
+        Variable interpolation for these file specifications is limited to <code>${basedir}</code>,
+        System properties and request properties.]]></description>
       <fields>
         <field>
           <name>missing</name>
