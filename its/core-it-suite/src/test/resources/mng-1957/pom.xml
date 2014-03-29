@@ -146,5 +146,15 @@ under the License.
         <jdkProperty6>PASSED</jdkProperty6>
       </properties>
     </profile>
+    <profile>
+      <!-- bounds close to current Java version (MNG-4512) -->
+      <id>test-6e</id>
+      <activation>
+        <jdk>[1.8,1.9)</jdk>
+      </activation>
+      <properties>
+        <jdkProperty6>PASSED</jdkProperty6>
+      </properties>
+    </profile>
   </profiles>
 </project>
