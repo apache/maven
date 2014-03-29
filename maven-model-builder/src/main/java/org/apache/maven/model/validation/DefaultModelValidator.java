@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Dependency;
@@ -154,6 +156,8 @@ public class DefaultModelValidator
                                   "must be unique but found duplicate profile with id " + profile.getId(), profile );
                 }
 
+                validate30RawProfileActivation( problems, profile.getActivation(), profile.getId(), prefix + ".activation", request );
+
                 validate20RawDependencies( problems, profile.getDependencies(), prefix + ".dependencies.dependency",
                                          request );
 
@@ -181,6 +185,53 @@ public class DefaultModelValidator
                                             request );
                     }
                 }
+            }
+        }
+    }
+
+    private void validate30RawProfileActivation( ModelProblemCollector problems, Activation activation,
+                                                 String sourceHint, String prefix, ModelBuildingRequest request )
+    {
+        if ( activation == null )
+        {
+            return;
+        }
+
+        ActivationFile file = activation.getFile();
+
+        if ( file != null )
+        {
+            String path;
+            boolean missing;
+
+            if ( StringUtils.isNotEmpty( file.getExists() ) )
+            {
+                path = file.getExists();
+                missing = false;
+            }
+            else if ( StringUtils.isNotEmpty( file.getMissing() ) )
+            {
+                path = file.getMissing();
+                missing = true;
+            }
+            else
+            {
+                return;
+            }
+
+            if ( hasProjectExpression( path ) )
+            {
+                addViolation( problems,
+                              Severity.WARNING,
+                              Version.V30,
+                              prefix + ( missing ? ".file.missing" : ".file.exists" ),
+                              null,
+                              "Failed to interpolate file location "
+                                  + path
+                                  + " for profile "
+                                  + sourceHint
+                                  + ": ${project.basedir} expression not supported during profile activation, use ${basedir} instead",
+                              file.getLocation( missing ? "missing" : "exists" ) );
             }
         }
     }
@@ -716,6 +767,11 @@ public class DefaultModelValidator
     private boolean hasExpression( String value )
     {
         return value != null && value.contains( "${" );
+    }
+
+    private boolean hasProjectExpression( String value )
+    {
+        return value != null && value.contains( "${project." );
     }
 
     private boolean validateStringNotEmpty( String fieldName, ModelProblemCollector problems, Severity severity, Version version,

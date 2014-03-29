@@ -47,6 +47,7 @@ import org.codehaus.plexus.util.StringUtils;
  * 
  * @author Benjamin Bentmann
  * @see ActivationFile
+ * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel(org.apache.maven.model.Model, org.apache.maven.model.building.ModelBuildingRequest, ModelProblemCollector)
  */
 @Component( role = ProfileActivator.class, hint = "file" )
 public class FileProfileActivator
@@ -117,14 +118,6 @@ public class FileProfileActivator
                     return null;
                 }
             } );
-
-            if ( path.contains( "${project.basedir}" ) )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
-                        .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": ${project.basedir} expression not supported during profile activation, use ${basedir} instead" )
-                        .setLocation( file.getLocation( missing ? "missing" : "exists" ) ) );
-            }
-
         }
         else if ( path.contains( "${basedir}" ) )
         {
