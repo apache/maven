@@ -219,7 +219,7 @@ public class DefaultModelValidator
                 return;
             }
 
-            if ( hasProjectExpression( path ) )
+            if ( path.contains( "${project.basedir}" ) )
             {
                 addViolation( problems,
                               Severity.WARNING,
@@ -231,6 +231,20 @@ public class DefaultModelValidator
                                   + " for profile "
                                   + sourceHint
                                   + ": ${project.basedir} expression not supported during profile activation, use ${basedir} instead",
+                              file.getLocation( missing ? "missing" : "exists" ) );
+            }
+            else if ( hasProjectExpression( path ) )
+            {
+                addViolation( problems,
+                              Severity.WARNING,
+                              Version.V30,
+                              prefix + ( missing ? ".file.missing" : ".file.exists" ),
+                              null,
+                              "Failed to interpolate file location "
+                                  + path
+                                  + " for profile "
+                                  + sourceHint
+                                  + ": ${project.*} expressions are not supported during profile activation",
                               file.getLocation( missing ? "missing" : "exists" ) );
             }
         }
