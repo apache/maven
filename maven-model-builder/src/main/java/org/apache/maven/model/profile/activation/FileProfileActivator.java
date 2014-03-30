@@ -145,6 +145,16 @@ public class FileProfileActivator
 
         path = pathTranslator.alignToBaseDirectory( path, basedir );
 
+        // replace activation value with interpolated value
+        if ( missing )
+        {
+            file.setMissing( path );
+        }
+        else
+        {
+            file.setExists( path );
+        }
+
         File f = new File( path );
 
         if ( !f.isAbsolute() )
