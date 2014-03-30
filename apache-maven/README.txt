@@ -27,30 +27,30 @@
   Memory:
     No minimum requirement.
   Disk:
-    No minimum requirement. Approximately 100MB will be used for your local repository,
-    however this will vary depending on usage and can be removed and redownloaded at
-    any time.
+    Approximately 10MB is required for the Maven installation itself. In addition to
+    that, additional disk space will be used for your local Maven repository. The size
+    of your local repository will vary depending on usage but expect at least 500MB.
   Operating System:
-    No minimum requirement. On Windows, Windows NT and above or Cygwin is required for
-    the startup scripts. Tested on Windows XP, Fedora Core and Mac OS X.
+    No minimum requirement. Start up scripts are included as shell scripts and Windows
+    batch files.
 
   Installing Maven
   ----------------
 
   1) Unpack the archive where you would like to store the binaries, eg:
 
-    Unix-based Operating Systems (Linux, Solaris and Mac OS X)
+    Unix-based operating systems (Linux, Solaris and Mac OS X)
       tar zxvf apache-maven-3.x.y.tar.gz
-    Windows 2000/XP
+    Windows
       unzip apache-maven-3.x.y.zip
 
   2) A directory called "apache-maven-3.x.y" will be created.
 
   3) Add the bin directory to your PATH, eg:
 
-    Unix-based Operating Systems (Linux, Solaris and Mac OS X)
+    Unix-based operating systems (Linux, Solaris and Mac OS X)
       export PATH=/usr/local/apache-maven-3.x.y/bin:$PATH
-    Windows 2000/XP
+    Windows
       set PATH="c:\program files\apache-maven-3.x.y\bin";%PATH%
 
   4) Make sure JAVA_HOME is set to the location of your JDK
@@ -62,7 +62,7 @@
   Licensing
   ---------
 
-  Please see the file called LICENSE.TXT
+  Please see the file called LICENSE.
 
   Maven URLS
   ----------
