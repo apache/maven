@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.maven.model.Activation;
-import org.apache.maven.model.ActivationFile;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -286,8 +285,8 @@ public class DefaultModelBuilder
                 profileSelector.getActiveProfiles( rawModel.getProfiles(), profileActivationContext, problems );
             currentData.setActiveProfiles( activePomProfiles );
 
-            Map<String, ActivationFile> interpolatedActivationFiles = getProfileActivationFiles( rawModel, false );
-            injectProfileActivationFiles( tmpModel, interpolatedActivationFiles );
+            Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
+            injectProfileActivations( tmpModel, interpolatedActivations );
 
             for ( Profile activeProfile : activePomProfiles )
             {
@@ -642,37 +641,30 @@ public class DefaultModelBuilder
         }
     }
 
-    private Map<String, ActivationFile> getProfileActivationFiles( Model model, boolean clone )
+    private Map<String, Activation> getProfileActivations( Model model, boolean clone )
     {
-        Map<String, ActivationFile> activationFiles = new HashMap<String, ActivationFile>();
+        Map<String, Activation> activations = new HashMap<String, Activation>();
         for ( Profile profile : model.getProfiles() )
         {
             Activation activation = profile.getActivation();
 
             if ( activation == null )
-            {
-                continue;
-            }
-
-            ActivationFile file = activation.getFile();
-
-            if ( file == null )
             {
                 continue;
             }
 
             if ( clone )
             {
-                file = file.clone();
+                activation = activation.clone();
             }
 
-            activationFiles.put( profile.getId(), file );
+            activations.put( profile.getId(), activation );
         }
 
-        return activationFiles;
+        return activations;
     }
 
-    private void injectProfileActivationFiles( Model model, Map<String, ActivationFile> activationFiles )
+    private void injectProfileActivations( Model model, Map<String, Activation> activations )
     {
         for ( Profile profile : model.getProfiles() )
         {
@@ -683,30 +675,21 @@ public class DefaultModelBuilder
                 continue;
             }
 
-            ActivationFile file = activation.getFile();
-
-            if ( file == null )
-            {
-                continue;
-            }
-
-            // restore file specification
-            ActivationFile originalFile = activationFiles.get( profile.getId() );
-            file.setExists( originalFile.getExists() );
-            file.setMissing( originalFile.getMissing() );
+            // restore activation
+            profile.setActivation( activations.get( profile.getId() ) );
         }
     }
 
     private Model interpolateModel( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        // save profiles with file activation before interpolation, since they are evaluated with limited scope
-        Map<String, ActivationFile> originalActivationFiles = getProfileActivationFiles( model, true );
+        // save profile activations before interpolation, since they are evaluated with limited scope
+        Map<String, Activation> originalActivations = getProfileActivations( model, true );
 
         Model result = modelInterpolator.interpolateModel( model, model.getProjectDirectory(), request, problems );
         result.setPomFile( model.getPomFile() );
 
         // restore profiles with file activation to their value before full interpolation
-        injectProfileActivationFiles( model, originalActivationFiles );
+        injectProfileActivations( model, originalActivations );
 
         return result;
     }
