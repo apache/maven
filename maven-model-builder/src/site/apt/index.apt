@@ -39,6 +39,10 @@ Maven Model Builder
 
  * phase 1
 
+   ** raw model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
+   with its <<<DefaultModelValidator>>> implementation
+   ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
+
    ** profile activation: see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}}.
    Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
    <<<$\{basedir}>>> (since Maven 3), System properties and request properties
