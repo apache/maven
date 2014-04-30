@@ -44,7 +44,8 @@ public class ExecutionEventLogger
     private final Logger logger;
 
     private static final int LINE_LENGTH = 72;
-    private static final int BUILD_TIME_DURATION_LENGTH = 9;
+    private static final int MAX_PADDED_BUILD_TIME_DURATION_LENGTH = 9;
+    private static final int MAX_PROJECT_NAME_LENGTH = 52;
 
     public ExecutionEventLogger()
     {
@@ -134,13 +135,16 @@ public class ExecutionEventLogger
             StringBuilder buffer = new StringBuilder( 128 );
 
             buffer.append( project.getName() );
+            buffer.append( ' ' );
 
-            buffer.append( ' ' );
-            while ( buffer.length() < LINE_LENGTH - 21 )
+            if ( buffer.length() <= MAX_PROJECT_NAME_LENGTH )
             {
-                buffer.append( '.' );
+                while ( buffer.length() < MAX_PROJECT_NAME_LENGTH )
+                {
+                    buffer.append( '.' );
+                }
+                buffer.append( ' ' );
             }
-            buffer.append( ' ' );
 
             BuildSummary buildSummary = result.getBuildSummary( project );
 
@@ -152,7 +156,11 @@ public class ExecutionEventLogger
             {
                 buffer.append( "SUCCESS [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
-                buffer.append( chars( ' ', BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length() ) );
+                int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
+                if ( padSize > 0 )
+                {
+                    buffer.append( chars( ' ', padSize ) );
+                }
                 buffer.append( buildTimeDuration );
                 buffer.append( "]" );
             }
@@ -160,7 +168,11 @@ public class ExecutionEventLogger
             {
                 buffer.append( "FAILURE [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
-                buffer.append( chars( ' ', BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length() ) );
+                int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
+                if ( padSize > 0 )
+                {
+                    buffer.append( chars( ' ', padSize ) );
+                }
                 buffer.append( buildTimeDuration );
                 buffer.append( "]" );
             }
