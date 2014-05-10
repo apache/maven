@@ -21,6 +21,7 @@ package org.apache.maven.cli.event;
 
 import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
+
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -29,7 +30,9 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -289,6 +292,8 @@ public class ExecutionEventLogger
 
             buffer.append( ">>> " );
             append( buffer, event.getMojoExecution() );
+            buffer.append( " > " );
+            appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
             append( buffer, event.getProject() );
             buffer.append( " >>>" );
 
@@ -309,6 +314,8 @@ public class ExecutionEventLogger
 
             buffer.append( "<<< " );
             append( buffer, event.getMojoExecution() );
+            buffer.append( " < " );
+            appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
             append( buffer, event.getProject() );
             buffer.append( " <<<" );
 
@@ -324,6 +331,26 @@ public class ExecutionEventLogger
         if ( me.getExecutionId() != null )
         {
             buffer.append( " (" ).append( me.getExecutionId() ).append( ')' );
+        }
+    }
+
+    private void appendForkInfo( StringBuilder buffer, MojoDescriptor md )
+    {
+        if ( StringUtils.isNotEmpty( md.getExecutePhase() ) )
+        {
+            // forked phase
+            if ( StringUtils.isNotEmpty( md.getExecuteLifecycle() ) )
+            {
+                buffer.append( '[' );
+                buffer.append( md.getExecuteLifecycle() );
+                buffer.append( ']' );
+            }
+            buffer.append( md.getExecutePhase() );
+        }
+        else
+        {
+            // forked goal
+            buffer.append( md.getExecuteGoal() );
         }
     }
 
