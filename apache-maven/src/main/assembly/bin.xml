@@ -36,8 +36,6 @@ under the License.
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
-        <exclude>junit:junit</exclude>
-        <exclude>commons-logging:commons-logging-api</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
