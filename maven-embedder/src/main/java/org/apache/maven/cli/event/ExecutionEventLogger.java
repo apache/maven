@@ -281,7 +281,8 @@ public class ExecutionEventLogger
     }
 
     /**
-     * <pre>>>> mojo-artifactId:version:goal (mojo-executionId) @ project-artifactId >>></pre>
+     * <pre>>>> mojo-artifactId:version:goal (mojo-executionId) > :forked-goal @ project-artifactId >>></pre>
+     * <pre>>>> mojo-artifactId:version:goal (mojo-executionId) > [lifecycle]phase @ project-artifactId >>></pre>
      */
     @Override
     public void forkStarted( ExecutionEvent event )
@@ -303,7 +304,8 @@ public class ExecutionEventLogger
     }
 
     /**
-     * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) @ project-artifactId &lt;&lt;&lt;</pre>
+     * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; :forked-goal @ project-artifactId &lt;&lt;&lt;</pre>
+     * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; [lifecycle]phase @ project-artifactId &lt;&lt;&lt;</pre>
      */
     @Override
     public void forkSucceeded( ExecutionEvent event )
