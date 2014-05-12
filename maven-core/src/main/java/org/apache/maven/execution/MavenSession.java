@@ -71,6 +71,8 @@ public class MavenSession
      */
     private List<MavenProject> allProjects;
 
+    private List<MavenProject> workspaceProjects;
+    
     private MavenProject topLevelProject;
 
     private ProjectDependencyGraph projectDependencyGraph;
@@ -245,6 +247,7 @@ public class MavenSession
         return settings;
     }
 
+    //JVZ: These are the projects to build. Should rename this
     public List<MavenProject> getProjects()
     {
         return projects;
@@ -424,5 +427,28 @@ public class MavenSession
         this.allProjects = allProjects;
     }
     
-    
+    /** This is a provisional method and may be removed */
+    public List<MavenProject> getWorkspaceProjects()
+    {
+        return workspaceProjects;
+    }
+
+    /** This is a provisional method and may be removed */
+    public void setWorkspaceProjects( List<MavenProject> workspaceProjects )
+    {
+        this.workspaceProjects = workspaceProjects;
+    }
+
+    /** This is a provisional method and may be removed */
+    public List<MavenProject> getBuildSpaceProjects()
+    {
+        return projects;
+    }
+
+    /** This is a provisional method and may be removed */
+    public void setBuildSpaceProjects( List<MavenProject> buildSpaceProjects )
+    {
+        this.projects = buildSpaceProjects;
+    }
+
 }

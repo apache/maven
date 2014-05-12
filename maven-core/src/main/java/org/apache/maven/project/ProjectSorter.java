@@ -234,6 +234,7 @@ public class ProjectSorter
     }
 
     // TODO: !![jc; 28-jul-2005] check this; if we're using '-r' and there are aggregator tasks, this will result in weirdness.
+    @Deprecated
     public MavenProject getTopLevelProject()
     {
         if ( topLevelProject == null )

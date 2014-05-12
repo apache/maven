@@ -96,6 +96,8 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 
+import com.google.common.collect.Lists;
+
 /**
  * @author Jason van Zyl
  */
@@ -274,6 +276,15 @@ public class DefaultMaven
 
         session.setProjects( projectDependencyGraph.getSortedProjects() );
 
+        try
+        {
+            session.setWorkspaceProjects( calculateWorkspaceProjects( session ) );
+        }
+        catch ( Exception e )
+        {
+            return addExceptionToResult( result, e );
+        }        
+        
         try
         {
             session.setProjectMap( getProjectMap( session.getProjects() ) );
@@ -1071,5 +1082,79 @@ public class DefaultMaven
 
         return false;
     }
+    
+    //
+    // The workspace is a combination of the buildspace projects plus any projects explicitly added, and
+    // any projects calculated as a result of workspace instructions like -wus
+    //
+    private List<MavenProject> calculateWorkspaceProjects( MavenSession session )
+        throws MavenExecutionException, CycleDetectedException, org.apache.maven.project.DuplicateProjectException
+    {
+        MavenExecutionRequest request = session.getRequest();
 
+        List<MavenProject> workspaceProjects = Lists.newArrayList();
+
+        for ( MavenProject buildspaceProject : session.getProjects() )
+        {
+            if ( projectShouldBeAddedToWorkspace( buildspaceProject ) )
+            {
+                workspaceProjects.add( buildspaceProject );
+            }
+        }
+
+        for ( String selector : request.getWorkspaceProjects() )
+        {
+            MavenProject selectedProject = null;
+            for ( MavenProject project : session.getAllProjects() )
+            {
+                if ( isMatchingProject( project, selector, null ) )
+                {
+                    selectedProject = project;
+                    break;
+                }
+            }
+            if ( selectedProject != null )
+            {
+                if ( !workspaceProjects.contains( selectedProject ) )
+                {
+                    workspaceProjects.add( selectedProject );
+                }
+            }
+            else
+            {
+                throw new MavenExecutionException( "Could not find the selected project in the reactor: " + selector,
+                                                   request.getPom() );
+            }
+        }
+
+        if ( request.getWorkspaceBehavior().equals( MavenExecutionRequest.WORKSPACE_RESOLUTION ) )
+        {
+            //
+            // This is not efficient, we need to figure out how to share the graph. We also have an issue with the graph
+            // where parents are considered dependencies. We will filter out projects of packaging = pom for now
+            //
+            ProjectDependencyGraph graph = new DefaultProjectDependencyGraph( session.getAllProjects() );
+
+            for ( MavenProject buildspaceProject : session.getProjects() )
+            {
+                List<MavenProject> upstreamProjects = graph.getUpstreamProjects( buildspaceProject, true );
+                for ( MavenProject upstreamProject : upstreamProjects )
+                {
+                    if ( !workspaceProjects.contains( upstreamProject )
+                        && projectShouldBeAddedToWorkspace( upstreamProject ) )
+                    {
+                        workspaceProjects.add( upstreamProject );
+                    }
+                }
+            }
+        }
+
+        return workspaceProjects;
+    }
+
+    // Right now I can't think of anything to exclude but we'll leave this here.
+    private boolean projectShouldBeAddedToWorkspace( MavenProject project )
+    {
+        return true;
+    }    
 }

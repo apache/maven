@@ -89,6 +89,12 @@ public class CLIManager
 
     public static final String ALSO_MAKE_DEPENDENTS = "amd";
 
+    // -wl :project-a
+    public static final String WORKSPACE_LIST = "wl";
+
+    // use :project-a and its dependencies to create the workspace set of projects
+    public static final String WORKSPACE_RESOLUTION = "ws";
+
     public static final String LOG_FILE = "l";
 
     public static final String ENCRYPT_MASTER_PASSWORD = "emp";
@@ -132,6 +138,9 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path." ).hasArg().create( PROJECT_LIST ) );
         options.addOption( OptionBuilder.withLongOpt( "also-make" ).withDescription( "If project list is specified, also build projects required by the list" ).create( ALSO_MAKE ) );
         options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription( "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
+        // Workspace support
+        options.addOption( OptionBuilder.withLongOpt( "workspace" ).withDescription( "Comma-delimited list of specified reactor projects to put in the workspace. A project can be specified by [groupId]:artifactId or by its relative path." ).hasArg().create( WORKSPACE_LIST ) );
+        options.addOption( OptionBuilder.withLongOpt( "workspace-resolution" ).withDescription( "If project list is specified, also add upstream projects to the workspace." ).create( WORKSPACE_RESOLUTION) );
         options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
         options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasOptionalArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );

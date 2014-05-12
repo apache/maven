@@ -77,6 +77,8 @@ public interface MavenExecutionRequest
 
     String REACTOR_MAKE_BOTH = "make-both";
 
+    String WORKSPACE_RESOLUTION = "workspace-resolution";
+
     // ----------------------------------------------------------------------
     // Artifact repository policies
     // ----------------------------------------------------------------------
@@ -150,7 +152,7 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setSelectedProjects( List<String> projects );
 
     List<String> getSelectedProjects();
-
+    
     /**
      * @param projects the projects to exclude
      * @return this MavenExecutionRequest
@@ -171,7 +173,21 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setMakeBehavior( String makeBehavior );
 
     String getMakeBehavior();
+    
+    // Workspace
+    
+    /** @provisional */
+    MavenExecutionRequest setWorkspaceProjects( List<String> projects );
 
+    /** @provisional */
+    List<String> getWorkspaceProjects();    
+    
+    /** @provisional */
+    MavenExecutionRequest setWorkspaceBehavior( String workspaceBehavior );
+
+    /** @provisional */
+    String getWorkspaceBehavior();
+    
     /**
      * Set's the parallel degree of concurrency used by the build.
      * 
@@ -187,8 +203,10 @@ public interface MavenExecutionRequest
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );
 
+    //JVZ: deprecate this method and pick a better name, this indicates looking at the <modules/> element and reading those
+    // projects as well. This method name is not very clear.
     boolean isRecursive();
-
+    
     MavenExecutionRequest setPom( File pom );
 
     File getPom();
@@ -376,6 +394,5 @@ public interface MavenExecutionRequest
      * 
      * @since 3.2.0
      */
-    String getBuilderId();
-
+    String getBuilderId();    
 }

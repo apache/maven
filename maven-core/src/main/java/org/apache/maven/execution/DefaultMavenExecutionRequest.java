@@ -102,6 +102,8 @@ public class DefaultMavenExecutionRequest
 
     private List<String> selectedProjects;
 
+    private List<String> workspaceProjects;
+
     private List<String> excludedProjects;
 
     private String resumeFrom;
@@ -260,6 +262,22 @@ public class DefaultMavenExecutionRequest
         return selectedProjects;
     }
 
+    public MavenExecutionRequest setWorkspaceProjects( List<String> workspaceProjects )
+    {
+        this.workspaceProjects = workspaceProjects;
+        return this;
+    }
+
+    public List<String> getWorkspaceProjects()
+    {
+        if ( workspaceProjects == null )
+        {
+            workspaceProjects = new ArrayList<String>();
+        }
+
+        return workspaceProjects;
+    }
+    
     public List<String> getExcludedProjects()
     {
         if ( excludedProjects == null )
@@ -1108,5 +1126,19 @@ public class DefaultMavenExecutionRequest
     public String getBuilderId()
     {
         return builderId;
+    }
+
+    /** @provisional */
+    private String workspaceBehavior = "";
+
+    public MavenExecutionRequest setWorkspaceBehavior( String workspaceBehavior )
+    {
+        this.workspaceBehavior = workspaceBehavior;
+        return this;
+    }
+
+    public String getWorkspaceBehavior()
+    {
+        return workspaceBehavior;
     }
 }
