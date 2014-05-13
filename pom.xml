@@ -600,16 +600,6 @@
               </reportSet>
             </reportSets>
           </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>cobertura-maven-plugin</artifactId>
-            <reportSets>
-              <reportSet>
-                <!-- Disabled as it kills the site generation via a NoClassDefFoundError -->
-                <reports />
-              </reportSet>
-            </reportSets>
-          </plugin>
         </plugins>
       </reporting>
     </profile>
