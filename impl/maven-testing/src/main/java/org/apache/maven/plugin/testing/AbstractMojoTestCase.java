@@ -439,6 +439,11 @@ public abstract class AbstractMojoTestCase
 
         PlexusConfiguration pluginConfiguration = new XmlPlexusConfiguration( configuration );
 
+        if ( mojoDescriptor.getComponentConfigurator() != null )
+        {
+            configurator = getContainer().lookup( ComponentConfigurator.class, mojoDescriptor.getComponentConfigurator() );
+        }        
+        
         configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
 
         return mojo;
@@ -627,6 +632,8 @@ public abstract class AbstractMojoTestCase
 
         ExpressionEvaluator evaluator = new ResolverExpressionEvaluatorStub();
 
+        System.out.println(pluginConfiguration);
+        
         configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
 
         return mojo;
@@ -772,5 +779,5 @@ public abstract class AbstractMojoTestCase
         }
 
         throw new Exception( "container is null, make sure super.setUp() is called" );
-    }
+    }    
 }
