@@ -352,6 +352,7 @@ public class ExecutionEventLogger
         else
         {
             // forked goal
+            buffer.append( ':' );
             buffer.append( md.getExecuteGoal() );
         }
     }
