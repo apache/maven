@@ -632,8 +632,6 @@ public abstract class AbstractMojoTestCase
 
         ExpressionEvaluator evaluator = new ResolverExpressionEvaluatorStub();
 
-        System.out.println(pluginConfiguration);
-        
         configurator.configureComponent( mojo, pluginConfiguration, evaluator, getContainer().getContainerRealm() );
 
         return mojo;
