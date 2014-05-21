@@ -79,7 +79,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.aether</groupId>
-      <artifactId>aether-connector-wagon</artifactId>
+      <artifactId>aether-transport-wagon</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
