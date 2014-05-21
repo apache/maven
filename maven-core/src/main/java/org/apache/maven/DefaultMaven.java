@@ -267,12 +267,12 @@ public class DefaultMaven
         //
         ProjectDependencyGraph projectDependencyGraph = createProjectDependencyGraph( projects, request, result, true );
 
-        session.setProjects( projectDependencyGraph.getSortedProjects() );
-        
         if ( result.hasExceptions() )
         {
             return result;
         }
+
+        session.setProjects( projectDependencyGraph.getSortedProjects() );
 
         try
         {
