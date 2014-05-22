@@ -34,7 +34,7 @@ public class MavenITmng5530MojoExecutionScopeTest
     public void test_copyfiles()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope");
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "basic" );
 
@@ -52,8 +52,36 @@ public class MavenITmng5530MojoExecutionScopeTest
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
 
-        //verifier.assertFilePresent( "target/execution-failure.txt" );
+        // verifier.assertFilePresent( "target/execution-failure.txt" );
         verifier.assertFilePresent( "target/execution-success.txt" );
         verifier.assertFilePresent( "target/execution-before.txt" );
     }
+
+    public void test_copyfiles_multithreaded()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope" );
+        File pluginDir = new File( testDir, "plugin" );
+        File projectDir = new File( testDir, "basic" );
+
+        Verifier verifier;
+
+        // install the test plugin
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // build the test project
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        verifier.getCliOptions().add("--builder multithreaded -T 1");
+        verifier.executeGoal( "package" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // verifier.assertFilePresent( "target/execution-failure.txt" );
+        verifier.assertFilePresent( "target/execution-success.txt" );
+        verifier.assertFilePresent( "target/execution-before.txt" );
+    }
+
 }
