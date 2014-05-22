@@ -22,6 +22,7 @@ package org.apache.maven.lifecycle.internal;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.maven.SessionScope;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
@@ -64,6 +65,9 @@ public class LifecycleModuleBuilder
     @Requirement
     private List<ProjectExecutionListener> projectExecutionListeners;
 
+    @Requirement
+    private SessionScope sessionScope;
+
     public void setProjectExecutionListeners( final List<ProjectExecutionListener> listeners )
     {
         this.projectExecutionListeners = listeners;
@@ -83,6 +87,10 @@ public class LifecycleModuleBuilder
 
         long buildStartTime = System.currentTimeMillis();
 
+        // session may be different from rootSession seeded in DefaultMaven
+        // explicitly seed the right session here to make sure it is used by Guice 
+        sessionScope.enter();
+        sessionScope.seed( MavenSession.class, session );
         try
         {
 
@@ -125,6 +133,8 @@ public class LifecycleModuleBuilder
         }
         finally
         {
+            sessionScope.exit();
+
             session.setCurrentProject( null );
 
             Thread.currentThread().setContextClassLoader( reactorContext.getOriginalContextClassLoader() );
