@@ -111,8 +111,12 @@ public class LifecycleStarter
                 throw new BuilderNotFoundException( String.format( "The builder requested using id = %s cannot be found", builderId ) );
             }
 
-            logger.info( "" );
-            logger.info( String.format( "Using the builder %s with a thread count of %s", builder.getClass().getName(), session.getRequest().getDegreeOfConcurrency() ) );
+            int degreeOfConcurrency = session.getRequest().getDegreeOfConcurrency();
+            if ( degreeOfConcurrency >= 2 )
+            {
+                logger.info( "" );
+                logger.info( String.format( "Using the builder %s with a thread count of %s", builder.getClass().getSimpleName(), degreeOfConcurrency ) );
+            }
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
 
         }
