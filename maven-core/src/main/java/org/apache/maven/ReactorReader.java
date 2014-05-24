@@ -41,7 +41,8 @@ import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 /**
- * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts.
+ * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either
+ * as packaged jar if it has been built, or only compile output directory if packaging hasn't happened yet.
  * 
  * @author Jason van Zyl
  */
@@ -222,7 +223,7 @@ class ReactorReader
     {
         //
         // We are taking as much as we can from the DefaultArtifact.equals(). The requested artifact has no file so
-        // we want to remove that from the comparision.
+        // we want to remove that from the comparison.
         //
         return requested.getArtifactId().equals( attached.getArtifactId() )
             && requested.getGroupId().equals( attached.getGroupId() )
