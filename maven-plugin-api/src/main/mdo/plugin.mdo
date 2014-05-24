@@ -18,9 +18,7 @@ under the License.
 -->
 
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/PLUGIN/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/lifecycle-${version}.xsd">
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd">
   <id>plugin</id>
   <name>PluginDescriptor</name>
   <description><![CDATA[
