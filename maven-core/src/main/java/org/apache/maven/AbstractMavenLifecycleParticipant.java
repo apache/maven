@@ -22,11 +22,14 @@ package org.apache.maven;
 import org.apache.maven.execution.MavenSession;
 
 /**
- * Allows core extensions to participate in build lifecycle.
+ * Allows core extensions to participate in Maven build session lifecycle.
  *
  * All callback methods (will) follow beforeXXX/afterXXX naming pattern to
  * indicate at what lifecycle point it is being called.
  *
+ * @see <a href="http://maven.apache.org/examples/maven-3-lifecycle-extensions.html">example</a>
+ * @see <a href="http://jira.codehaus.org/browse/MNG-4224">MNG-4224</a>
+ * @since 3.0-alpha-3
  */
 public abstract class AbstractMavenLifecycleParticipant
 {
