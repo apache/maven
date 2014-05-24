@@ -75,12 +75,9 @@ public class DefaultLifecycleTaskSegmentCalculator
 
         List<String> tasks = session.getGoals();
 
-        if ( tasks == null || tasks.isEmpty() )
+        if ( ( tasks == null || tasks.isEmpty() ) && !StringUtils.isEmpty( rootProject.getDefaultGoal() ) )
         {
-            if ( !StringUtils.isEmpty( rootProject.getDefaultGoal() ) )
-            {
-                tasks = Arrays.asList( StringUtils.split( rootProject.getDefaultGoal() ) );
-            }
+            tasks = Arrays.asList( StringUtils.split( rootProject.getDefaultGoal() ) );
         }
 
         return calculateTaskSegments( session, tasks );

@@ -76,12 +76,9 @@ class DefaultProjectDependencyGraph
     {
         for ( String id : sorter.getDependents( projectId ) )
         {
-            if ( projectIds.add( id ) )
+            if ( projectIds.add( id ) && transitive )
             {
-                if ( transitive )
-                {
-                    getDownstreamProjects( id, projectIds, transitive );
-                }
+                getDownstreamProjects( id, projectIds, transitive );
             }
         }
     }

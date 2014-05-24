@@ -35,7 +35,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 public interface ProjectRealmCache
 {
 
-    public static class CacheRecord
+    static class CacheRecord
     {
 
         public final ClassRealm realm;

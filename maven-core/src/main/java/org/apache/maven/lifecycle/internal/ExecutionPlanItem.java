@@ -27,7 +27,6 @@ import org.apache.maven.project.MavenProject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Wraps individual MojoExecutions, containing information about completion status and scheduling.

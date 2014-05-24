@@ -242,12 +242,9 @@ public class DefaultMavenExecutionRequestPopulator
 
     private void baseDirectory( MavenExecutionRequest request )
     {
-        if ( request.getBaseDirectory() == null )
+        if ( request.getBaseDirectory() == null && request.getPom() != null )
         {
-            if ( request.getPom() != null )
-            {
-                request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
-            }
+            request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
         }
     }
 

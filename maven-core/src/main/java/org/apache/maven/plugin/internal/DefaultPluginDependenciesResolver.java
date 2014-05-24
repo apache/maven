@@ -224,7 +224,7 @@ public class DefaultPluginDependenciesResolver
             org.eclipse.aether.graph.Dependency dep = node.getDependency();
             if ( dep != null )
             {
-                org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
+                Artifact art = dep.getArtifact();
 
                 buffer.append( art );
                 buffer.append( ':' ).append( dep.getScope() );

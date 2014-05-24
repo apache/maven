@@ -47,7 +47,7 @@ public interface PluginArtifactsCache
         // marker interface for cache keys
     }
 
-    public static class CacheRecord
+    static class CacheRecord
     {
 
         public final List<Artifact> artifacts;

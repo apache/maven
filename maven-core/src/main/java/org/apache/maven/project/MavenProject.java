@@ -71,7 +71,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -486,12 +485,9 @@ public class MavenProject
         if ( path != null )
         {
             path = path.trim();
-            if ( path.length() != 0 )
+            if ( path.length() != 0 && !getScriptSourceRoots().contains( path ) )
             {
-                if ( !getScriptSourceRoots().contains( path ) )
-                {
-                    getScriptSourceRoots().add( path );
-                }
+                getScriptSourceRoots().add( path );
             }
         }
     }
@@ -529,13 +525,11 @@ public class MavenProject
 
         for ( Artifact a : getArtifacts() )
         {                        
-            if ( a.getArtifactHandler().isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath()
+            // TODO: let the scope handler deal with this
+                && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) ) )
             {
-                // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    addArtifactPath( a, list );
-                }
+                addArtifactPath( a, list );
             }
         }
 
@@ -550,13 +544,11 @@ public class MavenProject
         for ( Artifact a : getArtifacts() )
         {
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath()
+            // TODO: let the scope handler deal with this
+                && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) ) )
             {
-                // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() ) || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    list.add( a );
-                }
+                list.add( a );
             }
         }
         return list;
@@ -681,13 +673,11 @@ public class MavenProject
 
         for ( Artifact a : getArtifacts() )
         {
-            if ( a.getArtifactHandler().isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath()
+            // TODO: let the scope handler deal with this
+                && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
             {
-                // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
-                {
-                    addArtifactPath( a, list );
-                }
+                addArtifactPath( a, list );
             }
         }
         return list;
@@ -701,13 +691,11 @@ public class MavenProject
         for ( Artifact a : getArtifacts()  )
         {
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath()
+            // TODO: let the scope handler deal with this
+                && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
             {
-                // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
-                {
-                    list.add( a );
-                }
+                list.add( a );
             }
         }
         return list;
@@ -758,13 +746,11 @@ public class MavenProject
 
         for ( Artifact a : getArtifacts() )
         {
-            if ( a.getArtifactHandler().isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath()
+            // TODO: let the scope handler deal with this
+                && Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
-                // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    addArtifactPath( a, list );
-                }
+                addArtifactPath( a, list );
             }
         }
         return list;
@@ -778,13 +764,11 @@ public class MavenProject
         for ( Artifact a : getArtifacts()  )
         {
             // TODO: classpath check doesn't belong here - that's the other method
-            if ( a.getArtifactHandler().isAddedToClasspath() )
+            if ( a.getArtifactHandler().isAddedToClasspath()
+            // TODO: let the scope handler deal with this
+                && Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
-                // TODO: let the scope handler deal with this
-                if ( Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
-                {
-                    list.add( a );
-                }
+                list.add( a );
             }
         }
         return list;
@@ -1892,26 +1876,22 @@ public class MavenProject
 
     protected ArtifactRepository getReleaseArtifactRepository()
     {
-        if ( releaseArtifactRepository == null )
+        if ( releaseArtifactRepository == null && getDistributionManagement() != null
+            && getDistributionManagement().getRepository() != null )
         {
-            if ( getDistributionManagement() != null && getDistributionManagement().getRepository() != null )
+            checkProjectBuildingRequest();
+            try
             {
-                checkProjectBuildingRequest();
-                try
-                {
-                    ArtifactRepository repo =
-                        repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
-                    repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(),
-                                                  Arrays.asList( repo ) );
-                    repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
-                                                           Arrays.asList( repo ) );
-                    setReleaseArtifactRepository( repo );
-                }
-                catch ( InvalidRepositoryException e )
-                {
-                    throw new IllegalStateException( "Failed to create release distribution repository for " + getId(),
-                                                     e );
-                }
+                ArtifactRepository repo =
+                    repositorySystem.buildArtifactRepository( getDistributionManagement().getRepository() );
+                repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(), Arrays.asList( repo ) );
+                repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
+                                                       Arrays.asList( repo ) );
+                setReleaseArtifactRepository( repo );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new IllegalStateException( "Failed to create release distribution repository for " + getId(), e );
             }
         }
 
@@ -1920,27 +1900,22 @@ public class MavenProject
 
     protected ArtifactRepository getSnapshotArtifactRepository()
     {
-        if ( snapshotArtifactRepository == null )
+        if ( snapshotArtifactRepository == null && getDistributionManagement() != null
+            && getDistributionManagement().getSnapshotRepository() != null )
         {
-            if ( getDistributionManagement() != null && getDistributionManagement().getSnapshotRepository() != null )
+            checkProjectBuildingRequest();
+            try
             {
-                checkProjectBuildingRequest();
-                try
-                {
-                    ArtifactRepository repo =
-                        repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
-                    repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(),
-                                                  Arrays.asList( repo ) );
-                    repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
-                                                           Arrays.asList( repo ) );
-                    setSnapshotArtifactRepository( repo );
-                }
-                catch ( InvalidRepositoryException e )
-                {
-                    throw new IllegalStateException(
-                                                     "Failed to create snapshot distribution repository for " + getId(),
-                                                     e );
-                }
+                ArtifactRepository repo =
+                    repositorySystem.buildArtifactRepository( getDistributionManagement().getSnapshotRepository() );
+                repositorySystem.injectProxy( projectBuilderConfiguration.getRepositorySession(), Arrays.asList( repo ) );
+                repositorySystem.injectAuthentication( projectBuilderConfiguration.getRepositorySession(),
+                                                       Arrays.asList( repo ) );
+                setSnapshotArtifactRepository( repo );
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new IllegalStateException( "Failed to create snapshot distribution repository for " + getId(), e );
             }
         }
 

@@ -157,13 +157,11 @@ public class MavenMetadataSource
             cache.get( artifact, request.isResolveManagedVersions(), request.getLocalRepository(),
                        request.getRemoteRepositories() );
 
-        if ( cached != null )
+        if ( cached != null
+        // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
+            && ( !request.isForceUpdate() || hasFile( cached.getPomArtifact() ) ) )
         {
-            // if the POM has no file, we cached a missing artifact, only return the cached data if no update forced
-            if ( !request.isForceUpdate() || hasFile( cached.getPomArtifact() ) )
-            {
-                return cached;
-            }
+            return cached;
         }
 
         List<Dependency> dependencies;

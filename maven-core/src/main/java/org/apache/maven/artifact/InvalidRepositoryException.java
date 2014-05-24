@@ -48,7 +48,7 @@ public class InvalidRepositoryException
     @Deprecated
     public InvalidRepositoryException( String message, Throwable t )
     {
-        super( message );
+        super( message, t );
         this.repositoryId = null;
     }
 

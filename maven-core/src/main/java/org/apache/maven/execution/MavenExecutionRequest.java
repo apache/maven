@@ -177,12 +177,12 @@ public interface MavenExecutionRequest
      * 
      * @param degreeOfConcurrency
      */
-    public void setDegreeOfConcurrency( final int degreeOfConcurrency );
+    void setDegreeOfConcurrency( int degreeOfConcurrency );
 
     /**
      * @return the degree of concurrency for the build.
      */
-    public int getDegreeOfConcurrency();
+    int getDegreeOfConcurrency();
 
     // Recursive (really to just process the top-level POM)
     MavenExecutionRequest setRecursive( boolean recursive );

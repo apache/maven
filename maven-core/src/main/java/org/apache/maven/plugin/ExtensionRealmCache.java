@@ -37,7 +37,7 @@ import org.eclipse.aether.artifact.Artifact;
 public interface ExtensionRealmCache
 {
 
-    public static class CacheRecord
+    static class CacheRecord
     {
 
         public final ClassRealm realm;
