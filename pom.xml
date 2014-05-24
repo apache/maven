@@ -572,6 +572,7 @@
             <configuration>
               <linksource>true</linksource>
               <notimestamp>true</notimestamp>
+              <quiet>true</quiet>
               <links combine.children="append">
                 <link>http://download.eclipse.org/aether/aether-core/${aetherVersion}/apidocs/</link>
                 <link>http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/</link>
