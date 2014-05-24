@@ -115,7 +115,7 @@ public class LifecycleStarter
             if ( degreeOfConcurrency >= 2 )
             {
                 logger.info( "" );
-                logger.info( String.format( "Using the %s implemenation with a thread count of %d", builder.getClass().getSimpleName(), degreeOfConcurrency ) );
+                logger.info( String.format( "Using the %s implementation with a thread count of %d", builder.getClass().getSimpleName(), degreeOfConcurrency ) );
             }
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
 
