@@ -83,6 +83,25 @@ public class JdkVersionProfileActivator
         }
     }
 
+    @Override
+    public boolean presentInConfig( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
+    {
+        Activation activation = profile.getActivation();
+
+        if ( activation == null )
+        {
+            return false;
+        }
+
+        String jdk = activation.getJdk();
+
+        if ( jdk == null )
+        {
+            return false;
+        }
+        return true;
+    }
+
     private static boolean isInRange( String value, List<RangeValue> range )
     {
         int leftRelation = getRelationOrder( value, range.get( 0 ), true );
