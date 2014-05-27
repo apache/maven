@@ -343,6 +343,9 @@ public class DefaultModelBuilder
 
         modelUrlNormalizer.normalize( resultModel, request );
 
+        //Now the fully interpolated model is available reconfigure the resolver
+        configureResolver( request.getModelResolver(), resultModel, problems , true );
+
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );
         resultData.setVersion( resultModel.getVersion() );
@@ -551,6 +554,11 @@ public class DefaultModelBuilder
 
     private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems )
     {
+        configureResolver( modelResolver, model, problems, false );
+    }
+
+    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems, boolean resetRepositories )
+    {
         if ( modelResolver == null )
         {
             return;
@@ -559,6 +567,11 @@ public class DefaultModelBuilder
         problems.setSource( model );
 
         List<Repository> repositories = model.getRepositories();
+
+        if (resetRepositories)
+        {
+            modelResolver.resetRepositories();
+        }
 
         for ( Repository repository : repositories )
         {

@@ -56,6 +56,12 @@ public interface ModelResolver
         throws InvalidRepositoryException;
 
     /**
+     * Resets repositories, has the effect of clearing any repositories previously added by the
+     * {link #addRepository(Repository) method
+     */
+    void resetRepositories();
+
+    /**
      * Clones this resolver for usage in a forked resolution process. In general, implementors need not provide a deep
      * clone. The only requirement is that invocations of {@link #addRepository(Repository)} on the clone do not affect
      * the state of the original resolver and vice versa.

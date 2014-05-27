@@ -20,6 +20,7 @@ package org.apache.maven.repository.internal;
  */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -60,6 +61,8 @@ class DefaultModelResolver
 
     private List<RemoteRepository> repositories;
 
+    private final List<RemoteRepository> externalRepositories;
+
     private final ArtifactResolver resolver;
 
     private final RemoteRepositoryManager remoteRepositoryManager;
@@ -76,6 +79,10 @@ class DefaultModelResolver
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.repositories = repositories;
+        List<RemoteRepository> externalRepositories = new ArrayList<RemoteRepository>();
+        externalRepositories.addAll(repositories);
+        this.externalRepositories = Collections.unmodifiableList(externalRepositories);
+
         this.repositoryIds = new HashSet<String>();
     }
 
@@ -87,9 +94,11 @@ class DefaultModelResolver
         this.resolver = original.resolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
         this.repositories = original.repositories;
+        this.externalRepositories = original.externalRepositories;
         this.repositoryIds = new HashSet<String>( original.repositoryIds );
     }
 
+    @Override
     public void addRepository( Repository repository )
         throws InvalidRepositoryException
     {
@@ -105,11 +114,21 @@ class DefaultModelResolver
             remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
     }
 
+    @Override
+    public void resetRepositories()
+    {
+        this.repositoryIds.clear();
+        this.repositories.clear();
+        this.repositories.addAll(externalRepositories);
+    }
+
+    @Override
     public ModelResolver newCopy()
     {
         return new DefaultModelResolver( this );
     }
 
+    @Override
     public ModelSource resolveModel( String groupId, String artifactId, String version )
         throws UnresolvableModelException
     {
