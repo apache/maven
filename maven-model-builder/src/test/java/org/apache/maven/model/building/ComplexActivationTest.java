@@ -35,7 +35,7 @@ public class ComplexActivationTest
         return new File( "src/test/resources/poms/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
-    public void testCompleteWiring()
+    public void testAndConditionInActivation()
             throws Exception
     {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
@@ -48,7 +48,8 @@ public class ComplexActivationTest
         ModelBuildingResult result = builder.build( request );
         assertNotNull( result );
         assertNotNull( result.getEffectiveModel() );
-        assertEquals( "activated", result.getEffectiveModel().getProperties().get( "profile.file" ) );
+        assertEquals( "activated-1", result.getEffectiveModel().getProperties().get( "profile.file" ) );
+        assertNull( result.getEffectiveModel().getProperties().get( "profile.miss" ) );
     }
 
 }

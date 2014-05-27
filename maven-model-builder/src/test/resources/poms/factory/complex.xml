@@ -12,7 +12,7 @@
 
     <profiles>
         <profile>
-            <id>another-two-conditions</id>
+            <id>unix-two-conditions</id>
             <activation>
                 <file>
                     <exists>simple.xml</exists>
@@ -22,7 +22,77 @@
                 </os>
             </activation>
             <properties>
-                <profile.file>activated</profile.file>
+                <profile.file>activated-1</profile.file>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac-two-conditions</id>
+            <activation>
+                <file>
+                    <exists>simple.xml</exists>
+                </file>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <profile.file>activated-1</profile.file>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-two-conditions</id>
+            <activation>
+                <file>
+                    <exists>simple.xml</exists>
+                </file>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <profile.file>activated-1</profile.file>
+            </properties>
+        </profile>
+        <profile>
+            <id>unix-another-two-conditions</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+                <file>
+                    <missing>simple.xml</missing>
+                </file>
+            </activation>
+            <properties>
+                <profile.miss>activated-2</profile.miss>
+            </properties>
+        </profile>
+        <profile>
+            <id>windows-another-two-conditions</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+                <file>
+                    <missing>simple.xml</missing>
+                </file>
+            </activation>
+            <properties>
+                <profile.miss>activated-2</profile.miss>
+            </properties>
+        </profile>
+        <profile>
+            <id>mac-another-two-conditions</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+                <file>
+                    <missing>simple.xml</missing>
+                </file>
+            </activation>
+            <properties>
+                <profile.miss>activated-2</profile.miss>
             </properties>
         </profile>
     </profiles>
