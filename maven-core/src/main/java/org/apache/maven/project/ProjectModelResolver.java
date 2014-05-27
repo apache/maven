@@ -84,8 +84,11 @@ class ProjectModelResolver
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<RemoteRepository>();
-        this.externalRepositories = repositories;
-        this.repositories = repositories;
+        List<RemoteRepository> externalRepositories = new ArrayList<RemoteRepository>();
+        externalRepositories.addAll(repositories);
+        this.externalRepositories = Collections.unmodifiableList(externalRepositories);
+        this.repositories = new ArrayList<RemoteRepository>();
+        this.repositories.addAll(externalRepositories);
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<String>();
         this.modelPool = modelPool;
@@ -127,6 +130,15 @@ class ProjectModelResolver
             repositories =
                 remoteRepositoryManager.aggregateRepositories( session, pomRepositories, externalRepositories, false );
         }
+    }
+
+    @Override
+    public void resetRepositories()
+    {
+        this.repositoryIds.clear();
+        this.pomRepositories.clear();
+        this.repositories.clear();
+        this.repositories.addAll(externalRepositories);
     }
 
     public ModelResolver newCopy()

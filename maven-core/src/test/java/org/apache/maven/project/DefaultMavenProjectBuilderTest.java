@@ -181,4 +181,13 @@ public class DefaultMavenProjectBuilderTest
         }
     }
 
+    public void testImportScopePomResolvesFromPropertyBasedRepository()
+            throws Exception
+    {
+        File pomFile = getTestFile( "src/test/resources/projects/import-scope-pom-resolves-from-property-based-repository.xml" );
+        ProjectBuildingRequest request = newBuildingRequest();
+        request.setProcessPlugins( false );
+        request.setResolveDependencies( true );
+        projectBuilder.build( pomFile, request );
+    }
 }
