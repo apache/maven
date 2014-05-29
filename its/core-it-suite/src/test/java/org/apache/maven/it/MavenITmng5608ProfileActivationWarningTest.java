@@ -43,7 +43,7 @@ public class MavenITmng5608ProfileActivationWarningTest
     public void testitMNG5608()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5608" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5608-profile-activation-warning" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.executeGoal( "validate" );
