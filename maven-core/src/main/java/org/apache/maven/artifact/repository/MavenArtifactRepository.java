@@ -134,10 +134,15 @@ public class MavenArtifactRepository
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append( "       id: " ).append( getId() ).append( "\n" );
+        sb.append( "      id: " ).append( getId() ).append( "\n" );
         sb.append( "      url: " ).append( getUrl() ).append( "\n" );
         sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( "\n" );
 
+        if( proxy != null)
+        {
+            sb.append("    proxy: " ).append( proxy.getHost() ).append(":").append( proxy.getPort() ).append( "\n" );
+        }
+        
         if ( snapshots != null )
         {
             sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );

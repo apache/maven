@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +33,20 @@ import java.util.Set;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.LegacyLocalRepositoryManager;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.DeploymentRepository;
+import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Parent;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.ReportPlugin;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
@@ -48,7 +59,6 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.StringModelSource;
 import org.apache.maven.model.resolution.ModelResolver;
-import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.repository.internal.ArtifactDescriptorUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -87,7 +97,7 @@ public class DefaultProjectBuilder
     private ProjectBuildingHelper projectBuildingHelper;
 
     @Requirement
-    private RepositorySystem repositorySystem;
+    private MavenRepositorySystem repositorySystem;
 
     @Requirement
     private org.eclipse.aether.RepositorySystem repoSystem;
@@ -121,9 +131,9 @@ public class DefaultProjectBuilder
 
         try
         {
-            ProjectBuildingRequest configuration = config.request;
+            ProjectBuildingRequest projectBuildingRequest = config.request;            
 
-            MavenProject project = configuration.getProject();
+            MavenProject project = projectBuildingRequest.getProject();
 
             List<ModelProblem> modelProblems = null;
             Throwable error = null;
@@ -132,10 +142,10 @@ public class DefaultProjectBuilder
             {
                 ModelBuildingRequest request = getModelBuildingRequest( config );
 
-                project = new MavenProject( repositorySystem, this, configuration, logger );
+                project = new MavenProject();
 
                 DefaultModelBuildingListener listener =
-                    new DefaultModelBuildingListener( project, projectBuildingHelper, configuration );
+                    new DefaultModelBuildingListener( project, projectBuildingHelper, projectBuildingRequest );
                 request.setModelBuildingListener( listener );
 
                 request.setPomFile( pomFile );
@@ -161,16 +171,16 @@ public class DefaultProjectBuilder
                 modelProblems = result.getProblems();
 
                 initProject( project, Collections.<String, MavenProject> emptyMap(), result,
-                             new HashMap<File, Boolean>() );
+                             new HashMap<File, Boolean>(), projectBuildingRequest );
             }
-            else if ( configuration.isResolveDependencies() )
+            else if ( projectBuildingRequest.isResolveDependencies() )
             {
                 projectBuildingHelper.selectProjectRealm( project );
             }
 
             DependencyResolutionResult resolutionResult = null;
 
-            if ( configuration.isResolveDependencies() )
+            if ( projectBuildingRequest.isResolveDependencies() )
             {
                 resolutionResult = resolveDependencies( project, config.session );
             }
@@ -437,7 +447,7 @@ public class DefaultProjectBuilder
 
         ModelBuildingRequest request = getModelBuildingRequest( config );
 
-        MavenProject project = new MavenProject( repositorySystem, this, config.request, logger );
+        MavenProject project = new MavenProject();
 
         request.setPomFile( pomFile );
         request.setTwoPhaseBuilding( true );
@@ -484,7 +494,8 @@ public class DefaultProjectBuilder
                     {
                         ModelProblem problem =
                             new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1, -1, null );
+                                + " does not exist", ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1,
+                                                     -1, null );
                         result.getProblems().add( problem );
 
                         noErrors = false;
@@ -520,8 +531,8 @@ public class DefaultProjectBuilder
 
                         ModelProblem problem =
                             new DefaultModelProblem( "Child module " + moduleFile + " of " + pomFile
-                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR, ModelProblem.Version.BASE, model, -1, -1,
-                                                     null );
+                                + " forms aggregation cycle " + buffer, ModelProblem.Severity.ERROR,
+                                                     ModelProblem.Version.BASE, model, -1, -1, null );
                         result.getProblems().add( problem );
 
                         noErrors = false;
@@ -602,7 +613,7 @@ public class DefaultProjectBuilder
                 ModelBuildingResult result = modelBuilder.build( interimResult.request, interimResult.result );
 
                 MavenProject project = interimResult.listener.getProject();
-                initProject( project, projectIndex, result, profilesXmls );
+                initProject( project, projectIndex, result, profilesXmls, request );
 
                 List<MavenProject> modules = new ArrayList<MavenProject>();
                 noErrors =
@@ -628,19 +639,59 @@ public class DefaultProjectBuilder
     }
 
     private void initProject( MavenProject project, Map<String, MavenProject> projects, ModelBuildingResult result,
-                              Map<File, Boolean> profilesXmls )
+                              Map<File, Boolean> profilesXmls, ProjectBuildingRequest projectBuildingRequest )
     {
         Model model = result.getEffectiveModel();
 
         project.setModel( model );
         project.setOriginalModel( result.getRawModel() );
-
         project.setFile( model.getPomFile() );
-
-        File parentPomFile = result.getRawModel( result.getModelIds().get( 1 ) ).getPomFile();
-        project.setParentFile( parentPomFile );
-
-        project.setParent( projects.get( result.getModelIds().get( 1 ) ) );
+        Parent p = model.getParent();
+        if ( p != null )
+        {
+            project.setParentArtifact( repositorySystem.createProjectArtifact( p.getGroupId(), p.getArtifactId(),
+                                                                               p.getVersion() ) );
+            // org.apache.maven.its.mng4834:parent:0.1
+            String parentModelId = result.getModelIds().get( 1 );
+            File parentPomFile = result.getRawModel( parentModelId ).getPomFile();
+            MavenProject parent = projects.get( parentModelId );
+            if ( parent == null )
+            {
+                //
+                // At this point the DefaultModelBuildingListener has fired and it populates the
+                // remote repositories with those found in the pom.xml, along with the existing externally
+                // defined repositories.
+                //
+                projectBuildingRequest.setRemoteRepositories( project.getRemoteArtifactRepositories() );
+                if ( parentPomFile != null )
+                {
+                    project.setParentFile( parentPomFile );
+                    try
+                    {
+                        parent = build( parentPomFile, projectBuildingRequest ).getProject();
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        // MNG-4488 where let invalid parents slide on by
+                        logger.warn( "Failed to build parent project for " + project.getId() );
+                    }
+                }
+                else
+                {
+                    Artifact parentArtifact = project.getParentArtifact();
+                    try
+                    {
+                        parent = build( parentArtifact, projectBuildingRequest ).getProject();
+                    }
+                    catch ( ProjectBuildingException e )
+                    {
+                        // MNG-4488 where let invalid parents slide on by
+                        logger.warn( "Failed to build parent project for " + project.getId() );
+                    }
+                }
+            }
+            project.setParent( parent );
+        }
 
         Artifact projectArtifact =
             repositorySystem.createArtifact( project.getGroupId(), project.getArtifactId(), project.getVersion(), null,
@@ -674,6 +725,145 @@ public class DefaultProjectBuilder
                     + ", this file is no longer supported and was ignored" + ", please use the settings.xml instead",
                                          ModelProblem.Severity.WARNING, ModelProblem.Version.V30, model, -1, -1, null );
             result.getProblems().add( problem );
+        }
+
+        //
+        // All the parts that were taken out of MavenProject for Maven 4.0.0
+        //
+        
+        project.setProjectBuildingRequest( projectBuildingRequest );
+        
+        // pluginArtifacts
+        Set<Artifact> pluginArtifacts = new HashSet<Artifact>();
+        for ( Plugin plugin : project.getBuildPlugins() )
+        {
+            Artifact artifact = repositorySystem.createPluginArtifact( plugin );
+
+            if ( artifact != null )
+            {
+                pluginArtifacts.add( artifact );
+            }
+        }
+        project.setPluginArtifacts( pluginArtifacts );
+
+        // reportArtifacts
+        Set<Artifact> reportArtifacts = new HashSet<Artifact>();
+        for ( ReportPlugin report : project.getReportPlugins() )
+        {
+            Plugin pp = new Plugin();
+            pp.setGroupId( report.getGroupId() );
+            pp.setArtifactId( report.getArtifactId() );
+            pp.setVersion( report.getVersion() );
+
+            Artifact artifact = repositorySystem.createPluginArtifact( pp );
+
+            if ( artifact != null )
+            {
+                reportArtifacts.add( artifact );
+            }
+        }
+        project.setReportArtifacts( reportArtifacts );
+
+        // extensionArtifacts
+        Set<Artifact> extensionArtifacts = new HashSet<Artifact>();
+        List<Extension> extensions = project.getBuildExtensions();
+        if ( extensions != null )
+        {
+            for ( Extension ext : extensions )
+            {
+                String version;
+                if ( StringUtils.isEmpty( ext.getVersion() ) )
+                {
+                    version = "RELEASE";
+                }
+                else
+                {
+                    version = ext.getVersion();
+                }
+
+                Artifact artifact =
+                    repositorySystem.createArtifact( ext.getGroupId(), ext.getArtifactId(), version, null, "jar" );
+
+                if ( artifact != null )
+                {
+                    extensionArtifacts.add( artifact );
+                }
+            }
+        }
+        project.setExtensionArtifacts( extensionArtifacts );
+
+        // managedVersionMap
+        Map<String, Artifact> map = null;
+        if ( repositorySystem != null )
+        {
+            List<Dependency> deps;
+            DependencyManagement dependencyManagement = project.getDependencyManagement();
+            if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null )
+                && ( deps.size() > 0 ) )
+            {
+                map = new HashMap<String, Artifact>();
+                for ( Dependency d : dependencyManagement.getDependencies() )
+                {
+                    Artifact artifact = repositorySystem.createDependencyArtifact( d );
+
+                    if ( artifact == null )
+                    {
+                        map = Collections.emptyMap();
+                    }
+
+                    map.put( d.getManagementKey(), artifact );
+                }
+            }
+            else
+            {
+                map = Collections.emptyMap();
+            }
+        }
+        project.setManagedVersionMap( map );
+
+        // release artifact repository
+        if ( project.getDistributionManagement() != null && project.getDistributionManagement().getRepository() != null )
+        {
+            try
+            {
+                DeploymentRepository r = project.getDistributionManagement().getRepository();
+                if ( !StringUtils.isEmpty( r.getId() ) && !StringUtils.isEmpty( r.getUrl() ) )
+                {
+                    ArtifactRepository repo =
+                        repositorySystem.buildArtifactRepository( project.getDistributionManagement().getRepository() );
+                    repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
+                    repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
+                    project.setReleaseArtifactRepository( repo );
+                }
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new IllegalStateException( "Failed to create release distribution repository for "
+                    + project.getId(), e );
+            }
+        }
+
+        // snapshot artifact repository
+        if ( project.getDistributionManagement() != null
+            && project.getDistributionManagement().getSnapshotRepository() != null )
+        {
+            try
+            {
+                DeploymentRepository r = project.getDistributionManagement().getSnapshotRepository();
+                if ( !StringUtils.isEmpty( r.getId() ) && !StringUtils.isEmpty( r.getUrl() ) )
+                {
+                    ArtifactRepository repo =
+                        repositorySystem.buildArtifactRepository( project.getDistributionManagement().getSnapshotRepository() );
+                    repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
+                    repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
+                    project.setSnapshotArtifactRepository( repo );
+                }
+            }
+            catch ( InvalidRepositoryException e )
+            {
+                throw new IllegalStateException( "Failed to create snapshot distribution repository for "
+                    + project.getId(), e );
+            }
         }
     }
 

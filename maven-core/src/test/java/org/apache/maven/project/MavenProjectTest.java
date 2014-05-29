@@ -179,32 +179,6 @@ public class MavenProjectTest
                        activeProfilesClone );
     }
 
-    public void testInvalidParent() throws Exception
-    {
-        Parent parent = new Parent();
-        parent.setGroupId( "test-group" );
-        parent.setArtifactId( "parent-artifact" );
-        parent.setVersion( "1.0" );
-        Model model = new Model();
-        model.setParent( parent );
-        model.setArtifactId( "child-artifact" );
-        final AtomicInteger logged = new AtomicInteger();
-        class L extends LoggerStub
-        {
-            @Override
-            public void error( String s, Throwable throwable )
-            {
-                logged.incrementAndGet();
-            }
-        }
-        MavenProject project = new MavenProject( repositorySystem, projectBuilder, newBuildingRequest(), new L() );
-        project.setModel( model );
-        assertNull( project.getParent() );
-        assertEquals( 1, logged.get() );
-        assertNull( project.getParent() );
-        assertEquals( 1, logged.get() );
-    }
-
     public void testUndefinedOutputDirectory()
         throws Exception
     {

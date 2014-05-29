@@ -24,11 +24,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
+import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
@@ -111,11 +114,27 @@ public class DefaultMavenExecutionRequestPopulator
         for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
         {
             request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
+            
+            if(settings.getActiveProfiles().contains( rawProfile.getId() ))
+            {
+                List<Repository> remoteRepositories = rawProfile.getRepositories();
+                for( Repository remoteRepository : remoteRepositories )
+                {
+                    try
+                    {
+                        request.addRemoteRepository( MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        // do nothing for now
+                    }
+                }
+            }
         }
 
         return request;
-    }
-
+    }    
+    
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );

@@ -19,6 +19,9 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import java.io.File;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -27,9 +30,6 @@ import org.apache.maven.project.artifact.AttachedArtifact;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-
-import java.io.File;
-import java.util.List;
 
 @SuppressWarnings( "deprecation" )
 @Component( role = MavenProjectHelper.class )
@@ -40,8 +40,7 @@ public class DefaultMavenProjectHelper
     @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
 
-    public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier,
-                                File artifactFile )
+    public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile )
     {
         String type = artifactType;
 
@@ -81,8 +80,9 @@ public class DefaultMavenProjectHelper
     {
         Artifact projectArtifact = project.getArtifact();
 
-        Artifact artifact = new AttachedArtifact( projectArtifact, projectArtifact.getType(), artifactClassifier,
-                                                  projectArtifact.getArtifactHandler() );
+        Artifact artifact =
+            new AttachedArtifact( projectArtifact, projectArtifact.getType(), artifactClassifier,
+                                  projectArtifact.getArtifactHandler() );
 
         artifact.setFile( artifactFile );
         artifact.setResolved( true );
@@ -92,6 +92,7 @@ public class DefaultMavenProjectHelper
 
     /**
      * Add an attached artifact or replace the file for an existing artifact.
+     * 
      * @see MavenProject#addAttachedArtifact(org.apache.maven.artifact.Artifact)
      * @param project project reference.
      * @param artifact artifact to add or replace.
@@ -101,7 +102,8 @@ public class DefaultMavenProjectHelper
         project.addAttachedArtifact( artifact );
     }
 
-    public void addResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes )
+    public void addResource( MavenProject project, String resourceDirectory, List<String> includes,
+                             List<String> excludes )
     {
         Resource resource = new Resource();
         resource.setDirectory( resourceDirectory );
@@ -111,7 +113,8 @@ public class DefaultMavenProjectHelper
         project.addResource( resource );
     }
 
-    public void addTestResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes )
+    public void addTestResource( MavenProject project, String resourceDirectory, List<String> includes,
+                                 List<String> excludes )
     {
         Resource resource = new Resource();
         resource.setDirectory( resourceDirectory );

@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -36,6 +37,8 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -48,6 +51,7 @@ import org.apache.maven.settings.Server;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositorySystemSession;
 
 /**
@@ -61,6 +65,9 @@ public class TestRepositorySystem
     @Requirement
     private ModelReader modelReader;
 
+    @Requirement
+    private ArtifactFactory artifactFactory;    
+    
     public ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException
     {
@@ -134,8 +141,22 @@ public class TestRepositorySystem
 
     public Artifact createPluginArtifact( Plugin plugin )
     {
-        return new DefaultArtifact( plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null,
-                                    "maven-plugin", null, new TestArtifactHandler( "maven-plugin", "jar" ) );
+        VersionRange versionRange;
+        try
+        {
+            String version = plugin.getVersion();
+            if ( StringUtils.isEmpty( version ) )
+            {
+                version = "RELEASE";
+            }
+            versionRange = VersionRange.createFromVersionSpec( version );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            return null;
+        }
+
+        return artifactFactory.createPluginArtifact( plugin.getGroupId(), plugin.getArtifactId(), versionRange );
     }
 
     public Artifact createProjectArtifact( String groupId, String artifactId, String version )
