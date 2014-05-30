@@ -336,47 +336,45 @@ public class DefaultMaven
         //
         projectDependencyGraph = createProjectDependencyGraph( session.getProjects(), request, result, false );
 
-        if ( result.hasExceptions() )
+        try
         {
-            try 
+            if ( result.hasExceptions() )
+            {
+                return result;
+            }
+
+            session.setProjects( projectDependencyGraph.getSortedProjects() );
+
+            session.setProjectDependencyGraph( projectDependencyGraph );
+
+            result.setTopologicallySortedProjects( session.getProjects() );
+
+            result.setProject( session.getTopLevelProject() );
+
+            lifecycleStarter.execute( session );
+
+            validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
+
+            if ( session.getResult().hasExceptions() )
+            {
+                return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
+            }
+        }
+        finally
+        {
+            try
             {
                 afterSessionEnd( projects, session );
-            } 
+            }
             catch ( MavenExecutionException e )
             {
                 return addExceptionToResult( result, e );
             }
-
-            return result;
+            finally
+            {
+                sessionScope.exit();
+            }
         }
-        
-        session.setProjects( projectDependencyGraph.getSortedProjects() );
-
-        session.setProjectDependencyGraph( projectDependencyGraph );
-
-        result.setTopologicallySortedProjects( session.getProjects() );
-
-        result.setProject( session.getTopLevelProject() );
-
-        lifecycleStarter.execute( session );
-
-        validateActivatedProfiles( session.getProjects(), request.getActiveProfiles() );
-
-        if ( session.getResult().hasExceptions() )
-        {
-            return addExceptionToResult( result, session.getResult().getExceptions().get( 0 ) );
-        }
-
-        try 
-        {
-            afterSessionEnd( projects, session );
-        } 
-        catch ( MavenExecutionException e )
-        {
-            return addExceptionToResult( result, e );
-        }
-
-        sessionScope.exit();
 
         return result;
     }
