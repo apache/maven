@@ -56,9 +56,18 @@ under the License.
           <exists>${project.basedir}/pom.xml</exists>
         </file>
       </activation>
-      <properties>
-        <mng-5608-exists-project.basedir>unexpected active profile</mng-5608-exists-project.basedir>
-      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-touch</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <configuration>
+              <fail>true</fail><!-- this profile should not be activated -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>mng-5608-missing-project.basedir</id>
@@ -91,9 +100,18 @@ under the License.
           <missing>${basedir}/pom.xml</missing>
         </file>
       </activation>
-      <properties>
-        <missing-basedir>unexpected active profile</missing-basedir>
-      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.plugins</groupId>
+            <artifactId>maven-it-plugin-touch</artifactId>
+            <version>2.1-SNAPSHOT</version>
+            <configuration>
+              <fail>true</fail><!-- this profile should not be activated -->
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>

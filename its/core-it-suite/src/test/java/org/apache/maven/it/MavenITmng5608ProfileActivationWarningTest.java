@@ -52,7 +52,6 @@ public class MavenITmng5608ProfileActivationWarningTest
 
         // check expected profiles activated, just for sanity
         Properties props = verifier.loadProperties( "target/project.properties" );
-        assertEquals( "expected 2 active profiles", 2, props.size() );
         assertEquals( "expected profile exists-basedir", "expected active profile",
                       props.getProperty( "exists-basedir" ) );
         assertEquals( "expected profile mng-5608-missing-project.basedir", "expected active profile",
