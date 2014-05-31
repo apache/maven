@@ -32,6 +32,7 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven IT Plugin :: Touch</name>
+  <description>Plugin to touch files.</description>
   <inceptionYear>2001</inceptionYear>
 
   <dependencies>

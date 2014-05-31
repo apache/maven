@@ -30,13 +30,13 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * Mojo that touches one <code>touch.txt</code> or more files with configured filenames,
+ * or cause failure if desired, and set build final name to '<code>coreitified</code>'
+ *
  * @goal touch
- *
  * @phase process-sources
- *
- * @description Goal which cleans the build
  */
-public class CoreItMojo
+public class CoreItTouchMojo
     extends AbstractMojo
 {
     /**
@@ -45,18 +45,26 @@ public class CoreItMojo
     private MavenProject project;
 
     /**
+     * Output directory for touched files.
+     *
      * @parameter default-value="${project.build.directory}"
      * @required
      */
     private String outputDirectory;
 
-    /** Test setting of plugin-artifacts on the PluginDescriptor instance.
+    /**
+     * Test setting of plugin-artifacts on the PluginDescriptor instance.
+     *
      * @parameter default-value="${plugin.artifactMap}"
      * @required
      */
-    private Map pluginArtifacts;
+    private Map<String, Artifact> pluginArtifacts;
 
     /**
+     * Parameter to check that File attribute is injected with absolute path, even if parameter
+     * value is relative: a <code>touch.txt</code> file will be created in specified directory, to be able
+     * to check that absolute value is at right place.
+     *
      * @parameter default-value="target/test-basedir-alignment"
      */
     private File basedirAlignmentDirectory;
@@ -72,11 +80,15 @@ public class CoreItMojo
     private String goalItem = "bar";
 
     /**
+     * Touch a file named after artifact absolute file name, replacing '/' and ':' by '_' and adding ".txt".
+     *
      * @parameter property="artifactToFile"
      */
     private String artifactToFile;
 
     /**
+     * Should the goal cause a failure before doing anything else?
+     *
      * @parameter property="fail"
      */
     private boolean fail = false;
@@ -89,19 +101,17 @@ public class CoreItMojo
             throw new MojoExecutionException( "Failing per \'fail\' parameter (specified in pom or system properties)" );
         }
 
-        touch( new File( outputDirectory ), "touch.txt" );
+        File outDir = new File( outputDirectory );
+
+        touch( outDir, "touch.txt" );
 
         // This parameter should be aligned to the basedir as the parameter type is specified
         // as java.io.File
-
         if ( !basedirAlignmentDirectory.isAbsolute() )
         {
             throw new MojoExecutionException( "basedirAlignmentDirectory not aligned" );
         }
-
         touch( basedirAlignmentDirectory, "touch.txt" );
-
-        File outDir = new File( outputDirectory );
 
         // Test parameter setting
         if ( pluginItem != null )
@@ -116,11 +126,11 @@ public class CoreItMojo
 
         if ( artifactToFile != null )
         {
-            Artifact artifact = (Artifact) pluginArtifacts.get( artifactToFile );
+            Artifact artifact = pluginArtifacts.get( artifactToFile );
 
             File artifactFile = artifact.getFile();
 
-            String filename = artifactFile.getAbsolutePath().replace('/', '_').replace(':', '_') + ".txt";
+            String filename = artifactFile.getAbsolutePath().replace( '/', '_' ).replace( ':', '_' ) + ".txt";
 
             touch( outDir, filename );
         }
@@ -148,6 +158,7 @@ public class CoreItMojo
 
              w.close();
         }
+        
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Error touching file", e );

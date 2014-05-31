@@ -21,7 +21,6 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,11 +28,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
+ * Mojo which makes a copy of the POM using MavenProject.getFile() to locate the file.
+ *
  * @goal copy-pom
- *
  * @phase generate-sources
- *
- * @description Mojo which makes a copy of the POM using MavenProject.getFile() to locate the file.
  */
 public class CopyPomMojo
     extends AbstractMojo
