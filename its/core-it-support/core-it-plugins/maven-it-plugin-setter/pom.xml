@@ -29,6 +29,8 @@ under the License.
   </parent>
 
   <artifactId>maven-it-plugin-setter</artifactId>
+  <description>Plugin to check that attribute injection through setter method
+   (instead of direct parameter injection) works.</description>
   <packaging>maven-plugin</packaging>
 
   <name>Maven IT Plugin :: Setter</name>

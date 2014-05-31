@@ -27,9 +27,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
+ * Mojo to check that attribute injection through setter method (instead of direct parameter injection) works.
  * @goal setter-touch
- *
- * @description Goal which cleans the build
  */
 public class CoreItMojoWithSetters
     extends AbstractMojo

@@ -30,9 +30,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
+ * Goal which read settings and dump it to a file
+ *
  * @goal settings-read
  * @phase validate
- * @description Goal which read settings and dump it to a file
  */
 public class SettingsReadItMojo
     extends AbstractMojo

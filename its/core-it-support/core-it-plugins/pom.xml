@@ -33,6 +33,7 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven IT :: Plugins</name>
+  <description>Maven Integration Tests Plugins, to completely decouple ITs from production plugins.</description>
 
   <modules>
     <module>maven-it-plugin-active-collection</module>
