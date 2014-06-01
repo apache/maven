@@ -30,9 +30,9 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Mojo that touches one <code>touch.txt</code> or more files with configured filenames,
- * or cause failure if desired, and set build final name to '<code>coreitified</code>'
- *
+ * Mojo that creates one <code>touch.txt</code> or more files with configured filenames in <code>target/</code>
+ * directory, or cause failure if desired, and set build final name to '<code>coreitified</code>'
+ * 
  * @goal touch
  * @phase process-sources
  */
