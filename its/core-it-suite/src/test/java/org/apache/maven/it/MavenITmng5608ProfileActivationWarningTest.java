@@ -50,17 +50,20 @@ public class MavenITmng5608ProfileActivationWarningTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        // check expected profiles activated, just for sanity
-        Properties props = verifier.loadProperties( "target/project.properties" );
-        assertEquals( "expected profile exists-basedir", "expected active profile",
-                      props.getProperty( "exists-basedir" ) );
-        assertEquals( "expected profile mng-5608-missing-project.basedir", "expected active profile",
-                      props.getProperty( "mng-5608-missing-project.basedir" ) );
+        // check expected profiles activated, just for sanity (or build should have failed, given other profiles)
+        assertFileExists( testDir, "target/exists-basedir" );
+        assertFileExists( testDir, "target/mng-5608-missing-project.basedir" );
 
         // check that the 2 profiles using ${project.basedir} caused warnings
         List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
         assertNotNull( findWarning( logFile, "mng-5608-exists-project.basedir" ) );
         assertNotNull( findWarning( logFile, "mng-5608-missing-project.basedir" ) );
+    }
+
+    private void assertFileExists( File dir, String filename )
+    {
+        File file = new File( dir, filename );
+        assertTrue( "expected file: " + file , file.exists() );
     }
 
     private String findWarning( List<String> logLines, String profileId )
