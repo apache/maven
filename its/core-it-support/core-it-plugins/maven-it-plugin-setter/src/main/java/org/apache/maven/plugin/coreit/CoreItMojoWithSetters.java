@@ -40,15 +40,9 @@ public class CoreItMojoWithSetters
     private String outputDirectoryValue;
 
     /**
-     * @parameter
+     * @parameter name="foo"
      */
-    private String foo;
-    /*
-     * was previously
-     * @parameter property="foo"
-     * private String fooValue;
-     * with plugin-tools 2.9, but this feature was removed from plugin-tools 3.0: see MPLUGIN-199
-     */
+    private String fooValue;
 
     /**
      * @parameter
@@ -71,7 +65,7 @@ public class CoreItMojoWithSetters
 
         getLog().info( "setFoo: " + fooValue );
 
-        this.foo = fooValue;
+        this.fooValue = fooValue;
 
         setFooSetterExecuted = true;
     }
@@ -101,12 +95,12 @@ public class CoreItMojoWithSetters
         File outDir = new File( outputDirectoryValue );
 
         // Test parameter setting
-        if ( foo != null && setFooSetterExecuted )
+        if ( fooValue != null && setFooSetterExecuted )
         {
 
             getLog().info( "fooValue != null && setFooSetterExecuted" );
 
-            touch( outDir, foo );
+            touch( outDir, fooValue );
         }
 
         if ( bar != null && setBarSetterExecuted )
