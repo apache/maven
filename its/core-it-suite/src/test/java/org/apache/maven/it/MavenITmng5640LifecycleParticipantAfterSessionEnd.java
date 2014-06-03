@@ -24,8 +24,8 @@ import java.io.File;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * IT that verifies that lifecycle participant afterSessionEnd
- * method is invoked even with build failure.
+ * IT that verifies that lifecycle participant
+ * methods are invoked even with various build failures/errors.
  */
 public class MavenITmng5640LifecycleParticipantAfterSessionEnd
     extends AbstractMavenIntegrationTestCase
@@ -36,15 +36,15 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
     }
 
     /**
-     * IT executing a Maven build that has UT failure. Asserts that afterSessionEnd is still executed.
+     * IT executing a Maven build that has UT failure.
      */
-    public void testBuildFailure()
+    public void testBuildFailureUTFail()
         throws Exception
     {
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
         File extensionDir = new File( testDir, "extension" );
-        File projectDir = new File( testDir, "buildfailure" );
+        File projectDir = new File( testDir, "buildfailure-utfail" );
 
         Verifier verifier;
 
@@ -75,7 +75,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
     }
 
     /**
-     * IT executing a Maven build that has missing dependency. Asserts that afterSessionEnd is still executed.
+     * IT executing a Maven build that has missing dependency.
      */
     public void testBuildFailureMissingDependency()
         throws Exception
@@ -113,7 +113,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
     }
 
     /**
-     * IT executing a Maven build that has failing Maven plugin. Asserts that afterSessionEnd is still executed.
+     * IT executing a Maven build that has failing Maven plugin.
      */
     public void testBuildError()
         throws Exception
@@ -122,7 +122,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
         File extensionDir = new File( testDir, "extension" );
         File pluginDir = new File( testDir, "badplugin" );
-        File projectDir = new File( testDir, "builderror" );
+        File projectDir = new File( testDir, "builderror-mojoex" );
 
         Verifier verifier;
 
@@ -158,7 +158,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
     }
 
     /**
-     * IT executing a Maven build that has failing Maven plugin throwing RuntimeException. Asserts that afterSessionEnd is still executed.
+     * IT executing a Maven build that has failing Maven plugin throwing RuntimeException.
      */
     public void testBuildErrorRt()
         throws Exception
@@ -167,7 +167,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
         File extensionDir = new File( testDir, "extension" );
         File pluginDir = new File( testDir, "badplugin" );
-        File projectDir = new File( testDir, "builderror-rt" );
+        File projectDir = new File( testDir, "builderror-runtimeex" );
 
         Verifier verifier;
 
