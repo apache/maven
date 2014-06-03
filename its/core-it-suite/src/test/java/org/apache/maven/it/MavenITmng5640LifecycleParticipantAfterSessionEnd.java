@@ -35,13 +35,16 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         super( "[3.2.2,)" );
     }
 
-    public void test()
+    /**
+     * IT executing a Maven build that has UT failure. Asserts that afterSessionEnd is still executed.
+     */
+    public void testBuildFailure()
         throws Exception
     {
         File testDir =
             ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
         File extensionDir = new File( testDir, "extension" );
-        File projectDir = new File( testDir, "basic" );
+        File projectDir = new File( testDir, "buildfailure" );
 
         Verifier verifier;
 
@@ -53,14 +56,148 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        try {
-            verifier.executeGoal("package");
-        } catch (VerificationException e) {
+        try
+        {
+            verifier.executeGoal( "package" );
+            fail( "The build should fail" );
+        }
+        catch (VerificationException e)
+        {
             // expected, as the build will fail due to always failing UT
         }
         verifier.resetStreams();
         verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
 
+        verifier.assertFilePresent( "target/afterProjectsRead.txt" );
+        // See http://jira.codehaus.org/browse/MNG-5641
+        // verifier.assertFilePresent( "target/afterSessionStart.txt" );
         verifier.assertFilePresent( "target/afterSessionEnd.txt" );
     }
-}
+
+    /**
+     * IT executing a Maven build that has missing dependency. Asserts that afterSessionEnd is still executed.
+     */
+    public void testBuildFailureMissingDependency()
+        throws Exception
+    {
+        File testDir =
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
+        File extensionDir = new File( testDir, "extension" );
+        File projectDir = new File( testDir, "buildfailure-depmissing" );
+
+        Verifier verifier;
+
+        // install the test plugin
+        verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // build the test project
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        try
+        {
+            verifier.executeGoal( "package" );
+            fail( "The build should fail" );
+        }
+        catch (VerificationException e)
+        {
+            // expected, as the build will fail due to always failing UT
+        }
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/afterProjectsRead.txt" );
+        // See http://jira.codehaus.org/browse/MNG-5641
+        // verifier.assertFilePresent( "target/afterSessionStart.txt" );
+        verifier.assertFilePresent( "target/afterSessionEnd.txt" );
+    }
+
+    /**
+     * IT executing a Maven build that has failing Maven plugin. Asserts that afterSessionEnd is still executed.
+     */
+    public void testBuildError()
+        throws Exception
+    {
+        File testDir =
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
+        File extensionDir = new File( testDir, "extension" );
+        File pluginDir = new File( testDir, "badplugin" );
+        File projectDir = new File( testDir, "builderror" );
+
+        Verifier verifier;
+
+        // install the test plugin
+        verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // install the bad plugin
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // build the test project
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        try
+        {
+            verifier.executeGoal( "package" );
+            fail( "The build should fail" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected, as the build will fail due to always failing UT
+        }
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/afterProjectsRead.txt" );
+        // See http://jira.codehaus.org/browse/MNG-5641
+        // verifier.assertFilePresent( "target/afterSessionStart.txt" );
+        verifier.assertFilePresent( "target/afterSessionEnd.txt" );
+    }
+
+    /**
+     * IT executing a Maven build that has failing Maven plugin throwing RuntimeException. Asserts that afterSessionEnd is still executed.
+     */
+    public void testBuildErrorRt()
+        throws Exception
+    {
+        File testDir =
+            ResourceExtractor.simpleExtractResources( getClass(), "/mng-5640-lifecycleParticipant-afterSession" );
+        File extensionDir = new File( testDir, "extension" );
+        File pluginDir = new File( testDir, "badplugin" );
+        File projectDir = new File( testDir, "builderror-rt" );
+
+        Verifier verifier;
+
+        // install the test plugin
+        verifier = newVerifier( extensionDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // install the bad plugin
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // build the test project
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        try
+        {
+            verifier.executeGoal( "package" );
+            fail( "The build should fail" );
+        }
+        catch ( VerificationException e )
+        {
+            // expected, as the build will fail due to always failing UT
+        }
+        verifier.resetStreams();
+
+        verifier.assertFilePresent( "target/afterProjectsRead.txt" );
+        // See http://jira.codehaus.org/browse/MNG-5641
+        // verifier.assertFilePresent( "target/afterSessionStart.txt" );
+        verifier.assertFilePresent( "target/afterSessionEnd.txt" );
+    }}

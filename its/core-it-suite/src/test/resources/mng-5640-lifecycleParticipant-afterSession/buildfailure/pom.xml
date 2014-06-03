@@ -24,7 +24,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng5640.lifecycleParticipantAfterSession</groupId>
-  <artifactId>mng-5640-lifecycleParticipant-afterSession-basic</artifactId>
+  <artifactId>mng-5640-lifecycleParticipant-afterSession-buildFailure</artifactId>
   <version>0.1</version>
 
   <dependencies>

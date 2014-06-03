@@ -46,14 +46,31 @@ public class LifecycleParticipantImpl
     }
 
     @Override
+    public void afterProjectsRead( MavenSession session )
+    {
+        dropMarker( session, "afterProjectsRead.txt" );
+    }
+
+    @Override
+    public void afterSessionStart( MavenSession session )
+    {
+        dropMarker( session, "afterSessionStart.txt" );
+    }
+
+    @Override
     public void afterSessionEnd( MavenSession session )
+    {
+        dropMarker( session, "afterSessionEnd.txt" );
+    }
+
+    private void dropMarker( MavenSession session, String markerName )
     {
         MavenProject project = session.getProjects().get( 0 );
 
         File target = new File( project.getBuild().getDirectory() );
-        File marker = new File( target, "afterSessionEnd.txt" );
+        File marker = new File( target, markerName );
 
-        if ( !target.exists() && !target.getParentFile().mkdirs() )
+        if ( !target.exists() && !target.mkdirs() )
         {
             log.error( "Could not create directory " + target );
         }
