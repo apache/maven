@@ -52,7 +52,22 @@ Artifact handlers are required by the dependency resolution mechanism.
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-          
+
+    <!--
+     | BUNDLE
+     |-->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>bundle</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>bundle</type>
+        <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
+      </configuration>
+    </component>
+
     <!--
      | EJB 
      |-->
