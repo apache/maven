@@ -111,6 +111,15 @@
     <contributor>
       <name>Stuart McCulloch</name>
     </contributor>
+    <contributor>
+      <name>Mark Ingram (MNG-5639)</name>
+    </contributor>
+    <contributor>
+      <name>Christopher Tubbs (MNG-4226)</name>
+    </contributor>
+    <contributor>
+      <name>Sébastian Le Merdy (MNG-5613)</name>
+    </contributor>
   </contributors>
 
   <prerequisites>
