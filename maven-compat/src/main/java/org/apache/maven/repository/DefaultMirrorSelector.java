@@ -89,6 +89,7 @@ public class DefaultMirrorSelector
             String[] repos = pattern.split( "," );
             for ( String repo : repos )
             {
+                repo = repo.trim();
                 // see if this is a negative match
                 if ( repo.length() > 1 && repo.startsWith( "!" ) )
                 {
