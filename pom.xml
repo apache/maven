@@ -123,6 +123,9 @@
     <contributor>
       <name>Phil Pratt-Szeliga (MNG-5645)</name>
     </contributor>
+    <contributor>
+      <name>Konstantin Perikov (MNG-4565)</name>
+    </contributor>
   </contributors>
 
   <prerequisites>
