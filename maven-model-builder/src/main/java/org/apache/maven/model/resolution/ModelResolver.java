@@ -19,6 +19,7 @@ package org.apache.maven.model.resolution;
  * under the License.
  */
 
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelSource;
 
@@ -42,6 +43,17 @@ public interface ModelResolver
      * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
      */
     ModelSource resolveModel( String groupId, String artifactId, String version )
+        throws UnresolvableModelException;
+
+    /**
+     * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.
+     *
+     * @param parent The parent coordinates to resolve, must not be {@code null}.
+     * @return The source of the requested POM, never {@code null}.
+     * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
+     * @since 3.2.2
+     */
+    ModelSource resolveModel( Parent parent )
         throws UnresolvableModelException;
 
     /**

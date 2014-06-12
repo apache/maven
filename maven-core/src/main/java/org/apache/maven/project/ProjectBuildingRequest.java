@@ -169,6 +169,12 @@ public interface ProjectBuildingRequest
      */
     RepositoryMerging getRepositoryMerging();
 
+    /** @since 3.2.2 */
+    boolean isResolveVersionRanges();
+
+    /** @since 3.2.2 */
+    ProjectBuildingRequest setResolveVersionRanges( boolean value );
+
     /**
      * The possible merge modes for combining remote repositories.
      */

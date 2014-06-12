@@ -28,10 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Named;
-
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.License;
@@ -49,9 +47,9 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.eclipse.aether.RepositoryException;
-import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryEvent.EventType;
+import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
@@ -66,6 +64,7 @@ import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
+import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
@@ -106,6 +105,9 @@ public class DefaultArtifactDescriptorReader
     private VersionResolver versionResolver;
 
     @Requirement
+    private VersionRangeResolver versionRangeResolver;
+
+    @Requirement
     private ArtifactResolver artifactResolver;
 
     @Requirement
@@ -137,6 +139,7 @@ public class DefaultArtifactDescriptorReader
         setLoggerFactory( locator.getService( LoggerFactory.class ) );
         setRemoteRepositoryManager( locator.getService( RemoteRepositoryManager.class ) );
         setVersionResolver( locator.getService( VersionResolver.class ) );
+        setVersionRangeResolver( locator.getService( VersionRangeResolver.class ) );
         setArtifactResolver( locator.getService( ArtifactResolver.class ) );
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
         modelBuilder = locator.getService( ModelBuilder.class );
@@ -175,6 +178,17 @@ public class DefaultArtifactDescriptorReader
             throw new IllegalArgumentException( "version resolver has not been specified" );
         }
         this.versionResolver = versionResolver;
+        return this;
+    }
+
+    /** @since 3.2.2 */
+    public DefaultArtifactDescriptorReader setVersionRangeResolver( VersionRangeResolver versionRangeResolver )
+    {
+        if ( versionRangeResolver == null )
+        {
+            throw new IllegalArgumentException( "version range resolver has not been specified" );
+        }
+        this.versionRangeResolver = versionRangeResolver;
         return this;
     }
 
@@ -347,7 +361,7 @@ public class DefaultArtifactDescriptorReader
                 modelRequest.setModelCache( DefaultModelCache.newInstance( session ) );
                 modelRequest.setModelResolver( new DefaultModelResolver( session, trace.newChild( modelRequest ),
                                                                          request.getRequestContext(), artifactResolver,
-                                                                         remoteRepositoryManager,
+                                                                         versionRangeResolver, remoteRepositoryManager,
                                                                          request.getRepositories() ) );
                 if ( resolveResult.getRepository() instanceof WorkspaceRepository )
                 {

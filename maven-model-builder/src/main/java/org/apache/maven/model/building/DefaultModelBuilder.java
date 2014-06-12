@@ -23,11 +23,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.maven.model.Activation;
@@ -262,8 +262,6 @@ public class DefaultModelBuilder
         ModelData superData = new ModelData( null, getSuperModel() );
 
         Collection<String> parentIds = new LinkedHashSet<String>();
-        parentIds.add( ModelProblemUtils.toId( inputModel ) );
-
         List<ModelData> lineage = new ArrayList<ModelData>();
 
         for ( ModelData currentData = resultData; currentData != null; )
@@ -308,23 +306,48 @@ public class DefaultModelBuilder
 
             configureResolver( request.getModelResolver(), tmpModel, problems );
 
-            currentData = readParent( tmpModel, currentData.getSource(), request, problems );
+            ModelData parentData = readParent( tmpModel, currentData.getSource(), request, problems );
 
-            if ( currentData == null )
+            if ( parentData == null )
             {
                 currentData = superData;
             }
-            else if ( !parentIds.add( currentData.getId() ) )
+            else if ( currentData == resultData )
+            { // First iteration - add initial parent id after version resolution.
+                currentData.setGroupId( currentData.getRawModel().getGroupId() == null
+                                            ? parentData.getGroupId()
+                                            : currentData.getRawModel().getGroupId() );
+
+                currentData.setVersion( currentData.getRawModel().getVersion() == null
+                                            ? parentData.getVersion()
+                                            : currentData.getRawModel().getVersion() );
+
+                currentData.setArtifactId( currentData.getRawModel().getArtifactId() );
+                parentIds.add( currentData.getId() );
+                // Reset - only needed for 'getId'.
+                currentData.setGroupId( null );
+                currentData.setArtifactId( null );
+                currentData.setVersion( null );
+                currentData = parentData;
+            }
+            else if ( !parentIds.add( parentData.getId() ) )
             {
                 String message = "The parents form a cycle: ";
                 for ( String modelId : parentIds )
                 {
                     message += modelId + " -> ";
                 }
-                message += currentData.getId();
+                message += parentData.getId();
 
-                problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE ).setMessage( message ) );
+                problems.add(
+                    new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE ).
+                    setMessage( message ) );
+
                 throw problems.newModelBuildingException();
+            }
+            else
+            {
+                currentData = parentData;
             }
         }
 
@@ -859,7 +882,7 @@ public class DefaultModelBuilder
     {
         problems.setSource( childModel );
 
-        Parent parent = childModel.getParent();
+        Parent parent = childModel.getParent().clone();
 
         String groupId = parent.getGroupId();
         String artifactId = parent.getArtifactId();
@@ -877,7 +900,7 @@ public class DefaultModelBuilder
         ModelSource modelSource;
         try
         {
-            modelSource = modelResolver.resolveModel( groupId, artifactId, version );
+            modelSource = modelResolver.resolveModel( parent );
         }
         catch ( UnresolvableModelException e )
         {
@@ -926,7 +949,31 @@ public class DefaultModelBuilder
 
         Model parentModel = readModel( modelSource, null, lenientRequest, problems );
 
-        ModelData parentData = new ModelData( modelSource, parentModel, groupId, artifactId, version );
+        if ( !parent.getVersion().equals( version ) )
+        {
+            if ( childModel.getVersion() == null )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 ).
+                    setMessage( "Version must be a constant" ).
+                    setLocation( childModel.getLocation( "" ) ) );
+
+            }
+            else
+            {
+                if ( childModel.getVersion().indexOf( "${" ) > -1 )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 ).
+                        setMessage( "Version must be a constant" ).
+                        setLocation( childModel.getLocation( "version" ) ) );
+
+                }
+            }
+
+            // MNG-2199: What else to check here ?
+        }
+
+        ModelData parentData = new ModelData( modelSource, parentModel, parent.getGroupId(), parent.getArtifactId(),
+                                              parent.getVersion() );
 
         return parentData;
     }

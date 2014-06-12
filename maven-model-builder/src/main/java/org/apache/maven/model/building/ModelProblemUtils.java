@@ -90,9 +90,9 @@ public class ModelProblemUtils
         String artifactId = model.getArtifactId();
 
         String version = model.getVersion();
-        if ( version == null && model.getParent() != null )
+        if ( version == null )
         {
-            version = model.getParent().getVersion();
+            version = "[unknown-version]";
         }
 
         return toId( groupId, artifactId, version );
