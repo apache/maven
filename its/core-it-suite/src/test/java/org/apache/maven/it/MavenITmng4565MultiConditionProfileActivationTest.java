@@ -25,17 +25,17 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3106">MNG-3106</a>:
- * it tests that profiles with multiple activators are activated 
- * when any of the activators are on.
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4565">MNG-3106</a>:
  * 
+ * When multiple activators are present in a profile they should be AND'd. All activator must
+ * conditions must be satisfied in order for the profile to be activated.
  */
-public class MavenITmng3106ProfileMultipleActivatorsTest
+public class MavenITmng4565MultiConditionProfileActivationTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng3106ProfileMultipleActivatorsTest()
+    public MavenITmng4565MultiConditionProfileActivationTest()
     {
-        super( "(2.0.9,3.2.2-SNAPSHOT]" );
+        super( "(3.2.2-SNAPSHOT,)" );
     }
 
     /**
@@ -47,7 +47,7 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
     public void testProfilesWithMultipleActivators()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3106" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4565-multi-condition-profile-activation" );
 
         Verifier verifier;
 
@@ -57,9 +57,13 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
         verifier.addCliOption( "-Dprofile1.on=true" );
         verifier.executeGoal( "validate" );
 
+        //
+        // The property profile1.on = true so only profile1 should be activated. The profile2.on property is not true so profile2 
+        // should not be activated. Only the profile1/touch.txt file should be generated.
+        //
         verifier.verifyErrorFreeLog();
         verifier.assertFilePresent( "target/profile1/touch.txt" );
-        verifier.assertFilePresent( "target/profile2/touch.txt" );
+        verifier.assertFileNotPresent( "target/profile2/touch.txt" );
         verifier.resetStreams();
     }
 
