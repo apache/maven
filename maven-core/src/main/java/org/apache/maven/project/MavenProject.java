@@ -40,7 +40,6 @@ import org.apache.maven.model.License;
 import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
@@ -380,10 +379,42 @@ public class MavenProject
                 checkProjectBuildingRequest();
                 ProjectBuildingRequest request = new DefaultProjectBuildingRequest( projectBuilderConfiguration );
                 request.setRemoteRepositories( getRemoteArtifactRepositories() );
+                request.setResolveVersionRanges( true );
 
                 try
                 {
-                    parent = mavenProjectBuilder.build( getParentArtifact(), request ).getProject();
+                    parent = mavenProjectBuilder.build( repositorySystem.createProjectArtifact(
+                        model.getParent().getGroupId(), model.getParent().getArtifactId(),
+                        model.getParent().getVersion() ), request ).getProject();
+
+                    if ( !model.getParent().getVersion().equals( parent.getVersion() ) )
+                    {
+                        if ( model.getVersion() == null )
+                        {
+                            if ( logger != null )
+                            {
+                                logger.error( "Failed to build parent project for " + getId()
+                                                  + ": Parent version must be a constant" );
+
+                            }
+                            parent = ERROR_BUILDING_PARENT;
+                        }
+                        else
+                        {
+                            if ( model.getVersion().indexOf( "${" ) > -1 )
+                            {
+                                if ( logger != null )
+                                {
+                                    logger.error( "Failed to build parent project for " + getId() + ": The version '"
+                                                      + model.getParent().getVersion() + "' must be a constant" );
+
+                                }
+                                parent = ERROR_BUILDING_PARENT;
+                            }
+                        }
+
+                        // MNG-2199: What else to check here ?
+                    }
                 }
                 catch ( ProjectBuildingException e )
                 {
@@ -1287,10 +1318,11 @@ public class MavenProject
 
     public Artifact getParentArtifact()
     {
-        if ( parentArtifact == null && model.getParent() != null )
+        if ( parentArtifact == null && getParent() != null )
         {
-            Parent p = model.getParent();
-            parentArtifact = repositorySystem.createProjectArtifact( p.getGroupId(), p.getArtifactId(), p.getVersion() );
+            parentArtifact = repositorySystem.createProjectArtifact(
+                getParent().getGroupId(), getParent().getArtifactId(), getParent().getVersion() );
+
         }
         return parentArtifact;
     }

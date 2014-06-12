@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
@@ -42,6 +43,9 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
 
 /**
  * A model resolver to assist building of projects. This resolver gives priority to those repositories that have been
@@ -177,4 +181,46 @@ class ProjectModelResolver
         return new FileModelSource( pomFile );
     }
 
+    public ModelSource resolveModel( Parent parent )
+        throws UnresolvableModelException
+    {
+        Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom",
+                                                 parent.getVersion() );
+
+        VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
+        versionRangeRequest.setTrace( trace );
+
+        try
+        {
+            VersionRangeResult versionRangeResult = resolver.resolveVersionRange( session, versionRangeRequest );
+
+            if ( versionRangeResult.getHighestVersion() == null )
+            {
+                throw new UnresolvableModelException( "No versions matched the requested range '" + parent.getVersion()
+                                                          + "'", parent.getGroupId(), parent.getArtifactId(),
+                                                      parent.getVersion() );
+
+            }
+
+            if ( versionRangeResult.getVersionConstraint() != null
+                     && versionRangeResult.getVersionConstraint().getRange() != null
+                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+            {
+                throw new UnresolvableModelException( "The requested version range '" + parent.getVersion()
+                                                          + "' does not specify an upper bound", parent.getGroupId(),
+                                                      parent.getArtifactId(), parent.getVersion() );
+
+            }
+
+            parent.setVersion( versionRangeResult.getHighestVersion().toString() );
+        }
+        catch ( VersionRangeResolutionException e )
+        {
+            throw new UnresolvableModelException( e.getMessage(), parent.getGroupId(), parent.getArtifactId(),
+                                                  parent.getVersion(), e );
+
+        }
+
+        return resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+    }
 }

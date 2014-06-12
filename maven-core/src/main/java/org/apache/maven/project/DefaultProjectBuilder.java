@@ -63,6 +63,9 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
 
 /**
  */
@@ -279,6 +282,44 @@ public class DefaultProjectBuilder
         InternalConfig config = new InternalConfig( request, null );
 
         boolean localProject;
+
+        if ( request.isResolveVersionRanges() )
+        {
+            VersionRangeRequest versionRangeRequest = new VersionRangeRequest( pomArtifact, config.repositories, null );
+
+            try
+            {
+                VersionRangeResult versionRangeResult =
+                    repoSystem.resolveVersionRange( config.session, versionRangeRequest );
+
+                if ( versionRangeResult.getHighestVersion() == null )
+                {
+                    throw new ProjectBuildingException(
+                        artifact.getId(), "Error resolving project artifact: No versions matched the requested range",
+                        (Throwable) null );
+
+                }
+
+                if ( versionRangeResult.getVersionConstraint() != null
+                         && versionRangeResult.getVersionConstraint().getRange() != null
+                         && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+                {
+                    throw new ProjectBuildingException(
+                        artifact.getId(),
+                        "Error resolving project artifact: The requested version range does not specify an upper bound",
+                        (Throwable) null );
+
+                }
+
+                pomArtifact = pomArtifact.setVersion( versionRangeResult.getHighestVersion().toString() );
+            }
+            catch ( VersionRangeResolutionException e )
+            {
+                throw new ProjectBuildingException(
+                    artifact.getId(), "Error resolving project artifact: " + e.getMessage(), e );
+
+            }
+        }
 
         try
         {

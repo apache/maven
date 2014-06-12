@@ -61,6 +61,8 @@ public class DefaultProjectBuildingRequest
 
     private boolean resolveDependencies;
 
+    private boolean resolveVersionRanges;
+
     private RepositoryMerging repositoryMerging = RepositoryMerging.POM_DOMINANT;
 
     public DefaultProjectBuildingRequest()
@@ -213,6 +215,19 @@ public class DefaultProjectBuildingRequest
     public boolean isResolveDependencies()
     {
         return resolveDependencies;
+    }
+
+    /** @since 3.2.2 */
+    public ProjectBuildingRequest setResolveVersionRanges( boolean value )
+    {
+        this.resolveVersionRanges = value;
+        return this;
+    }
+
+    /** @since 3.2.2 */
+    public boolean isResolveVersionRanges()
+    {
+        return this.resolveVersionRanges;
     }
 
     public ProjectBuildingRequest setValidationLevel( int validationLevel )
