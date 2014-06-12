@@ -194,15 +194,15 @@ Mappings to default lifecycle, specific for each packaging.
             <id>default</id>
             <!-- START SNIPPET: maven-plugin-lifecycle -->
             <phases>
-              <generate-resources>
-                org.apache.maven.plugins:maven-plugin-plugin:3.2:descriptor
-              </generate-resources>
               <process-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <compile>
                 org.apache.maven.plugins:maven-compiler-plugin:2.5.1:compile
               </compile>
+              <process-classes>
+                org.apache.maven.plugins:maven-plugin-plugin:3.2:descriptor
+              </process-classes>              
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.6:testResources
               </process-test-resources>
