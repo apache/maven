@@ -108,7 +108,7 @@ public abstract class AbstractModelInterpolatorTest
         Date secondTestDate = cal.getTime();
         
         SimpleDateFormat format =
-            new SimpleDateFormat( AbstractStringBasedModelInterpolator.DEFAULT_BUILD_TIMESTAMP_FORMAT );
+            new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
         assertEquals( "19761111-0016", format.format( firstTestDate ) );
         assertEquals( "19761111-2316", format.format( secondTestDate ) );
     }

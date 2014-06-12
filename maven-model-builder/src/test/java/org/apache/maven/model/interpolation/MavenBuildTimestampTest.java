@@ -22,25 +22,17 @@ package org.apache.maven.model.interpolation;
 import java.util.Date;
 import java.util.Properties;
 
-import org.codehaus.plexus.interpolation.AbstractValueSource;
+import junit.framework.TestCase;
 
-class BuildTimestampValueSource
-    extends AbstractValueSource
+public class MavenBuildTimestampTest
+    extends TestCase
 {
-    private final MavenBuildTimestamp mavenBuildTimestamp;
-    
-    public BuildTimestampValueSource( Date startTime, Properties properties )
+    public void testMavenBuildTimestampUsesUTC()
     {
-        super( false );
-        this.mavenBuildTimestamp = new MavenBuildTimestamp( startTime, properties );
-    }
-
-    public Object getValue( String expression )
-    {
-        if ( "build.timestamp".equals( expression ) || "maven.build.timestamp".equals( expression ) )
-        {
-            return mavenBuildTimestamp.formattedTimestamp();
-        }
-        return null;
+        Properties interpolationProperties = new Properties();
+        interpolationProperties.setProperty( "maven.build.timestamp.format", "yyyyMMdd-HHmm:z" );
+        MavenBuildTimestamp timestamp = new MavenBuildTimestamp( new Date(), interpolationProperties );
+        String formattedTimestamp = timestamp.formattedTimestamp();
+        assertTrue( "We expect the UTC marker at the end of the timestamp.", formattedTimestamp.endsWith( "UTC" ) );
     }
 }

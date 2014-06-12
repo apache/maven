@@ -35,6 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
@@ -54,6 +55,7 @@ import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
+import org.apache.maven.model.interpolation.MavenBuildTimestamp;
 import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
@@ -206,14 +208,8 @@ public class DefaultMaven
     //    
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
-        if ( request.getStartTime() != null )
-        {
-            request.getSystemProperties().put( "${build.timestamp}",
-                                               new SimpleDateFormat( "yyyyMMdd-hhmm" ).format( request.getStartTime() ) );
-        }
-
         request.setStartTime( new Date() );
-
+        
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try

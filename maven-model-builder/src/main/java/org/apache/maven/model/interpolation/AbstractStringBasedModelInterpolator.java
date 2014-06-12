@@ -19,10 +19,20 @@ package org.apache.maven.model.interpolation;
  * under the License.
  */
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
+import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.path.UrlNormalizer;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -38,16 +48,6 @@ import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
-
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
@@ -56,18 +56,6 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
 {
-
-    /**
-     * The default format used for build timestamps.
-     */
-    static final String DEFAULT_BUILD_TIMESTAMP_FORMAT = "yyyyMMdd-HHmm";
-
-    /**
-     * The name of a property that if present in the model's {@code <properties>} section specifies a custom format for
-     * build timestamps. See {@link java.text.SimpleDateFormat} for details on the format.
-     */
-    private static final String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
-
     private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
@@ -168,13 +156,7 @@ public abstract class AbstractStringBasedModelInterpolator
                 }
             }, PROJECT_PREFIXES, false );
             valueSources.add( baseUriValueSource );
-
-            String timestampFormat = DEFAULT_BUILD_TIMESTAMP_FORMAT;
-            if ( modelProperties != null )
-            {
-                timestampFormat = modelProperties.getProperty( BUILD_TIMESTAMP_FORMAT_PROPERTY, timestampFormat );
-            }
-            valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), timestampFormat ) );
+            valueSources.add( new BuildTimestampValueSource( config.getBuildStartTime(), modelProperties ) );
         }
 
         valueSources.add( modelValueSource1 );
