@@ -233,9 +233,9 @@ public class LifecycleExecutorTest
         assertEquals( "it:xpp3-writer", executions.get( 4 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "it:java", executions.get( 5 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "it:xpp3-reader", executions.get( 6 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "plugin:descriptor", executions.get( 7 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "resources:resources", executions.get( 8 ).getMojoDescriptor().getFullGoalName() );
-        assertEquals( "compiler:compile", executions.get( 9 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "resources:resources", executions.get( 7 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "compiler:compile", executions.get( 8 ).getMojoDescriptor().getFullGoalName() );
+        assertEquals( "plugin:descriptor", executions.get( 9 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "resources:testResources", executions.get( 10 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "compiler:testCompile", executions.get( 11 ).getMojoDescriptor().getFullGoalName() );
         assertEquals( "surefire:test", executions.get( 12 ).getMojoDescriptor().getFullGoalName() );
