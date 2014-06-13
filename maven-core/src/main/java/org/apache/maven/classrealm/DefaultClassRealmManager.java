@@ -203,6 +203,8 @@ public class DefaultClassRealmManager
 
         // javax.inject (JSR-330)
         imports.put( "javax.inject.*", coreRealm );
+        // javax.enterprise.inject (JSR-299)
+        imports.put( "javax.enterprise.util.*", coreRealm );
         imports.put( "javax.enterprise.inject.*", coreRealm );
 
         // com.google
