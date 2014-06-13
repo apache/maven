@@ -37,6 +37,12 @@ under the License.
   <name>Maven Core ITs</name>
   <description>Maven Core Integration Tests provide tooling to test every aspect of Maven functionalities with any Maven version.</description>
 
+  <contributors>
+    <contributor>
+      <name>Mark Ingram</name>
+    </contributor>  
+  </contributors>
+
   <scm>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven-integration-testing.git</developerConnection>
