@@ -105,8 +105,10 @@ public class DefaultProfileSelector
     private boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         boolean isActive = false;
-        for ( ProfileActivator activator : activators ) {
-            if ( activator.presentInConfig( profile, context, problems ) ) {
+        for ( ProfileActivator activator : activators )
+        {
+            if ( activator.presentInConfig( profile, context, problems ) )
+            {
                 isActive = true;
             }
         }

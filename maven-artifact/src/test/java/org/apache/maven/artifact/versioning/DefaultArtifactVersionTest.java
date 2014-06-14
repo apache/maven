@@ -201,7 +201,7 @@ public class DefaultArtifactVersionTest
         }
         catch ( Exception e )
         {
-            assertTrue("We expect a NumberFormatException to be thrown.", e instanceof NumberFormatException);
+            assertTrue( "We expect a NumberFormatException to be thrown.", e instanceof NumberFormatException );
         }
     }
 

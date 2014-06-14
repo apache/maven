@@ -383,26 +383,6 @@
 
         return profileMap;
     }
-
-    //[MNG-3954] :: this is required for the release plugin
-
-    private RuntimeInfo runtimeInfo;
-
-    @Deprecated
-    public void setRuntimeInfo( RuntimeInfo runtimeInfo )
-    {
-        this.runtimeInfo = runtimeInfo;
-    }
-
-    @Deprecated
-    public RuntimeInfo getRuntimeInfo()
-    {
-        if ( runtimeInfo == null )
-        {
-            runtimeInfo = new RuntimeInfo();
-        }
-        return runtimeInfo;
-    }
             ]]>
           </code>
         </codeSegment>

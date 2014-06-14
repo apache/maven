@@ -123,11 +123,4 @@ class SettingsAdapter
     {
         return request.getPluginGroups();
     }
-
-    @Override
-    public RuntimeInfo getRuntimeInfo()
-    {
-        return runtimeInfo;
-    }
-
 }
