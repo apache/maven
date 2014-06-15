@@ -106,25 +106,28 @@
       <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</url>
     </site>
   </distributionManagement>
-
+  
   <contributors>
     <contributor>
       <name>Stuart McCulloch</name>
     </contributor>
     <contributor>
-      <name>Mark Ingram (MNG-5639)</name>
+      <name>Christian Schulte (MNG-2199)</name>
     </contributor>
     <contributor>
       <name>Christopher Tubbs (MNG-4226)</name>
     </contributor>
     <contributor>
+      <name>Konstantin Perikov (MNG-4565)</name>
+    </contributor>
+    <contributor>
       <name>Sébastian Le Merdy (MNG-5613)</name>
     </contributor>
     <contributor>
-      <name>Phil Pratt-Szeliga (MNG-5645)</name>
+      <name>Mark Ingram (MNG-5639)</name>
     </contributor>
     <contributor>
-      <name>Konstantin Perikov (MNG-4565)</name>
+      <name>Phil Pratt-Szeliga (MNG-5645)</name>
     </contributor>
   </contributors>
 
