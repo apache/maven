@@ -126,7 +126,7 @@ Maven Model Builder
 <<<pom.baseUri>>> (<deprecated>) | the directory containing the <<<pom.xml>>> file as URI | <<<$\{project.baseUri\}>>> |
 *----+------+------+
 | <<<build.timestamp>>>\
-<<<maven.build.timestamp>>> | the timestamp of build start, in <<<yyyyMMdd-HHmm>>> default format, which can be overridden with <<<maven.build.timestamp.format>>> POM property | <<<$\{maven.build.timestamp\}>>> |
+<<<maven.build.timestamp>>> | the UTC timestamp of build start, in <<<yyyy-MM-dd'T'HH:mm:ss'Z'>>> default format, which can be overridden with <<<maven.build.timestamp.format>>> POM property | <<<$\{maven.build.timestamp\}>>> |
 *----+------+------+
 | <<<*>>> | user properties, set from CLI with <<<-Dproperty=value>>> | <<<$\{skipTests\}>>> |
 *----+------+------+

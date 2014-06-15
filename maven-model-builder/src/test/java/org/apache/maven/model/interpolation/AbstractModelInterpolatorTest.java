@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * @author jdcasey
@@ -83,34 +84,62 @@ public abstract class AbstractModelInterpolatorTest
         }
         return config;
     }
-    
-    public void testDefaultBuildTimestampFormatShouldParseTimeIn24HourFormat()
+
+    public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat()
     {
         Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
         cal.set( Calendar.HOUR, 12 );
         cal.set( Calendar.AM_PM, Calendar.AM );
-        
+
         // just to make sure all the bases are covered...
         cal.set( Calendar.HOUR_OF_DAY, 0 );
         cal.set( Calendar.MINUTE, 16 );
+        cal.set( Calendar.SECOND, 0 );
         cal.set( Calendar.YEAR, 1976 );
         cal.set( Calendar.MONTH, Calendar.NOVEMBER );
         cal.set( Calendar.DATE, 11 );
-        
+
         Date firstTestDate = cal.getTime();
-        
+
         cal.set( Calendar.HOUR, 11 );
         cal.set( Calendar.AM_PM, Calendar.PM );
-        
+
         // just to make sure all the bases are covered...
         cal.set( Calendar.HOUR_OF_DAY, 23 );
-        
+
         Date secondTestDate = cal.getTime();
-        
+
         SimpleDateFormat format =
             new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
-        assertEquals( "19761111-0016", format.format( firstTestDate ) );
-        assertEquals( "19761111-2316", format.format( secondTestDate ) );
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        assertEquals( "1976-11-11T00:16:00Z", format.format( firstTestDate ) );
+        assertEquals( "1976-11-11T23:16:00Z", format.format( secondTestDate ) );
+    }
+
+    public void testDefaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover()
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+
+        cal.set( Calendar.HOUR_OF_DAY, 1 );
+        cal.set( Calendar.MINUTE, 16 );
+        cal.set( Calendar.SECOND, 0 );
+        cal.set( Calendar.YEAR, 2014 );
+        cal.set( Calendar.MONTH, Calendar.JUNE );
+        cal.set( Calendar.DATE, 16 );
+
+        Date firstTestDate = cal.getTime();
+
+        cal.set( Calendar.MONTH, Calendar.NOVEMBER );
+
+        Date secondTestDate = cal.getTime();
+
+        SimpleDateFormat format =
+            new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        assertEquals( "2014-06-15T23:16:00Z", format.format( firstTestDate ) );
+        assertEquals( "2014-11-16T00:16:00Z", format.format( secondTestDate ) );
     }
 
     public void testShouldNotThrowExceptionOnReferenceToNonExistentValue()
@@ -194,7 +223,7 @@ public abstract class AbstractModelInterpolatorTest
         model.setOrganization( org );
 
         ModelInterpolator interpolator = createInterpolator();
-        
+
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ),
                                            new SimpleProblemCollector() );
@@ -219,7 +248,7 @@ public abstract class AbstractModelInterpolatorTest
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
         assertColllectorState(0, 0, 1, collector );
-        
+
         assertEquals( "3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
@@ -254,8 +283,8 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertProblemFree( collector );        
-        
+        assertProblemFree( collector );
+
         assertEquals( "${something}", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
@@ -277,7 +306,7 @@ public abstract class AbstractModelInterpolatorTest
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
         assertColllectorState( 0, 0, 2, collector );
-        
+
         assertEquals( "foo-3.8.1", ( out.getDependencies().get( 0 ) ).getVersion() );
     }
 
@@ -298,7 +327,7 @@ public abstract class AbstractModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "file://localhost/myBasedir/temp-repo", ( out.getRepositories().get( 0 ) ).getUrl() );
     }
@@ -345,7 +374,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "/path/to/home", out.getProperties().getProperty( "outputDirectory" ) );
     }
@@ -366,7 +395,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${env.DOES_NOT_EXIST}" );
     }
@@ -387,8 +416,8 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out =
             interpolator.interpolateModel( model, new File( "." ), createModelBuildingRequest( context ), collector );
-        assertProblemFree( collector );        
-        
+        assertProblemFree( collector );
+
         assertEquals( out.getProperties().getProperty( "outputDirectory" ), "${DOES_NOT_EXIST}" );
     }
 
@@ -422,8 +451,8 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model out = interpolator.interpolateModel( model, null, createModelBuildingRequest( context ), collector );
         assertColllectorState( 0, 0, 2, collector );
-        
-        
+
+
         List<Resource> outResources = out.getBuild().getResources();
         Iterator<Resource> resIt = outResources.iterator();
 
@@ -447,7 +476,7 @@ public abstract class AbstractModelInterpolatorTest
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         Model result = interpolator.interpolateModel( model, basedir, createModelBuildingRequest( context ), collector );
         assertProblemFree(  collector );
-        
+
 
         List<Dependency> rDeps = result.getDependencies();
         assertNotNull( rDeps );

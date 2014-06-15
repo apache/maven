@@ -30,9 +30,9 @@ public class MavenBuildTimestampTest
     public void testMavenBuildTimestampUsesUTC()
     {
         Properties interpolationProperties = new Properties();
-        interpolationProperties.setProperty( "maven.build.timestamp.format", "yyyyMMdd-HHmm:z" );
+        interpolationProperties.setProperty( "maven.build.timestamp.format", "yyyyMMdd'T'HHmm'Z'" );
         MavenBuildTimestamp timestamp = new MavenBuildTimestamp( new Date(), interpolationProperties );
         String formattedTimestamp = timestamp.formattedTimestamp();
-        assertTrue( "We expect the UTC marker at the end of the timestamp.", formattedTimestamp.endsWith( "UTC" ) );
+        assertTrue( "We expect the UTC marker at the end of the timestamp.", formattedTimestamp.endsWith( "Z" ) );
     }
 }
