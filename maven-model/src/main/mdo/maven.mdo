@@ -3451,8 +3451,11 @@
           <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>2.0</defaultValue>
-          <description>The minimum version of Maven required to build the project. If this project is a plugin, this is
-          in addition the minimum version of Maven required to use it.</description>
+          <description><![CDATA[
+            The minimum version of Maven required to build the project.<br />
+            If this project builds a plugin, this is in addition the minimum version of Maven required to use
+            the resulting plugin.]]>
+          </description>
           <required>false</required>
         </field>
       </fields>
