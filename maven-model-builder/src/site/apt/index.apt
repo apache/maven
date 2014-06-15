@@ -136,7 +136,7 @@ Maven Model Builder
 *----+------+------+
 | <<<maven.version>>> | The version number of the current Maven execution <(since 3.0.4)>. For example, "<<<3.0.5>>>". | <<<$\{maven.version\}>>> |
 *----+------+------+
-| <<<maven.build.version>>> | The full build version of the current Maven execution <(since 3.0.4)>. For example, "<<<Apache Maven 3.0.5 (r01de14724cdef164cd33c7c8c2fe155faf9602da; 2013-02-19 14:51:28+0100)>>>". | <<<$\{maven.build.version\}>>> |
+| <<<maven.build.version>>> | The full build version of the current Maven execution <(since 3.0.4)>. For example, "<<<Apache Maven 3.2.2 (r01de14724cdef164cd33c7c8c2fe155faf9602da; 2013-02-19T14:51:28+01:00)>>>". | <<<$\{maven.build.version\}>>> |
 *----+------+------+
 | <<<*>>> | Java system properties (see {{{http://download.oracle.com/javase/6/docs/api/java/lang/System.html#getProperties()}JDK reference}}) | <<<$\{user.home\}>>>\
  | | <<<$\{java.home\}>>> |
@@ -154,7 +154,7 @@ Maven Model Builder
   {{{../maven-settings/settings.html}Settings Model}},
 
   * encoding configuration have been defined as POM properties looking like POM content but not added to POM model to maintain
-  compatibility with previous Maven versions: 
+  compatibility with previous Maven versions:
 
     * <<<$\{project.build.sourceEncoding\}>>> for
     {{{http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding}source files encoding}}
