@@ -26,7 +26,7 @@ import java.util.Properties;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5452">MNG-4091</a>
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5452">MNG-5452</a>
  * Make sure that the maven.build.timestamp is in UTC.
  */
 public class MavenITmng5452MavenBuildTimestampUTCTest
