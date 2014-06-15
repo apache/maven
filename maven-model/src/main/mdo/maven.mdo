@@ -3115,7 +3115,9 @@
       <name>Activation</name>
       <version>4.0.0+</version>
       <description>The conditions within the build runtime environment which will trigger the
-        automatic inclusion of the build profile.</description>
+        automatic inclusion of the build profile. Multiple conditions can be defined, which must
+        be all satisfied to activate the profile.
+      </description>
       <fields>
         <field>
           <name>activeByDefault</name>
