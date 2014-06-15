@@ -24,6 +24,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
+import com.google.common.base.Preconditions;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -119,7 +121,9 @@ public class DefaultLifecycles
         ArrayList<Lifecycle> result = new ArrayList<Lifecycle>();
         for ( String name : lifecycleNames )
         {
-            result.add( lifecycles.get( name ) );
+            Lifecycle lifecycle = lifecycles.get( name );
+            Preconditions.checkNotNull( "A lifecycle must have an id.", lifecycle.getId() );
+            result.add( lifecycle );
         }
 
         return result;
@@ -129,7 +133,7 @@ public class DefaultLifecycles
     {
         Set<String> phases = new LinkedHashSet<String>();
 
-        for ( Lifecycle lifecycle : lifecycles.values() )
+        for ( Lifecycle lifecycle : getLifeCycles() )
         {
             phases.addAll( lifecycle.getPhases() );
         }
