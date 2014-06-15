@@ -21,6 +21,7 @@ package org.apache.maven.cli;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
@@ -152,6 +153,10 @@ public final class CLIReportingUtils
         // Manual construction of the tz offset because only Java 7 is aware of ISO 8601 time zones
         TimeZone tz = TimeZone.getDefault();
         int offset = tz.getRawOffset();
+
+        // Raw offset ignores DST, so check if we are in DST now and add the offset
+        if( tz.inDaylightTime( new Date( timestamp ) ) )
+        	offset += tz.getDSTSavings();
 
         long m = Math.abs( ( offset / ONE_MINUTE ) % 60 );
         long h = Math.abs( ( offset / ONE_HOUR ) % 24 );
