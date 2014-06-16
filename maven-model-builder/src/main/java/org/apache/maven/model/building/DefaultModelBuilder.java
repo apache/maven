@@ -591,7 +591,7 @@ public class DefaultModelBuilder
 
         List<Repository> repositories = model.getRepositories();
 
-        if (resetRepositories)
+        if ( resetRepositories )
         {
             modelResolver.resetRepositories();
         }

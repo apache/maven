@@ -155,8 +155,10 @@ public final class CLIReportingUtils
         int offset = tz.getRawOffset();
 
         // Raw offset ignores DST, so check if we are in DST now and add the offset
-        if( tz.inDaylightTime( new Date( timestamp ) ) )
-        	offset += tz.getDSTSavings();
+        if ( tz.inDaylightTime( new Date( timestamp ) ) )
+        {
+            offset += tz.getDSTSavings();
+        }
 
         long m = Math.abs( ( offset / ONE_MINUTE ) % 60 );
         long h = Math.abs( ( offset / ONE_HOUR ) % 24 );
