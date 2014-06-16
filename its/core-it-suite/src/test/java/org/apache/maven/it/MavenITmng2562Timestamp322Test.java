@@ -32,13 +32,13 @@ import java.text.SimpleDateFormat;
  * 
  * @version $Id$
  */
-public class MavenITmng2562TimestampTest
+public class MavenITmng2562Timestamp322Test
     extends AbstractMavenIntegrationTestCase
 {
-    
-    public MavenITmng2562TimestampTest()
+
+    public MavenITmng2562Timestamp322Test()
     {
-        super( "[2.1.0-M1,3.2.2)" ); // 2.1.0+ only
+        super( "[3.2.2-SNAPSHOT,)" ); // 3.2.2+ only as we changed the timestamp format
     }
 
     public void testitDefaultFormat()
@@ -58,8 +58,8 @@ public class MavenITmng2562TimestampTest
         Properties props = verifier.loadProperties( "target/pom.properties" );
 
         String timestamp1 = props.getProperty( "project.properties.timestamp1", "" );
-        assertTrue( timestamp1, timestamp1.matches( "[0-9]{8}-[0-9]{4}" ) );
-        Date date = new SimpleDateFormat( "yyyyMMdd-HHmm" ).parse( timestamp1 );
+        assertTrue( timestamp1, timestamp1.matches( "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z" ) );
+        Date date = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ss'Z'" ).parse( timestamp1 );
         assertTrue( now + " vs " + date, Math.abs( now.getTime() - date.getTime() ) < 24 * 60 * 60 * 1000 );
 
         String timestamp2 = props.getProperty( "project.properties.timestamp2", "" );
