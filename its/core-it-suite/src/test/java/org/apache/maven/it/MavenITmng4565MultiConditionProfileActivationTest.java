@@ -35,7 +35,7 @@ public class MavenITmng4565MultiConditionProfileActivationTest
 {
     public MavenITmng4565MultiConditionProfileActivationTest()
     {
-        super( "(3.2.2-SNAPSHOT,)" );
+        super( "(3.2.2,)" );
     }
 
     /**

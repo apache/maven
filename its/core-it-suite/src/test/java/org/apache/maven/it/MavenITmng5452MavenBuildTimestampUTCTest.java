@@ -35,7 +35,7 @@ public class MavenITmng5452MavenBuildTimestampUTCTest
 
     public MavenITmng5452MavenBuildTimestampUTCTest()
     {
-        super( "[3.2.2-SNAPSHOT,)" );
+        super( "[3.2.2,)" );
     }
 
     public void testMavenBuildTimestampIsUsingUTC()

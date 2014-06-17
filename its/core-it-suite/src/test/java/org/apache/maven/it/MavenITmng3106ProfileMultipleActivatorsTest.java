@@ -35,7 +35,7 @@ public class MavenITmng3106ProfileMultipleActivatorsTest
 {
     public MavenITmng3106ProfileMultipleActivatorsTest()
     {
-        super( "(2.0.9,3.2.2-SNAPSHOT]" );
+        super( "(2.0.9,3.2.2)" );
     }
 
     /**

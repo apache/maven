@@ -36,7 +36,7 @@ public class MavenITmng5639ImportScopePomResolutionTest
 
     public MavenITmng5639ImportScopePomResolutionTest()
     {
-        super( "(3.2.2-SNAPSHOT,)" );
+        super( "(3.2.2,)" );
     }
 
     public void testitMNG5639()

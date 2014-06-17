@@ -38,7 +38,7 @@ public class MavenITmng2562Timestamp322Test
 
     public MavenITmng2562Timestamp322Test()
     {
-        super( "[3.2.2-SNAPSHOT,)" ); // 3.2.2+ only as we changed the timestamp format
+        super( "[3.2.2,)" ); // 3.2.2+ only as we changed the timestamp format
     }
 
     public void testitDefaultFormat()
