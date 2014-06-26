@@ -14,9 +14,16 @@
  */
 package org.apache.maven.execution.scope.internal;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.maven.execution.MojoExecutionEvent;
+import org.apache.maven.execution.scope.WeakMojoExecutionListener;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import junit.framework.TestCase;
 
 import com.google.inject.Key;
+import com.google.inject.Provider;
 
 public class MojoExecutionScopeTest
     extends TestCase
@@ -45,9 +52,71 @@ public class MojoExecutionScopeTest
         try
         {
             scope.exit();
+            fail();
         }
         catch ( IllegalStateException expected )
         {
         }
+    }
+
+    public void testMultiKeyInstance()
+        throws Exception
+    {
+        MojoExecutionScope scope = new MojoExecutionScope();
+        scope.enter();
+
+        final AtomicInteger beforeExecution = new AtomicInteger();
+        final AtomicInteger afterExecutionSuccess = new AtomicInteger();
+        final AtomicInteger afterExecutionFailure = new AtomicInteger();
+        final WeakMojoExecutionListener instance = new WeakMojoExecutionListener()
+        {
+            @Override
+            public void beforeMojoExecution( MojoExecutionEvent event )
+                throws MojoExecutionException
+            {
+                beforeExecution.incrementAndGet();
+            }
+
+            @Override
+            public void afterMojoExecutionSuccess( MojoExecutionEvent event )
+                throws MojoExecutionException
+            {
+                afterExecutionSuccess.incrementAndGet();
+            }
+
+            @Override
+            public void afterExecutionFailure( MojoExecutionEvent event )
+            {
+                afterExecutionFailure.incrementAndGet();
+            }
+        };
+        assertSame( instance, scope.scope( Key.get( Object.class ), new Provider<Object>()
+        {
+            @Override
+            public Object get()
+            {
+                return instance;
+            }
+        } ).get() );
+        assertSame( instance,
+                    scope.scope( Key.get( WeakMojoExecutionListener.class ), new Provider<WeakMojoExecutionListener>()
+                    {
+                        @Override
+                        public WeakMojoExecutionListener get()
+                        {
+                            return instance;
+                        }
+                    } ).get() );
+
+        final MojoExecutionEvent event = new MojoExecutionEvent( null, null, null, null );
+        scope.beforeMojoExecution( event );
+        scope.afterMojoExecutionSuccess( event );
+        scope.afterExecutionFailure( event );
+
+        assertEquals( 1, beforeExecution.get() );
+        assertEquals( 1, afterExecutionSuccess.get() );
+        assertEquals( 1, afterExecutionFailure.get() );
+
+        scope.exit();
     }
 }
