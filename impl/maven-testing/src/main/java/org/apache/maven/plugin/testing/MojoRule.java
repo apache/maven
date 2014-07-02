@@ -37,6 +37,7 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurationExceptio
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.Assert;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -320,6 +321,7 @@ public class MojoRule
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setBaseDirectory( basedir );
         ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
+        configuration.setRepositorySession( new DefaultRepositorySystemSession() );
         MavenProject project = lookup( ProjectBuilder.class ).build( pom, configuration ).getProject();
         Assert.assertNotNull( project );
         return project;
