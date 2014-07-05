@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
+@Deprecated
 public interface ProjectDependenciesResolver
 {
 
