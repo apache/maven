@@ -21,6 +21,7 @@ package org.apache.maven.it;
 
 import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.codehaus.plexus.util.Os;
 
 import java.io.File;
 import java.util.Properties;
@@ -51,7 +52,19 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
-        verifier.setSystemProperty( "test.prop", "&x=y<>" );
+
+        // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6468220
+        // A lot of bugs related to Windows arguments and quoting
+        // Directly called from commandline succeeds, indirect often fails
+        if( Os.isFamily( Os.FAMILY_WINDOWS ) && !System.getProperties().contains( "CLASSWORLDS_LAUNCHER" ) )
+        {
+            verifier.setSystemProperty( "test.prop", "\"&x=y<>\"" );
+        }
+        else
+        {
+            verifier.setSystemProperty( "test.prop", "&x=y<>" );
+        }
+
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
