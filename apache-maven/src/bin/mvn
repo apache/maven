@@ -79,11 +79,11 @@ case "`uname`" in
              export JAVA_HOME=/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
            fi           
 
-           if [[ -z "$JAVA_HOME" && -x /usr/libexec/java_home ]] ; then
+           if [[ -z "$JAVA_HOME" && -x "/usr/libexec/java_home" ]] ; then
              #
              # Apple JDKs
              #
-             export JAVA_HOME=$(/usr/libexec/java_home)
+             export JAVA_HOME=/usr/libexec/java_home
            fi
            ;;
 esac
