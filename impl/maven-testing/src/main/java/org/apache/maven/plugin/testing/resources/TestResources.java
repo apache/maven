@@ -171,4 +171,23 @@ public class TestResources
         Assert.assertTrue( "delete " + path, new File( basedir, path ).delete() );
     }
 
+    /**
+     * @since 3.2.0
+     */
+    public static void create( File basedir, String... paths )
+        throws IOException
+    {
+        if ( paths == null || paths.length == 0 )
+        {
+            throw new IllegalArgumentException();
+        }
+        for ( String path : paths )
+        {
+            File file = new File( basedir, path );
+            Assert.assertTrue( file.getParentFile().mkdirs() );
+            file.createNewFile();
+            Assert.assertTrue( file.isFile() && file.canRead() );
+        }
+    }
+
 }
