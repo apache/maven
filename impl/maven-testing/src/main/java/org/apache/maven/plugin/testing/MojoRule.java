@@ -367,6 +367,34 @@ public class MojoRule
     /**
      * @since 3.2.0
      */
+    public void executeMojo( MavenProject project, String goal, Xpp3Dom... parameters )
+        throws Exception
+    {
+        MavenSession session = newMavenSession( project );
+        executeMojo( session, project, goal, parameters );
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    public void executeMojo( MavenSession session, MavenProject project, String goal, Xpp3Dom... parameters )
+        throws Exception
+    {
+        MojoExecution execution = newMojoExecution( goal );
+        if ( parameters != null )
+        {
+            Xpp3Dom configuration = execution.getConfiguration();
+            for ( Xpp3Dom parameter : parameters )
+            {
+                configuration.addChild( parameter );
+            }
+        }
+        executeMojo( session, project, execution );
+    }
+
+    /**
+     * @since 3.2.0
+     */
     public void executeMojo( MavenSession session, MavenProject project, MojoExecution execution )
         throws Exception
     {
