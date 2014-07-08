@@ -42,6 +42,8 @@ import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.scope.MojoExecutionScoped;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
@@ -78,6 +80,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 
 /**
@@ -223,6 +226,19 @@ public abstract class AbstractMojoTestCase
         try
         {
             List<Module> modules = new ArrayList<Module>();
+            modules.add( new AbstractModule()
+            {
+                @Override
+                protected void configure()
+                {
+                    // execution scope bindings (core binds these in plugin realm injector only)
+                    MojoExecutionScope executionScope = new MojoExecutionScope();
+                    bindScope( MojoExecutionScoped.class, executionScope );
+                    bind( MojoExecutionScope.class ).toInstance( executionScope );
+                    bind( MavenProject.class ).toProvider( MojoExecutionScope.<MavenProject> seededKeyProvider() ).in( executionScope );
+                    bind( MojoExecution.class ).toProvider( MojoExecutionScope.<MojoExecution> seededKeyProvider() ).in( executionScope );
+                }
+            } );
             addGuiceModules( modules );
             container = new DefaultPlexusContainer( cc, modules.toArray( new Module[modules.size()] ) );
         }

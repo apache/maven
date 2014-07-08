@@ -23,9 +23,13 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.maven.SessionScope;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.MojoExecutionEvent;
+import org.apache.maven.execution.MojoExecutionListener;
+import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -333,7 +337,10 @@ public class MojoRule
     public void executeMojo( File basedir, String goal )
         throws Exception
     {
-        lookupConfiguredMojo( basedir, goal ).execute();
+        MavenProject project = readMavenProject( basedir );
+        MavenSession session = newMavenSession( project );
+        MojoExecution execution = newMojoExecution( goal );
+        executeMojo( session, project, execution );
     }
 
     /**
@@ -355,6 +362,46 @@ public class MojoRule
         throws ComponentLookupException
     {
         return getContainer().lookup( role );
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    public void executeMojo( MavenSession session, MavenProject project, MojoExecution execution )
+        throws Exception
+    {
+        SessionScope sessionScope = lookup( SessionScope.class );
+        try
+        {
+            sessionScope.enter();
+            sessionScope.seed( MavenSession.class, session );
+
+            MojoExecutionScope executionScope = lookup( MojoExecutionScope.class );
+            try
+            {
+                executionScope.enter();
+
+                executionScope.seed( MavenProject.class, project );
+                executionScope.seed( MojoExecution.class, execution );
+
+                Mojo mojo = lookupConfiguredMojo( session, execution );
+                mojo.execute();
+
+                MojoExecutionEvent event = new MojoExecutionEvent( session, project, execution, mojo );
+                for ( MojoExecutionListener listener : getContainer().lookupList( MojoExecutionListener.class ) )
+                {
+                    listener.afterMojoExecutionSuccess( event );
+                }
+            }
+            finally
+            {
+                executionScope.exit();
+            }
+        }
+        finally
+        {
+            sessionScope.exit();
+        }
     }
 
 }
