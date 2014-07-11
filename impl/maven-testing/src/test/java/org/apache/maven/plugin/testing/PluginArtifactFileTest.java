@@ -27,6 +27,8 @@ import org.apache.maven.plugin.MojoExecution;
 public class PluginArtifactFileTest
     extends AbstractMojoTestCase
 {
+    private static final String FS = System.getProperty( "file.separator" );
+    
     public void testArtifact()
         throws Exception
     {
@@ -40,7 +42,7 @@ public class PluginArtifactFileTest
         assertEquals( "test", artifact.getGroupId() );
         assertEquals( "test-plugin", artifact.getArtifactId() );
         assertEquals( "0.0.1-SNAPSHOT", artifact.getBaseVersion() );
-        assertTrue( artifact.getFile().getAbsolutePath().endsWith( "target/test-classes" ) );
+        assertTrue( artifact.getFile().getAbsolutePath().endsWith( FS + "target" + FS + "test-classes" ) );
     }
 
     // TODO find a way to automate testing of jar:file:/ test plugin URLs
