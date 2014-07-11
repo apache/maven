@@ -557,6 +557,7 @@
             <exclude>bootstrap/**</exclude>
             <exclude>README.bootstrap.txt</exclude>
             <exclude>.repository/**</exclude> <!-- jenkins with local maven repository -->
+            <exclude>.maven/spy.log</exclude> <!-- hudson maven3 integration log -->
           </excludes>
           <!-- maven-parent:24 sets ignore errors, but core is ahead -->
           <ignoreErrors>false</ignoreErrors>
