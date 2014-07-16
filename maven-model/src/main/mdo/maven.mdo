@@ -3135,7 +3135,8 @@
             <![CDATA[
             Specifies that this profile will be activated when a matching JDK is detected.
             For example, <code>1.4</code> only activates on JDKs versioned 1.4,
-            while <code>!1.4</code> matches any JDK that is not version 1.4.
+            while <code>!1.4</code> matches any JDK that is not version 1.4. Ranges are supported too:
+            <code>[1.5,)</code> activates when the JDK is 1.5 minimum.
             ]]>
           </description>
         </field>
