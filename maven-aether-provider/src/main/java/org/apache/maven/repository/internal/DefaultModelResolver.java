@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
@@ -102,7 +104,7 @@ class DefaultModelResolver
         this.resolver = original.resolver;
         this.versionRangeResolver = original.versionRangeResolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
-        this.repositories = original.repositories;
+        this.repositories = new ArrayList<RemoteRepository>(original.repositories);
         this.externalRepositories = original.externalRepositories;
         this.repositoryIds = new HashSet<String>( original.repositoryIds );
     }
@@ -111,9 +113,22 @@ class DefaultModelResolver
     public void addRepository( Repository repository )
         throws InvalidRepositoryException
     {
-        if ( session.isIgnoreArtifactDescriptorRepositories() || !repositoryIds.add( repository.getId() ) )
+        addRepository( repository, false );
+    }
+
+    @Override
+    public void addRepository(final Repository repository, boolean replace) throws InvalidRepositoryException {
+        if ( session.isIgnoreArtifactDescriptorRepositories() )
         {
             return;
+        }
+
+        if ( !repositoryIds.add( repository.getId() ) ) {
+            if ( !replace ) {
+                return;
+            }
+
+            removeMatchingRepository( repositories, repository.getId() );
         }
 
         List<RemoteRepository> newRepositories =
@@ -123,12 +138,13 @@ class DefaultModelResolver
             remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
     }
 
-    @Override
-    public void resetRepositories()
-    {
-        this.repositoryIds.clear();
-        this.repositories.clear();
-        this.repositories.addAll( externalRepositories );
+    private static void removeMatchingRepository(Iterable<RemoteRepository> repositories, final String id) {
+        Iterables.removeIf(repositories, new Predicate<RemoteRepository>() {
+            @Override
+            public boolean apply(RemoteRepository remoteRepository) {
+                return remoteRepository.getId().equals(id);
+            }
+        });
     }
 
     @Override
