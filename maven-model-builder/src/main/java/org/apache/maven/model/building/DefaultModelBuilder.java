@@ -580,7 +580,7 @@ public class DefaultModelBuilder
         configureResolver( modelResolver, model, problems, false );
     }
 
-    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems, boolean resetRepositories )
+    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems, boolean replaceRepositories )
     {
         if ( modelResolver == null )
         {
@@ -591,16 +591,11 @@ public class DefaultModelBuilder
 
         List<Repository> repositories = model.getRepositories();
 
-        if ( resetRepositories )
-        {
-            modelResolver.resetRepositories();
-        }
-
         for ( Repository repository : repositories )
         {
             try
             {
-                modelResolver.addRepository( repository );
+                modelResolver.addRepository( repository, replaceRepositories );
             }
             catch ( InvalidRepositoryException e )
             {

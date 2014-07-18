@@ -68,10 +68,18 @@ public interface ModelResolver
         throws InvalidRepositoryException;
 
     /**
-     * Resets repositories, has the effect of clearing any repositories previously added by the
-     * {link #addRepository(Repository) method
+     * Adds a repository to use for subsequent resolution requests. The order in which repositories are added matters,
+     * repositories that were added first should also be searched first. When multiple repositories with the same
+     * identifier are added, then the value of the replace argument is determines the behaviour.
+     *
+     * If replace is false than any existing repository with the same Id will remain in use. If replace
+     * is true the new repository replaces the original.
+     *
+     * @param repository The repository to add to the internal search chain, must not be {@code null}.
+     * @throws InvalidRepositoryException If the repository could not be added (e.g. due to invalid URL or layout).
      */
-    void resetRepositories();
+    void addRepository( Repository repository, boolean replace )
+            throws InvalidRepositoryException;
 
     /**
      * Clones this resolver for usage in a forked resolution process. In general, implementors need not provide a deep
