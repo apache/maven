@@ -74,5 +74,19 @@ under the License.
       <version>3.2</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- IT MNG-5663 maven-resources -->
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-resources-plugin</artifactId>
+      <version>2.6</version>
+      <scope>runtime</scope>
+    </dependency>
+      <!-- IT MNG-5663 maven-compiler -->
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-compiler-plugin</artifactId>
+      <version>3.1</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

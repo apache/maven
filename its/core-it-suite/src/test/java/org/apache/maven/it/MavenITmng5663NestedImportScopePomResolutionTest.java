@@ -22,31 +22,34 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5639">MNG-5639</a>:
- * Check that import POM defined in DependencyManagement can be resolved from a parameterised repository
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5663">MNG-5663</a>:
+ *
+ * The test POM references an import scope POM, which also has a dependency on an import scope POM.
+ *
+ * The 2nd import scope POM is found in a repository that is only defined in the test POM. The test confirms
+ * that dependencies are successfully resolved for this setup.
+ *
  */
-public class MavenITmng5639ImportScopePomResolutionTest
+public class MavenITmng5663NestedImportScopePomResolutionTest
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng5639ImportScopePomResolutionTest()
+    public MavenITmng5663NestedImportScopePomResolutionTest()
     {
-        super( "[3.2.2,)" );
+        super( "[3.0.4,3.2.2),(3.2.2,)" );
     }
 
     public void testitMNG5639()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5639-import-scope-pom-resolution" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5663-nested-import-scope-pom-resolution");
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.deleteArtifacts( "org.apache.maven.its.mng5639" );
+        verifier.deleteArtifacts( "org.apache.maven.its.mng5663" );
 
+        verifier.filterFile( "pom-template.xml", "pom.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
@@ -55,7 +58,7 @@ public class MavenITmng5639ImportScopePomResolutionTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        verifier.assertArtifactPresent( "org.apache.maven.its.mng5639", "b", "0.1", "jar" );
+        verifier.assertArtifactPresent( "org.apache.maven.its.mng5663", "c", "0.1", "jar" );
 
     }
 
