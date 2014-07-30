@@ -106,7 +106,11 @@ public class DefaultSettingsBuildingRequest
         if ( systemProperties != null )
         {
             this.systemProperties = new Properties();
-            this.systemProperties.putAll( systemProperties );
+            // MNG-5670 guard against ConcurrentModificationException
+            for ( String key : System.getProperties().stringPropertyNames() )
+            {
+                this.systemProperties.put( key, System.getProperty( key ) );
+            }
         }
         else
         {

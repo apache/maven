@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingException;
@@ -71,7 +72,7 @@ public class DefaultMavenSettingsBuilder
         SettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setUserSettingsFile( userSettingsFile );
         request.setGlobalSettingsFile( globalSettingsFile );
-        request.setSystemProperties( System.getProperties() );
+        request.setSystemProperties( SystemProperties.getSystemProperties() );
         return build( request );
     }
 

@@ -68,6 +68,7 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.properties.internal.EnvironmentUtils;
+import org.apache.maven.properties.internal.SystemProperties;
 import org.apache.maven.repository.legacy.metadata.DefaultMetadataResolutionRequest;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
 import org.codehaus.plexus.PlexusContainer;
@@ -752,7 +753,7 @@ public class MavenMetadataSource
 
         EnvironmentUtils.addEnvVars( props );
 
-        props.putAll( System.getProperties() );
+        SystemProperties.addSystemProperties( props );
 
         return props;
     }
