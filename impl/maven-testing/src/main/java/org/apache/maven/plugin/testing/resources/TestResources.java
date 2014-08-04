@@ -73,6 +73,11 @@ public class TestResources
     public File getBasedir( String project )
         throws IOException
     {
+        if ( name == null )
+        {
+            throw new IllegalStateException( getClass().getSimpleName()
+                + " must be a test class field annotated with org.junit.Rule" );
+        }
         File src = new File( projectsDir, project ).getCanonicalFile();
         Assert.assertTrue( "Test project directory does not exist: " + src.getPath(), src.isDirectory() );
         File basedir = new File( workDir, name + "_" + project ).getCanonicalFile();
