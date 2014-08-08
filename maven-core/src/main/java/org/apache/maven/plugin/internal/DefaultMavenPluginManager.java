@@ -330,7 +330,7 @@ public class DefaultMavenPluginManager
                 pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
         }
 
-        pluginRealmCache.register( project, cacheRecord );
+        pluginRealmCache.register( project, cacheKey, cacheRecord );
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,

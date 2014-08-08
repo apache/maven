@@ -21,9 +21,9 @@ package org.apache.maven.plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
@@ -44,7 +44,7 @@ public class DefaultPluginArtifactsCache
     implements PluginArtifactsCache
 {
 
-    private static class CacheKey
+    protected static class CacheKey
         implements Key
     {
 
@@ -133,7 +133,7 @@ public class DefaultPluginArtifactsCache
 
     }
 
-    protected final Map<Key, CacheRecord> cache = new HashMap<Key, CacheRecord>();
+    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
 
     public Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
                           RepositorySystemSession session )
@@ -210,7 +210,7 @@ public class DefaultPluginArtifactsCache
         return CacheUtils.pluginEquals( a, b );
     }
 
-    public void register( MavenProject project, CacheRecord record )
+    public void register( MavenProject project, Key cacheKey, CacheRecord record )
     {
         // default cache does not track record usage
     }

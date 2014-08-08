@@ -21,14 +21,16 @@ package org.apache.maven.plugin;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.eclipse.aether.artifact.Artifact;
 
 /**
@@ -36,10 +38,11 @@ import org.eclipse.aether.artifact.Artifact;
  */
 @Component( role = ExtensionRealmCache.class )
 public class DefaultExtensionRealmCache
-    implements ExtensionRealmCache
+    implements ExtensionRealmCache, Disposable
 {
 
-    private static class CacheKey
+    protected static class CacheKey
+        implements Key
     {
 
         private final List<File> files;
@@ -97,28 +100,36 @@ public class DefaultExtensionRealmCache
                 && sizes.equals( other.sizes );
         }
 
+        @Override
+        public String toString()
+        {
+            return files.toString();
+        }
     }
 
-    private final Map<CacheKey, CacheRecord> cache = new HashMap<CacheKey, CacheRecord>();
+    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
 
-    public CacheRecord get( List<? extends Artifact> extensionArtifacts )
+    @Override
+    public Key createKey( List<? extends Artifact> extensionArtifacts )
     {
-        return cache.get( new CacheKey( extensionArtifacts ) );
+        return new CacheKey( extensionArtifacts );
     }
 
-    public CacheRecord put( List<? extends Artifact> extensionArtifacts, ClassRealm extensionRealm,
-                            ExtensionDescriptor extensionDescriptor )
+    public CacheRecord get( Key key )
+    {
+        return cache.get( key );
+    }
+
+    public CacheRecord put( Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor )
     {
         if ( extensionRealm == null )
         {
             throw new NullPointerException();
         }
 
-        CacheKey key = new CacheKey( extensionArtifacts );
-
         if ( cache.containsKey( key ) )
         {
-            throw new IllegalStateException( "Duplicate extension realm for extension " + extensionArtifacts );
+            throw new IllegalStateException( "Duplicate extension realm for extension " + key );
         }
 
         CacheRecord record = new CacheRecord( extensionRealm, extensionDescriptor );
@@ -130,12 +141,29 @@ public class DefaultExtensionRealmCache
 
     public void flush()
     {
+        for ( CacheRecord record : cache.values() )
+        {
+            ClassRealm realm = record.realm;
+            try
+            {
+                realm.getWorld().disposeRealm( realm.getId() );
+            }
+            catch ( NoSuchRealmException e )
+            {
+                // ignore
+            }
+        }
         cache.clear();
     }
 
-    public void register( MavenProject project, CacheRecord record )
+    public void register( MavenProject project, Key key, CacheRecord record )
     {
         // default cache does not track extension usage
+    }
+
+    public void dispose()
+    {
+        flush();
     }
 
 }

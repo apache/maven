@@ -36,6 +36,13 @@ import org.eclipse.aether.artifact.Artifact;
  */
 public interface ExtensionRealmCache
 {
+    /**
+     * A cache key.
+     */
+    interface Key
+    {
+        // marker interface for cache keys
+    }
 
     static class CacheRecord
     {
@@ -52,10 +59,11 @@ public interface ExtensionRealmCache
 
     }
 
-    CacheRecord get( List<? extends Artifact> extensionArtifacts );
+    Key createKey( List<? extends Artifact> extensionArtifacts );
 
-    CacheRecord put( List<? extends Artifact> extensionArtifacts, ClassRealm extensionRealm,
-                     ExtensionDescriptor extensionDescriptor );
+    CacheRecord get( Key key );
+
+    CacheRecord put( Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor );
 
     void flush();
 
@@ -67,6 +75,6 @@ public interface ExtensionRealmCache
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, CacheRecord record );
+    void register( MavenProject project, Key key, CacheRecord record );
 
 }

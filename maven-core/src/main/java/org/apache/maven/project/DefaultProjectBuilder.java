@@ -143,6 +143,7 @@ public class DefaultProjectBuilder
                 ModelBuildingRequest request = getModelBuildingRequest( config );
 
                 project = new MavenProject();
+                project.setFile( pomFile );
 
                 DefaultModelBuildingListener listener =
                     new DefaultModelBuildingListener( project, projectBuildingHelper, projectBuildingRequest );

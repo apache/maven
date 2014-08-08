@@ -35,6 +35,14 @@ import org.eclipse.aether.graph.DependencyFilter;
 public interface ProjectRealmCache
 {
 
+    /**
+     * A cache key.
+     */
+    interface Key
+    {
+        // marker interface for cache keys
+    }
+
     static class CacheRecord
     {
 
@@ -50,10 +58,11 @@ public interface ProjectRealmCache
 
     }
 
-    CacheRecord get( List<? extends ClassRealm> extensionRealms );
+    Key createKey( List<? extends ClassRealm> extensionRealms );
 
-    CacheRecord put( List<? extends ClassRealm> extensionRealms, ClassRealm projectRealm,
-                     DependencyFilter extensionArtifactFilter );
+    CacheRecord get( Key key );
+
+    CacheRecord put( Key key, ClassRealm projectRealm, DependencyFilter extensionArtifactFilter );
 
     void flush();
 
@@ -65,6 +74,6 @@ public interface ProjectRealmCache
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, CacheRecord record );
+    void register( MavenProject project, Key key, CacheRecord record );
 
 }

@@ -86,6 +86,6 @@ public interface PluginArtifactsCache
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */
-    void register( MavenProject project, CacheRecord record );
+    void register( MavenProject project, Key cacheKey, CacheRecord record );
 
 }

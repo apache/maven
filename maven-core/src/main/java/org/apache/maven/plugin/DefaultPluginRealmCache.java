@@ -206,7 +206,7 @@ public class DefaultPluginRealmCache
         return CacheUtils.pluginEquals( a, b );
     }
 
-    public void register( MavenProject project, CacheRecord record )
+    public void register( MavenProject project, Key key, CacheRecord record )
     {
         // default cache does not track plugin usage
     }

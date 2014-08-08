@@ -244,18 +244,20 @@ public class DefaultProjectBuildingHelper
                 {
                     pluginArtifactsCache.put( cacheKey, e );
 
-                    pluginArtifactsCache.register( project, recordArtifacts );
+                    pluginArtifactsCache.register( project, cacheKey, recordArtifacts );
 
                     throw e;
                 }
             }
 
-            pluginArtifactsCache.register( project, recordArtifacts );
+            pluginArtifactsCache.register( project, cacheKey, recordArtifacts );
 
             ClassRealm extensionRealm;
             ExtensionDescriptor extensionDescriptor = null;
+            
+            final ExtensionRealmCache.Key extensionKey = extensionRealmCache.createKey( artifacts );
 
-            ExtensionRealmCache.CacheRecord recordRealm = extensionRealmCache.get( artifacts );
+            ExtensionRealmCache.CacheRecord recordRealm = extensionRealmCache.get( extensionKey );
 
             if ( recordRealm != null )
             {
@@ -295,10 +297,10 @@ public class DefaultProjectBuildingHelper
                     }
                 }
 
-                recordRealm = extensionRealmCache.put( artifacts, extensionRealm, extensionDescriptor );
+                recordRealm = extensionRealmCache.put( extensionKey, extensionRealm, extensionDescriptor );
             }
 
-            extensionRealmCache.register( project, recordRealm );
+            extensionRealmCache.register( project, extensionKey, recordRealm );
 
             extensionRealms.add( extensionRealm );
             if ( extensionDescriptor != null )
@@ -324,7 +326,9 @@ public class DefaultProjectBuildingHelper
             logger.debug( "Extension realms for project " + model.getId() + ": " + extensionRealms );
         }
 
-        ProjectRealmCache.CacheRecord record = projectRealmCache.get( extensionRealms );
+        ProjectRealmCache.Key projectRealmKey = projectRealmCache.createKey( extensionRealms );
+
+        ProjectRealmCache.CacheRecord record = projectRealmCache.get( projectRealmKey );
 
         if ( record == null )
         {
@@ -365,10 +369,10 @@ public class DefaultProjectBuildingHelper
                 extensionArtifactFilter = new ExclusionsDependencyFilter( exclusions );
             }
 
-            record = projectRealmCache.put( extensionRealms, projectRealm, extensionArtifactFilter );
+            record = projectRealmCache.put( projectRealmKey, projectRealm, extensionArtifactFilter );
         }
 
-        projectRealmCache.register( project, record );
+        projectRealmCache.register( project, projectRealmKey, record );
 
         return record;
     }
