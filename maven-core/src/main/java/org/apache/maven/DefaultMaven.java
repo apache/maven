@@ -222,6 +222,14 @@ public class DefaultMaven
         DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
 
         MavenSession session = new MavenSession( container, repoSession, request, result );
+        
+        //
+        // We enter the session scope right after the MavenSession creation and before any of the AbstractLifecycleParticipant lookups
+        // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
+        // 
+        sessionScope.enter();
+        sessionScope.seed( MavenSession.class, session );
+        
         legacySupport.setSession( session );
 
         try
@@ -278,8 +286,6 @@ public class DefaultMaven
         }
         
         WorkspaceReader reactorWorkspace;
-        sessionScope.enter();
-        sessionScope.seed( MavenSession.class, session );
         try
         {
             reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
