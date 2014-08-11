@@ -52,7 +52,7 @@ public interface RepositorySystem
 
     String DEFAULT_REMOTE_REPO_ID = "central";
 
-    String DEFAULT_REMOTE_REPO_URL = "http://repo.maven.apache.org/maven2";
+    String DEFAULT_REMOTE_REPO_URL = "https://repo.maven.apache.org/maven2";
 
     Artifact createArtifact( String groupId, String artifactId, String version, String packaging );
 
