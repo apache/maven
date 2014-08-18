@@ -33,7 +33,8 @@ public class ArtifactNotFoundException
 {
     private String downloadUrl;
 
-    protected ArtifactNotFoundException( String message, Artifact artifact, List<ArtifactRepository> remoteRepositories )
+    protected ArtifactNotFoundException( String message, Artifact artifact,
+                                         List<ArtifactRepository> remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
@@ -52,6 +53,7 @@ public class ArtifactNotFoundException
               cause );
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
                                       String classifier, List<ArtifactRepository> remoteRepositories,
                                       String downloadUrl, List<String> path, Throwable cause )
@@ -63,6 +65,7 @@ public class ArtifactNotFoundException
         this.downloadUrl = downloadUrl;
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
                                        String classifier, List<ArtifactRepository> remoteRepositories,
                                        String downloadUrl, List<String> path )

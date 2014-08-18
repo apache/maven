@@ -1,3 +1,4 @@
+// CHECKSTYLE_OFF: RegexpHeader
 /**
  * POM merger.
  */

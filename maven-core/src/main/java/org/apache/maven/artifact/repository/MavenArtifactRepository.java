@@ -138,9 +138,9 @@ public class MavenArtifactRepository
         sb.append( "      url: " ).append( getUrl() ).append( "\n" );
         sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( "\n" );
 
-        if( proxy != null)
+        if ( proxy != null )
         {
-            sb.append("    proxy: " ).append( proxy.getHost() ).append(":").append( proxy.getPort() ).append( "\n" );
+            sb.append( "    proxy: " ).append( proxy.getHost() ).append( ":" ).append( proxy.getPort() ).append( "\n" );
         }
         
         if ( snapshots != null )

@@ -1,7 +1,5 @@
 package org.apache.maven.properties.internal;
 
-import java.util.Properties;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -20,6 +18,8 @@ import java.util.Properties;
  * specific language governing permissions and limitations
  * under the License.
  */
+
+import java.util.Properties;
 
 /**
  * @since 3.2.3

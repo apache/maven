@@ -1,3 +1,4 @@
+// CHECKSTYLE_OFF: RegexpHeader|LineLength
 /**
  * XML reader and writer classes for Maven POM, generated from <code>maven.mdo</code> model.
  * These classes use

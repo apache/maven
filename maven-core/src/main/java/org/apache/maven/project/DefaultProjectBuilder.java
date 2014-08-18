@@ -171,7 +171,7 @@ public class DefaultProjectBuilder
 
                 modelProblems = result.getProblems();
 
-                initProject( project, Collections.<String, MavenProject> emptyMap(), result,
+                initProject( project, Collections.<String, MavenProject>emptyMap(), result,
                              new HashMap<File, Boolean>(), projectBuildingRequest );
             }
             else if ( projectBuildingRequest.isResolveDependencies() )

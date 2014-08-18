@@ -54,6 +54,7 @@ public class AbstractArtifactResolutionException
 
     static final String LS = System.getProperty( "line.separator" );
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     protected AbstractArtifactResolutionException( String message,
                                                    String groupId,
                                                    String artifactId,
@@ -66,6 +67,7 @@ public class AbstractArtifactResolutionException
         this( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, null );
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     protected AbstractArtifactResolutionException( String message,
                                                    String groupId,
                                                    String artifactId,
@@ -248,6 +250,7 @@ public class AbstractArtifactResolutionException
         return sb.toString();
     }
 
+    @SuppressWarnings( "checkstyle:parameternumber" )
     protected static String constructMissingArtifactMessage( String message,
                                                              String indentation,
                                                              String groupId,

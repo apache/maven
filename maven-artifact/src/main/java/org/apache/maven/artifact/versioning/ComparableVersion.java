@@ -149,6 +149,7 @@ public class ComparableVersion
     {
         private static final String[] QUALIFIERS = { "alpha", "beta", "milestone", "rc", "snapshot", "", "sp" };
 
+        @SuppressWarnings( "checkstyle:constantname" )
         private static final List<String> _QUALIFIERS = Arrays.asList( QUALIFIERS );
 
         private static final Properties ALIASES = new Properties();
@@ -183,6 +184,7 @@ public class ComparableVersion
                     case 'm':
                         value = "milestone";
                         break;
+                    default:
                 }
             }
             this.value = ALIASES.getProperty( value , value );
@@ -201,7 +203,8 @@ public class ComparableVersion
         /**
          * Returns a comparable value for a qualifier.
          *
-         * This method takes into account the ordering of known qualifiers then unknown qualifiers with lexical ordering.
+         * This method takes into account the ordering of known qualifiers then unknown qualifiers with lexical
+         * ordering.
          *
          * just returning an Integer with the index here is faster, but requires a lot of if/then/else to check for -1
          * or QUALIFIERS.size and then resort to lexical ordering. Most comparisons are decided by the first character,

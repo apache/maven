@@ -214,7 +214,7 @@ public class DefaultArtifactVersion
             }
             return Integer.valueOf( s );
         }
-        catch( NoSuchElementException e )
+        catch ( NoSuchElementException e )
         {
             throw new NumberFormatException( "Number is invalid" );
         }

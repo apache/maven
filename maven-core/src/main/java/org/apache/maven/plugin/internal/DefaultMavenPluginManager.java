@@ -136,7 +136,8 @@ public class DefaultMavenPluginManager
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
-    public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
+    public synchronized PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
+                                                              RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
     {
         PluginDescriptorCache.Key cacheKey = pluginDescriptorCache.createKey( plugin, repositories, session );
@@ -365,7 +366,7 @@ public class DefaultMavenPluginManager
 
         List<Artifact> exposedPluginArtifacts = new ArrayList<Artifact>( nlg.getNodes().size() );
         RepositoryUtils.toArtifacts( exposedPluginArtifacts, Collections.singleton( root ),
-                                     Collections.<String> emptyList(), null );
+                                     Collections.<String>emptyList(), null );
         for ( Iterator<Artifact> it = exposedPluginArtifacts.iterator(); it.hasNext(); )
         {
             Artifact artifact = it.next();

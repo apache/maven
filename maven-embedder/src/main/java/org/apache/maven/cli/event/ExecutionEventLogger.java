@@ -216,9 +216,9 @@ public class ExecutionEventLogger
 
         Runtime r = Runtime.getRuntime();
 
-        long MB = 1024 * 1024;
+        long mb = 1024 * 1024;
 
-        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / MB + "M/" + r.totalMemory() / MB + "M" );
+        logger.info( "Final Memory: " + ( r.totalMemory() - r.freeMemory() ) / mb + "M/" + r.totalMemory() / mb + "M" );
     }
 
     @Override
@@ -303,10 +303,12 @@ public class ExecutionEventLogger
         }
     }
 
+    // CHECKSTYLE_OFF: LineLength
     /**
      * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; :forked-goal @ project-artifactId &lt;&lt;&lt;</pre>
      * <pre>&lt;&lt;&lt; mojo-artifactId:version:goal (mojo-executionId) &lt; [lifecycle]phase @ project-artifactId &lt;&lt;&lt;</pre>
      */
+    // CHECKSTYLE_ON: LineLength
     @Override
     public void forkSucceeded( ExecutionEvent event )
     {

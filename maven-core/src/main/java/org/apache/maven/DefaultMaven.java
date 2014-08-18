@@ -131,7 +131,7 @@ public class DefaultMaven
     private RepositorySystem repoSystem;
 
     @Requirement( optional = true, hint = "simple" )
-    private LocalRepositoryManagerFactory simpleLocalRepositoryManagerFactory;
+    private LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
 
     @Requirement
     private SettingsDecrypter settingsDecrypter;
@@ -188,21 +188,22 @@ public class DefaultMaven
     //
     // 6) Get reactor projects looking for general POM errors
     //
-    // 7) Create ProjectDependencyGraph using trimming which takes into account --projects and reactor mode. This ensures
-    //    that the projects passed into the ReactorReader are only those specified.
+    // 7) Create ProjectDependencyGraph using trimming which takes into account --projects and reactor mode.
+    //    This ensures that the projects passed into the ReactorReader are only those specified.
     //
     // 8) Create ReactorReader with the getProjectMap( projects ). NOTE that getProjectMap(projects) is the code that
-    //    checks for duplicate projects definitions in the build. Ideally this type of duplicate checking should be part of
-    //    getting the reactor projects in 6). The duplicate checking is conflated with getProjectMap(projects).
+    //    checks for duplicate projects definitions in the build. Ideally this type of duplicate checking should be
+    //    part of getting the reactor projects in 6). The duplicate checking is conflated with getProjectMap(projects).
     //
     // 9) Execute AbstractLifecycleParticipant.afterProjectsRead(session)
     //
-    // 10) Create ProjectDependencyGraph without trimming (as trimming was done in 7). A new topological sort is required after
-    //     the execution of 9) as the AbstractLifecycleParticipants are free to mutate the MavenProject instances, which may change
-    //     dependencies which can, in turn, affect the build order.
-    // 
+    // 10) Create ProjectDependencyGraph without trimming (as trimming was done in 7). A new topological sort is
+    //     required after the execution of 9) as the AbstractLifecycleParticipants are free to mutate the MavenProject
+    //     instances, which may change dependencies which can, in turn, affect the build order.
+    //
     // 11) Execute LifecycleStarter.start()
-    //    
+    //
+    @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
         request.setStartTime( new Date() );
@@ -225,7 +226,7 @@ public class DefaultMaven
 
         try
         {
-            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject> emptyList() ) )
+            for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
             {
                 listener.afterSessionStart( session );
             }
@@ -430,10 +431,11 @@ public class DefaultMaven
 
         if ( request.isUseLegacyLocalRepository() )
         {
-            logger.warn( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure build reproducibility." );
+            logger.warn( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
+                + " build reproducibility." );
             try
             {
-                session.setLocalRepositoryManager( simpleLocalRepositoryManagerFactory.newInstance( session, localRepo ) );
+                session.setLocalRepositoryManager( simpleLocalRepoMgrFactory.newInstance( session, localRepo ) );
             }
             catch ( NoLocalRepositoryManagerException e )
             {
@@ -677,8 +679,8 @@ public class DefaultMaven
 
                 for ( ModelProblem problem : result.getProblems() )
                 {
-                    String location = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
-                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( location ) ? " @ " + location : "" ) );
+                    String loc = ModelProblemUtils.formatLocation( problem, result.getProjectId() );
+                    logger.warn( problem.getMessage() + ( StringUtils.isNotEmpty( loc ) ? " @ " + loc : "" ) );
                 }
 
                 problems = true;
@@ -743,11 +745,11 @@ public class DefaultMaven
     {
         Map<String, MavenProject> projectsMap = new HashMap<String, MavenProject>();
 
-        for ( MavenProject project : projects )
+        for ( MavenProject p : projects )
         {
-            String projectKey = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
+            String projectKey = ArtifactUtils.key( p.getGroupId(), p.getArtifactId(), p.getVersion() );
 
-            projectsMap.put( projectKey, project );
+            projectsMap.put( projectKey, p );
         }
 
         for ( MavenProject project : projects )
@@ -763,7 +765,8 @@ public class DefaultMaven
                     if ( projectsMap.containsKey( pluginKey ) )
                     {
                         logger.warn( project.getName() + " uses " + plugin.getKey()
-                            + " as extensions, which is not possible within the same reactor build. This plugin was pulled from the local repository!" );
+                            + " as extensions, which is not possible within the same reactor build. "
+                            + "This plugin was pulled from the local repository!" );
                     }
                 }
             }
@@ -795,7 +798,8 @@ public class DefaultMaven
         return logger;
     }
 
-    private ProjectDependencyGraph createProjectDependencyGraph( Collection<MavenProject> projects, MavenExecutionRequest request,
+    private ProjectDependencyGraph createProjectDependencyGraph( Collection<MavenProject> projects,
+                                                                 MavenExecutionRequest request,
                                                                  MavenExecutionResult result, boolean trimming )
     {
         ProjectDependencyGraph projectDependencyGraph = null;

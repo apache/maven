@@ -39,6 +39,10 @@ under the License.
     <tag>HEAD</tag>
   </scm>
 
+  <properties>
+    <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

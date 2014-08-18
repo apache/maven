@@ -38,30 +38,31 @@ import org.slf4j.Logger;
  */
 public final class CLIReportingUtils
 {
-
+    // CHECKSTYLE_OFF: MagicNumber
     public static final long MB = 1024 * 1024;
 
     private static final long ONE_SECOND = 1000L;
     private static final long ONE_MINUTE = 60 * ONE_SECOND;
     private static final long ONE_HOUR = 60 * ONE_MINUTE;
     private static final long ONE_DAY = 24 * ONE_HOUR;
+    // CHECKSTYLE_ON: MagicNumber
 
     public static final String BUILD_VERSION_PROPERTY = "version";
 
     public static String showVersion()
     {
-        final String LS = System.getProperty( "line.separator" );
+        final String ls = System.getProperty( "line.separator" );
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder();
-        version.append( createMavenVersionString( properties ) ).append( LS );
+        version.append( createMavenVersionString( properties ) ).append( ls );
         version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: "
-                            + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( LS );
+                            + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( ls );
         version.append( "Java version: " ).append(
             System.getProperty( "java.version", "<unknown java version>" ) ).append( ", vendor: " ).append(
-            System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( LS );
-        version.append( "Java home: " ).append( System.getProperty( "java.home", "<unknown java home>" ) ).append( LS );
+            System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( ls );
+        version.append( "Java home: " ).append( System.getProperty( "java.home", "<unknown java home>" ) ).append( ls );
         version.append( "Default locale: " ).append( Locale.getDefault() ).append( ", platform encoding: " ).append(
-            System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( LS );
+            System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( ls );
         version.append( "OS name: \"" ).append( Os.OS_NAME ).append( "\", version: \"" ).append( Os.OS_VERSION ).append(
             "\", arch: \"" ).append( Os.OS_ARCH ).append( "\", family: \"" ).append( Os.OS_FAMILY ).append( "\"" );
         return version.toString();
@@ -160,8 +161,10 @@ public final class CLIReportingUtils
             offset += tz.getDSTSavings();
         }
 
+        // CHECKSTYLE_OFF: MagicNumber
         long m = Math.abs( ( offset / ONE_MINUTE ) % 60 );
         long h = Math.abs( ( offset / ONE_HOUR ) % 24 );
+        // CHECKSTYLE_ON: MagicNumber
 
         int offsetDir = (int) Math.signum( (float) offset );
         char offsetSign = offsetDir >= 0 ? '+' : '-';
@@ -170,11 +173,13 @@ public final class CLIReportingUtils
 
     public static String formatDuration( long duration )
     {
+        // CHECKSTYLE_OFF: MagicNumber
         long ms = duration % 1000;
         long s = ( duration / ONE_SECOND ) % 60;
         long m = ( duration / ONE_MINUTE ) % 60;
         long h = ( duration / ONE_HOUR ) % 24;
         long d = duration / ONE_DAY;
+        // CHECKSTYLE_ON: MagicNumber
 
         String format;
         if ( d > 0 )

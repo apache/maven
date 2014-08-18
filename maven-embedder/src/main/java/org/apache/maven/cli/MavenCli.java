@@ -100,8 +100,10 @@ public class MavenCli
 
     public static final String THREADS_DEPRECATED = "maven.threads.experimental";
 
+    @SuppressWarnings( "checkstyle:constantname" )
     public static final String userHome = System.getProperty( "user.home" );
 
+    @SuppressWarnings( "checkstyle:constantname" )
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
 
     public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
@@ -266,8 +268,8 @@ public class MavenCli
         throws Exception
     {
         //
-        // Parsing errors can happen during the processing of the arguments and we prefer not having to check if the logger is null
-        // and construct this so we can use an SLF4J logger everywhere.
+        // Parsing errors can happen during the processing of the arguments and we prefer not having to check if
+        // the logger is null and construct this so we can use an SLF4J logger everywhere.
         //
         slf4jLogger = new Slf4jStdoutLogger();
 
@@ -498,10 +500,9 @@ public class MavenCli
             
             if ( passwd == null )
             {
-                Console cons;
-                char[] password;
-                if ( ( cons = System.console() ) != null
-                    && ( password = cons.readPassword( "Master password: " ) ) != null )
+                Console cons = System.console();
+                char[] password = ( cons == null ) ? null : cons.readPassword( "Master password: " );
+                if ( password != null )
                 {
                     // Cipher uses Strings
                     passwd = String.copyValueOf( password );
@@ -513,7 +514,8 @@ public class MavenCli
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-            System.out.println( cipher.encryptAndDecorate( passwd, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
+            System.out.println( cipher.encryptAndDecorate( passwd,
+                                                           DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION ) );
 
             throw new ExitException( 0 );
         }
@@ -523,10 +525,9 @@ public class MavenCli
             
             if ( passwd == null )
             {
-                Console cons;
-                char[] password;
-                if ( ( cons = System.console() ) != null
-                    && ( password = cons.readPassword( "Password: " ) ) != null )
+                Console cons = System.console();
+                char[] password = ( cons == null ) ? null : cons.readPassword( "Password: " );
+                if ( password != null )
                 {
                     // Cipher uses Strings
                     passwd = String.copyValueOf( password );
@@ -569,7 +570,8 @@ public class MavenCli
     private void repository( CliRequest cliRequest )
         throws Exception
     {
-        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY ) || Boolean.getBoolean( "maven.legacyLocalRepo" ) )
+        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY )
+            || Boolean.getBoolean( "maven.legacyLocalRepo" ) )
         {
            cliRequest.request.setUseLegacyLocalRepository( true );
         }
@@ -687,7 +689,8 @@ public class MavenCli
         {
             String line = indent + lines[i].trim();
 
-            if ( i == lines.length - 1 && ( showErrors || ( summary.getException() instanceof InternalErrorException ) ) )
+            if ( ( i == lines.length - 1 )
+                && ( showErrors || ( summary.getException() instanceof InternalErrorException ) ) )
             {
                 slf4jLogger.error( line, summary.getException() );
             }
@@ -705,6 +708,7 @@ public class MavenCli
         }
     }
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     private void settings( CliRequest cliRequest )
         throws Exception
     {
@@ -757,7 +761,8 @@ public class MavenCli
         eventSpyDispatcher.onEvent( settingsRequest );
 
         slf4jLogger.debug( "Reading global settings from "
-            + getSettingsLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
+            + getSettingsLocation( settingsRequest.getGlobalSettingsSource(),
+                                   settingsRequest.getGlobalSettingsFile() ) );
         slf4jLogger.debug( "Reading user settings from "
             + getSettingsLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
@@ -1074,9 +1079,9 @@ public class MavenCli
         // Builder, concurrency and parallelism
         //
         // We preserve the existing methods for builder selection which is to look for various inputs in the threading
-        // configuration. We don't have an easy way to allow a pluggable builder to provide its own configuration parameters
-        // but this is sufficient for now. Ultimately we want components like Builders to provide a way to extend the command
-        // line to accept its own configuration parameters. 
+        // configuration. We don't have an easy way to allow a pluggable builder to provide its own configuration
+        // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
+        // extend the command line to accept its own configuration parameters. 
         //
         final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
             ? commandLine.getOptionValue( CLIManager.THREADS )

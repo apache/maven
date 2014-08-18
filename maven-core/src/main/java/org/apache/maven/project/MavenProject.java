@@ -846,7 +846,8 @@ public class MavenProject
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
-        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null ) ? getSnapshotArtifactRepository()
+        return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null )
+                        ? getSnapshotArtifactRepository()
                         : getReleaseArtifactRepository();
     }
 
@@ -1407,7 +1408,7 @@ public class MavenProject
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
-        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact> emptySet();
+        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
         this.artifacts = null;
         this.artifactMap = null;
     }

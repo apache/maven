@@ -25,17 +25,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.MavenArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.artifact.ArtifactType;
@@ -122,7 +116,7 @@ public class RepositoryUtils
             nodeTrail.addAll( trail );
             nodeTrail.add( artifact.getId() );
 
-            if ( filter == null || filter.accept( node, Collections.<DependencyNode> emptyList() ) )
+            if ( filter == null || filter.accept( node, Collections.<DependencyNode>emptyList() ) )
             {
                 artifact.setDependencyTrail( nodeTrail );
                 artifacts.add( artifact );
@@ -282,10 +276,10 @@ public class RepositoryUtils
         DefaultArtifactHandler handler = new DefaultArtifactHandler( type );
         handler.setExtension( artifact.getExtension() );
         handler.setLanguage( artifact.getProperty( ArtifactProperties.LANGUAGE, null ) );
-        handler.setAddedToClasspath( Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.CONSTITUTES_BUILD_PATH,
-                                                                                 "" ) ) );
-        handler.setIncludesDependencies( Boolean.parseBoolean( artifact.getProperty( ArtifactProperties.INCLUDES_DEPENDENCIES,
-                                                                                     "" ) ) );
+        String addedToClasspath = artifact.getProperty( ArtifactProperties.CONSTITUTES_BUILD_PATH, "" );
+        handler.setAddedToClasspath( Boolean.parseBoolean( addedToClasspath ) );
+        String includesDependencies = artifact.getProperty( ArtifactProperties.INCLUDES_DEPENDENCIES, "" );
+        handler.setIncludesDependencies( Boolean.parseBoolean( includesDependencies ) );
         return handler;
     }
 

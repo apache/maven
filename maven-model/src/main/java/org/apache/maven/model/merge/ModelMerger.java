@@ -76,14 +76,17 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * Map<Object, Object> context )</code> for each model class</li>
  * <li><code>merge<i>Classname</i>_<i>FieldName</i>( <i>Classname</i> target, <i>Classname</i> source, boolean
  * sourceDominant, Map<Object, Object> context )</code> for each field of each model class</li>
- * <li><code>Object get<i>Classname</i>Key( <i>Classname</i> <i>classname</i> )</code> for each class that is used in a list</li>
+ * <li><code>Object get<i>Classname</i>Key( <i>Classname</i> <i>classname</i> )</code>
+ * for each class that is used in a list</li>
  * </ul>
  * Code is written like it could be generated, with default behaviour to be overridden when necessary.
- * This is particularly the case for <code>Object get<i>Classname</i>Key( <i>Classname</i> <i>classname</i> )</code> method,
- * which by default return the object itself and is expected to be overridden to calculate better suited key value.
+ * This is particularly the case for <code>Object get<i>Classname</i>Key( <i>Classname</i> <i>classname</i> )</code>
+ * method, which by default return the object itself and is expected to be overridden to calculate better suited key
+ * value.
  *
  * @author Benjamin Bentmann
  */
+@SuppressWarnings( { "checkstyle:methodname" } )
 public class ModelMerger
 {
 

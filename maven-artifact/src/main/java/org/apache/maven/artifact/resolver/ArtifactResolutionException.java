@@ -30,6 +30,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public class ArtifactResolutionException
     extends AbstractArtifactResolutionException
 {
+    @SuppressWarnings( "checkstyle:parameternumber" )
     public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
                                         String classifier, List<ArtifactRepository> remoteRepositories,
                                         List<String> path, Throwable t )

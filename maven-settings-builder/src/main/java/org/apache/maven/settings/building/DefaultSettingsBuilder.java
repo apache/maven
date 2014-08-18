@@ -180,14 +180,14 @@ public class DefaultSettingsBuilder
         }
         catch ( SettingsParseException e )
         {
-            problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsSource.getLocation() + ": "
-                + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
+            problems.add( SettingsProblem.Severity.FATAL, "Non-parseable settings " + settingsSource.getLocation()
+                + ": " + e.getMessage(), e.getLineNumber(), e.getColumnNumber(), e );
             return new Settings();
         }
         catch ( IOException e )
         {
-            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsSource.getLocation() + ": "
-                + e.getMessage(), -1, -1, e );
+            problems.add( SettingsProblem.Severity.FATAL, "Non-readable settings " + settingsSource.getLocation()
+                + ": " + e.getMessage(), -1, -1, e );
             return new Settings();
         }
 
@@ -196,7 +196,8 @@ public class DefaultSettingsBuilder
         return settings;
     }
 
-    private Settings interpolate( Settings settings, SettingsBuildingRequest request, SettingsProblemCollector problems )
+    private Settings interpolate( Settings settings, SettingsBuildingRequest request,
+                                  SettingsProblemCollector problems )
     {
         StringWriter writer = new StringWriter( 1024 * 4 );
 

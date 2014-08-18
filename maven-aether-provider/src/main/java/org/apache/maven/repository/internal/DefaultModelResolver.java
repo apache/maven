@@ -104,7 +104,7 @@ class DefaultModelResolver
         this.resolver = original.resolver;
         this.versionRangeResolver = original.versionRangeResolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
-        this.repositories = new ArrayList<RemoteRepository>(original.repositories);
+        this.repositories = new ArrayList<RemoteRepository>( original.repositories );
         this.externalRepositories = original.externalRepositories;
         this.repositoryIds = new HashSet<String>( original.repositoryIds );
     }
@@ -117,14 +117,18 @@ class DefaultModelResolver
     }
 
     @Override
-    public void addRepository(final Repository repository, boolean replace) throws InvalidRepositoryException {
+    public void addRepository( final Repository repository, boolean replace )
+        throws InvalidRepositoryException
+    {
         if ( session.isIgnoreArtifactDescriptorRepositories() )
         {
             return;
         }
 
-        if ( !repositoryIds.add( repository.getId() ) ) {
-            if ( !replace ) {
+        if ( !repositoryIds.add( repository.getId() ) )
+        {
+            if ( !replace )
+            {
                 return;
             }
 
@@ -138,13 +142,16 @@ class DefaultModelResolver
             remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
     }
 
-    private static void removeMatchingRepository(Iterable<RemoteRepository> repositories, final String id) {
-        Iterables.removeIf(repositories, new Predicate<RemoteRepository>() {
+    private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
+    {
+        Iterables.removeIf( repositories, new Predicate<RemoteRepository>()
+        {
             @Override
-            public boolean apply(RemoteRepository remoteRepository) {
-                return remoteRepository.getId().equals(id);
+            public boolean apply( RemoteRepository remoteRepository )
+            {
+                return remoteRepository.getId().equals( id );
             }
-        });
+        } );
     }
 
     @Override

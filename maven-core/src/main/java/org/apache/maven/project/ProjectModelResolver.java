@@ -91,10 +91,10 @@ class ProjectModelResolver
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.pomRepositories = new ArrayList<RemoteRepository>();
         List<RemoteRepository> externalRepositories = new ArrayList<RemoteRepository>();
-        externalRepositories.addAll(repositories);
-        this.externalRepositories = Collections.unmodifiableList(externalRepositories);
+        externalRepositories.addAll( repositories );
+        this.externalRepositories = Collections.unmodifiableList( externalRepositories );
         this.repositories = new ArrayList<RemoteRepository>();
-        this.repositories.addAll(externalRepositories);
+        this.repositories.addAll( externalRepositories );
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<String>();
         this.modelPool = modelPool;
@@ -106,9 +106,9 @@ class ProjectModelResolver
         this.trace = original.trace;
         this.resolver = original.resolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
-        this.pomRepositories = new ArrayList<RemoteRepository>(original.pomRepositories);
+        this.pomRepositories = new ArrayList<RemoteRepository>( original.pomRepositories );
         this.externalRepositories = original.externalRepositories;
-        this.repositories = new ArrayList<RemoteRepository>(original.repositories);
+        this.repositories = new ArrayList<RemoteRepository>( original.repositories );
         this.repositoryMerging = original.repositoryMerging;
         this.repositoryIds = new HashSet<String>( original.repositoryIds );
         this.modelPool = original.modelPool;
@@ -121,15 +121,19 @@ class ProjectModelResolver
     }
 
     @Override
-    public void addRepository(final Repository repository, boolean replace) throws InvalidRepositoryException {
-        if ( !repositoryIds.add( repository.getId() ) ) {
-            if ( !replace ) {
+    public void addRepository( final Repository repository, boolean replace )
+        throws InvalidRepositoryException
+    {
+        if ( !repositoryIds.add( repository.getId() ) )
+        {
+            if ( !replace )
+            {
                 return;
             }
 
-            //Remove any previous repository with this Id
-            removeMatchingRepository(repositories, repository.getId());
-            removeMatchingRepository(pomRepositories, repository.getId());
+            // Remove any previous repository with this Id
+            removeMatchingRepository( repositories, repository.getId() );
+            removeMatchingRepository( pomRepositories, repository.getId() );
         }
 
         List<RemoteRepository> newRepositories =
@@ -137,7 +141,8 @@ class ProjectModelResolver
 
         if ( ProjectBuildingRequest.RepositoryMerging.REQUEST_DOMINANT.equals( repositoryMerging ) )
         {
-            repositories = remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories, true );
+            repositories = remoteRepositoryManager.aggregateRepositories( session, repositories, newRepositories,
+                                                                          true );
         }
         else
         {
@@ -148,13 +153,16 @@ class ProjectModelResolver
         }
     }
 
-    private static void removeMatchingRepository(Iterable<RemoteRepository> repositories, final String id) {
-        Iterables.removeIf(repositories, new Predicate<RemoteRepository>() {
+    private static void removeMatchingRepository( Iterable<RemoteRepository> repositories, final String id )
+    {
+        Iterables.removeIf( repositories, new Predicate<RemoteRepository>()
+        {
             @Override
-            public boolean apply(RemoteRepository remoteRepository) {
-                return remoteRepository.getId().equals(id);
+            public boolean apply( RemoteRepository remoteRepository )
+            {
+                return remoteRepository.getId().equals( id );
             }
-        });
+        } );
     }
 
     public ModelResolver newCopy()

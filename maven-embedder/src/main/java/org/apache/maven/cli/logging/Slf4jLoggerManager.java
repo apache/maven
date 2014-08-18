@@ -25,7 +25,8 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 /**
- * Use an SLF4J {@link org.slf4j.ILoggerFactory} as a backing for a Plexus {@link org.codehaus.plexus.logging.LoggerManager},
+ * Use an SLF4J {@link org.slf4j.ILoggerFactory} as a backing for a Plexus
+ * {@link org.codehaus.plexus.logging.LoggerManager},
  * ignoring Plexus logger API parts that are not classical and probably not really used.
  *
  * @author Jason van Zyl
