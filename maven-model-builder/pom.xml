@@ -54,6 +54,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <classifier>no_aop</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.3</version>
