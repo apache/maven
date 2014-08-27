@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.Authentication;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
@@ -40,6 +41,7 @@ public class LegacyRepositorySystemTest
     {
         super.customizeContainerConfiguration( containerConfiguration );
         containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     @Override
