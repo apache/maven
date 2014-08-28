@@ -87,7 +87,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.aether</groupId>
-      <artifactId>aether-connector-wagon</artifactId>
+      <artifactId>aether-connector-basic</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.aether</groupId>
+      <artifactId>aether-transport-wagon</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
