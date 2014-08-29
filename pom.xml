@@ -44,7 +44,7 @@
   <properties>
     <maven.compiler.source>1.6</maven.compiler.source>
     <maven.compiler.target>1.6</maven.compiler.target>    
-    <classWorldsVersion>2.5.1</classWorldsVersion>
+    <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
     <junitVersion>3.8.2</junitVersion>
