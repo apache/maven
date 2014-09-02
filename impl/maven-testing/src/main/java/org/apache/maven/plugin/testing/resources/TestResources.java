@@ -61,7 +61,12 @@ public class TestResources
     @Override
     protected void starting( Description d )
     {
-        name = d.getTestClass().getSimpleName() + "_" + d.getMethodName();
+        String methodName = d.getMethodName();
+        if ( methodName != null )
+        {
+            methodName = methodName.replace('/', '_').replace('\\', '_');
+        }
+        name = d.getTestClass().getSimpleName() + "_" + methodName;
     }
 
     /**
