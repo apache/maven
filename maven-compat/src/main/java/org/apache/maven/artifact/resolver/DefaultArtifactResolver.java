@@ -60,6 +60,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepositoryManager;
@@ -71,7 +72,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
  */
 @Component( role = ArtifactResolver.class )
 public class DefaultArtifactResolver
-    implements ArtifactResolver
+    implements ArtifactResolver, Disposable
 {
     @Requirement 
     private Logger logger;
@@ -118,17 +119,6 @@ public class DefaultArtifactResolver
                 new ThreadPoolExecutor( threads, threads, 3, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
                                         new DaemonThreadCreator() );
         }
-    }
-
-    @Override
-    protected void finalize()
-        throws Throwable
-    {
-        if ( executor instanceof ExecutorService )
-        {
-            ( (ExecutorService) executor ).shutdown();
-        }
-        super.finalize();
     }
 
     private RepositorySystemSession getSession( ArtifactRepository localRepository )
@@ -571,6 +561,7 @@ public class DefaultArtifactResolver
         {
             Thread newThread = new Thread( GROUP, r, "resolver-" + THREAD_NUMBER.getAndIncrement() );
             newThread.setDaemon( true );
+            newThread.setContextClassLoader( null );
             return newThread;
         }
     }
@@ -638,6 +629,15 @@ public class DefaultArtifactResolver
             }
         }
 
+    }
+
+    @Override
+    public void dispose()
+    {
+        if ( executor instanceof ExecutorService )
+        {
+            ( (ExecutorService) executor ).shutdownNow();
+        }
     }
 
 }
