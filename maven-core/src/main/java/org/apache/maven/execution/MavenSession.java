@@ -271,8 +271,10 @@ public class MavenSession
     {
         this.projectMap = projectMap;
     }
-
-    public Map<String, MavenProject> getProjectMap()
+    
+    @Deprecated
+    /** @deprecated This appears to only be used in the ReactorReader and we can do any processing required there */
+    public Map<String, MavenProject> getProjectMap() 
     {
         return projectMap;
     }
@@ -288,7 +290,7 @@ public class MavenSession
     {
         this.allProjects = allProjects;
     }
-
+    
     /*if_not[MAVEN4]*/
 
     //
@@ -433,5 +435,4 @@ public class MavenSession
     }   
     
     /*end[MAVEN4]*/
-    
 }

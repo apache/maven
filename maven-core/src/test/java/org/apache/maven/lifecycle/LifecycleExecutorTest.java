@@ -409,6 +409,11 @@ public class LifecycleExecutorTest
             {
                 return Collections.emptyList();
             }
+            
+            public java.util.List<MavenProject> getAllSortedProjects()
+            {
+                return Collections.emptyList();
+            }
         } );
 
         final List<String> log = new ArrayList<String>();

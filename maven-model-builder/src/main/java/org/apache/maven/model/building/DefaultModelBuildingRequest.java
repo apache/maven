@@ -25,8 +25,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.resolution.WorkspaceModelResolver;
 
 /**
  * Collects settings that control building of effective models.
@@ -36,6 +38,8 @@ import org.apache.maven.model.resolution.ModelResolver;
 public class DefaultModelBuildingRequest
     implements ModelBuildingRequest
 {
+
+    private Model rawModel;
 
     private File pomFile;
 
@@ -66,6 +70,8 @@ public class DefaultModelBuildingRequest
     private ModelBuildingListener modelBuildingListener;
 
     private ModelCache modelCache;
+
+    private WorkspaceModelResolver workspaceResolver;
 
     /**
      * Creates an empty request.
@@ -370,6 +376,32 @@ public class DefaultModelBuildingRequest
     {
         this.modelCache = modelCache;
 
+        return this;
+    }
+
+    @Override
+    public Model getRawModel()
+    {
+        return rawModel;
+    }
+
+    @Override
+    public ModelBuildingRequest setRawModel( Model rawModel )
+    {
+        this.rawModel = rawModel;
+        return this;
+    }
+
+    @Override
+    public WorkspaceModelResolver getWorkspaceModelResolver()
+    {
+        return workspaceResolver;
+    }
+
+    @Override
+    public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
+    {
+        this.workspaceResolver = workspaceResolver;
         return this;
     }
 

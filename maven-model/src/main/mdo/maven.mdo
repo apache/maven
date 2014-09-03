@@ -1466,12 +1466,18 @@
           <version>4.0.0+</version>
           <code>
             <![CDATA[
+    private String managementKey;
+
     /**
      * @return the management key as <code>groupId:artifactId:type</code>
      */
     public String getManagementKey()
     {
-        return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" );
+        if ( managementKey == null )
+        {
+            managementKey = groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" );
+        }
+        return managementKey;
     }
             ]]>
           </code>

@@ -19,6 +19,10 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,6 +67,7 @@ import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
+import org.apache.maven.model.resolution.WorkspaceModelResolver;
 import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.component.annotations.Component;
@@ -241,8 +246,8 @@ public class DefaultModelBuilder
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         problems.setSource( "(external profiles)" );
-        List<Profile> activeExternalProfiles =
-            profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext, problems );
+        List<Profile> activeExternalProfiles = profileSelector.getActiveProfiles( request.getProfiles(),
+                                                                                  profileActivationContext, problems );
 
         result.setActiveExternalProfiles( activeExternalProfiles );
 
@@ -258,7 +263,11 @@ public class DefaultModelBuilder
         }
 
         // read and validate raw model
-        Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+        Model inputModel = request.getRawModel();
+        if ( inputModel == null )
+        {
+            inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
+        }
 
         problems.setRootModel( inputModel );
 
@@ -272,10 +281,11 @@ public class DefaultModelBuilder
         {
             lineage.add( currentData );
 
-            Model tmpModel = currentData.getModel();
-
-            Model rawModel = tmpModel.clone();
+            Model rawModel = currentData.getModel();
             currentData.setRawModel( rawModel );
+
+            Model tmpModel = rawModel.clone();
+            currentData.setModel( tmpModel );
 
             problems.setSource( tmpModel );
 
@@ -284,8 +294,8 @@ public class DefaultModelBuilder
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
-            List<Profile> activePomProfiles =
-                profileSelector.getActiveProfiles( rawModel.getProfiles(), profileActivationContext, problems );
+            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
+                                                                                 profileActivationContext, problems );
             currentData.setActiveProfiles( activePomProfiles );
 
             Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
@@ -320,13 +330,13 @@ public class DefaultModelBuilder
             }
             else if ( currentData == resultData )
             { // First iteration - add initial parent id after version resolution.
-                currentData.setGroupId( currentData.getRawModel().getGroupId() == null
-                                            ? parentData.getGroupId()
-                                            : currentData.getRawModel().getGroupId() );
+                currentData.setGroupId( currentData.getRawModel().getGroupId() == null ? parentData.getGroupId()
+                                                                                      : currentData.getRawModel()
+                                                                                          .getGroupId() );
 
-                currentData.setVersion( currentData.getRawModel().getVersion() == null
-                                            ? parentData.getVersion()
-                                            : currentData.getRawModel().getVersion() );
+                currentData.setVersion( currentData.getRawModel().getVersion() == null ? parentData.getVersion()
+                                                                                      : currentData.getRawModel()
+                                                                                          .getVersion() );
 
                 currentData.setArtifactId( currentData.getRawModel().getArtifactId() );
                 parentIds.add( currentData.getId() );
@@ -345,9 +355,8 @@ public class DefaultModelBuilder
                 }
                 message += parentData.getId();
 
-                problems.add(
-                    new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE ).
-                    setMessage( message ) );
+                problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE )
+                    .setMessage( message ) );
 
                 throw problems.newModelBuildingException();
             }
@@ -376,7 +385,7 @@ public class DefaultModelBuilder
         modelUrlNormalizer.normalize( resultModel, request );
 
         // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver( request.getModelResolver(), resultModel, problems , true );
+        configureResolver( request.getModelResolver(), resultModel, problems, true );
 
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );
@@ -469,6 +478,23 @@ public class DefaultModelBuilder
         return result;
     }
 
+    @Override
+    public Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking )
+    {
+        final ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( validationLevel )
+            .setLocationTracking( locationTracking );
+        final DefaultModelProblemCollector collector = 
+            new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
+        try
+        {
+            return newResult( readModel( null, pomFile, request, collector ), collector.getProblems() );
+        }
+        catch ( ModelBuildingException e )
+        {
+            return error( collector.getProblems() );
+        }
+    }
+
     private Model readModel( ModelSource modelSource, File pomFile, ModelBuildingRequest request,
                              DefaultModelProblemCollector problems )
         throws ModelBuildingException
@@ -524,14 +550,14 @@ public class DefaultModelBuilder
                 if ( pomFile != null )
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V20 )
-                            .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                            .setException( e ) );
+                        .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
+                        .setException( e ) );
                 }
                 else
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
-                            .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                            .setException( e ) );
+                        .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
+                        .setException( e ) );
                 }
             }
 
@@ -544,8 +570,8 @@ public class DefaultModelBuilder
         catch ( ModelParseException e )
         {
             problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                    .setMessage( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                    .setException( e ) );
+                .setMessage( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage() )
+                .setException( e ) );
             throw problems.newModelBuildingException();
         }
         catch ( IOException e )
@@ -564,8 +590,7 @@ public class DefaultModelBuilder
                 }
             }
             problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                    .setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg )
-                    .setException( e ) );
+                .setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg ).setException( e ) );
             throw problems.newModelBuildingException();
         }
 
@@ -621,9 +646,8 @@ public class DefaultModelBuilder
             catch ( InvalidRepositoryException e )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
-                        .setLocation( repository.getLocation( "" ) )
-                        .setException( e ) );
+                    .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
+                    .setLocation( repository.getLocation( "" ) ).setException( e ) );
             }
         }
     }
@@ -675,7 +699,8 @@ public class DefaultModelBuilder
             if ( versions.get( key ) == null && managedVersions.get( key ) == null )
             {
                 InputLocation location = plugins.get( key ).getLocation( "" );
-                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
+                problems
+                    .add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
                         .setMessage( "'build.plugins.plugin.version' for " + key + " is missing." )
                         .setLocation( location ) );
             }
@@ -800,9 +825,9 @@ public class DefaultModelBuilder
             if ( !"pom".equals( parentModel.getPackaging() ) )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
+                    .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
                                      + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
-                        .setLocation( parentModel.getLocation( "packaging" ) ) );
+                    .setLocation( parentModel.getLocation( "packaging" ) ) );
             }
         }
         else
@@ -817,20 +842,52 @@ public class DefaultModelBuilder
                                          DefaultModelProblemCollector problems )
         throws ModelBuildingException
     {
-        ModelSource candidateSource = getParentPomFile( childModel, childSource );
-
-        if ( candidateSource == null )
+        final Parent parent = childModel.getParent();
+        final ModelSource candidateSource;
+        final Model candidateModel;
+        final WorkspaceModelResolver resolver = request.getWorkspaceModelResolver();
+        if ( resolver == null )
         {
-            return null;
+            candidateSource = getParentPomFile( childModel, childSource );
+
+            if ( candidateSource == null )
+            {
+                return null;
+            }
+
+            File pomFile = null;
+            if ( candidateSource instanceof FileModelSource )
+            {
+                pomFile = ( (FileModelSource) candidateSource ).getPomFile();
+            }
+
+            candidateModel = readModel( candidateSource, pomFile, request, problems );
+        }
+        else
+        {
+            try
+            {
+                candidateModel =
+                    resolver.resolveRawModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+            }
+            catch ( UnresolvableModelException e )
+            {
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ) //
+                .setMessage( e.getMessage().toString() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
+                throw problems.newModelBuildingException();
+            }
+            if ( candidateModel == null )
+            {
+                return null;
+            }
+            candidateSource = new FileModelSource( candidateModel.getPomFile() );
         }
 
-        File pomFile = null;
-        if ( candidateSource instanceof FileModelSource )
-        {
-            pomFile = ( (FileModelSource) candidateSource ).getPomFile();
-        }
-
-        Model candidateModel = readModel( candidateSource, pomFile, request, problems );
+        //
+        // TODO:jvz Why isn't all this checking the job of the duty of the workspace resolver, we know that we
+        // have a model that is suitable, yet more checks are done here and the one for the version is problematic
+        // before because with parents as ranges it will never work in this scenario.
+        //
 
         String groupId = candidateModel.getGroupId();
         if ( groupId == null && candidateModel.getParent() != null )
@@ -843,8 +900,6 @@ public class DefaultModelBuilder
         {
             version = candidateModel.getParent().getVersion();
         }
-
-        Parent parent = childModel.getParent();
 
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
             || !artifactId.equals( parent.getArtifactId() ) )
@@ -861,14 +916,18 @@ public class DefaultModelBuilder
 
             problems.setSource( childModel );
             problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
-                    .setMessage( buffer.toString() )
-                    .setLocation( parent.getLocation( "" ) ) );
+                .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ) );
             return null;
         }
-        if ( version == null || !version.equals( parent.getVersion() ) )
-        {
-            return null;
-        }
+
+        //
+        // Here we just need to know that a version is fine to use but this validation we can do in our workspace
+        // resolver.
+        //
+
+        /*
+         * if ( version == null || !version.equals( parent.getVersion() ) ) { return null; }
+         */
 
         ModelData parentData = new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
 
@@ -944,9 +1003,7 @@ public class DefaultModelBuilder
             }
 
             problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                    .setMessage( buffer.toString() )
-                    .setLocation( parent.getLocation( "" ) )
-                    .setException( e ) );
+                .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
             throw problems.newModelBuildingException();
         }
 
@@ -969,18 +1026,17 @@ public class DefaultModelBuilder
         {
             if ( childModel.getVersion() == null )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 ).
-                    setMessage( "Version must be a constant" ).
-                    setLocation( childModel.getLocation( "" ) ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
+                    .setMessage( "Version must be a constant" ).setLocation( childModel.getLocation( "" ) ) );
 
             }
             else
             {
                 if ( childModel.getVersion().indexOf( "${" ) > -1 )
                 {
-                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 ).
-                        setMessage( "Version must be a constant" ).
-                        setLocation( childModel.getLocation( "version" ) ) );
+                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
+                        .setMessage( "Version must be a constant" )
+                        .setLocation( childModel.getLocation( "version" ) ) );
 
                 }
             }
@@ -1013,7 +1069,8 @@ public class DefaultModelBuilder
 
         importIds.add( importing );
 
-        ModelResolver modelResolver = request.getModelResolver();
+        final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
+        final ModelResolver modelResolver = request.getModelResolver();
 
         ModelBuildingRequest importRequest = null;
 
@@ -1037,25 +1094,25 @@ public class DefaultModelBuilder
             if ( groupId == null || groupId.length() <= 0 )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "'dependencyManagement.dependencies.dependency.groupId' for "
-                                        + dependency.getManagementKey() + " is missing." )
-                        .setLocation( dependency.getLocation( "" ) ) );
+                    .setMessage( "'dependencyManagement.dependencies.dependency.groupId' for "
+                                     + dependency.getManagementKey() + " is missing." )
+                    .setLocation( dependency.getLocation( "" ) ) );
                 continue;
             }
             if ( artifactId == null || artifactId.length() <= 0 )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
-                                        + dependency.getManagementKey() + " is missing." )
-                        .setLocation( dependency.getLocation( "" ) ) );
+                    .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
+                                     + dependency.getManagementKey() + " is missing." )
+                    .setLocation( dependency.getLocation( "" ) ) );
                 continue;
             }
             if ( version == null || version.length() <= 0 )
             {
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "'dependencyManagement.dependencies.dependency.version' for "
-                                        + dependency.getManagementKey() + " is missing." )
-                        .setLocation( dependency.getLocation( "" ) ) );
+                    .setMessage( "'dependencyManagement.dependencies.dependency.version' for "
+                                     + dependency.getManagementKey() + " is missing." )
+                    .setLocation( dependency.getLocation( "" ) ) );
                 continue;
             }
 
@@ -1074,67 +1131,85 @@ public class DefaultModelBuilder
                 continue;
             }
 
-            DependencyManagement importMngt =
-                getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT );
+            DependencyManagement importMngt = getCache( request.getModelCache(), groupId, artifactId, version,
+                                                        ModelCacheTag.IMPORT );
 
             if ( importMngt == null )
             {
-                if ( modelResolver == null )
+                if ( workspaceResolver == null && modelResolver == null )
                 {
                     throw new IllegalArgumentException( "no model resolver provided, cannot resolve import POM "
                         + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
                         + ModelProblemUtils.toSourceHint( model ) );
                 }
 
-                ModelSource importSource;
-                try
+                Model importModel = null;
+                if ( workspaceResolver != null )
                 {
-                    importSource = modelResolver.resolveModel( groupId, artifactId, version );
-                }
-                catch ( UnresolvableModelException e )
-                {
-                    StringBuilder buffer = new StringBuilder( 256 );
-                    buffer.append( "Non-resolvable import POM" );
-                    if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
+                    try
                     {
-                        buffer.append( " " ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+                        importModel = workspaceResolver.resolveEffectiveModel( groupId, artifactId, version );
                     }
-                    buffer.append( ": " ).append( e.getMessage() );
+                    catch ( UnresolvableModelException e )
+                    {
+                        problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
+                            .setMessage( e.getMessage().toString() ).setException( e ) );
+                        continue;
+                    }
+                }
 
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                            .setMessage( buffer.toString() )
-                            .setLocation( dependency.getLocation( "" ) )
+                // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
+                if ( importModel == null )
+                {
+                    final ModelSource importSource;
+                    try
+                    {
+                        importSource = modelResolver.resolveModel( groupId, artifactId, version );
+                    }
+                    catch ( UnresolvableModelException e )
+                    {
+                        StringBuilder buffer = new StringBuilder( 256 );
+                        buffer.append( "Non-resolvable import POM" );
+                        if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
+                        {
+                            buffer.append( " " ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+                        }
+                        buffer.append( ": " ).append( e.getMessage() );
+
+                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                            .setMessage( buffer.toString() ).setLocation( dependency.getLocation( "" ) )
                             .setException( e ) );
-                    continue;
+                        continue;
+                    }
+
+                    if ( importRequest == null )
+                    {
+                        importRequest = new DefaultModelBuildingRequest();
+                        importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
+                        importRequest.setModelCache( request.getModelCache() );
+                        importRequest.setSystemProperties( request.getSystemProperties() );
+                        importRequest.setUserProperties( request.getUserProperties() );
+                        importRequest.setLocationTracking( request.isLocationTracking() );
+                    }
+
+                    importRequest.setModelSource( importSource );
+                    importRequest.setModelResolver( modelResolver.newCopy() );
+
+                    final ModelBuildingResult importResult;
+                    try
+                    {
+                        importResult = build( importRequest );
+                    }
+                    catch ( ModelBuildingException e )
+                    {
+                        problems.addAll( e.getProblems() );
+                        continue;
+                    }
+
+                    problems.addAll( importResult.getProblems() );
+
+                    importModel = importResult.getEffectiveModel();
                 }
-
-                if ( importRequest == null )
-                {
-                    importRequest = new DefaultModelBuildingRequest();
-                    importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-                    importRequest.setModelCache( request.getModelCache() );
-                    importRequest.setSystemProperties( request.getSystemProperties() );
-                    importRequest.setUserProperties( request.getUserProperties() );
-                    importRequest.setLocationTracking( request.isLocationTracking() );
-                }
-
-                importRequest.setModelSource( importSource );
-                importRequest.setModelResolver( modelResolver.newCopy() );
-
-                ModelBuildingResult importResult;
-                try
-                {
-                    importResult = build( importRequest );
-                }
-                catch ( ModelBuildingException e )
-                {
-                    problems.addAll( e.getProblems() );
-                    continue;
-                }
-
-                problems.addAll( importResult.getProblems() );
-
-                Model importModel = importResult.getEffectiveModel();
 
                 importMngt = importModel.getDependencyManagement();
 

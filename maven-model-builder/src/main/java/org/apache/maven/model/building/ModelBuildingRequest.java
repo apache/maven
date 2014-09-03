@@ -24,8 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.resolution.WorkspaceModelResolver;
 
 /**
  * Collects settings that control the building of effective models.
@@ -61,6 +63,20 @@ public interface ModelBuildingRequest
      * Denotes strict validation as recommended by the current Maven version.
      */
     int VALIDATION_LEVEL_STRICT = VALIDATION_LEVEL_MAVEN_3_0;
+
+    /**
+     * Gets the raw model to build. If not set, model source will be used to load raw model.
+     * 
+     * @return The raw model to build or {@code null} if not set.
+     */
+    Model getRawModel();
+
+    /**
+     * Set raw model.
+     *
+     * @param model
+     */
+    ModelBuildingRequest setRawModel( Model rawModel );
 
     /**
      * Gets the source of the POM to process.
@@ -314,5 +330,9 @@ public interface ModelBuildingRequest
      * @return This request, never {@code null}.
      */
     ModelBuildingRequest setModelCache( ModelCache modelCache );
+
+    WorkspaceModelResolver getWorkspaceModelResolver();
+
+    ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
 
 }

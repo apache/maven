@@ -52,6 +52,7 @@ import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.RepositoryEventDispatcher;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.impl.VersionResolver;
+import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorPolicy;
@@ -215,7 +216,6 @@ public class DefaultArtifactDescriptorReader
         ArtifactDescriptorResult result = new ArtifactDescriptorResult( request );
 
         Model model = loadPom( session, request, result );
-
         if ( model != null )
         {
             Map<String, Object> config = session.getConfigProperties();
@@ -303,6 +303,18 @@ public class DefaultArtifactDescriptorReader
             }
 
             Model model;
+
+            // hack: don't rebuild model if it was already loaded during reactor resolution
+            final WorkspaceReader workspace = session.getWorkspaceReader();
+            if ( workspace instanceof MavenWorkspaceReader )
+            {
+                model = ( (MavenWorkspaceReader) workspace ).findModel( pomArtifact );
+                if ( model != null )
+                {
+                    return model;
+                }
+            }
+
             try
             {
                 ModelBuildingRequest modelRequest = new DefaultModelBuildingRequest();

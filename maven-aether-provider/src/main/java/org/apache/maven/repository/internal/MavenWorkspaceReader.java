@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.repository.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -9,7 +9,7 @@ package org.apache.maven;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -19,21 +19,14 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.model.Model;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.repository.WorkspaceReader;
 
-/**
- * @author jdcasey
- */
-public class ProjectCycleException
-    extends BuildFailureException
+public interface MavenWorkspaceReader
+    extends WorkspaceReader
 {
-    public ProjectCycleException( String message )
-    {
-        super( message );
-    }
-    
-    public ProjectCycleException( String message, CycleDetectedException cause )
-    {
-        super( message, cause );
-    }
+
+    Model findModel( Artifact artifact );
+
 }

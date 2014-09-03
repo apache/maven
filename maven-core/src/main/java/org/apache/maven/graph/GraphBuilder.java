@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.graph;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,21 +19,13 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.model.building.Result;
 
-/**
- * @author jdcasey
- */
-public class ProjectCycleException
-    extends BuildFailureException
+public interface GraphBuilder
 {
-    public ProjectCycleException( String message )
-    {
-        super( message );
-    }
-    
-    public ProjectCycleException( String message, CycleDetectedException cause )
-    {
-        super( message, cause );
-    }
+    String HINT = "graphBuilder";
+
+    Result<? extends ProjectDependencyGraph> build( MavenSession session );
 }

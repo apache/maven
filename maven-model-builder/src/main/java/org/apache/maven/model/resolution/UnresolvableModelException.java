@@ -78,6 +78,22 @@ public class UnresolvableModelException
     }
 
     /**
+     * Creates a new exception with specified cause
+     *
+     * @param cause
+     * @param groupId
+     * @param artifactId
+     * @param version
+     */
+    public UnresolvableModelException( Throwable cause, String groupId, String artifactId, String version )
+    {
+        super( cause );
+        this.groupId = groupId;
+        this.artifactId = artifactId;
+        this.version = version;
+    }
+
+    /**
      * Gets the group id of the unresolvable model.
      *
      * @return The group id of the unresolvable model, can be empty but never {@code null}.

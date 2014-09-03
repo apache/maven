@@ -28,6 +28,7 @@ import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
@@ -55,7 +56,7 @@ import org.eclipse.aether.resolution.VersionRangeResult;
  *
  * @author Benjamin Bentmann
  */
-class ProjectModelResolver
+public class ProjectModelResolver
     implements ModelResolver
 {
 

@@ -34,9 +34,10 @@ import javax.inject.Named;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Model;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.repository.internal.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
@@ -49,7 +50,7 @@ import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 @Named( ReactorReader.HINT )
 @SessionScoped
 class ReactorReader
-    implements WorkspaceReader
+    implements MavenWorkspaceReader
 {
     public static final String HINT = "reactor";
 
@@ -134,6 +135,14 @@ class ReactorReader
         }
 
         return Collections.unmodifiableList( versions );
+    }
+
+    @Override
+    public Model findModel( Artifact artifact )
+    {
+        String projectKey = ArtifactUtils.key( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion() );
+        MavenProject project = projectsByGAV.get( projectKey );
+        return project == null ? null : project.getModel();
     }
 
     //

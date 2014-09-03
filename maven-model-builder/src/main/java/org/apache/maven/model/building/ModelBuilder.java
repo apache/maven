@@ -19,6 +19,10 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.io.File;
+
+import org.apache.maven.model.Model;
+
 /**
  * Builds the effective model from a POM.
  *
@@ -50,5 +54,14 @@ public interface ModelBuilder
      */
     ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
         throws ModelBuildingException;
+
+    /**
+     * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
+     *
+     * @param request
+     * @return
+     * @throws ModelBuildingException
+     */
+    Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking );
 
 }

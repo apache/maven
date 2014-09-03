@@ -37,7 +37,7 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
  *
  * @author Benjamin Bentmann
  */
-class DefaultModelBuildingListener
+public class DefaultModelBuildingListener
     extends AbstractModelBuildingListener
 {
 

@@ -24,8 +24,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.resolution.ModelResolver;
+import org.apache.maven.model.resolution.WorkspaceModelResolver;
 
 /**
  * A model building request that delegates all methods invocations to another request, meant for easy transformations by
@@ -251,6 +253,32 @@ class FilterModelBuildingRequest
     {
         request.setModelCache( modelCache );
 
+        return this;
+    }
+
+    @Override
+    public Model getRawModel()
+    {
+        return request.getRawModel();
+    }
+
+    @Override
+    public ModelBuildingRequest setRawModel( Model rawModel )
+    {
+        request.setRawModel( rawModel );
+        return this;
+    }
+
+    @Override
+    public WorkspaceModelResolver getWorkspaceModelResolver()
+    {
+        return request.getWorkspaceModelResolver();
+    }
+
+    @Override
+    public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
+    {
+        request.setWorkspaceModelResolver( workspaceResolver );
         return this;
     }
 

@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.graph;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -36,7 +36,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
  *
  * @author Benjamin Bentmann
  */
-class DefaultProjectDependencyGraph
+public class DefaultProjectDependencyGraph
     implements ProjectDependencyGraph
 {
 

@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.model.resolution;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,21 +19,15 @@ package org.apache.maven;
  * under the License.
  */
 
-import org.codehaus.plexus.util.dag.CycleDetectedException;
+import org.apache.maven.model.Model;
 
-/**
- * @author jdcasey
- */
-public class ProjectCycleException
-    extends BuildFailureException
+public interface WorkspaceModelResolver
 {
-    public ProjectCycleException( String message )
-    {
-        super( message );
-    }
-    
-    public ProjectCycleException( String message, CycleDetectedException cause )
-    {
-        super( message, cause );
-    }
+
+    Model resolveRawModel( String groupId, String artifactId, String versionConstraint )
+        throws UnresolvableModelException;
+
+    Model resolveEffectiveModel( String groupId, String artifactId, String versionConstraint )
+        throws UnresolvableModelException;
+
 }

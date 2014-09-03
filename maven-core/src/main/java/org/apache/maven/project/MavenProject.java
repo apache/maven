@@ -1171,7 +1171,7 @@ public class MavenProject
         return clone;
     }
 
-    protected void setModel( Model model )
+    public void setModel( Model model )
     {
         this.model = model;
     }
