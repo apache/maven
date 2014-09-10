@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.DuplicateProjectException;
@@ -32,7 +33,7 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 
 /**
  * Describes the inter-dependencies between projects in the reactor.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class DefaultProjectDependencyGraph
@@ -43,12 +44,13 @@ class DefaultProjectDependencyGraph
 
     /**
      * Creates a new project dependency graph based on the specified projects.
-     * 
+     *
      * @param projects The projects to create the dependency graph with
-     * @throws DuplicateProjectException 
-     * @throws CycleDetectedException 
+     * @throws DuplicateProjectException
+     * @throws CycleDetectedException
      */
-    public DefaultProjectDependencyGraph( Collection<MavenProject> projects ) throws CycleDetectedException, DuplicateProjectException
+    public DefaultProjectDependencyGraph( Collection<MavenProject> projects )
+        throws CycleDetectedException, DuplicateProjectException
     {
         this.sorter = new ProjectSorter( projects );
     }
@@ -65,14 +67,14 @@ class DefaultProjectDependencyGraph
             throw new IllegalArgumentException( "project missing" );
         }
 
-        Collection<String> projectIds = new HashSet<String>();
+        Set<String> projectIds = new HashSet<String>();
 
         getDownstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
 
-        return getProjects( projectIds );
+        return getSortedProjects( projectIds );
     }
 
-    private void getDownstreamProjects( String projectId, Collection<String> projectIds, boolean transitive )
+    private void getDownstreamProjects( String projectId, Set<String> projectIds, boolean transitive )
     {
         for ( String id : sorter.getDependents( projectId ) )
         {
@@ -90,11 +92,11 @@ class DefaultProjectDependencyGraph
             throw new IllegalArgumentException( "project missing" );
         }
 
-        Collection<String> projectIds = new HashSet<String>();
+        Set<String> projectIds = new HashSet<String>();
 
         getUpstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
 
-        return getProjects( projectIds );
+        return getSortedProjects( projectIds );
     }
 
     private void getUpstreamProjects( String projectId, Collection<String> projectIds, boolean transitive )
@@ -108,21 +110,19 @@ class DefaultProjectDependencyGraph
         }
     }
 
-    private List<MavenProject> getProjects( Collection<String> projectIds )
+    private List<MavenProject> getSortedProjects( Set<String> projectIds )
     {
-        List<MavenProject> projects = new ArrayList<MavenProject>( projectIds.size() );
+        List<MavenProject> result = new ArrayList<MavenProject>( projectIds.size() );
 
-        for ( String projectId : projectIds )
+        for ( MavenProject mavenProject : sorter.getSortedProjects() )
         {
-            MavenProject project = sorter.getProjectMap().get( projectId );
-
-            if ( project != null )
+            if ( projectIds.contains( ProjectSorter.getId( mavenProject ) ) )
             {
-                projects.add( project );
+                result.add( mavenProject );
             }
         }
 
-        return projects;
+        return result;
     }
 
     @Override
