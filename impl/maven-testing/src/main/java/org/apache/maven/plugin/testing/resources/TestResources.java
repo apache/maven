@@ -64,7 +64,7 @@ public class TestResources
         String methodName = d.getMethodName();
         if ( methodName != null )
         {
-            methodName = methodName.replace('/', '_').replace('\\', '_');
+            methodName = methodName.replace( '/', '_' ).replace( '\\', '_' );
         }
         name = d.getTestClass().getSimpleName() + "_" + methodName;
     }
