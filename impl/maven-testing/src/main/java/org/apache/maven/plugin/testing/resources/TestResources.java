@@ -47,7 +47,7 @@ public class TestResources
 
     public TestResources()
     {
-        this( "src/test/projects", "target/ut/" );
+        this( "src/test/projects", "target/test-projects" );
     }
 
     public TestResources( String projectsDir, String workDir )
