@@ -23,18 +23,18 @@ import java.io.File;
 
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenITmng5530MojoExecutionScopeTest
+public class MavenITmng5578SessionScopeTest
     extends AbstractMavenIntegrationTestCase
 {
-    public MavenITmng5530MojoExecutionScopeTest()
+    public MavenITmng5578SessionScopeTest()
     {
-        super( "[3.2.1,)" );
+        super( "[3.2.4,)" );
     }
 
-    public void test_copyfiles()
+    public void testBasic()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5578-session-scope" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "basic" );
 
@@ -48,19 +48,16 @@ public class MavenITmng5530MojoExecutionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        verifier.addCliOption( "-Dit-build-extensions=false" );
         verifier.executeGoal( "package" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
-
-        // verifier.assertFilePresent( "target/execution-failure.txt" );
-        verifier.assertFilePresent( "target/execution-success.txt" );
-        verifier.assertFilePresent( "target/execution-before.txt" );
     }
 
-    public void test_copyfiles_multithreaded()
+    public void testBasic_multithreaded()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5578-session-scope" );
         File pluginDir = new File( testDir, "plugin" );
         File projectDir = new File( testDir, "basic" );
 
@@ -74,20 +71,40 @@ public class MavenITmng5530MojoExecutionScopeTest
 
         // build the test project
         verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
-        verifier.getCliOptions().add( "--builder multithreaded -T 1" );
+        verifier.addCliOption( "-Dit-build-extensions=false" );
+        verifier.addCliOption( "--builder multithreaded -T 1" );
         verifier.executeGoal( "package" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
+    }
 
-        // verifier.assertFilePresent( "target/execution-failure.txt" );
-        verifier.assertFilePresent( "target/execution-success.txt" );
-        verifier.assertFilePresent( "target/execution-before.txt" );
+    public void testBasic_buildExtension()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5578-session-scope" );
+        File pluginDir = new File( testDir, "plugin" );
+        File projectDir = new File( testDir, "basic" );
+
+        Verifier verifier;
+
+        // install the test plugin
+        verifier = newVerifier( pluginDir.getAbsolutePath(), "remote" );
+        verifier.executeGoal( "install" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
+
+        // build the test project
+        verifier = newVerifier( projectDir.getAbsolutePath(), "remote" );
+        verifier.addCliOption( "-Dit-build-extensions=true" );
+        verifier.executeGoal( "package" );
+        verifier.resetStreams();
+        verifier.verifyErrorFreeLog();
     }
 
     public void testExtension()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5530-mojo-execution-scope" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5578-session-scope" );
         File extensionDir = new File( testDir, "extension" );
         File pluginDir = new File( testDir, "extension-plugin" );
         File projectDir = new File( testDir, "extension-project" );
@@ -113,6 +130,6 @@ public class MavenITmng5530MojoExecutionScopeTest
         verifier.executeGoal( "package" );
         verifier.resetStreams();
         verifier.verifyErrorFreeLog();
-    }
 
+    }
 }
