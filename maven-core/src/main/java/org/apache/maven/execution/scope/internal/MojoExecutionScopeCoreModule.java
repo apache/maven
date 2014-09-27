@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.execution.scope.internal;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,21 +19,27 @@ package org.apache.maven;
  * under the License.
  */
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.maven.execution.MavenSession;
-
-import com.google.inject.AbstractModule;
+import org.apache.maven.execution.MojoExecutionListener;
 
 @Named
-public class SessionModule extends AbstractModule
-{            
+public class MojoExecutionScopeCoreModule
+    extends MojoExecutionScopeModule
+{
+
+    @Inject
+    public MojoExecutionScopeCoreModule()
+    {
+        super( new MojoExecutionScope() );
+    }
+
     @Override
     protected void configure()
     {
-        SessionScope scope = new SessionScope();
-        bindScope( SessionScoped.class, scope );
-        bind( SessionScope.class ).toInstance( scope );
-        bind( MavenSession.class ).toProvider( SessionScope.<MavenSession>seededKeyProvider() ).in( scope );
+        super.configure();
+        bind( MojoExecutionListener.class ).toInstance( scope );
     }
+
 }

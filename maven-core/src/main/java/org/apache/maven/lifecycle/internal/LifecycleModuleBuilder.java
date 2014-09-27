@@ -22,7 +22,6 @@ package org.apache.maven.lifecycle.internal;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.maven.SessionScope;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.ExecutionEvent;
@@ -33,6 +32,7 @@ import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 

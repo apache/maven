@@ -41,7 +41,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.execution.scope.internal.MojoExecutionScope;
+import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
@@ -67,6 +67,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -392,8 +393,8 @@ public class DefaultMavenPluginManager
                 container.addComponentDescriptor( componentDescriptor );
             }
 
-            ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm,
-                                                                       MojoExecutionScope.getScopeModule( container ) );
+            ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm, new SessionScopeModule( container ),
+                                                                       new MojoExecutionScopeModule( container ) );
         }
         catch ( ComponentLookupException e )
         {

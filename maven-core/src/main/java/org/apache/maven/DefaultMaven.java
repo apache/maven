@@ -61,6 +61,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
