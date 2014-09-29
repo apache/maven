@@ -87,11 +87,6 @@
       <artifactId>aether-transport-wagon</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
