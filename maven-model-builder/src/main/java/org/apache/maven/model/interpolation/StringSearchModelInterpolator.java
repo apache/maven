@@ -450,6 +450,7 @@ public class StringSearchModelInterpolator
                             }
                             catch ( UnsupportedOperationException ignore )
                             {
+                                // nop
                             }
                         }
                     }

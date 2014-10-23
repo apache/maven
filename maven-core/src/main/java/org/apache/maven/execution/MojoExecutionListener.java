@@ -19,13 +19,12 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.execution.scope.WeakMojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Extension point that allows build extensions observe and possibly veto mojo executions.
  * 
- * @see WeakMojoExecutionListener
+ * @see org.apache.maven.execution.scope.WeakMojoExecutionListener
  * @since 3.1.2
  * @provisional This interface is part of work in progress and can be changed or removed without notice.
  */

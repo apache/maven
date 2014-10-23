@@ -124,9 +124,9 @@ public class DefaultModelBuilderFactory
 
     protected ModelInterpolator newModelInterpolator()
     {
-        UrlNormalizer urlNormalizer = newUrlNormalizer();
+        UrlNormalizer normalizer = newUrlNormalizer();
         PathTranslator pathTranslator = newPathTranslator();
-        return new StringSearchModelInterpolator().setPathTranslator( pathTranslator ).setUrlNormalizer( urlNormalizer );
+        return new StringSearchModelInterpolator().setPathTranslator( pathTranslator ).setUrlNormalizer( normalizer );
     }
 
     protected ModelValidator newModelValidator()

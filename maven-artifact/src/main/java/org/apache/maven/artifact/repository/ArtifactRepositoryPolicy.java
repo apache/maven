@@ -170,7 +170,7 @@ public class ArtifactRepositoryPolicy
         {
             setEnabled( true );
 
-            if ( ordinalOfChecksumPolicy( policy.getChecksumPolicy() ) < ordinalOfChecksumPolicy( getChecksumPolicy() ) )
+            if ( ordinalOfCksumPolicy( policy.getChecksumPolicy() ) < ordinalOfCksumPolicy( getChecksumPolicy() ) )
             {
                 setChecksumPolicy( policy.getChecksumPolicy() );
             }
@@ -182,7 +182,7 @@ public class ArtifactRepositoryPolicy
         }
     }
 
-    private int ordinalOfChecksumPolicy( String policy )
+    private int ordinalOfCksumPolicy( String policy )
     {
         if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( policy ) )
         {

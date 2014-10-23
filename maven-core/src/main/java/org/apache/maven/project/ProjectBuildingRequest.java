@@ -25,7 +25,6 @@ import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
-import org.apache.maven.model.building.ModelBuildingRequest;
 import org.eclipse.aether.RepositorySystemSession;
 
 public interface ProjectBuildingRequest
@@ -95,7 +94,7 @@ public interface ProjectBuildingRequest
      * Controls the level of validation to perform on processed models. By default, models are validated in strict mode.
      * 
      * @param validationLevel The level of validation to perform on processed models, e.g.
-     *            {@link ModelBuildingRequest#VALIDATION_LEVEL_STRICT}.
+     *            {@link org.apache.maven.model.building.ModelBuildingRequest#VALIDATION_LEVEL_STRICT}.
      * @return This configuration, never {@code null}.
      */
     ProjectBuildingRequest setValidationLevel( int validationLevel );

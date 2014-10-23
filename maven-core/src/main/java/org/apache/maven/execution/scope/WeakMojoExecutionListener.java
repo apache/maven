@@ -20,7 +20,6 @@ package org.apache.maven.execution.scope;
  */
 
 import org.apache.maven.execution.MojoExecutionEvent;
-import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.plugin.MojoExecutionException;
 
 /**
@@ -29,7 +28,7 @@ import org.apache.maven.plugin.MojoExecutionException;
  * Unlike {@link MojoExecutionListener}, this extension point does not trigger instantiation of the component, hence
  * "weak" class name prefix. Only applies to mojo execution scoped components.
  * 
- * @see MojoExecutionListener
+ * @see org.apache.maven.execution.MojoExecutionListener
  * @since 3.1.2
  * @provisional This interface is part of work in progress and can be changed or removed without notice.
  */

@@ -106,7 +106,8 @@ public class DefaultReportingConverter
         {
 
             problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V31 )
-                    .setMessage( "The <reporting> section is deprecated, please move the reports to the <configuration> section of the new Maven Site Plugin." )
+                    .setMessage( "The <reporting> section is deprecated, please move the reports to the <configuration>"
+                                 + " section of the new Maven Site Plugin." )
                     .setLocation( reporting.getLocation( "" ) ) );
         }*/
 

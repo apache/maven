@@ -53,7 +53,7 @@ public class ExceptionSummary
         this.exception = exception;
         this.message = ( message != null ) ? message : "";
         this.reference = ( reference != null ) ? reference : "";
-        this.children = ( children != null ) ? children : Collections.<ExceptionSummary> emptyList();
+        this.children = ( children != null ) ? children : Collections.<ExceptionSummary>emptyList();
     }
 
     public Throwable getException()

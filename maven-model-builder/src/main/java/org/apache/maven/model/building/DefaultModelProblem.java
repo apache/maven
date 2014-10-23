@@ -61,8 +61,8 @@ public class DefaultModelProblem
      * @param exception The exception that caused this problem, may be {@code null}.
      */
     //mkleint: does this need to be public?
-    public DefaultModelProblem( String message, Severity severity, Version version, Model source, int lineNumber, int columnNumber,
-                                Exception exception )
+    public DefaultModelProblem( String message, Severity severity, Version version, Model source, int lineNumber,
+                                int columnNumber, Exception exception )
     {
         this( message, severity, version, ModelProblemUtils.toPath( source ), lineNumber, columnNumber,
               ModelProblemUtils.toId( source ), exception );
@@ -82,8 +82,8 @@ public class DefaultModelProblem
      * @param exception The exception that caused this problem, may be {@code null}.
      */
     //mkleint: does this need to be public?
-    public DefaultModelProblem( String message, Severity severity, Version version, String source, int lineNumber, int columnNumber,
-                                String modelId, Exception exception )
+    public DefaultModelProblem( String message, Severity severity, Version version, String source, int lineNumber,
+                                int columnNumber, String modelId, Exception exception )
     {
         this.message = message;
         this.severity = ( severity != null ) ? severity : Severity.ERROR;

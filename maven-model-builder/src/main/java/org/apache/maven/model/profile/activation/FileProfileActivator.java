@@ -47,7 +47,7 @@ import org.codehaus.plexus.util.StringUtils;
  * 
  * @author Benjamin Bentmann
  * @see ActivationFile
- * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel(org.apache.maven.model.Model, org.apache.maven.model.building.ModelBuildingRequest, ModelProblemCollector)
+ * @see org.apache.maven.model.validation.DefaultModelValidator#validateRawModel
  */
 @Component( role = ProfileActivator.class, hint = "file" )
 public class FileProfileActivator
@@ -137,7 +137,8 @@ public class FileProfileActivator
         catch ( Exception e )
         {
             problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId() + ": " + e.getMessage() )
+                    .setMessage( "Failed to interpolate file location " + path + " for profile " + profile.getId()
+                                 + ": " + e.getMessage() )
                     .setLocation( file.getLocation( missing ? "missing" : "exists" ) )
                     .setException( e ) );
             return false;

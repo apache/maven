@@ -143,13 +143,13 @@ public class DefaultVersionRangeResolver
         return this;
     }
 
-    public DefaultVersionRangeResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
+    public DefaultVersionRangeResolver setRepositoryEventDispatcher( RepositoryEventDispatcher red )
     {
-        if ( repositoryEventDispatcher == null )
+        if ( red == null )
         {
             throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
         }
-        this.repositoryEventDispatcher = repositoryEventDispatcher;
+        this.repositoryEventDispatcher = red;
         return this;
     }
 

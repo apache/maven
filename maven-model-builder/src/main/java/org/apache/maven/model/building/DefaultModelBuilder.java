@@ -580,7 +580,8 @@ public class DefaultModelBuilder
         configureResolver( modelResolver, model, problems, false );
     }
 
-    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems, boolean replaceRepositories )
+    private void configureResolver( ModelResolver modelResolver, Model model, DefaultModelProblemCollector problems,
+                                    boolean replaceRepositories )
     {
         if ( modelResolver == null )
         {
@@ -835,8 +836,8 @@ public class DefaultModelBuilder
                 buffer.append( " of POM " ).append( ModelProblemUtils.toSourceHint( childModel ) );
             }
             buffer.append( " points at " ).append( groupId ).append( ":" ).append( artifactId );
-            buffer.append( " instead of " ).append( parent.getGroupId() ).append( ":" ).append( parent.getArtifactId() );
-            buffer.append( ", please verify your project structure" );
+            buffer.append( " instead of " ).append( parent.getGroupId() ).append( ":" );
+            buffer.append( parent.getArtifactId() ).append( ", please verify your project structure" );
 
             problems.setSource( childModel );
             problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )

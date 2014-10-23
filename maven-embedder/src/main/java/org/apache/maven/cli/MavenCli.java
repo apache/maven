@@ -1118,7 +1118,8 @@ public class MavenCli
 
     int calculateDegreeOfConcurrencyWithCoreMultiplier( String threadConfiguration )
     {
-        return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * Runtime.getRuntime().availableProcessors() );
+        int procs = Runtime.getRuntime().availableProcessors();
+        return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * procs );
     }
     
     static File resolveFile( File file, String workingDirectory )
@@ -1240,7 +1241,7 @@ public class MavenCli
     static class ExitException
         extends Exception
     {
-
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public int exitCode;
 
         public ExitException( int exitCode )

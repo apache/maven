@@ -65,7 +65,7 @@ public class DefaultMavenExecutionResult
 
     public List<MavenProject> getTopologicallySortedProjects()
     {
-        return null == topologicallySortedProjects ? Collections.<MavenProject> emptyList()
+        return null == topologicallySortedProjects ? Collections.<MavenProject>emptyList()
                         : topologicallySortedProjects;
     }
 
@@ -83,7 +83,7 @@ public class DefaultMavenExecutionResult
 
     public List<Throwable> getExceptions()
     {
-        return exceptions == null ? Collections.<Throwable> emptyList() : exceptions;
+        return exceptions == null ? Collections.<Throwable>emptyList() : exceptions;
     }
 
     public MavenExecutionResult addException( Throwable t )

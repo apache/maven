@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -41,7 +40,7 @@ import org.apache.maven.project.MavenProject;
  * {@code @Component} annotations.
  * 
  * @since 3.2.0
- * @see DefaultLifecycleMappingDelegate
+ * @see org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate
  * @author ifedorenko
  */
 public interface LifecycleMappingDelegate

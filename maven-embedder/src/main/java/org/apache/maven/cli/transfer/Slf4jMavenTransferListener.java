@@ -61,7 +61,8 @@ public class Slf4jMavenTransferListener
     {
         TransferResource resource = event.getResource();
 
-        out.warn( event.getException().getMessage() + " for " + resource.getRepositoryUrl() + resource.getResourceName() );
+        out.warn( event.getException().getMessage() + " for " + resource.getRepositoryUrl()
+            + resource.getResourceName() );
     }
 
     @Override

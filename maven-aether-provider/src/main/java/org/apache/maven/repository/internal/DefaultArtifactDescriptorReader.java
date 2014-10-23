@@ -202,13 +202,13 @@ public class DefaultArtifactDescriptorReader
         return this;
     }
 
-    public DefaultArtifactDescriptorReader setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
+    public DefaultArtifactDescriptorReader setRepositoryEventDispatcher( RepositoryEventDispatcher red )
     {
-        if ( repositoryEventDispatcher == null )
+        if ( red == null )
         {
             throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
         }
-        this.repositoryEventDispatcher = repositoryEventDispatcher;
+        this.repositoryEventDispatcher = red;
         return this;
     }
 
@@ -287,17 +287,17 @@ public class DefaultArtifactDescriptorReader
         RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
         Set<String> visited = new LinkedHashSet<String>();
-        for ( Artifact artifact = request.getArtifact();; )
+        for ( Artifact a = request.getArtifact();; )
         {
-            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( artifact );
+            Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( a );
             try
             {
                 VersionRequest versionRequest =
-                    new VersionRequest( artifact, request.getRepositories(), request.getRequestContext() );
+                    new VersionRequest( a, request.getRepositories(), request.getRequestContext() );
                 versionRequest.setTrace( trace );
                 VersionResult versionResult = versionResolver.resolveVersion( session, versionRequest );
 
-                artifact = artifact.setVersion( versionResult.getVersion() );
+                a = a.setVersion( versionResult.getVersion() );
 
                 versionRequest =
                     new VersionRequest( pomArtifact, request.getRepositories(), request.getRequestContext() );
@@ -312,12 +312,12 @@ public class DefaultArtifactDescriptorReader
                 throw new ArtifactDescriptorException( result );
             }
 
-            if ( !visited.add( artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + artifact.getBaseVersion() ) )
+            if ( !visited.add( a.getGroupId() + ':' + a.getArtifactId() + ':' + a.getBaseVersion() ) )
             {
                 RepositoryException exception =
                     new RepositoryException( "Artifact relocations form a cycle: " + visited );
-                invalidDescriptor( session, trace, artifact, exception );
-                if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
+                invalidDescriptor( session, trace, a, exception );
+                if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
                 {
                     return null;
                 }
@@ -339,8 +339,8 @@ public class DefaultArtifactDescriptorReader
             {
                 if ( e.getCause() instanceof ArtifactNotFoundException )
                 {
-                    missingDescriptor( session, trace, artifact, (Exception) e.getCause() );
-                    if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
+                    missingDescriptor( session, trace, a, (Exception) e.getCause() );
+                    if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_MISSING ) != 0 )
                     {
                         return null;
                     }
@@ -384,8 +384,8 @@ public class DefaultArtifactDescriptorReader
                         throw new ArtifactDescriptorException( result );
                     }
                 }
-                invalidDescriptor( session, trace, artifact, e );
-                if ( ( getPolicy( session, artifact, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
+                invalidDescriptor( session, trace, a, e );
+                if ( ( getPolicy( session, a, request ) & ArtifactDescriptorPolicy.IGNORE_INVALID ) != 0 )
                 {
                     return null;
                 }
@@ -397,11 +397,11 @@ public class DefaultArtifactDescriptorReader
 
             if ( relocation != null )
             {
-                result.addRelocation( artifact );
-                artifact =
-                    new RelocatedArtifact( artifact, relocation.getGroupId(), relocation.getArtifactId(),
+                result.addRelocation( a );
+                a =
+                    new RelocatedArtifact( a, relocation.getGroupId(), relocation.getArtifactId(),
                                            relocation.getVersion() );
-                result.setArtifact( artifact );
+                result.setArtifact( a );
             }
             else
             {
@@ -510,14 +510,14 @@ public class DefaultArtifactDescriptorReader
         repositoryEventDispatcher.dispatch( event.build() );
     }
 
-    private int getPolicy( RepositorySystemSession session, Artifact artifact, ArtifactDescriptorRequest request )
+    private int getPolicy( RepositorySystemSession session, Artifact a, ArtifactDescriptorRequest request )
     {
         ArtifactDescriptorPolicy policy = session.getArtifactDescriptorPolicy();
         if ( policy == null )
         {
             return ArtifactDescriptorPolicy.STRICT;
         }
-        return policy.getPolicy( session, new ArtifactDescriptorPolicyRequest( artifact, request.getRequestContext() ) );
+        return policy.getPolicy( session, new ArtifactDescriptorPolicyRequest( a, request.getRequestContext() ) );
     }
 
 }

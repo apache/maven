@@ -332,7 +332,7 @@ public class DefaultClassRealmManager
         ClassLoader parent = ClassLoader.getSystemClassLoader();
 
         Map<String, ClassLoader> foreignImports =
-            Collections.<String, ClassLoader> singletonMap( "", getMavenApiRealm() );
+            Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
 
         return createRealm( getKey( plugin, true ), RealmType.Extension, parent, null, foreignImports, artifacts );
     }

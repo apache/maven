@@ -601,12 +601,12 @@ public class MavenModelMerger
             List<ReportSet> tgt = target.getReportSets();
             Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
 
-            for ( ReportSet element : src )
+            for ( ReportSet rset : src )
             {
-                if ( sourceDominant || ( element.getInherited() != null ? element.isInherited() : source.isInherited() ) )
+                if ( sourceDominant || ( rset.getInherited() != null ? rset.isInherited() : source.isInherited() ) )
                 {
-                    Object key = getReportSetKey( element );
-                    merged.put( key, element );
+                    Object key = getReportSetKey( rset );
+                    merged.put( key, rset );
                 }
             }
 

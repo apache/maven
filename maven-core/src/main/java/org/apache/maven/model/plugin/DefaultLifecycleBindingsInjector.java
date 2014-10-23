@@ -93,7 +93,7 @@ public class DefaultLifecycleBindingsInjector
             }
 
             Map<Object, Object> context =
-                Collections.<Object, Object> singletonMap( PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement() );
+                Collections.<Object, Object>singletonMap( PLUGIN_MANAGEMENT, target.getBuild().getPluginManagement() );
 
             mergePluginContainer_Plugins( target.getBuild(), source.getBuild(), false, context );
         }

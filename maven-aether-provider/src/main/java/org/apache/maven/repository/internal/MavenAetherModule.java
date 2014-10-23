@@ -62,8 +62,10 @@ public final class MavenAetherModule
 
     @Provides
     @Singleton
-    Set<MetadataGeneratorFactory> provideMetadataGeneratorFactories( @Named( "snapshot" ) MetadataGeneratorFactory snapshot,
-                                                                     @Named( "versions" ) MetadataGeneratorFactory versions )
+    Set<MetadataGeneratorFactory> provideMetadataGeneratorFactories( @Named( "snapshot" )
+                                                                     MetadataGeneratorFactory snapshot,
+                                                                     @Named( "versions" )
+                                                                     MetadataGeneratorFactory versions )
     {
         Set<MetadataGeneratorFactory> factories = new HashSet<MetadataGeneratorFactory>();
         factories.add( snapshot );

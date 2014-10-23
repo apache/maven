@@ -233,9 +233,9 @@ public class DefaultVersionResolver
         }
         else
         {
-            List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
+            List<MetadataRequest> metadataReqs = new ArrayList<MetadataRequest>( request.getRepositories().size() );
 
-            metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
+            metadataReqs.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
 
             for ( RemoteRepository repository : request.getRepositories() )
             {
@@ -244,10 +244,10 @@ public class DefaultVersionResolver
                 metadataRequest.setDeleteLocalCopyIfMissing( true );
                 metadataRequest.setFavorLocalRepository( true );
                 metadataRequest.setTrace( trace );
-                metadataRequests.add( metadataRequest );
+                metadataReqs.add( metadataRequest );
             }
 
-            List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
+            List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataReqs );
 
             Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
 
@@ -261,8 +261,8 @@ public class DefaultVersionResolver
                     repository = session.getLocalRepository();
                 }
 
-                Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
-                merge( artifact, infos, versioning, repository );
+                Versioning v = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+                merge( artifact, infos, v, repository );
             }
 
             if ( RELEASE.equals( version ) )
@@ -282,7 +282,8 @@ public class DefaultVersionResolver
                     subRequest.setArtifact( artifact.setVersion( result.getVersion() ) );
                     if ( result.getRepository() instanceof RemoteRepository )
                     {
-                        subRequest.setRepositories( Collections.singletonList( (RemoteRepository) result.getRepository() ) );
+                        RemoteRepository r = (RemoteRepository) result.getRepository();
+                        subRequest.setRepositories( Collections.singletonList( r ) );
                     }
                     else
                     {
@@ -467,7 +468,8 @@ public class DefaultVersionResolver
         VersionInfo dstInfo = infos.get( dstKey );
 
         if ( dstInfo == null
-            || ( srcInfo != null && dstInfo.isOutdated( srcInfo.timestamp ) && srcInfo.repository != dstInfo.repository ) )
+            || ( srcInfo != null && dstInfo.isOutdated( srcInfo.timestamp )
+                 && srcInfo.repository != dstInfo.repository ) )
         {
             infos.put( dstKey, srcInfo );
         }

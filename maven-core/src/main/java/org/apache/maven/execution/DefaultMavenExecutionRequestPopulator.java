@@ -117,7 +117,7 @@ public class DefaultMavenExecutionRequestPopulator
             if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
             {
                 List<Repository> remoteRepositories = rawProfile.getRepositories();
-                for( Repository remoteRepository : remoteRepositories )
+                for ( Repository remoteRepository : remoteRepositories )
                 {
                     try
                     {

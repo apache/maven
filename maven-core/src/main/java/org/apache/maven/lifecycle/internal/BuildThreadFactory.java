@@ -28,12 +28,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BuildThreadFactory
     implements ThreadFactory
 {
-    private final AtomicInteger ID = new AtomicInteger();
+    private final AtomicInteger id = new AtomicInteger();
 
     private static final String PREFIX = "BuilderThread";
 
     public Thread newThread( Runnable r )
     {
-        return new Thread( r, String.format( "%s %d", PREFIX, ID.getAndIncrement() ) );
+        return new Thread( r, String.format( "%s %d", PREFIX, id.getAndIncrement() ) );
     }
 }

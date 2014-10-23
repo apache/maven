@@ -19,7 +19,6 @@ package org.apache.maven.execution;
  * under the License.
  */
 
-import org.apache.maven.execution.scope.WeakMojoExecutionListener;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
@@ -29,7 +28,7 @@ import org.apache.maven.project.MavenProject;
  * it become necessary to introduce new parameters in the existing callbacks in the future.
  * 
  * @see MojoExecutionListener
- * @see WeakMojoExecutionListener
+ * @see org.apache.maven.execution.scope.WeakMojoExecutionListener
  * @since 3.1.2
  * @provisional This class is part of work in progress and can be changed or removed without notice.
  */

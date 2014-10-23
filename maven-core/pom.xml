@@ -30,6 +30,10 @@
     <tag>HEAD</tag>
   </scm>
 
+  <properties>
+    <checkstyle.violation.ignore>RedundantThrows,NewlineAtEndOfFile,ParameterNumber,MethodLength,FileLength,JavadocType,LineLength,MethodName,MagicNumber,ConstantName,VisibilityModifier,InnerAssignment</checkstyle.violation.ignore>
+  </properties>
+
   <dependencies>
     <!--  Maven -->
     <dependency>
