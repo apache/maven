@@ -182,6 +182,7 @@ if [ -z "$JAVA_HOME" ] ; then
   echo "Warning: JAVA_HOME environment variable is not set."
 fi
 
+CLASSWORLDS_JAR=`echo "${M2_HOME}"/boot/plexus-classworlds-*.jar`
 CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
 # For Cygwin, switch paths to Windows format before running java
@@ -192,6 +193,8 @@ if $cygwin; then
     JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   [ -n "$CLASSPATH" ] &&
     CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
+  [ -n "$CLASSWORLDS_JAR" ] &&
+    CLASSWORLDS_JAR=`cygpath --path --windows "$CLASSWORLDS_JAR"`
 fi
 
 # traverses directory structure from process work directory to filesystem root
@@ -238,7 +241,7 @@ export MAVEN_CMD_LINE_ARGS
 exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
-  -classpath "${M2_HOME}"/boot/plexus-classworlds-*.jar \
+  -classpath "${CLASSWORLDS_JAR}" \
   "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
   "-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
   "-Dlibrary.jansi.path=${MAVEN_HOME}/lib/ext" \
