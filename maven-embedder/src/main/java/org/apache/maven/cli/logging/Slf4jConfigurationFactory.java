@@ -22,8 +22,12 @@ package org.apache.maven.cli.logging;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
+import org.apache.maven.cli.logging.impl.UnsupportedSlf4jBindingConfiguration;
 import org.codehaus.plexus.util.PropertyUtils;
 import org.slf4j.ILoggerFactory;
 
@@ -41,11 +45,13 @@ public class Slf4jConfigurationFactory
 
     public static Slf4jConfiguration getConfiguration( ILoggerFactory loggerFactory )
     {
+        Map<URL, Set<Object>> supported = new LinkedHashMap<URL, Set<Object>>();
+
+        String slf4jBinding = loggerFactory.getClass().getCanonicalName();
+
         try
         {
             Enumeration<URL> resources = Slf4jConfigurationFactory.class.getClassLoader().getResources( RESOURCE );
-
-            String key = loggerFactory.getClass().getCanonicalName();
 
             while ( resources.hasMoreElements() )
             {
@@ -53,12 +59,14 @@ public class Slf4jConfigurationFactory
 
                 Properties conf = PropertyUtils.loadProperties( resource.openStream() );
 
-                String impl = conf.getProperty( key );
+                String impl = conf.getProperty( slf4jBinding );
 
                 if ( impl != null )
                 {
                     return (Slf4jConfiguration) Class.forName( impl ).newInstance();
                 }
+
+                supported.put( resource, conf.keySet() );
             }
         }
         catch ( IOException e )
@@ -78,6 +86,6 @@ public class Slf4jConfigurationFactory
             e.printStackTrace();
         }
 
-        return new BaseSlf4jConfiguration();
+        return new UnsupportedSlf4jBindingConfiguration( slf4jBinding, supported );
     }
 }
