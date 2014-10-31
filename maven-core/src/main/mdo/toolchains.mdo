@@ -26,14 +26,26 @@
     <id>toolchains</id>
     <name>MavenToolchains</name>
     <description><![CDATA[
-
+    <p>This is a reference for the Maven Toolchains descriptor.</p>
+    <p>The default location for the toolchains file is <code>~/.m2/toolchains.xml</code></p>
+    <p>A Toolchain is a preconfigured object that Maven plugins can use for tool configuration retrieval (location and other information).</p>
+    <p>The <a href="/plugins/maven-toolchains-plugin/">toolchains-plugin</a> can read available toolchains on the user's computer
+    and match them against the toolchain requirements of the project (as configured in <code>pom.xml</code>):
+    if match is found, the toolchain instance is made available to other Maven plugins.</p>
+    <p>With <code>jdk</code> toolchain, for example, instead of being stuck with the JDK used to run Maven, all plugins can use
+    the same other JDK instance without hardcoding absolute paths into the <code>pom.xml</code>
+    and without configuring every plugin that require path to JDK tools.</p>
+    <p>See the <a href="/guides/mini/guide-using-toolchains.html">Guide to Using Toolchains</a> for
+    more information.</p>
     ]]></description>
+
     <defaults>
         <default>
             <key>package</key>
             <value>org.apache.maven.toolchain.model</value>
         </default>
     </defaults>
+
     <classes>
         <class rootElement="true" xml.tagName="toolchains" xsd.compositor="sequence">
             <name>PersistedToolchains</name>
@@ -46,7 +58,7 @@
                 <field>
                     <name>toolchains</name>
                     <version>1.0.0+</version>
-                    <description><![CDATA[The toolchain definition.]]></description>
+                    <description><![CDATA[The toolchain instance definition.]]></description>
                     <association xml.itemsStyle="flat">
                         <type>ToolchainModel</type>
                         <multiplicity>*</multiplicity>
@@ -57,23 +69,43 @@
         <class>
             <name>ToolchainModel</name>
             <version>1.0.0+</version>
+            <description>Definition of a toolchain instance.</description>
             <fields>
                 <field>
                     <name>type</name>
                     <version>1.0.0+</version>
                     <description>
-                    <![CDATA[Type of toolchain]]></description>
+                    <![CDATA[Type of toolchain:<ul>
+                    <li><code>jdk</code> for
+                    <a href="http://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain</a>,</li>
+                    <li>...</li>
+                    </ul>
+                    ]]></description>
                     <type>String</type>
                 </field>
                 <field>
                     <name>provides</name>
                     <version>1.0.0+</version>
                     <type>DOM</type>
+                    <description>
+                    <![CDATA[
+                    <p>Toolchain identification information, which will be matched against project requirements.</p>
+                    <p>Actual content structure is completely open: each toochain type will define its own format and semantics.</p>
+                    <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
+                    predefined properties names.</p> 
+                    ]]></description>
                 </field>
                 <field>
                     <name>configuration</name>
                     <version>1.0.0+</version>
                     <type>DOM</type>
+                    <description>
+                    <![CDATA[
+                    <p>Toolchain configuration information, like location or any information that is to be retrieved.</p>
+                    <p>Actual content structure is completely open: each toochain type will define its own format and semantics.</p>
+                    <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> wih
+                    predefined properties names.</p> 
+                    ]]></description>
                 </field>
             </fields>
         </class>
