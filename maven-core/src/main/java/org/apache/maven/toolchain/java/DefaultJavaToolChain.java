@@ -30,6 +30,7 @@ import org.codehaus.plexus.util.Os;
 
 /**
  * @author Milos Kleint
+ * @since 2.0.9
  */
 @Component( role = JavaToolChain.class )
 public class DefaultJavaToolChain

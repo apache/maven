@@ -24,6 +24,7 @@ import org.apache.maven.toolchain.Toolchain;
 /**
  * @author Jason van Zyl
  * @author Milos Kleint
+ * @since 2.0.9
  */
 public interface JavaToolChain
     extends Toolchain

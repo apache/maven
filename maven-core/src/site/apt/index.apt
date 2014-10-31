@@ -33,8 +33,6 @@ Maven Core
 
  * {{{./artifact-handlers.html}default artifact handlers}},
 
- * {{{./toolchains.html}Toolchains descriptor reference}},
-
  * <<<Maven>>> component ({{{./apidocs/org/apache/maven/Maven.html}javadoc}}),
  with its <<<DefaultMaven>>> implementation ({{{./xref/org/apache/maven/DefaultMaven.html}source}}),
 
@@ -58,4 +56,19 @@ Maven Core
  * <<<ExceptionHandler>>> component ({{{./apidocs/org/apache/maven/exception/ExceptionHandler.html}javadoc}}),
  with its <<<DefaultExceptionHandler>>> implementation
  ({{{./xref/org/apache/maven/exception/DefaultExceptionHandler.html}source}}), use to transform exception into useful end-user messages.
- 
+
+* Toolchains
+
+ * {{{./toolchains.html}Toolchains descriptor reference}},
+
+ * <<<ToolchainManager>>> component ({{{./apidocs/org/apache/maven/toolchain/ToolchainManager.html}javadoc}}))
+ with its <<<DefaultToolchainManager>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManager.html}source}}),
+ to get selected <<<Toolchain>>> ({{{./apidocs/org/apache/maven/toolchain/Toolchain.html}javadoc}}) instance,
+
+ * internal <<<ToolchainManagerPrivate>>> component ({{{./apidocs/org/apache/maven/toolchain/ToolchainManagerPrivate.html}javadoc}}))
+ with its <<<DefaultToolchainManagerPrivate>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManagerPrivate.html}source}}),
+ to manage toolchain selection,
+
+ * <<<JavaToolchain>>> component ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
+ with its <<<DefaultJavaToolchain>>> implementation
+ ({{{./xref/org/apache/maven/toolchain/java/DefaultJavaToolchain.html}source}}).
