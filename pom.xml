@@ -46,7 +46,7 @@
     <maven.compiler.target>1.6</maven.compiler.target>    
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
-    <junitVersion>3.8.2</junitVersion>
+    <junitVersion>4.11</junitVersion>
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.21</plexusInterpolationVersion>
     <plexusUtilsVersion>3.0.20</plexusUtilsVersion>
