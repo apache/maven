@@ -1,0 +1,91 @@
+package org.apache.maven.toolchain;
+
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.InputStream;
+
+import org.apache.maven.toolchain.java.DefaultJavaToolChain;
+import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.toolchain.model.ToolchainModel;
+import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
+
+public class DefaultToolchainTest
+{
+    private MavenToolchainsXpp3Reader reader = new MavenToolchainsXpp3Reader();
+
+    @Test
+    public void testEquals() throws Exception
+    {
+        InputStream jdksIS = null;
+        InputStream jdksExtraIS = null;
+        try 
+        {
+            jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
+            jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" );
+            
+            PersistedToolchains jdks = reader.read( jdksIS );
+            PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
+            
+            DefaultJavaToolChain tc1 = new DefaultJavaToolChain( jdks.getToolchains().get( 0 ), null );
+            DefaultJavaToolChain tc2 = new DefaultJavaToolChain( jdksExtra.getToolchains().get( 0 ), null );
+            
+            // tc1{type:jdk,id:default} tc2{type:jdk} (no id, so should be considered 'default')
+            assertTrue( tc1.equals( tc1 ) );
+            assertTrue( tc1.equals( tc2 ) );
+            assertTrue( tc2.equals( tc1 ) );
+            assertTrue( tc2.equals( tc2 ) );
+        }
+        finally
+        {
+            IOUtil.close( jdksIS );
+            IOUtil.close( jdksExtraIS );
+        }
+    }
+
+    @Test
+    public void testHashCode() throws Exception
+    {
+        InputStream jdksIS = null;
+        InputStream jdksExtraIS = null;
+        try 
+        {
+            jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
+            jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" );
+            
+            PersistedToolchains jdks = reader.read( jdksIS );
+            PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
+            
+            DefaultJavaToolChain tc1 = new DefaultJavaToolChain( jdks.getToolchains().get( 0 ), null );
+            DefaultJavaToolChain tc2 = new DefaultJavaToolChain( jdksExtra.getToolchains().get( 0 ), null );
+            
+            assertEquals( tc1.hashCode(), tc2.hashCode() );
+        }
+        finally
+        {
+            IOUtil.close( jdksIS );
+            IOUtil.close( jdksExtraIS );
+        }
+    }
+}
