@@ -47,8 +47,53 @@
     </defaults>
 
     <classes>
+    <class java.clone="deep">
+	      <name>TrackableBase</name>
+	      <version>1.1.0+</version>
+	      <description>
+	        common base class that contains code to track the source for
+	        this instance (USER|GLOBAL)
+	      </description>
+	      <codeSegments>
+	        <codeSegment>
+	          <version>1.1.0+</version>
+	          <code>
+	            <![CDATA[
+	    public static final String USER_LEVEL = "user-level";
+	    public static final String GLOBAL_LEVEL = "global-level";
+	
+	    private String sourceLevel = USER_LEVEL;
+	    private boolean sourceLevelSet = false;
+	
+	    public void setSourceLevel( String sourceLevel )
+	    {
+	        if ( sourceLevelSet )
+	        {
+	            throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
+	        }
+	        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+	        {
+	            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+	        }
+	        else
+	        {
+	            this.sourceLevel = sourceLevel;
+	            this.sourceLevelSet = true;
+	        }
+	    }
+	
+	    public String getSourceLevel()
+	    {
+	        return sourceLevel;
+	    }
+	            ]]>
+	          </code>
+	        </codeSegment>
+	      </codeSegments>
+	    </class>
         <class rootElement="true" xml.tagName="toolchains" xsd.compositor="sequence">
             <name>PersistedToolchains</name>
+            <superClass>TrackableBase</superClass>
             <description><![CDATA[
          The <code>&lt;toolchains&gt;</code> element is the root of the descriptor.
          The following table lists all of the possible child elements.
@@ -68,6 +113,7 @@
         </class>
         <class>
             <name>ToolchainModel</name>
+            <superClass>TrackableBase</superClass>
             <version>1.0.0+</version>
             <description>Definition of a toolchain instance.</description>
             <fields>
