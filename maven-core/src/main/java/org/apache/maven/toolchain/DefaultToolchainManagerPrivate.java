@@ -48,22 +48,22 @@ public class DefaultToolchainManagerPrivate
 
         List<ToolchainPrivate> toRet = new ArrayList<ToolchainPrivate>();
 
-        if ( pers != null )
+        ToolchainFactory fact = factories.get( type );
+        if ( fact == null )
+        {
+            logger.error( "Missing toolchain factory for type: " + type
+                + ". Possibly caused by misconfigured project." );
+        }
+        else if ( pers != null )
         {
             List<ToolchainModel> lst = pers.getToolchains();
             if ( lst != null )
             {
                 for ( ToolchainModel toolchainModel : lst )
                 {
-                    ToolchainFactory fact = factories.get( toolchainModel.getType() );
-                    if ( fact != null )
+                    if ( type.equals( toolchainModel.getType() ) )
                     {
                         toRet.add( fact.createToolchain( toolchainModel ) );
-                    }
-                    else
-                    {
-                        logger.error( "Missing toolchain factory for type: " + toolchainModel.getType()
-                            + ". Possibly caused by misconfigured project." );
                     }
                 }
             }
