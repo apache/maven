@@ -208,7 +208,7 @@ Do you want to continue?</input>
     <modello file="maven-plugin-api/src/main/mdo/lifecycle.mdo" />
     <modello file="maven-model-builder/src/main/mdo/profiles.mdo" />
     <modello file="maven-settings/src/main/mdo/settings.mdo" version="1.1.0" />
-    <modello file="maven-core/src/main/mdo/toolchains.mdo" />
+    <modello file="maven-core/src/main/mdo/toolchains.mdo" version="1.1.0" />
     <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo" version="1.1.0" />
     <modello file="maven-compat/src/main/mdo/profiles.mdo" />
     <modello file="maven-compat/src/main/mdo/paramdoc.mdo" />
