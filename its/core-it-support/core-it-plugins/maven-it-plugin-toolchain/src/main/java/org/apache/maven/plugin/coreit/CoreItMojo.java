@@ -32,7 +32,6 @@ import java.util.Properties;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.ToolchainManagerPrivate;
 import org.apache.maven.toolchain.ToolchainPrivate;
 
@@ -109,9 +108,9 @@ public class CoreItMojo
         Properties properties = new Properties();
 
         int count = 1;
-        for ( Iterator i = Arrays.asList( tcs ).iterator(); i.hasNext(); count++ )
+        for ( Iterator<ToolchainPrivate> i = Arrays.<ToolchainPrivate>asList( tcs ).iterator(); i.hasNext(); count++ )
         {
-            ToolchainPrivate toolchain = (ToolchainPrivate) i.next();
+            ToolchainPrivate toolchain = i.next();
 
             String foundTool = toolchain.findTool( tool );
             if ( foundTool != null )
@@ -150,7 +149,7 @@ public class CoreItMojo
     private ToolchainPrivate[] getToolchains()
         throws MojoExecutionException
     {
-        Class managerClass = toolchainManager.getClass();
+        Class<? extends ToolchainManagerPrivate> managerClass = toolchainManager.getClass();
 
         try
         {

@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5716ToolchainsTypeTest.class );
         suite.addTestSuite( MavenITmng5663NestedImportScopePomResolutionTest.class );
         suite.addTestSuite( MavenITmng2562Timestamp322Test.class );
         suite.addTestSuite( MavenITmng2199ParentVersionRangeTest.class );
