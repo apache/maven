@@ -2879,7 +2879,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>The build lifecycle phase to bind the goals in this execution to. If omitted,
-            the goals will be bound to the default phase specified in their metadata. </description>
+            the goals will be bound to the default phase specified by the plugin. </description>
         </field>
         <field xml.transient="true">
           <name>priority</name>
