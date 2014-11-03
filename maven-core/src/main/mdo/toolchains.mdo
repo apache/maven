@@ -48,49 +48,49 @@
 
     <classes>
     <class java.clone="deep">
-	      <name>TrackableBase</name>
-	      <version>1.1.0+</version>
-	      <description>
-	        common base class that contains code to track the source for
-	        this instance (USER|GLOBAL)
-	      </description>
-	      <codeSegments>
-	        <codeSegment>
-	          <version>1.1.0+</version>
-	          <code>
-	            <![CDATA[
-	    public static final String USER_LEVEL = "user-level";
-	    public static final String GLOBAL_LEVEL = "global-level";
-	
-	    private String sourceLevel = USER_LEVEL;
-	    private boolean sourceLevelSet = false;
-	
-	    public void setSourceLevel( String sourceLevel )
-	    {
-	        if ( sourceLevelSet )
-	        {
-	            throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
-	        }
-	        else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
-	        {
-	            throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
-	        }
-	        else
-	        {
-	            this.sourceLevel = sourceLevel;
-	            this.sourceLevelSet = true;
-	        }
-	    }
-	
-	    public String getSourceLevel()
-	    {
-	        return sourceLevel;
-	    }
-	            ]]>
-	          </code>
-	        </codeSegment>
-	      </codeSegments>
-	    </class>
+          <name>TrackableBase</name>
+          <version>1.1.0+</version>
+          <description>
+            common base class that contains code to track the source for
+            this instance (USER|GLOBAL)
+          </description>
+          <codeSegments>
+            <codeSegment>
+              <version>1.1.0+</version>
+              <code>
+                <![CDATA[
+        public static final String USER_LEVEL = "user-level";
+        public static final String GLOBAL_LEVEL = "global-level";
+    
+        private String sourceLevel = USER_LEVEL;
+        private boolean sourceLevelSet = false;
+    
+        public void setSourceLevel( String sourceLevel )
+        {
+            if ( sourceLevelSet )
+            {
+                throw new IllegalStateException( "Cannot reset sourceLevel attribute; it is already set to: " + sourceLevel );
+            }
+            else if ( !( USER_LEVEL.equals( sourceLevel ) || GLOBAL_LEVEL.equals( sourceLevel ) ) )
+            {
+                throw new IllegalArgumentException( "sourceLevel must be one of: {" + USER_LEVEL + "," + GLOBAL_LEVEL + "}" );
+            }
+            else
+            {
+                this.sourceLevel = sourceLevel;
+                this.sourceLevelSet = true;
+            }
+        }
+    
+        public String getSourceLevel()
+        {
+            return sourceLevel;
+        }
+                ]]>
+              </code>
+            </codeSegment>
+          </codeSegments>
+        </class>
         <class rootElement="true" xml.tagName="toolchains" xsd.compositor="sequence">
             <name>PersistedToolchains</name>
             <superClass>TrackableBase</superClass>
@@ -131,14 +131,31 @@
                 </field>
                 <field>
                     <name>provides</name>
-                    <version>1.0.0+</version>
-                    <type>DOM</type>
+                    <version>1.0.0/1.0.99</version> <!-- fake upperbound, it's inclusive -->
+                    <type>DOM</type> <!-- DOM for Maven 2.0.9/2.3.3 -->
                     <description>
                     <![CDATA[
                     <p>Toolchain identification information, which will be matched against project requirements.</p>
-                    <p>Actual content structure is completely open: each toochain type will define its own format and semantics.</p>
+                    <p>Actual content structure is completely open: each toolchain type will define its own format and semantics.</p>
                     <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
                     predefined properties names.</p> 
+                    ]]></description>
+                </field>
+                <field>
+                    <name>provides</name>
+                    <version>1.1.0+</version>
+                    <type>Properties</type> <!-- Properties for Maven 2.3.4+ -->
+                    <association xml.mapStyle="inline">
+                      <type>String</type>
+                      <multiplicity>*</multiplicity>
+                    </association>
+                    <description>
+                    <![CDATA[
+                    <p>Toolchain identification information, which will be matched against project requirements.</p>
+                    <p>For Maven 2.0.9/3.2.3 the actual content structure was completely open: each toolchain type would define its own format and semantics.</p>
+                    <p>In general, this was a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
+                    predefined properties names.</p>
+                    <p>Since Maven 3.2.4 the type for this field has been changed to Properties.</p>
                     ]]></description>
                 </field>
                 <field>

@@ -19,14 +19,12 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  *
@@ -130,54 +128,14 @@ public abstract class DefaultToolchain
             return false;
         }
 
-        Xpp3Dom thisProvides = (Xpp3Dom) this.getModel().getProvides();
-        Xpp3Dom otherProvides = (Xpp3Dom) other.getModel().getProvides();
+        Properties thisProvides = this.getModel().getProvides();
+        Properties otherProvides = other.getModel().getProvides();
     
-        if ( thisProvides == null ? otherProvides != null : otherProvides == null )
+        if ( thisProvides == null ? otherProvides != null : !thisProvides.equals( otherProvides ) )
         {
             return false;
         }
-    
-        Xpp3Dom thisId = thisProvides.getChild( "id" );
-        Xpp3Dom otherId = otherProvides.getChild( "id" );
-        if ( ( thisId == null || "default".equals( thisId.getValue() ) )
-            && ( otherId == null || "default".equals( otherId.getValue() ) ) )
-        {
-            return true;
-        }
-    
-        List<String> names = new ArrayList<String>();
-    
-        // collect names of both provides, exclude id
-        for ( Xpp3Dom thisChild : thisProvides.getChildren() )
-        {
-            if ( "id".equals( thisChild.getName() ) )
-            {
-                continue;
-            }
-            names.add( thisChild.getName() );
-        }
-    
-        for ( Xpp3Dom thisChild : otherProvides.getChildren() )
-        {
-            if ( "id".equals( thisChild.getName() ) )
-            {
-                continue;
-            }
-            names.add( thisChild.getName() );
-        }
-    
-        for ( String name : names )
-        {
-            Xpp3Dom thisChild = thisProvides.getChild( name );
-            Xpp3Dom otherChild = otherProvides.getChild( name );
-    
-            if ( thisChild != null ? !thisChild.equals( otherChild ) : otherChild != null )
-            {
-                return false;
-            }
-        }
-    
+        
         return true;
     }
 
@@ -188,13 +146,7 @@ public abstract class DefaultToolchain
         
         if ( this.getModel().getProvides() != null )
         {
-            Xpp3Dom providesElm = (Xpp3Dom) this.getModel().getProvides();
-            
-            Xpp3Dom idElm = providesElm.getChild( "id" );
-            
-            String idValue = ( idElm == null ? "default" : idElm.getValue() );
-            
-            hashCode = 31 * hashCode + idValue.hashCode();
+            hashCode = 31 * hashCode + this.getModel().getProvides().hashCode();
         }
         return hashCode;
     }

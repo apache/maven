@@ -20,6 +20,8 @@ package org.apache.maven.toolchain.java;
  */
 
 import java.io.File;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
@@ -76,13 +78,11 @@ public class DefaultJavaToolchainFactory
         }
 
         //now populate the provides section.
-        //TODO possibly move at least parts to a utility method or abstract implementation.
-        dom = (Xpp3Dom) model.getProvides();
-        Xpp3Dom[] provides = dom.getChildren();
-        for ( Xpp3Dom provide : provides )
+        Properties provides = model.getProvides(); 
+        for ( Entry<Object, Object> provide : provides.entrySet() )
         {
-            String key = provide.getName();
-            String value = provide.getValue();
+            String key = (String) provide.getKey();
+            String value = (String) provide.getValue();
             if ( value == null )
             {
                 throw new MisconfiguredToolchainException(

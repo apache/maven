@@ -25,7 +25,6 @@ under the License.
      <provides>
          <version>1.5</version>
          <vendor>sun</vendor>
-         <id>default</id>
      </provides>
      <configuration>
         <jdkHome>${env.JAVA_HOME}</jdkHome>
@@ -36,7 +35,6 @@ under the License.
      <provides>
          <version>1.6</version>
          <vendor>sun</vendor>
-         <id>ide</id>
      </provides>
      <configuration>
         <jdkHome>${env.JAVA_HOME}</jdkHome>
