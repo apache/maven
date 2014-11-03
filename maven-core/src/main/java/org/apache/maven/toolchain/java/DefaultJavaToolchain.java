@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
@@ -32,16 +31,15 @@ import org.codehaus.plexus.util.Os;
  * @author Milos Kleint
  * @since 2.0.9
  */
-@Component( role = JavaToolChain.class )
-public class DefaultJavaToolChain
+public class DefaultJavaToolchain
     extends DefaultToolchain
-    implements JavaToolChain
+    implements JavaToolchain
 {
     private String javaHome;
 
     public static final String KEY_JAVAHOME = "jdkHome"; //NOI18N
 
-    public DefaultJavaToolChain( ToolchainModel model, Logger logger )
+    public DefaultJavaToolchain( ToolchainModel model, Logger logger )
     {
         super( model, "jdk", logger );
     }

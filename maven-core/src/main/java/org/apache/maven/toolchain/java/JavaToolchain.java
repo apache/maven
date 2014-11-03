@@ -26,7 +26,7 @@ import org.apache.maven.toolchain.Toolchain;
  * @author Milos Kleint
  * @since 2.0.9
  */
-public interface JavaToolChain
+public interface JavaToolchain
     extends Toolchain
 {
 //    /**

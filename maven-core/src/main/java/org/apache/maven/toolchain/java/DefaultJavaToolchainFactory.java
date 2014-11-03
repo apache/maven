@@ -58,13 +58,13 @@ public class DefaultJavaToolchainFactory
         {
             return null;
         }
-        DefaultJavaToolChain jtc = new DefaultJavaToolChain( model, logger );
+        DefaultJavaToolchain jtc = new DefaultJavaToolchain( model, logger );
         Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
-        Xpp3Dom javahome = dom.getChild( DefaultJavaToolChain.KEY_JAVAHOME );
+        Xpp3Dom javahome = dom.getChild( DefaultJavaToolchain.KEY_JAVAHOME );
         if ( javahome == null )
         {
             throw new MisconfiguredToolchainException( "Java toolchain without the "
-                + DefaultJavaToolChain.KEY_JAVAHOME + " configuration element." );
+                + DefaultJavaToolchain.KEY_JAVAHOME + " configuration element." );
         }
         File normal = new File( FileUtils.normalize( javahome.getValue() ) );
         if ( normal.exists() )
