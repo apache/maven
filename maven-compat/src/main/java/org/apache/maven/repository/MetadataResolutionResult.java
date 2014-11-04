@@ -234,11 +234,10 @@ public class MetadataResolutionResult
     {
         if ( exceptions == null )
         {
-            initList( exceptions );
-        } else 
-        {
-            exceptions.add( e );
+            exceptions = initList( exceptions );
         }
+        exceptions.add( e );
+        
         return this;
     }
 
