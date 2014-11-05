@@ -237,7 +237,6 @@ public class MetadataResolutionResult
             exceptions = initList( exceptions );
         }
         exceptions.add( e );
-        
         return this;
     }
 
