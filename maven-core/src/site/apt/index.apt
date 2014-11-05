@@ -61,7 +61,7 @@ Maven Core
 
  * {{{./toolchains.html}Toolchains descriptor reference}},
 
- * <<<ToolchainManager>>> component ({{{./apidocs/org/apache/maven/toolchain/ToolchainManager.html}javadoc}})
+ * public API for toolchains-aware plugins: <<<ToolchainManager>>> component ({{{./apidocs/org/apache/maven/toolchain/ToolchainManager.html}javadoc}})
  with its <<<DefaultToolchainManager>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManager.html}source}}),
  to get selected <<<Toolchain>>> ({{{./apidocs/org/apache/maven/toolchain/Toolchain.html}javadoc}}) instance,
 
@@ -69,7 +69,7 @@ Maven Core
  with its <<<DefaultToolchainManagerPrivate>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManagerPrivate.html}source}}),
  to manage toolchain selection,
 
- * <<<JavaToolchain>>> interface ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
+ * internal JDK toolchain implementation: <<<JavaToolchain>>> interface ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
  with its <<<DefaultJavaToolchain>>> implementation
  ({{{./xref/org/apache/maven/toolchain/java/DefaultJavaToolchain.html}source}}) and <<<JavaToolchainFactory>>>
  factory ({{{./xref/org/apache/maven/toolchain/java/JavaToolchainFactory.html}source}}).
