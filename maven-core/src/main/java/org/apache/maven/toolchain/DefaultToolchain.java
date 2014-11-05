@@ -27,6 +27,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
 
 /**
+ * Default toolchain implementation.
  *
  * @author mkleint
  * @since 2.0.9

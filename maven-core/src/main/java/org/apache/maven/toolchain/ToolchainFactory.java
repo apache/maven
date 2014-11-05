@@ -22,7 +22,8 @@ package org.apache.maven.toolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
- *
+ * Internal toolchain factory, to prepare toolchains instances.
+ *  
  * @author mkleint
  * @since 2.0.9
  */
@@ -35,7 +36,7 @@ public interface ToolchainFactory
         throws MisconfiguredToolchainException;
 
     /**
-     * Returns the default instance of the particular type of toolchain, can return null
+     * Returns the default instance of the particular type of toolchain, can return <code>null</code>
      * if not applicable.
      * TODO keep around??
      **/

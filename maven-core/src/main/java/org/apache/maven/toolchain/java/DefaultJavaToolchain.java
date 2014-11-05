@@ -28,6 +28,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 
 /**
+ * JDK toolchain implementation.
+ * 
  * @author Milos Kleint
  * @since 2.0.9
  */

@@ -23,7 +23,8 @@ import org.apache.maven.execution.MavenSession;
 
 
 /**
- *
+ * Public API for a plugin to get a toolchain instance.
+ * 
  * @author mkleint
  * @since 2.0.9
  */
