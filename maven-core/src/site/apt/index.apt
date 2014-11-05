@@ -69,7 +69,7 @@ Maven Core
  with its <<<DefaultToolchainManagerPrivate>>> implementation ({{{./xref/org/apache/maven/toolchain/DefaultToolchainManagerPrivate.html}source}}),
  to manage toolchain selection,
 
- * <<<JavaToolchain>>> component ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
+ * <<<JavaToolchain>>> interface ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
  with its <<<DefaultJavaToolchain>>> implementation
- ({{{./xref/org/apache/maven/toolchain/java/DefaultJavaToolchain.html}source}}) and <<<DefaultJavaToolchainFactory>>>
- factory ({{{./xref/org/apache/maven/toolchain/java/DefaultJavaToolchainFactory.html}source}}).
+ ({{{./xref/org/apache/maven/toolchain/java/DefaultJavaToolchain.html}source}}) and <<<JavaToolchainFactory>>>
+ factory ({{{./xref/org/apache/maven/toolchain/java/JavaToolchainFactory.html}source}}).
