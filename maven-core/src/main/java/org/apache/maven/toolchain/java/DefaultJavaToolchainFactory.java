@@ -35,7 +35,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
- *
+ * JDK toolchain factory.
+ * 
  * @author mkleint
  * @since 2.0.9
  */
@@ -47,10 +48,6 @@ public class DefaultJavaToolchainFactory
     @Requirement
     private Logger logger;
 
-    public DefaultJavaToolchainFactory()
-    {
-    }
-
     public ToolchainPrivate createToolchain( ToolchainModel model )
         throws MisconfiguredToolchainException
     {
@@ -58,7 +55,33 @@ public class DefaultJavaToolchainFactory
         {
             return null;
         }
+
         DefaultJavaToolchain jtc = new DefaultJavaToolchain( model, logger );
+
+        // populate the provides section
+        Properties provides = model.getProvides(); 
+        for ( Entry<Object, Object> provide : provides.entrySet() )
+        {
+            String key = (String) provide.getKey();
+            String value = (String) provide.getValue();
+
+            if ( value == null )
+            {
+                throw new MisconfiguredToolchainException(
+                    "Provides token '" + key + "' doesn't have any value configured." );
+            }
+
+            if ( "version".equals( key ) )
+            {
+                jtc.addProvideToken( key, RequirementMatcherFactory.createVersionMatcher( value ) );
+            }
+            else
+            {
+                jtc.addProvideToken( key, RequirementMatcherFactory.createExactMatcher( value ) );
+            }
+        }
+
+        // populate the configuration section
         Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
         Xpp3Dom javahome = dom.getChild( DefaultJavaToolchain.KEY_JAVAHOME );
         if ( javahome == null )
@@ -77,26 +100,6 @@ public class DefaultJavaToolchainFactory
                 + normal.getAbsolutePath() );
         }
 
-        //now populate the provides section.
-        Properties provides = model.getProvides(); 
-        for ( Entry<Object, Object> provide : provides.entrySet() )
-        {
-            String key = (String) provide.getKey();
-            String value = (String) provide.getValue();
-            if ( value == null )
-            {
-                throw new MisconfiguredToolchainException(
-                    "Provides token '" + key + "' doesn't have any value configured." );
-            }
-            if ( "version".equals( key ) )
-            {
-                jtc.addProvideToken( key, RequirementMatcherFactory.createVersionMatcher( value ) );
-            }
-            else
-            {
-                jtc.addProvideToken( key, RequirementMatcherFactory.createExactMatcher( value ) );
-            }
-        }
         return jtc;
     }
 
