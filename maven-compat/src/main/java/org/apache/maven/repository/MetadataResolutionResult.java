@@ -232,10 +232,7 @@ public class MetadataResolutionResult
 
     public MetadataResolutionResult addError( Exception e )
     {
-        if ( exceptions == null )
-        {
-            exceptions = initList( exceptions );
-        }
+        exceptions = initList( exceptions );        
         exceptions.add( e );
         return this;
     }
