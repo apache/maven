@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
+import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
 import org.apache.maven.toolchain.ToolchainFactory;
 import org.apache.maven.toolchain.ToolchainPrivate;
@@ -73,14 +74,17 @@ public class JavaToolchainFactory
                     "Provides token '" + key + "' doesn't have any value configured." );
             }
 
+            RequirementMatcher matcher;
             if ( "version".equals( key ) )
             {
-                jtc.addProvideToken( key, RequirementMatcherFactory.createVersionMatcher( value ) );
+                matcher = RequirementMatcherFactory.createVersionMatcher( value );
             }
             else
             {
-                jtc.addProvideToken( key, RequirementMatcherFactory.createExactMatcher( value ) );
+                matcher = RequirementMatcherFactory.createExactMatcher( value );
             }
+
+            jtc.addProvideToken( key, matcher );
         }
 
         // populate the configuration section
