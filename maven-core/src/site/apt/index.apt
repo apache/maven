@@ -70,6 +70,6 @@ Maven Core
  to manage toolchain selection,
 
  * internal JDK toolchain implementation: <<<JavaToolchain>>> interface ({{{./apidocs/org/apache/maven/toolchain/java/JavaToolchain.html}javadoc}}),
- with its <<<DefaultJavaToolchain>>> implementation
- ({{{./xref/org/apache/maven/toolchain/java/DefaultJavaToolchain.html}source}}) and <<<JavaToolchainFactory>>>
+ with its <<<JavaToolchainImpl>>> implementation
+ ({{{./xref/org/apache/maven/toolchain/java/JavaToolchainImpl.html}source}}) and <<<JavaToolchainFactory>>>
  factory ({{{./xref/org/apache/maven/toolchain/java/JavaToolchainFactory.html}source}}).

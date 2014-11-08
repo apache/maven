@@ -27,12 +27,13 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Default toolchain implementation.
+ * Default abstract toolchain implementation, to be used as base class for any toolchain implementation
+ * to avoid rewriting usual code.
  *
  * @author mkleint
  * @since 2.0.9
  */
-public abstract class DefaultToolchain
+public abstract class DefaultToolchain // should have been AbstractToolchain...
     implements Toolchain, ToolchainPrivate
 {
 

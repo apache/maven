@@ -31,9 +31,9 @@ import org.codehaus.plexus.util.Os;
  * JDK toolchain implementation.
  * 
  * @author Milos Kleint
- * @since 2.0.9
+ * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
  */
-public class DefaultJavaToolchain
+public class JavaToolchainImpl
     extends DefaultToolchain
     implements JavaToolchain
 {
@@ -41,7 +41,7 @@ public class DefaultJavaToolchain
 
     public static final String KEY_JAVAHOME = "jdkHome"; //NOI18N
 
-    public DefaultJavaToolchain( ToolchainModel model, Logger logger )
+    public JavaToolchainImpl( ToolchainModel model, Logger logger )
     {
         super( model, "jdk", logger );
     }

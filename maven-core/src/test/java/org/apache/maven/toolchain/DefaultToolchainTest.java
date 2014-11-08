@@ -24,7 +24,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.InputStream;
 
-import org.apache.maven.toolchain.java.DefaultJavaToolchain;
+import org.apache.maven.toolchain.java.JavaToolchainImpl;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
@@ -48,8 +48,8 @@ public class DefaultToolchainTest
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
             
-            DefaultJavaToolchain tc1 = new DefaultJavaToolchain( jdks.getToolchains().get( 0 ), null );
-            DefaultJavaToolchain tc2 = new DefaultJavaToolchain( jdksExtra.getToolchains().get( 0 ), null );
+            JavaToolchainImpl tc1 = new JavaToolchainImpl( jdks.getToolchains().get( 0 ), null );
+            JavaToolchainImpl tc2 = new JavaToolchainImpl( jdksExtra.getToolchains().get( 0 ), null );
             
             assertTrue( tc1.equals( tc1 ) );
             assertFalse( tc1.equals( tc2 ) );

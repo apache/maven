@@ -59,7 +59,7 @@ public class JavaToolchainFactory
             return null;
         }
 
-        DefaultJavaToolchain jtc = new DefaultJavaToolchain( model, logger );
+        JavaToolchainImpl jtc = new JavaToolchainImpl( model, logger );
 
         // populate the provides section
         Properties provides = model.getProvides(); 
@@ -89,11 +89,11 @@ public class JavaToolchainFactory
 
         // populate the configuration section
         Xpp3Dom dom = (Xpp3Dom) model.getConfiguration();
-        Xpp3Dom javahome = dom.getChild( DefaultJavaToolchain.KEY_JAVAHOME );
+        Xpp3Dom javahome = dom.getChild( JavaToolchainImpl.KEY_JAVAHOME );
         if ( javahome == null )
         {
             throw new MisconfiguredToolchainException( "Java toolchain without the "
-                + DefaultJavaToolchain.KEY_JAVAHOME + " configuration element." );
+                + JavaToolchainImpl.KEY_JAVAHOME + " configuration element." );
         }
         File normal = new File( FileUtils.normalize( javahome.getValue() ) );
         if ( normal.exists() )
