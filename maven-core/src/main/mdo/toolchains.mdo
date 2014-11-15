@@ -124,7 +124,8 @@
                     <![CDATA[Type of toolchain:<ul>
                     <li><code>jdk</code> for
                     <a href="http://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain</a>,</li>
-                    <li>...</li>
+                    <li>other value for
+                    <a href="http://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain</a></li>
                     </ul>
                     ]]></description>
                     <type>String</type>
@@ -152,10 +153,10 @@
                     <description>
                     <![CDATA[
                     <p>Toolchain identification information, which will be matched against project requirements.</p>
-                    <p>For Maven 2.0.9/3.2.3 the actual content structure was completely open: each toolchain type would define its own format and semantics.</p>
-                    <p>In general, this was a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
-                    predefined properties names.</p>
-                    <p>Since Maven 3.2.4 the type for this field has been changed to Properties.</p>
+                    <p>For Maven 2.0.9 to 3.2.3, the actual content structure was completely open: each toolchain type would define its own format and semantics.
+                    In general, this was a properties format.</p>
+                    <p>Since Maven 3.2.4, the type for this field has been changed to Properties to match the de-facto format.</p>
+                    <p>Each toolchain defines its own properties names and semantics.</p>
                     ]]></description>
                 </field>
                 <field>
@@ -166,8 +167,8 @@
                     <![CDATA[
                     <p>Toolchain configuration information, like location or any information that is to be retrieved.</p>
                     <p>Actual content structure is completely open: each toochain type will define its own format and semantics.</p>
-                    <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> wih
-                    predefined properties names.</p> 
+                    <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
+                    per-toolchain defined properties names.</p> 
                     ]]></description>
                 </field>
             </fields>
