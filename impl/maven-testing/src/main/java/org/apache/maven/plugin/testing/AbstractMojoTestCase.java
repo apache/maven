@@ -34,9 +34,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.io.input.XmlStreamReader;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -71,6 +73,7 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.ReflectionUtils;
@@ -96,6 +99,37 @@ import com.google.inject.Module;
 public abstract class AbstractMojoTestCase
     extends PlexusTestCase
 {
+    private static final DefaultArtifactVersion MAVEN_VERSION;
+
+    static
+    {
+        DefaultArtifactVersion version = null;
+        String path = "/META-INF/maven/org.apache.maven/maven-core/pom.properties";
+        InputStream is = AbstractMojoTestCase.class.getResourceAsStream( path );
+        try
+        {
+            Properties properties = new Properties();
+            if ( is != null )
+            {
+                properties.load( is );
+            }
+            String property = properties.getProperty( "version" );
+            if ( property != null )
+            {
+                version = new DefaultArtifactVersion( property );
+            }
+        }
+        catch ( IOException e )
+        {
+            // odd, where did this come from
+        }
+        finally
+        {
+            IOUtil.close( is );
+        }
+        MAVEN_VERSION = version;
+    }
+
     private ComponentConfigurator configurator;
 
     private PlexusContainer container;
@@ -112,6 +146,9 @@ public abstract class AbstractMojoTestCase
     protected void setUp()
         throws Exception
     {
+        assertTrue( "Maven 3.2.4 or better is required",
+                    MAVEN_VERSION == null || new DefaultArtifactVersion( "3.2.3" ).compareTo( MAVEN_VERSION ) < 0 );
+
         configurator = getContainer().lookup( ComponentConfigurator.class, "basic" );
 
         InputStream is = getClass().getResourceAsStream( "/" + getPluginDescriptorLocation() );
