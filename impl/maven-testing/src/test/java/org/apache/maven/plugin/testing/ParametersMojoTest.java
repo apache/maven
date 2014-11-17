@@ -25,12 +25,11 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.plugin.testing.ParametersMojo;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 
 public class ParametersMojoTest
     extends AbstractMojoTestCase
@@ -100,6 +99,7 @@ public class ParametersMojoTest
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setBaseDirectory( basedir );
         ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
+        configuration.setRepositorySession( new DefaultRepositorySystemSession() );
         MavenProject project = lookup( ProjectBuilder.class ).build( pom, configuration ).getProject();
         assertNotNull( project );
         return project;
