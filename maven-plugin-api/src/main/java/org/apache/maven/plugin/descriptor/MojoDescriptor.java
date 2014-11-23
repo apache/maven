@@ -291,7 +291,7 @@ public class MojoDescriptor
      * resolution, this does not include the download of the files for the dependency artifacts. It is meant for mojos
      * that only want to analyze the set of transitive dependencies, in particular during early lifecycle phases where
      * full dependency resolution might fail due to projects which haven't been built yet.
-     * 
+     *
      * @return The scope of (transitive) dependencies that should be collected or {@code null} if none.
      * @since 3.0-alpha-3
      */

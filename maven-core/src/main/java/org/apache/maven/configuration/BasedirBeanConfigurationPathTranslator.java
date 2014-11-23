@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * A path translator that resolves relative paths against a specific base directory.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class BasedirBeanConfigurationPathTranslator
@@ -34,7 +34,7 @@ public class BasedirBeanConfigurationPathTranslator
 
     /**
      * Creates a new path translator using the specified base directory.
-     * 
+     *
      * @param basedir The base directory to resolve relative paths against, may be {@code null} to disable path
      *            translation.
      */

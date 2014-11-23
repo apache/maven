@@ -39,7 +39,7 @@ public class DefaultMavenExecutionTest
         assertNotNull( copy );
         assertNotSame( copy, original );
     }
-    
+
     public void testResultWithNullTopologicallySortedProjectsIsEmptyList()
     {
         MavenExecutionResult result = new DefaultMavenExecutionResult();

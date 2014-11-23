@@ -34,7 +34,7 @@ public class CycleDetectedInPluginGraphException
 
     public CycleDetectedInPluginGraphException( Plugin plugin, CycleDetectedInComponentGraphException e )
     {
-        super( "A cycle was detected in the component graph of the plugin: " + plugin.getArtifactId() ); 
+        super( "A cycle was detected in the component graph of the plugin: " + plugin.getArtifactId() );
 
         this.plugin = plugin;
     }

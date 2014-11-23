@@ -56,7 +56,7 @@ public abstract class AbstractRepositoryMetadata
     }
 
     public String getLocalFilename( ArtifactRepository repository )
-    {        
+    {
         return "maven-metadata-" + repository.getKey() + ".xml";
     }
 
@@ -208,7 +208,7 @@ public abstract class AbstractRepositoryMetadata
         AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
         this.metadata.merge( repoMetadata.getMetadata() );
     }
-    
+
     public void merge( ArtifactMetadata metadata )
     {
         // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact replaces?

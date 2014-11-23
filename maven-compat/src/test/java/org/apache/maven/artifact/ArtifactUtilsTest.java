@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link ArtifactUtils}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ArtifactUtilsTest

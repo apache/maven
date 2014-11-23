@@ -47,7 +47,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 /**
  * <strong>Warning:</strong> This is an internal utility class that is only public for technical reasons, it is not part
  * of the public API. In particular, this class can be changed or deleted without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class LegacyLocalRepositoryManager

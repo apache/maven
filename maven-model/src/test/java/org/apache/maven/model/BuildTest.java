@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Build}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class BuildTest

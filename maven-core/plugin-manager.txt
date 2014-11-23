@@ -47,50 +47,50 @@ i'l
 // - plugins with a dependency the same as the core but different versions, make it fail then fix it
 
   /*
- * 
+ *
  * h2. Concerns for the plugin manager
- * 
+ *
  * h3. resolving the dependencies of a plugin - these could be resolved remotely at runtime or, -
  * they could be resolved from a local repository - i think we need a simple dependency model here
  * that is more mercury related and not Maven related i.e no POMs - workspace resolver - we need
  * tools to pre-populate this repository
- * 
+ *
  * h3. create an isolated classloader
- * 
+ *
  * h3. lookup the plugin with a configuration
- * 
+ *
  * h3. execute the plugin
- * 
+ *
  * h3. plugins may have to deal with particular actions when a plugin is - installed - loaded -
  * unloaded - update - uninstalled
- * 
+ *
  * h3. plugins should be able to have specific metadata for a plugin model and that be translated -
  * dependencies - resources - configuration - extension points of plugins
- * 
+ *
  * For a particular application plugin there will be a declarative descriptor for that plugin type.
- * 
+ *
  * - nexus - the plugin class - UI to contribute - what JS to hook into the UI - what resources to
  * load into the UI - having packed or unpacked plugins, and positioning resources if necessary -
  * maven can work out of the classloader, nexus plugins probably couldn't given the js and image
  * resources
- * 
+ *
  * We need to look at Maven, and Nexus as use cases and figure out what each of them needs to be
  * able to do
- * 
+ *
  * - now what is really the difference between this and loading a component in plexus - custom
  * classloading capability - remote resolution of dependencies - do we want a model for sharing
  * information among plugins, is this more like an extension point - do we need a sort of bus for
  * application data - do we need a dictionary for our applications like Apple does. We could easily
  * hook into this and this is the model we need to follow - how many of our REST services do not map
  * directory to a method in the application interface?
- * 
+ *
  * - research extension points versus plugins
- * 
+ *
  * from igor: two plugins A and B, both depend on the same library but use different versions, say
  * lib 1.0 and lib 2.0 when debugger hits a breakpoint inside a class from the library, IDE needs to
  * know which version of library the class comes from
  */
-  
+
 This document outlines the concerns of a general plugin manager that would be used in conjunction with any Plexus-based application. The following outlined concerns are an attempt to describe what a plugin manager would need to do for Maven and for Nexus.
 
 h2. Concerns for the plugin manager
@@ -144,8 +144,8 @@ Each application will have its own model for plugins. Much of this model will be
 * Configuration metadata and default configuration values
 * Extension points that plugins might expose
 
-h3. The plugin manager may have to deal with particular actions when a plugin is 
-  
+h3. The plugin manager may have to deal with particular actions when a plugin is
+
 * installation
 * activation
 * update
@@ -158,7 +158,7 @@ We might want to separate between installation and activation, it might be nice 
 
 These particular phases in a plugin’s lifecycle can probably be generalized to all plugins so could be something implemented in all plugins. Here we could have the descriptor either point to methods for each of these phases to execute or we could create a lifecycle in Plexus for these phases.
 
-For a particular application plugin there will be a declarative descriptor for that plugin type. 
+For a particular application plugin there will be a declarative descriptor for that plugin type.
 
 h3. Some general notes on Nexus
 
@@ -168,11 +168,11 @@ The plugin metadata:
 * what JS to hook into the UI
 * what resources to load into the UI
 * having packed or unpacked plugins, and positioning resources if necessary
-* maven can work out of the classloader, nexus plugins probably couldn't given the js and image resources  
-  
+* maven can work out of the classloader, nexus plugins probably couldn't given the js and image resources
+
 h3. Other issues
 
-We need to look at Maven, and Nexus as use cases and figure out what each of them needs to be able to do  
+We need to look at Maven, and Nexus as use cases and figure out what each of them needs to be able to do
 
 * now what is really the difference between this and loading a component in plexus
 * do we want a model for sharing information among plugins, is this more like an extension point
@@ -182,4 +182,3 @@ We need to look at Maven, and Nexus as use cases and figure out what each of the
 
 - an example of adding js
 - an example of adding a URI
-   

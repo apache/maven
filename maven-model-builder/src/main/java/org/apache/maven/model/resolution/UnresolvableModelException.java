@@ -21,7 +21,7 @@ package org.apache.maven.model.resolution;
 
 /**
  * Signals an error when resolving the path to an external model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class UnresolvableModelException
@@ -45,7 +45,7 @@ public class UnresolvableModelException
 
     /**
      * Creates a new exception with specified detail message and cause.
-     * 
+     *
      * @param message The detail message, may be {@code null}.
      * @param groupId The group id of the unresolvable model, may be {@code null}.
      * @param artifactId The artifact id of the unresolvable model, may be {@code null}.
@@ -63,7 +63,7 @@ public class UnresolvableModelException
 
     /**
      * Creates a new exception with specified detail message.
-     * 
+     *
      * @param message The detail message, may be {@code null}.
      * @param groupId The group id of the unresolvable model, may be {@code null}.
      * @param artifactId The artifact id of the unresolvable model, may be {@code null}.
@@ -79,7 +79,7 @@ public class UnresolvableModelException
 
     /**
      * Gets the group id of the unresolvable model.
-     * 
+     *
      * @return The group id of the unresolvable model, can be empty but never {@code null}.
      */
     public String getGroupId()
@@ -89,7 +89,7 @@ public class UnresolvableModelException
 
     /**
      * Gets the artifact id of the unresolvable model.
-     * 
+     *
      * @return The artifact id of the unresolvable model, can be empty but never {@code null}.
      */
     public String getArtifactId()
@@ -99,7 +99,7 @@ public class UnresolvableModelException
 
     /**
      * Gets the version of the unresolvable model.
-     * 
+     *
      * @return The version of the unresolvable model, can be empty but never {@code null}.
      */
     public String getVersion()

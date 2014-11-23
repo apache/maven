@@ -170,7 +170,7 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         calculateForkedExecutions( mojoExecution, session, project, new HashSet<MojoDescriptor>() );
     }
-    
+
     public List<MojoExecution> calculateMojoExecutions( MavenSession session, MavenProject project,
                                                          List<Object> tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,

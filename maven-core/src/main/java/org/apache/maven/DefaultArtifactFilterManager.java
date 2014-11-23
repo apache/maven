@@ -38,7 +38,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * @todo this should probably be a component with some dynamic control of filtering
  */
 @Component( role = ArtifactFilterManager.class )
-public class DefaultArtifactFilterManager 
+public class DefaultArtifactFilterManager
     implements ArtifactFilterManager
 {
 

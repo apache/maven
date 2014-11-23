@@ -27,7 +27,7 @@ import org.apache.maven.artifact.repository.RepositoryRequest;
 
 /**
  * Forms a request to retrieve artifact metadata.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface MetadataResolutionRequest
@@ -36,14 +36,14 @@ public interface MetadataResolutionRequest
 
     /**
      * Indicates whether network access to remote repositories has been disabled.
-     * 
+     *
      * @return {@code true} if remote access has been disabled, {@code false} otherwise.
      */
     boolean isOffline();
 
     /**
      * Enables/disables network access to remote repositories.
-     * 
+     *
      * @param offline {@code true} to disable remote access, {@code false} to allow network access.
      * @return This request, never {@code null}.
      */
@@ -51,14 +51,14 @@ public interface MetadataResolutionRequest
 
     /**
      * Gets the artifact to resolve metadata for.
-     * 
+     *
      * @return The artifact to resolve metadata for or {@code null} if not set.
      */
     Artifact getArtifact();
 
     /**
      * Sets the artifact for which to resolve metadata.
-     * 
+     *
      * @param artifact The artifact for which to resolve metadata.
      * @return This request, never {@code null}.
      */
@@ -66,14 +66,14 @@ public interface MetadataResolutionRequest
 
     /**
      * Gets the local repository to use for the resolution.
-     * 
+     *
      * @return The local repository to use for the resolution or {@code null} if not set.
      */
     ArtifactRepository getLocalRepository();
 
     /**
      * Sets the local repository to use for the resolution.
-     * 
+     *
      * @param localRepository The local repository to use for the resolution.
      * @return This request, never {@code null}.
      */
@@ -81,14 +81,14 @@ public interface MetadataResolutionRequest
 
     /**
      * Gets the remote repositories to use for the resolution.
-     * 
+     *
      * @return The remote repositories to use for the resolution, never {@code null}.
      */
     List<ArtifactRepository> getRemoteRepositories();
 
     /**
      * Sets the remote repositories to use for the resolution.
-     * 
+     *
      * @param remoteRepositories The remote repositories to use for the resolution.
      * @return This request, never {@code null}.
      */
@@ -96,14 +96,14 @@ public interface MetadataResolutionRequest
 
     /**
      * Determines whether the managed version information should be retrieved.
-     * 
+     *
      * @return {@code true} if the dependency management information should be retrieved, {@code false} otherwise.
      */
     boolean isResolveManagedVersions();
 
     /**
      * Enables/disables resolution of the dependency manageemnt information.
-     * 
+     *
      * @param resolveManagedVersions {@code true} if the dependency management information should be retrieved, {@code
      *            false} otherwise.
      * @return This request, never {@code null}.

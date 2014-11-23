@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface ModelProblemCollectorExt extends ModelProblemCollector
 {
-    
+
     /**
      * The collected problems.
      * @return a list of model problems encountered, never {@code null}

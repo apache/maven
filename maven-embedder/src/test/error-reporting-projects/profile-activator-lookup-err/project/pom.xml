@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>profile-activator-lookup-err</artifactId>
   <version>1</version>
-  
+
   <profiles>
     <profile>
       <id>test-profile</id>
@@ -33,7 +33,7 @@ under the License.
       </activation>
     </profile>
   </profiles>
-  
+
   <build>
     <extensions>
       <extension>

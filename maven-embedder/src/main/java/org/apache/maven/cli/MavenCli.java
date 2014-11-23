@@ -120,9 +120,9 @@ public class MavenCli
     private LoggerManager plexusLoggerManager;
 
     private ILoggerFactory slf4jLoggerFactory;
-    
+
     private Logger slf4jLogger;
-    
+
     private EventSpyDispatcher eventSpyDispatcher;
 
     private ModelProcessor modelProcessor;
@@ -297,7 +297,7 @@ public class MavenCli
             System.out.println( CLIReportingUtils.showVersion() );
             throw new ExitException( 0 );
         }
-    }    
+    }
 
     /**
      * configure logging
@@ -497,7 +497,7 @@ public class MavenCli
         if ( cliRequest.commandLine.hasOption( CLIManager.ENCRYPT_MASTER_PASSWORD ) )
         {
             String passwd = cliRequest.commandLine.getOptionValue( CLIManager.ENCRYPT_MASTER_PASSWORD );
-            
+
             if ( passwd == null )
             {
                 Console cons = System.console();
@@ -506,7 +506,7 @@ public class MavenCli
                 {
                     // Cipher uses Strings
                     passwd = String.copyValueOf( password );
-                    
+
                     // Sun/Oracle advises to empty the char array
                     java.util.Arrays.fill( password, ' ' );
                 }
@@ -522,7 +522,7 @@ public class MavenCli
         else if ( cliRequest.commandLine.hasOption( CLIManager.ENCRYPT_PASSWORD ) )
         {
             String passwd = cliRequest.commandLine.getOptionValue( CLIManager.ENCRYPT_PASSWORD );
-            
+
             if ( passwd == null )
             {
                 Console cons = System.console();
@@ -927,7 +927,7 @@ public class MavenCli
         if ( quiet )
         {
             transferListener = new QuietMavenTransferListener();
-        }        
+        }
         else if ( request.isInteractiveMode() && !cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             //
@@ -1009,10 +1009,10 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.PROJECT_LIST ) )
         {
             String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
-            
+
             List<String> inclProjects = new ArrayList<String>();
             List<String> exclProjects = new ArrayList<String>();
-            
+
             if ( projectOptionValues != null )
             {
                 for ( String projectOptionValue : projectOptionValues )
@@ -1038,7 +1038,7 @@ public class MavenCli
                     }
                 }
             }
-            
+
             request.setSelectedProjects( inclProjects );
             request.setExcludedProjects( exclProjects );
         }
@@ -1070,24 +1070,24 @@ public class MavenCli
         {
             request.setLocalRepositoryPath( localRepoProperty );
         }
-        
+
 
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );
 
-        // 
+        //
         // Builder, concurrency and parallelism
         //
         // We preserve the existing methods for builder selection which is to look for various inputs in the threading
         // configuration. We don't have an easy way to allow a pluggable builder to provide its own configuration
         // parameters but this is sufficient for now. Ultimately we want components like Builders to provide a way to
-        // extend the command line to accept its own configuration parameters. 
+        // extend the command line to accept its own configuration parameters.
         //
         final String threadConfiguration = commandLine.hasOption( CLIManager.THREADS )
             ? commandLine.getOptionValue( CLIManager.THREADS )
             : request.getSystemProperties().getProperty(
                 MavenCli.THREADS_DEPRECATED ); // TODO: Remove this setting. Note that the int-tests use it
-        
+
         if ( threadConfiguration != null )
         {
             //
@@ -1104,15 +1104,15 @@ public class MavenCli
                 request.setDegreeOfConcurrency( Integer.valueOf( threadConfiguration ) );
             }
         }
-              
+
         //
         // Allow the builder to be overriden by the user if requested. The builders are now pluggable.
         //
         if ( commandLine.hasOption( CLIManager.BUILDER ) )
-        {          
+        {
             request.setBuilderId( commandLine.getOptionValue( CLIManager.BUILDER ) );
-        }        
-        
+        }
+
         return request;
     }
 
@@ -1121,7 +1121,7 @@ public class MavenCli
         int procs = Runtime.getRuntime().availableProcessors();
         return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * procs );
     }
-    
+
     static File resolveFile( File file, String workingDirectory )
     {
         if ( file == null )
@@ -1250,21 +1250,21 @@ public class MavenCli
         }
 
     }
-    
+
     //
     // Customizations available via the CLI
     //
-    
-    protected TransferListener getConsoleTransferListener() 
+
+    protected TransferListener getConsoleTransferListener()
     {
         return new ConsoleMavenTransferListener( System.out );
     }
-    
+
     protected TransferListener getBatchTransferListener()
     {
         return new Slf4jMavenTransferListener();
     }
-    
+
     protected void customizeContainer( PlexusContainer container )
     {
     }
@@ -1273,5 +1273,5 @@ public class MavenCli
         throws ComponentLookupException
     {
         return container.lookup( ModelProcessor.class );
-    }        
+    }
 }

@@ -26,7 +26,7 @@ import org.apache.maven.model.building.ModelCache;
 
 /**
  * A simple model cache used to accelerate model building during a reactor build.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class ReactorModelCache

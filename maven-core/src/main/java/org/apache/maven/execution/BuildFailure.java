@@ -23,7 +23,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Summarizes the result of a failed project build in the reactor.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class BuildFailure
@@ -37,7 +37,7 @@ public class BuildFailure
 
     /**
      * Creates a new build summary for the specified project.
-     * 
+     *
      * @param project The project being summarized, must not be {@code null}.
      * @param time The build time of the project in milliseconds.
      * @param cause The cause of the build failure, may be {@code null}.
@@ -50,7 +50,7 @@ public class BuildFailure
 
     /**
      * Gets the cause of the build failure.
-     * 
+     *
      * @return The cause of the build failure or {@code null} if unknown.
      */
     public Throwable getCause()

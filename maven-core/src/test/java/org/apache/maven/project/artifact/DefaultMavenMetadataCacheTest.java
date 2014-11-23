@@ -75,7 +75,7 @@ public class DefaultMavenMetadataCacheTest
 
         CacheKey k1 = new CacheKey( a1, false, lr1, Collections.singletonList( rr1 ) );
         CacheKey k2 = new CacheKey( a2, false, lr2, Collections.singletonList( rr2 ) );
-        
+
         assertEquals(k1.hashCode(), k2.hashCode());
     }
 }

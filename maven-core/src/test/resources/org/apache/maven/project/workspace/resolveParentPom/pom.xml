@@ -5,6 +5,6 @@
     <artifactId>resolve-parent-pom-parent</artifactId>
     <version>1</version>
   </parent>
-  
+
   <artifactId>resolve-parent-pom</artifactId>
 </project>

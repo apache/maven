@@ -30,7 +30,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 
 /**
  * Collects settings that control building of effective models.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultModelBuildingRequest
@@ -76,7 +76,7 @@ public class DefaultModelBuildingRequest
 
     /**
      * Creates a shallow copy of the specified request.
-     * 
+     *
      * @param request The request to copy, must not be {@code null}.
      */
     public DefaultModelBuildingRequest( ModelBuildingRequest request )

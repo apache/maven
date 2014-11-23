@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code DistributionManagement}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DistributionManagementTest

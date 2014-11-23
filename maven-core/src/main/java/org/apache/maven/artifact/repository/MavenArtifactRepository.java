@@ -142,7 +142,7 @@ public class MavenArtifactRepository
         {
             sb.append( "    proxy: " ).append( proxy.getHost() ).append( ":" ).append( proxy.getPort() ).append( "\n" );
         }
-        
+
         if ( snapshots != null )
         {
             sb.append( "snapshots: [enabled => " ).append( snapshots.isEnabled() );

@@ -131,7 +131,7 @@ public class DefaultProjectBuilder
 
         try
         {
-            ProjectBuildingRequest projectBuildingRequest = config.request;            
+            ProjectBuildingRequest projectBuildingRequest = config.request;
 
             MavenProject project = projectBuildingRequest.getProject();
 
@@ -731,9 +731,9 @@ public class DefaultProjectBuilder
         //
         // All the parts that were taken out of MavenProject for Maven 4.0.0
         //
-        
+
         project.setProjectBuildingRequest( projectBuildingRequest );
-        
+
         // pluginArtifacts
         Set<Artifact> pluginArtifacts = new HashSet<Artifact>();
         for ( Plugin plugin : project.getBuildPlugins() )

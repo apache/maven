@@ -28,7 +28,7 @@ public class SystemProperties
 {
     /**
      * Thread-safe System.properties copy implementation.
-     * 
+     *
      * @see http://jira.codehaus.org/browse/MNG-5670
      */
     public static void addSystemProperties( Properties props )

@@ -23,7 +23,7 @@ import org.apache.maven.toolchain.Toolchain;
 
 /**
  * JDK toolchain interface.
- * 
+ *
  * @author Jason van Zyl
  * @author Milos Kleint
  * @since 2.0.9, renamed from JavaToolChain in 3.2.4

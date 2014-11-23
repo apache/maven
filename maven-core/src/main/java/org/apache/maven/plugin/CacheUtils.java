@@ -137,7 +137,7 @@ class CacheUtils
     {
         return eq( a.getArtifactId(), b.getArtifactId() ) //
             && eq( a.getGroupId(), b.getGroupId() ) //
-            && eq( a.getVersion(), b.getVersion() ) // 
+            && eq( a.getVersion(), b.getVersion() ) //
             && a.isExtensions() == b.isExtensions() //
             && dependenciesEquals( a.getDependencies(), b.getDependencies() );
     }
@@ -159,7 +159,7 @@ class CacheUtils
 
             boolean r = eq( aD.getGroupId(), bD.getGroupId() ) //
                 && eq( aD.getArtifactId(), bD.getArtifactId() ) //
-                && eq( aD.getVersion(), bD.getVersion() ) // 
+                && eq( aD.getVersion(), bD.getVersion() ) //
                 && eq( aD.getType(), bD.getType() ) //
                 && eq( aD.getClassifier(), bD.getClassifier() ) //
                 && eq( aD.getScope(), bD.getScope() );

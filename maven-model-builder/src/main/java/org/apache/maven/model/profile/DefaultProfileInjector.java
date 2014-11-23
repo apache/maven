@@ -43,7 +43,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles profile injection into the model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ProfileInjector.class )

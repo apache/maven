@@ -27,7 +27,7 @@ import org.apache.maven.plugin.MojoExecution;
  * Assists in firing execution events. <strong>Warning:</strong> This is an internal utility interface that is only
  * public for technical reasons, it is not part of the public API. In particular, this interface can be changed or
  * deleted without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ExecutionEventCatapult

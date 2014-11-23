@@ -41,7 +41,7 @@ public class RegexBasedModelInterpolator
         throws IOException
     {
     }
-    
+
     public RegexBasedModelInterpolator( PathTranslator pathTranslator )
     {
         super( pathTranslator );

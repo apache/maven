@@ -63,16 +63,16 @@ public class ProjectInheritanceTest
         throws Exception
     {
         File localRepo = getLocalRepositoryPath();
-        
+
         System.out.println( "Local repository is at: " + localRepo.getAbsolutePath() );
-        
+
         File pom0 = new File( localRepo, "p0/pom.xml" );
         File pom1 = new File( pom0.getParentFile(), "p1/pom.xml" );
         File pom2 = new File( pom1.getParentFile(), "p2/pom.xml" );
         File pom3 = new File( pom2.getParentFile(), "p3/pom.xml" );
         File pom4 = new File( pom3.getParentFile(), "p4/pom.xml" );
         File pom5 = new File( pom4.getParentFile(), "p5/pom.xml" );
-        
+
         System.out.println( "Location of project-4's POM: " + pom4.getPath() );
 
         // load everything...
@@ -114,22 +114,22 @@ public class ProjectInheritanceTest
         // ----------------------------------------------------------------------
 
         assertEquals( "4.0.0", project4.getModelVersion() );
-        
+
         Build build = project4.getBuild();
         List<Plugin> plugins = build.getPlugins();
-        
+
         Map validPluginCounts = new HashMap();
-        
+
         String testPluginArtifactId = "maven-compiler-plugin";
-        
+
         // this is the plugin we're looking for.
         validPluginCounts.put( testPluginArtifactId, 0 );
-        
+
         // these are injected if -DperformRelease=true
         validPluginCounts.put( "maven-deploy-plugin", 0 );
         validPluginCounts.put( "maven-javadoc-plugin", 0 );
         validPluginCounts.put( "maven-source-plugin", 0 );
-        
+
         Plugin testPlugin = null;
 
         for ( Plugin plugin : plugins )
@@ -161,9 +161,9 @@ public class ProjectInheritanceTest
                 }
             }
         }
-        
+
         List executions = testPlugin.getExecutions();
-        
+
         assertEquals( 1, executions.size() );
     }
 }

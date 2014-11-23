@@ -25,7 +25,7 @@ import org.eclipse.aether.RepositorySystemSession;
 
 /**
  * A model builder cache backed by the repository system cache.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class DefaultModelCache

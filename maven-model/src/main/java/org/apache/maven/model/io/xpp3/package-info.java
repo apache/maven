@@ -4,7 +4,7 @@
  * These classes use
  * <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/pull/package-summary.html">plexus-utils'
  * XML Pull Parser API</a> for their internal XML handling and
- * <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomBuilder.html">Xpp3DomBuilder</a> + 
+ * <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomBuilder.html">Xpp3DomBuilder</a> +
  * <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3Dom.html">Xpp3Dom</a> for
  * DOM content representation (see <code>&lt;configuration&gt;</code> elements).
  */

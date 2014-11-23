@@ -22,6 +22,6 @@ under the License.
   <localRepository>/global/maven/local-repository</localRepository>
   <pluginGroups>
     <pluginGroup>org.codehaus.tycho</pluginGroup>
-    <pluginGroup>org.sonatype.pwt</pluginGroup>    
+    <pluginGroup>org.sonatype.pwt</pluginGroup>
   </pluginGroups>
 </settings>

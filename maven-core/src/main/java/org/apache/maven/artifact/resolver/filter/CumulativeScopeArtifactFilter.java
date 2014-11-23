@@ -28,7 +28,7 @@ import java.util.Set;
  * scopes and their associated implied scopes, so that the user can filter apply a series of implication rules in a
  * single step. This should be a more efficient implementation of multiple standard {@link ScopeArtifactFilter}
  * instances ORed together.
- * 
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author jdcasey
  */
@@ -40,7 +40,7 @@ public class CumulativeScopeArtifactFilter
 
     /**
      * Create a new filter with the specified scopes and their implied scopes enabled.
-     * 
+     *
      * @param scopes The scopes to enable, along with all implied scopes, may be {@code null}.
      */
     public CumulativeScopeArtifactFilter( Collection<String> scopes )
@@ -52,7 +52,7 @@ public class CumulativeScopeArtifactFilter
 
     /**
      * Creates a new filter that combines the specified filters.
-     * 
+     *
      * @param filters The filters to combine, may be {@code null}.
      */
     public CumulativeScopeArtifactFilter( CumulativeScopeArtifactFilter... filters )

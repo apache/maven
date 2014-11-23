@@ -37,7 +37,7 @@ import java.util.TreeSet;
 
 /**
  * Logs debug output from the various lifecycle phases.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl

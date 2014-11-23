@@ -213,14 +213,14 @@ public class LifecycleExecutorTest
         //[05] modello:xpp3-writer
         //[06] modello:java
         //[07] modello:xpp3-reader
-        //[08] plugin:descriptor        
+        //[08] plugin:descriptor
         //[09] resources:resources
         //[10] compiler:compile
         //[11] resources:testResources
         //[12] compiler:testCompile
         //[13] surefire:test
         //[14] jar:jar
-        //[15] plugin:addPluginArtifactMetadata        
+        //[15] plugin:addPluginArtifactMetadata
         //[16] install:install
         //
 

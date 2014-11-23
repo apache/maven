@@ -563,9 +563,9 @@ public class DefaultModelValidatorTest
                         "'dependencies.dependency.exclusions.exclusion.groupId' for gid:aid:jar" );
         assertContains( result.getWarnings().get( 1 ),
                         "'dependencies.dependency.exclusions.exclusion.artifactId' for gid:aid:jar" );
-        
+
         // MNG-3832: Aether (part of M3+) supports wildcard expressions for exclusions
-        
+
         SimpleProblemCollector result_30 = validate( "bad-dependency-exclusion-id.xml" );
 
         assertViolations( result_30, 0, 0, 0 );

@@ -52,7 +52,7 @@ import org.eclipse.aether.resolution.VersionRangeResult;
 /**
  * A model resolver to assist building of projects. This resolver gives priority to those repositories that have been
  * declared in the POM.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class ProjectModelResolver

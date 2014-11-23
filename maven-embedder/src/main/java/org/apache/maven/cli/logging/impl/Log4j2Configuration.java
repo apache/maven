@@ -23,7 +23,7 @@ import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 
 /**
  * Configuration for slf4j-log4j2.
- * 
+ *
  * @author Hervé Boutemy
  * @since 3.1.0
  */
@@ -39,7 +39,7 @@ public class Log4j2Configuration
             case DEBUG:
                 value = "debug";
                 break;
-            
+
             case INFO:
                 value = "info";
                 break;

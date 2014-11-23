@@ -59,7 +59,7 @@ public class RepositorySystemTest
         ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
         request.setArtifact( artifact );
         request.addRepository( newTestRepository() );
-        
+
         ArtifactDescriptorResult result = system.readArtifactDescriptor( session, request );
 
         List<Dependency> deps = result.getDependencies();

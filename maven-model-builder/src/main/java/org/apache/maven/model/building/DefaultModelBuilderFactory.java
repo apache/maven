@@ -70,7 +70,7 @@ import org.apache.maven.model.validation.ModelValidator;
  * only meant as a utility for developers that want to employ the model builder outside of the Maven build system, Maven
  * plugins should always acquire model builder instances via dependency injection. Developers might want to subclass
  * this factory to provide custom implementations for some of the components used by the model builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultModelBuilderFactory
@@ -201,7 +201,7 @@ public class DefaultModelBuilderFactory
 
     /**
      * Creates a new model builder instance.
-     * 
+     *
      * @return The new model builder instance, never {@code null}.
      */
     public DefaultModelBuilder newInstance()

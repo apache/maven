@@ -33,7 +33,7 @@ public interface MavenExecutionResult
     MavenProject getProject();
 
     MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> projects );
-    
+
     /**
      * @return the sorted list, or an empty list if there are no projects.
      */

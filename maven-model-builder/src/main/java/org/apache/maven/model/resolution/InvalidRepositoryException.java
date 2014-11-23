@@ -23,7 +23,7 @@ import org.apache.maven.model.Repository;
 
 /**
  * Signals an error when adding a repository to the model resolver.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class InvalidRepositoryException
@@ -37,7 +37,7 @@ public class InvalidRepositoryException
 
     /**
      * Creates a new exception with specified detail message and cause for the given repository.
-     * 
+     *
      * @param message The detail message, may be {@code null}.
      * @param repository The repository that caused the error, may be {@code null}.
      * @param cause The cause, may be {@code null}.
@@ -50,7 +50,7 @@ public class InvalidRepositoryException
 
     /**
      * Creates a new exception with specified detail message for the given repository.
-     * 
+     *
      * @param message The detail message, may be {@code null}.
      * @param repository The repository that caused the error, may be {@code null}.
      */
@@ -62,7 +62,7 @@ public class InvalidRepositoryException
 
     /**
      * Gets the repository that causes this error (if any).
-     * 
+     *
      * @return The repository that causes this error or {@code null} if not known.
      */
     public Repository getRepository()

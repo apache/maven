@@ -79,8 +79,8 @@ public class DefaultWagonManager
 
     @Requirement
     private LegacySupport legacySupport;
-    
-    
+
+
     //
     // Retriever
     //
@@ -235,12 +235,12 @@ public class DefaultWagonManager
     private void connectWagon( Wagon wagon, ArtifactRepository repository )
         throws ConnectionException, AuthenticationException
     {
-        // MNG-5509 
+        // MNG-5509
         // See org.eclipse.aether.connector.wagon.WagonRepositoryConnector.connectWagon(Wagon)
         if( legacySupport.getRepositorySession() != null )
         {
             Properties headers = new Properties();
-            
+
             headers.put( "User-Agent", ConfigUtils.getString( legacySupport.getRepositorySession(), "Maven",
                                                               ConfigurationProperties.USER_AGENT ) );
             try
@@ -257,7 +257,7 @@ public class DefaultWagonManager
                 logger.debug( "Could not set user agent for wagon " + wagon.getClass().getName() + ": " + e );
             }
         }
-        
+
         if ( repository.getProxy() != null && logger.isDebugEnabled() )
         {
             logger.debug( "Using proxy " + repository.getProxy().getHost() + ":" + repository.getProxy().getPort()
@@ -802,7 +802,7 @@ public class DefaultWagonManager
             throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: "
                 + protocol, e );
         }
-        
+
         return wagon;
     }
 

@@ -111,7 +111,7 @@ public class DefaultProfileManagerTest
         assertEquals( 1, active.size() );
         assertEquals( "syspropActivated", ( (Profile) active.get( 0 ) ).getId() );
     }
-    
+
 
     public void testShouldNotActivateReversalOfPresentSystemProperty()
         throws Exception

@@ -84,12 +84,12 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
       <optional>true</optional>
-    </dependency>      
+    </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <optional>true</optional>
-    </dependency>      
+    </dependency>
     <!-- CLI -->
     <dependency>
       <groupId>commons-cli</groupId>

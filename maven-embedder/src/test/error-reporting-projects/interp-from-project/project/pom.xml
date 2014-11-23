@@ -3,7 +3,7 @@
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>interp-from-project</artifactId>
   <version>1</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.test</groupId>

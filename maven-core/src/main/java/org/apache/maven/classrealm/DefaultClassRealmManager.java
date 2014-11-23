@@ -51,7 +51,7 @@ import org.eclipse.aether.artifact.Artifact;
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
  * public for technical reasons, it is not part of the public API. In particular, this class can be changed or deleted
  * without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ClassRealmManager.class )
@@ -227,7 +227,7 @@ public class DefaultClassRealmManager
 
     /**
      * Creates a new class realm with the specified parent and imports.
-     * 
+     *
      * @param baseRealmId The base id to use for the new realm, must not be {@code null}.
      * @param type The type of the class realm, must not be {@code null}.
      * @param parent The parent realm for the new realm, may be {@code null}.

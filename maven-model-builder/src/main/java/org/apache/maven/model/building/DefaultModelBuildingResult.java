@@ -29,7 +29,7 @@ import org.apache.maven.model.Profile;
 
 /**
  * Collects the output of the model builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class DefaultModelBuildingResult

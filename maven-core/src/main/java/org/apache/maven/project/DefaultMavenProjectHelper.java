@@ -92,7 +92,7 @@ public class DefaultMavenProjectHelper
 
     /**
      * Add an attached artifact or replace the file for an existing artifact.
-     * 
+     *
      * @see MavenProject#addAttachedArtifact(org.apache.maven.artifact.Artifact)
      * @param project project reference.
      * @param artifact artifact to add or replace.

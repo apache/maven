@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Extension}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ExtensionTest

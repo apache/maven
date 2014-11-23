@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code CiManagement}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class CiManagementTest

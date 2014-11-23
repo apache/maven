@@ -5,7 +5,7 @@
   <packaging>pom</packaging>
   <name>Jetty :: Administrative Parent</name>
   <version>7</version>
- 
+
   <build>
 
     <plugins>

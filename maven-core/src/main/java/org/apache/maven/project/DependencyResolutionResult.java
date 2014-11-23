@@ -26,7 +26,7 @@ import org.eclipse.aether.graph.DependencyNode;
 
 /**
  * The result of a project dependency resolution.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface DependencyResolutionResult
@@ -34,7 +34,7 @@ public interface DependencyResolutionResult
 
     /**
      * Gets the dependency graph of the project.
-     * 
+     *
      * @return The dependency graph or {@code null} if not available.
      */
     DependencyNode getDependencyGraph();
@@ -43,35 +43,35 @@ public interface DependencyResolutionResult
      * Gets the transitive dependencies of the project that were not excluded by
      * {@link DependencyResolutionRequest#getResolutionFilter()}. This list is a union of the results from
      * {@link #getResolvedDependencies()} and {@link #getUnresolvedDependencies()}.
-     * 
+     *
      * @return The transitive dependencies, never {@code null}.
      */
     List<Dependency> getDependencies();
 
     /**
      * Gets the dependencies that were successfully resolved.
-     * 
+     *
      * @return The resolved dependencies, never {@code null}.
      */
     List<Dependency> getResolvedDependencies();
 
     /**
      * Gets the dependencies that could not be resolved.
-     * 
+     *
      * @return The unresolved dependencies, never {@code null}.
      */
     List<Dependency> getUnresolvedDependencies();
 
     /**
      * Gets the errors that occurred while building the dependency graph.
-     * 
+     *
      * @return The errors that occurred while building the dependency graph, never {@code null}.
      */
     List<Exception> getCollectionErrors();
 
     /**
      * Gets the errors that occurred while resolving the specified dependency.
-     * 
+     *
      * @param dependency The dependency for which to retrieve the errors, must not be {@code null}.
      * @return The resolution errors for the specified dependency, never {@code null}.
      */

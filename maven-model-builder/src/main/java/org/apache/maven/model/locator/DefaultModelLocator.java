@@ -25,7 +25,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Locates a POM file within a project base directory.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ModelLocator.class )

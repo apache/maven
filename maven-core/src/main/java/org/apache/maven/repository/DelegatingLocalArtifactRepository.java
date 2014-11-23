@@ -185,7 +185,7 @@ public class DelegatingLocalArtifactRepository
         {
             return false;
         }
-        
+
         DelegatingLocalArtifactRepository other = (DelegatingLocalArtifactRepository) obj;
 
         return eq( buildReactor, other.buildReactor )

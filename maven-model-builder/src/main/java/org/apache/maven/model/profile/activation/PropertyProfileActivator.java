@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Determines profile activation based on the existence or value of some execution property.
- * 
+ *
  * @author Benjamin Bentmann
  * @see ActivationProperty
  */

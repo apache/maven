@@ -26,7 +26,7 @@ under the License.
   <artifactId>test1</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3944</name> 
+  <name>Maven Integration Test :: MNG-3944</name>
   <description>
     Test that interpolation of ${basedir} works for a POM that is not named "pom.xml"
   </description>

@@ -26,7 +26,7 @@
       <version>1.0</version>
       <executions>
         <execution>
-          <id>default</id> 
+          <id>default</id>
           <goals>
             <goal>process</goal>
           </goals>

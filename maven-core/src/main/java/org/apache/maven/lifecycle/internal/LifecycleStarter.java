@@ -36,7 +36,7 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * Starts the build life cycle
- * 
+ *
  * @author Jason van Zyl
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold

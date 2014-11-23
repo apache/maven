@@ -3,7 +3,7 @@
   <groupId>testing</groupId>
   <artifactId>read-with-deps</artifactId>
   <version>1</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>tests</groupId>

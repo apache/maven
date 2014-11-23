@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link ExtensionDescriptorBuilder}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ExtensionDescriptorBuilderTest

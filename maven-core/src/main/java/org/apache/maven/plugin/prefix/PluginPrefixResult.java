@@ -23,7 +23,7 @@ import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin prefix resolution request.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -32,21 +32,21 @@ public interface PluginPrefixResult
 
     /**
      * The resolved group id for the plugin.
-     * 
+     *
      * @return The resolved group id for the plugin, never {@code null}.
      */
     String getGroupId();
 
     /**
      * The resolved artifact id for the plugin.
-     * 
+     *
      * @return The resolved artifact id for the plugin, never {@code null}.
      */
     String getArtifactId();
 
     /**
      * The repository from which the plugin prefix was resolved.
-     * 
+     *
      * @return The repository from which the plugin prefix was resolved or {@code null} if the prefix was resolved from
      *         the supplied POM.
      */

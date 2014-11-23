@@ -26,7 +26,7 @@ import org.apache.maven.settings.Mirror;
 
 /**
  * Handles the selection of mirrors for repositories.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface MirrorSelector
@@ -34,7 +34,7 @@ public interface MirrorSelector
 
     /**
      * Determines the mirror for the specified repository.
-     * 
+     *
      * @param repository The repository to determine the mirror for, must not be {@code null}.
      * @param mirrors The available mirrors, may be {@code null}.
      * @return The mirror specification for the repository or {@code null} if no mirror matched.

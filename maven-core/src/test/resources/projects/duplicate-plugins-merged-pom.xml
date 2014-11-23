@@ -3,7 +3,7 @@
     <groupId>tests.project</groupId>
     <artifactId>duplicate-plugin-defs-merged</artifactId>
     <version>1</version>
-    
+
     <build>
       <plugins>
         <plugin>
@@ -44,5 +44,5 @@
         </plugin>
       </plugins>
     </build>
-    
+
 </project>

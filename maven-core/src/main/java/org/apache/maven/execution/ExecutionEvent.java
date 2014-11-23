@@ -24,7 +24,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Holds data relevant for an execution event.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ExecutionEvent
@@ -56,35 +56,35 @@ public interface ExecutionEvent
 
     /**
      * Gets the type of the event.
-     * 
+     *
      * @return The type of the event, never {@code null}.
      */
     Type getType();
 
     /**
      * Gets the session from which this event originates.
-     * 
+     *
      * @return The current session, never {@code null}.
      */
     MavenSession getSession();
 
     /**
      * Gets the current project (if any).
-     * 
+     *
      * @return The current project or {@code null} if not applicable.
      */
     MavenProject getProject();
 
     /**
      * Gets the current mojo execution (if any).
-     * 
+     *
      * @return The current mojo execution or {@code null} if not applicable.
      */
     MojoExecution getMojoExecution();
 
     /**
      * Gets the exception that caused the event (if any).
-     * 
+     *
      * @return The exception or {@code null} if none.
      */
     Exception getException();

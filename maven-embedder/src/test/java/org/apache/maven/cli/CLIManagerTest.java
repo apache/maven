@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.FileUtils;
 /**
  * Pseudo test to generate documentation fragment about supported CLI options.
  * TODO such documentation generation code should not be necessary as unit test but should be run
- * during site generation (Velocity? Doxia macro?) 
+ * during site generation (Velocity? Doxia macro?)
  */
 public class CLIManagerTest
     extends PlexusTestCase

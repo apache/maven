@@ -143,7 +143,7 @@ public class DefaultMavenProjectBuilderTest
                                                        null, null );
         return r;
     }
-    
+
     public void xtestLoop()
         throws Exception
     {

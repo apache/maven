@@ -10,7 +10,7 @@
         </requirement>
       </requirements>
     </component>
-      
+
     <component>
       <role>org.test.ComponentTwo</role>
       <role-hint>default</role-hint>

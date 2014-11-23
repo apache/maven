@@ -44,7 +44,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = LifecycleBindingsInjector.class )

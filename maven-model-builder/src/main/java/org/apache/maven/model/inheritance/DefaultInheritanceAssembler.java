@@ -59,7 +59,7 @@ public class DefaultInheritanceAssembler
     /**
      * Calculates the relative path from the base directory of the parent to the parent directory of the base directory
      * of the child. The general idea is to adjust inherited URLs to match the project layout (in SCM).
-     * 
+     *
      * <p>This calculation is only a heuristic based on our conventions.
      * In detail, the algo relies on the following assumptions: <ul>
      * <li>The parent uses aggregation and refers to the child via the modules section</li>

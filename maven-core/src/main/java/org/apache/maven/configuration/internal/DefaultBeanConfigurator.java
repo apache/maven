@@ -40,7 +40,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 /**
  * <strong>Warning:</strong> This is an internal class that is only public for technical reasons, it is not part of the
  * public API. In particular, this class can be changed or deleted without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = BeanConfigurator.class )

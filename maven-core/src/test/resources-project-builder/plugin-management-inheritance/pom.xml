@@ -27,7 +27,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: it0052</name> 
+  <name>Maven Integration Test :: it0052</name>
   <description>Test that source attachment doesn't take place when -DperformRelease=true is missing.</description>
 
   <!-- NOTE: Use stub versions of the core plugins referenced by the build -->

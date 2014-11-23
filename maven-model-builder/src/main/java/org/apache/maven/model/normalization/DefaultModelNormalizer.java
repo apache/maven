@@ -37,7 +37,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles normalization of a model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ModelNormalizer.class )

@@ -51,7 +51,7 @@ import java.util.TreeSet;
 
 /**
  * Executes an individual mojo
- * 
+ *
  * @since 3.0
  * @author Jason van Zyl
  * @author Benjamin Bentmann

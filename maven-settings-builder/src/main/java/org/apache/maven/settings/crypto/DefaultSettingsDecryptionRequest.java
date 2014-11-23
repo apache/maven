@@ -29,7 +29,7 @@ import org.apache.maven.settings.Settings;
 
 /**
  * Collects parameters that control the decryption of settings.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultSettingsDecryptionRequest
@@ -50,7 +50,7 @@ public class DefaultSettingsDecryptionRequest
 
     /**
      * Creates a new request to decrypt the specified settings.
-     * 
+     *
      * @param settings The settings to decrypt, must not be {@code null}.
      */
     public DefaultSettingsDecryptionRequest( Settings settings )
@@ -61,7 +61,7 @@ public class DefaultSettingsDecryptionRequest
 
     /**
      * Creates a new request to decrypt the specified server.
-     * 
+     *
      * @param server The server to decrypt, must not be {@code null}.
      */
     public DefaultSettingsDecryptionRequest( Server server )
@@ -71,7 +71,7 @@ public class DefaultSettingsDecryptionRequest
 
     /**
      * Creates a new request to decrypt the specified proxy.
-     * 
+     *
      * @param proxy The proxy to decrypt, must not be {@code null}.
      */
     public DefaultSettingsDecryptionRequest( Proxy proxy )

@@ -31,7 +31,7 @@ public class MojoNotFoundException
     private String goal;
 
     private PluginDescriptor pluginDescriptor;
-        
+
     public MojoNotFoundException( String goal, PluginDescriptor pluginDescriptor )
     {
         super( toMessage( goal, pluginDescriptor ) );
@@ -48,7 +48,7 @@ public class MojoNotFoundException
     public PluginDescriptor getPluginDescriptor()
     {
         return pluginDescriptor;
-    }        
+    }
 
     private static String toMessage( String goal, PluginDescriptor pluginDescriptor )
     {

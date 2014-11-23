@@ -35,7 +35,7 @@ public class BuildTimestampValueSource
     private final Date startTime;
 
     private final String format;
-    
+
     private String formattedDate;
 
     public BuildTimestampValueSource( Date startTime, String format )
@@ -53,7 +53,7 @@ public class BuildTimestampValueSource
             {
                 formattedDate = new SimpleDateFormat( format ).format( startTime );
             }
-            
+
             return formattedDate;
         }
 

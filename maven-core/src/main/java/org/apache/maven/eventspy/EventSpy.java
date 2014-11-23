@@ -37,7 +37,7 @@ public interface EventSpy
 
         /**
          * Gets key-value pairs providing information about the Maven runtime.
-         * 
+         *
          * @return The key-value pairs, never {@code null}.
          */
         Map<String, Object> getData();
@@ -46,7 +46,7 @@ public interface EventSpy
 
     /**
      * Initializes the spy.
-     * 
+     *
      * @param context The event spy context, never {@code null}.
      */
     void init( Context context )
@@ -54,7 +54,7 @@ public interface EventSpy
 
     /**
      * Notifies the spy of some build event/operation.
-     * 
+     *
      * @param event The event, never {@code null}.
      * @see org.apache.maven.settings.building.SettingsBuildingRequest
      * @see org.apache.maven.settings.building.SettingsBuildingResult

@@ -47,7 +47,7 @@ public class MavenProjectTest
         childModel.setArtifactId( "artifact" );
 
         MavenProject childProject = new MavenProject( childModel );
-        
+
         File childFile =
             new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis()
                 + "/child/pom.xml" );
@@ -57,7 +57,7 @@ public class MavenProjectTest
         String adjustment = parentProject.getModulePathAdjustment( childProject );
 
         assertNotNull( adjustment );
-        
+
         assertEquals( "..", adjustment );
     }
 
@@ -147,11 +147,11 @@ public class MavenProjectTest
 
         assertEquals( "..", pathAdjustment );
     }
-    
+
     public void testCloneWithDistributionManagement()
         throws Exception
     {
-        
+
         File f = getFileForClasspathResource( "distributionManagement-pom.xml" );
         MavenProject projectToClone = getProject( f );
 

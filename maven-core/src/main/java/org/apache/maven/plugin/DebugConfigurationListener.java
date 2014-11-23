@@ -58,7 +58,7 @@ public class DebugConfigurationListener
 
     /**
      * Creates a human-friendly string represenation of the specified object.
-     * 
+     *
      * @param obj The object to create a string representation for, may be <code>null</code>.
      * @return The string representation, never <code>null</code>.
      */

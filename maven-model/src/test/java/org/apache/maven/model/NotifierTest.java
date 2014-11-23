@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Notifier}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class NotifierTest

@@ -15,9 +15,9 @@
           </releases>
         </repository>
       </repositories>
-    </profile>  
+    </profile>
   </profiles>
   <activeProfiles>
     <activeProfile>company</activeProfile>
-  </activeProfiles>      
+  </activeProfiles>
 </settings>

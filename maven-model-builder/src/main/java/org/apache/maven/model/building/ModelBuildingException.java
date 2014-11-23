@@ -30,7 +30,7 @@ import org.apache.maven.model.Model;
  * Signals one ore more errors during model building. The model builder tries to collect as many problems as possible
  * before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to query the
  * details of the failure.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ModelBuildingException
@@ -41,7 +41,7 @@ public class ModelBuildingException
 
     /**
      * Creates a new exception with the specified problems.
-     * 
+     *
      * @param model The model that could not be built, may be {@code null}.
      * @param modelId The identifier of the model that could not be built, may be {@code null}.
      * @param problems The problems that causes this exception, may be {@code null}.
@@ -72,7 +72,7 @@ public class ModelBuildingException
 
     /**
      * Creates a new exception from the specified interim result and its associated problems.
-     * 
+     *
      * @param result The interim result, may be {@code null}.
      */
     public ModelBuildingException( ModelBuildingResult result )
@@ -83,7 +83,7 @@ public class ModelBuildingException
 
     /**
      * Gets the interim result of the model building up to the point where it failed.
-     * 
+     *
      * @return The interim model building result or {@code null} if not available.
      */
     public ModelBuildingResult getResult()
@@ -93,7 +93,7 @@ public class ModelBuildingException
 
     /**
      * Gets the model that could not be built properly.
-     * 
+     *
      * @return The erroneous model or {@code null} if not available.
      */
     public Model getModel()
@@ -113,7 +113,7 @@ public class ModelBuildingException
      * Gets the identifier of the POM whose effective model could not be built. The general format of the identifier is
      * {@code <groupId>:<artifactId>:<version>} but some of these coordinates may still be unknown at the point the
      * exception is thrown so this information is merely meant to assist the user.
-     * 
+     *
      * @return The identifier of the POM or an empty string if not known, never {@code null}.
      */
     public String getModelId()
@@ -127,7 +127,7 @@ public class ModelBuildingException
 
     /**
      * Gets the problems that caused this exception.
-     * 
+     *
      * @return The problems that caused this exception, never {@code null}.
      */
     public List<ModelProblem> getProblems()

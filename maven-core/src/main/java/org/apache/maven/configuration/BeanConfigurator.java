@@ -24,7 +24,7 @@ package org.apache.maven.configuration;
  * similar to the way Maven configures plugins from the POM, i.e. some configuration like {@code <param>value</param>}
  * is mapped to an equally named property of the bean and converted. The properties of the bean are supposed to either
  * have a public setter or be backed by an equally named field (of any visibility).
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -33,7 +33,7 @@ public interface BeanConfigurator
 
     /**
      * Performs the specified bean configuration.
-     * 
+     *
      * @param request The configuration request that specifies the bean and the configuration to process, must not be
      *            {@code null}.
      * @throws BeanConfigurationException If the bean configuration could not be successfully processed.

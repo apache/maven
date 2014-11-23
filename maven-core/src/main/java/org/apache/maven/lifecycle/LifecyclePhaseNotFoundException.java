@@ -21,7 +21,7 @@ package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to locate the lifecycle for some phase.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class LifecyclePhaseNotFoundException
@@ -32,7 +32,7 @@ public class LifecyclePhaseNotFoundException
 
     /**
      * Creates a new exception to indicate that the specified lifecycle phase is not defined by any known lifecycle.
-     * 
+     *
      * @param message The detail message, may be {@code null}.
      * @param lifecyclePhase The name of the lifecycle phase that could not be located, may be {@code null}.
      */
@@ -44,7 +44,7 @@ public class LifecyclePhaseNotFoundException
 
     /**
      * Gets the lifecycle phase that was not found.
-     * 
+     *
      * @return The lifecycle phase that was not found, never {@code null}.
      */
     public String getLifecyclePhase()

@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 /**
  * Normalizes URLs to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
  * model inheritance.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelUrlNormalizer
@@ -33,7 +33,7 @@ public interface ModelUrlNormalizer
 
     /**
      * Normalizes the well-known URLs of the specified model.
-     * 
+     *
      * @param model The model whose URLs should be normalized, may be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.
      */

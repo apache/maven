@@ -24,7 +24,7 @@ import java.util.List;
 public class InvalidPluginDescriptorException
     extends Exception
 {
-    
+
     public InvalidPluginDescriptorException( String message, List<String> errors )
     {
         super( toMessage( message, errors ) );

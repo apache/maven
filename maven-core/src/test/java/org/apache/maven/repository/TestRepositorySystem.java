@@ -66,8 +66,8 @@ public class TestRepositorySystem
     private ModelReader modelReader;
 
     @Requirement
-    private ArtifactFactory artifactFactory;    
-    
+    private ArtifactFactory artifactFactory;
+
     public ArtifactRepository buildArtifactRepository( Repository repository )
         throws InvalidRepositoryException
     {

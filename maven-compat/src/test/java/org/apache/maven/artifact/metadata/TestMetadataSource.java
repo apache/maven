@@ -37,7 +37,7 @@ public class TestMetadataSource
 {
     @Requirement
     private ArtifactFactory factory;
-    
+
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
@@ -56,7 +56,7 @@ public class TestMetadataSource
                 throw new ArtifactMetadataRetrievalException( "Error retrieving metadata", e, a );
             }
         }
-        
+
         if ( "i".equals( artifact.getArtifactId() ) )
         {
             Artifact a = null;
@@ -70,7 +70,7 @@ public class TestMetadataSource
                 throw new ArtifactMetadataRetrievalException( "Error retrieving metadata", e, a );
             }
         }
-        
+
 
         return new ResolutionGroup( artifact, dependencies, remoteRepositories );
     }

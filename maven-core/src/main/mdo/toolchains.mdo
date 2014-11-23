@@ -61,10 +61,10 @@
                 <![CDATA[
         public static final String USER_LEVEL = "user-level";
         public static final String GLOBAL_LEVEL = "global-level";
-    
+
         private String sourceLevel = USER_LEVEL;
         private boolean sourceLevelSet = false;
-    
+
         public void setSourceLevel( String sourceLevel )
         {
             if ( sourceLevelSet )
@@ -81,7 +81,7 @@
                 this.sourceLevelSet = true;
             }
         }
-    
+
         public String getSourceLevel()
         {
             return sourceLevel;
@@ -139,7 +139,7 @@
                     <p>Toolchain identification information, which will be matched against project requirements.</p>
                     <p>Actual content structure is completely open: each toolchain type will define its own format and semantics.</p>
                     <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
-                    predefined properties names.</p> 
+                    predefined properties names.</p>
                     ]]></description>
                 </field>
                 <field>
@@ -168,7 +168,7 @@
                     <p>Toolchain configuration information, like location or any information that is to be retrieved.</p>
                     <p>Actual content structure is completely open: each toochain type will define its own format and semantics.</p>
                     <p>In general, this is a properties format: <code>&lt;name&gt;value&lt;/name&gt;</code> with
-                    per-toolchain defined properties names.</p> 
+                    per-toolchain defined properties names.</p>
                     ]]></description>
                 </field>
             </fields>

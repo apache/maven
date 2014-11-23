@@ -70,15 +70,15 @@ public class OperatingSystemProfileActivator
     {
         String test = version;
         boolean reverse = false;
-        
+
         if ( test.startsWith( "!" ) )
         {
             reverse = true;
             test = test.substring( 1 );
         }
-        
+
         boolean result = Os.isVersion( test );
-        
+
         if ( reverse )
         {
             return !result;
@@ -93,15 +93,15 @@ public class OperatingSystemProfileActivator
     {
         String test = arch;
         boolean reverse = false;
-        
+
         if ( test.startsWith( "!" ) )
         {
             reverse = true;
             test = test.substring( 1 );
         }
-        
+
         boolean result = Os.isArch( test );
-        
+
         if ( reverse )
         {
             return !result;
@@ -116,7 +116,7 @@ public class OperatingSystemProfileActivator
     {
         String test = name;
         boolean reverse = false;
-        
+
         if ( test.startsWith( "!" ) )
         {
             reverse = true;
@@ -139,15 +139,15 @@ public class OperatingSystemProfileActivator
     {
         String test = family;
         boolean reverse = false;
-        
+
         if ( test.startsWith( "!" ) )
         {
             reverse = true;
             test = test.substring( 1 );
         }
-        
+
         boolean result = Os.isFamily( test );
-        
+
         if ( reverse )
         {
             return !result;

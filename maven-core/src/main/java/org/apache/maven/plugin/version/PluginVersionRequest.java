@@ -27,7 +27,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve the version for a plugin.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -36,14 +36,14 @@ public interface PluginVersionRequest
 
     /**
      * Gets the group id of the plugin.
-     * 
+     *
      * @return The group id of the plugin.
      */
     String getGroupId();
 
     /**
      * Sets the group id of the plugin.
-     * 
+     *
      * @param groupId The group id of the plugin.
      * @return This request, never {@code null}.
      */
@@ -51,14 +51,14 @@ public interface PluginVersionRequest
 
     /**
      * Gets the artifact id of the plugin.
-     * 
+     *
      * @return The artifact id of the plugin.
      */
     String getArtifactId();
 
     /**
      * Sets the artifact id of the plugin.
-     * 
+     *
      * @param artifactId The artifact id of the plugin.
      * @return This request, never {@code null}.
      */
@@ -66,7 +66,7 @@ public interface PluginVersionRequest
 
     /**
      * Gets the POM whose build plugins are to be scanned for the version.
-     * 
+     *
      * @return The POM whose build plugins are to be scanned for the verion or {@code null} to only search the plugin
      *         repositories.
      */
@@ -74,7 +74,7 @@ public interface PluginVersionRequest
 
     /**
      * Sets the POM whose build plugins are to be scanned for the version.
-     * 
+     *
      * @param pom The POM whose build plugins are to be scanned for the version, may be {@code null} to only search the
      *            plugin repositories.
      * @return This request, never {@code null}.
@@ -83,7 +83,7 @@ public interface PluginVersionRequest
 
     /**
      * Gets the remote repositories to use.
-     * 
+     *
      * @return The remote repositories to use, never {@code null}.
      */
     List<RemoteRepository> getRepositories();
@@ -91,7 +91,7 @@ public interface PluginVersionRequest
     /**
      * Sets the remote repositories to use. <em>Note:</em> When creating a request from a project, be sure to use the
      * plugin repositories and not the regular project repositories.
-     * 
+     *
      * @param repositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
@@ -99,14 +99,14 @@ public interface PluginVersionRequest
 
     /**
      * Gets the session to use for repository access.
-     * 
+     *
      * @return The repository session or {@code null} if not set.
      */
     RepositorySystemSession getRepositorySession();
 
     /**
      * Sets the session to use for repository access.
-     * 
+     *
      * @param repositorySession The repository session to use.
      * @return This request, never {@code null}.
      */

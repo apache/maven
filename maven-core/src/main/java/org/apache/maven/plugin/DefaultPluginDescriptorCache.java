@@ -41,7 +41,7 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * data like the plugin realm. <strong>Warning:</strong> This is an internal utility interface that is only public for
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
  * prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */

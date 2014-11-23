@@ -22,7 +22,7 @@ package org.apache.maven.model.path;
 /**
  * Normalizes a URL to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
  * model inheritance.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface UrlNormalizer
@@ -30,7 +30,7 @@ public interface UrlNormalizer
 
     /**
      * Normalizes the specified URL.
-     * 
+     *
      * @param url The URL to normalize, may be {@code null}.
      * @return The normalized URL or {@code null} if the input was {@code null}.
      */

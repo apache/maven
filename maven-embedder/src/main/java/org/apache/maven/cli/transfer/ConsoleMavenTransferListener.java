@@ -29,7 +29,7 @@ import org.eclipse.aether.transfer.TransferResource;
 
 /**
  * Console download progress meter.
- * 
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class ConsoleMavenTransferListener

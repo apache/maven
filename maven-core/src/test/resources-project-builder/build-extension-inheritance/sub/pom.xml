@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>child</artifactId>
 
-  <name>Maven Integration Test :: MNG-3899</name> 
+  <name>Maven Integration Test :: MNG-3899</name>
   <description>
     Test that build extensions are properly merged during inheritance.
   </description>

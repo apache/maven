@@ -25,7 +25,7 @@ import org.apache.maven.model.Model;
 
 /**
  * Assists in the handling of model problems.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ModelProblemUtils
@@ -33,7 +33,7 @@ public class ModelProblemUtils
 
     /**
      * Creates a user-friendly source hint for the specified model.
-     * 
+     *
      * @param model The model to create a source hint for, may be {@code null}.
      * @return The user-friendly source hint, never {@code null}.
      */
@@ -100,7 +100,7 @@ public class ModelProblemUtils
 
     /**
      * Creates a user-friendly artifact id from the specified coordinates.
-     * 
+     *
      * @param groupId The group id, may be {@code null}.
      * @param artifactId The artifact id, may be {@code null}.
      * @param version The version, may be {@code null}.
@@ -123,7 +123,7 @@ public class ModelProblemUtils
      * Creates a string with all location details for the specified model problem. If the project identifier is
      * provided, the generated location will omit the model id and source information and only give line/column
      * information for problems originating directly from this POM.
-     * 
+     *
      * @param problem The problem whose location should be formatted, must not be {@code null}.
      * @param projectId The {@code <groupId>:<artifactId>:<version>} of the corresponding project, may be {@code null}
      *            to force output of model id and source.

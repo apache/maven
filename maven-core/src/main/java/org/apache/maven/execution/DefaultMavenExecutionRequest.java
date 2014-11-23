@@ -140,7 +140,7 @@ public class DefaultMavenExecutionRequest
 
     /**
      * Suppress SNAPSHOT updates.
-     * 
+     *
      * @issue MNG-2681
      */
     private boolean noSnapshotUpdates;

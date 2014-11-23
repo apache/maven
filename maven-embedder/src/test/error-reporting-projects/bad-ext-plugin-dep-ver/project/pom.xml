@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>bad-ext-plugin-dep-ver</artifactId>
   <version>1</version>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -33,5 +33,5 @@ under the License.
       </plugin>
     </plugins>
   </build>
-  
+
 </project>

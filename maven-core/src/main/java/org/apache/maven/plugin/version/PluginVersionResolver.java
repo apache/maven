@@ -21,7 +21,7 @@ package org.apache.maven.plugin.version;
 
 /**
  * Resolves a version for a plugin.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -30,7 +30,7 @@ public interface PluginVersionResolver
 
     /**
      * Resolves the version for the specified request.
-     * 
+     *
      * @param request The request that holds the details about the plugin and the repositories to consult, must not be
      *            {@code null}.
      * @return The result of the version resolution, never {@code null}.

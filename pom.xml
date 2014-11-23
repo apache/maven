@@ -43,7 +43,7 @@
 
   <properties>
     <maven.compiler.source>1.6</maven.compiler.source>
-    <maven.compiler.target>1.6</maven.compiler.target>    
+    <maven.compiler.target>1.6</maven.compiler.target>
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <junitVersion>4.11</junitVersion>
@@ -107,7 +107,7 @@
       <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</url>
     </site>
   </distributionManagement>
-  
+
   <contributors>
     <contributor>
       <name>Stuart McCulloch</name>
@@ -513,9 +513,9 @@
         <configuration>
           <asfExtOptions>
             <charter>The mission of the Apache Maven project is to create and maintain software
-            libraries that provide a widely-used project build tool, targeting mainly Java 
-            development. Apache Maven promotes the use of dependencies via a 
-            standardized coordinate system, binary plugins, and a standard build 
+            libraries that provide a widely-used project build tool, targeting mainly Java
+            development. Apache Maven promotes the use of dependencies via a
+            standardized coordinate system, binary plugins, and a standard build
             lifecycle.</charter>
           </asfExtOptions>
         </configuration>

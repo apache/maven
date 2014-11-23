@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 /**
  * Provides access to the contents of settings independently of the backing store (e.g. file system, database, memory).
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsSource
@@ -33,7 +33,7 @@ public interface SettingsSource
     /**
      * Gets a byte stream to the settings contents. Closing the returned stream is the responsibility of the caller.
      * Note that each invocation of this method returns a new/fresh stream which represents the entire contents.
-     * 
+     *
      * @return A byte stream to the settings contents, never {@code null}.
      */
     InputStream getInputStream()
@@ -42,7 +42,7 @@ public interface SettingsSource
     /**
      * Provides a user-friendly hint about the location of the settings. This could be a local file path, a URI or just
      * an empty string. The intention is to assist users during error reporting.
-     * 
+     *
      * @return A user-friendly hint about the location of the settings, never {@code null}.
      */
     String getLocation();

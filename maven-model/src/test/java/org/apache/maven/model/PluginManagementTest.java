@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code PluginManagement}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class PluginManagementTest

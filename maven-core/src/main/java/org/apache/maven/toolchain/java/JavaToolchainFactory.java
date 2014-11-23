@@ -39,7 +39,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  * JDK toolchain factory.
  * This is a <code>ToolchainFactory</code> Plexus component registered with
  * <code>jdk</code> hint.
- * 
+ *
  * @author mkleint
  * @since 2.0.9, renamed from <code>DefaultJavaToolchainFactory</code> in 3.2.4
  */
@@ -62,7 +62,7 @@ public class JavaToolchainFactory
         JavaToolchainImpl jtc = new JavaToolchainImpl( model, logger );
 
         // populate the provides section
-        Properties provides = model.getProvides(); 
+        Properties provides = model.getProvides();
         for ( Entry<Object, Object> provide : provides.entrySet() )
         {
             String key = (String) provide.getKey();

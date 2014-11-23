@@ -140,7 +140,7 @@ public interface RepositorySystem
     void injectProxy( RepositorySystemSession session, List<ArtifactRepository> repositories );
 
     void injectAuthentication( RepositorySystemSession session, List<ArtifactRepository> repositories );
-    
+
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 
     // Install

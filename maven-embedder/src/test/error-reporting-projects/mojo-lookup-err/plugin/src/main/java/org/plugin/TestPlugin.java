@@ -17,7 +17,7 @@ public class TestPlugin
 {
 
     private Log log;
-    
+
     /**
      * @component role-hint="nonexistant"
      */

@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Dependency}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DependencyTest

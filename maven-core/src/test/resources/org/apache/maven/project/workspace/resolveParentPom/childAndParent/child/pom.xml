@@ -5,6 +5,6 @@
     <artifactId>childAndParent-parent</artifactId>
     <version>1</version>
   </parent>
-  
+
   <artifactId>childAndParent-child</artifactId>
 </project>

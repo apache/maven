@@ -88,8 +88,8 @@ under the License.
       <![CDATA[
       This is a set of Artifact instances resolved from the set of dependencies for
       the current project.
-      
-      NOTE: This will likely contain much more than the direct dependencies of the 
+
+      NOTE: This will likely contain much more than the direct dependencies of the
       current POM, since Maven uses transitive, or chained, dependency resolution.
     ]]></description>
   </expression>
@@ -120,7 +120,7 @@ under the License.
       <![CDATA[
       This is the list of Artifact instances for plugins used in the current build
       for this project.
-      
+
       NOTE: This list may contain plugin Artifacts which are implied by the current POM's
       packaging and the lifecycle phase being built.
     ]]></description>
@@ -137,7 +137,7 @@ under the License.
       <![CDATA[
       This is a list of ArtifactRepository instances used to resolve the Artifacts associated
       with the current POM.
-      
+
       NOTE: This list will contain entries for repositories specified by ancestor POMs, including
       the default built-in super-POM, which is the parent of all POMs.
     ]]></description>
@@ -154,7 +154,7 @@ under the License.
       <![CDATA[
       This is a list of ArtifactRepository instances used to resolve the Artifacts associated
       with plugins used in building the current POM.
-      
+
       NOTE: This list will contain entries for repositories specified by ancestor POMs, including
       the default built-in super-POM, which is the parent of all POMs.
     ]]></description>

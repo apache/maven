@@ -4,7 +4,7 @@
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>mojo-config-error-maven-plugin</artifactId>
   <version>1</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

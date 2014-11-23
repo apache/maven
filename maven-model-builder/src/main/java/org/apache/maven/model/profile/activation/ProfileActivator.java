@@ -25,7 +25,7 @@ import org.apache.maven.model.profile.ProfileActivationContext;
 
 /**
  * Determines whether a profile should be activated.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ProfileActivator
@@ -33,7 +33,7 @@ public interface ProfileActivator
 
     /**
      * Determines whether the specified profile is active in the given activator context.
-     * 
+     *
      * @param profile The profile whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of the profile, must not be
      *            {@code null}.

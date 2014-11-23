@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Abstract implementation.
- * 
+ *
  * @author Hervé Boutemy
  * @since 3.1.0
  */

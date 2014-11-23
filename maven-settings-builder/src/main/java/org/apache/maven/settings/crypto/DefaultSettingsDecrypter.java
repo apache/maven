@@ -34,7 +34,7 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 /**
  * Decrypts passwords in the settings.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = SettingsDecrypter.class )

@@ -36,7 +36,7 @@ public class Slf4jStdoutLogger
 
     //
     // These are the only methods we need in our primordial logger
-    //    
+    //
     public void error( String msg )
     {
         out.print( ERROR );
@@ -50,12 +50,12 @@ public class Slf4jStdoutLogger
         if ( null != t )
         {
             t.printStackTrace( out );
-        }        
-    }    
+        }
+    }
 
     //
     // Don't need any of this
-    //    
+    //
     public String getName()
     {
         return null;

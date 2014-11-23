@@ -27,7 +27,7 @@ import org.codehaus.plexus.logging.Logger;
 /**
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
- * 
+ *
  */
 
 public class DefaultGraphConflictResolverTest
@@ -54,7 +54,7 @@ extends PlexusTestCase
     	 *       v2
     	 *   v1<
     	 *      v3-v4
-    	 * 
+    	 *
     	 */
     	graph = new MetadataGraph( 4, 3 );
     	v1 = graph.addVertex(new ArtifactMetadata("g","a1","1.0"));

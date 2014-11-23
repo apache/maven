@@ -45,7 +45,7 @@ public class PluginManagerTest
         super.setUp();
         pluginManager = (DefaultBuildPluginManager) lookup( BuildPluginManager.class );
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception
@@ -62,7 +62,7 @@ public class PluginManagerTest
     public void testPluginLoading()
         throws Exception
     {
-        MavenSession session = createMavenSession( null );       
+        MavenSession session = createMavenSession( null );
         Plugin plugin = new Plugin();
         plugin.setGroupId( "org.apache.maven.its.plugins" );
         plugin.setArtifactId( "maven-it-plugin" );
@@ -72,17 +72,17 @@ public class PluginManagerTest
                                       session.getRepositorySession() );
         assertNotNull( pluginDescriptor );
     }
-    
+
     public void testMojoDescriptorRetrieval()
         throws Exception
     {
-        MavenSession session = createMavenSession( null );       
+        MavenSession session = createMavenSession( null );
         String goal = "it";
         Plugin plugin = new Plugin();
         plugin.setGroupId( "org.apache.maven.its.plugins" );
         plugin.setArtifactId( "maven-it-plugin" );
         plugin.setVersion( "0.1" );
-        
+
         MojoDescriptor mojoDescriptor =
             pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject().getRemotePluginRepositories(),
                                              session.getRepositorySession() );
@@ -90,53 +90,53 @@ public class PluginManagerTest
         assertEquals( goal, mojoDescriptor.getGoal() );
         // igorf: plugin realm comes later
         // assertNotNull( mojoDescriptor.getRealm() );
-        
+
         PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
         assertNotNull( pluginDescriptor );
         assertEquals( "org.apache.maven.its.plugins", pluginDescriptor.getGroupId() );
         assertEquals( "maven-it-plugin", pluginDescriptor.getArtifactId() );
         assertEquals( "0.1", pluginDescriptor.getVersion() );
     }
-    
+
     // -----------------------------------------------------------------------------------------------
     // Tests which exercise the lifecycle executor when it is dealing with individual goals.
     // -----------------------------------------------------------------------------------------------
-    
+
     //TODO: These two tests display a lack of symmetry with respect to the input which is a free form string and the
     //      mojo descriptor which comes back. All the free form parsing needs to be done somewhere else, this is
     //      really the function of the CLI, and then the pre-processing of that output still needs to be fed into
     //      a hinting process which helps flesh out the full specification of the plugin. The plugin manager should
     //      only deal in concrete terms -- all version finding mumbo jumbo is a customization to base functionality
     //      the plugin manager provides.
-    
+
     public void testRemoteResourcesPlugin()
         throws Exception
     {
         //TODO: turn an equivalent back on when the RR plugin is released.
-        
+
         /*
 
         This will not work until the RR plugin is released to get rid of the binding to the reporting exception which is a mistake.
-        
+
         This happpens after removing the reporting API from the core:
-        
+
         java.lang.NoClassDefFoundError: org/apache/maven/reporting/MavenReportException
-        
-        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );       
+
+        MavenSession session = createMavenSession( getProject( "project-with-inheritance" ) );
         String goal = "process";
-        
+
         Plugin plugin = new Plugin();
         plugin.setGroupId( "org.apache.maven.plugins" );
         plugin.setArtifactId( "maven-remote-resources-plugin" );
         plugin.setVersion( "1.0-beta-2" );
-        
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject(), session.getLocalRepository() );        
+
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getCurrentProject(), session.getLocalRepository() );
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-remote-resources-plugin", "1.0-beta-2" );
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor );
         pluginManager.executeMojo( session, mojoExecution );
         */
     }
-    
+
     //TODO: this will be the basis of the customizable lifecycle execution so need to figure this out quickly.
     public void testSurefirePlugin()
         throws Exception
@@ -151,22 +151,22 @@ public class PluginManagerTest
         plugin.setVersion( "2.4.2" );
 
         // The project has already been fully interpolated so getting the raw mojoDescriptor is not going to have the processes configuration.
-        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );        
+        MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor( plugin, goal, session.getLocalRepository(), session.getCurrentProject().getPluginArtifactRepositories() );
         assertPluginDescriptor( mojoDescriptor, "org.apache.maven.plugins", "maven-surefire-plugin", "2.4.2" );
-        
+
         System.out.println( session.getCurrentProject().getBuild().getPluginsAsMap() );
-        
+
         Xpp3Dom configuration = (Xpp3Dom) session.getCurrentProject().getBuild().getPluginsAsMap().get( plugin.getKey() ).getExecutions().get( 0 ).getConfiguration();
         MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, configuration );
         pluginManager.executeMojo( session, mojoExecution );
         */
     }
-    
+
     public void testMojoConfigurationIsMergedCorrectly()
         throws Exception
     {
     }
-    
+
     /**
      * The case where the user wants to specify an alternate version of the underlying tool. Common case
      * is in the Antlr plugin which comes bundled with a version of Antlr but the user often times needs
@@ -177,7 +177,7 @@ public class PluginManagerTest
     {
     }
 
-    /** 
+    /**
      * The case where you have a plugin in the current build that you want to be used on projects in
      * the current build.
      */
@@ -203,13 +203,13 @@ public class PluginManagerTest
         throws Exception
     {
     }
-    
+
     // test that mojo which does not require dependency resolution trigger no downloading of dependencies
-    
+
     // test interpolation of basedir values in mojo configuration
-    
+
     // test a build where projects use different versions of the same plugin
-    
+
     public void testThatPluginDependencyThatHasSystemScopeIsResolved()
         throws Exception
     {
@@ -218,27 +218,27 @@ public class PluginManagerTest
 
         Plugin plugin = new PluginBuilder( "org.apache.maven", "project-test", "1.0" )
             .addDependency( "org.apache.maven", "system-dependency", "1.0", Artifact.SCOPE_SYSTEM, systemPath.getAbsolutePath() )
-            .get();        
+            .get();
 
         MavenProject pluginProject = new ProjectBuilder( "org.apache.maven", "project-test", "1.0" )
             .addPlugin( plugin )
             .addDependency( "junit", "junit", "3.8.1", Artifact.SCOPE_COMPILE )
-            .get();        
-        
+            .get();
+
         // i'm making this artifact which is assumed to come from a pom in the metadata processor, then it tries to create a POM artifact
         // and parse it for the dependencies and it blows up.
         //
         // we need to pass this through as is so it doesn't get parsed again.
         Artifact pluginArtifact = new ProjectArtifact( pluginProject );
-        
+
         Set<Artifact> artifacts = pluginManager.getPluginArtifacts( pluginArtifact, plugin, getLocalRepository(), getPluginArtifactRepositories() );
         System.out.println( artifacts );
         */
-        
+
         MavenSession session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
         MavenProject project = session.getCurrentProject();
-        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );                
-        
+        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
+
         RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
         repositoryRequest.setLocalRepository( getLocalRepository() );
         repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
@@ -257,23 +257,23 @@ public class PluginManagerTest
                 return;
             }
         }
-        
+
         fail( "Can't find the system scoped dependency in the plugin artifacts." );
     }
-    
+
     // -----------------------------------------------------------------------------------------------
     // Testing help
     // -----------------------------------------------------------------------------------------------
 
     protected void assertPluginDescriptor( MojoDescriptor mojoDescriptor, String groupId, String artifactId, String version )
     {
-        assertNotNull( mojoDescriptor );        
+        assertNotNull( mojoDescriptor );
         PluginDescriptor pd = mojoDescriptor.getPluginDescriptor();
         assertNotNull( pd );
         assertEquals( groupId, pd.getGroupId() );
         assertEquals( artifactId, pd.getArtifactId() );
-        assertEquals( version, pd.getVersion() );        
-    }       
+        assertEquals( version, pd.getVersion() );
+    }
 
     public void testPluginRealmCache()
         throws Exception
@@ -299,7 +299,7 @@ public class PluginManagerTest
             assertNotNull( descriptor.getRealm() );
             assertNotNull( descriptor.getImplementationClass() );
         }
-        
+
         // reload plugin realm from cache
         session = createMavenSession( getProject( "project-contributing-system-scope-plugin-dep" ) );
         project = session.getCurrentProject();

@@ -3,7 +3,7 @@
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>err-resolving-ext-plugin</artifactId>
   <version>1</version>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -14,5 +14,5 @@
       </plugin>
     </plugins>
   </build>
-  
+
 </project>

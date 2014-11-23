@@ -25,7 +25,7 @@ import java.net.URL;
 
 /**
  * Wraps an ordinary {@link URL} as a settings source.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class UrlSettingsSource
@@ -36,7 +36,7 @@ public class UrlSettingsSource
 
     /**
      * Creates a new model source backed by the specified URL.
-     * 
+     *
      * @param settingsUrl The settings URL, must not be {@code null}.
      */
     public UrlSettingsSource( URL settingsUrl )
@@ -61,7 +61,7 @@ public class UrlSettingsSource
 
     /**
      * Gets the settings URL of this model source.
-     * 
+     *
      * @return The underlying settings URL, never {@code null}.
      */
     public URL getSettingsUrl()

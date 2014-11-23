@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Profile}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ProfileTest

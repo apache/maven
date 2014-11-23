@@ -3,7 +3,7 @@
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>bad-maven-version</artifactId>
   <version>1</version>
-  
+
   <prerequisites>
     <maven>10</maven>
   </prerequisites>

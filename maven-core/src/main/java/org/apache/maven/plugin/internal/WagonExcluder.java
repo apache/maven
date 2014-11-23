@@ -30,7 +30,7 @@ import org.eclipse.aether.graph.Dependency;
  * for its use. However, the (old) wagons pulled in transitively via legacy Maven core artifacts are usually not
  * intended as dependencies and more importantly screw up artifact resolution because they would get preferred over the
  * core wagon versions. This is a hack to provide backward-compat with Maven 2 (MNG-4528, MNG-4561).
- * 
+ *
  * @author Benjamin Bentmann
  */
 class WagonExcluder

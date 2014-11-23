@@ -28,7 +28,7 @@ import java.util.List;
  * Signals one ore more errors during settings building. The settings builder tries to collect as many problems as
  * possible before eventually failing to provide callers with rich error information. Use {@link #getProblems()} to
  * query the details of the failure.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class SettingsBuildingException
@@ -39,7 +39,7 @@ public class SettingsBuildingException
 
     /**
      * Creates a new exception with the specified problems.
-     * 
+     *
      * @param problems The problems that causes this exception, may be {@code null}.
      */
     public SettingsBuildingException( List<SettingsProblem> problems )
@@ -55,7 +55,7 @@ public class SettingsBuildingException
 
     /**
      * Gets the problems that caused this exception.
-     * 
+     *
      * @return The problems that caused this exception, never {@code null}.
      */
     public List<SettingsProblem> getProblems()

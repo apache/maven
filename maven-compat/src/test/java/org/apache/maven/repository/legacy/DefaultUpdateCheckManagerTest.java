@@ -59,7 +59,7 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1-SNAPSHOT" );
-        File file = new File( localRepository.getBasedir(), 
+        File file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
@@ -77,7 +77,7 @@ public class DefaultUpdateCheckManagerTest
 
         assertNull( updateCheckManager.readLastUpdated( touchFile,
                                                         updateCheckManager.getRepositoryKey( remoteRepository ) ) );
-        
+
         assertFalse( updateCheckManager.getTouchfile( a ).exists() );
     }
 
@@ -89,7 +89,7 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1-SNAPSHOT" );
-        File file = new File( localRepository.getBasedir(), 
+        File file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
@@ -115,7 +115,7 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1", "pom" );
-        File file = new File( localRepository.getBasedir(), 
+        File file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
@@ -133,7 +133,7 @@ public class DefaultUpdateCheckManagerTest
 
         assertNull( updateCheckManager.readLastUpdated( touchFile,
                                                         updateCheckManager.getRepositoryKey( remoteRepository ) ) );
-        
+
         assertFalse( updateCheckManager.getTouchfile( a ).exists() );
     }
 
@@ -145,7 +145,7 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = createArtifact( "a", "0.0.1", "pom" );
-        File file = new File( localRepository.getBasedir(), 
+        File file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         file.delete();
         a.setFile( file );
@@ -223,14 +223,14 @@ public class DefaultUpdateCheckManagerTest
         ArtifactRepository localRepository = localRepository();
 
         Artifact a = artifactFactory.createArtifactWithClassifier( "groupdId", "a", "0.0.1-SNAPSHOT", "jar", null );
-        File file = new File( localRepository.getBasedir(), 
+        File file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         a.setFile( file );
 
         assertEquals( "a-0.0.1-SNAPSHOT.jar.lastUpdated", updateCheckManager.getTouchfile( a ).getName() );
 
         a = artifactFactory.createArtifactWithClassifier( "groupdId", "a", "0.0.1-SNAPSHOT", "jar", "classifier" );
-        file = new File( localRepository.getBasedir(), 
+        file = new File( localRepository.getBasedir(),
                               localRepository.pathOf( a ) );
         a.setFile( file );
 

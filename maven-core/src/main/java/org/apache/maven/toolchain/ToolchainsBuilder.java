@@ -26,7 +26,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 /**
  * Builds the toolchains model from a previously configured filesystem path to the toolchains file.
  * <strong>Note:</strong> This is an internal component whose interface can change without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ToolchainsBuilder
@@ -34,7 +34,7 @@ public interface ToolchainsBuilder
 
     /**
      * Builds the toolchains model from the configured toolchain files.
-     * 
+     *
      * @param userToolchainsFile The path to the toolchains file, may be <code>null</code> to disable parsing.
      * @return The toolchains model or <code>null</code> if no toolchain file was configured or the configured file does
      *         not exist.

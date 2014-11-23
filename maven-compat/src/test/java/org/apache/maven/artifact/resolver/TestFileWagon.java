@@ -30,7 +30,7 @@ import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.resource.Resource;
 
 /**
- * Wagon used for test cases that annotates some methods. Note that this is not a thread-safe implementation. 
+ * Wagon used for test cases that annotates some methods. Note that this is not a thread-safe implementation.
  */
 public class TestFileWagon
     extends FileWagon
@@ -38,10 +38,10 @@ public class TestFileWagon
     private TestTransferListener testTransferListener;
     private boolean insideGet;
 
-    protected void getTransfer( Resource resource, 
-                                File destination, 
-                                InputStream input, 
-                                boolean closeInput, 
+    protected void getTransfer( Resource resource,
+                                File destination,
+                                InputStream input,
+                                boolean closeInput,
                                 int maxSize )
         throws TransferFailedException
     {
@@ -50,16 +50,16 @@ public class TestFileWagon
     }
 
     public void get( String resourceName, File destination )
-        throws TransferFailedException, 
-               ResourceDoesNotExistException, 
+        throws TransferFailedException,
+               ResourceDoesNotExistException,
                AuthorizationException
     {
         addTransfer( "get " + resourceName );
-        
+
         insideGet = true;
-        
+
         super.get( resourceName, destination );
-        
+
         insideGet = false;
     }
 
@@ -72,8 +72,8 @@ public class TestFileWagon
     }
 
     public boolean getIfNewer( String resourceName, File destination, long timestamp )
-        throws TransferFailedException, 
-               ResourceDoesNotExistException, 
+        throws TransferFailedException,
+               ResourceDoesNotExistException,
                AuthorizationException
     {
         if ( !insideGet )

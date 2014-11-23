@@ -26,16 +26,16 @@ import org.codehaus.plexus.component.annotations.Component;
 @Component(role=ProjectBuilder.class,hint="classpath")
 public class TestProjectBuilder
     extends DefaultProjectBuilder
-{    
-    
+{
+
     @Override
     public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest request )
         throws ProjectBuildingException
-    {                       
+    {
         if ( "maven-test".equals( artifact.getGroupId() ) )
         {
             String scope = artifact.getArtifactId().substring( "scope-".length() );
-            
+
             try
             {
                 artifact.setFile( ProjectClasspathTest.getFileForClasspathResource( ProjectClasspathTest.dir + "transitive-" + scope + "-dep.xml" ) );

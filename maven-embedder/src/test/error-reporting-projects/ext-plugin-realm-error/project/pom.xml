@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>ext-plugin-realm-error</artifactId>
   <version>1</version>
-  
+
   <build>
     <plugins>
       <plugin>

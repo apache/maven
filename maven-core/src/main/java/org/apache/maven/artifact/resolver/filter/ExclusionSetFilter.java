@@ -73,14 +73,14 @@ public class ExclusionSetFilter
         {
             return true;
         }
-        
+
         if ( !( obj instanceof ExclusionSetFilter ) )
         {
             return false;
         }
-        
+
         ExclusionSetFilter other = (ExclusionSetFilter) obj;
-        
+
         return excludes.equals( other.excludes );
     }
 }

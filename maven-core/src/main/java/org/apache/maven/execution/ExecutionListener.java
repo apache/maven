@@ -23,7 +23,7 @@ package org.apache.maven.execution;
  * Defines events that Maven fires during a build. <strong>Warning:</strong> This interface might be extended in future
  * Maven versions to support further events. Hence it is strongly recommended to derive custom listeners from
  * {@link AbstractExecutionListener} in order to avoid interoperability problems.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ExecutionListener

@@ -26,7 +26,7 @@ import org.apache.maven.model.Profile;
 
 /**
  * Collects the output of the model builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelBuildingResult
@@ -37,14 +37,14 @@ public interface ModelBuildingResult
      * constructed. Model identifiers have the form {@code <groupId>:<artifactId>:<version>}. The first identifier from
      * the list denotes the model on which the model builder was originally invoked. The last identifier will always be
      * an empty string that by definition denotes the super POM.
-     * 
+     *
      * @return The model identifiers from the lineage of models, never {@code null}.
      */
     List<String> getModelIds();
 
     /**
      * Gets the assembled model.
-     * 
+     *
      * @return The assembled model, never {@code null}.
      */
     Model getEffectiveModel();
@@ -52,7 +52,7 @@ public interface ModelBuildingResult
     /**
      * Gets the raw model as it was read from the input model source. Apart from basic validation, the raw model has not
      * undergone any updates by the model builder, e.g. reflects neither inheritance nor interpolation.
-     * 
+     *
      * @return The raw model, never {@code null}.
      */
     Model getRawModel();
@@ -62,7 +62,7 @@ public interface ModelBuildingResult
      * undergone any updates by the model builder, e.g. reflects neither inheritance nor interpolation. The model
      * identifier should be from the collection obtained by {@link #getModelIds()}. As a special case, an empty string
      * can be used as the identifier for the super POM.
-     * 
+     *
      * @param modelId The identifier of the desired raw model, must not be {@code null}.
      * @return The raw model or {@code null} if the specified model id does not refer to a known model.
      */
@@ -72,7 +72,7 @@ public interface ModelBuildingResult
      * Gets the profiles from the specified model that were active during model building. The model identifier should be
      * from the collection obtained by {@link #getModelIds()}. As a special case, an empty string can be used as the
      * identifier for the super POM.
-     * 
+     *
      * @param modelId The identifier of the model whose active profiles should be retrieved, must not be {@code null}.
      * @return The active profiles of the model or an empty list if none or {@code null} if the specified model id does
      *         not refer to a known model.
@@ -82,7 +82,7 @@ public interface ModelBuildingResult
     /**
      * Gets the external profiles that were active during model building. External profiles are those that were
      * contributed by {@link ModelBuildingRequest#getProfiles()}.
-     * 
+     *
      * @return The active external profiles or an empty list if none, never {@code null}.
      */
     List<Profile> getActiveExternalProfiles();
@@ -91,7 +91,7 @@ public interface ModelBuildingResult
      * Gets the problems that were encountered during the model building. Note that only problems of severity
      * {@link ModelProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
      * the model builder to fail with a {@link ModelBuildingException}.
-     * 
+     *
      * @return The problems that were encountered during the model building, can be empty but never {@code null}.
      */
     List<ModelProblem> getProblems();

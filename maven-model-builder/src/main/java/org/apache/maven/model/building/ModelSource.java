@@ -27,7 +27,7 @@ import java.io.InputStream;
  * <p>
  * This interface does not support loading of parent POM(s) from the same backing store, integrators are strongly
  * encouraged to implement {@link ModelSource2} instead of implementing this interface directly.
- * 
+ *
  * @author Benjamin Bentmann
  * @see ModelSource2
  */
@@ -36,7 +36,7 @@ public interface ModelSource
 
     /**
      * Gets a byte stream to the POM contents. Closing the returned stream is the responsibility of the caller.
-     * 
+     *
      * @return A byte stream to the POM contents, never {@code null}.
      */
     InputStream getInputStream()
@@ -45,7 +45,7 @@ public interface ModelSource
     /**
      * Provides a user-friendly hint about the location of the POM. This could be a local file path, a URI or just an
      * empty string. The intention is to assist users during error reporting.
-     * 
+     *
      * @return A user-friendly hint about the location of the POM, never {@code null}.
      */
     String getLocation();

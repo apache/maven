@@ -28,7 +28,7 @@ import org.eclipse.aether.graph.DependencyFilter;
  * Caches project class realms. <strong>Warning:</strong> This is an internal utility interface that is only public for
  * technical reasons, it is not part of the public API. In particular, this interface can be changed or deleted without
  * prior notice.
- * 
+ *
  * @author Igor Fedorenko
  * @author Benjamin Bentmann
  */
@@ -70,7 +70,7 @@ public interface ProjectRealmCache
      * Registers the specified cache record for usage with the given project. Integrators can use the information
      * collected from this method in combination with a custom cache implementation to dispose unused records from the
      * cache.
-     * 
+     *
      * @param project The project that employs the plugin realm, must not be {@code null}.
      * @param record The cache record being used for the project, must not be {@code null}.
      */

@@ -29,21 +29,21 @@ import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 
 /**
- * 
+ *
  * A {@link Builder} encapsulates a strategy for building a set of Maven projects. The default strategy in Maven builds the
  * the projects serially, but a {@link Builder} can employ any type of concurrency model to build the projects.
- * 
+ *
  * @author jvanzyl
- * @provisional 
+ * @provisional
  *
  */
 public interface Builder
 {
     //
-    // Be nice to whittle this down to Session, maybe add task segments to the session. The session really is the 
+    // Be nice to whittle this down to Session, maybe add task segments to the session. The session really is the
     // the place to store reactor related information.
     //
     void build( MavenSession session, ReactorContext reactorContext, ProjectBuildList projectBuilds,
                 List<TaskSegment> taskSegments, ReactorBuildStatus reactorBuildStatus )
         throws ExecutionException, InterruptedException;
-} 
+}

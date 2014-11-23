@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles expansion of general build plugin configuration into individual executions.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface PluginConfigurationExpander
@@ -33,7 +33,7 @@ public interface PluginConfigurationExpander
 
     /**
      * Merges values from general build plugin configuration into the individual plugin executions of the given model.
-     * 
+     *
      * @param model The model whose build plugin configuration should be expanded, must not be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.

@@ -5,7 +5,7 @@
     <artifactId>missing-parent-pom-parent</artifactId>
     <version>1</version>
   </parent>
-  
+
   <artifactId>missing-parent-pom</artifactId>
-  
+
 </project>

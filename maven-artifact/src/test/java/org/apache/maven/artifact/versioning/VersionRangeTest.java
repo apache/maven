@@ -53,7 +53,7 @@ public class VersionRangeTest
         throws InvalidVersionSpecificationException, OverConstrainedVersionException
     {
         Artifact artifact = null;
-        
+
         VersionRange range = VersionRange.createFromVersionSpec( "(,1.0]" );
         List<Restriction> restrictions = range.getRestrictions();
         assertEquals( CHECK_NUM_RESTRICTIONS, 1, restrictions.size() );

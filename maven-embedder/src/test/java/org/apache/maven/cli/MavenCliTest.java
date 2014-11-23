@@ -25,20 +25,20 @@ public class MavenCliTest
     extends TestCase
 {
     private MavenCli cli;
-    
+
     protected void setUp()
     {
-        cli = new MavenCli();  
+        cli = new MavenCli();
     }
-    
+
     public void testCalculateDegreeOfConcurrencyWithCoreMultiplier()
     {
-        int cores = Runtime.getRuntime().availableProcessors();        
+        int cores = Runtime.getRuntime().availableProcessors();
         // -T2.2C
         assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "C2.2" ) );
         // -TC2.2
         assertEquals( (int) ( cores * 2.2 ), cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "2.2C" ) );
-        
+
         try
         {
             cli.calculateDegreeOfConcurrencyWithCoreMultiplier( "CXXX" );
@@ -47,6 +47,6 @@ public class MavenCliTest
         catch ( NumberFormatException e )
         {
             // carry on
-        }        
-    }    
+        }
+    }
 }

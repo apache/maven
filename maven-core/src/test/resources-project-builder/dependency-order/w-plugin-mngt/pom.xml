@@ -26,7 +26,7 @@ under the License.
   <artifactId>test</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-4003</name> 
+  <name>Maven Integration Test :: MNG-4003</name>
   <description>
     Verify that dependencies survive the project construction in the POM order.
   </description>

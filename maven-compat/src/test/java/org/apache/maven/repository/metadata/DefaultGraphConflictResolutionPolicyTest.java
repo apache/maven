@@ -22,7 +22,7 @@ import org.codehaus.plexus.PlexusTestCase;
 /**
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
- * 
+ *
  */
 
 public class DefaultGraphConflictResolutionPolicyTest

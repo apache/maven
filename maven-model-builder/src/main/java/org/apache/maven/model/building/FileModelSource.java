@@ -27,7 +27,7 @@ import java.net.URI;
 
 /**
  * Wraps an ordinary {@link File} as a model source.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class FileModelSource
@@ -37,7 +37,7 @@ public class FileModelSource
 
     /**
      * Creates a new model source backed by the specified file.
-     * 
+     *
      * @param pomFile The POM file, must not be {@code null}.
      */
     public FileModelSource( File pomFile )
@@ -62,7 +62,7 @@ public class FileModelSource
 
     /**
      * Gets the POM file of this model source.
-     * 
+     *
      * @return The underlying POM file, never {@code null}.
      */
     public File getPomFile()

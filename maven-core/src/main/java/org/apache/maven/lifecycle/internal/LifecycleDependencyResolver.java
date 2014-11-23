@@ -52,7 +52,7 @@ import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 
 /**
  * Resolves dependencies for the artifacts in context of the lifecycle build
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl

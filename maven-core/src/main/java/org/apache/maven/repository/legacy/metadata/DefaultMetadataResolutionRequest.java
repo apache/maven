@@ -29,7 +29,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 
 /**
  * Forms a request to retrieve artifact metadata.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultMetadataResolutionRequest

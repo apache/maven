@@ -21,7 +21,7 @@ package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to build because no goal was specified.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class NoGoalSpecifiedException
@@ -30,7 +30,7 @@ public class NoGoalSpecifiedException
 
     /**
      * Creates a new exception.
-     * 
+     *
      * @param message The detail message, may be {@code null}.
      */
     public NoGoalSpecifiedException( String message )

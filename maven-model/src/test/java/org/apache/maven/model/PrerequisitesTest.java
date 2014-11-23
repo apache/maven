@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Prerequisites}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class PrerequisitesTest

@@ -30,7 +30,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Provides common services to test {@link ProfileActivator} implementations.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>

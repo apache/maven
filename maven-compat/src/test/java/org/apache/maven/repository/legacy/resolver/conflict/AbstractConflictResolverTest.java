@@ -36,11 +36,11 @@ public abstract class AbstractConflictResolverTest
     extends PlexusTestCase
 {
     // constants --------------------------------------------------------------
-    
+
     private static final String GROUP_ID = "test";
-    
+
     // fields -----------------------------------------------------------------
-    
+
     protected Artifact a1;
 
     protected Artifact a2;
@@ -48,21 +48,21 @@ public abstract class AbstractConflictResolverTest
     protected Artifact b1;
 
     private final String roleHint;
-    
+
     private ArtifactFactory artifactFactory;
 
     private ConflictResolver conflictResolver;
-    
+
     // constructors -----------------------------------------------------------
-    
+
     public AbstractConflictResolverTest( String roleHint )
         throws Exception
     {
         this.roleHint = roleHint;
     }
-    
+
     // TestCase methods -------------------------------------------------------
-    
+
     /*
      * @see junit.framework.TestCase#setUp()
      */
@@ -72,12 +72,12 @@ public abstract class AbstractConflictResolverTest
 
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
         conflictResolver = (ConflictResolver) lookup( ConflictResolver.ROLE, roleHint );
-        
+
         a1 = createArtifact( "a", "1.0" );
         a2 = createArtifact( "a", "2.0" );
         b1 = createArtifact( "b", "1.0" );
     }
-    
+
     /*
      * @see org.codehaus.plexus.PlexusTestCase#tearDown()
      */
@@ -86,24 +86,24 @@ public abstract class AbstractConflictResolverTest
         a1 = null;
         a2 = null;
         b1 = null;
-        
+
         artifactFactory = null;
         conflictResolver = null;
-        
+
         super.tearDown();
     }
-    
+
     // protected methods ------------------------------------------------------
-    
+
     protected ConflictResolver getConflictResolver()
     {
         return conflictResolver;
     }
-    
+
     protected void assertResolveConflict( ResolutionNode expectedNode, ResolutionNode actualNode1, ResolutionNode actualNode2 )
     {
         ResolutionNode resolvedNode = getConflictResolver().resolveConflict( actualNode1, actualNode2 );
-        
+
         assertNotNull( "Expected resolvable", resolvedNode );
         assertEquals( "Resolution node", expectedNode, resolvedNode );
     }
@@ -111,7 +111,7 @@ public abstract class AbstractConflictResolverTest
     protected void assertUnresolvableConflict( ResolutionNode actualNode1, ResolutionNode actualNode2 )
     {
         ResolutionNode resolvedNode = getConflictResolver().resolveConflict( actualNode1, actualNode2 );
-        
+
         assertNull( "Expected unresolvable", resolvedNode );
     }
 
@@ -136,7 +136,7 @@ public abstract class AbstractConflictResolverTest
         throws InvalidVersionSpecificationException
     {
         VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-        
+
         return artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope,
                                                          inheritedScope, optional );
     }

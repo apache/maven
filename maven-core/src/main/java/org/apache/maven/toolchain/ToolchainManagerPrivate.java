@@ -24,7 +24,7 @@ import org.apache.maven.execution.MavenSession;
 
 /**
  * Component for use by the <code>maven-toolchains-plugin</code> only.
- * 
+ *
  * @author mkleint
  * @since 2.0.9
  */
@@ -33,7 +33,7 @@ public interface ToolchainManagerPrivate
 
     /**
      * Retrieves the toolchains of given type from the user settings.
-     * 
+     *
      * @since 3.0 (addition of the <code>MavenSession</code> parameter)
      */
     ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
@@ -41,7 +41,7 @@ public interface ToolchainManagerPrivate
 
     /**
      * Stores the toolchain into build context.
-     * 
+     *
      * @since 2.0.9
      */
     void storeToolchainToBuildContext( ToolchainPrivate toolchain, MavenSession context );

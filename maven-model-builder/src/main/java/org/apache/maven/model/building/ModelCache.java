@@ -25,7 +25,7 @@ package org.apache.maven.model.building;
  * formed by a combination of group id, artifact id, version and tag. The first three components generally refer to the
  * identify of a model. The tag allows for further classification of the associated data on the sole discretion of the
  * model builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelCache
@@ -33,7 +33,7 @@ public interface ModelCache
 
     /**
      * Puts the specified data into the cache.
-     * 
+     *
      * @param groupId The group id of the cache record, must not be {@code null}.
      * @param artifactId The artifact id of the cache record, must not be {@code null}.
      * @param version The version of the cache record, must not be {@code null}.
@@ -44,7 +44,7 @@ public interface ModelCache
 
     /**
      * Gets the specified data from the cache.
-     * 
+     *
      * @param groupId The group id of the cache record, must not be {@code null}.
      * @param artifactId The artifact id of the cache record, must not be {@code null}.
      * @param version The version of the cache record, must not be {@code null}.

@@ -33,7 +33,7 @@ under the License.
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4070 :: Child</name> 
+  <name>Maven Integration Test :: MNG-4070 :: Child</name>
   <description>
     Test that whitespace around artifact coordinates does not change artifact identity.
   </description>

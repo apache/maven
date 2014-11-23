@@ -34,7 +34,7 @@ import org.apache.maven.plugin.MojoExecution;
 /**
  * A stub implementation that assumes an empty lifecycle to bypass interaction with the plugin manager and to avoid
  * plugin artifact resolution from repositories.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class EmptyLifecycleExecutor
@@ -50,7 +50,7 @@ public class EmptyLifecycleExecutor
     {
         return new MavenExecutionPlan( null, null );
     }
-    
+
     public void execute( MavenSession session )
     {
     }

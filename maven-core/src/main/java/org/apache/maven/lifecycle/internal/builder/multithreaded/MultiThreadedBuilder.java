@@ -45,7 +45,7 @@ import org.codehaus.plexus.logging.Logger;
 
 /**
  * Builds the full lifecycle in weave-mode (phase by phase as opposed to project-by-project)
- * 
+ *
  * @since 3.0
  * @author Kristian Rosenvold
  *         Builds one or more lifecycles for a full module
@@ -79,7 +79,7 @@ public class MultiThreadedBuilder
         CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
         ConcurrencyDependencyGraph analyzer =
             new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
-        
+
         // Currently disabled
         ThreadOutputMuxer muxer = null; // new ThreadOutputMuxer( analyzer.getProjectBuilds(), System.out );
 

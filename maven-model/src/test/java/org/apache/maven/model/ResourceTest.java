@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Resource}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ResourceTest

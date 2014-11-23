@@ -28,7 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * A basic bean configuration request.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultBeanConfigurationRequest
@@ -83,7 +83,7 @@ public class DefaultBeanConfigurationRequest
     /**
      * Sets the configuration to the configuration taken from the specified build plugin in the POM. First, the build
      * plugins will be searched for the specified plugin, if that fails, the plugin management section will be searched.
-     * 
+     *
      * @param model The POM to extract the plugin configuration from, may be {@code null}.
      * @param pluginGroupId The group id of the plugin whose configuration should be used, must not be {@code null} or
      *            empty.

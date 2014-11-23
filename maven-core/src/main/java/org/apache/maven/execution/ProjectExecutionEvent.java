@@ -27,7 +27,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * Encapsulates parameters of ProjectExecutionListener callback methods and is meant to provide API evolution path
  * should it become necessary to introduce new parameters in the existing callbacks in the future.
- * 
+ *
  * @see ProjectExecutionListener
  * @since 3.1.2
  * @provisional This class is part of work in progress and can be changed or removed without notice.

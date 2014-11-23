@@ -21,7 +21,7 @@ package org.apache.maven.configuration;
 
 /**
  * Thrown when a bean couldn't be configured.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class BeanConfigurationException

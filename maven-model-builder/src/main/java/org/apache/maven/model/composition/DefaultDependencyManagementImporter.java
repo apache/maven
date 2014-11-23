@@ -33,7 +33,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Handles the import of dependency management from other models into the target model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = DependencyManagementImporter.class )

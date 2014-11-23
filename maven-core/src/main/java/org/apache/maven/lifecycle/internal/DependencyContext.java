@@ -28,7 +28,7 @@ import java.util.TreeSet;
 
 /**
  * Context of dependency artifacts for a particular project.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold (class extract only)

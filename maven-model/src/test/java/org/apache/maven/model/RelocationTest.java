@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Relocation}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class RelocationTest

@@ -66,7 +66,7 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
  * technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
  * prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ProjectBuildingHelper.class )
@@ -255,7 +255,7 @@ public class DefaultProjectBuildingHelper
 
             ClassRealm extensionRealm;
             ExtensionDescriptor extensionDescriptor = null;
-            
+
             final ExtensionRealmCache.Key extensionKey = extensionRealmCache.createKey( artifacts );
 
             ExtensionRealmCache.CacheRecord recordRealm = extensionRealmCache.get( extensionKey );

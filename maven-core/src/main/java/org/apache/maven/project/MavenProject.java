@@ -227,7 +227,7 @@ public class MavenProject
 
     /**
      * Returns the project corresponding to a declared parent.
-     * 
+     *
      * @return the parent, or null if no parent is declared or there was an error building it
      */
     public MavenProject getParent()
@@ -690,7 +690,7 @@ public class MavenProject
      * All dependencies that this project has, including transitive ones. Contents are lazily populated, so depending on
      * what phases have run dependencies in some scopes won't be included. eg. if only compile phase has run,
      * dependencies with scope test won't be included.
-     * 
+     *
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getDependencyArtifacts() to get only direct dependencies
      */
@@ -894,7 +894,7 @@ public class MavenProject
      * {@code settings.xml}. The profile identifiers are grouped by the identifier of their source, e.g.
      * {@code <groupId>:<artifactId>:<version>} for a POM profile or {@code external} for profiles from the
      * {@code settings.xml}.
-     * 
+     *
      * @return The identifiers of all injected profiles, indexed by the source from which the profiles originated, never
      *         {@code null}.
      */
@@ -909,7 +909,7 @@ public class MavenProject
      * 3.0.x. Historically, it logged and ignored a second addition of the same g/a/v/c/t. Now it replaces the file for
      * the artifact, so that plugins (e.g. shade) can change the pathname of the file for a particular set of
      * coordinates.
-     * 
+     *
      * @param artifact the artifact to add or replace.
      * @throws DuplicateArtifactAttachmentException
      */
@@ -986,7 +986,7 @@ public class MavenProject
 
     /**
      * Direct dependencies that this project has.
-     * 
+     *
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getArtifacts() to get all transitive dependencies
      */
@@ -1352,7 +1352,7 @@ public class MavenProject
      * Sets the project's class realm. <strong>Warning:</strong> This is an internal utility method that is only public
      * for technical reasons, it is not part of the public API. In particular, this method can be changed or deleted
      * without prior notice and must not be used by plugins.
-     * 
+     *
      * @param classRealm The class realm hosting the build extensions of this project, may be {@code null}.
      */
     public void setClassRealm( ClassRealm classRealm )
@@ -1365,7 +1365,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     * 
+     *
      * @return The project's class realm or {@code null}.
      */
     public ClassRealm getClassRealm()
@@ -1377,7 +1377,7 @@ public class MavenProject
      * Sets the artifact filter used to exclude shared extension artifacts from plugin realms. <strong>Warning:</strong>
      * This is an internal utility method that is only public for technical reasons, it is not part of the public API.
      * In particular, this method can be changed or deleted without prior notice and must not be used by plugins.
-     * 
+     *
      * @param extensionDependencyFilter The dependency filter to apply to plugins, may be {@code null}.
      */
     public void setExtensionDependencyFilter( DependencyFilter extensionDependencyFilter )
@@ -1390,7 +1390,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     * 
+     *
      * @return The dependency filter or {@code null}.
      */
     public DependencyFilter getExtensionDependencyFilter()
@@ -1403,7 +1403,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     * 
+     *
      * @param artifacts The set of artifacts, may be {@code null}.
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
@@ -1418,7 +1418,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     * 
+     *
      * @param artifactFilter The artifact filter, may be {@code null} to exclude all artifacts.
      */
     public void setArtifactFilter( ArtifactFilter artifactFilter )
@@ -1432,7 +1432,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     * 
+     *
      * @param phase The phase to check for, must not be {@code null}.
      * @return {@code true} if the phase has been seen.
      */
@@ -1445,7 +1445,7 @@ public class MavenProject
      * <strong>Warning:</strong> This is an internal utility method that is only public for technical reasons, it is not
      * part of the public API. In particular, this method can be changed or deleted without prior notice and must not be
      * used by plugins.
-     * 
+     *
      * @param lifecyclePhase The lifecycle phase to add, must not be {@code null}.
      */
     public void addLifecyclePhase( String lifecyclePhase )
@@ -1523,8 +1523,8 @@ public class MavenProject
         }
 
         return moduleAdjustments.get( module );
-    }    
-    
+    }
+
     @Deprecated
     public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter )
         throws InvalidDependencyVersionException
@@ -1688,8 +1688,8 @@ public class MavenProject
             }
         }
         return list;
-    }    
-    
+    }
+
     @Deprecated
     public List<Artifact> getRuntimeArtifacts()
     {
@@ -1706,8 +1706,8 @@ public class MavenProject
             }
         }
         return list;
-    }    
-    
+    }
+
     @Deprecated
     public List<String> getSystemClasspathElements()
         throws DependencyResolutionRequiredException
@@ -1944,7 +1944,7 @@ public class MavenProject
     /**
      * Gets the project building request from which this project instance was created. <strong>Warning:</strong> This is
      * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
-     * 
+     *
      * @return The project building request or {@code null}.
      * @since 2.1
      */
@@ -1957,7 +1957,7 @@ public class MavenProject
     /**
      * Sets the project building request from which this project instance was created. <strong>Warning:</strong> This is
      * an utility method that is meant to assist integrators of Maven, it must not be used by Maven plugins.
-     * 
+     *
      * @param projectBuildingRequest The project building request, may be {@code null}.
      * @since 2.1
      */

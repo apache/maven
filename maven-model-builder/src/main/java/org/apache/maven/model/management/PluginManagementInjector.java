@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles injection of plugin management into the model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface PluginManagementInjector
@@ -33,7 +33,7 @@ public interface PluginManagementInjector
 
     /**
      * Merges default values from the plugin management section of the given model into itself.
-     * 
+     *
      * @param model The model into which to merge the values specified by its plugin management section, must not be
      *            <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.

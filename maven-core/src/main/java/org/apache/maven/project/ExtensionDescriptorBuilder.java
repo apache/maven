@@ -37,7 +37,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Creates an extension descriptor from some XML stream.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class ExtensionDescriptorBuilder
@@ -50,7 +50,7 @@ class ExtensionDescriptorBuilder
 
     /**
      * Extracts the extension descriptor (if any) from the specified JAR file.
-     * 
+     *
      * @param extensionJar The JAR file or directory to extract the descriptor from, must not be {@code null}.
      * @return The extracted descriptor or {@code null} if no descriptor was found.
      * @throws IOException If the descriptor is present but could not be parsed.

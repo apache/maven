@@ -23,7 +23,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 
 /**
  * Assists unit testing.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class TestArtifactHandler

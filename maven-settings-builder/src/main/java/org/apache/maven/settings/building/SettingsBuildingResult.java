@@ -25,7 +25,7 @@ import org.apache.maven.settings.Settings;
 
 /**
  * Collects the output of the settings builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsBuildingResult
@@ -33,7 +33,7 @@ public interface SettingsBuildingResult
 
     /**
      * Gets the assembled settings.
-     * 
+     *
      * @return The assembled settings, never {@code null}.
      */
     Settings getEffectiveSettings();
@@ -42,7 +42,7 @@ public interface SettingsBuildingResult
      * Gets the problems that were encountered during the settings building. Note that only problems of severity
      * {@link SettingsProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
      * the settings builder to fail with a {@link SettingsBuildingException}.
-     * 
+     *
      * @return The problems that were encountered during the settings building, can be empty but never {@code null}.
      */
     List<SettingsProblem> getProblems();

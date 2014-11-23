@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Site}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class SiteTest

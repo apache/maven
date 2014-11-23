@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-2174</name> 
+  <name>Maven Integration Test :: MNG-2174</name>
   <description>
     Verify that plugin dependencies defined by plugin management of a parent profile are not lost when the
     parent's main plugin management section is also present.

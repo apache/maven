@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Handles deserialization of settings from the default textual format.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = SettingsReader.class )

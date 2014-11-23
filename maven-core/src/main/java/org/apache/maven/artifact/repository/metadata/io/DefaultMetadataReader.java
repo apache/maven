@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Handles deserialization of metadata from some kind of textual format like XML.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = MetadataReader.class )

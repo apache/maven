@@ -3,14 +3,14 @@
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>project-dep-missing</artifactId>
   <version>1</version>
-  
+
   <repositories>
     <repository>
       <id>central</id>
       <url>file://${java.io.tmpdir}</url>
     </repository>
   </repositories>
-  
+
   <dependencies>
     <dependency>
       <groupId>not</groupId>
@@ -18,5 +18,5 @@
       <version>3.8.1</version>
     </dependency>
   </dependencies>
-  
+
 </project>

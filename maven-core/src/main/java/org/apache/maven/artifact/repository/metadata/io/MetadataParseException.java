@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * Signals a failure to parse the metadata due to invalid syntax (e.g. non-wellformed XML or unknown elements).
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MetadataParseException
@@ -42,7 +42,7 @@ public class MetadataParseException
 
     /**
      * Creates a new parser exception with the specified details.
-     * 
+     *
      * @param message The error message, may be {@code null}.
      * @param lineNumber The one-based index of the line containing the error or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
@@ -56,7 +56,7 @@ public class MetadataParseException
 
     /**
      * Creates a new parser exception with the specified details.
-     * 
+     *
      * @param message The error message, may be {@code null}.
      * @param lineNumber The one-based index of the line containing the error or {@code -1} if unknown.
      * @param columnNumber The one-based index of the column containing the error or {@code -1} if unknown.
@@ -72,7 +72,7 @@ public class MetadataParseException
 
     /**
      * Gets the one-based index of the line containing the error.
-     * 
+     *
      * @return The one-based index of the line containing the error or a non-positive value if unknown.
      */
     public int getLineNumber()
@@ -82,7 +82,7 @@ public class MetadataParseException
 
     /**
      * Gets the one-based index of the column containing the error.
-     * 
+     *
      * @return The one-based index of the column containing the error or non-positive value if unknown.
      */
     public int getColumnNumber()

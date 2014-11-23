@@ -43,7 +43,7 @@ import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 /**
  * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either
  * as packaged jar if it has been built, or only compile output directory if packaging hasn't happened yet.
- * 
+ *
  * @author Jason van Zyl
  */
 @Named( ReactorReader.HINT )
@@ -52,7 +52,7 @@ class ReactorReader
     implements WorkspaceReader
 {
     public static final String HINT = "reactor";
-    
+
     private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
@@ -193,7 +193,7 @@ class ReactorReader
 
     /**
      * Tries to resolve the specified artifact from the artifacts of the given project.
-     * 
+     *
      * @param project The project to try to resolve the artifact from, must not be <code>null</code>.
      * @param requestedArtifact The artifact to resolve, must not be <code>null</code>.
      * @return The matching artifact from the project or <code>null</code> if not found. Note that this
@@ -234,7 +234,7 @@ class ReactorReader
 
     /**
      * Determines whether the specified artifact refers to test classes.
-     * 
+     *
      * @param artifact The artifact to check, must not be {@code null}.
      * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
      */

@@ -23,7 +23,7 @@ under the License.
   <groupId>foo</groupId>
   <version>99.44</version>
   <packaging>bleh</packaging>
-  
+
   <modules>
     <module>test-module</module>
   </modules>

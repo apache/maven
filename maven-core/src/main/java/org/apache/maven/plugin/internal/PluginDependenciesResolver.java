@@ -33,7 +33,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * Assists in resolving the dependencies of a plugin. <strong>Warning:</strong> This is an internal utility interface
  * that is only public for technical reasons, it is not part of the public API. In particular, this interface can be
  * changed or deleted without prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -42,7 +42,7 @@ public interface PluginDependenciesResolver
 
     /**
      * Resolves the main artifact of the specified plugin.
-     * 
+     *
      * @param plugin The plugin for which to resolve the main artifact, must not be {@code null}.
      * @param repositories The plugin repositories to use for resolving the plugin's main artifact, must not be {@code
      *            null}.
@@ -55,7 +55,7 @@ public interface PluginDependenciesResolver
 
     /**
      * Resolves the runtime dependencies of the specified plugin.
-     * 
+     *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param pluginArtifact The plugin's main artifact, may be {@code null}.
      * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.

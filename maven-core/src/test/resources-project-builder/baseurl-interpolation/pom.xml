@@ -26,7 +26,7 @@ under the License.
   <artifactId>test1</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: MNG-3760</name> 
+  <name>Maven Integration Test :: MNG-3760</name>
   <description>
     Test interpolation of ${project.baseUri}
   </description>

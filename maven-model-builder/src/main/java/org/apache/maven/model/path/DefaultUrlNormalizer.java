@@ -23,7 +23,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Normalizes a URL.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = UrlNormalizer.class )

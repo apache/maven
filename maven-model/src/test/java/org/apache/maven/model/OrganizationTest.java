@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Organization}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class OrganizationTest

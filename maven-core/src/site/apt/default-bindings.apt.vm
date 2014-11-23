@@ -22,7 +22,7 @@
  ---
  2013-08-02
  ---
-  
+
 Plugin Bindings for <<<default>>> Lifecycle Reference
 
   The {{{./lifecycles.html}<<<default>>> lifecycle}} is defined without any plugin binding; plugin bindings are defined separately
@@ -65,4 +65,3 @@ Plugin Bindings for <<<default>>> Lifecycle Reference
 * Plugin bindings for <<<par>>> packaging
 
 %{snippet|id=par-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
-  

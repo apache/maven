@@ -31,11 +31,11 @@ public class MojoExecution
 {
 
     private Plugin plugin;
-    
+
     private String goal;
-    
+
     private String executionId;
-    
+
     private MojoDescriptor mojoDescriptor;
 
     private Xpp3Dom configuration;
@@ -77,7 +77,7 @@ public class MojoExecution
         this.goal = goal;
         this.executionId = executionId;
     }
-    
+
     public MojoExecution( MojoDescriptor mojoDescriptor )
     {
         this.mojoDescriptor = mojoDescriptor;
@@ -109,7 +109,7 @@ public class MojoExecution
 
     /**
      * Gets the source of this execution.
-     * 
+     *
      * @return The source of this execution or {@code null} if unknown.
      */
     public Source getSource()
@@ -146,14 +146,14 @@ public class MojoExecution
     {
         this.configuration = configuration;
     }
-    
+
     public String identify()
     {
         StringBuilder sb = new StringBuilder( 256 );
-        
+
         sb.append( executionId );
         sb.append( configuration.toString() );
-        
+
         return sb.toString();
     }
 
@@ -165,7 +165,7 @@ public class MojoExecution
     public void setLifecyclePhase( String lifecyclePhase )
     {
         this.lifecyclePhase = lifecyclePhase;
-    }        
+    }
 
     @Override
     public String toString()
@@ -185,7 +185,7 @@ public class MojoExecution
         {
             return mojoDescriptor.getPluginDescriptor().getGroupId();
         }
-        
+
         return plugin.getGroupId();
     }
 
@@ -195,7 +195,7 @@ public class MojoExecution
         {
             return mojoDescriptor.getPluginDescriptor().getArtifactId();
         }
-        
+
         return plugin.getArtifactId();
     }
 
@@ -204,8 +204,8 @@ public class MojoExecution
         if ( mojoDescriptor != null )
         {
             return mojoDescriptor.getPluginDescriptor().getVersion();
-        }        
-        
+        }
+
         return plugin.getVersion();
     }
 
@@ -215,7 +215,7 @@ public class MojoExecution
         {
             return mojoDescriptor.getGoal();
         }
-        
+
         return goal;
     }
 

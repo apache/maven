@@ -30,7 +30,7 @@ under the License.
 
   <artifactId>child</artifactId>
 
-  <name>Maven Integration Test :: MNG-3938</name> 
+  <name>Maven Integration Test :: MNG-3938</name>
   <description>
     Test that plugin executions with the same id are merged during inheritance, especially executions using the
     default id, regardless whether the id is given explicitly by the user or implicitly assumed from defaults.

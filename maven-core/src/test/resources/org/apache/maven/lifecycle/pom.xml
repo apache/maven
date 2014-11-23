@@ -45,22 +45,22 @@ under the License.
   <properties>
     <classWorldsVersion>1.3</classWorldsVersion>
     <commonsCliVersion>1.0</commonsCliVersion>
-    <!-- 
-    
+    <!--
+
     Do not update this, Doxia will be decoupled completely from 3.x and someone can
-    create a rendering engine for it if they like when the release stabilizes. JVZ 
-    
+    create a rendering engine for it if they like when the release stabilizes. JVZ
+
     -->
     <doxiaVersion>1.0-alpha-9</doxiaVersion>
     <easyMockVersion>1.2_Java1.3</easyMockVersion>
-    <junitVersion>3.8.1</junitVersion>    
+    <junitVersion>3.8.1</junitVersion>
     <plexusVersion>1.0-beta-3.0.7-SNAPSHOT</plexusVersion>
     <plexusInteractivityVersion>1.0-alpha-6</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.1</plexusInterpolationVersion>
     <plexusPluginManagerVersion>1.0-alpha-1</plexusPluginManagerVersion>
     <plexusUtilsVersion>1.5.8</plexusUtilsVersion>
     <plexusJetty6Version>1.6</plexusJetty6Version>
-    <plexusWebdavVersion>1.0</plexusWebdavVersion>    
+    <plexusWebdavVersion>1.0</plexusWebdavVersion>
     <wagonVersion>1.0-beta-4</wagonVersion>
     <modelBuilderVersion>1.7-SNAPSHOT</modelBuilderVersion>
     <mercuryVersion>1.0-alpha-6-SNAPSHOT</mercuryVersion>
@@ -247,7 +247,7 @@ under the License.
     <module>maven-toolchain</module>
     <module>maven-compat</module>
     <module>maven-repository</module>
-    <module>maven-repository-mercury</module>    
+    <module>maven-repository-mercury</module>
   </modules>
   <!--start-->
   <dependencies>
@@ -366,11 +366,11 @@ under the License.
           </exclusion>
         </exclusions>
       </dependency>
-      
+
       <!--  Plexus test dependencies -->
       <dependency>
-        <groupId>org.sonatype.plexus</groupId>                                                                                
-        <artifactId>plexus-jetty6</artifactId>                                                                                
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-jetty6</artifactId>
         <version>${plexusJetty6Version}</version>
         <scope>test</scope>
       </dependency>
@@ -380,7 +380,7 @@ under the License.
         <version>${plexusWebdavVersion}</version>
         <scope>test</scope>
       </dependency>
-      
+
       <!--  Wagon -->
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>

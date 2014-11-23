@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Reporting}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ReportingTest

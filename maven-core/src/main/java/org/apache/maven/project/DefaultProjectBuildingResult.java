@@ -27,7 +27,7 @@ import org.apache.maven.model.building.ModelProblem;
 
 /**
  * Collects the output of the project builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class DefaultProjectBuildingResult
@@ -46,7 +46,7 @@ class DefaultProjectBuildingResult
 
     /**
      * Creates a new result with the specified contents.
-     * 
+     *
      * @param project The project that was built, may be {@code null}.
      * @param problems The problems that were encouterned, may be {@code null}.
      * @param dependencyResolutionResult The result of the resolution for the project dependencies, may be {@code null}.
@@ -65,7 +65,7 @@ class DefaultProjectBuildingResult
 
     /**
      * Creates a new result with the specified contents.
-     * 
+     *
      * @param projectId The identifier of the project, may be {@code null}.
      * @param pomFile The POM file from which the project was built, may be {@code null}.
      * @param problems The problems that were encouterned, may be {@code null}.

@@ -30,7 +30,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 /**
  * Normalizes URLs to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
  * model inheritance.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ModelUrlNormalizer.class )

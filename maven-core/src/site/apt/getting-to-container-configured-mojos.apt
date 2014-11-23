@@ -34,9 +34,9 @@ Abstract
   If these mojos are to be first-class components, the configuration from these
   various sources must be consolidated and injected using the container.
 
-  Currently, mojo configuration is done externally to the container, in the 
+  Currently, mojo configuration is done externally to the container, in the
   DefaultPluginManager in the maven-core API. In order to get from here to
-  there, we need to do several things to add capability to the default 
+  there, we need to do several things to add capability to the default
   configuration of plexus. This document will detail those changes.
 
 Container Enhancements
@@ -59,7 +59,7 @@ Container Enhancements
   components. This wouldn't be a problem, except for the local instance of
   DefaultExpressionEvaluator used within. See the above discussion for more
   on why this evaluator is bad. We need to provide either an alternative
-  implementation under a different roleHint, or else replace the 
+  implementation under a different roleHint, or else replace the
   BasicComponentConfigurator.
 
 * Other
@@ -95,7 +95,7 @@ Maven Modifications
 
 * MavenSession
 
-  We may need to enable the context injection here, since this will be 
+  We may need to enable the context injection here, since this will be
   instantiated per-project. If we always inject the same context parameters,
   and are careful to inject nulls where things are missing, we should be
   able to minimize reconfiguration artifacts injected from basic parameters.

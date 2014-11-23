@@ -43,7 +43,7 @@ public interface ModelSource2
      * <li>point either at file or directory, in the latter case POM file name 'pom.xml' needs to be used by the
      * requested model source.</li>
      * </ul>
-     * 
+     *
      * @param relPath is the path of the requested model source relative to this model source POM.
      * @return related model source or <code>null</code> if no such model source.
      */

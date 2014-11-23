@@ -25,7 +25,7 @@ import java.net.URL;
 
 /**
  * Wraps an ordinary {@link URL} as a model source.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class UrlModelSource
@@ -36,7 +36,7 @@ public class UrlModelSource
 
     /**
      * Creates a new model source backed by the specified URL.
-     * 
+     *
      * @param pomUrl The POM file, must not be {@code null}.
      */
     public UrlModelSource( URL pomUrl )
@@ -61,7 +61,7 @@ public class UrlModelSource
 
     /**
      * Gets the POM URL of this model source.
-     * 
+     *
      * @return The underlying POM URL, never {@code null}.
      */
     public URL getPomUrl()

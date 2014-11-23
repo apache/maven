@@ -57,7 +57,7 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><td><code>*</code></td>                 <td></td>               <td>project properties</td></tr>
  * </table>
  * <i>Notice:</i> <code>reports</code> was supported in Maven 2.x but was removed in Maven 3
- * 
+ *
  * @author Jason van Zyl
  * @see MavenSession
  * @see MojoExecution

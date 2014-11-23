@@ -21,7 +21,7 @@ package org.apache.maven.artifact.repository.metadata;
 
 /**
  * Assists in handling repository metadata.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class MetadataUtils

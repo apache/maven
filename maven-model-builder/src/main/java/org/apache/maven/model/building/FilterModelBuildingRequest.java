@@ -30,7 +30,7 @@ import org.apache.maven.model.resolution.ModelResolver;
 /**
  * A model building request that delegates all methods invocations to another request, meant for easy transformations by
  * subclassing.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class FilterModelBuildingRequest

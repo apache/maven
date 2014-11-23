@@ -23,7 +23,7 @@ import org.eclipse.aether.repository.ArtifactRepository;
 
 /**
  * Describes the result of a plugin version resolution request.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -32,14 +32,14 @@ public interface PluginVersionResult
 
     /**
      * The resolved plugin version.
-     * 
+     *
      * @return The resolved plugin version, never {@code null}.
      */
     String getVersion();
 
     /**
      * The repository from which the plugin version was resolved.
-     * 
+     *
      * @return The repository from which the plugin version was resolved, never {@code null}.
      */
     ArtifactRepository getRepository();

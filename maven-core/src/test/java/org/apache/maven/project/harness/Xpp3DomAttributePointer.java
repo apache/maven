@@ -26,7 +26,7 @@ import org.apache.commons.jxpath.ri.model.NodePointer;
 
 /**
  * An attribute pointer for JXPath to support <code>Xpp3Dom</code>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class Xpp3DomAttributePointer

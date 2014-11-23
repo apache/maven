@@ -36,11 +36,11 @@ public final class ModelProblemCollectorRequest
     private Exception exception;
     private String message;
     private InputLocation location;
-    
+
     /**
      * Create a new request with mandatory parameters.
      * @param severity
-     * @param version 
+     * @param version
      */
     public ModelProblemCollectorRequest( Severity severity, Version version )
     {

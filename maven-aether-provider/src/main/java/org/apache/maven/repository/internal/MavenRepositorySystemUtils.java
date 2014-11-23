@@ -52,7 +52,7 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
  * A utility class to assist in setting up a Maven-like repository system. <em>Note:</em> This component is meant to
  * assist those clients that employ the repository system outside of an IoC container, Maven plugins should instead
  * always use regular dependency injection to acquire the repository system.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public final class MavenRepositorySystemUtils
@@ -66,7 +66,7 @@ public final class MavenRepositorySystemUtils
     /**
      * Creates a new service locator that already knows about all service implementations included in this library. To
      * acquire a complete repository system, clients need to add some repository connectors for remote transfers.
-     * 
+     *
      * @return The new service locator, never {@code null}.
      */
     public static DefaultServiceLocator newServiceLocator()
@@ -85,7 +85,7 @@ public final class MavenRepositorySystemUtils
      * Maven-based resolution. In more detail, this method configures settings relevant for the processing of dependency
      * graphs, most other settings remain at their generic default value. Use the various setters to further configure
      * the session with authentication, mirror, proxy and other information required for your environment.
-     * 
+     *
      * @return The new repository system session, never {@code null}.
      */
     public static DefaultRepositorySystemSession newSession()
@@ -126,7 +126,7 @@ public final class MavenRepositorySystemUtils
 
         session.setArtifactDescriptorPolicy( new SimpleArtifactDescriptorPolicy( true, true ) );
 
-        // MNG-5670 guard against ConcurrentModificationException  
+        // MNG-5670 guard against ConcurrentModificationException
         Properties sysProps = new Properties();
         for ( String key : System.getProperties().stringPropertyNames() )
         {

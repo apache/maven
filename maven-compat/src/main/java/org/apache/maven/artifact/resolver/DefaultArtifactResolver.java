@@ -74,7 +74,7 @@ import org.eclipse.aether.resolution.ArtifactResult;
 public class DefaultArtifactResolver
     implements ArtifactResolver, Disposable
 {
-    @Requirement 
+    @Requirement
     private Logger logger;
 
     @Requirement
@@ -88,7 +88,7 @@ public class DefaultArtifactResolver
 
     @Requirement
     private ArtifactMetadataSource source;
-    
+
     @Requirement
     private PlexusContainer container;
 
@@ -169,7 +169,7 @@ public class DefaultArtifactResolver
         {
             return;
         }
-        
+
         if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
         {
             File systemFile = artifact.getFile();
@@ -190,7 +190,7 @@ public class DefaultArtifactResolver
             }
 
             artifact.setResolved( true );
-            
+
             return;
         }
 
@@ -322,7 +322,7 @@ public class DefaultArtifactResolver
             .setArtifact( originatingArtifact )
             .setResolveRoot( false )
             // This is required by the surefire plugin
-            .setArtifactDependencies( artifacts )            
+            .setArtifactDependencies( artifacts )
             .setManagedVersionMap( managedVersions )
             .setLocalRepository( localRepository )
             .setRemoteRepositories( remoteRepositories )
@@ -358,10 +358,10 @@ public class DefaultArtifactResolver
         Set<Artifact> artifacts = request.getArtifactDependencies();
         Map<String, Artifact> managedVersions = request.getManagedVersionMap();
         List<ResolutionListener> listeners = request.getListeners();
-        ArtifactFilter collectionFilter = request.getCollectionFilter();                       
+        ArtifactFilter collectionFilter = request.getCollectionFilter();
         ArtifactFilter resolutionFilter = request.getResolutionFilter();
         RepositorySystemSession session = getSession( request.getLocalRepository() );
-        
+
         //TODO: hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the workspace
         if ( source == null )
         {
@@ -393,9 +393,9 @@ public class DefaultArtifactResolver
         // This is often an artifact like a POM that is taken from disk and we already have hold of the
         // file reference. But this may be a Maven Plugin that we need to resolve from a remote repository
         // as well as its dependencies.
-                        
+
         if ( request.isResolveRoot() /* && rootArtifact.getFile() == null */ )
-        {            
+        {
             try
             {
                 resolve( rootArtifact, request.getRemoteRepositories(), session );
@@ -470,7 +470,7 @@ public class DefaultArtifactResolver
                 return result;
             }
         }
-        
+
         if ( artifacts == null || artifacts.isEmpty() )
         {
             if ( request.isResolveRoot() )
@@ -478,13 +478,13 @@ public class DefaultArtifactResolver
                 result.addArtifact( rootArtifact );
             }
             return result;
-        } 
+        }
 
         // After the collection we will have the artifact object in the result but they will not be resolved yet.
         result =
             artifactCollector.collect( artifacts, rootArtifact, managedVersions, collectionRequest, source,
                                        collectionFilter, listeners, null );
-                        
+
         // We have metadata retrieval problems, or there are cycles that have been detected
         // so we give this back to the calling code and let them deal with this information
         // appropriately.
@@ -528,14 +528,14 @@ public class DefaultArtifactResolver
         // We want to send the root artifact back in the result but we need to do this after the other dependencies
         // have been resolved.
         if ( request.isResolveRoot() )
-        {            
+        {
             // Add the root artifact (as the first artifact to retain logical order of class path!)
             Set<Artifact> allArtifacts = new LinkedHashSet<Artifact>();
             allArtifacts.add( rootArtifact );
             allArtifacts.addAll( result.getArtifacts() );
             result.setArtifacts( allArtifacts );
-        }                        
-                 
+        }
+
         return result;
     }
 

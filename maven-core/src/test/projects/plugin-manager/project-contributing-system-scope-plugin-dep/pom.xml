@@ -5,7 +5,7 @@
   <artifactId>test2</artifactId>
   <version>1.0</version>
 
-  <name>Maven Integration Test :: MNG-3586</name> 
+  <name>Maven Integration Test :: MNG-3586</name>
   <description>
     Test that plugin dependencies with scope system are part of the plugin class realm.
   </description>
@@ -37,7 +37,7 @@
               <goal>load</goal>
             </goals>
           </execution>
-        </executions>        
+        </executions>
       </plugin>
     </plugins>
   </build>

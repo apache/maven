@@ -29,7 +29,7 @@ public class LifecycleExecutionException
     extends Exception
 {
     private MavenProject project;
-    
+
     public LifecycleExecutionException( String message )
     {
         super( message );
@@ -44,7 +44,7 @@ public class LifecycleExecutionException
     {
         super( message, cause );
     }
-    
+
     public LifecycleExecutionException( String message, MavenProject project )
     {
         super( message );

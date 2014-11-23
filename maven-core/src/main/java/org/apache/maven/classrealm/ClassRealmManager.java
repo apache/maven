@@ -31,7 +31,7 @@ import org.eclipse.aether.artifact.Artifact;
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility interface that is only
  * public for technical reasons, it is not part of the public API. In particular, this interface can be changed or
  * deleted without prior notice.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ClassRealmManager
@@ -39,21 +39,21 @@ public interface ClassRealmManager
 
     /**
      * Gets the class realm hosting the Maven core.
-     * 
+     *
      * @return The class realm hosting the Maven core, never {@code null}.
      */
     ClassRealm getCoreRealm();
 
     /**
      * Gets the class realm exposing the Maven API. This is basically a restricted view on the Maven core realm.
-     * 
+     *
      * @return The class realm exposing the Maven API, never {@code null}.
      */
     ClassRealm getMavenApiRealm();
 
     /**
      * Creates a new class realm for the specified project and its build extensions.
-     * 
+     *
      * @param model The model of the project for which to create a realm, must not be {@code null}.
      * @param artifacts The artifacts to add to the class realm, may be {@code null}. Unresolved artifacts (i.e. with a
      *            missing file) will automatically be excluded from the realm.
@@ -63,7 +63,7 @@ public interface ClassRealmManager
 
     /**
      * Creates a new class realm for the specified build extension.
-     * 
+     *
      * @param extension The extension plugin for which to create a realm, must not be {@code null}.
      * @param artifacts The artifacts to add to the class realm, may be {@code null}. Unresolved artifacts (i.e. with a
      *            missing file) will automatically be excluded from the realm.
@@ -73,7 +73,7 @@ public interface ClassRealmManager
 
     /**
      * Creates a new class realm for the specified plugin.
-     * 
+     *
      * @param plugin The plugin for which to create a realm, must not be {@code null}.
      * @param parent The parent realm for the new realm, may be {@code null}.
      * @param parentImports The packages/types to import from the parent realm, may be {@code null}.

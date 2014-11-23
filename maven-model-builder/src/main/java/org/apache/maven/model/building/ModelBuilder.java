@@ -21,7 +21,7 @@ package org.apache.maven.model.building;
 
 /**
  * Builds the effective model from a POM.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelBuilder
@@ -29,7 +29,7 @@ public interface ModelBuilder
 
     /**
      * Builds the effective model of the specified POM.
-     * 
+     *
      * @param request The model building request that holds the parameters, must not be {@code null}.
      * @return The result of the model building, never {@code null}.
      * @throws ModelBuildingException If the effective model could not be built.
@@ -42,7 +42,7 @@ public interface ModelBuilder
      * {@link #build(ModelBuildingRequest)} with {@link ModelBuildingRequest#isTwoPhaseBuilding()} being {@code true}.
      * The model building request passed to this method must be the same as the one used for the first phase of the
      * model building.
-     * 
+     *
      * @param request The model building request that holds the parameters, must not be {@code null}.
      * @param result The interim result of the first phase of model building, must not be {@code null}.
      * @return The result of the model building, never {@code null}.

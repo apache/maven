@@ -31,7 +31,7 @@ import java.util.Stack;
 
 /**
  * Generic implementation of version comparison.
- * 
+ *
  * <p>Features:
  * <ul>
  * <li>mixing of '<code>-</code>' (dash) and '<code>.</code>' (dot) separators,</li>

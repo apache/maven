@@ -27,7 +27,7 @@ import org.codehaus.plexus.PlexusTestCase;
 /**
  *
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
- * 
+ *
  */
 
 public class DefaultClasspathTransformationTest
@@ -53,7 +53,7 @@ extends PlexusTestCase
     	 *       v2
     	 *   v1<
     	 *       v3-v4
-    	 * 
+    	 *
     	 */
     	v1 = graph.addVertex(new ArtifactMetadata("g","a1","1.0"));
     	graph.setEntry(v1);

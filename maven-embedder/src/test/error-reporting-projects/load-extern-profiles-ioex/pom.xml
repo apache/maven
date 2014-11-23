@@ -3,5 +3,5 @@
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>load-extern-profiles-ioex</artifactId>
   <version>1</version>
-  
+
 </project>

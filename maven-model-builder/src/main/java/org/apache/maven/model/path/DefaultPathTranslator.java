@@ -25,7 +25,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Resolves relative paths against a specific base directory.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = PathTranslator.class )

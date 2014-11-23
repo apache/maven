@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code License}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class LicenseTest

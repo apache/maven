@@ -26,7 +26,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 
 /**
  * Resolves relative paths of a model against a specific base directory.
- * 
+ *
  * @author Jason van Zyl
  */
 public interface ModelPathTranslator
@@ -35,7 +35,7 @@ public interface ModelPathTranslator
     /**
      * Resolves the well-known paths of the specified model against the given base directory. Paths within plugin
      * configuration are not processed.
-     * 
+     *
      * @param model The model whose paths should be resolved, may be {@code null}.
      * @param basedir The base directory to resolve relative paths against, may be {@code null}.
      * @param request The model building request that holds further settings, must not be {@code null}.

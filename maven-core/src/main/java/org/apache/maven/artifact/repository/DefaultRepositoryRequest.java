@@ -27,7 +27,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Collects basic settings to access the repository system.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultRepositoryRequest
@@ -52,7 +52,7 @@ public class DefaultRepositoryRequest
 
     /**
      * Creates a shallow copy of the specified repository request.
-     * 
+     *
      * @param repositoryRequest The repository request to copy from, must not be {@code null}.
      */
     public DefaultRepositoryRequest( RepositoryRequest repositoryRequest )

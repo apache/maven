@@ -63,7 +63,7 @@ public class ArtifactResolverTest
 
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception

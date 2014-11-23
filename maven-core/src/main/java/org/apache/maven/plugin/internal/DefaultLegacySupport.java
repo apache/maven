@@ -29,7 +29,7 @@ import org.eclipse.aether.RepositorySystemSession;
  * Helps to provide backward-compatibility with plugins that use legacy components. <strong>Warning:</strong> This is an
  * internal utility component that is only public for technical reasons, it is not part of the public API. In
  * particular, this component can be changed or deleted without prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */

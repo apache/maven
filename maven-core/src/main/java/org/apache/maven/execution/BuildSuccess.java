@@ -23,7 +23,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Summarizes the result of a successful project build in the reactor.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class BuildSuccess
@@ -32,7 +32,7 @@ public class BuildSuccess
 
     /**
      * Creates a new build summary for the specified project.
-     * 
+     *
      * @param project The project being summarized, must not be {@code null}.
      * @param time The build time of the project in milliseconds.
      */

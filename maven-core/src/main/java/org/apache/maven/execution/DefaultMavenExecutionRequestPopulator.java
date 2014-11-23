@@ -132,8 +132,8 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         return request;
-    }    
-    
+    }
+
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );

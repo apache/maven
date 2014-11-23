@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>bad-ext-direct-deps</artifactId>
   <version>1</version>
-  
+
   <build>
     <extensions>
       <extension>

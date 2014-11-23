@@ -45,9 +45,9 @@ public class ProjectClasspathTest
         // the metadata source looks up the default impl, so we have to trick it
         getContainer().addComponent( projectBuilder, ProjectBuilder.class, "default" );
 
-        repositorySystem = lookup( RepositorySystem.class );        
+        repositorySystem = lookup( RepositorySystem.class );
     }
-   
+
     @Override
     protected String getCustomConfigurationName()
     {

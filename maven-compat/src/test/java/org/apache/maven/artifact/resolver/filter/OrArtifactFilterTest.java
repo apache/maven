@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link OrArtifactFilter}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class OrArtifactFilterTest

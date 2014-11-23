@@ -27,7 +27,7 @@ under the License.
   <version>0.1</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-3904</name> 
+  <name>Maven Integration Test :: MNG-3904</name>
   <description>
     Test that properties which refer to build directories which in turn refer to other build directories are
     properly interpolated.

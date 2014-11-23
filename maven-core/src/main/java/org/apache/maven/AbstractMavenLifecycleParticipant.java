@@ -69,7 +69,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * code.
      */
     public void afterSessionEnd( MavenSession session )
-        throws MavenExecutionException    
+        throws MavenExecutionException
     {
         // do nothing
     }

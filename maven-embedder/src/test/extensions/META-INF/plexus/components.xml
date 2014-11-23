@@ -21,7 +21,7 @@ under the License.
   <components>
     <component>
       <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
-      <role-hint>default</role-hint>      
+      <role-hint>default</role-hint>
       <implementation>org.apache.maven.embedder.CustomArtifactFactory</implementation>
     </component>
   </components>

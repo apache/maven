@@ -43,7 +43,7 @@ import java.util.List;
  * <p/>
  * Additionally this class contains a clone of the MavenSession, which is *only* needed
  * because it has as notion of a "current" project.
- * 
+ *
  * @since 3.0
  * @author Jason van Zyl
  * @author Benjamin Bentmann

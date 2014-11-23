@@ -27,7 +27,7 @@ under the License.
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Maven Integration Test :: MNG-4116</name> 
+  <name>Maven Integration Test :: MNG-4116</name>
   <description>
     Test that the project builder does not decode URLs (which must be done by the transport layer instead).
   </description>

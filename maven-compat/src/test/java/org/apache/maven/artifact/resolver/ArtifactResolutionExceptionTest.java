@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 /**
  * Test the artifact resolution exception message
- * 
+ *
  * @author Mauro Talevi
  */
 public class ArtifactResolutionExceptionTest

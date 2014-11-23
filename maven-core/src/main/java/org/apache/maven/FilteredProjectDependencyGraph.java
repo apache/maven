@@ -30,7 +30,7 @@ import org.apache.maven.project.MavenProject;
 
 /**
  * Provides a sub view of another dependency graph.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class FilteredProjectDependencyGraph
@@ -45,7 +45,7 @@ class FilteredProjectDependencyGraph
 
     /**
      * Creates a new project dependency graph from the specified graph.
-     * 
+     *
      * @param projectDependencyGraph The project dependency graph to create a sub view from, must not be {@code null}.
      * @param whiteList The projects on which the dependency view should focus, must not be {@code null}.
      */

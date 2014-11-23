@@ -31,7 +31,7 @@ import com.google.inject.util.Providers;
 
 public class SessionScope
     implements Scope
-{    
+{
     private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>()
     {
         public Object get()

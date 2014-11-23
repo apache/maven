@@ -5,7 +5,7 @@
   <groupId>optionaldependency</groupId>
   <artifactId>p01</artifactId>
   <version>0.0.1-SNAPSHOT</version>
- 
+
   <!--
   <dependencies>
     <dependency>
@@ -16,5 +16,5 @@
     </dependency>
   </dependencies>
   -->
- 
+
 </project>

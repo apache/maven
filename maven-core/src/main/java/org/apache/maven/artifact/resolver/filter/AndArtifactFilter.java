@@ -35,7 +35,7 @@ import org.apache.maven.artifact.Artifact;
 public class AndArtifactFilter
     implements ArtifactFilter
 {
-    private Set<ArtifactFilter> filters; 
+    private Set<ArtifactFilter> filters;
 
     public AndArtifactFilter()
     {
@@ -46,7 +46,7 @@ public class AndArtifactFilter
     {
         this.filters = new LinkedHashSet<ArtifactFilter>( filters );
     }
-    
+
     public boolean include( Artifact artifact )
     {
         boolean include = true;
@@ -86,14 +86,14 @@ public class AndArtifactFilter
         {
             return true;
         }
-        
+
         if ( !( obj instanceof AndArtifactFilter ) )
         {
             return false;
         }
-        
+
         AndArtifactFilter other = (AndArtifactFilter) obj;
-        
+
         return filters.equals( other.filters );
     }
 }

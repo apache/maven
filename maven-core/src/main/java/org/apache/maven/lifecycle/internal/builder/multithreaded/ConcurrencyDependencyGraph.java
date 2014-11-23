@@ -31,7 +31,7 @@ import java.util.Set;
 
 /**
  * Presents a view of the Dependency Graph that is suited for concurrent building.
- * 
+ *
  * @since 3.0
  * @author Kristian Rosenvold
  *         <p/>
@@ -59,7 +59,7 @@ public class ConcurrencyDependencyGraph
 
     /**
      * Gets all the builds that have no reactor-dependencies
-     * 
+     *
      * @return A list of all the initial builds
      */
 
@@ -78,7 +78,7 @@ public class ConcurrencyDependencyGraph
 
     /**
      * Marks the provided project as finished. Returns a list of
-     * 
+     *
      * @param mavenProject The project
      * @return The list of builds that are eligible for starting now that the provided project is done
      */
@@ -129,7 +129,7 @@ public class ConcurrencyDependencyGraph
 
     /**
      * For the given {@link MavenProject} {@code p}, return all of {@code p}'s dependencies.
-     * 
+     *
      * @param p
      * @return List of prerequisite projects
      */
@@ -140,7 +140,7 @@ public class ConcurrencyDependencyGraph
 
     /**
      * For the given {@link MavenProject} {@code p} return {@code p}'s uncompleted dependencies.
-     * 
+     *
      * @param p
      * @return List of uncompleted prerequisite projects
      */

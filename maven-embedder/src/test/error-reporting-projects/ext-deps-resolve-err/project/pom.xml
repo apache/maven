@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven.errortest</groupId>
   <artifactId>ext-deps-resolve-err</artifactId>
   <version>1</version>
-  
+
   <build>
     <extensions>
       <extension>

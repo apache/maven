@@ -30,7 +30,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve a plugin prefix.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -59,7 +59,7 @@ public class DefaultPluginPrefixRequest
      * Creates a request for the specified plugin prefix and build session. The provided build session will be used to
      * configure repository settings. If the session has a current project, its plugin repositories and model will be
      * used as well.
-     * 
+     *
      * @param prefix The plugin prefix to resolve, must not be {@code null}.
      * @param session The build session from which to derive further settings, must not be {@code null}.
      */

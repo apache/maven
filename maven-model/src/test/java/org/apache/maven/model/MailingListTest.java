@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code MailingList}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MailingListTest

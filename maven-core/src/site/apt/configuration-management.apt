@@ -23,10 +23,10 @@
 
 Configuration levels in maven
 
- In maven configuration control happens on four differ levels: the site level, the group level, 
+ In maven configuration control happens on four differ levels: the site level, the group level,
  the project level, and the user level. On the site level you can configure maven for all users
- utilizing the local installation, the group level allows configuration management for all the projects 
- that belong to the same group, the project level allows configuration management at 
+ utilizing the local installation, the group level allows configuration management for all the projects
+ that belong to the same group, the project level allows configuration management at
  the project level, and the user level allows users to override settings on
  the site level, group level and project level.
 
@@ -81,7 +81,7 @@ ${maven.home}
 
  User configuration which is utilized site wide are controlled with the ${user.home}/.m2/maven.properties.
 
- User configuration which is utilized at the project level are controlled with the 
+ User configuration which is utilized at the project level are controlled with the
  ${project.home}/maven.properties file.
 
 Plugin configuration
@@ -111,7 +111,7 @@ Unified source directory
  in a known location. This would also help with developer setup i.e. getting
  new developers up and running. They could run a maven command and have all
  their source trees set up in the same way as their collegues.
- 
+
  here's what I do currently in the netbeans part of the mevenide project to
  find the relevant subprojects/sibling projects. I check if the user has
  defined the maven.multiproject.includes property in any of his properties

@@ -27,7 +27,7 @@ import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 
 /**
  * Ensures that expressions referring to URLs evaluate to normalized URLs.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class UrlNormalizingPostProcessor

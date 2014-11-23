@@ -13,7 +13,7 @@ public class TestPlugin
 {
 
     private Log log;
-    
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {

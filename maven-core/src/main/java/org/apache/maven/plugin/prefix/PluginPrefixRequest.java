@@ -27,7 +27,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 /**
  * Collects settings required to resolve a plugin prefix.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -36,14 +36,14 @@ public interface PluginPrefixRequest
 
     /**
      * Gets the prefix of the plugin.
-     * 
+     *
      * @return The prefix of the plugin.
      */
     String getPrefix();
 
     /**
      * Sets the prefix of the plugin.
-     * 
+     *
      * @param prefix The prefix of the plugin.
      * @return This request, never {@code null}.
      */
@@ -51,14 +51,14 @@ public interface PluginPrefixRequest
 
     /**
      * Gets the list of group ids to scan for the plugin prefix.
-     * 
+     *
      * @return The list of group ids to scan for the plugin prefix, never {@code null}.
      */
     List<String> getPluginGroups();
 
     /**
      * Sets the list of group ids to scan for the plugin prefix.
-     * 
+     *
      * @param pluginGroups The list of group ids to scan for the plugin prefix, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -66,7 +66,7 @@ public interface PluginPrefixRequest
 
     /**
      * Gets the POM whose build plugins are to be scanned for the prefix.
-     * 
+     *
      * @return The POM whose build plugins are to be scanned for the prefix or {@code null} to only search the plugin
      *         repositories.
      */
@@ -74,7 +74,7 @@ public interface PluginPrefixRequest
 
     /**
      * Sets the POM whose build plugins are to be scanned for the prefix.
-     * 
+     *
      * @param pom The POM whose build plugins are to be scanned for the prefix, may be {@code null} to only search the
      *            plugin repositories.
      * @return This request, never {@code null}.
@@ -83,7 +83,7 @@ public interface PluginPrefixRequest
 
     /**
      * Gets the remote repositories to use.
-     * 
+     *
      * @return The remote repositories to use, never {@code null}.
      */
     List<RemoteRepository> getRepositories();
@@ -91,7 +91,7 @@ public interface PluginPrefixRequest
     /**
      * Sets the remote repositories to use. <em>Note:</em> When creating a request from a project, be sure to use the
      * plugin repositories and not the regular project repositories.
-     * 
+     *
      * @param repositories The remote repositories to use.
      * @return This request, never {@code null}.
      */
@@ -99,14 +99,14 @@ public interface PluginPrefixRequest
 
     /**
      * Gets the session to use for repository access.
-     * 
+     *
      * @return The repository session or {@code null} if not set.
      */
     RepositorySystemSession getRepositorySession();
 
     /**
      * Sets the session to use for repository access.
-     * 
+     *
      * @param repositorySession The repository session to use.
      * @return This request, never {@code null}.
      */

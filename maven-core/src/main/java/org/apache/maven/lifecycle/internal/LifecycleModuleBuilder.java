@@ -38,7 +38,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Builds one or more lifecycles for a full module
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  * @author Jason van Zyl
@@ -88,7 +88,7 @@ public class LifecycleModuleBuilder
         long buildStartTime = System.currentTimeMillis();
 
         // session may be different from rootSession seeded in DefaultMaven
-        // explicitly seed the right session here to make sure it is used by Guice 
+        // explicitly seed the right session here to make sure it is used by Guice
         sessionScope.enter();
         sessionScope.seed( MavenSession.class, session );
         try

@@ -23,7 +23,7 @@ import org.apache.maven.model.Model;
 
 /**
  * Provides the super POM that all models implicitly inherit from.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SuperPomProvider
@@ -33,7 +33,7 @@ public interface SuperPomProvider
      * Gets the super POM for the specified model version. The returned model is supposed to be read-only, i.e. if the
      * caller intends to make updates to the model the return value must be cloned before updating to ensure the
      * modifications don't affect future retrievals of the super POM.
-     * 
+     *
      * @param version The model version to retrieve the super POM for (e.g. "4.0.0"), must not be {@code null}.
      * @return The super POM, never {@code null}.
      */

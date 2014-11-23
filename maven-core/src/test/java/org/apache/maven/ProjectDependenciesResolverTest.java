@@ -65,7 +65,7 @@ public class ProjectDependenciesResolverTest
 
         new ProjectBuilder( project ).addDependency( "org.apache.maven.its", "b", "0.1", Artifact.SCOPE_RUNTIME,
                                                      exclusion );
-        
+
         Set<Artifact> artifactDependencies =
             resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session );
         assertEquals( 0, artifactDependencies.size() );
@@ -75,7 +75,7 @@ public class ProjectDependenciesResolverTest
         assertEquals( "b", artifactDependencies.iterator().next().getArtifactId() );
     }
     */
-    
+
     public void testSystemScopeDependencies()
         throws Exception
     {
@@ -88,8 +88,8 @@ public class ProjectDependenciesResolverTest
         Set<Artifact> artifactDependencies =
             resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session );
         assertEquals( 1, artifactDependencies.size() );
-    }  
-    
+    }
+
     public void testSystemScopeDependencyIsPresentInTheCompileClasspathElements()
         throws Exception
     {
@@ -102,10 +102,10 @@ public class ProjectDependenciesResolverTest
         MavenProject project = session.getCurrentProject();
 
         project.setArtifacts( resolver.resolve( project, Collections.singleton( Artifact.SCOPE_COMPILE ), session ) );
-                
+
         List<String> elements = project.getCompileClasspathElements();
         assertEquals( 2, elements.size() );
-        
+
         @SuppressWarnings( "deprecation" )
         List<Artifact> artifacts = project.getCompileArtifacts();
         assertEquals( 1, artifacts.size() );

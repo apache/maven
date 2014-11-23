@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>config-rdonly-mojo-param</artifactId>
   <version>1</version>
-  
+
   <build>
     <plugins>
       <plugin>

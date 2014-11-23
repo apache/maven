@@ -61,9 +61,9 @@ public class ArtifactResolutionRequest
     // Needs to go away
     private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
 
-    // This is like a filter but overrides all transitive versions 
+    // This is like a filter but overrides all transitive versions
     private Map<String, Artifact> managedVersionMap;
-    
+
     private boolean resolveRoot = true;
 
     private boolean resolveTransitively = false;
@@ -141,7 +141,7 @@ public class ArtifactResolutionRequest
 
     /**
      * Gets the artifact filter that controls traversal of the dependency graph.
-     * 
+     *
      * @return The filter used to determine which of the artifacts in the dependency graph should be traversed or
      *         {@code null} to collect all transitive dependencies.
      */
@@ -160,7 +160,7 @@ public class ArtifactResolutionRequest
     /**
      * Gets the artifact filter that controls downloading of artifact files. This filter operates on those artifacts
      * that have been included by the {@link #getCollectionFilter()}.
-     * 
+     *
      * @return The filter used to determine which of the artifacts should have their files resolved or {@code null} to
      *         resolve the files for all collected artifacts.
      */
@@ -182,12 +182,12 @@ public class ArtifactResolutionRequest
     }
 
     public ArtifactResolutionRequest setListeners( List<ResolutionListener> listeners )
-    {        
+    {
         this.listeners = listeners;
-        
+
         return this;
     }
-    
+
     public ArtifactResolutionRequest addListener( ResolutionListener listener )
     {
         listeners.add( listener );
@@ -210,26 +210,26 @@ public class ArtifactResolutionRequest
     public ArtifactResolutionRequest setResolveRoot( boolean resolveRoot )
     {
         this.resolveRoot = resolveRoot;
-        
+
         return this;
     }
-    
+
     public boolean isResolveRoot()
     {
         return resolveRoot;
-    }        
+    }
 
     public ArtifactResolutionRequest setResolveTransitively( boolean resolveDependencies )
     {
         this.resolveTransitively = resolveDependencies;
-        
+
         return this;
     }
-    
+
     public boolean isResolveTransitively()
     {
         return resolveTransitively;
-    }        
+    }
 
     public String toString()
     {
@@ -239,7 +239,7 @@ public class ArtifactResolutionRequest
                 .append( artifactDependencies ).append(  "\n" )
                 .append( "localRepository: " ).append(  localRepository ).append(  "\n" )
                 .append( "remoteRepositories: " ).append(  remoteRepositories ).append(  "\n" );
-        
+
         return sb.toString();
     }
 
@@ -322,8 +322,8 @@ public class ArtifactResolutionRequest
     // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
     // this here, possibly indefinitely.
     //
-    public ArtifactResolutionRequest setCache( RepositoryCache cache )                                                                                             
-    {                                                                                                                                                              
-        return this;                                                                                                                                               
-    }                    
+    public ArtifactResolutionRequest setCache( RepositoryCache cache )
+    {
+        return this;
+    }
 }

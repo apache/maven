@@ -21,7 +21,7 @@ package org.apache.maven.settings.building;
 
 /**
  * Collects problems that are encountered during settings building.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsProblemCollector
@@ -29,7 +29,7 @@ public interface SettingsProblemCollector
 
     /**
      * Adds the specified problem.
-     * 
+     *
      * @param severity The severity of the problem, must not be {@code null}.
      * @param message The detail message of the problem, may be {@code null}.
      * @param line The one-based index of the line containing the problem or {@code -1} if unknown.

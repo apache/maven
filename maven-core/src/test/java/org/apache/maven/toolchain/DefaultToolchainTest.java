@@ -40,17 +40,17 @@ public class DefaultToolchainTest
     {
         InputStream jdksIS = null;
         InputStream jdksExtraIS = null;
-        try 
+        try
         {
             jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
             jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" );
-            
+
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
-            
+
             JavaToolchainImpl tc1 = new JavaToolchainImpl( jdks.getToolchains().get( 0 ), null );
             JavaToolchainImpl tc2 = new JavaToolchainImpl( jdksExtra.getToolchains().get( 0 ), null );
-            
+
             assertTrue( tc1.equals( tc1 ) );
             assertFalse( tc1.equals( tc2 ) );
             assertFalse( tc2.equals( tc1 ) );

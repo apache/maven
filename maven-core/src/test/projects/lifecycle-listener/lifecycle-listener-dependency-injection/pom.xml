@@ -4,7 +4,7 @@
   <groupId>org.apache.maven.lifecycle-listener.test</groupId>
   <artifactId>simple</artifactId>
   <version>1.0</version>
-  
+
   <properties>
     <foo>${injected}</foo>
   </properties>

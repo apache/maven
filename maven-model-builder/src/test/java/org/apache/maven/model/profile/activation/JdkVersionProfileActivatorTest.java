@@ -26,7 +26,7 @@ import org.apache.maven.model.Profile;
 
 /**
  * Tests {@link JdkVersionProfileActivator}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class JdkVersionProfileActivatorTest

@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Holds all POM files that are known to the reactor. This allows the project builder to resolve imported POMs from the
  * reactor when building another project's effective model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class ReactorModelPool

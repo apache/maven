@@ -25,7 +25,7 @@ import java.io.InputStream;
 
 /**
  * Wraps an ordinary {@link CharSequence} as a model source.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class StringModelSource
@@ -38,7 +38,7 @@ public class StringModelSource
 
     /**
      * Creates a new model source backed by the specified string.
-     * 
+     *
      * @param pom The POM's string representation, may be empty or {@code null}.
      */
     public StringModelSource( CharSequence pom )
@@ -48,7 +48,7 @@ public class StringModelSource
 
     /**
      * Creates a new model source backed by the specified string.
-     * 
+     *
      * @param pom The POM's string representation, may be empty or {@code null}.
      * @param location The location to report for this use, may be {@code null}.
      */
@@ -71,7 +71,7 @@ public class StringModelSource
 
     /**
      * Gets the character sequence of this model source.
-     * 
+     *
      * @return The underlying character stream, never {@code null}.
      */
     public String getModel()

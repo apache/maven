@@ -79,7 +79,7 @@ public class MavenRepositorySystem
 
     @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
-    
+
     @Requirement
     private ArtifactResolver artifactResolver;
 
@@ -91,7 +91,7 @@ public class MavenRepositorySystem
 
     @Requirement
     private SettingsDecrypter settingsDecrypter;
-    
+
     // DefaultProjectBuilder
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
@@ -600,7 +600,7 @@ public class MavenRepositorySystem
 
         return repository;
     }
-    
+
     // ArtifactFactory
     private Artifact XcreateArtifact( String groupId, String artifactId, String version, String scope, String type )
     {
@@ -694,5 +694,5 @@ public class MavenRepositorySystem
 
         return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
                                     optional );
-    }    
+    }
 }

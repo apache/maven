@@ -21,7 +21,7 @@ package org.apache.maven.settings.crypto;
 
 /**
  * Decrypts passwords in the settings.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsDecrypter
@@ -29,7 +29,7 @@ public interface SettingsDecrypter
 
     /**
      * Decrypts passwords in the settings.
-     * 
+     *
      * @param request The settings decryption request that holds the parameters, must not be {@code null}.
      * @return The result of the settings decryption, never {@code null}.
      */

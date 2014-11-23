@@ -21,7 +21,7 @@ package org.apache.maven.lifecycle;
 
 /**
  * Signals a failure to locate a lifecycle.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class LifecycleNotFoundException
@@ -32,7 +32,7 @@ public class LifecycleNotFoundException
 
     /**
      * Creates a new exception to indicate that the specified lifecycle is unknown.
-     * 
+     *
      * @param lifecycleId The identifier of the lifecycle that could not be located, may be {@code null}.
      */
     public LifecycleNotFoundException( String lifecycleId )
@@ -43,7 +43,7 @@ public class LifecycleNotFoundException
 
     /**
      * Gets the identifier of the lifecycle that was not found.
-     * 
+     *
      * @return The identifier of the lifecycle that was not found, never {@code null}.
      */
     public String getLifecycleId()

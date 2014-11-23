@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code PluginContainer}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class PluginContainerTest

@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Parent}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ParentTest

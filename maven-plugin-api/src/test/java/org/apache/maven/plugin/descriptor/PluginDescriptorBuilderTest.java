@@ -32,7 +32,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link PluginDescriptorBuilder}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class PluginDescriptorBuilderTest

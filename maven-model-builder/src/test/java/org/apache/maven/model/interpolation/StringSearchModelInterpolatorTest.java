@@ -38,7 +38,7 @@ import java.util.concurrent.FutureTask;
  * @author Benjamin Bentmann
  */
 public class StringSearchModelInterpolatorTest
-    extends AbstractModelInterpolatorTest 
+    extends AbstractModelInterpolatorTest
 {
 
     protected ModelInterpolator interpolator;
@@ -81,7 +81,7 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( values, model, new File( "." ), config, collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "value", values[0] );
         assertEquals( "value2", values[1] );
@@ -113,7 +113,7 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "value", obj.values[0] );
         assertEquals( "value2", obj.values[1] );
@@ -167,7 +167,7 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "key", obj.values.get( 0 ) );
         assertEquals( "value2", obj.values.get( 1 ) );
@@ -192,7 +192,7 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "${key}", obj.values.get( 0 ) );
     }
@@ -276,7 +276,7 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "val", obj.values.get( "key" ) );
         assertEquals( "value2", obj.values.get( "key2" ) );
@@ -329,7 +329,7 @@ public class StringSearchModelInterpolatorTest
 
         final SimpleProblemCollector collector = new SimpleProblemCollector();
         interpolator.interpolateObject( obj, model, new File( "." ), config, collector );
-        assertProblemFree( collector );        
+        assertProblemFree( collector );
 
         assertEquals( "value", ( (String[]) obj.values.get( "key" ) )[0] );
         assertEquals( "value2", ( (String[]) obj.values.get( "key" ) )[1] );
@@ -460,7 +460,7 @@ public class StringSearchModelInterpolatorTest
             return fooBar;
         }
     }
-    
+
     public void testFinalFieldsExcludedFromInterpolation()
     {
         Properties props = new Properties();

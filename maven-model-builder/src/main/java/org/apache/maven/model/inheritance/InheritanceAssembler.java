@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles inheritance of model values.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface InheritanceAssembler
@@ -35,7 +35,7 @@ public interface InheritanceAssembler
      * Merges values from the specified parent model into the given child model. Implementations are expected to keep
      * parent and child completely decoupled by injecting deep copies of objects into the child rather than the original
      * objects from the parent.
-     * 
+     *
      * @param child The child model into which to merge the values inherited from the parent, must not be
      *            <code>null</code>.
      * @param parent The (read-only) parent model from which to inherit the values, may be <code>null</code>.

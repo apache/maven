@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * Describes a constituent of a class realm.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ClassRealmConstituent
@@ -31,42 +31,42 @@ public interface ClassRealmConstituent
 
     /**
      * Gets the group id of the constituent's artifact.
-     * 
+     *
      * @return The group id, never {@code null}.
      */
     String getGroupId();
 
     /**
      * Gets the artifact id of the constituent's artifact.
-     * 
+     *
      * @return The artifact id, never {@code null}.
      */
     String getArtifactId();
 
     /**
      * Gets the type of the constituent's artifact.
-     * 
+     *
      * @return The type, never {@code null}.
      */
     String getType();
 
     /**
      * Gets the classifier of the constituent's artifact.
-     * 
+     *
      * @return The classifier or an empty string, never {@code null}.
      */
     String getClassifier();
 
     /**
      * Gets the version of the constituent's artifact.
-     * 
+     *
      * @return The version, never {@code null}.
      */
     String getVersion();
 
     /**
      * Gets the file of the constituent's artifact.
-     * 
+     *
      * @return The file, never {@code null}.
      */
     File getFile();

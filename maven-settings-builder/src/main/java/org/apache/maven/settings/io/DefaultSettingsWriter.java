@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.WriterFactory;
 
 /**
  * Handles serialization of settings into the default textual format.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = SettingsWriter.class )

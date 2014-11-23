@@ -26,7 +26,7 @@ import java.util.Map;
 
 /**
  * Signals a collision of two or more projects with the same g:a:v during a reactor build.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DuplicateProjectException
@@ -37,7 +37,7 @@ public class DuplicateProjectException
 
     /**
      * Creates a new exception with specified details.
-     * 
+     *
      * @param message The message text, may be {@code null}.
      * @param collisions The POM files of the projects that collided, indexed by their g:a:v, may be {@code null}.
      */
@@ -50,7 +50,7 @@ public class DuplicateProjectException
 
     /**
      * Gets the POM files of the projects that collided.
-     * 
+     *
      * @return The POM files of the projects that collided, indexed by their g:a:v, never {@code null}.
      */
     public Map<String, List<File>> getCollisions()

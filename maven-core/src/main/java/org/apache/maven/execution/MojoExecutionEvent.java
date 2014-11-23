@@ -26,7 +26,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * Encapsulates parameters of MojoExecutionListener callback methods and is meant to provide API evolution path should
  * it become necessary to introduce new parameters in the existing callbacks in the future.
- * 
+ *
  * @see MojoExecutionListener
  * @see org.apache.maven.execution.scope.WeakMojoExecutionListener
  * @since 3.1.2

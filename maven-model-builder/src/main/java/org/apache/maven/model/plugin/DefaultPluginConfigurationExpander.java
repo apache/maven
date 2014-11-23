@@ -33,7 +33,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general build plugin configuration into individual executions.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = PluginConfigurationExpander.class )

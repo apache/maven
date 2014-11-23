@@ -29,7 +29,7 @@ import org.codehaus.plexus.util.Os;
  * Assists the project builder. <strong>Warning:</strong> This is an internal utility class that is only public for
  * technical reasons, it is not part of the public API. In particular, this class can be changed or deleted without
  * prior notice.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -43,7 +43,7 @@ public class EnvironmentUtils
      * env.PATH}. Unlike native environment variables, properties are always case-sensitive. For the sake of
      * determinism, the environment variable names will be normalized to upper case on platforms with case-insensitive
      * variable lookup.
-     * 
+     *
      * @param props The properties to add the environment variables to, may be {@code null}.
      */
     public static void addEnvVars( Properties props )

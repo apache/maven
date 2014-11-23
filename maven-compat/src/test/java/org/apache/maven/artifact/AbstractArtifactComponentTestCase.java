@@ -85,7 +85,7 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         super.setUp();
-        artifactFactory = lookup( ArtifactFactory.class);        
+        artifactFactory = lookup( ArtifactFactory.class);
         artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
 
         RepositorySystemSession repoSession = initRepoSession();
@@ -96,13 +96,13 @@ public abstract class AbstractArtifactComponentTestCase
         LegacySupport legacySupport = lookup(LegacySupport.class);
         legacySupport.setSession( session );
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception
     {
         release( artifactFactory );
-        
+
         super.tearDown();
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractArtifactComponentTestCase
 
     /**
      * Return an existing file, not a directory - causes creation to fail.
-     * 
+     *
      * @throws Exception
      */
     protected ArtifactRepository badLocalRepository()
@@ -314,7 +314,7 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         Artifact a = artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
-                
+
         return a;
     }
 

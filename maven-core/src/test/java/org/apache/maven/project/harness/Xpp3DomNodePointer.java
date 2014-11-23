@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * A node pointer for JXPath to support <code>Xpp3Dom</code>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class Xpp3DomNodePointer

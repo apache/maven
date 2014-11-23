@@ -61,7 +61,7 @@ import org.eclipse.aether.version.VersionScheme;
 
 /**
  * Resolves a version for a plugin.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */

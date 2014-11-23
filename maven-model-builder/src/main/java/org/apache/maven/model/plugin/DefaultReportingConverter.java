@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles conversion of the legacy reporting section into the configuration of the new Maven Site Plugin.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ReportingConverter.class )

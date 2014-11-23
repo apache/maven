@@ -25,7 +25,7 @@ import java.io.InputStream;
 
 /**
  * Wraps an ordinary {@link CharSequence} as a settings source.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class StringSettingsSource
@@ -38,7 +38,7 @@ public class StringSettingsSource
 
     /**
      * Creates a new settings source backed by the specified string.
-     * 
+     *
      * @param settings The settings' string representation, may be empty or {@code null}.
      */
     public StringSettingsSource( CharSequence settings )
@@ -48,7 +48,7 @@ public class StringSettingsSource
 
     /**
      * Creates a new settings source backed by the specified string.
-     * 
+     *
      * @param settings The settings' string representation, may be empty or {@code null}.
      * @param location The location to report for this use, may be {@code null}.
      */
@@ -71,7 +71,7 @@ public class StringSettingsSource
 
     /**
      * Gets the character sequence of this settings source.
-     * 
+     *
      * @return The underlying character stream, never {@code null}.
      */
     public String getSettings()

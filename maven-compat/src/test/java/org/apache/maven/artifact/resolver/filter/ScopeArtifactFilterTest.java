@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link ScopeArtifactFilter}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ScopeArtifactFilterTest

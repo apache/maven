@@ -30,5 +30,5 @@ public interface Maven
     @Deprecated
     String POMv4 = "pom.xml";
 
-    MavenExecutionResult execute( MavenExecutionRequest request );    
+    MavenExecutionResult execute( MavenExecutionRequest request );
 }

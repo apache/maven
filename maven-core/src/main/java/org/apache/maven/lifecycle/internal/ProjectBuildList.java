@@ -35,7 +35,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * A list of project segments, ordered so that all ProjectSegments from first TaskSegment come before any
  * subsequent TaskSegments.
- * 
+ *
  * @since 3.0
  * @author Kristian Rosenvold
  *         <p/>

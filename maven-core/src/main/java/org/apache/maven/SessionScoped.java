@@ -29,7 +29,7 @@ import com.google.inject.ScopeAnnotation;
 
 /**
  * Indicates that annotated component should be instantiated before session starts and discarded after session execution completes.
- * 
+ *
  * @author Jason van Zyl
  * @since 3.2.0
  */

@@ -22,5 +22,5 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>mojo-exec-err</artifactId>
   <version>1</version>
-  
+
 </project>

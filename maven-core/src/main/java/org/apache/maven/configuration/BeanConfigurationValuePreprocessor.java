@@ -22,7 +22,7 @@ package org.apache.maven.configuration;
 /**
  * Preprocesses a value from a bean configuration before the bean configurator unmarshals it into a bean property. A
  * common use case for such preprocessing is the evaluation of variables within the configuration value.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface BeanConfigurationValuePreprocessor
@@ -33,7 +33,7 @@ public interface BeanConfigurationValuePreprocessor
      * requirement) for the preprocessor to resolve the value to a compatible value or a (string) value than can be
      * unmarshalled into that type. The preprocessor is not required to perform any type conversion but should rather
      * filter out incompatible values from its result.
-     * 
+     *
      * @param value The configuration value to preprocess, must not be {@code null}.
      * @param type The target type of the value, may be {@code null}.
      * @return The processed configuration value or {@code null} if none.

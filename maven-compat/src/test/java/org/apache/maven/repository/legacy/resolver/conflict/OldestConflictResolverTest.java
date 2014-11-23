@@ -34,13 +34,13 @@ public class OldestConflictResolverTest
     extends AbstractConflictResolverTest
 {
     // constructors -----------------------------------------------------------
-    
+
     public OldestConflictResolverTest()
         throws Exception
     {
         super("oldest");
     }
-    
+
     // tests ------------------------------------------------------------------
 
     /**
@@ -55,7 +55,7 @@ public class OldestConflictResolverTest
         ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
         ResolutionNode b1n = new ResolutionNode( b1, Collections.EMPTY_LIST );
         ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST, b1n );
-        
+
         assertResolveConflict( a1n, a1n, a2n );
     }
 
@@ -71,7 +71,7 @@ public class OldestConflictResolverTest
         ResolutionNode b1n = new ResolutionNode( b1, Collections.EMPTY_LIST );
         ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST, b1n );
         ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
-        
+
         assertResolveConflict( a1n, a2n, a1n );
     }
 
@@ -86,7 +86,7 @@ public class OldestConflictResolverTest
     {
         ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
         ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST );
-        
+
         assertResolveConflict( a1n, a1n, a2n );
     }
 
@@ -101,7 +101,7 @@ public class OldestConflictResolverTest
     {
         ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST );
         ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
-        
+
         assertResolveConflict( a1n, a2n, a1n );
     }
 }

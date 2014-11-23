@@ -44,7 +44,7 @@ public class AbstractArtifactResolutionException
 
     private String classifier;
 
-    private Artifact artifact; 
+    private Artifact artifact;
 
     private List<ArtifactRepository> remoteRepositories;
 

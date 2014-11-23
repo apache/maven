@@ -24,7 +24,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 
 /**
  * A request to resolve the dependencies of a project.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface DependencyResolutionRequest
@@ -32,14 +32,14 @@ public interface DependencyResolutionRequest
 
     /**
      * Gets the project to resolve dependencies for.
-     * 
+     *
      * @return The project to resolve dependencies for or {@code null} if not set.
      */
     MavenProject getMavenProject();
 
     /**
      * Sets the project to resolve dependencies for.
-     * 
+     *
      * @param project The project to resolve dependencies for, may be {@code null}.
      * @return This request for chaining, never {@code null}.
      */
@@ -47,7 +47,7 @@ public interface DependencyResolutionRequest
 
     /**
      * Gets the filter used to exclude some dependencies from resolution.
-     * 
+     *
      * @return The filter to exclude dependencies from resolution or {@code null} to resolve all dependencies.
      */
     DependencyFilter getResolutionFilter();
@@ -56,7 +56,7 @@ public interface DependencyResolutionRequest
      * Sets the filter used to exclude some dependencies from resolution. Note that this filter only controls the
      * resolution/download of dependency artifacts, not the inclusion of dependency nodes in the resolved dependency
      * graph.
-     * 
+     *
      * @param filter The filter to exclude dependencies from resolution, may be {@code null} to resolve all
      *            dependencies.
      * @return This request for chaining, never {@code null}.
@@ -65,14 +65,14 @@ public interface DependencyResolutionRequest
 
     /**
      * Gets the session to use for repository access.
-     * 
+     *
      * @return The repository session or {@code null} if not set.
      */
     RepositorySystemSession getRepositorySession();
 
     /**
      * Sets the session to use for repository access.
-     * 
+     *
      * @param repositorySession The repository session to use.
      * @return This request for chaining, never {@code null}.
      */

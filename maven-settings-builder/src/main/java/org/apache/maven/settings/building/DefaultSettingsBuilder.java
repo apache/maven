@@ -44,7 +44,7 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = SettingsBuilder.class )

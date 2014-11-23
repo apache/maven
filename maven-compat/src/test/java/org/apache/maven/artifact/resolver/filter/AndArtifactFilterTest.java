@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@link AndArtifactFilter}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class AndArtifactFilterTest

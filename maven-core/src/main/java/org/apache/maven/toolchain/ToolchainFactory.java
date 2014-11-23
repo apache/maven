@@ -23,7 +23,7 @@ import org.apache.maven.toolchain.model.ToolchainModel;
 
 /**
  * Internal toolchain factory, to prepare toolchains instances.
- *  
+ *
  * @author mkleint
  * @since 2.0.9
  */

@@ -68,19 +68,19 @@ public class IncludesArtifactFilter
     {
         int hash = 17;
         hash = hash * 31 + patterns.hashCode();
-        
+
         return hash;
     }
 
     @Override
     public boolean equals( Object obj )
     {
-        if ( this == obj ) 
+        if ( this == obj )
         {
             return true;
         }
 
-        // make sure IncludesArtifactFilter is not equal ExcludesArtifactFilter! 
+        // make sure IncludesArtifactFilter is not equal ExcludesArtifactFilter!
         if ( obj == null || getClass() != obj.getClass() )
         {
             return false;

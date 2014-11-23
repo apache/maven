@@ -33,7 +33,7 @@ import org.eclipse.aether.repository.RemoteRepository;
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
  * that the plugins/mojos can be used in arbitrary contexts. In particular, the mojos can be used for ordinary build
  * plugins as well as special purpose plugins like reports.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */
@@ -42,7 +42,7 @@ public interface MavenPluginManager
 
     /**
      * Retrieves the descriptor for the specified plugin from its main artifact.
-     * 
+     *
      * @param plugin The plugin whose descriptor should be retrieved, must not be {@code null}.
      * @param repositories The plugin repositories to use for resolving the plugin's main artifact, must not be {@code
      *            null}.
@@ -54,7 +54,7 @@ public interface MavenPluginManager
 
     /**
      * Retrieves the descriptor for the specified plugin goal from the plugin's main artifact.
-     * 
+     *
      * @param plugin The plugin whose mojo descriptor should be retrieved, must not be {@code null}.
      * @param goal The simple name of the mojo whose descriptor should be retrieved, must not be {@code null}.
      * @param repositories The plugin repositories to use for resolving the plugin's main artifact, must not be {@code
@@ -69,7 +69,7 @@ public interface MavenPluginManager
 
     /**
      * Verifies the specified plugin is compatible with the current Maven runtime.
-     * 
+     *
      * @param pluginDescriptor The descriptor of the plugin to check, must not be {@code null}.
      */
     void checkRequiredMavenVersion( PluginDescriptor pluginDescriptor )
@@ -78,7 +78,7 @@ public interface MavenPluginManager
     /**
      * Sets up the class realm for the specified plugin. Both the class realm and the plugin artifacts that constitute
      * it will be stored in the plugin descriptor.
-     * 
+     *
      * @param pluginDescriptor The plugin descriptor in which to save the class realm and the plugin artifacts, must not
      *            be {@code null}.
      * @param session The build session from which to pick the current project and repository settings, must not be
@@ -97,7 +97,7 @@ public interface MavenPluginManager
      * lookup the mojo from. <strong>Warning:</strong> The returned mojo instance must be released via
      * {@link #releaseMojo(Object, MojoExecution)} when the mojo is no longer needed to free any resources allocated for
      * it.
-     * 
+     *
      * @param mojoInterface The component role of the mojo, must not be {@code null}.
      * @param session The build session in whose context the mojo will be used, must not be {@code null}.
      * @param mojoExecution The mojo execution to retrieve the mojo for, must not be {@code null}.
@@ -108,7 +108,7 @@ public interface MavenPluginManager
 
     /**
      * Releases the specified mojo back to the container.
-     * 
+     *
      * @param mojo The mojo to release, may be {@code null}.
      * @param mojoExecution The mojo execution the mojo was originally retrieved for, must not be {@code null}.
      */

@@ -28,7 +28,7 @@ import org.apache.maven.settings.building.SettingsProblem;
 
 /**
  * Collects the output of the settings decrypter.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class DefaultSettingsDecryptionResult

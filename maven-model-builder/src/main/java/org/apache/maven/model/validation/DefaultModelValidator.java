@@ -747,7 +747,7 @@ public class DefaultModelValidator
         }
     }
 
-    
+
     private boolean validateStringNoExpression( String fieldName, ModelProblemCollector problems, Severity severity,
                                                 Version version, String string, InputLocationTracker tracker )
     {

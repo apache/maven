@@ -23,7 +23,7 @@ import java.io.File;
 
 /**
  * Locates a POM file within a project base directory.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelLocator
@@ -34,7 +34,7 @@ public interface ModelLocator
      * or does not contain a POM file, the return value indicates the expected path to the POM file. Sub directories of
      * the project directory will not be considered when locating the POM file. The return value will be an absolute
      * path if the project directory is given as an absolute path.
-     * 
+     *
      * @param projectDirectory The (possibly non-existent) base directory to locate the POM file in, must not be {@code
      *            null}.
      * @return The path to the (possibly non-existent) POM file, never {@code null}.

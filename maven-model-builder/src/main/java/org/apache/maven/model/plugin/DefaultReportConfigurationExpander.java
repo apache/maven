@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /**
  * Handles expansion of general report plugin configuration into individual report sets.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ReportConfigurationExpander.class )

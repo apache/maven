@@ -37,7 +37,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * Handles deserialization of a model from some kind of textual format like XML.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ModelReader.class )

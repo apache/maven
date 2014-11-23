@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Exclusion}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ExclusionTest

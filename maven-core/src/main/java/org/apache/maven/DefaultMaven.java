@@ -145,7 +145,7 @@ public class DefaultMaven
 
     @Requirement
     private SessionScope sessionScope;
-        
+
     public MavenExecutionResult execute( MavenExecutionRequest request )
     {
         MavenExecutionResult result;
@@ -176,7 +176,7 @@ public class DefaultMaven
         return result;
     }
 
-    // 
+    //
     // 1) Setup initial properties.
     //
     // 2) Validate local repository directory is accessible.
@@ -208,7 +208,7 @@ public class DefaultMaven
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
     {
         request.setStartTime( new Date() );
-        
+
         MavenExecutionResult result = new DefaultMavenExecutionResult();
 
         try
@@ -223,14 +223,14 @@ public class DefaultMaven
         DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
 
         MavenSession session = new MavenSession( container, repoSession, request, result );
-        
+
         //
         // We enter the session scope right after the MavenSession creation and before any of the AbstractLifecycleParticipant lookups
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
-        // 
+        //
         sessionScope.enter();
         sessionScope.seed( MavenSession.class, session );
-        
+
         legacySupport.setSession( session );
 
         try
@@ -285,7 +285,7 @@ public class DefaultMaven
         {
             return addExceptionToResult( result, e );
         }
-        
+
         WorkspaceReader reactorWorkspace;
         try
         {
@@ -295,14 +295,14 @@ public class DefaultMaven
         {
             return addExceptionToResult( result, e );
         }
-        
+
         //
         // Desired order of precedence for local artifact repositories
         //
         // Reactor
         // Workspace
         // User Local Repository
-        //        
+        //
         repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorWorkspace,
                                                                             repoSession.getWorkspaceReader() ) );
 
@@ -380,7 +380,7 @@ public class DefaultMaven
         return result;
     }
 
-    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session ) 
+    private void afterSessionEnd( Collection<MavenProject> projects, MavenSession session )
         throws MavenExecutionException
     {
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
@@ -641,7 +641,7 @@ public class DefaultMaven
         throws ProjectBuildingException
     {
         MavenExecutionRequest request = session.getRequest();
-        
+
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
         List<MavenProject> projects = new ArrayList<MavenProject>();
@@ -761,7 +761,7 @@ public class DefaultMaven
 
         for ( MavenProject project : projects )
         {
-            // MNG-1911 / MNG-5572: Building plugins with extensions cannot be part of reactor 
+            // MNG-1911 / MNG-5572: Building plugins with extensions cannot be part of reactor
             for ( Plugin plugin : project.getBuildPlugins() )
             {
                 if ( plugin.isExtensions() )
@@ -940,7 +940,7 @@ public class DefaultMaven
 
         return result;
     }
-    
+
     private List<MavenProject> trimExcludedProjects( List<MavenProject> projects, MavenExecutionRequest request )
         throws MavenExecutionException
     {

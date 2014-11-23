@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Repository}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class RepositoryTest

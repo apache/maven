@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles expansion of general report plugin configuration into individual report sets.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ReportConfigurationExpander
@@ -33,7 +33,7 @@ public interface ReportConfigurationExpander
 
     /**
      * Merges values from general report plugin configuration into the individual reports sets of the given model.
-     * 
+     *
      * @param model The model whose report plugin configuration should be expanded, must not be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.

@@ -31,7 +31,7 @@ import org.apache.maven.settings.validation.SettingsValidator;
  * is only meant as a utility for developers that want to employ the settings builder outside of the Maven build system,
  * Maven plugins should always acquire settings builder instances via dependency injection. Developers might want to
  * subclass this factory to provide custom implementations for some of the components used by the settings builder.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class DefaultSettingsBuilderFactory
@@ -54,7 +54,7 @@ public class DefaultSettingsBuilderFactory
 
     /**
      * Creates a new settings builder instance.
-     * 
+     *
      * @return The new settings builder instance, never {@code null}.
      */
     public DefaultSettingsBuilder newInstance()

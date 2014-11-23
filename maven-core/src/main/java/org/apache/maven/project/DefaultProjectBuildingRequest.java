@@ -208,7 +208,7 @@ public class DefaultProjectBuildingRequest
         this.processPlugins = processPlugins;
         return this;
     }
-    
+
     public ProjectBuildingRequest setResolveDependencies( boolean resolveDependencies )
     {
         this.resolveDependencies = resolveDependencies;

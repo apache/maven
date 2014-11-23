@@ -32,7 +32,7 @@ import org.apache.maven.model.io.ModelParseException;
  * an expressive source hint for the model problem. Instead, the source hint is configured by the model builder before
  * it delegates to other components that potentially encounter problems. Then, the problem reporter can focus on
  * providing a simple error message, leaving the donkey work of creating a nice model problem to this component.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class DefaultModelProblemCollector

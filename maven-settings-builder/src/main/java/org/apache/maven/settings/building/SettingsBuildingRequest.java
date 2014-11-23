@@ -24,7 +24,7 @@ import java.util.Properties;
 
 /**
  * Collects settings that control the building of effective settings.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsBuildingRequest
@@ -32,7 +32,7 @@ public interface SettingsBuildingRequest
 
     /**
      * Gets the global settings file.
-     * 
+     *
      * @return The global settings file or {@code null} if none.
      */
     File getGlobalSettingsFile();
@@ -40,7 +40,7 @@ public interface SettingsBuildingRequest
     /**
      * Sets the global settings file. A non-existent settings file is equivalent to empty settings. If both user
      * settings and global settings are given, the user settings take precedence.
-     * 
+     *
      * @param globalSettingsFile The global settings file, may be {@code null} to disable global settings.
      * @return This request, never {@code null}.
      */
@@ -48,7 +48,7 @@ public interface SettingsBuildingRequest
 
     /**
      * Gets the global settings source.
-     * 
+     *
      * @return The global settings source or {@code null} if none.
      */
     SettingsSource getGlobalSettingsSource();
@@ -56,7 +56,7 @@ public interface SettingsBuildingRequest
     /**
      * Sets the global settings source. If both user settings and a global settings are given, the user settings take
      * precedence.
-     * 
+     *
      * @param globalSettingsSource The global settings source, may be {@code null} to disable global settings.
      * @return This request, never {@code null}.
      */
@@ -64,7 +64,7 @@ public interface SettingsBuildingRequest
 
     /**
      * Gets the user settings file.
-     * 
+     *
      * @return The user settings file or {@code null} if none.
      */
     File getUserSettingsFile();
@@ -72,7 +72,7 @@ public interface SettingsBuildingRequest
     /**
      * Sets the user settings file. A non-existent settings file is equivalent to empty settings. If both a user
      * settings file and a global settings file are given, the user settings take precedence.
-     * 
+     *
      * @param userSettingsFile The user settings file, may be {@code null} to disable user settings.
      * @return This request, never {@code null}.
      */
@@ -80,7 +80,7 @@ public interface SettingsBuildingRequest
 
     /**
      * Gets the user settings source.
-     * 
+     *
      * @return The user settings source or {@code null} if none.
      */
     SettingsSource getUserSettingsSource();
@@ -88,7 +88,7 @@ public interface SettingsBuildingRequest
     /**
      * Sets the user settings source. If both user settings and a global settings are given, the user settings take
      * precedence.
-     * 
+     *
      * @param userSettingsSource The user settings source, may be {@code null} to disable user settings.
      * @return This request, never {@code null}.
      */
@@ -97,7 +97,7 @@ public interface SettingsBuildingRequest
     /**
      * Gets the system properties to use for interpolation. The system properties are collected from the runtime
      * environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @return The system properties, never {@code null}.
      */
     Properties getSystemProperties();
@@ -105,7 +105,7 @@ public interface SettingsBuildingRequest
     /**
      * Sets the system properties to use for interpolation. The system properties are collected from the runtime
      * environment like {@link System#getProperties()} and environment variables.
-     * 
+     *
      * @param systemProperties The system properties, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -114,7 +114,7 @@ public interface SettingsBuildingRequest
     /**
      * Gets the user properties to use for interpolation. The user properties have been configured directly by the user
      * on his discretion, e.g. via the {@code -Dkey=value} parameter on the command line.
-     * 
+     *
      * @return The user properties, never {@code null}.
      */
     Properties getUserProperties();
@@ -122,7 +122,7 @@ public interface SettingsBuildingRequest
     /**
      * Sets the user properties to use for interpolation. The user properties have been configured directly by the user
      * on his discretion, e.g. via the {@code -Dkey=value} parameter on the command line.
-     * 
+     *
      * @param userProperties The user properties, may be {@code null}.
      * @return This request, never {@code null}.
      */

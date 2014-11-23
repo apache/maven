@@ -26,7 +26,7 @@ import java.io.InputStream;
 
 /**
  * Wraps an ordinary {@link File} as a settings source.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class FileSettingsSource
@@ -37,7 +37,7 @@ public class FileSettingsSource
 
     /**
      * Creates a new settings source backed by the specified file.
-     * 
+     *
      * @param settingsFile The settings file, must not be {@code null}.
      */
     public FileSettingsSource( File settingsFile )
@@ -62,7 +62,7 @@ public class FileSettingsSource
 
     /**
      * Gets the settings file of this model source.
-     * 
+     *
      * @return The underlying settings file, never {@code null}.
      */
     public File getSettingsFile()

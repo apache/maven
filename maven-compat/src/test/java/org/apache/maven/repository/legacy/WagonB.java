@@ -24,7 +24,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Wagon for testing, for protocols <code>b1</code> and <code>b2</code>
- * 
+ *
  * @author <a href="mailto:carlos@apache.org">Carlos Sanchez</a>
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */

@@ -54,10 +54,10 @@ public class DefaultArtifactInstaller
 
     @Requirement
     private RepositorySystem repoSystem;
-    
+
     @Requirement
     private LegacySupport legacySupport;
-    
+
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
     public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )

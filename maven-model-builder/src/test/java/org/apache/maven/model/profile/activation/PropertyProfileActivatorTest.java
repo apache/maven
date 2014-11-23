@@ -27,7 +27,7 @@ import org.apache.maven.model.Profile;
 
 /**
  * Tests {@link PropertyProfileActivator}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class PropertyProfileActivatorTest

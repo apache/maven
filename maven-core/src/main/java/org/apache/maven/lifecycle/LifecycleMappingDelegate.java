@@ -38,7 +38,7 @@ import org.apache.maven.project.MavenProject;
  * <p>
  * Implementations of this interface must be annotated with either {@code @Named("lifecycle-id")} or equivalent plexus
  * {@code @Component} annotations.
- * 
+ *
  * @since 3.2.0
  * @see org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate
  * @author ifedorenko

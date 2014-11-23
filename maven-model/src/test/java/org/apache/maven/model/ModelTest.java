@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code Model}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ModelTest

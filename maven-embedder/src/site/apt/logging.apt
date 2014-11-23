@@ -32,12 +32,12 @@ Maven Logging
 
  Maven uses
  {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
- Container logging API}}, like any other Plexus components, ie 
+ Container logging API}}, like any other Plexus components, ie
  {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
  / {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
 
  Starting with Maven 3.1.0:
- 
+
   *  Maven supports SLF4J API logging API too, ie {{{http://slf4j.org/apidocs/org/slf4j/LoggerFactory.html}LoggerFactory}} /
      {{{http://slf4j.org/apidocs/org/slf4j/Logger.html}Logger}},
 
@@ -86,7 +86,7 @@ public class DefaultMyComponent
  Starting with Maven 3.1.0, SLF4J Logger can be used directly too, without Plexus. Of course, this will only work when run under
  Maven 3.1.0, then this technique can be used safely only in Maven core components or in plugins/component not requiring
  compatibility with previous Maven versions.
- 
+
 +-----+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

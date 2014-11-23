@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>repo-creation-err</artifactId>
   <version>1</version>
-  
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -30,7 +30,7 @@ under the License.
       <version>3.8.1</version>
     </dependency>
   </dependencies>
-  
+
   <repositories>
     <repository>
       <id>test</id>

@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code IssueManagement}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class IssueManagementTest

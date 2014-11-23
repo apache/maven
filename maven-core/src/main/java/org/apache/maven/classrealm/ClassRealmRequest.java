@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * Describes the requirements for a new class realm.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ClassRealmRequest
@@ -58,14 +58,14 @@ public interface ClassRealmRequest
 
     /**
      * Gets the type of the class realm.
-     * 
+     *
      * @return The type of the class realm, never {@code null}.
      */
     RealmType getType();
 
     /**
      * Gets the parent class realm (if any).
-     * 
+     *
      * @return The parent class realm or {@code null} if using the default parent.
      */
     ClassLoader getParent();
@@ -78,21 +78,21 @@ public interface ClassRealmRequest
 
     /**
      * Gets the packages/types to import from the parent realm.
-     * 
+     *
      * @return The modifiable list of packages/types to import from the parent realm, never {@code null}.
      */
     List<String> getParentImports();
 
     /**
      * Gets the packages/types to import from foreign realms.
-     * 
+     *
      * @return The modifiable map of packages/types to import from foreign realms, never {@code null}.
      */
     Map<String, ClassLoader> getForeignImports();
 
     /**
      * Gets the constituents for the class realm.
-     * 
+     *
      * @return The modifiable list of constituents for the class realm, never {@code null}.
      */
     List<ClassRealmConstituent> getConstituents();

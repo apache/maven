@@ -27,7 +27,7 @@ import org.apache.maven.artifact.Artifact;
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  */
 public class ArtifactMetadataRetrievalException
-    extends Exception 
+    extends Exception
 {
     private Artifact artifact;
 

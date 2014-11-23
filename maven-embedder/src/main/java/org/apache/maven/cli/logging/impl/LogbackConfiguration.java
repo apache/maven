@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for slf4j-logback.
- * 
+ *
  * @author Hervé Boutemy
  * @since 3.1.0
  */
@@ -41,7 +41,7 @@ public class LogbackConfiguration
             case DEBUG:
                 value = ch.qos.logback.classic.Level.DEBUG;
                 break;
-            
+
             case INFO:
                 value = ch.qos.logback.classic.Level.INFO;
                 break;

@@ -28,7 +28,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles the import of dependency management from other models into the target model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface DependencyManagementImporter
@@ -36,7 +36,7 @@ public interface DependencyManagementImporter
 
     /**
      * Imports the specified dependency management sections into the given target model.
-     * 
+     *
      * @param target The model into which to import the dependency management section, must not be <code>null</code>.
      * @param sources The dependency management sections to import, may be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.

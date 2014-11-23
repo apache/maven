@@ -23,7 +23,7 @@ import org.apache.maven.model.Model;
 
 /**
  * Holds data relevant for a model building event.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ModelBuildingEvent
@@ -31,21 +31,21 @@ public interface ModelBuildingEvent
 
     /**
      * Gets the model being built. The precise state of this model depends on the event being fired.
-     * 
+     *
      * @return The model being built, never {@code null}.
      */
     Model getModel();
 
     /**
      * Gets the model building request being processed.
-     * 
+     *
      * @return The model building request being processed, never {@code null}.
      */
     ModelBuildingRequest getRequest();
 
     /**
      * Gets the container used to collect problems that were encountered while processing the event.
-     * 
+     *
      * @return The container used to collect problems that were encountered, never {@code null}.
      */
     ModelProblemCollector getProblems();

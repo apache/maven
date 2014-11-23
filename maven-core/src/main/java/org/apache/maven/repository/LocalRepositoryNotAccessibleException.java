@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * Signals a failure to store files within the local repository.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class LocalRepositoryNotAccessibleException

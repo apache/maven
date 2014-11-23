@@ -84,7 +84,7 @@ public class DefaultToolchainManager
             desc.setArtifactId( PluginDescriptor.getDefaultPluginArtifactId( "toolchains" ) );
 
             MavenProject current = session.getCurrentProject();
-            
+
             if ( current != null )
             {
                 //TODO: why is this using the context

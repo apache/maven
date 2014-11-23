@@ -4,7 +4,7 @@
   <artifactId>p0</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -13,10 +13,10 @@
         <executions>
           <execution>
             <id>test</id>
-            
+
             <!--  The key to this test... -->
             <inherited>false</inherited>
-            
+
             <goals>
               <goal>compile</goal>
             </goals>

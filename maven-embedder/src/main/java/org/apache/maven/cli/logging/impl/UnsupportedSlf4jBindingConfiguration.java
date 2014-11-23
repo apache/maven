@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Pseudo-configuration for unsupported slf4j binding.
- * 
+ *
  * @author Hervé Boutemy
  * @since 3.2.4
  */
@@ -59,7 +59,7 @@ public class UnsupportedSlf4jBindingConfiguration
         for ( Map.Entry<URL, Set<Object>> entry : supported.entrySet() )
         {
             StringBuilder sb = new StringBuilder();
-            sb.append( "(from " ).append( entry.getKey().toExternalForm() ).append( ")" ); 
+            sb.append( "(from " ).append( entry.getKey().toExternalForm() ).append( ")" );
 
             for ( Object binding : entry.getValue() )
             {

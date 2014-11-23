@@ -23,7 +23,7 @@ import junit.framework.TestCase;
 
 /**
  * Tests {@code ActivationOS}.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class ActivationOSTest

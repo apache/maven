@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles injection of dependency management into the model.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface DependencyManagementInjector
@@ -33,7 +33,7 @@ public interface DependencyManagementInjector
 
     /**
      * Merges default values from the dependency management section of the given model into itself.
-     * 
+     *
      * @param model The model into which to merge the values specified by its dependency management sections, must not
      *            be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.

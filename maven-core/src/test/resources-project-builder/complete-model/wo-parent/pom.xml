@@ -27,7 +27,7 @@ under the License.
   <version>0.2</version>
   <packaging>pom</packaging>
 
-  <name>project-name</name> 
+  <name>project-name</name>
   <description>project-description</description>
   <url>http://project.url/</url>
   <inceptionYear>2009</inceptionYear>

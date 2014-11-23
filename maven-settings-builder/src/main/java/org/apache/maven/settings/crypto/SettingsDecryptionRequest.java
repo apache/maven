@@ -26,7 +26,7 @@ import org.apache.maven.settings.Server;
 
 /**
  * Collects parameters that control the decryption of settings.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsDecryptionRequest
@@ -34,14 +34,14 @@ public interface SettingsDecryptionRequest
 
     /**
      * Gets the servers whose passwords should be decrypted.
-     * 
+     *
      * @return The servers to decrypt, never {@code null}.
      */
     List<Server> getServers();
 
     /**
      * Sets the servers whose passwords should be decrypted.
-     * 
+     *
      * @param servers The servers to decrypt, may be {@code null}.
      * @return This request, never {@code null}.
      */
@@ -49,14 +49,14 @@ public interface SettingsDecryptionRequest
 
     /**
      * Gets the proxies whose passwords should be decrypted.
-     * 
+     *
      * @return The proxies to decrypt, never {@code null}.
      */
     List<Proxy> getProxies();
 
     /**
      * Sets the proxies whose passwords should be decrypted.
-     * 
+     *
      * @param proxies The proxies to decrypt, may be {@code null}.
      * @return This request, never {@code null}.
      */

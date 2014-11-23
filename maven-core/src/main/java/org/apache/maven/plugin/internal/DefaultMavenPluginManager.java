@@ -102,7 +102,7 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
  * Provides basic services to manage Maven plugins and their mojos. This component is kept general in its design such
  * that the plugins/mojos can be used in arbitrary contexts. In particular, the mojos can be used for ordinary build
  * plugins as well as special purpose plugins like reports.
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */

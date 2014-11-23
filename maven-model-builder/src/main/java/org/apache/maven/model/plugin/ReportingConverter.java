@@ -25,7 +25,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Handles conversion of the legacy reporting section into the configuration of the new Maven Site Plugin.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ReportingConverter
@@ -33,7 +33,7 @@ public interface ReportingConverter
 
     /**
      * Converts values from model's reporting section into the configuration for the new Maven Site Plugin.
-     * 
+     *
      * @param model The model whose reporting section should be converted, must not be <code>null</code>.
      * @param request The model building request that holds further settings, must not be {@code null}.
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.

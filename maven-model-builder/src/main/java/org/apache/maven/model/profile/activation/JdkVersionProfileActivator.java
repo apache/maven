@@ -34,7 +34,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * Determines profile activation based on the version of the current Java runtime.
- * 
+ *
  * @author Benjamin Bentmann
  * @see Activation#getJdk()
  */

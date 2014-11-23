@@ -73,7 +73,7 @@ public class DefaultBuildPluginManager
      * @return PluginDescriptor The component descriptor for the Maven plugin.
      * @throws PluginNotFoundException The plugin could not be found in any repositories.
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
-     * @throws InvalidPluginDescriptorException 
+     * @throws InvalidPluginDescriptorException
      */
     public PluginDescriptor loadPlugin( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
@@ -215,9 +215,9 @@ public class DefaultBuildPluginManager
     /**
      * TODO pluginDescriptor classRealm and artifacts are set as a side effect of this
      *      call, which is not nice.
-     * @throws PluginResolutionException 
+     * @throws PluginResolutionException
      */
-    public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor ) 
+    public ClassRealm getPluginRealm( MavenSession session, PluginDescriptor pluginDescriptor )
         throws PluginResolutionException, PluginManagerException
     {
         ClassRealm pluginRealm = pluginDescriptor.getClassRealm();

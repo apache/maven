@@ -33,7 +33,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * Resolves relative paths within a model against a specific base directory.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ModelPathTranslator.class )

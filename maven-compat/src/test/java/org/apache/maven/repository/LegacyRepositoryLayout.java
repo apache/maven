@@ -39,7 +39,7 @@ public class LegacyRepositoryLayout
     {
         return "legacy";
     }
-    
+
     public String pathOf( Artifact artifact )
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();

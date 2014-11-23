@@ -62,7 +62,7 @@ public interface PluginManager
 
     Map getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException;
-    
+
     /**
      * @since 2.2.1
      */
@@ -70,7 +70,7 @@ public interface PluginManager
         throws ArtifactResolutionException, PluginVersionResolutionException, ArtifactNotFoundException,
         InvalidVersionSpecificationException, InvalidPluginException, PluginManagerException, PluginNotFoundException,
         PluginVersionNotFoundException;
-    
+
     /**
      * @since 2.2.1
      */

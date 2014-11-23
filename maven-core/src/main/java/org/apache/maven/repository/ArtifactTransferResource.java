@@ -21,7 +21,7 @@ package org.apache.maven.repository;
 
 /**
  * Describes a resource being uploaded or downloaded by the repository system.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ArtifactTransferResource
@@ -30,35 +30,35 @@ public interface ArtifactTransferResource
     /**
      * The base URL of the repository, e.g. "http://repo1.maven.org/maven2/". Unless the URL is unknown, it will be
      * terminated by a trailing slash.
-     * 
+     *
      * @return The base URL of the repository or an empty string if unknown, never {@code null}.
      */
     String getRepositoryUrl();
 
     /**
      * The path of the artifact relative to the repository's base URL.
-     * 
+     *
      * @return The path of the artifact, never {@code null}.
      */
     String getName();
 
     /**
      * Gets the full URL of the artifact.
-     * 
+     *
      * @return The full URL of the artifact, never {@code null}.
      */
     String getUrl();
 
     /**
      * The size of the artifact in bytes.
-     * 
+     *
      * @return The of the artifact in bytes or a negative value if unknown.
      */
     long getContentLength();
 
     /**
      * Gets the timestamp when the transfer of this artifact was started.
-     * 
+     *
      * @return The timestamp when the transfer of this artifact was started.
      */
     long getTransferStartTime();

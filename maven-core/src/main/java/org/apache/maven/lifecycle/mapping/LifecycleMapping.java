@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface LifecycleMapping
-{        
+{
 
     @Deprecated
     String ROLE = LifecycleMapping.class.getName();

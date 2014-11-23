@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>profile-activator-err</artifactId>
   <version>1</version>
-  
+
   <profiles>
     <profile>
       <id>faulty</id>

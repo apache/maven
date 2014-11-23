@@ -23,5 +23,5 @@ package org.apache.maven.artifact.metadata;
 public interface ArtifactMetadata
     extends org.apache.maven.repository.legacy.metadata.ArtifactMetadata
 {
-    void merge( ArtifactMetadata metadata );    
+    void merge( ArtifactMetadata metadata );
 }

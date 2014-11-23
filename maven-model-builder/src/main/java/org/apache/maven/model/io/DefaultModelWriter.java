@@ -34,7 +34,7 @@ import org.codehaus.plexus.util.WriterFactory;
 
 /**
  * Handles serialization of a model into some kind of textual format like XML.
- * 
+ *
  * @author Benjamin Bentmann
  */
 @Component( role = ModelWriter.class )

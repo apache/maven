@@ -339,5 +339,5 @@ public class ArtifactTransferEvent
         }
         return true;
     }
-    
+
 }

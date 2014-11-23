@@ -27,7 +27,7 @@ import org.apache.maven.model.building.ModelProblemCollector;
 
 /**
  * Calculates the active profiles among a given collection of profiles.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface ProfileSelector
@@ -36,7 +36,7 @@ public interface ProfileSelector
     /**
      * Determines the profiles which are active in the specified activation context. Active profiles will eventually be
      * injected into the model.
-     * 
+     *
      * @param profiles The profiles whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of a profile, must not be
      *            {@code null}.

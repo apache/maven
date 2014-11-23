@@ -21,12 +21,12 @@ under the License.
 
 <project>
   <modelVersion>4.0.0</modelVersion>
-  
+
   <groupId>org.apache.maven.its.it0043</groupId>
   <artifactId>maven-it-it0043</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>Maven Integration Test :: it0043</name> 
+  <name>Maven Integration Test :: it0043</name>
   <description>Test for repository inheritence - ensure using the same id overrides the defaults</description>
 
   <repositories>

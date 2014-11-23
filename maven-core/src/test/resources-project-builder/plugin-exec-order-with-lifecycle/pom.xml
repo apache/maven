@@ -28,7 +28,7 @@ under the License.
   <!-- NOTE: The upper-case packaging name is intentional and triggers a special mode in the EmptyLifecycleExecutor -->
   <packaging>JAR</packaging>
 
-  <name>Maven Integration Test :: MNG-4341</name> 
+  <name>Maven Integration Test :: MNG-4341</name>
   <description>
     Test that plugins bound to the same phase get executed in POM order even if one of the plugins participates
     in the default lifecycle bindings for the project's packaging.

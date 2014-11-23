@@ -36,7 +36,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
  * for its use. However, the (old) wagons pulled in transitively via legacy Maven core artifacts are usually not
  * intended as dependencies and more importantly screw up artifact resolution because they would get preferred over the
  * core wagon versions. This is a hack to provide backward-compat with Maven 2 (MNG-4528, MNG-4561).
- * 
+ *
  * @since 3.0
  * @author Benjamin Bentmann
  */

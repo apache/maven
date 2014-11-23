@@ -23,7 +23,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 
 /**
  * Extension point that allows build extensions observe and possibly veto project build execution.
- * 
+ *
  * @see ExecutionListener
  * @see MojoExecutionListener
  * @since 3.1.2

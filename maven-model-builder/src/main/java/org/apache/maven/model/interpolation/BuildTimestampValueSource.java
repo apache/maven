@@ -28,7 +28,7 @@ class BuildTimestampValueSource
     extends AbstractValueSource
 {
     private final MavenBuildTimestamp mavenBuildTimestamp;
-    
+
     public BuildTimestampValueSource( Date startTime, Properties properties )
     {
         super( false );

@@ -22,7 +22,7 @@ under the License.
   <groupId>org.apache.maven</groupId>
   <artifactId>bad-mg-dep-version</artifactId>
   <version>1</version>
-  
+
   <dependencyManagement>
     <dependencies>
       <dependency>

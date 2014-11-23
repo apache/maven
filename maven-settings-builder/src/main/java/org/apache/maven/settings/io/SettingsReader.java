@@ -29,7 +29,7 @@ import org.apache.maven.settings.Settings;
 
 /**
  * Handles deserialization of settings from some kind of textual format like XML.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public interface SettingsReader
@@ -43,7 +43,7 @@ public interface SettingsReader
 
     /**
      * Reads the settings from the specified file.
-     * 
+     *
      * @param input The file to deserialize the settings from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized settings, never {@code null}.
@@ -56,7 +56,7 @@ public interface SettingsReader
     /**
      * Reads the settings from the specified character reader. The reader will be automatically closed before the method
      * returns.
-     * 
+     *
      * @param input The reader to deserialize the settings from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized settings, never {@code null}.
@@ -69,7 +69,7 @@ public interface SettingsReader
     /**
      * Reads the settings from the specified byte stream. The stream will be automatically closed before the method
      * returns.
-     * 
+     *
      * @param input The stream to deserialize the settings from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.
      * @return The deserialized settings, never {@code null}.

@@ -32,7 +32,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 /**
  * Injects plexus-utils:1.1 into a plugin's class path if it doesn't already declare a dependency on plexus-utils. This
  * is another legacy bit to provide backward-compat with Maven 2.x.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class PlexusUtilsInjector
