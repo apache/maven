@@ -81,7 +81,7 @@ under the License.
       <version>2.6</version>
       <scope>runtime</scope>
     </dependency>
-      <!-- IT MNG-5663 maven-compiler -->
+    <!-- IT MNG-5663 maven-compiler -->
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-compiler-plugin</artifactId>
