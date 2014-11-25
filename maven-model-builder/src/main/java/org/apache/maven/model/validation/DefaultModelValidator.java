@@ -559,8 +559,7 @@ public class DefaultModelValidator
             validateStringNotEmpty( prefix + "type", problems, Severity.ERROR, Version.BASE, d.getType(),
                                     d.getManagementKey(), d );
 
-            validateStringNotEmpty( prefix + "version", problems, Severity.ERROR, Version.BASE, d.getVersion(),
-                                    d.getManagementKey(), d );
+            validateDependencyVersion( problems, d, prefix );
         }
 
         if ( "system".equals( d.getScope() ) )
@@ -624,6 +623,15 @@ public class DefaultModelValidator
                 }
             }
         }
+    }
+
+    /**
+     * @since 3.2.4 
+     */
+    protected void validateDependencyVersion( ModelProblemCollector problems, Dependency d, String prefix )
+    {
+        validateStringNotEmpty( prefix + "version", problems, Severity.ERROR, Version.BASE, d.getVersion(),
+                                d.getManagementKey(), d );
     }
 
     private void validateRawRepositories( ModelProblemCollector problems, List<Repository> repositories, String prefix,
