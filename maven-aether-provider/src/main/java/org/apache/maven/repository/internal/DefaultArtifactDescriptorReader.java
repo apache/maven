@@ -19,24 +19,17 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import org.apache.maven.model.DependencyManagement;
+
 import org.apache.maven.model.DistributionManagement;
-import org.apache.maven.model.License;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.Relocation;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.DefaultModelBuilderFactory;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.FileModelSource;
@@ -53,13 +46,6 @@ import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.ArtifactProperties;
-import org.eclipse.aether.artifact.ArtifactType;
-import org.eclipse.aether.artifact.ArtifactTypeRegistry;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.artifact.DefaultArtifactType;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.impl.ArtifactDescriptorReader;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
@@ -232,49 +218,16 @@ public class DefaultArtifactDescriptorReader
 
         if ( model != null )
         {
-            ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
+            Map<String, Object> config = session.getConfigProperties();
+            ArtifactDescriptorReaderDelegate delegate =
+                (ArtifactDescriptorReaderDelegate) config.get( ArtifactDescriptorReaderDelegate.class.getName() );
 
-            for ( Repository r : model.getRepositories() )
+            if ( delegate == null )
             {
-                result.addRepository( ArtifactDescriptorUtils.toRemoteRepository( r ) );
+                delegate = new ArtifactDescriptorReaderDelegate();
             }
 
-            for ( org.apache.maven.model.Dependency dependency : model.getDependencies() )
-            {
-                result.addDependency( convert( dependency, stereotypes ) );
-            }
-
-            DependencyManagement mngt = model.getDependencyManagement();
-            if ( mngt != null )
-            {
-                for ( org.apache.maven.model.Dependency dependency : mngt.getDependencies() )
-                {
-                    result.addManagedDependency( convert( dependency, stereotypes ) );
-                }
-            }
-
-            Map<String, Object> properties = new LinkedHashMap<String, Object>();
-
-            Prerequisites prerequisites = model.getPrerequisites();
-            if ( prerequisites != null )
-            {
-                properties.put( "prerequisites.maven", prerequisites.getMaven() );
-            }
-
-            List<License> licenses = model.getLicenses();
-            properties.put( "license.count", licenses.size() );
-            for ( int i = 0; i < licenses.size(); i++ )
-            {
-                License license = licenses.get( i );
-                properties.put( "license." + i + ".name", license.getName() );
-                properties.put( "license." + i + ".url", license.getUrl() );
-                properties.put( "license." + i + ".comments", license.getComments() );
-                properties.put( "license." + i + ".distribution", license.getDistribution() );
-            }
-
-            result.setProperties( properties );
-
-            setArtifactProperties( result, model );
+            delegate.populateResult( session, result, model );
         }
 
         return result;
@@ -433,59 +386,6 @@ public class DefaultArtifactDescriptorReader
             relocation = distMngt.getRelocation();
         }
         return relocation;
-    }
-
-    private void setArtifactProperties( ArtifactDescriptorResult result, Model model )
-    {
-        String downloadUrl = null;
-        DistributionManagement distMngt = model.getDistributionManagement();
-        if ( distMngt != null )
-        {
-            downloadUrl = distMngt.getDownloadUrl();
-        }
-        if ( downloadUrl != null && downloadUrl.length() > 0 )
-        {
-            Artifact artifact = result.getArtifact();
-            Map<String, String> props = new HashMap<String, String>( artifact.getProperties() );
-            props.put( ArtifactProperties.DOWNLOAD_URL, downloadUrl );
-            result.setArtifact( artifact.setProperties( props ) );
-        }
-    }
-
-    private Dependency convert( org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes )
-    {
-        ArtifactType stereotype = stereotypes.get( dependency.getType() );
-        if ( stereotype == null )
-        {
-            stereotype = new DefaultArtifactType( dependency.getType() );
-        }
-
-        boolean system = dependency.getSystemPath() != null && dependency.getSystemPath().length() > 0;
-
-        Map<String, String> props = null;
-        if ( system )
-        {
-            props = Collections.singletonMap( ArtifactProperties.LOCAL_PATH, dependency.getSystemPath() );
-        }
-
-        Artifact artifact =
-            new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), null,
-                                 dependency.getVersion(), props, stereotype );
-
-        List<Exclusion> exclusions = new ArrayList<Exclusion>( dependency.getExclusions().size() );
-        for ( org.apache.maven.model.Exclusion exclusion : dependency.getExclusions() )
-        {
-            exclusions.add( convert( exclusion ) );
-        }
-
-        Dependency result = new Dependency( artifact, dependency.getScope(), dependency.isOptional(), exclusions );
-
-        return result;
-    }
-
-    private Exclusion convert( org.apache.maven.model.Exclusion exclusion )
-    {
-        return new Exclusion( exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*" );
     }
 
     private void missingDescriptor( RepositorySystemSession session, RequestTrace trace, Artifact artifact,
