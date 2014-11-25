@@ -107,6 +107,11 @@ public class MavenRepositorySystem
     // DefaultProjectBuilder
     public Artifact createDependencyArtifact( Dependency d )
     {
+        if ( d.getVersion() == null )
+        {
+            return null;
+        }
+
         VersionRange versionRange;
         try
         {

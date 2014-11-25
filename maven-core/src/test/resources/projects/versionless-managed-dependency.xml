@@ -1,0 +1,24 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>test</groupId>
+  <artifactId>versionless-managed-dependency.xml</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its</groupId>
+      <artifactId>a</artifactId>
+    </dependency>
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>a</artifactId>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
