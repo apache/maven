@@ -21,6 +21,7 @@ package org.apache.maven.project;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.RepositoryUtils;
@@ -66,15 +67,21 @@ public class DefaultProjectDependenciesResolver
     @Requirement
     private RepositorySystem repoSystem;
 
+    @Requirement
+    private List<RepositorySessionDecorator> decorators;
+
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )
         throws DependencyResolutionException
     {
-        RequestTrace trace = RequestTrace.newChild( null, request );
+        final RequestTrace trace = RequestTrace.newChild( null, request );
 
-        DefaultDependencyResolutionResult result = new DefaultDependencyResolutionResult();
+        final DefaultDependencyResolutionResult result = new DefaultDependencyResolutionResult();
 
-        MavenProject project = request.getMavenProject();
+        final MavenProject project = request.getMavenProject();
+        final DependencyFilter filter = request.getResolutionFilter();
         RepositorySystemSession session = request.getRepositorySession();
+        ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
+
         if ( logger.isDebugEnabled()
             && session.getConfigProperties().get( DependencyManagerUtils.CONFIG_PROP_VERBOSE ) == null )
         {
@@ -82,9 +89,15 @@ public class DefaultProjectDependenciesResolver
             verbose.setConfigProperty( DependencyManagerUtils.CONFIG_PROP_VERBOSE, Boolean.TRUE );
             session = verbose;
         }
-        DependencyFilter filter = request.getResolutionFilter();
 
-        ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
+        for ( RepositorySessionDecorator decorator : decorators )
+        {
+            RepositorySystemSession decorated = decorator.decorate( project, session );
+            if ( decorated != null )
+            {
+                session = decorated;
+            }
+        }
 
         CollectRequest collect = new CollectRequest();
         collect.setRootArtifact( RepositoryUtils.toArtifact( project.getArtifact() ) );
