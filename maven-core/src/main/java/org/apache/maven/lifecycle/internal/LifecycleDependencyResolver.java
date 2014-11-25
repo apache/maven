@@ -28,10 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -41,8 +43,6 @@ import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -60,20 +60,20 @@ import org.eclipse.aether.util.filter.ScopeDependencyFilter;
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
  */
-@Component( role = LifecycleDependencyResolver.class )
+@Named
 public class LifecycleDependencyResolver
 {
 
-    @Requirement
+    @Inject
     private ProjectDependenciesResolver dependenciesResolver;
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
-    private ArtifactFactory artifactFactory;
+    @Inject
+    private ProjectArtifactFactory artifactFactory;
 
-    @Requirement
+    @Inject
     private EventSpyDispatcher eventSpyDispatcher;
 
     public LifecycleDependencyResolver()
@@ -116,7 +116,7 @@ public class LifecycleDependencyResolver
             {
                 try
                 {
-                    project.setDependencyArtifacts( project.createArtifacts( artifactFactory, null, null ) );
+                    project.setDependencyArtifacts( artifactFactory.createArtifacts( project ) );
                 }
                 catch ( InvalidDependencyVersionException e )
                 {
