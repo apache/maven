@@ -101,6 +101,8 @@ public class MavenProject
 
     private File file;
 
+    private File basedir;
+
     private Set<Artifact> resolvedArtifacts;
 
     private ArtifactFilter artifactFilter;
@@ -253,19 +255,22 @@ public class MavenProject
     public void setFile( File file )
     {
         this.file = file;
+        this.basedir = file != null ? file.getParentFile() : null;
+    }
+
+    /**
+     * Sets project {@code file} without changing project {@code basedir}.
+     * 
+     * @since 3.2.4
+     */
+    public void setPomFile( File file )
+    {
+        this.file = file;
     }
 
     public File getBasedir()
     {
-        if ( getFile() != null )
-        {
-            return getFile().getParentFile();
-        }
-        else
-        {
-            // repository based POM
-            return null;
-        }
+        return basedir;
     }
 
     public void setDependencies( List<Dependency> dependencies )
