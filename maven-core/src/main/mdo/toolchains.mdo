@@ -120,6 +120,7 @@
                 <field>
                     <name>type</name>
                     <version>1.0.0+</version>
+                    <!-- <identifier>true</identifier> -->
                     <description>
                     <![CDATA[Type of toolchain:<ul>
                     <li><code>jdk</code> for
@@ -150,6 +151,7 @@
                       <type>String</type>
                       <multiplicity>*</multiplicity>
                     </association>
+                    <!-- <identifier>true</identifier> -->
                     <description>
                     <![CDATA[
                     <p>Toolchain identification information, which will be matched against project requirements.</p>
@@ -172,6 +174,57 @@
                     ]]></description>
                 </field>
             </fields>
+            <codeSegments>
+            <codeSegment>
+              <version>1.1.0+</version>
+              <comment>Generated hashCode() and equals() based on identifier also calls its super, which breaks comparison</comment>
+              <code>
+                <![CDATA[
+    /**
+     * Method hashCode.
+     * 
+     * @return int
+     */
+    public int hashCode()
+    {
+        int result = 17;
+
+        result = 37 * result + ( type != null ? type.hashCode() : 0 );
+        result = 37 * result + ( provides != null ? provides.hashCode() : 0 );
+
+        return result;
+    } //-- int hashCode()
+    
+    /**
+     * Method equals.
+     * 
+     * @param other
+     * @return boolean
+     */
+    public boolean equals( Object other )
+    {
+        if ( this == other )
+        {
+            return true;
+        }
+
+        if ( !( other instanceof ToolchainModel ) )
+        {
+            return false;
+        }
+
+        ToolchainModel that = (ToolchainModel) other;
+        boolean result = true;
+
+        result = result && ( getType() == null ? that.getType() == null : getType().equals( that.getType() ) );
+        result = result && ( getProvides() == null ? that.getProvides() == null : getProvides().equals( that.getProvides() ) );
+
+        return result;
+    } //-- boolean equals( Object )    
+                ]]>
+              </code>
+            </codeSegment>
+          </codeSegments>
         </class>
     </classes>
 </model>
