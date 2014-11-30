@@ -34,7 +34,14 @@ public class ComparableVersionTest
 {
     private Comparable newComparable( String version )
     {
-        return new ComparableVersion( version );
+        ComparableVersion ret = new ComparableVersion( version );
+        String canonical = ret.getCanonical();
+        String parsedCanonical = new ComparableVersion( canonical ).getCanonical();
+
+        assertEquals( "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical, canonical,
+                      parsedCanonical );
+
+        return ret;
     }
 
     private static final String[] VERSIONS_QUALIFIER =

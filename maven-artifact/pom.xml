@@ -42,6 +42,17 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestEntries>
+              <Main-Class>org.apache.maven.artifact.versioning.ComparableVersion</Main-Class>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

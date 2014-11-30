@@ -20,13 +20,25 @@
  -----
  Hervé Boutemy
  -----
- 2012-09-29
+ 2014-11-30
  -----
 
 Maven Artifact
 
- Maven Artifact classes, providing <<<Artifact>>> component ({{{./apidocs/org/apache/maven/artifact/Artifact.html}javadoc}}),
+ Maven Artifact classes, providing <<<Artifact>>> interface ({{{./apidocs/org/apache/maven/artifact/Artifact.html}javadoc}}),
  with its <<<DefaultArtifact>>> implementation ({{{./xref/org/apache/maven/artifact/DefaultArtifact.html}source}}).
+
+ The jar file is executable and provides a little tool to display how Maven parses and compares versions:
+
++----+
+$ java -jar maven-artifact-*.jar 3.2.4-alpha-1 3.2.4-SNAPSHOT 3.2.4.0
+Display parameters as parsed by Maven (in canonical form) and comparison result:
+1. 3.2.4-alpha-1 == 3.2.4.alpha.1
+   3.2.4-alpha-1 < 3.2.4-SNAPSHOT
+2. 3.2.4-SNAPSHOT == 3.2.4.snapshot
+   3.2.4-SNAPSHOT < 3.2.4.0
+3. 3.2.4.0 == 3.2.4
++----+
 
 * Useful entry points
 

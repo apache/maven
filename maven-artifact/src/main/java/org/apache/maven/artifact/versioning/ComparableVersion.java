@@ -329,16 +329,16 @@ public class ComparableVersion
 
         public String toString()
         {
-            StringBuilder buffer = new StringBuilder( "(" );
+            StringBuilder buffer = new StringBuilder();
             for ( Iterator<Item> iter = iterator(); iter.hasNext(); )
             {
-                buffer.append( iter.next() );
-                if ( iter.hasNext() )
+                Item item = iter.next();
+                if ( buffer.length() > 0 )
                 {
-                    buffer.append( ',' );
+                    buffer.append( ( item instanceof ListItem ) ? '-' : '.' );
                 }
+                buffer.append( item );
             }
-            buffer.append( ')' );
             return buffer.toString();
         }
     }
@@ -458,6 +458,11 @@ public class ComparableVersion
         return value;
     }
 
+    public String getCanonical()
+    {
+        return canonical;
+    }
+
     public boolean equals( Object o )
     {
         return ( o instanceof ComparableVersion ) && canonical.equals( ( (ComparableVersion) o ).canonical );
@@ -466,5 +471,37 @@ public class ComparableVersion
     public int hashCode()
     {
         return canonical.hashCode();
+    }
+
+    /**
+     * Main to test version parsing and comparison.
+     *
+     * @param args the version strings to parse and compare
+     */
+    public static void main( String... args )
+    {
+        System.out.println( "Display parameters as parsed by Maven (in canonical form) and comparison result:" );
+        if ( args.length == 0 )
+        {
+            return;
+        }
+
+        ComparableVersion prev = null;
+        int i = 1;
+        for ( String version : args )
+        {
+            ComparableVersion c = new ComparableVersion( version );
+
+            if ( prev != null )
+            {
+                int compare = prev.compareTo( c );
+                System.out.println( "   " + prev.toString() + ' '
+                    + ( ( compare == 0 ) ? "==" : ( ( compare < 0 ) ? "<" : ">" ) ) + ' ' + version );
+            }
+
+            System.out.println( String.valueOf( i++ ) + ". " + version + " == " + c.getCanonical() );
+
+            prev = c;
+        }
     }
 }
