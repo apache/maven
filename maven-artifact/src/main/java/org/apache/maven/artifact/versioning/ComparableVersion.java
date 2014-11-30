@@ -269,14 +269,16 @@ public class ComparableVersion
 
         void normalize()
         {
-            for ( ListIterator<Item> iterator = listIterator( size() ); iterator.hasPrevious(); )
+            for ( int i = size() - 1; i >= 0; i-- )
             {
-                Item item = iterator.previous();
-                if ( item.isNull() )
+                Item lastItem = get( i );
+
+                if ( lastItem.isNull() )
                 {
-                    iterator.remove(); // remove null trailing items: 0, "", empty list
+                    // remove null trailing items: 0, "", empty list
+                    remove( i );
                 }
-                else
+                else if ( !( lastItem instanceof ListItem ) )
                 {
                     break;
                 }
@@ -393,19 +395,8 @@ public class ComparableVersion
                 }
                 startIndex = i + 1;
 
-                if ( isDigit )
-                {
-                    list.normalize(); // 1.0-* = 1-*
-
-                    if ( ( i + 1 < version.length() ) && Character.isDigit( version.charAt( i + 1 ) ) )
-                    {
-                        // new ListItem only if previous were digits and new char is a digit,
-                        // ie need to differentiate only 1.1 from 1-1
-                        list.add( list = new ListItem() );
-
-                        stack.push( list );
-                    }
-                }
+                list.add( list = new ListItem() );
+                stack.push( list );
             }
             else if ( Character.isDigit( c ) )
             {
@@ -413,6 +404,9 @@ public class ComparableVersion
                 {
                     list.add( new StringItem( version.substring( startIndex, i ), true ) );
                     startIndex = i;
+
+                    list.add( list = new ListItem() );
+                    stack.push( list );
                 }
 
                 isDigit = true;
@@ -423,6 +417,9 @@ public class ComparableVersion
                 {
                     list.add( parseItem( true, version.substring( startIndex, i ) ) );
                     startIndex = i;
+
+                    list.add( list = new ListItem() );
+                    stack.push( list );
                 }
 
                 isDigit = false;

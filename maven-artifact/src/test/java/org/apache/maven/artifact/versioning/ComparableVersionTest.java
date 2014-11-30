@@ -38,6 +38,7 @@ public class ComparableVersionTest
         String canonical = ret.getCanonical();
         String parsedCanonical = new ComparableVersion( canonical ).getCanonical();
 
+        System.out.println( "canonical( " + version + " ) = " + canonical );
         assertEquals( "canonical( " + version + " ) = " + canonical + " -> canonical: " + parsedCanonical, canonical,
                       parsedCanonical );
 
@@ -104,6 +105,7 @@ public class ComparableVersionTest
 
     public void testVersionsEqual()
     {
+        newComparable( "1.0-alpha" );
         checkVersionsEqual( "1", "1" );
         checkVersionsEqual( "1", "1.0" );
         checkVersionsEqual( "1", "1.0.0" );
@@ -112,18 +114,16 @@ public class ComparableVersionTest
         checkVersionsEqual( "1", "1.0-0" );
         checkVersionsEqual( "1.0", "1.0-0" );
         // no separator between number and character
-        checkVersionsEqual( "1a", "1.a" );
         checkVersionsEqual( "1a", "1-a" );
         checkVersionsEqual( "1a", "1.0-a" );
         checkVersionsEqual( "1a", "1.0.0-a" );
-        checkVersionsEqual( "1.0a", "1.0.a" );
-        checkVersionsEqual( "1.0.0a", "1.0.0.a" );
-        checkVersionsEqual( "1x", "1.x" );
+        checkVersionsEqual( "1.0a", "1-a" );
+        checkVersionsEqual( "1.0.0a", "1-a" );
         checkVersionsEqual( "1x", "1-x" );
         checkVersionsEqual( "1x", "1.0-x" );
         checkVersionsEqual( "1x", "1.0.0-x" );
-        checkVersionsEqual( "1.0x", "1.0.x" );
-        checkVersionsEqual( "1.0.0x", "1.0.0.x" );
+        checkVersionsEqual( "1.0x", "1-x" );
+        checkVersionsEqual( "1.0.0x", "1-x" );
 
         // aliases
         checkVersionsEqual( "1ga", "1" );
@@ -131,9 +131,9 @@ public class ComparableVersionTest
         checkVersionsEqual( "1cr", "1rc" );
 
         // special "aliases" a, b and m for alpha, beta and milestone
-        checkVersionsEqual( "1a1", "1alpha1" );
-        checkVersionsEqual( "1b2", "1beta2" );
-        checkVersionsEqual( "1m3", "1milestone3" );
+        checkVersionsEqual( "1a1", "1-alpha-1" );
+        checkVersionsEqual( "1b2", "1-beta-2" );
+        checkVersionsEqual( "1m3", "1-milestone-3" );
 
         // case insensitive
         checkVersionsEqual( "1X", "1x" );
@@ -181,6 +181,24 @@ public class ComparableVersionTest
 
         checkVersionsOrder( "2.0.1", "2.0.1-123" );
         checkVersionsOrder( "2.0.1-xyz", "2.0.1-123" );
+    }
+
+    /**
+     * Test <a href="https://jira.codehaus.org/browse/MNG-5568">MNG-5568</a> edge case
+     * which was showing transitive inconsistency: since A > B and B > C then we should have A > C
+     * otherwise sorting a list of ComparableVersions() will in some cases throw runtime exception;
+     * see Netbeans issues <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=240845">240845</a> and
+     * <a href="https://netbeans.org/bugzilla/show_bug.cgi?id=226100">226100</a>
+     */
+    public void testMng5568()
+    {
+        String a = "6.1.0";
+        String b = "6.1.0rc3";
+        String c = "6.1H.5-beta"; // this is the unusual version string, with 'H' in the middle
+
+        checkVersionsOrder( b, a ); // classical
+        checkVersionsOrder( b, c ); // now b < c, but before MNG-5568, we had b > c
+        checkVersionsOrder( a, c );
     }
 
     public void testLocaleIndependent()
