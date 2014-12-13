@@ -59,7 +59,10 @@ public class JavaToolchainFactory
             return null;
         }
 
-        JavaToolchainImpl jtc = new JavaToolchainImpl( model, logger );
+        // use DefaultJavaToolChain for compatibility with maven 3.2.3 and earlier
+
+        @SuppressWarnings( "deprecation" )
+        JavaToolchainImpl jtc = new DefaultJavaToolChain( model, logger );
 
         // populate the provides section
         Properties provides = model.getProvides();
