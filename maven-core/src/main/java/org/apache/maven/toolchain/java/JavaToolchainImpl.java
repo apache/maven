@@ -29,6 +29,7 @@ import org.codehaus.plexus.util.Os;
 
 /**
  * JDK toolchain implementation.
+ * <strong>Note:</strong> This is an internal component whose interface can change without prior notice.
  *
  * @author Milos Kleint
  * @since 2.0.9, renamed from DefaultJavaToolChain in 3.2.4
