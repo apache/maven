@@ -93,6 +93,7 @@ public class DefaultRepositorySystemSessionFactory
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
 
+    @SuppressWarnings( "checkstyle:methodlength" )
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -152,7 +153,12 @@ public class DefaultRepositorySystemSessionFactory
             session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
         }
 
-        if ( request.getWorkspaceReader() != null )
+        // As of Maven 3.4.0, workspace resolution can be disabled. See MNG-5738.
+        if ( request.isUseLegacyReactorResolution() )
+        {
+            session.setWorkspaceReader( null );
+        }
+        else if ( request.getWorkspaceReader() != null )
         {
             session.setWorkspaceReader( request.getWorkspaceReader() );
         }

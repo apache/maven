@@ -232,25 +232,30 @@ public class DefaultMaven
             return addExceptionToResult( result, e );
         }
 
-        WorkspaceReader reactorWorkspace;
-        try
+        // As of Maven 3.4.0, workspace resolution can be disabled. See MNG-5738.
+        if ( !request.isUseLegacyReactorResolution() )
         {
-            reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
-        }
-        catch ( ComponentLookupException e )
-        {
-            return addExceptionToResult( result, e );
-        }
+            WorkspaceReader reactorWorkspace;
+            try
+            {
+                reactorWorkspace = container.lookup( WorkspaceReader.class, ReactorReader.HINT );
+            }
+            catch ( ComponentLookupException e )
+            {
+                return addExceptionToResult( result, e );
+            }
 
-        //
-        // Desired order of precedence for local artifact repositories
-        //
-        // Reactor
-        // Workspace
-        // User Local Repository
-        //
-        repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorWorkspace,
-                                                                            repoSession.getWorkspaceReader() ) );
+            //
+            // Desired order of precedence for local artifact repositories
+            //
+            // Reactor
+            // Workspace
+            // User Local Repository
+            //
+            repoSession.setWorkspaceReader( ChainedWorkspaceReader.newInstance( reactorWorkspace,
+                                                                                repoSession.getWorkspaceReader() ) );
+
+        }
 
         repoSession.setReadOnly();
 

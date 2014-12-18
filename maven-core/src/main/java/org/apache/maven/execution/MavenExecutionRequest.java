@@ -442,4 +442,15 @@ public interface MavenExecutionRequest
      * @since 3.3.0
      */
     Map<String, Object> getData();
+
+    /**
+     * @since 3.4.0
+     */
+    boolean isUseLegacyReactorResolution();
+
+    /**
+     * @since 3.4.0
+     */
+    MavenExecutionRequest setUseLegacyReactorResolution( boolean value );
+
 }

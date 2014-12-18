@@ -287,6 +287,7 @@ public class MavenCli
             populateRequest( cliRequest );
             encryption( cliRequest );
             repository( cliRequest );
+            resolution( cliRequest );
             return execute( cliRequest );
         }
         catch ( ExitException e )
@@ -943,6 +944,16 @@ public class MavenCli
             "maven.legacyLocalRepo" ) )
         {
             cliRequest.request.setUseLegacyLocalRepository( true );
+        }
+    }
+
+    private void resolution( CliRequest cliRequest )
+        throws Exception
+    {
+        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_REACTOR_RESOLUTION )
+                 || Boolean.getBoolean( "maven.legacyReactorResolution" ) )
+        {
+            cliRequest.request.setUseLegacyReactorResolution( true );
         }
     }
 
