@@ -101,6 +101,8 @@ public class CLIManager
 
     public static final String LEGACY_LOCAL_REPOSITORY = "llr";
 
+    public static final String LEGACY_REACTOR_RESOLUTION = "lrr";
+
     public static final String BUILDER = "b";
 
     protected Options options;
@@ -141,6 +143,7 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasOptionalArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "threads" ).hasArg().withDescription( "Thread count, for instance 2.0C where C is core multiplied" ).create( THREADS ) );
         options.addOption( OptionBuilder.withLongOpt( "legacy-local-repository" ).withDescription( "Use Maven 2 Legacy Local Repository behaviour, ie no use of _remote.repositories. Can also be activated by using -Dmaven.legacyLocalRepo=true" ).create( LEGACY_LOCAL_REPOSITORY ) );
+        options.addOption( OptionBuilder.withLongOpt( "legacy-reactor-resolution" ).withDescription( "Use Maven 2 legacy reactor resolution behaviour, ie disable workspace resolution. Can also be activated by using -Dmaven.legacyReactorResolution=true" ).create( LEGACY_REACTOR_RESOLUTION ) );
         options.addOption( OptionBuilder.withLongOpt( "builder" ).hasArg().withDescription( "The id of the build strategy to use." ).create( BUILDER ) );
 
         // Adding this back in for compatibility with the verifier that hard codes this option.
