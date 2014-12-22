@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.CiManagement;
+import org.apache.maven.model.QualityManagement;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
@@ -166,6 +167,24 @@ public class MavenModelMerger
                 tgt.setLocation( "", src.getLocation( "" ) );
                 target.setCiManagement( tgt );
                 mergeCiManagement( tgt, src, sourceDominant, context );
+            }
+        }
+    }
+
+    @Override
+    protected void mergeModel_QualityManagement( Model target, Model source, boolean sourceDominant,
+                                            Map<Object, Object> context )
+    {
+        QualityManagement src = source.getQualityManagement();
+        if ( src != null )
+        {
+            QualityManagement tgt = target.getQualityManagement();
+            if ( tgt == null )
+            {
+                tgt = new QualityManagement();
+                tgt.setLocation( "", src.getLocation( "" ) );
+                target.setQualityManagement( tgt );
+                mergeQualityManagement( tgt, src, sourceDominant, context );
             }
         }
     }

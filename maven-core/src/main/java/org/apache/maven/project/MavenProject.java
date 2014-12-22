@@ -42,6 +42,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.CiManagement;
+import org.apache.maven.model.QualityManagement;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -546,6 +547,16 @@ public class MavenProject
     public void setCiManagement( CiManagement ciManagement )
     {
         getModel().setCiManagement( ciManagement );
+    }
+
+    public QualityManagement getQualityManagement()
+    {
+        return getModel().getQualityManagement();
+    }
+
+    public void setQualityManagement( QualityManagement qualityManagement )
+    {
+        getModel().setQualityManagement( qualityManagement );
     }
 
     public IssueManagement getIssueManagement()

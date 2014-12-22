@@ -430,6 +430,19 @@
         </field>
 
         <!-- ====================================================================== -->
+        <!-- Quality Management                                                          -->
+        <!-- ====================================================================== -->
+
+        <field>
+          <name>qualityManagement</name>
+          <version>4.0.0+</version>
+          <description>The project's quality management information.</description>
+          <association>
+            <type>QualityManagement</type>
+          </association>
+        </field>
+
+        <!-- ====================================================================== -->
         <!-- Distribution Management                                                -->
         <!-- ====================================================================== -->
 
@@ -1075,6 +1088,35 @@
             <multiplicity>*</multiplicity>
             <type>Notifier</type>
           </association>
+        </field>
+      </fields>
+    </class>
+    <class java.clone="deep">
+      <name>QualityManagement</name>
+      <version>4.0.0+</version>
+      <description>
+        <![CDATA[
+        The <code>&lt;QualityManagement&gt;</code> element contains informations required to the
+        quality management system of the project.
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>system</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            The name of the quality management system, e.g. <code>SonarQube</code>.
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>url</name>
+          <version>4.0.0+</version>
+          <description>URL for the quality management system used by the project if it has a web
+            interface.</description>
+          <type>String</type>
         </field>
       </fields>
     </class>
