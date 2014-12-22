@@ -173,7 +173,7 @@ public class MavenModelMerger
 
     @Override
     protected void mergeModel_QualityManagement( Model target, Model source, boolean sourceDominant,
-                                            Map<Object, Object> context )
+                                                 Map<Object, Object> context )
     {
         QualityManagement src = source.getQualityManagement();
         if ( src != null )

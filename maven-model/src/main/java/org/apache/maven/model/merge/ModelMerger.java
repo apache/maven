@@ -469,7 +469,7 @@ public class ModelMerger
     }
 
     protected void mergeModel_QualityManagement( Model target, Model source, boolean sourceDominant,
-        Map<Object, Object> context )
+                                                 Map<Object, Object> context )
     {
         QualityManagement src = source.getQualityManagement();
         if ( src != null )
@@ -2160,14 +2160,14 @@ public class ModelMerger
     }
 
     protected void mergeQualityManagement( QualityManagement target, QualityManagement source, boolean sourceDominant,
-                                            Map<Object, Object> context )
+                                           Map<Object, Object> context )
     {
         mergeQualityManagement_System( target, source, sourceDominant, context );
         mergeQualityManagement_Url( target, source, sourceDominant, context );
     }
 
     protected void mergeQualityManagement_System( QualityManagement target, QualityManagement source,
-                                                    boolean sourceDominant, Map<Object, Object> context )
+                                                  boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getSystem();
         if ( src != null )
@@ -2181,7 +2181,7 @@ public class ModelMerger
     }
 
     protected void mergeQualityManagement_Url( QualityManagement target, QualityManagement source,
-                                                boolean sourceDominant, Map<Object, Object> context )
+                                               boolean sourceDominant, Map<Object, Object> context )
     {
         String src = source.getUrl();
         if ( src != null )
