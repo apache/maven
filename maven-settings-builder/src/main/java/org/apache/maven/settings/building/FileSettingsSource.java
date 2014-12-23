@@ -20,20 +20,20 @@ package org.apache.maven.settings.building;
  */
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+
+import org.apache.maven.building.FileSource;
 
 /**
  * Wraps an ordinary {@link File} as a settings source.
  *
  * @author Benjamin Bentmann
+ * 
+ * @deprecated instead use {@link FileSource}
  */
-public class FileSettingsSource
+@Deprecated
+public class FileSettingsSource extends FileSource
     implements SettingsSource
 {
-
-    private File settingsFile;
 
     /**
      * Creates a new settings source backed by the specified file.
@@ -42,38 +42,18 @@ public class FileSettingsSource
      */
     public FileSettingsSource( File settingsFile )
     {
-        if ( settingsFile == null )
-        {
-            throw new IllegalArgumentException( "no settings file specified" );
-        }
-        this.settingsFile = settingsFile.getAbsoluteFile();
-    }
-
-    public InputStream getInputStream()
-        throws IOException
-    {
-        return new FileInputStream( settingsFile );
-    }
-
-    public String getLocation()
-    {
-        return settingsFile.getPath();
+        super( settingsFile );
     }
 
     /**
      * Gets the settings file of this model source.
      *
      * @return The underlying settings file, never {@code null}.
+     * @deprecated instead use {@link #getFile()}
      */
+    @Deprecated
     public File getSettingsFile()
     {
-        return settingsFile;
+        return getFile();
     }
-
-    @Override
-    public String toString()
-    {
-        return getLocation();
-    }
-
 }

@@ -19,22 +19,19 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.apache.maven.building.StringSource;
 
 /**
  * Wraps an ordinary {@link CharSequence} as a settings source.
  *
  * @author Benjamin Bentmann
+ * 
+ * @deprecated instead use {@link StringSource}
  */
-public class StringSettingsSource
+@Deprecated
+public class StringSettingsSource extends StringSource
     implements SettingsSource
 {
-
-    private String settings;
-
-    private String location;
 
     /**
      * Creates a new settings source backed by the specified string.
@@ -54,35 +51,19 @@ public class StringSettingsSource
      */
     public StringSettingsSource( CharSequence settings, String location )
     {
-        this.settings = ( settings != null ) ? settings.toString() : "";
-        this.location = ( location != null ) ? location : "(memory)";
-    }
-
-    public InputStream getInputStream()
-        throws IOException
-    {
-        return new ByteArrayInputStream( settings.getBytes( "UTF-8" ) );
-    }
-
-    public String getLocation()
-    {
-        return location;
+        super( settings, location );
     }
 
     /**
      * Gets the character sequence of this settings source.
      *
      * @return The underlying character stream, never {@code null}.
+     * @deprecated instead use {@link #getContent()}
      */
+    @Deprecated
     public String getSettings()
     {
-        return settings;
-    }
-
-    @Override
-    public String toString()
-    {
-        return getLocation();
+        return getContent();
     }
 
 }

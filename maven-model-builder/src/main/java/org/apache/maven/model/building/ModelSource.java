@@ -1,5 +1,7 @@
 package org.apache.maven.model.building;
 
+import org.apache.maven.building.Source;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,8 +21,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Provides access to the contents of a POM independently of the backing store (e.g. file system, database, memory).
@@ -30,24 +30,10 @@ import java.io.InputStream;
  *
  * @author Benjamin Bentmann
  * @see ModelSource2
+ * @deprecated instead use {@link Source}
  */
-public interface ModelSource
+@Deprecated
+public interface ModelSource extends org.apache.maven.building.Source
 {
-
-    /**
-     * Gets a byte stream to the POM contents. Closing the returned stream is the responsibility of the caller.
-     *
-     * @return A byte stream to the POM contents, never {@code null}.
-     */
-    InputStream getInputStream()
-        throws IOException;
-
-    /**
-     * Provides a user-friendly hint about the location of the POM. This could be a local file path, a URI or just an
-     * empty string. The intention is to assist users during error reporting.
-     *
-     * @return A user-friendly hint about the location of the POM, never {@code null}.
-     */
-    String getLocation();
 
 }

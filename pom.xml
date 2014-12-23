@@ -73,6 +73,7 @@
 
   <modules>
     <module>maven-plugin-api</module>
+    <module>maven-builder-support</module>
     <module>maven-model</module>
     <module>maven-model-builder</module>
     <module>maven-core</module>
@@ -195,6 +196,11 @@
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-repository-metadata</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-builder-support</artifactId>
         <version>${project.version}</version>
       </dependency>
       <!--bootstrap-end-comment-->
@@ -488,7 +494,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.10</version>
+        <version>1.14-SNAPSHOT</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>

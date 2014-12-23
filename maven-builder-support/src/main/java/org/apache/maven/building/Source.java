@@ -1,6 +1,4 @@
-package org.apache.maven.model.building;
-
-import org.apache.maven.building.StringSource;
+package org.apache.maven.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -21,37 +19,31 @@ import org.apache.maven.building.StringSource;
  * under the License.
  */
 
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * Wraps an ordinary {@link CharSequence} as a model source.
+ * Provides access to the contents of a source independently of the backing store (e.g. file system, database, memory).
  *
  * @author Benjamin Bentmann
- * 
- * @deprecated instead use {@link StringSource}
  */
-@Deprecated
-public class StringModelSource extends org.apache.maven.building.StringSource
-    implements ModelSource
+public interface Source
 {
 
     /**
-     * Creates a new model source backed by the specified string.
+     * Gets a byte stream to the source contents. Closing the returned stream is the responsibility of the caller.
      *
-     * @param pom The POM's string representation, may be empty or {@code null}.
+     * @return A byte stream to the source contents, never {@code null}.
      */
-    public StringModelSource( CharSequence pom )
-    {
-        this( pom, null );
-    }
+    InputStream getInputStream()
+        throws IOException;
 
     /**
-     * Creates a new model source backed by the specified string.
+     * Provides a user-friendly hint about the location of the source. This could be a local file path, a URI or just an
+     * empty string. The intention is to assist users during error reporting.
      *
-     * @param pom The POM's string representation, may be empty or {@code null}.
-     * @param location The location to report for this use, may be {@code null}.
+     * @return A user-friendly hint about the location of the source, never {@code null}.
      */
-    public StringModelSource( CharSequence pom, String location )
-    {
-        super( pom, location );
-    }
+    String getLocation();
+
 }

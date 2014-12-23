@@ -19,32 +19,17 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.apache.maven.building.Source;
 
 /**
  * Provides access to the contents of settings independently of the backing store (e.g. file system, database, memory).
  *
  * @author Benjamin Bentmann
+ * 
+ * @deprecated instead use {@link Source}
  */
-public interface SettingsSource
+@Deprecated
+public interface SettingsSource extends Source
 {
-
-    /**
-     * Gets a byte stream to the settings contents. Closing the returned stream is the responsibility of the caller.
-     * Note that each invocation of this method returns a new/fresh stream which represents the entire contents.
-     *
-     * @return A byte stream to the settings contents, never {@code null}.
-     */
-    InputStream getInputStream()
-        throws IOException;
-
-    /**
-     * Provides a user-friendly hint about the location of the settings. This could be a local file path, a URI or just
-     * an empty string. The intention is to assist users during error reporting.
-     *
-     * @return A user-friendly hint about the location of the settings, never {@code null}.
-     */
-    String getLocation();
 
 }

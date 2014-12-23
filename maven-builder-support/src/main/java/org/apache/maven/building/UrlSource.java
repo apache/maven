@@ -1,4 +1,4 @@
-package org.apache.maven.settings.building;
+package org.apache.maven.building;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,42 +19,62 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.maven.building.UrlSource;
-
 /**
- * Wraps an ordinary {@link URL} as a settings source.
+ * Wraps an ordinary {@link URL} as a source.
  *
  * @author Benjamin Bentmann
- * 
- * @deprecated instead use {@link UrlSource}
  */
-@Deprecated
-public class UrlSettingsSource extends UrlSource
-    implements SettingsSource
+public class UrlSource
+    implements Source
 {
 
+    private URL url;
+
     /**
-     * Creates a new model source backed by the specified URL.
+     * Creates a new source backed by the specified URL.
      *
-     * @param settingsUrl The settings URL, must not be {@code null}.
+     * @param url The file, must not be {@code null}.
      */
-    public UrlSettingsSource( URL settingsUrl )
+    public UrlSource( URL url )
     {
-        super( settingsUrl );
+        if ( url == null )
+        {
+            throw new IllegalArgumentException( "no POM URL specified" );
+        }
+        this.url = url;
+    }
+
+    @Override
+    public InputStream getInputStream()
+        throws IOException
+    {
+        return url.openStream();
+    }
+
+    @Override
+    public String getLocation()
+    {
+        return url.toString();
     }
 
     /**
-     * Gets the settings URL of this model source.
+     * Gets the URL of this source.
      *
-     * @return The underlying settings URL, never {@code null}.
-     * @deprecated instead use {@link #getUrl()}
+     * @return The underlying URL, never {@code null}.
      */
-    @Deprecated
-    public URL getSettingsUrl()
+    public URL getUrl()
     {
-        return getUrl();
+        return url;
     }
-    
+
+    @Override
+    public String toString()
+    {
+        return getLocation();
+    }
+
 }
