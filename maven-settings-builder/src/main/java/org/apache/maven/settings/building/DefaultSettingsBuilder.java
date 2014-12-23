@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.building.FileSource;
+import org.apache.maven.building.Source;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
@@ -86,11 +88,11 @@ public class DefaultSettingsBuilder
     {
         DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector( null );
 
-        SettingsSource globalSettingsSource =
+        Source globalSettingsSource =
             getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
         Settings globalSettings = readSettings( globalSettingsSource, request, problems );
 
-        SettingsSource userSettingsSource =
+        Source userSettingsSource =
             getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
         Settings userSettings = readSettings( userSettingsSource, request, problems );
 
@@ -135,7 +137,7 @@ public class DefaultSettingsBuilder
         return false;
     }
 
-    private SettingsSource getSettingsSource( File settingsFile, SettingsSource settingsSource )
+    private Source getSettingsSource( File settingsFile, Source settingsSource )
     {
         if ( settingsSource != null )
         {
@@ -143,12 +145,12 @@ public class DefaultSettingsBuilder
         }
         else if ( settingsFile != null && settingsFile.exists() )
         {
-            return new FileSettingsSource( settingsFile );
+            return new FileSource( settingsFile );
         }
         return null;
     }
 
-    private Settings readSettings( SettingsSource settingsSource, SettingsBuildingRequest request,
+    private Settings readSettings( Source settingsSource, SettingsBuildingRequest request,
                                    DefaultSettingsProblemCollector problems )
     {
         if ( settingsSource == null )
