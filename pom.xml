@@ -494,7 +494,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>animal-sniffer-maven-plugin</artifactId>
-        <version>1.14-SNAPSHOT</version>
+        <version>1.13</version>
         <configuration>
           <signature>
             <groupId>org.codehaus.mojo.signature</groupId>
