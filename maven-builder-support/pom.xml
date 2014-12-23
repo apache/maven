@@ -30,8 +30,8 @@ under the License.
 
   <artifactId>maven-builder-support</artifactId>
 
-  <name>Maven Settings</name>
-  <description>Maven Builder Support</description>
+  <name>Maven Builder Support</name>
+  <description>Support for Builders</description>
 
   <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
