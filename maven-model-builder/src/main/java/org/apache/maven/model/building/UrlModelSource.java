@@ -31,7 +31,7 @@ import org.apache.maven.building.UrlSource;
  * @deprecated instead use {@link UrlSource}
  */
 @Deprecated
-public class UrlModelSource extends org.apache.maven.building.UrlSource
+public class UrlModelSource extends UrlSource
     implements ModelSource
 {
     /**

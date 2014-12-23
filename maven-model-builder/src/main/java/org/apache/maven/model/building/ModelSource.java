@@ -1,7 +1,5 @@
 package org.apache.maven.model.building;
 
-import org.apache.maven.building.Source;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +19,7 @@ import org.apache.maven.building.Source;
  * under the License.
  */
 
+import org.apache.maven.building.Source;
 
 /**
  * Provides access to the contents of a POM independently of the backing store (e.g. file system, database, memory).
@@ -33,7 +32,7 @@ import org.apache.maven.building.Source;
  * @deprecated instead use {@link Source}
  */
 @Deprecated
-public interface ModelSource extends org.apache.maven.building.Source
+public interface ModelSource extends Source
 {
 
 }

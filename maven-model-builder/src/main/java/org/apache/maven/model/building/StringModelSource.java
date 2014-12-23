@@ -1,7 +1,5 @@
 package org.apache.maven.model.building;
 
-import org.apache.maven.building.StringSource;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -21,6 +19,7 @@ import org.apache.maven.building.StringSource;
  * under the License.
  */
 
+import org.apache.maven.building.StringSource;
 
 /**
  * Wraps an ordinary {@link CharSequence} as a model source.
@@ -30,7 +29,7 @@ import org.apache.maven.building.StringSource;
  * @deprecated instead use {@link StringSource}
  */
 @Deprecated
-public class StringModelSource extends org.apache.maven.building.StringSource
+public class StringModelSource extends StringSource
     implements ModelSource
 {
 
