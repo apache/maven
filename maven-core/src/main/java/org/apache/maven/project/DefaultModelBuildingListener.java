@@ -28,6 +28,7 @@ import org.apache.maven.model.building.ModelBuildingEvent;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
@@ -120,6 +121,12 @@ class DefaultModelBuildingListener
                         .setException( e ) );
             }
             catch ( PluginVersionResolutionException e )
+            {
+                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Unresolveable build extension: " + e.getMessage() )
+                        .setException( e ) );
+            }
+            catch ( PluginManagerException e )
             {
                 event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                         .setMessage( "Unresolveable build extension: " + e.getMessage() )

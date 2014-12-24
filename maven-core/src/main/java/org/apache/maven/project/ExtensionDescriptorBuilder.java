@@ -40,7 +40,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  *
  * @author Benjamin Bentmann
  */
-class ExtensionDescriptorBuilder
+public class ExtensionDescriptorBuilder
 {
 
     private String getExtensionDescriptorLocation()

@@ -25,6 +25,7 @@ import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 
@@ -66,7 +67,7 @@ public interface ProjectBuildingHelper
      */
     ProjectRealmCache.CacheRecord createProjectRealm( MavenProject project, Model model,
                                                       ProjectBuildingRequest request )
-        throws PluginResolutionException, PluginVersionResolutionException;
+        throws PluginResolutionException, PluginVersionResolutionException, PluginManagerException;
 
     /**
      * Updates the context class loader such that the container will search the project realm when the model builder

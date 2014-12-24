@@ -21,10 +21,10 @@ package org.apache.maven.plugin;
 
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.ExtensionDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.eclipse.aether.artifact.Artifact;
 
 /**
  * Caches extension class realms. <strong>Warning:</strong> This is an internal utility interface that is only public
@@ -51,19 +51,23 @@ public interface ExtensionRealmCache
 
         public final ExtensionDescriptor desciptor;
 
-        public CacheRecord( ClassRealm realm, ExtensionDescriptor descriptor )
+        public final List<Artifact> artifacts;
+
+        public CacheRecord( ClassRealm realm, ExtensionDescriptor descriptor, List<Artifact> artifacts )
         {
             this.realm = realm;
             this.desciptor = descriptor;
+            this.artifacts = artifacts;
         }
 
     }
 
-    Key createKey( List<? extends Artifact> extensionArtifacts );
+    Key createKey( List<Artifact> extensionArtifacts );
 
     CacheRecord get( Key key );
 
-    CacheRecord put( Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor );
+    CacheRecord put( Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor,
+                     List<Artifact> artifacts );
 
     void flush();
 
