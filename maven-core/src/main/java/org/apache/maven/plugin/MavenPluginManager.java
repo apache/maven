@@ -25,6 +25,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -90,6 +91,15 @@ public interface MavenPluginManager
     void setupPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
                            List<String> imports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException;
+
+    /**
+     * Sets up class realm for the specified build extensions plugin.
+     * 
+     * @since 3.2.6
+     */
+    ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
+                                                          RepositorySystemSession session )
+        throws PluginManagerException;
 
     /**
      * Looks up the mojo for the specified mojo execution and populates its parameters from the configuration given by

@@ -46,17 +46,20 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.monitor.logging.DefaultLog;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
+import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MavenPluginValidator;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginIncompatibleException;
+import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginParameterException;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluator;
 import org.apache.maven.plugin.PluginRealmCache;
@@ -65,6 +68,12 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.plugin.version.PluginVersionResolver;
+import org.apache.maven.project.ExtensionDescriptor;
+import org.apache.maven.project.ExtensionDescriptorBuilder;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
@@ -111,6 +120,15 @@ public class DefaultMavenPluginManager
     implements MavenPluginManager
 {
 
+    /**
+     * PluginId=>ExtensionRealmCache.CacheRecord map MavenProject context value key. The map is used to ensure the same
+     * class realm is used to load build extensions and load mojos for extensions=true plugins.
+     * 
+     * @noreference this is part of internal implementation and may be changed or removed without notice
+     * @since 3.2.6
+     */
+    public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
+
     @Requirement
     private Logger logger;
 
@@ -134,6 +152,17 @@ public class DefaultMavenPluginManager
 
     @Requirement
     private RuntimeInformation runtimeInformation;
+
+    @Requirement
+    private ExtensionRealmCache extensionRealmCache;
+
+    @Requirement
+    private PluginVersionResolver pluginVersionResolver;
+
+    @Requirement
+    private PluginArtifactsCache pluginArtifactsCache;
+
+    private ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
 
     private PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
@@ -355,45 +384,72 @@ public class DefaultMavenPluginManager
 
         MavenProject project = session.getCurrentProject();
 
-        DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
-        dependencyFilter = AndDependencyFilter.newInstance( dependencyFilter, filter );
+        final ClassRealm pluginRealm;
+        final List<Artifact> pluginArtifacts;
 
-        DependencyNode root =
-            pluginDependenciesResolver.resolve( plugin, RepositoryUtils.toArtifact( pluginArtifact ), dependencyFilter,
-                                                project.getRemotePluginRepositories(), session.getRepositorySession() );
-
-        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-        root.accept( nlg );
-
-        List<Artifact> exposedPluginArtifacts = new ArrayList<Artifact>( nlg.getNodes().size() );
-        RepositoryUtils.toArtifacts( exposedPluginArtifacts, Collections.singleton( root ),
-                                     Collections.<String>emptyList(), null );
-        for ( Iterator<Artifact> it = exposedPluginArtifacts.iterator(); it.hasNext(); )
+        RepositorySystemSession repositorySession = session.getRepositorySession();
+        if ( plugin.isExtensions() )
         {
-            Artifact artifact = it.next();
-            if ( artifact.getFile() == null )
+            // TODO discover components in #setupExtensionsRealm
+
+            ExtensionRealmCache.CacheRecord extensionRecord;
+            try
             {
-                it.remove();
+                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
             }
+            catch ( PluginManagerException e )
+            {
+                // extensions realm is expected to be fully setup at this point
+                // any exception means a problem in maven code, not a user error
+                throw new IllegalStateException( e );
+            }
+
+            pluginRealm = extensionRecord.realm;
+            pluginArtifacts = extensionRecord.artifacts;
+        }
+        else
+        {
+            DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
+            dependencyFilter = AndDependencyFilter.newInstance( dependencyFilter, filter );
+
+            DependencyNode root =
+                pluginDependenciesResolver.resolve( plugin, RepositoryUtils.toArtifact( pluginArtifact ),
+                                                    dependencyFilter, project.getRemotePluginRepositories(),
+                                                    repositorySession );
+
+            PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+            root.accept( nlg );
+
+            pluginArtifacts = toMavenArtifacts( root, nlg );
+
+            pluginRealm =
+                classRealmManager.createPluginRealm( plugin, parent, null, foreignImports,
+                                                     toAetherArtifacts( pluginArtifacts ) );
+
+            discoverPluginComponents( pluginRealm, plugin, pluginDescriptor );
         }
 
-        List<org.eclipse.aether.artifact.Artifact> pluginArtifacts = nlg.getArtifacts( true );
-
-        ClassRealm pluginRealm =
-            classRealmManager.createPluginRealm( plugin, parent, null, foreignImports, pluginArtifacts );
-
         pluginDescriptor.setClassRealm( pluginRealm );
-        pluginDescriptor.setArtifacts( exposedPluginArtifacts );
+        pluginDescriptor.setArtifacts( pluginArtifacts );
+    }
 
+    private void discoverPluginComponents( final ClassRealm pluginRealm, Plugin plugin,
+                                           PluginDescriptor pluginDescriptor )
+        throws PluginContainerException
+    {
         try
         {
-            for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
+            if ( pluginDescriptor != null )
             {
-                componentDescriptor.setRealm( pluginRealm );
-                container.addComponentDescriptor( componentDescriptor );
+                for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
+                {
+                    componentDescriptor.setRealm( pluginRealm );
+                    container.addComponentDescriptor( componentDescriptor );
+                }
             }
 
-            ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm, new SessionScopeModule( container ),
+            ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm,
+                                                                       new SessionScopeModule( container ),
                                                                        new MojoExecutionScopeModule( container ) );
         }
         catch ( ComponentLookupException e )
@@ -406,6 +462,26 @@ public class DefaultMavenPluginManager
             throw new PluginContainerException( plugin, pluginRealm, "Error in component graph of plugin "
                 + plugin.getId() + ": " + e.getMessage(), e );
         }
+    }
+
+    private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts( final List<Artifact> pluginArtifacts )
+    {
+        return new ArrayList<org.eclipse.aether.artifact.Artifact>( RepositoryUtils.toArtifacts( pluginArtifacts ) );
+    }
+
+    private List<Artifact> toMavenArtifacts( DependencyNode root, PreorderNodeListGenerator nlg )
+    {
+        List<Artifact> artifacts = new ArrayList<Artifact>( nlg.getNodes().size() );
+        RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.<String>emptyList(), null );
+        for ( Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); )
+        {
+            Artifact artifact = it.next();
+            if ( artifact.getFile() == null )
+            {
+                it.remove();
+            }
+        }
+        return artifacts;
     }
 
     private Map<String, ClassLoader> calcImports( MavenProject project, ClassLoader parent, List<String> imports )
@@ -723,6 +799,139 @@ public class DefaultMavenPluginManager
                 logger.debug( "Error releasing mojo for " + goalExecId, e );
             }
         }
+    }
+
+    public ExtensionRealmCache.CacheRecord setupExtensionsRealm( MavenProject project, Plugin plugin,
+                                                                 RepositorySystemSession session )
+        throws PluginManagerException
+    {
+        @SuppressWarnings( "unchecked" )
+        Map<String, ExtensionRealmCache.CacheRecord> pluginRealms =
+            (Map<String, ExtensionRealmCache.CacheRecord>) project.getContextValue( KEY_EXTENSIONS_REALMS );
+        if ( pluginRealms == null )
+        {
+            pluginRealms = new HashMap<String, ExtensionRealmCache.CacheRecord>();
+            project.setContextValue( KEY_EXTENSIONS_REALMS, pluginRealms );
+        }
+
+        final String pluginKey = plugin.getId();
+
+        ExtensionRealmCache.CacheRecord extensionRecord = pluginRealms.get( pluginKey );
+        if ( extensionRecord != null )
+        {
+            return extensionRecord;
+        }
+
+        final List<RemoteRepository> repositories = project.getRemotePluginRepositories();
+
+        // resolve plugin version as necessary
+        if ( plugin.getVersion() == null )
+        {
+            PluginVersionRequest versionRequest = new DefaultPluginVersionRequest( plugin, session, repositories );
+            try
+            {
+                plugin.setVersion( pluginVersionResolver.resolve( versionRequest ).getVersion() );
+            }
+            catch ( PluginVersionResolutionException e )
+            {
+                throw new PluginManagerException( plugin, e.getMessage(), e );
+            }
+        }
+
+        // resolve plugin artifacts
+        List<Artifact> artifacts;
+        PluginArtifactsCache.Key cacheKey = pluginArtifactsCache.createKey( plugin, null, repositories, session );
+        PluginArtifactsCache.CacheRecord recordArtifacts;
+        try
+        {
+            recordArtifacts = pluginArtifactsCache.get( cacheKey );
+        }
+        catch ( PluginResolutionException e )
+        {
+            throw new PluginManagerException( plugin, e.getMessage(), e );
+        }
+        if ( recordArtifacts != null )
+        {
+            artifacts = recordArtifacts.artifacts;
+        }
+        else
+        {
+            try
+            {
+                artifacts = resolveExtensionArtifacts( plugin, repositories, session );
+                recordArtifacts = pluginArtifactsCache.put( cacheKey, artifacts );
+            }
+            catch ( PluginResolutionException e )
+            {
+                pluginArtifactsCache.put( cacheKey, e );
+                pluginArtifactsCache.register( project, cacheKey, recordArtifacts );
+                throw new PluginManagerException( plugin, e.getMessage(), e );
+            }
+        }
+        pluginArtifactsCache.register( project, cacheKey, recordArtifacts );
+
+        // create and cache extensions realms
+        final ExtensionRealmCache.Key extensionKey = extensionRealmCache.createKey( artifacts );
+        extensionRecord = extensionRealmCache.get( extensionKey );
+        if ( extensionRecord == null )
+        {
+            ClassRealm extensionRealm = classRealmManager.createExtensionRealm( plugin, toAetherArtifacts( artifacts ) );
+
+            PluginDescriptor pluginDescriptor = null;
+            if ( plugin.isExtensions() && !artifacts.isEmpty() )
+            {
+                // ignore plugin descriptor parsing errors at this point
+                // these errors will reported during calculation of project build execution plan
+                try
+                {
+                    pluginDescriptor = extractPluginDescriptor( artifacts.get( 0 ), plugin );
+                }
+                catch ( PluginDescriptorParsingException e )
+                {
+                    // ignore, see above
+                }
+                catch ( InvalidPluginDescriptorException e )
+                {
+                    // ignore, see above
+                }
+            }
+
+            discoverPluginComponents( extensionRealm, plugin, pluginDescriptor );
+
+            ExtensionDescriptor extensionDescriptor = null;
+            Artifact extensionArtifact = artifacts.get( 0 );
+            try
+            {
+                extensionDescriptor = extensionDescriptorBuilder.build( extensionArtifact.getFile() );
+            }
+            catch ( IOException e )
+            {
+                String message = "Invalid extension descriptor for " + plugin.getId() + ": " + e.getMessage();
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.error( message, e );
+                }
+                else
+                {
+                    logger.error( message );
+                }
+            }
+            extensionRecord = extensionRealmCache.put( extensionKey, extensionRealm, extensionDescriptor, artifacts );
+        }
+        extensionRealmCache.register( project, extensionKey, extensionRecord );
+        pluginRealms.put( pluginKey, extensionRecord );
+
+        return extensionRecord;
+    }
+
+    private List<Artifact> resolveExtensionArtifacts( Plugin extensionPlugin, List<RemoteRepository> repositories,
+                                                      RepositorySystemSession session )
+        throws PluginResolutionException
+    {
+        DependencyNode root = pluginDependenciesResolver.resolve( extensionPlugin, null, null, repositories, session );
+        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+        root.accept( nlg );
+        return toMavenArtifacts( root, nlg );
     }
 
 }
