@@ -1,4 +1,4 @@
-package org.apache.maven.toolchain.building.io;
+package org.apache.maven.toolchain.io;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
