@@ -348,6 +348,22 @@ public interface MavenExecutionRequest
 
     MavenExecutionRequest setUserToolchainsFile( File userToolchainsFile );
 
+    /**
+     * 
+     * 
+     * @return the global toolchains file
+     * @since 3.2.6
+     */
+    File getGlobalToolchainsFile();
+
+    /**
+     * 
+     * @param globalToolchainsFile the global toolchains file
+     * @return this request
+     * @since 3.2.6
+     */
+    MavenExecutionRequest setGlobalToolchainsFile( File globalToolchainsFile );
+
     ExecutionListener getExecutionListener();
 
     MavenExecutionRequest setExecutionListener( ExecutionListener executionListener );

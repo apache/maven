@@ -37,6 +37,7 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.building.Source;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
@@ -65,7 +66,7 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.building.SettingsSource;
+import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -113,6 +114,9 @@ public class MavenCli
 
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
+    public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE = 
+       new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/toolchains.xml" );
+
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
 
     private ClassWorld classWorld;
@@ -132,6 +136,8 @@ public class MavenCli
     private MavenExecutionRequestPopulator executionRequestPopulator;
 
     private SettingsBuilder settingsBuilder;
+
+    private ToolchainsBuilder toolchainsBuilder;
 
     private DefaultSecDispatcher dispatcher;
 
@@ -210,6 +216,7 @@ public class MavenCli
             localContainer = container( cliRequest );
             commands( cliRequest );
             settings( cliRequest );
+            toolchains( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
             repository( cliRequest );
@@ -761,10 +768,10 @@ public class MavenCli
         eventSpyDispatcher.onEvent( settingsRequest );
 
         slf4jLogger.debug( "Reading global settings from "
-            + getSettingsLocation( settingsRequest.getGlobalSettingsSource(),
+            + getLocation( settingsRequest.getGlobalSettingsSource(),
                                    settingsRequest.getGlobalSettingsFile() ) );
         slf4jLogger.debug( "Reading user settings from "
-            + getSettingsLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
+            + getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -785,8 +792,57 @@ public class MavenCli
             slf4jLogger.warn( "" );
         }
     }
+    
+    @SuppressWarnings( "checkstyle:methodlength" )
+    private void toolchains( CliRequest cliRequest )
+        throws Exception
+    {
+        File userToolchainsFile;
 
-    private Object getSettingsLocation( SettingsSource source, File file )
+        if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
+        {
+            userToolchainsFile =
+                new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
+            userToolchainsFile = resolveFile( userToolchainsFile, cliRequest.workingDirectory );
+
+            if ( !userToolchainsFile.isFile() )
+            {
+                throw new FileNotFoundException( "The specified user toolchains file does not exist: "
+                    + userToolchainsFile );
+            }
+        }
+        else
+        {
+            userToolchainsFile = DEFAULT_USER_TOOLCHAINS_FILE;
+        }
+
+        File globalToolchainsFile;
+
+        if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS ) )
+        {
+            globalToolchainsFile =
+                new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS ) );
+            globalToolchainsFile = resolveFile( globalToolchainsFile, cliRequest.workingDirectory );
+
+            if ( !globalToolchainsFile.isFile() )
+            {
+                throw new FileNotFoundException( "The specified global toolchains file does not exist: "
+                    + globalToolchainsFile );
+            }
+        }
+        else
+        {
+            globalToolchainsFile = DEFAULT_GLOBAL_TOOLCHAINS_FILE;
+        }
+
+        cliRequest.request.setGlobalToolchainsFile( globalToolchainsFile );
+        cliRequest.request.setUserToolchainsFile( userToolchainsFile );
+        
+        // Unlike settings, the toolchains aren't built here. 
+        // That's done by the maven-toolchains-plugin, by calling it from the project with the proper configuration
+    }
+
+    private Object getLocation( Source source, File file )
     {
         if ( source != null )
         {
@@ -974,7 +1030,7 @@ public class MavenCli
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setUserToolchainsFile( userToolchainsFile );
+            ;
 
         if ( alternatePomFile != null )
         {

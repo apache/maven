@@ -84,6 +84,8 @@ public class DefaultMavenExecutionRequest
 
     private File userToolchainsFile;
 
+    private File globalToolchainsFile;
+
     // ----------------------------------------------------------------------------
     // Request
     // ----------------------------------------------------------------------------
@@ -169,6 +171,7 @@ public class DefaultMavenExecutionRequest
         copy.setUserSettingsFile( original.getUserSettingsFile() );
         copy.setGlobalSettingsFile( original.getGlobalSettingsFile() );
         copy.setUserToolchainsFile( original.getUserToolchainsFile() );
+        copy.setGlobalToolchainsFile( original.getGlobalToolchainsFile() );
         copy.setBaseDirectory( ( original.getBaseDirectory() != null ) ? new File( original.getBaseDirectory() ) : null );
         copy.setGoals( original.getGoals() );
         copy.setRecursive( original.isRecursive() );
@@ -929,6 +932,19 @@ public class DefaultMavenExecutionRequest
     {
         this.userToolchainsFile = userToolchainsFile;
 
+        return this;
+    }
+    
+    @Override
+    public File getGlobalToolchainsFile()
+    {
+        return globalToolchainsFile;
+    }
+    
+    @Override
+    public MavenExecutionRequest setGlobalToolchainsFile( File globalToolchainsFile )
+    {
+        this.globalToolchainsFile = globalToolchainsFile;
         return this;
     }
 

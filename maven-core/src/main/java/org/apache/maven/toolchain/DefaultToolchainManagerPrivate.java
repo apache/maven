@@ -19,11 +19,16 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.building.FileSource;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
+import org.apache.maven.toolchain.building.ToolchainsBuildingException;
+import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.component.annotations.Component;
@@ -31,6 +36,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 /**
  * @author mkleint
+ * @author Robert Scholte
  */
 @Component( role = ToolchainManagerPrivate.class )
 public class DefaultToolchainManagerPrivate
@@ -39,12 +45,36 @@ public class DefaultToolchainManagerPrivate
 {
 
     @Requirement
-    private ToolchainsBuilder toolchainsBuilder;
+    private org.apache.maven.toolchain.building.ToolchainsBuilder toolchainsBuilder;
 
     public ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
         throws MisconfiguredToolchainException
     {
-        PersistedToolchains pers = toolchainsBuilder.build( context.getRequest().getUserToolchainsFile() );
+        DefaultToolchainsBuildingRequest buildRequest = new DefaultToolchainsBuildingRequest();
+        
+        File globalToolchainsFile = context.getRequest().getGlobalToolchainsFile();
+        if ( globalToolchainsFile != null && globalToolchainsFile.isFile() )
+        {
+            buildRequest.setGlobalToolchainsSource( new FileSource( globalToolchainsFile ) );
+        }
+
+        File userToolchainsFile = context.getRequest().getUserToolchainsFile();
+        if ( userToolchainsFile != null && userToolchainsFile.isFile() )
+        {
+            buildRequest.setUserToolchainsSource( new FileSource( userToolchainsFile ) );
+        }
+        
+        ToolchainsBuildingResult buildResult;
+        try
+        {
+            buildResult = toolchainsBuilder.build( buildRequest );
+        }
+        catch ( ToolchainsBuildingException e )
+        {
+            throw new MisconfiguredToolchainException( e.getMessage(), e );
+        }
+        
+        PersistedToolchains pers = buildResult.getEffectiveToolchains();
 
         List<ToolchainPrivate> toRet = new ArrayList<ToolchainPrivate>();
 

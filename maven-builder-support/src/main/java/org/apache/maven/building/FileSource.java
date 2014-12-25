@@ -43,7 +43,7 @@ public class FileSource
     {
         if ( file == null )
         {
-            throw new IllegalArgumentException( "no POM file specified" );
+            throw new IllegalArgumentException( "no file specified" );
         }
         this.file = file.getAbsoluteFile();
     }

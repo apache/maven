@@ -32,7 +32,10 @@ import org.codehaus.plexus.util.ReaderFactory;
 
 /**
  * @author Benjamin Bentmann
+ * 
+ * @deprecated instead use {@link org.apache.maven.toolchain.building.DefaultToolchainsBuilder}
  */
+@Deprecated
 @Component( role = ToolchainsBuilder.class, hint = "default" )
 public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
