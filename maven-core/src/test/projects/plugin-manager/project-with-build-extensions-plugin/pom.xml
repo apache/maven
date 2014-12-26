@@ -1,0 +1,31 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.test</groupId>
+  <artifactId>project-with-build-extensions-plugin</artifactId>
+  <version>1.0</version>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin</artifactId>
+        <version>0.1</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>load</id>
+            <phase>validate</phase>
+            <configuration>
+              <resourcePaths>maven-core-it.properties</resourcePaths>
+              <pluginClassLoaderOutput>target/pcl.properties</pluginClassLoaderOutput>
+            </configuration>
+            <goals>
+              <goal>load</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

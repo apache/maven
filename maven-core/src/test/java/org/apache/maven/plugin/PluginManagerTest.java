@@ -30,6 +30,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 
@@ -317,5 +318,25 @@ public class PluginManagerTest
             assertNotNull( descriptor.getRealm() );
             assertNotNull( descriptor.getImplementationClass() );
         }
+    }
+
+    public void testBuildExtensionsPluginLoading()
+        throws Exception
+    {
+        RepositoryRequest repositoryRequest = new DefaultRepositoryRequest();
+        repositoryRequest.setLocalRepository( getLocalRepository() );
+        repositoryRequest.setRemoteRepositories( getPluginArtifactRepositories() );
+
+        // prime realm cache
+        MavenSession session = createMavenSession( getProject( "project-with-build-extensions-plugin" ) );
+        MavenProject project = session.getCurrentProject();
+        Plugin plugin = project.getPlugin( "org.apache.maven.its.plugins:maven-it-plugin" );
+
+        PluginDescriptor pluginDescriptor =
+            pluginManager.loadPlugin( plugin, session.getCurrentProject().getRemotePluginRepositories(),
+                                      session.getRepositorySession() );
+        ClassRealm pluginRealm = pluginManager.getPluginRealm( session, pluginDescriptor );
+        
+        assertEquals(pluginRealm, pluginDescriptor.getComponents().get(0).getRealm());
     }
 }
