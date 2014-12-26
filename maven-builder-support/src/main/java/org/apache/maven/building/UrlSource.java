@@ -43,7 +43,7 @@ public class UrlSource
     {
         if ( url == null )
         {
-            throw new IllegalArgumentException( "no POM URL specified" );
+            throw new IllegalArgumentException( "no url specified" );
         }
         this.url = url;
     }
