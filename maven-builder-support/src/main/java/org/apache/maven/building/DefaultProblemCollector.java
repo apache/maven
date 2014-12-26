@@ -53,6 +53,7 @@ class DefaultProblemCollector
         this.source = source;
     }
 
+    @Override
     public void add( Problem.Severity severity, String message, int line, int column, Exception cause )
     {
         Problem problem = new DefaultProblem( message, severity, source, line, column, cause );

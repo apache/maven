@@ -27,7 +27,7 @@ package org.apache.maven.building;
  * @author Benjamin Bentmann
  * @author Robert Scholte
  */
-public class DefaultProblem
+class DefaultProblem
     implements Problem
 {
 
@@ -45,6 +45,7 @@ public class DefaultProblem
 
     /**
      * Creates a new problem with the specified message and exception.
+     * Either {@code message} or {@code exception} is required
      *
      * @param message The message describing the problem, may be {@code null}.
      * @param severity The severity level of the problem, may be {@code null} to default to

@@ -32,6 +32,7 @@ public interface ProblemCollector
 
     /**
      * Adds the specified problem.
+     * Either message or exception is required
      *
      * @param severity The severity of the problem, must not be {@code null}.
      * @param message The detail message of the problem, may be {@code null}.
@@ -51,7 +52,7 @@ public interface ProblemCollector
     
     /**
      * 
-     * @return the collected Problems
+     * @return the collected Problems, never {@code null}
      */
     List<Problem> getProblems();
 
