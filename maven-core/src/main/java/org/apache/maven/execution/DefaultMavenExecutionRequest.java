@@ -147,7 +147,7 @@ public class DefaultMavenExecutionRequest
      */
     private boolean noSnapshotUpdates;
 
-    private boolean useSimpleLocalRepositoryManager = false;
+    private boolean useLegacyLocalRepositoryManager = false;
 
     public DefaultMavenExecutionRequest()
     {
@@ -191,6 +191,7 @@ public class DefaultMavenExecutionRequest
         copy.setWorkspaceReader( original.getWorkspaceReader() );
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
+        copy.setUseLegacyLocalRepository( original.isUseLegacyLocalRepository() );
         return copy;
     }
 
@@ -1106,12 +1107,12 @@ public class DefaultMavenExecutionRequest
 
     public boolean isUseLegacyLocalRepository()
     {
-        return this.useSimpleLocalRepositoryManager;
+        return this.useLegacyLocalRepositoryManager;
     }
 
-    public MavenExecutionRequest setUseLegacyLocalRepository( boolean useSimpleLocalRepositoryManager )
+    public MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepositoryManager )
     {
-        this.useSimpleLocalRepositoryManager = useSimpleLocalRepositoryManager;
+        this.useLegacyLocalRepositoryManager = useLegacyLocalRepositoryManager;
         return this;
     }
 
