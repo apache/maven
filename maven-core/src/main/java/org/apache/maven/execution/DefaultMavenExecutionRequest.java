@@ -192,6 +192,7 @@ public class DefaultMavenExecutionRequest
         copy.setNoSnapshotUpdates( original.isNoSnapshotUpdates() );
         copy.setExecutionListener( original.getExecutionListener() );
         copy.setUseLegacyLocalRepository( original.isUseLegacyLocalRepository() );
+        copy.setBuilderId( original.getBuilderId() );
         return copy;
     }
 
