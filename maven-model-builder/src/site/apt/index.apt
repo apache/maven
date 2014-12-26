@@ -35,23 +35,25 @@ Maven Model Builder
  {{{./xref/org/apache/maven/model/building/DefaultModelBuilder.html}source}})
  that manages the steps sequence.
 
- The sequence is divided into 2 phases, with optional plugin processing:
+ The sequence is divided into 2 phases:
 
  * phase 1
-
-   ** raw model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
-   with its <<<DefaultModelValidator>>> implementation
-   ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
 
    ** profile activation: see {{{./apidocs/org/apache/maven/model/profile/activation/package-summary.html}available activators}}.
    Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to
    <<<$\{basedir}>>> (since Maven 3), System properties and request properties
 
-   ** model normalization: <<<ModelNormalizer>>> ({{{./apidocs/org/apache/maven/model/normalization/ModelNormalizer.html}javadoc}}),
+   ** raw model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
+   with its <<<DefaultModelValidator>>> implementation
+   ({{{./xref/org/apache/maven/model/validation/DefaultModelValidator.html}source}})
+
+   ** model normalization - merge duplicates: <<<ModelNormalizer>>> ({{{./apidocs/org/apache/maven/model/normalization/ModelNormalizer.html}javadoc}}),
    with its <<<DefaultModelNormalizer>>> implementation
    ({{{./xref/org/apache/maven/model/normalization/DefaultModelNormalizer.html}source}})
 
-   ** profile injection
+   ** profile injection: <<<ProfileInjector>>> ({{{./apidocs/org/apache/maven/model/profile/ProfileInjector.html}javadoc}}),
+   with its <<<DefaultProfileInjector>>> implementation
+   ({{{./xref/org/apache/maven/model/profile/DefaultProfileInjector.html}source}})
 
    ** parent resolution until {{{./super-pom.html}super-pom}}
 
@@ -67,25 +69,41 @@ Maven Model Builder
 
    []
 
- * phase 2
+ * phase 2, with optional plugin processing
 
    ** model path translation: <<<ModelPathTranslator>>> ({{{./apidocs/org/apache/maven/model/path/ModelPathTranslator.html}javadoc}}),
    with its <<<DefaultModelPathTranslator>>> implementation
    ({{{./xref/org/apache/maven/model/path/DefaultModelPathTranslator.html}source}})
 
-   ** plugin management injection
+   ** plugin management injection: <<<PluginManagementInjector>>> ({{{./apidocs/org/apache/maven/model/management/PluginManagementInjector.html}javadoc}}),
+   with its <<<DefaultPluginManagementInjector>>> implementation
+   ({{{./xref/org/apache/maven/model/management/DefaultPluginManagementInjector.html}source}})
 
-   ** <(optional)> lifecycle bindings injection
+   ** <(optional)> lifecycle bindings injection: <<<LifecycleBindingsInjector>>> ({{{./apidocs/org/apache/maven/model/plugin/LifecycleBindingsInjector.html}javadoc}}),
+   with its <<<DefaultLifecycleBindingsInjector>>> implementation
+   ({{{./xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
 
    ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
 
-   ** dependency management injection
+   ** dependency management injection: <<<DependencyManagementInjector>>> ({{{./apidocs/org/apache/maven/model/management/DependencyManagementInjector.html}javadoc}}),
+   with its <<<DefaultDependencyManagementInjector>>> implementation
+   ({{{./xref/org/apache/maven/model/management/DefaultDependencyManagementInjector.html}source}})
 
-   ** <(optional)> reports configuration
+   ** model normalization - inject default values: <<<ModelNormalizer>>> ({{{./apidocs/org/apache/maven/model/normalization/ModelNormalizer.html}javadoc}}),
+   with its <<<DefaultModelNormalizer>>> implementation
+   ({{{./xref/org/apache/maven/model/normalization/DefaultModelNormalizer.html}source}})
 
-   ** <(optional)> reports conversion to decoupled site plugin
+   ** <(optional)> reports configuration: <<<ReportConfigurationExpander>>> ({{{./apidocs/org/apache/maven/model/plugin/ReportConfigurationExpander.html}javadoc}}),
+   with its <<<DefaultReportConfigurationExpander>>> implementation
+   ({{{./xref/org/apache/maven/model/plugin/DefaultReportConfigurationExpander.html}source}})
 
-   ** <(optional)> plugins configuration
+   ** <(optional)> reports conversion to decoupled site plugin: <<<ReportingConverter>>> ({{{./apidocs/org/apache/maven/model/plugin/ReportingConverter.html}javadoc}}),
+   with its <<<DefaultReportingConverter>>> implementation
+   ({{{./xref/org/apache/maven/model/plugin/DefaultReportingConverter.html}source}})
+
+   ** <(optional)> plugins configuration: <<<PluginConfigurationExpander>>> ({{{./apidocs/org/apache/maven/model/plugin/PluginConfigurationExpander.html}javadoc}}),
+   with its <<<DefaultPluginConfigurationExpander>>> implementation
+   ({{{./xref/org/apache/maven/model/plugin/DefaultPluginConfigurationExpander.html}source}})
 
    ** effective model validation: <<<ModelValidator>>> ({{{./apidocs/org/apache/maven/model/validation/ModelValidator.html}javadoc}}),
    with its <<<DefaultModelValidator>>> implementation

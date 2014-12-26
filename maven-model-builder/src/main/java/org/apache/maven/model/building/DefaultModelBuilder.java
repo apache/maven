@@ -231,10 +231,12 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
     {
+        // phase 1
         DefaultModelBuildingResult result = new DefaultModelBuildingResult();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
 
+        // profile activation
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         problems.setSource( "(external profiles)" );
@@ -254,6 +256,7 @@ public class DefaultModelBuilder
             profileActivationContext.setUserProperties( profileProps );
         }
 
+        // read and validate raw model
         Model inputModel = readModel( request.getModelSource(), request.getPomFile(), request, problems );
 
         problems.setRootModel( inputModel );
@@ -275,6 +278,7 @@ public class DefaultModelBuilder
 
             problems.setSource( tmpModel );
 
+            // model normalization
             modelNormalizer.mergeDuplicates( tmpModel, request, problems );
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
@@ -286,6 +290,7 @@ public class DefaultModelBuilder
             Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
             injectProfileActivations( tmpModel, interpolatedActivations );
 
+            // profile injection
             for ( Profile activeProfile : activePomProfiles )
             {
                 profileInjector.injectProfile( tmpModel, activeProfile, request, problems );
@@ -354,6 +359,7 @@ public class DefaultModelBuilder
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
+        // inheritance assembly
         assembleInheritance( lineage, request, problems );
 
         Model resultModel = resultData.getModel();
@@ -361,12 +367,14 @@ public class DefaultModelBuilder
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
 
+        // model interpolation
         resultModel = interpolateModel( resultModel, request, problems );
         resultData.setModel( resultModel );
 
+        // url normalization
         modelUrlNormalizer.normalize( resultModel, request );
 
-        //Now the fully interpolated model is available reconfigure the resolver
+        // Now the fully interpolated model is available: reconfigure the resolver
         configureResolver( request.getModelResolver(), resultModel, problems , true );
 
         resultData.setGroupId( resultModel.getGroupId() );
@@ -402,14 +410,17 @@ public class DefaultModelBuilder
                                        Collection<String> imports )
         throws ModelBuildingException
     {
+        // phase 2
         Model resultModel = result.getEffectiveModel();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
 
+        // model path translation
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
 
+        // plugin management injection
         pluginManagementInjector.injectManagement( resultModel, request, problems );
 
         fireEvent( resultModel, request, problems, ModelBuildingEventCatapult.BUILD_EXTENSIONS_ASSEMBLED );
@@ -421,24 +432,31 @@ public class DefaultModelBuilder
                 throw new IllegalStateException( "lifecycle bindings injector is missing" );
             }
 
+            // lifecycle bindings injection
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
+        // dependency management import
         importDependencyManagement( resultModel, request, problems, imports );
 
+        // dependency management injection
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
 
         modelNormalizer.injectDefaultValues( resultModel, request, problems );
 
         if ( request.isProcessPlugins() )
         {
+            // reports configuration
             reportConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
 
+            // reports conversion to decoupled site plugin
             reportingConverter.convertReporting( resultModel, request, problems );
 
+            // plugins configuration
             pluginConfigurationExpander.expandPluginConfiguration( resultModel, request, problems );
         }
 
+        // effective model validation
         modelValidator.validateEffectiveModel( resultModel, request, problems );
 
         if ( hasModelErrors( problems ) )
