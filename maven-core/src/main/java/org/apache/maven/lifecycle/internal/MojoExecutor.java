@@ -348,34 +348,32 @@ public class MojoExecutor
 
                     List<MojoExecution> mojoExecutions = fork.getValue();
 
-                    if ( mojoExecutions.isEmpty() )
+                    if ( !mojoExecutions.isEmpty() )
                     {
-                        continue;
-                    }
+                        try
+                        {
+                            session.setCurrentProject( executedProject );
+                            session.getProjects().set( index, executedProject );
+                            projectIndex.getProjects().put( projectId, executedProject );
 
-                    try
-                    {
-                        session.setCurrentProject( executedProject );
-                        session.getProjects().set( index, executedProject );
-                        projectIndex.getProjects().put( projectId, executedProject );
+                            eventCatapult.fire( ExecutionEvent.Type.ForkedProjectStarted, session, mojoExecution );
 
-                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectStarted, session, mojoExecution );
+                            execute( session, mojoExecutions, projectIndex );
 
-                        execute( session, mojoExecutions, projectIndex );
+                            eventCatapult.fire( ExecutionEvent.Type.ForkedProjectSucceeded, session, mojoExecution );
+                        }
+                        catch ( LifecycleExecutionException e )
+                        {
+                            eventCatapult.fire( ExecutionEvent.Type.ForkedProjectFailed, session, mojoExecution, e );
 
-                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectSucceeded, session, mojoExecution );
-                    }
-                    catch ( LifecycleExecutionException e )
-                    {
-                        eventCatapult.fire( ExecutionEvent.Type.ForkedProjectFailed, session, mojoExecution, e );
-
-                        throw e;
-                    }
-                    finally
-                    {
-                        projectIndex.getProjects().put( projectId, forkedProject );
-                        session.getProjects().set( index, forkedProject );
-                        session.setCurrentProject( project );
+                            throw e;
+                        }
+                        finally
+                        {
+                            projectIndex.getProjects().put( projectId, forkedProject );
+                            session.getProjects().set( index, forkedProject );
+                            session.setCurrentProject( project );
+                        }
                     }
                 }
 

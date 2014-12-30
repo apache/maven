@@ -28,26 +28,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
 
-import com.google.common.collect.Maps;
-
 /** @author Jason van Zyl */
 public class DefaultMavenExecutionResult
     implements MavenExecutionResult
 {
-    private MavenProject project;
+    private volatile MavenProject project;
 
-    private List<MavenProject> topologicallySortedProjects = Collections.emptyList();
+    private final List<MavenProject> topologicallySortedProjects = new CopyOnWriteArrayList<MavenProject>();
 
-    private DependencyResolutionResult dependencyResolutionResult;
+    private volatile DependencyResolutionResult dependencyResolutionResult;
 
-    private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
+    private final List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
-    private Map<MavenProject, BuildSummary> buildSummaries = Maps.newConcurrentMap();
+    private final Map<MavenProject, BuildSummary> buildSummaries = new ConcurrentHashMap<MavenProject, BuildSummary>( 0 );
 
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
-
         return this;
     }
 
@@ -58,14 +55,17 @@ public class DefaultMavenExecutionResult
 
     public MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> topologicallySortedProjects )
     {
-        this.topologicallySortedProjects = topologicallySortedProjects;
-
+        this.topologicallySortedProjects.clear();
+        if ( topologicallySortedProjects != null )
+        {
+            this.topologicallySortedProjects.addAll( topologicallySortedProjects );
+        }
         return this;
     }
 
     public List<MavenProject> getTopologicallySortedProjects()
     {
-        return null == topologicallySortedProjects ? Collections.<MavenProject>emptyList()
+        return topologicallySortedProjects.isEmpty() ? Collections.<MavenProject>emptyList()
                         : topologicallySortedProjects;
     }
 
@@ -77,19 +77,17 @@ public class DefaultMavenExecutionResult
     public MavenExecutionResult setDependencyResolutionResult( DependencyResolutionResult dependencyResolutionResult )
     {
         this.dependencyResolutionResult = dependencyResolutionResult;
-
         return this;
     }
 
     public List<Throwable> getExceptions()
     {
-        return exceptions == null ? Collections.<Throwable>emptyList() : exceptions;
+        return exceptions.isEmpty() ? Collections.<Throwable>emptyList() : exceptions;
     }
 
     public MavenExecutionResult addException( Throwable t )
     {
         exceptions.add( t );
-
         return this;
     }
 
@@ -100,15 +98,11 @@ public class DefaultMavenExecutionResult
 
     public BuildSummary getBuildSummary( MavenProject project )
     {
-        return ( buildSummaries != null ) ? buildSummaries.get( project ) : null;
+        return buildSummaries.get( project );
     }
 
     public void addBuildSummary( BuildSummary summary )
     {
-        if ( buildSummaries == null )
-        {
-            buildSummaries = new ConcurrentHashMap<MavenProject, BuildSummary>();
-        }
         buildSummaries.put( summary.getProject(), summary );
     }
 }

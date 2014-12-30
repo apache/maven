@@ -22,9 +22,9 @@ package org.apache.maven.artifact;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -43,11 +43,11 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultArtifact
     implements Artifact
 {
-    private String groupId;
+    private volatile String groupId;
 
-    private String artifactId;
+    private volatile String artifactId;
 
-    private String baseVersion;
+    private volatile String baseVersion;
 
     private final String type;
 
@@ -57,29 +57,29 @@ public class DefaultArtifact
 
     private volatile File file;
 
-    private ArtifactRepository repository;
+    private volatile ArtifactRepository repository;
 
-    private String downloadUrl;
+    private volatile String downloadUrl;
 
-    private ArtifactFilter dependencyFilter;
+    private volatile ArtifactFilter dependencyFilter;
 
-    private ArtifactHandler artifactHandler;
+    private volatile ArtifactHandler artifactHandler;
 
-    private List<String> dependencyTrail;
+    private volatile List<String> dependencyTrail;
 
     private volatile String version;
 
-    private VersionRange versionRange;
+    private volatile VersionRange versionRange;
 
     private volatile boolean resolved;
 
-    private boolean release;
+    private volatile boolean release;
 
-    private List<ArtifactVersion> availableVersions;
+    private volatile List<ArtifactVersion> availableVersions;
 
-    private Map<Object, ArtifactMetadata> metadataMap;
+    private final Map<Object, ArtifactMetadata> metadataMap = new ConcurrentHashMap<Object, ArtifactMetadata>( 0 );
 
-    private boolean optional;
+    private volatile boolean optional;
 
     public DefaultArtifact( String groupId, String artifactId, String version, String scope, String type,
                             String classifier, ArtifactHandler artifactHandler )
@@ -249,11 +249,6 @@ public class DefaultArtifact
 
     public void addMetadata( ArtifactMetadata metadata )
     {
-        if ( metadataMap == null )
-        {
-            metadataMap = new HashMap<Object, ArtifactMetadata>();
-        }
-
         ArtifactMetadata m = metadataMap.get( metadata.getKey() );
         if ( m != null )
         {
@@ -267,12 +262,7 @@ public class DefaultArtifact
 
     public Collection<ArtifactMetadata> getMetadataList()
     {
-        if ( metadataMap == null )
-        {
-            return Collections.emptyList();
-        }
-
-        return metadataMap.values();
+        return Collections.unmodifiableCollection( metadataMap.values() );
     }
 
     // ----------------------------------------------------------------------

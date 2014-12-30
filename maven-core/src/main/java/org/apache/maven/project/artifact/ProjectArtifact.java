@@ -32,7 +32,7 @@ public class ProjectArtifact
     extends DefaultArtifact
     implements ArtifactWithDependencies
 {
-    private MavenProject project;
+    private final MavenProject project;
 
     public ProjectArtifact( MavenProject project )
     {
