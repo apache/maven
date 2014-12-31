@@ -40,7 +40,8 @@ public class DefaultMavenExecutionResult
 
     private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
-    private Map<MavenProject, BuildSummary> buildSummaries = Collections.synchronizedMap(new IdentityHashMap<MavenProject, BuildSummary>());
+    private Map<MavenProject, BuildSummary> buildSummaries =
+        Collections.synchronizedMap( new IdentityHashMap<MavenProject, BuildSummary>() );
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -105,7 +106,7 @@ public class DefaultMavenExecutionResult
     {
         if ( buildSummaries == null )
         {
-            buildSummaries = Collections.synchronizedMap(new IdentityHashMap<MavenProject, BuildSummary>());
+            buildSummaries = Collections.synchronizedMap( new IdentityHashMap<MavenProject, BuildSummary>() );
         }
         buildSummaries.put( summary.getProject(), summary );
     }
