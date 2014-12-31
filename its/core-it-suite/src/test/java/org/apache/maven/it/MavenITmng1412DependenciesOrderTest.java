@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1349">MNG-1349</a>:
+ * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1412">MNG-1412</a>:
  * it tests that dependencies order in classpath matches <code>pom.xml</code>.
  *
  * @author <a href="mailto:hboutemy@apache.org">Hervé Boutemy</a>
