@@ -20,15 +20,13 @@ package org.apache.maven.execution;
  */
 
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.maven.project.DependencyResolutionResult;
 import org.apache.maven.project.MavenProject;
-
-import com.google.common.collect.Maps;
 
 /** @author Jason van Zyl */
 public class DefaultMavenExecutionResult
@@ -42,7 +40,7 @@ public class DefaultMavenExecutionResult
 
     private List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
-    private Map<MavenProject, BuildSummary> buildSummaries = Maps.newConcurrentMap();
+    private Map<MavenProject, BuildSummary> buildSummaries = Collections.synchronizedMap(new IdentityHashMap<MavenProject, BuildSummary>());
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -107,7 +105,7 @@ public class DefaultMavenExecutionResult
     {
         if ( buildSummaries == null )
         {
-            buildSummaries = new ConcurrentHashMap<MavenProject, BuildSummary>();
+            buildSummaries = Collections.synchronizedMap(new IdentityHashMap<MavenProject, BuildSummary>());
         }
         buildSummaries.put( summary.getProject(), summary );
     }
