@@ -20,6 +20,7 @@ package org.apache.maven.execution;
  */
 
 import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,7 +41,8 @@ public class DefaultMavenExecutionResult
 
     private final List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
-    private final Map<MavenProject, BuildSummary> buildSummaries = new ConcurrentHashMap<MavenProject, BuildSummary>( 0 );
+    private final Map<MavenProject, BuildSummary> buildSummaries =
+        Collections.synchronizedMap( new IdentityHashMap<MavenProject, BuildSummary>() );
 
     public MavenExecutionResult setProject( MavenProject project )
     {
@@ -82,7 +84,7 @@ public class DefaultMavenExecutionResult
 
     public List<Throwable> getExceptions()
     {
-        return exceptions.isEmpty() ? Collections.<Throwable>emptyList() : exceptions;
+        return exceptions;
     }
 
     public MavenExecutionResult addException( Throwable t )
