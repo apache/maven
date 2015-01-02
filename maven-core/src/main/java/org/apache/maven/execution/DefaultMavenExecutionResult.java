@@ -99,7 +99,7 @@ public class DefaultMavenExecutionResult
 
     public BuildSummary getBuildSummary( MavenProject project )
     {
-        return ( buildSummaries != null ) ? buildSummaries.get( project ) : null;
+        return buildSummaries.get( project );
     }
 
     public void addBuildSummary( BuildSummary summary )
