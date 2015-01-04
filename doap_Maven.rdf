@@ -270,86 +270,8 @@ under the License.
     </repository>
     <maintainer>
       <foaf:Person>
-        <foaf:name>Jason van Zyl</foaf:name>
-        <foaf:mbox rdf:resource="mailto:jason@sonatype.com"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Brett Porter</foaf:name>
-        <foaf:mbox rdf:resource="mailto:brett@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Emmanuel Venisse</foaf:name>
-        <foaf:mbox rdf:resource="mailto:evenisse@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Kenney Westerhof</foaf:name>
-        <foaf:mbox rdf:resource="mailto:kenney@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Stephane Nicoll</foaf:name>
-        <foaf:mbox rdf:resource="mailto:snicoll@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Vincent Massol</foaf:name>
-        <foaf:mbox rdf:resource="mailto:vmassol@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Fabrizio Giustina</foaf:name>
-        <foaf:mbox rdf:resource="mailto:fgiust@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Edwin Punzalan</foaf:name>
-        <foaf:mbox rdf:resource="mailto:epunzalan@mergere.com"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Mike Perham</foaf:name>
-        <foaf:mbox rdf:resource="mailto:mperham@gmail.com"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>John Casey</foaf:name>
-        <foaf:mbox rdf:resource="mailto:jdcasey@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Trygve Laugstol</foaf:name>
-        <foaf:mbox rdf:resource="mailto:trygvis@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Vincent Siveton</foaf:name>
-        <foaf:mbox rdf:resource="mailto:vsiveton@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Carlos Sanchez</foaf:name>
-        <foaf:mbox rdf:resource="mailto:carlos@apache.org"/>
-      </foaf:Person>
-    </maintainer>
-    <maintainer>
-      <foaf:Person>
-        <foaf:name>Dennis Lundberg</foaf:name>
-        <foaf:mbox rdf:resource="mailto:dennisl@apache.org"/>
+        <foaf:name>Apache Maven PMC</foaf:name>
+          <foaf:mbox rdf:resource="mailto:dev@maven.apache.org"/>
       </foaf:Person>
     </maintainer>
   </Project>
