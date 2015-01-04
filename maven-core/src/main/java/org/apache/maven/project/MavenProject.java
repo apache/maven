@@ -25,12 +25,14 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -95,86 +97,86 @@ public class MavenProject
 
     public static final String EMPTY_PROJECT_VERSION = "0";
 
-    private Model model;
+    private volatile Model model;
 
-    private MavenProject parent;
+    private volatile MavenProject parent;
 
-    private File file;
+    private volatile File file;
 
-    private File basedir;
+    private volatile File basedir;
 
-    private Set<Artifact> resolvedArtifacts;
+    private final Set<Artifact> resolvedArtifacts = new CopyOnWriteArraySet<Artifact>();
 
-    private ArtifactFilter artifactFilter;
+    private volatile ArtifactFilter artifactFilter;
 
-    private Set<Artifact> artifacts;
+    private volatile Set<Artifact> artifacts;
 
-    private Artifact parentArtifact;
+    private volatile Artifact parentArtifact;
 
-    private Set<Artifact> pluginArtifacts;
+    private final Set<Artifact> pluginArtifacts = new CopyOnWriteArraySet<Artifact>();
 
-    private List<ArtifactRepository> remoteArtifactRepositories;
+    private final List<ArtifactRepository> remoteArtifactRepositories = new CopyOnWriteArrayList<ArtifactRepository>();
 
-    private List<ArtifactRepository> pluginArtifactRepositories;
+    private final List<ArtifactRepository> pluginArtifactRepositories = new CopyOnWriteArrayList<ArtifactRepository>();
 
-    private List<RemoteRepository> remoteProjectRepositories;
+    private final List<RemoteRepository> remoteProjectRepositories = new CopyOnWriteArrayList<RemoteRepository>();
 
-    private List<RemoteRepository> remotePluginRepositories;
+    private final List<RemoteRepository> remotePluginRepositories = new CopyOnWriteArrayList<RemoteRepository>();
 
-    private List<Artifact> attachedArtifacts;
+    private final List<Artifact> attachedArtifacts = new CopyOnWriteArrayList<Artifact>();
 
-    private MavenProject executionProject;
+    private volatile MavenProject executionProject;
 
-    private List<MavenProject> collectedProjects;
+    private volatile List<MavenProject> collectedProjects;
 
-    private List<String> compileSourceRoots = new ArrayList<String>();
+    private final List<String> compileSourceRoots = new CopyOnWriteArrayList<String>();
 
-    private List<String> testCompileSourceRoots = new ArrayList<String>();
+    private final List<String> testCompileSourceRoots = new CopyOnWriteArrayList<String>();
 
-    private List<String> scriptSourceRoots = new ArrayList<String>();
+    private final List<String> scriptSourceRoots = new CopyOnWriteArrayList<String>();
 
-    private ArtifactRepository releaseArtifactRepository;
+    private volatile ArtifactRepository releaseArtifactRepository;
 
-    private ArtifactRepository snapshotArtifactRepository;
+    private volatile ArtifactRepository snapshotArtifactRepository;
 
-    private List<Profile> activeProfiles = new ArrayList<Profile>();
+    private final List<Profile> activeProfiles = new CopyOnWriteArrayList<Profile>();
 
-    private Map<String, List<String>> injectedProfileIds = new LinkedHashMap<String, List<String>>();
+    private final Map<String, List<String>> injectedProfileIds = new ConcurrentHashMap<String, List<String>>( 0 );
 
-    private Set<Artifact> dependencyArtifacts;
+    private volatile Set<Artifact> dependencyArtifacts;
 
-    private Artifact artifact;
+    private volatile Artifact artifact;
 
     // calculated.
-    private Map<String, Artifact> artifactMap;
+    private volatile Map<String, Artifact> artifactMap;
 
-    private Model originalModel;
+    private volatile Model originalModel;
 
-    private Map<String, Artifact> pluginArtifactMap;
+    private volatile Map<String, Artifact> pluginArtifactMap;
 
-    private Set<Artifact> reportArtifacts;
+    private final Set<Artifact> reportArtifacts = new CopyOnWriteArraySet<Artifact>();
 
-    private Map<String, Artifact> reportArtifactMap;
+    private volatile Map<String, Artifact> reportArtifactMap;
 
-    private Set<Artifact> extensionArtifacts;
+    private final Set<Artifact> extensionArtifacts = new CopyOnWriteArraySet<Artifact>();
 
-    private Map<String, Artifact> extensionArtifactMap;
+    private volatile Map<String, Artifact> extensionArtifactMap;
 
-    private Map<String, Artifact> managedVersionMap;
+    private final Map<String, Artifact> managedVersionMap = new ConcurrentHashMap<String, Artifact>( 0 );
 
-    private Map<String, MavenProject> projectReferences = new HashMap<String, MavenProject>();
+    private final Map<String, MavenProject> projectReferences = new ConcurrentHashMap<String, MavenProject>( 0 );
 
-    private boolean executionRoot;
+    private volatile boolean executionRoot;
 
-    private File parentFile;
+    private volatile File parentFile;
 
-    private Map<String, Object> context;
+    private final Map<String, Object> context = new ConcurrentHashMap<String, Object>( 0 );
 
-    private ClassRealm classRealm;
+    private volatile ClassRealm classRealm;
 
-    private DependencyFilter extensionDependencyFilter;
+    private volatile DependencyFilter extensionDependencyFilter;
 
-    private final Set<String> lifecyclePhases = Collections.synchronizedSet( new LinkedHashSet<String>() );
+    private final Set<String> lifecyclePhases = new CopyOnWriteArraySet<String>();
 
     public MavenProject()
     {
@@ -260,7 +262,7 @@ public class MavenProject
 
     /**
      * Sets project {@code file} without changing project {@code basedir}.
-     * 
+     *
      * @since 3.2.4
      */
     public void setPomFile( File file )
@@ -408,7 +410,7 @@ public class MavenProject
         for ( Artifact a : getArtifacts() )
         {
             if ( a.getArtifactHandler().isAddedToClasspath()
-            // TODO: let the scope handler deal with this
+                // TODO: let the scope handler deal with this
                 && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
             {
                 addArtifactPath( a, list );
@@ -703,7 +705,7 @@ public class MavenProject
     {
         if ( artifacts == null )
         {
-            if ( artifactFilter == null || resolvedArtifacts == null )
+            if ( artifactFilter == null || resolvedArtifacts.isEmpty() )
             {
                 artifacts = new LinkedHashSet<Artifact>();
             }
@@ -733,7 +735,11 @@ public class MavenProject
 
     public void setPluginArtifacts( Set<Artifact> pluginArtifacts )
     {
-        this.pluginArtifacts = pluginArtifacts;
+        this.pluginArtifacts.clear();
+        if ( pluginArtifacts != null )
+        {
+            this.pluginArtifacts.addAll( pluginArtifacts );
+        }
 
         this.pluginArtifactMap = null;
     }
@@ -815,24 +821,39 @@ public class MavenProject
 
     public void setRemoteArtifactRepositories( List<ArtifactRepository> remoteArtifactRepositories )
     {
-        this.remoteArtifactRepositories = remoteArtifactRepositories;
-        this.remoteProjectRepositories = RepositoryUtils.toRepos( getRemoteArtifactRepositories() );
+        this.remoteArtifactRepositories.clear();
+        if ( remoteArtifactRepositories != null )
+        {
+            this.remoteArtifactRepositories.addAll( remoteArtifactRepositories );
+        }
+
+        List<RemoteRepository> repos = RepositoryUtils.toRepos( getRemoteArtifactRepositories() );
+        this.remoteProjectRepositories.clear();
+        if ( repos != null )
+        {
+            this.remoteProjectRepositories.addAll( repos );
+        }
     }
 
     public List<ArtifactRepository> getRemoteArtifactRepositories()
     {
-        if ( remoteArtifactRepositories == null )
-        {
-            remoteArtifactRepositories = new ArrayList<ArtifactRepository>();
-        }
-
         return remoteArtifactRepositories;
     }
 
     public void setPluginArtifactRepositories( List<ArtifactRepository> pluginArtifactRepositories )
     {
-        this.pluginArtifactRepositories = pluginArtifactRepositories;
-        this.remotePluginRepositories = RepositoryUtils.toRepos( getPluginArtifactRepositories() );
+        this.pluginArtifactRepositories.clear();
+        if ( pluginArtifactRepositories != null )
+        {
+            this.pluginArtifactRepositories.addAll( pluginArtifactRepositories );
+        }
+
+        List<RemoteRepository> repos = RepositoryUtils.toRepos( getPluginArtifactRepositories() );
+        this.remotePluginRepositories.clear();
+        if ( repos != null )
+        {
+            this.remotePluginRepositories.addAll( repos );
+        }
     }
 
     /**
@@ -841,19 +862,14 @@ public class MavenProject
      */
     public List<ArtifactRepository> getPluginArtifactRepositories()
     {
-        if ( pluginArtifactRepositories == null )
-        {
-            pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
-        }
-
         return pluginArtifactRepositories;
     }
 
     public ArtifactRepository getDistributionManagementArtifactRepository()
     {
         return getArtifact().isSnapshot() && ( getSnapshotArtifactRepository() != null )
-                        ? getSnapshotArtifactRepository()
-                        : getReleaseArtifactRepository();
+            ? getSnapshotArtifactRepository()
+            : getReleaseArtifactRepository();
     }
 
     public List<Repository> getPluginRepositories()
@@ -873,7 +889,11 @@ public class MavenProject
 
     public void setActiveProfiles( List<Profile> activeProfiles )
     {
-        this.activeProfiles = activeProfiles;
+        this.activeProfiles.clear();
+        if ( activeProfiles != null )
+        {
+            this.activeProfiles.addAll( activeProfiles );
+        }
     }
 
     public List<Profile> getActiveProfiles()
@@ -926,10 +946,6 @@ public class MavenProject
 
     public List<Artifact> getAttachedArtifacts()
     {
-        if ( attachedArtifacts == null )
-        {
-            attachedArtifacts = new ArrayList<Artifact>();
-        }
         return attachedArtifacts;
     }
 
@@ -1002,7 +1018,8 @@ public class MavenProject
 
     public void setDependencyArtifacts( Set<Artifact> dependencyArtifacts )
     {
-        this.dependencyArtifacts = dependencyArtifacts;
+        this.dependencyArtifacts =
+            dependencyArtifacts == null ? null : new CopyOnWriteArraySet<Artifact>( dependencyArtifacts );
     }
 
     public void setReleaseArtifactRepository( ArtifactRepository releaseArtifactRepository )
@@ -1027,7 +1044,11 @@ public class MavenProject
 
     public void setManagedVersionMap( Map<String, Artifact> map )
     {
-        managedVersionMap = map;
+        managedVersionMap.clear();
+        if ( map != null )
+        {
+            managedVersionMap.putAll( map );
+        }
     }
 
     public Map<String, Artifact> getManagedVersionMap()
@@ -1150,25 +1171,48 @@ public class MavenProject
     }
 
     /**
-     * @throws CloneNotSupportedException
      * @since 2.0.9
      */
     @Override
     public MavenProject clone()
     {
-        MavenProject clone;
-        try
+        MavenProject copy = new MavenProject();
+        copy.parent = parent;
+        copy.basedir = basedir;
+        copy.resolvedArtifacts.addAll( resolvedArtifacts );
+        copy.artifactFilter = artifactFilter;
+        copy.remoteProjectRepositories.addAll( remoteProjectRepositories );
+        copy.remotePluginRepositories.addAll( remotePluginRepositories );
+        copy.executionProject = executionProject;
+        copy.releaseArtifactRepository = releaseArtifactRepository;
+        copy.snapshotArtifactRepository = snapshotArtifactRepository;
+        copy.injectedProfileIds.putAll( injectedProfileIds );
+        copy.projectReferences.putAll( projectReferences );
+        copy.context.putAll( context );
+        copy.classRealm = classRealm;
+        copy.extensionDependencyFilter = extensionDependencyFilter;
+        if ( collectedProjects != null )
         {
-            clone = (MavenProject) super.clone();
+            copy.collectedProjects.addAll( collectedProjects );
         }
-        catch ( CloneNotSupportedException e )
+        if ( artifactMap != null )
         {
-            throw new UnsupportedOperationException( e );
+            copy.artifactMap.putAll( artifactMap );
         }
-
-        clone.deepCopy( this );
-
-        return clone;
+        if ( pluginArtifactMap != null )
+        {
+            copy.pluginArtifactMap.putAll( pluginArtifactMap );
+        }
+        if ( reportArtifactMap != null )
+        {
+            copy.reportArtifactMap.putAll( reportArtifactMap );
+        }
+        if ( extensionArtifactMap != null )
+        {
+            copy.extensionArtifactMap.putAll( extensionArtifactMap );
+        }
+        copy.deepCopy( this );
+        return copy;
     }
 
     protected void setModel( Model model )
@@ -1178,17 +1222,29 @@ public class MavenProject
 
     protected void setAttachedArtifacts( List<Artifact> attachedArtifacts )
     {
-        this.attachedArtifacts = attachedArtifacts;
+        this.attachedArtifacts.clear();
+        if ( attachedArtifacts != null )
+        {
+            this.attachedArtifacts.addAll( attachedArtifacts );
+        }
     }
 
     protected void setCompileSourceRoots( List<String> compileSourceRoots )
     {
-        this.compileSourceRoots = compileSourceRoots;
+        this.compileSourceRoots.clear();
+        if ( compileSourceRoots != null )
+        {
+            this.compileSourceRoots.addAll( compileSourceRoots );
+        }
     }
 
     protected void setTestCompileSourceRoots( List<String> testCompileSourceRoots )
     {
-        this.testCompileSourceRoots = testCompileSourceRoots;
+        this.testCompileSourceRoots.clear();
+        if ( testCompileSourceRoots != null )
+        {
+            this.testCompileSourceRoots.addAll( testCompileSourceRoots );
+        }
     }
 
     protected ArtifactRepository getReleaseArtifactRepository()
@@ -1210,97 +1266,36 @@ public class MavenProject
 
         // don't need a deep copy, they don't get modified or added/removed to/from - but make them unmodifiable to be
         // sure!
-        if ( project.getDependencyArtifacts() != null )
-        {
-            setDependencyArtifacts( Collections.unmodifiableSet( project.getDependencyArtifacts() ) );
-        }
-
-        if ( project.getArtifacts() != null )
-        {
-            setArtifacts( Collections.unmodifiableSet( project.getArtifacts() ) );
-        }
-
+        setDependencyArtifacts( project.getDependencyArtifacts() );
+        setArtifacts( project.getArtifacts() );
         if ( project.getParentFile() != null )
         {
             parentFile = new File( project.getParentFile().getAbsolutePath() );
         }
-
-        if ( project.getPluginArtifacts() != null )
-        {
-            setPluginArtifacts( Collections.unmodifiableSet( project.getPluginArtifacts() ) );
-        }
-
-        if ( project.getReportArtifacts() != null )
-        {
-            setReportArtifacts( Collections.unmodifiableSet( project.getReportArtifacts() ) );
-        }
-
-        if ( project.getExtensionArtifacts() != null )
-        {
-            setExtensionArtifacts( Collections.unmodifiableSet( project.getExtensionArtifacts() ) );
-        }
-
-        setParentArtifact( ( project.getParentArtifact() ) );
-
-        if ( project.getRemoteArtifactRepositories() != null )
-        {
-            setRemoteArtifactRepositories( Collections.unmodifiableList( project.getRemoteArtifactRepositories() ) );
-        }
-
-        if ( project.getPluginArtifactRepositories() != null )
-        {
-            setPluginArtifactRepositories( ( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) ) );
-        }
-
-        if ( project.getActiveProfiles() != null )
-        {
-            setActiveProfiles( ( Collections.unmodifiableList( project.getActiveProfiles() ) ) );
-        }
-
-        if ( project.getAttachedArtifacts() != null )
-        {
-            // clone properties modifyable by plugins in a forked lifecycle
-            setAttachedArtifacts( new ArrayList<Artifact>( project.getAttachedArtifacts() ) );
-        }
-
-        if ( project.getCompileSourceRoots() != null )
-        {
-            // clone source roots
-            setCompileSourceRoots( ( new ArrayList<String>( project.getCompileSourceRoots() ) ) );
-        }
-
-        if ( project.getTestCompileSourceRoots() != null )
-        {
-            setTestCompileSourceRoots( ( new ArrayList<String>( project.getTestCompileSourceRoots() ) ) );
-        }
-
-        if ( project.getScriptSourceRoots() != null )
-        {
-            setScriptSourceRoots( ( new ArrayList<String>( project.getScriptSourceRoots() ) ) );
-        }
-
+        setPluginArtifacts( project.getPluginArtifacts() );
+        setReportArtifacts( project.getReportArtifacts() );
+        setExtensionArtifacts( project.getExtensionArtifacts() );
+        setParentArtifact( project.getParentArtifact() );
+        setRemoteArtifactRepositories( project.getRemoteArtifactRepositories() );
+        setPluginArtifactRepositories( project.getPluginArtifactRepositories() );
+        setActiveProfiles( project.getActiveProfiles() );
+        // clone properties modifiable by plugins in a forked lifecycle
+        setAttachedArtifacts( project.getAttachedArtifacts() );
+        // clone source roots
+        setCompileSourceRoots( project.getCompileSourceRoots() );
+        setTestCompileSourceRoots( project.getTestCompileSourceRoots() );
+        setScriptSourceRoots( project.getScriptSourceRoots() );
         if ( project.getModel() != null )
         {
             setModel( project.getModel().clone() );
         }
-
-        if ( project.getOriginalModel() != null )
-        {
-            setOriginalModel( project.getOriginalModel() );
-        }
-
+        setOriginalModel( project.getOriginalModel() );
         setExecutionRoot( project.isExecutionRoot() );
-
         if ( project.getArtifact() != null )
         {
             setArtifact( ArtifactUtils.copyArtifact( project.getArtifact() ) );
         }
-
-        if ( project.getManagedVersionMap() != null )
-        {
-            setManagedVersionMap( new HashMap<String, Artifact>( project.getManagedVersionMap() ) );
-        }
-
+        setManagedVersionMap( project.getManagedVersionMap() );
         lifecyclePhases.addAll( project.lifecyclePhases );
     }
 
@@ -1327,10 +1322,6 @@ public class MavenProject
      */
     public void setContextValue( String key, Object value )
     {
-        if ( context == null )
-        {
-            context = new HashMap<String, Object>();
-        }
         if ( value != null )
         {
             context.put( key, value );
@@ -1346,10 +1337,6 @@ public class MavenProject
      */
     public Object getContextValue( String key )
     {
-        if ( context == null )
-        {
-            return null;
-        }
         return context.get( key );
     }
 
@@ -1413,7 +1400,11 @@ public class MavenProject
      */
     public void setResolvedArtifacts( Set<Artifact> artifacts )
     {
-        this.resolvedArtifacts = ( artifacts != null ) ? artifacts : Collections.<Artifact>emptySet();
+        this.resolvedArtifacts.clear();
+        if ( artifacts != null )
+        {
+            this.resolvedArtifacts.addAll( artifacts );
+        }
         this.artifacts = null;
         this.artifactMap = null;
     }
@@ -1540,7 +1531,11 @@ public class MavenProject
     @Deprecated
     protected void setScriptSourceRoots( List<String> scriptSourceRoots )
     {
-        this.scriptSourceRoots = scriptSourceRoots;
+        this.scriptSourceRoots.clear();
+        if ( scriptSourceRoots != null )
+        {
+            this.scriptSourceRoots.addAll( scriptSourceRoots );
+        }
     }
 
     @Deprecated
@@ -1704,7 +1699,7 @@ public class MavenProject
         {
             // TODO: classpath check doesn't belong here - that's the other method
             if ( a.getArtifactHandler().isAddedToClasspath()
-            // TODO: let the scope handler deal with this
+                // TODO: let the scope handler deal with this
                 && ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) ) )
             {
                 list.add( a );
@@ -1806,7 +1801,11 @@ public class MavenProject
     @Deprecated
     public void setReportArtifacts( Set<Artifact> reportArtifacts )
     {
-        this.reportArtifacts = reportArtifacts;
+        this.reportArtifacts.clear();
+        if ( reportArtifacts != null )
+        {
+            this.reportArtifacts.addAll( reportArtifacts );
+        }
 
         reportArtifactMap = null;
     }
@@ -1831,7 +1830,11 @@ public class MavenProject
     @Deprecated
     public void setExtensionArtifacts( Set<Artifact> extensionArtifacts )
     {
-        this.extensionArtifacts = extensionArtifacts;
+        this.extensionArtifacts.clear();
+        if ( extensionArtifacts != null )
+        {
+            this.extensionArtifacts.addAll( extensionArtifacts );
+        }
 
         extensionArtifactMap = null;
     }

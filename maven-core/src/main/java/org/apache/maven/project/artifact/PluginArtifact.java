@@ -32,7 +32,7 @@ public class PluginArtifact
     extends DefaultArtifact
     implements ArtifactWithDependencies
 {
-    private Plugin plugin;
+    private final Plugin plugin;
 
     public PluginArtifact( Plugin plugin, Artifact pluginArtifact )
     {

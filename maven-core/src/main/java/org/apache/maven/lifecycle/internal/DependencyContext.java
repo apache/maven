@@ -21,7 +21,6 @@ package org.apache.maven.lifecycle.internal;
 
 import org.apache.maven.project.MavenProject;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -39,7 +38,7 @@ import java.util.TreeSet;
 public class DependencyContext
 {
 
-    private static final Collection<?> UNRESOLVED = Arrays.asList();
+    private static final Collection<?> UNRESOLVED = Collections.emptySet();
 
     private final MavenProject project;
 
@@ -99,10 +98,8 @@ public class DependencyContext
     public boolean isResolutionRequiredForAggregatedProjects( Collection<String> scopesToCollect,
                                                               Collection<String> scopesToResolve )
     {
-        boolean required =
-            scopesToCollectForAggregatedProjects.addAll( scopesToCollect )
-                || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
-        return required;
+        return scopesToCollectForAggregatedProjects.addAll( scopesToCollect )
+            || scopesToResolveForAggregatedProjects.addAll( scopesToResolve );
     }
 
     public void synchronizeWithProjectState()

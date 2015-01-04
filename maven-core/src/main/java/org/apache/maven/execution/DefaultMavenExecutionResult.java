@@ -32,11 +32,11 @@ import org.apache.maven.project.MavenProject;
 public class DefaultMavenExecutionResult
     implements MavenExecutionResult
 {
-    private MavenProject project;
+    private volatile MavenProject project;
 
-    private List<MavenProject> topologicallySortedProjects = Collections.emptyList();
+    private final List<MavenProject> topologicallySortedProjects = new CopyOnWriteArrayList<MavenProject>();
 
-    private DependencyResolutionResult dependencyResolutionResult;
+    private volatile DependencyResolutionResult dependencyResolutionResult;
 
     private final List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
 
@@ -46,7 +46,6 @@ public class DefaultMavenExecutionResult
     public MavenExecutionResult setProject( MavenProject project )
     {
         this.project = project;
-
         return this;
     }
 
@@ -57,14 +56,17 @@ public class DefaultMavenExecutionResult
 
     public MavenExecutionResult setTopologicallySortedProjects( List<MavenProject> topologicallySortedProjects )
     {
-        this.topologicallySortedProjects = topologicallySortedProjects;
-
+        this.topologicallySortedProjects.clear();
+        if ( topologicallySortedProjects != null )
+        {
+            this.topologicallySortedProjects.addAll( topologicallySortedProjects );
+        }
         return this;
     }
 
     public List<MavenProject> getTopologicallySortedProjects()
     {
-        return null == topologicallySortedProjects ? Collections.<MavenProject>emptyList()
+        return topologicallySortedProjects.isEmpty() ? Collections.<MavenProject>emptyList()
                         : topologicallySortedProjects;
     }
 
@@ -76,7 +78,6 @@ public class DefaultMavenExecutionResult
     public MavenExecutionResult setDependencyResolutionResult( DependencyResolutionResult dependencyResolutionResult )
     {
         this.dependencyResolutionResult = dependencyResolutionResult;
-
         return this;
     }
 
@@ -88,7 +89,6 @@ public class DefaultMavenExecutionResult
     public MavenExecutionResult addException( Throwable t )
     {
         exceptions.add( t );
-
         return this;
     }
 
