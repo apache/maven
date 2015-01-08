@@ -59,6 +59,16 @@ public class DefaultClassRealmManager
     implements ClassRealmManager
 {
 
+    /**
+     * During normal command line build, ClassWorld is loaded by jvm system classloader, which only includes
+     * plexus-classworlds jar and possibly javaagent classes, see http://jira.codehaus.org/browse/MNG-4747.
+     * <p>
+     * Using ClassWorld to determine plugin/extensions realm parent classloaders gives m2e and integration test harness
+     * flexibility to load multiple version of maven into dedicated classloaders without assuming state of jvm system
+     * classloader.
+     */
+    private static final ClassLoader PARENT_CLASSLOADER = ClassWorld.class.getClassLoader();
+
     @Requirement
     private Logger logger;
 
@@ -329,7 +339,7 @@ public class DefaultClassRealmManager
             throw new IllegalArgumentException( "extension plugin missing" );
         }
 
-        ClassLoader parent = ClassLoader.getSystemClassLoader();
+        ClassLoader parent = PARENT_CLASSLOADER;
 
         Map<String, ClassLoader> foreignImports =
             Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
@@ -347,7 +357,7 @@ public class DefaultClassRealmManager
 
         if ( parent == null )
         {
-            parent = ClassLoader.getSystemClassLoader();
+            parent = PARENT_CLASSLOADER;
         }
 
         return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, parentImports, foreignImports, artifacts );
