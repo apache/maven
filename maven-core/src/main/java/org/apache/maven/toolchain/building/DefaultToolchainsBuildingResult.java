@@ -26,6 +26,7 @@ import org.apache.maven.building.Problem;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 
 /**
+ * Holds the result of the merged toolchains and holds the problems during this build, if any.
  * 
  * @author Robert Scholte
  * @since 3.2.6
@@ -38,6 +39,12 @@ public class DefaultToolchainsBuildingResult
     
     private List<Problem> problems;
     
+    /**
+     * Default constructor
+     * 
+     * @param effectiveToolchains the merged toolchains, may not be {@code null}
+     * @param problems the problems while building the effectiveToolchains, if any.
+     */
     public DefaultToolchainsBuildingResult( PersistedToolchains effectiveToolchains, List<Problem> problems )
     {
         this.effectiveToolchains = effectiveToolchains;

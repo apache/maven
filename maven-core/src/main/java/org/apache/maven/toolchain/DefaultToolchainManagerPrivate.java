@@ -74,7 +74,7 @@ public class DefaultToolchainManagerPrivate
             throw new MisconfiguredToolchainException( e.getMessage(), e );
         }
         
-        PersistedToolchains pers = buildResult.getEffectiveToolchains();
+        PersistedToolchains effectiveToolchains = buildResult.getEffectiveToolchains();
 
         List<ToolchainPrivate> toRet = new ArrayList<ToolchainPrivate>();
 
@@ -84,9 +84,9 @@ public class DefaultToolchainManagerPrivate
             logger.error( "Missing toolchain factory for type: " + type
                 + ". Possibly caused by misconfigured project." );
         }
-        else if ( pers != null )
+        else
         {
-            List<ToolchainModel> lst = pers.getToolchains();
+            List<ToolchainModel> lst = effectiveToolchains.getToolchains();
             if ( lst != null )
             {
                 for ( ToolchainModel toolchainModel : lst )
@@ -97,11 +97,9 @@ public class DefaultToolchainManagerPrivate
                     }
                 }
             }
-        }
-
-        for ( ToolchainFactory toolchainFactory : factories.values() )
-        {
-            ToolchainPrivate tool = toolchainFactory.createDefaultToolchain();
+            
+            // add default toolchain
+            ToolchainPrivate tool = fact.createDefaultToolchain();
             if ( tool != null )
             {
                 toRet.add( tool );
