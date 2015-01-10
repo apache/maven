@@ -52,6 +52,7 @@ class DefaultSettingsProblemCollector
         this.source = source;
     }
 
+    @Override
     public void add( SettingsProblem.Severity severity, String message, int line, int column, Exception cause )
     {
         if ( line <= 0 && column <= 0 && ( cause instanceof SettingsParseException ) )

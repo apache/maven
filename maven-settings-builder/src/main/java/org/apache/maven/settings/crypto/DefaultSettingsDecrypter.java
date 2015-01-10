@@ -45,6 +45,7 @@ public class DefaultSettingsDecrypter
     @Requirement( hint = "maven" )
     private SecDispatcher securityDispatcher;
 
+    @Override
     public SettingsDecryptionResult decrypt( SettingsDecryptionRequest request )
     {
         List<SettingsProblem> problems = new ArrayList<SettingsProblem>();

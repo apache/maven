@@ -79,6 +79,7 @@ public class DefaultSettingsDecryptionRequest
         this.proxies = new ArrayList<Proxy>( Arrays.asList( proxy ) );
     }
 
+    @Override
     public List<Server> getServers()
     {
         if ( servers == null )
@@ -89,6 +90,7 @@ public class DefaultSettingsDecryptionRequest
         return servers;
     }
 
+    @Override
     public DefaultSettingsDecryptionRequest setServers( List<Server> servers )
     {
         this.servers = servers;
@@ -96,6 +98,7 @@ public class DefaultSettingsDecryptionRequest
         return this;
     }
 
+    @Override
     public List<Proxy> getProxies()
     {
         if ( proxies == null )
@@ -106,6 +109,7 @@ public class DefaultSettingsDecryptionRequest
         return proxies;
     }
 
+    @Override
     public DefaultSettingsDecryptionRequest setProxies( List<Proxy> proxies )
     {
         this.proxies = proxies;

@@ -43,11 +43,13 @@ public class DefaultSettingsBuildingRequest
 
     private Properties userProperties;
 
+    @Override
     public File getGlobalSettingsFile()
     {
         return globalSettingsFile;
     }
 
+    @Override
     public DefaultSettingsBuildingRequest setGlobalSettingsFile( File globalSettingsFile )
     {
         this.globalSettingsFile = globalSettingsFile;
@@ -55,11 +57,13 @@ public class DefaultSettingsBuildingRequest
         return this;
     }
 
+    @Override
     public SettingsSource getGlobalSettingsSource()
     {
         return globalSettingsSource;
     }
 
+    @Override
     public DefaultSettingsBuildingRequest setGlobalSettingsSource( SettingsSource globalSettingsSource )
     {
         this.globalSettingsSource = globalSettingsSource;
@@ -67,11 +71,13 @@ public class DefaultSettingsBuildingRequest
         return this;
     }
 
+    @Override
     public File getUserSettingsFile()
     {
         return userSettingsFile;
     }
 
+    @Override
     public DefaultSettingsBuildingRequest setUserSettingsFile( File userSettingsFile )
     {
         this.userSettingsFile = userSettingsFile;
@@ -79,11 +85,13 @@ public class DefaultSettingsBuildingRequest
         return this;
     }
 
+    @Override
     public SettingsSource getUserSettingsSource()
     {
         return userSettingsSource;
     }
 
+    @Override
     public DefaultSettingsBuildingRequest setUserSettingsSource( SettingsSource userSettingsSource )
     {
         this.userSettingsSource = userSettingsSource;
@@ -91,6 +99,7 @@ public class DefaultSettingsBuildingRequest
         return this;
     }
 
+    @Override
     public Properties getSystemProperties()
     {
         if ( systemProperties == null )
@@ -101,6 +110,7 @@ public class DefaultSettingsBuildingRequest
         return systemProperties;
     }
 
+    @Override
     public DefaultSettingsBuildingRequest setSystemProperties( Properties systemProperties )
     {
         if ( systemProperties != null )
@@ -120,6 +130,7 @@ public class DefaultSettingsBuildingRequest
         return this;
     }
 
+    @Override
     public Properties getUserProperties()
     {
         if ( userProperties == null )
@@ -130,6 +141,7 @@ public class DefaultSettingsBuildingRequest
         return userProperties;
     }
 
+    @Override
     public DefaultSettingsBuildingRequest setUserProperties( Properties userProperties )
     {
         if ( userProperties != null )

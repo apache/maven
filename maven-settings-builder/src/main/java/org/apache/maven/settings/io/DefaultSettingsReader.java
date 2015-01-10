@@ -42,6 +42,7 @@ public class DefaultSettingsReader
     implements SettingsReader
 {
 
+    @Override
     public Settings read( File input, Map<String, ?> options )
         throws IOException
     {
@@ -55,6 +56,7 @@ public class DefaultSettingsReader
         return settings;
     }
 
+    @Override
     public Settings read( Reader input, Map<String, ?> options )
         throws IOException
     {
@@ -78,6 +80,7 @@ public class DefaultSettingsReader
         }
     }
 
+    @Override
     public Settings read( InputStream input, Map<String, ?> options )
         throws IOException
     {

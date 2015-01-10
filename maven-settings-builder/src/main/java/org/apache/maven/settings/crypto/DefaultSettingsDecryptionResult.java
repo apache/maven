@@ -48,26 +48,31 @@ class DefaultSettingsDecryptionResult
         this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
     }
 
+    @Override
     public Server getServer()
     {
         return servers.isEmpty() ? null : servers.get( 0 );
     }
 
+    @Override
     public List<Server> getServers()
     {
         return servers;
     }
 
+    @Override
     public Proxy getProxy()
     {
         return proxies.isEmpty() ? null : proxies.get( 0 );
     }
 
+    @Override
     public List<Proxy> getProxies()
     {
         return proxies;
     }
 
+    @Override
     public List<SettingsProblem> getProblems()
     {
         return problems;

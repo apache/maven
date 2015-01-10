@@ -64,21 +64,25 @@ public class DefaultSettingsProblem
         this.exception = exception;
     }
 
+    @Override
     public String getSource()
     {
         return source;
     }
 
+    @Override
     public int getLineNumber()
     {
         return lineNumber;
     }
 
+    @Override
     public int getColumnNumber()
     {
         return columnNumber;
     }
 
+    @Override
     public String getLocation()
     {
         StringBuilder buffer = new StringBuilder( 256 );
@@ -113,11 +117,13 @@ public class DefaultSettingsProblem
         return buffer.toString();
     }
 
+    @Override
     public Exception getException()
     {
         return exception;
     }
 
+    @Override
     public String getMessage()
     {
         String msg;
@@ -139,6 +145,7 @@ public class DefaultSettingsProblem
         return msg;
     }
 
+    @Override
     public Severity getSeverity()
     {
         return severity;

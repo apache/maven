@@ -47,6 +47,7 @@ public class DefaultSettingsValidator
 
     private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
 
+    @Override
     public void validate( Settings settings, SettingsProblemCollector problems )
     {
         if ( settings.isUsePluginRegistry() )

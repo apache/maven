@@ -43,11 +43,13 @@ class DefaultSettingsBuildingResult
         this.problems = ( problems != null ) ? problems : new ArrayList<SettingsProblem>();
     }
 
+    @Override
     public Settings getEffectiveSettings()
     {
         return effectiveSettings;
     }
 
+    @Override
     public List<SettingsProblem> getProblems()
     {
         return problems;

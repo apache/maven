@@ -42,6 +42,7 @@ public class DefaultSettingsWriter
     implements SettingsWriter
 {
 
+    @Override
     public void write( File output, Map<String, Object> options, Settings settings )
         throws IOException
     {
@@ -60,6 +61,7 @@ public class DefaultSettingsWriter
         write( WriterFactory.newXmlWriter( output ), options, settings );
     }
 
+    @Override
     public void write( Writer output, Map<String, Object> options, Settings settings )
         throws IOException
     {
@@ -84,6 +86,7 @@ public class DefaultSettingsWriter
         }
     }
 
+    @Override
     public void write( OutputStream output, Map<String, Object> options, Settings settings )
         throws IOException
     {
