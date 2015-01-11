@@ -86,15 +86,11 @@ public class DefaultToolchainManagerPrivate
         }
         else
         {
-            List<ToolchainModel> lst = effectiveToolchains.getToolchains();
-            if ( lst != null )
+            for ( ToolchainModel toolchainModel : effectiveToolchains.getToolchains() )
             {
-                for ( ToolchainModel toolchainModel : lst )
+                if ( type.equals( toolchainModel.getType() ) )
                 {
-                    if ( type.equals( toolchainModel.getType() ) )
-                    {
-                        toRet.add( fact.createToolchain( toolchainModel ) );
-                    }
+                    toRet.add( fact.createToolchain( toolchainModel ) );
                 }
             }
             

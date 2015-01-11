@@ -33,7 +33,9 @@ public interface ToolchainManagerPrivate
 
     /**
      * Retrieves the toolchains of given type from the user settings.
-     *
+     * 
+     * @param type the type, must not be {@code null}
+     * @param context the Maven session, must not be {@code null}
      * @since 3.0 (addition of the <code>MavenSession</code> parameter)
      */
     ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
@@ -42,6 +44,8 @@ public interface ToolchainManagerPrivate
     /**
      * Stores the toolchain into build context.
      *
+     * @param toolchain the toolchain to store, must not be {@code null}
+     * @param context the Maven session, must not be {@code null}
      * @since 2.0.9
      */
     void storeToolchainToBuildContext( ToolchainPrivate toolchain, MavenSession context );
