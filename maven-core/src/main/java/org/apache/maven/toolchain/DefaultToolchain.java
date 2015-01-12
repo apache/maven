@@ -20,6 +20,7 @@ package org.apache.maven.toolchain;
  */
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -47,6 +48,11 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
 
     private Logger logger;
 
+    /**
+     * 
+     * @param model the model, must not be {@code null}
+     * @param logger the logger, must not be {@code null}
+     */
     protected DefaultToolchain( ToolchainModel model, Logger logger )
     {
         this.model = model;
@@ -54,6 +60,12 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
         this.logger = logger;
     }
 
+    /**
+     * 
+     * @param model the model, must not be {@code null}
+     * @param type the type
+     * @param logger the logger, must not be {@code null}
+     */
     protected DefaultToolchain( ToolchainModel model, String type, Logger logger )
     {
         this( model, logger );
@@ -151,5 +163,28 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
             hashCode = 31 * hashCode + this.getModel().getProvides().hashCode();
         }
         return hashCode;
+    }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append( "type:" ).append( getType() );
+        builder.append( '{' );
+
+        Iterator<Map.Entry<String, RequirementMatcher>> providesIter = provides.entrySet().iterator();
+        while ( providesIter.hasNext() )
+        {
+            Map.Entry<String, RequirementMatcher> provideEntry = providesIter.next();
+            builder.append( provideEntry.getKey() ).append( " = " ).append( provideEntry.getValue() );
+            if ( providesIter.hasNext() )
+            {
+                builder.append( ';' );
+            }
+        }
+        
+        builder.append( '}' );
+        
+        return builder.toString();
     }
 }

@@ -54,16 +54,22 @@ public final class RequirementMatcherFactory
             this.provides = provides;
         }
 
+        @Override
         public boolean matches( String requirement )
         {
             return provides.equalsIgnoreCase( requirement );
+        }
+        
+        @Override
+        public String toString()
+        {
+            return provides;
         }
     }
 
     private static final class VersionMatcher
         implements RequirementMatcher
     {
-
         DefaultArtifactVersion version;
 
         private VersionMatcher( String version )
@@ -71,6 +77,7 @@ public final class RequirementMatcherFactory
             this.version = new DefaultArtifactVersion( version );
         }
 
+        @Override
         public boolean matches( String requirement )
         {
             try
@@ -91,6 +98,12 @@ public final class RequirementMatcherFactory
                 ex.printStackTrace();
                 return false;
             }
+        }
+        
+        @Override
+        public String toString()
+        {
+            return version.toString();
         }
     }
 }
