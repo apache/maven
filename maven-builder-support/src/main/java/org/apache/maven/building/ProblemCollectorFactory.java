@@ -32,7 +32,7 @@ public class ProblemCollectorFactory
     /**
      * The default implementation is not visible, create it with this factory 
      * 
-     * @param problems
+     * @param problems starting set of problems, may be {@code null}
      * @return a new instance of a ProblemCollector
      */
     public static ProblemCollector newInstance( List<Problem> problems )
