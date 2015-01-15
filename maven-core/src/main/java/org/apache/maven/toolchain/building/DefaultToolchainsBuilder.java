@@ -26,6 +26,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.ProblemCollector;
@@ -43,6 +44,7 @@ import org.apache.maven.toolchain.model.TrackableBase;
  * @since 3.2.6
  */
 @Named
+@Singleton
 public class DefaultToolchainsBuilder
     implements ToolchainsBuilder
 {

@@ -79,8 +79,13 @@ public class ToolchainsBuildingException
             writer.print( problem.getSeverity() );
             writer.print( "] " );
             writer.print( problem.getMessage() );
-            writer.print( " @ " );
-            writer.println( problem.getLocation() );
+            String location = problem.getLocation();
+            if ( !location.isEmpty() )
+            {
+                writer.print( " @ " );
+                writer.print( location );
+            }
+            writer.println();
         }
 
         return buffer.toString();
