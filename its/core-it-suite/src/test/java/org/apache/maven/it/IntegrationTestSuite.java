@@ -24,11 +24,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
-import org.codehaus.plexus.util.IOUtil;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * The Core IT suite.
@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5753CustomMojoExecutionConfiguratorTest.class );
         suite.addTestSuite( MavenITmng5716ToolchainsTypeTest.class );
         suite.addTestSuite( MavenITmng5663NestedImportScopePomResolutionTest.class );
         suite.addTestSuite( MavenITmng2562Timestamp322Test.class );
