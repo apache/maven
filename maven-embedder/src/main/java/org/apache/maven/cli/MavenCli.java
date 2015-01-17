@@ -37,6 +37,8 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.building.FileSource;
+import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
@@ -66,7 +68,11 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
+import org.apache.maven.toolchain.MisconfiguredToolchainException;
+import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
+import org.apache.maven.toolchain.building.ToolchainsBuildingException;
+import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -444,6 +450,8 @@ public class MavenCli
         modelProcessor = createModelProcessor( container );
 
         settingsBuilder = container.lookup( SettingsBuilder.class );
+
+        toolchainsBuilder = container.lookup( ToolchainsBuilder.class );
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
@@ -837,18 +845,60 @@ public class MavenCli
 
         cliRequest.request.setGlobalToolchainsFile( globalToolchainsFile );
         cliRequest.request.setUserToolchainsFile( userToolchainsFile );
-        
-        // Unlike settings, the toolchains aren't built here. 
-        // That's done by the maven-toolchains-plugin, by calling it from the project with the proper configuration
+
+        DefaultToolchainsBuildingRequest toolchainsRequest = new DefaultToolchainsBuildingRequest();
+        if ( globalToolchainsFile.isFile() )
+        {
+            toolchainsRequest.setGlobalToolchainsSource( new FileSource( globalToolchainsFile ) );
+        }
+        if ( userToolchainsFile.isFile() )
+        {
+            toolchainsRequest.setUserToolchainsSource( new FileSource( userToolchainsFile ) );
+        }
+
+        eventSpyDispatcher.onEvent( toolchainsRequest );
+
+        slf4jLogger.debug( "Reading global toolchains from "
+            + getLocation( toolchainsRequest.getGlobalToolchainsSource(), globalToolchainsFile ) );
+        slf4jLogger.debug( "Reading user toolchains from "
+            + getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
+
+        ToolchainsBuildingResult toolchainsResult;
+        try
+        {
+            toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
+        }
+        catch ( ToolchainsBuildingException e )
+        {
+            throw new MisconfiguredToolchainException( e.getMessage(), e );
+        }
+
+        eventSpyDispatcher.onEvent( toolchainsRequest );
+
+        executionRequestPopulator.populateFromToolchains( cliRequest.request,
+                                                          toolchainsResult.getEffectiveToolchains() );
+
+        if ( !toolchainsResult.getProblems().isEmpty() && slf4jLogger.isWarnEnabled() )
+        {
+            slf4jLogger.warn( "" );
+            slf4jLogger.warn( "Some problems were encountered while building the effective toolchains" );
+
+            for ( Problem problem : toolchainsResult.getProblems() )
+            {
+                slf4jLogger.warn( problem.getMessage() + " @ " + problem.getLocation() );
+            }
+
+            slf4jLogger.warn( "" );
+        }
     }
 
-    private Object getLocation( Source source, File file )
+    private Object getLocation( Source source, File defaultLocation )
     {
         if ( source != null )
         {
             return source.getLocation();
         }
-        return file;
+        return defaultLocation;
     }
 
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )

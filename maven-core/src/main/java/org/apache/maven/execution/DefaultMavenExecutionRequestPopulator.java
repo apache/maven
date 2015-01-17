@@ -20,8 +20,11 @@ package org.apache.maven.execution;
  */
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
@@ -34,6 +37,8 @@ import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+import org.apache.maven.toolchain.model.PersistedToolchains;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -46,6 +51,7 @@ public class DefaultMavenExecutionRequestPopulator
     @Requirement
     private RepositorySystem repositorySystem;
 
+    @Override
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException
     {
@@ -134,6 +140,29 @@ public class DefaultMavenExecutionRequestPopulator
         return request;
     }
 
+    @Override
+    public MavenExecutionRequest populateFromToolchains( MavenExecutionRequest request, PersistedToolchains toolchains )
+        throws MavenExecutionRequestPopulationException
+    {
+        if ( toolchains != null )
+        {
+            Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<String, List<ToolchainModel>>( 2 );
+
+            for ( ToolchainModel model : toolchains.getToolchains() )
+            {
+                if ( !groupedToolchains.containsKey( model.getType() ) )
+                {
+                    groupedToolchains.put( model.getType(), new ArrayList<ToolchainModel>() );
+                }
+
+                groupedToolchains.get( model.getType() ).add( model );
+            }
+
+            request.setToolchains( groupedToolchains );
+        }
+        return request;
+    }
+    
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );

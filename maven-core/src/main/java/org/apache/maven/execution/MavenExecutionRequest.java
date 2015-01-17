@@ -22,6 +22,7 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -31,6 +32,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -393,5 +395,20 @@ public interface MavenExecutionRequest
      * @since 3.2.0
      */
     String getBuilderId();
+
+    /**
+     * 
+     * @param toolchains all toolchains grouped by type 
+     * @return this request 
+     * @since 3.2.6
+     */
+    MavenExecutionRequest setToolchains( Map<String, List<ToolchainModel>> toolchains );
+    
+    /**
+     * 
+     * @return all toolchains grouped by type, never {@code null}
+     * @since 3.2.6
+     */
+    Map<String, List<ToolchainModel>> getToolchains();
 
 }

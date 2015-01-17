@@ -22,7 +22,9 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -32,6 +34,7 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
+import org.apache.maven.toolchain.model.ToolchainModel;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -139,6 +142,8 @@ public class DefaultMavenExecutionRequest
     private int degreeOfConcurrency = 1;
 
     private String builderId = "singlethreaded";
+    
+    private Map<String, List<ToolchainModel>> toolchains;
 
     /**
      * Suppress SNAPSHOT updates.
@@ -1126,5 +1131,22 @@ public class DefaultMavenExecutionRequest
     public String getBuilderId()
     {
         return builderId;
+    }
+    
+    @Override
+    public Map<String, List<ToolchainModel>> getToolchains()
+    {
+        if ( toolchains == null )
+        {
+            toolchains = new HashMap<String, List<ToolchainModel>>();
+        }
+        return toolchains;
+    }
+
+    @Override
+    public MavenExecutionRequest setToolchains( Map<String, List<ToolchainModel>> toolchains )
+    {
+        this.toolchains = toolchains;
+        return this;
     }
 }
