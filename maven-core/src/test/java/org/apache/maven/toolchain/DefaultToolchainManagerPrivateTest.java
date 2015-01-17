@@ -20,31 +20,25 @@ package org.apache.maven.toolchain;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.toolchain.building.DefaultToolchainsBuildingResult;
-import org.apache.maven.toolchain.building.ToolchainsBuildingException;
-import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
-import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
-import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -52,9 +46,6 @@ import org.mockito.MockitoAnnotations;
 public class DefaultToolchainManagerPrivateTest
 {
     // Mocks to inject into toolchainManager
-    @Mock
-    private org.apache.maven.toolchain.building.ToolchainsBuilder toolchainsBuilder;
-
     @Mock
     private Logger logger;
 
@@ -88,8 +79,6 @@ public class DefaultToolchainManagerPrivateTest
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
         when( session.getRequest() ).thenReturn( req );
 
-        ToolchainsBuildingResult toolchainsResult = new DefaultToolchainsBuildingResult( new PersistedToolchains(), null );
-        when( toolchainsBuilder.build( isA( ToolchainsBuildingRequest.class ) ) ).thenReturn( toolchainsResult );
         ToolchainPrivate basicToolchain = mock( ToolchainPrivate.class );
         when( toolchainFactory_basicType.createDefaultToolchain() ).thenReturn( basicToolchain );
         ToolchainPrivate rareToolchain = mock( ToolchainPrivate.class );
@@ -112,8 +101,6 @@ public class DefaultToolchainManagerPrivateTest
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
         when( session.getRequest() ).thenReturn( req );
 
-        ToolchainsBuildingResult toolchainsResult = new DefaultToolchainsBuildingResult( new PersistedToolchains(), null );
-        when( toolchainsBuilder.build( isA( ToolchainsBuildingRequest.class ) ) ).thenReturn( toolchainsResult );
         ToolchainPrivate basicToolchain = mock( ToolchainPrivate.class );
         when( toolchainFactory_basicType.createDefaultToolchain() ).thenReturn( basicToolchain );
         ToolchainPrivate rareToolchain = mock( ToolchainPrivate.class );
@@ -135,19 +122,21 @@ public class DefaultToolchainManagerPrivateTest
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
         when( session.getRequest() ).thenReturn( req );
+        Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<String, List<ToolchainModel>>();
+        req.setToolchains( groupedToolchains );
 
-        PersistedToolchains effectiveToolchains = new PersistedToolchains();
+        List<ToolchainModel> basicToolchains = new ArrayList<ToolchainModel>();
         ToolchainModel basicToolchainModel = new ToolchainModel();
         basicToolchainModel.setType( "basic" );
-        effectiveToolchains.addToolchain( basicToolchainModel );
-        effectiveToolchains.addToolchain( basicToolchainModel );
+        basicToolchains.add( basicToolchainModel );
+        basicToolchains.add( basicToolchainModel );
+        groupedToolchains.put( "basic", basicToolchains );
 
+        List<ToolchainModel> rareToolchains = new ArrayList<ToolchainModel>();
         ToolchainModel rareToolchainModel = new ToolchainModel();
         rareToolchainModel.setType( "rare" );
-        effectiveToolchains.addToolchain( rareToolchainModel );
-        
-        ToolchainsBuildingResult toolchainsResult = new DefaultToolchainsBuildingResult( effectiveToolchains, null );
-        when( toolchainsBuilder.build( isA( ToolchainsBuildingRequest.class ) ) ).thenReturn( toolchainsResult );
+        rareToolchains.add( rareToolchainModel );
+        groupedToolchains.put( "rare", rareToolchains );
 
         // execute
         ToolchainPrivate[] toolchains = toolchainManager.getToolchainsForType( "basic", session );
@@ -166,62 +155,12 @@ public class DefaultToolchainManagerPrivateTest
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
         when( session.getRequest() ).thenReturn( req );
+        when(toolchainFactory_basicType.createDefaultToolchain()).thenThrow( MisconfiguredToolchainException.class );
 
-        when( toolchainsBuilder.build( isA( ToolchainsBuildingRequest.class ) ) ).thenThrow( ToolchainsBuildingException.class );
-        
         // execute
         toolchainManager.getToolchainsForType( "basic", session );
         
         // verify
         fail( "Should exit with a MisconfiguredToolchainException" );
     }
-    
-    @Test
-    public void testGlobalToolchainsFile()
-        throws Exception
-    {
-        // prepare
-        MavenSession session = mock( MavenSession.class );
-        MavenExecutionRequest req = new DefaultMavenExecutionRequest();
-        File globalFile = new File( "target/test-classes/org/apache/maven/toolchain/global.xml" );
-        req.setGlobalToolchainsFile( globalFile );
-        when( session.getRequest() ).thenReturn( req );
-
-        ToolchainsBuildingResult toolchainsResult = new DefaultToolchainsBuildingResult( new PersistedToolchains(), null );
-        when( toolchainsBuilder.build( isA( ToolchainsBuildingRequest.class ) ) ).thenReturn( toolchainsResult );
-        
-        // execute
-        toolchainManager.getToolchainsForType( "basic", session );
-
-        // verify
-        ArgumentCaptor<ToolchainsBuildingRequest> argument = ArgumentCaptor.forClass(ToolchainsBuildingRequest.class);
-        verify( toolchainsBuilder ).build( argument.capture() );
-        assertNull( argument.getValue().getUserToolchainsSource() );
-        assertEquals( globalFile.getAbsolutePath(), argument.getValue().getGlobalToolchainsSource().getLocation() );
-    }
-
-    @Test
-    public void testUserToolchainsFile()
-        throws Exception
-    {
-        // prepare
-        MavenSession session = mock( MavenSession.class );
-        MavenExecutionRequest req = new DefaultMavenExecutionRequest();
-        File userFile = new File( "target/test-classes/org/apache/maven/toolchain/user.xml" );
-        req.setUserToolchainsFile( userFile );
-        when( session.getRequest() ).thenReturn( req );
-
-        ToolchainsBuildingResult toolchainsResult = new DefaultToolchainsBuildingResult( new PersistedToolchains(), null );
-        when( toolchainsBuilder.build( isA( ToolchainsBuildingRequest.class ) ) ).thenReturn( toolchainsResult );
-        
-        // execute
-        toolchainManager.getToolchainsForType( "basic", session );
-
-        // verify
-        ArgumentCaptor<ToolchainsBuildingRequest> argument = ArgumentCaptor.forClass(ToolchainsBuildingRequest.class);
-        verify( toolchainsBuilder ).build( argument.capture() );
-        assertNull( argument.getValue().getGlobalToolchainsSource() );
-        assertEquals( userFile.getAbsolutePath(), argument.getValue().getUserToolchainsSource().getLocation() );
-    }
-
 }
