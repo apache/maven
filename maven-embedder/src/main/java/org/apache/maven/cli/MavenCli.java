@@ -68,10 +68,8 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
-import org.apache.maven.toolchain.building.ToolchainsBuildingException;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -863,15 +861,7 @@ public class MavenCli
         slf4jLogger.debug( "Reading user toolchains from "
             + getLocation( toolchainsRequest.getUserToolchainsSource(), userToolchainsFile ) );
 
-        ToolchainsBuildingResult toolchainsResult;
-        try
-        {
-            toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
-        }
-        catch ( ToolchainsBuildingException e )
-        {
-            throw new MisconfiguredToolchainException( e.getMessage(), e );
-        }
+        ToolchainsBuildingResult toolchainsResult = toolchainsBuilder.build( toolchainsRequest );
 
         eventSpyDispatcher.onEvent( toolchainsRequest );
 
