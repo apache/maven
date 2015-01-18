@@ -19,6 +19,9 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
 
 
@@ -26,6 +29,7 @@ import org.apache.maven.execution.MavenSession;
  * Public API for a toolchain-aware plugin to get expected toolchain instance.
  *
  * @author mkleint
+ * @author Robert Scholte
  * @since 2.0.9
  */
 public interface ToolchainManager
@@ -39,4 +43,15 @@ public interface ToolchainManager
      * to be used from plugins capable of working with toolchains.
      */
     Toolchain getToolchainFromBuildContext( String type, MavenSession context );
+    
+    /**
+     * Select all toolchains matching the type and requirements
+     * 
+     * @param session the maven session, must not be {@code null}
+     * @param type the type, must not be {@code null}
+     * @param requirements the requirements, may be {@code null}
+     * @return the matching toolchains, never {@code null}
+     * @since 3.2.6
+     */
+    List<Toolchain> getToolchains( MavenSession session, String type, Map<String, String> requirements );
 }

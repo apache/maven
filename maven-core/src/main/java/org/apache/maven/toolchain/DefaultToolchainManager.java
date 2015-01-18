@@ -19,7 +19,10 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.execution.MavenSession;
@@ -42,7 +45,8 @@ public class DefaultToolchainManager
 
     @Requirement( role = ToolchainFactory.class )
     Map<String, ToolchainFactory> factories;
-
+    
+    @Override
     public Toolchain getToolchainFromBuildContext( String type, MavenSession session )
     {
         Map<String, Object> context = retrieveContext( session );
@@ -51,28 +55,60 @@ public class DefaultToolchainManager
 
         if ( model != null )
         {
-            try
+            List<Toolchain> toolchains = selectToolchains( Collections.singletonList( model ), type, null );
+            
+            if ( !toolchains.isEmpty() )
             {
-                ToolchainFactory fact = factories.get( type );
-                if ( fact != null )
-                {
-                    return fact.createToolchain( model );
-                }
-                else
-                {
-                    logger.error( "Missing toolchain factory for type: " + type
-                        + ". Possibly caused by misconfigured project." );
-                }
-            }
-            catch ( MisconfiguredToolchainException ex )
-            {
-                logger.error( "Misconfigured toolchain.", ex );
+                return toolchains.get( 0 );
             }
         }
 
         return null;
     }
 
+    @Override
+    public List<Toolchain> getToolchains( MavenSession session, String type, Map<String, String> requirements )
+    {
+        List<ToolchainModel> models = session.getRequest().getToolchains().get( type );
+
+        return selectToolchains( models, type, requirements );
+    }
+
+    private List<Toolchain> selectToolchains( List<ToolchainModel> models, String type, Map<String, String> requirements )
+    {
+        List<Toolchain> toolchains = new ArrayList<Toolchain>();
+
+        if ( models != null )
+        {
+            ToolchainFactory fact = factories.get( type );
+
+            if ( fact == null )
+            {
+                logger.error( "Missing toolchain factory for type: " + type
+                    + ". Possibly caused by misconfigured project." );
+            }
+            else
+            {
+                for ( ToolchainModel model : models )
+                {
+                    try
+                    {
+                        ToolchainPrivate toolchain = fact.createToolchain( model );
+                        if ( requirements == null || toolchain.matchesRequirements( requirements ) )
+                        {
+                            toolchains.add( toolchain );
+                        }
+                    }
+                    catch ( MisconfiguredToolchainException ex )
+                    {
+                        logger.error( "Misconfigured toolchain.", ex );
+                    }
+                }
+            }
+        }
+        return toolchains;
+    }
+    
     Map<String, Object> retrieveContext( MavenSession session )
     {
         Map<String, Object> context = null;
