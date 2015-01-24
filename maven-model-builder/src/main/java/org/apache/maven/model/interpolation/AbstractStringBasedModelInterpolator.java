@@ -133,6 +133,7 @@ public abstract class AbstractStringBasedModelInterpolator
         {
             ValueSource basedirValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
             {
+                @Override
                 public Object getValue( String expression )
                 {
                     if ( "basedir".equals( expression ) )
@@ -146,6 +147,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
             ValueSource baseUriValueSource = new PrefixedValueSourceWrapper( new AbstractValueSource( false )
             {
+                @Override
                 public Object getValue( String expression )
                 {
                     if ( "baseUri".equals( expression ) )
@@ -169,6 +171,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
         valueSources.add( new AbstractValueSource( false )
         {
+            @Override
             public Object getValue( String expression )
             {
                 return config.getSystemProperties().getProperty( "env." + expression );

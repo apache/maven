@@ -43,16 +43,19 @@ class DefaultModelBuildingEvent
         this.problems = problems;
     }
 
+    @Override
     public Model getModel()
     {
         return model;
     }
 
+    @Override
     public ModelBuildingRequest getRequest()
     {
         return request;
     }
 
+    @Override
     public ModelProblemCollector getProblems()
     {
         return problems;

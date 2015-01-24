@@ -41,6 +41,7 @@ public class PropertyProfileActivator
     implements ProfileActivator
 {
 
+    @Override
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         Activation activation = profile.getActivation();

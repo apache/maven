@@ -33,6 +33,7 @@ public class DefaultModelLocator
     implements ModelLocator
 {
 
+    @Override
     public File locatePom( File projectDirectory )
     {
         return new File( projectDirectory, "pom.xml" );

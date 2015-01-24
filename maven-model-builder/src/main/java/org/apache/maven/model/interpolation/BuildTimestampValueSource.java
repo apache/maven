@@ -35,6 +35,7 @@ class BuildTimestampValueSource
         this.mavenBuildTimestamp = new MavenBuildTimestamp( startTime, properties );
     }
 
+    @Override
     public Object getValue( String expression )
     {
         if ( "build.timestamp".equals( expression ) || "maven.build.timestamp".equals( expression ) )

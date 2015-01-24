@@ -70,22 +70,26 @@ interface ModelCacheTag<T>
     ModelCacheTag<ModelData> RAW = new ModelCacheTag<ModelData>()
     {
 
+        @Override
         public String getName()
         {
             return "raw";
         }
 
+        @Override
         public Class<ModelData> getType()
         {
             return ModelData.class;
         }
 
+        @Override
         public ModelData intoCache( ModelData data )
         {
             Model model = ( data.getModel() != null ) ? data.getModel().clone() : null;
             return new ModelData( data.getSource(), model, data.getGroupId(), data.getArtifactId(), data.getVersion() );
         }
 
+        @Override
         public ModelData fromCache( ModelData data )
         {
             return intoCache( data );
@@ -99,21 +103,25 @@ interface ModelCacheTag<T>
     ModelCacheTag<DependencyManagement> IMPORT = new ModelCacheTag<DependencyManagement>()
     {
 
+        @Override
         public String getName()
         {
             return "import";
         }
 
+        @Override
         public Class<DependencyManagement> getType()
         {
             return DependencyManagement.class;
         }
 
+        @Override
         public DependencyManagement intoCache( DependencyManagement data )
         {
             return ( data != null ) ? data.clone() : null;
         }
 
+        @Override
         public DependencyManagement fromCache( DependencyManagement data )
         {
             return intoCache( data );

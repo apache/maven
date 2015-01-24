@@ -72,6 +72,7 @@ class DefaultModelProblemCollector
         return severities.contains( ModelProblem.Severity.ERROR ) || severities.contains( ModelProblem.Severity.FATAL );
     }
 
+    @Override
     public List<ModelProblem> getProblems()
     {
         return problems;
@@ -140,6 +141,7 @@ class DefaultModelProblemCollector
         }
     }
 
+    @Override
     public void add( ModelProblemCollectorRequest req )
     {
         int line = -1;

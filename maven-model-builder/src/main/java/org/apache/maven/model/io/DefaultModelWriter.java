@@ -42,6 +42,7 @@ public class DefaultModelWriter
     implements ModelWriter
 {
 
+    @Override
     public void write( File output, Map<String, Object> options, Model model )
         throws IOException
     {
@@ -60,6 +61,7 @@ public class DefaultModelWriter
         write( WriterFactory.newXmlWriter( output ), options, model );
     }
 
+    @Override
     public void write( Writer output, Map<String, Object> options, Model model )
         throws IOException
     {
@@ -84,6 +86,7 @@ public class DefaultModelWriter
         }
     }
 
+    @Override
     public void write( OutputStream output, Map<String, Object> options, Model model )
         throws IOException
     {

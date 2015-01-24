@@ -38,6 +38,7 @@ public class OperatingSystemProfileActivator
     implements ProfileActivator
 {
 
+    @Override
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         Activation activation = profile.getActivation();

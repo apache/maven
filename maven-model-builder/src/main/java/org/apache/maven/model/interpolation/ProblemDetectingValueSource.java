@@ -53,6 +53,7 @@ class ProblemDetectingValueSource
         this.problems = problems;
     }
 
+    @Override
     public Object getValue( String expression )
     {
         Object value = valueSource.getValue( expression );
@@ -70,12 +71,14 @@ class ProblemDetectingValueSource
         return value;
     }
 
+    @Override
     @SuppressWarnings( "unchecked" )
     public List getFeedback()
     {
         return valueSource.getFeedback();
     }
 
+    @Override
     public void clearFeedback()
     {
         valueSource.clearFeedback();

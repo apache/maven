@@ -54,6 +54,7 @@ public class StringSearchModelInterpolator
     // Empirical data from 3.x, actual =40
 
 
+    @Override
     public Model interpolateModel( Model model, File projectDir, ModelBuildingRequest config,
                                    ModelProblemCollector problems )
     {
@@ -82,6 +83,7 @@ public class StringSearchModelInterpolator
         }
     }
 
+    @Override
     protected Interpolator createInterpolator()
     {
         StringSearchInterpolator interpolator = new StringSearchInterpolator();
@@ -120,6 +122,7 @@ public class StringSearchModelInterpolator
             this.problems = problems;
         }
 
+        @Override
         public Object run()
         {
             while ( !interpolationTargets.isEmpty() )

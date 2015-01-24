@@ -57,6 +57,7 @@ class DefaultModelBuildingResult
         problems = new ArrayList<ModelProblem>();
     }
 
+    @Override
     public Model getEffectiveModel()
     {
         return effectiveModel;
@@ -69,6 +70,7 @@ class DefaultModelBuildingResult
         return this;
     }
 
+    @Override
     public List<String> getModelIds()
     {
         return modelIds;
@@ -86,11 +88,13 @@ class DefaultModelBuildingResult
         return this;
     }
 
+    @Override
     public Model getRawModel()
     {
         return rawModels.get( modelIds.get( 0 ) );
     }
 
+    @Override
     public Model getRawModel( String modelId )
     {
         return rawModels.get( modelId );
@@ -108,6 +112,7 @@ class DefaultModelBuildingResult
         return this;
     }
 
+    @Override
     public List<Profile> getActivePomProfiles( String modelId )
     {
         return activePomProfiles.get( modelId );
@@ -132,6 +137,7 @@ class DefaultModelBuildingResult
         return this;
     }
 
+    @Override
     public List<Profile> getActiveExternalProfiles()
     {
         return activeExternalProfiles;
@@ -151,6 +157,7 @@ class DefaultModelBuildingResult
         return this;
     }
 
+    @Override
     public List<ModelProblem> getProblems()
     {
         return problems;

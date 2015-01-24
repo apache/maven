@@ -45,6 +45,7 @@ public class DefaultModelReader
     implements ModelReader
 {
 
+    @Override
     public Model read( File input, Map<String, ?> options )
         throws IOException
     {
@@ -60,6 +61,7 @@ public class DefaultModelReader
         return model;
     }
 
+    @Override
     public Model read( Reader input, Map<String, ?> options )
         throws IOException
     {
@@ -78,6 +80,7 @@ public class DefaultModelReader
         }
     }
 
+    @Override
     public Model read( InputStream input, Map<String, ?> options )
         throws IOException
     {

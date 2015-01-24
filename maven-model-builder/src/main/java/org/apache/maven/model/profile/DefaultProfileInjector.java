@@ -53,6 +53,7 @@ public class DefaultProfileInjector
 
     private ProfileModelMerger merger = new ProfileModelMerger();
 
+    @Override
     public void injectProfile( Model model, Profile profile, ModelBuildingRequest request,
                                ModelProblemCollector problems )
     {

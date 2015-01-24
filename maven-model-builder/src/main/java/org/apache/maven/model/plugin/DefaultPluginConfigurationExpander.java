@@ -41,6 +41,7 @@ public class DefaultPluginConfigurationExpander
     implements PluginConfigurationExpander
 {
 
+    @Override
     public void expandPluginConfiguration( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Build build = model.getBuild();

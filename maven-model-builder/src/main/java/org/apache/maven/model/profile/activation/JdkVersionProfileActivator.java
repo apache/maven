@@ -43,6 +43,7 @@ public class JdkVersionProfileActivator
     implements ProfileActivator
 {
 
+    @Override
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         Activation activation = profile.getActivation();
@@ -213,6 +214,7 @@ public class JdkVersionProfileActivator
             this.closed = closed;
         }
 
+        @Override
         public String toString()
         {
             return value;

@@ -54,23 +54,27 @@ public class DefaultModelProcessor
         return this;
     }
 
+    @Override
     public File locatePom( File projectDirectory )
     {
         return locator.locatePom( projectDirectory );
     }
 
+    @Override
     public Model read( File input, Map<String, ?> options )
         throws IOException
     {
         return reader.read( input, options );
     }
 
+    @Override
     public Model read( Reader input, Map<String, ?> options )
         throws IOException
     {
         return reader.read( input, options );
     }
 
+    @Override
     public Model read( InputStream input, Map<String, ?> options )
         throws IOException
     {

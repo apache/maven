@@ -47,6 +47,7 @@ public class DefaultModelNormalizer
 
     private DuplicateMerger merger = new DuplicateMerger();
 
+    @Override
     public void mergeDuplicates( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Build build = model.getBuild();
@@ -104,6 +105,7 @@ public class DefaultModelNormalizer
 
     }
 
+    @Override
     public void injectDefaultValues( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         injectDependencyDefaults( model.getDependencies() );

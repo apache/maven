@@ -74,6 +74,7 @@ public class DefaultModelValidator
 
     private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
 
+    @Override
     public void validateRawModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         Parent parent = m.getParent();
@@ -286,6 +287,7 @@ public class DefaultModelValidator
         }
     }
 
+    @Override
     public void validateEffectiveModel( Model m, ModelBuildingRequest request, ModelProblemCollector problems )
     {
         validateStringNotEmpty( "modelVersion", problems, Severity.ERROR, Version.BASE, m.getModelVersion(), m );

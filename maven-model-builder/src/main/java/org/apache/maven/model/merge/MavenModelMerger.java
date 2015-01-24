@@ -314,6 +314,7 @@ public class MavenModelMerger
         }
     }
 
+    @Override
     protected void mergeModelBase_PluginRepositories( ModelBase target, ModelBase source, boolean sourceDominant,
                                                       Map<Object, Object> context )
     {

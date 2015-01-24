@@ -28,6 +28,7 @@ public class AbstractModelBuildingListener
     implements ModelBuildingListener
 {
 
+    @Override
     public void buildExtensionsAssembled( ModelBuildingEvent event )
     {
         // default does nothing

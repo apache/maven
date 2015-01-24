@@ -41,6 +41,7 @@ public class DefaultDependencyManagementImporter
     implements DependencyManagementImporter
 {
 
+    @Override
     public void importManagement( Model target, List<? extends DependencyManagement> sources,
                                   ModelBuildingRequest request, ModelProblemCollector problems )
     {

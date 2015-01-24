@@ -233,6 +233,7 @@ public class DefaultModelBuilderFactory
         implements LifecycleBindingsInjector
     {
 
+        @Override
         public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
         {
         }

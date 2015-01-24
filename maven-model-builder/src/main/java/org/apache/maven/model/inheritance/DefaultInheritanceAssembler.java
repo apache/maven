@@ -48,6 +48,7 @@ public class DefaultInheritanceAssembler
 
     private InheritanceModelMerger merger = new InheritanceModelMerger();
 
+    @Override
     public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
                                           ModelProblemCollector problems )
     {

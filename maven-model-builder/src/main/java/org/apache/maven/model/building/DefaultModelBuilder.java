@@ -228,6 +228,7 @@ public class DefaultModelBuilder
         return this;
     }
 
+    @Override
     public ModelBuildingResult build( ModelBuildingRequest request )
         throws ModelBuildingException
     {
@@ -400,6 +401,7 @@ public class DefaultModelBuilder
         return result;
     }
 
+    @Override
     public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
         throws ModelBuildingException
     {

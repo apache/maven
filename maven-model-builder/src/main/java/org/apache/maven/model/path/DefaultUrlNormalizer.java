@@ -31,6 +31,7 @@ public class DefaultUrlNormalizer
     implements UrlNormalizer
 {
 
+    @Override
     public String normalize( String url )
     {
         String result = url;

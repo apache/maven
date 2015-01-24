@@ -56,6 +56,7 @@ public class DefaultProfileSelector
         return this;
     }
 
+    @Override
     public List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
                                             ModelProblemCollector problems )
     {

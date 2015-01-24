@@ -53,6 +53,7 @@ public class DefaultSuperPomProvider
         return this;
     }
 
+    @Override
     public Model getSuperModel( String version )
     {
         if ( superModel == null )

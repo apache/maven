@@ -55,6 +55,7 @@ class UrlNormalizingPostProcessor
         this.normalizer = normalizer;
     }
 
+    @Override
     public Object execute( String expression, Object value )
     {
         if ( value != null && URL_EXPRESSIONS.contains( expression ) )

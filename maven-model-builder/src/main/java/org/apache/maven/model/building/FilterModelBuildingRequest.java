@@ -44,11 +44,13 @@ class FilterModelBuildingRequest
         this.request = request;
     }
 
+    @Override
     public File getPomFile()
     {
         return request.getPomFile();
     }
 
+    @Override
     public FilterModelBuildingRequest setPomFile( File pomFile )
     {
         request.setPomFile( pomFile );
@@ -56,11 +58,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public ModelSource getModelSource()
     {
         return request.getModelSource();
     }
 
+    @Override
     public FilterModelBuildingRequest setModelSource( ModelSource modelSource )
     {
         request.setModelSource( modelSource );
@@ -68,11 +72,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public int getValidationLevel()
     {
         return request.getValidationLevel();
     }
 
+    @Override
     public FilterModelBuildingRequest setValidationLevel( int validationLevel )
     {
         request.setValidationLevel( validationLevel );
@@ -80,11 +86,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public boolean isProcessPlugins()
     {
         return request.isProcessPlugins();
     }
 
+    @Override
     public FilterModelBuildingRequest setProcessPlugins( boolean processPlugins )
     {
         request.setProcessPlugins( processPlugins );
@@ -92,11 +100,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public boolean isTwoPhaseBuilding()
     {
         return request.isTwoPhaseBuilding();
     }
 
+    @Override
     public FilterModelBuildingRequest setTwoPhaseBuilding( boolean twoPhaseBuilding )
     {
         request.setTwoPhaseBuilding( twoPhaseBuilding );
@@ -104,11 +114,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public boolean isLocationTracking()
     {
         return request.isLocationTracking();
     }
 
+    @Override
     public FilterModelBuildingRequest setLocationTracking( boolean locationTracking )
     {
         request.setLocationTracking( locationTracking );
@@ -116,11 +128,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public List<Profile> getProfiles()
     {
         return request.getProfiles();
     }
 
+    @Override
     public FilterModelBuildingRequest setProfiles( List<Profile> profiles )
     {
         request.setProfiles( profiles );
@@ -128,11 +142,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public List<String> getActiveProfileIds()
     {
         return request.getActiveProfileIds();
     }
 
+    @Override
     public FilterModelBuildingRequest setActiveProfileIds( List<String> activeProfileIds )
     {
         request.setActiveProfileIds( activeProfileIds );
@@ -140,11 +156,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public List<String> getInactiveProfileIds()
     {
         return request.getInactiveProfileIds();
     }
 
+    @Override
     public FilterModelBuildingRequest setInactiveProfileIds( List<String> inactiveProfileIds )
     {
         request.setInactiveProfileIds( inactiveProfileIds );
@@ -152,11 +170,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public Properties getSystemProperties()
     {
         return request.getSystemProperties();
     }
 
+    @Override
     public FilterModelBuildingRequest setSystemProperties( Properties systemProperties )
     {
         request.setSystemProperties( systemProperties );
@@ -164,11 +184,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public Properties getUserProperties()
     {
         return request.getUserProperties();
     }
 
+    @Override
     public FilterModelBuildingRequest setUserProperties( Properties userProperties )
     {
         request.setUserProperties( userProperties );
@@ -176,11 +198,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public Date getBuildStartTime()
     {
         return request.getBuildStartTime();
     }
 
+    @Override
     public ModelBuildingRequest setBuildStartTime( Date buildStartTime )
     {
         request.setBuildStartTime( buildStartTime );
@@ -188,11 +212,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public ModelResolver getModelResolver()
     {
         return request.getModelResolver();
     }
 
+    @Override
     public FilterModelBuildingRequest setModelResolver( ModelResolver modelResolver )
     {
         request.setModelResolver( modelResolver );
@@ -200,11 +226,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public ModelBuildingListener getModelBuildingListener()
     {
         return request.getModelBuildingListener();
     }
 
+    @Override
     public ModelBuildingRequest setModelBuildingListener( ModelBuildingListener modelBuildingListener )
     {
         request.setModelBuildingListener( modelBuildingListener );
@@ -212,11 +240,13 @@ class FilterModelBuildingRequest
         return this;
     }
 
+    @Override
     public ModelCache getModelCache()
     {
         return request.getModelCache();
     }
 
+    @Override
     public FilterModelBuildingRequest setModelCache( ModelCache modelCache )
     {
         request.setModelCache( modelCache );

@@ -95,31 +95,37 @@ public class DefaultModelProblem
         this.version = version;
     }
 
+    @Override
     public String getSource()
     {
         return source;
     }
 
+    @Override
     public int getLineNumber()
     {
         return lineNumber;
     }
 
+    @Override
     public int getColumnNumber()
     {
         return columnNumber;
     }
 
+    @Override
     public String getModelId()
     {
         return modelId;
     }
 
+    @Override
     public Exception getException()
     {
         return exception;
     }
 
+    @Override
     public String getMessage()
     {
         String msg;
@@ -141,11 +147,13 @@ public class DefaultModelProblem
         return msg;
     }
 
+    @Override
     public Severity getSeverity()
     {
         return severity;
     }
 
+    @Override
     public Version getVersion()
     {
         return version;

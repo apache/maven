@@ -63,6 +63,7 @@ public class FileProfileActivator
         return this;
     }
 
+    @Override
     public boolean isActive( Profile profile, ProfileActivationContext context, ModelProblemCollector problems )
     {
         Activation activation = profile.getActivation();
@@ -105,6 +106,7 @@ public class FileProfileActivator
         {
             interpolator.addValueSource( new AbstractValueSource( false )
             {
+                @Override
                 public Object getValue( String expression )
                 {
                     /*
