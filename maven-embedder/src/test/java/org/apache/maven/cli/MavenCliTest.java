@@ -24,7 +24,6 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.maven.cli.MavenCli.CliRequest;
 
 public class MavenCliTest
     extends TestCase

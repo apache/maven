@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -48,6 +49,8 @@ import org.apache.maven.Maven;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
+import org.apache.maven.cli.configuration.ConfigurationProcessor;
+import org.apache.maven.cli.configuration.SettingsXmlConfigurationProcessor;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
@@ -77,11 +80,6 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
-import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuilder;
-import org.apache.maven.settings.building.SettingsBuildingRequest;
-import org.apache.maven.settings.building.SettingsBuildingResult;
-import org.apache.maven.settings.building.SettingsProblem;
 import org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuilder;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
@@ -132,11 +130,6 @@ public class MavenCli
     @SuppressWarnings( "checkstyle:constantname" )
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
 
-    public static final File DEFAULT_USER_SETTINGS_FILE = new File( userMavenConfigurationHome, "settings.xml" );
-
-    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
-        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/settings.xml" );
-
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE = 
@@ -162,12 +155,12 @@ public class MavenCli
 
     private MavenExecutionRequestPopulator executionRequestPopulator;
 
-    private SettingsBuilder settingsBuilder;
-
     private ToolchainsBuilder toolchainsBuilder;
 
     private DefaultSecDispatcher dispatcher;
 
+    private Map<String, ConfigurationProcessor> configurationProcessors;
+    
     public MavenCli()
     {
         this( null );
@@ -274,7 +267,7 @@ public class MavenCli
             properties( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
-            settings( cliRequest );
+            configure( cliRequest );
             toolchains( cliRequest );
             populateRequest( cliRequest );
             encryption( cliRequest );
@@ -581,8 +574,8 @@ public class MavenCli
 
         modelProcessor = createModelProcessor( container );
 
-        settingsBuilder = container.lookup( SettingsBuilder.class );
-
+        configurationProcessors = container.lookupMap( ConfigurationProcessor.class );
+        
         toolchainsBuilder = container.lookup( ToolchainsBuilder.class );
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
@@ -639,20 +632,24 @@ public class MavenCli
                 Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
 
                 executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
-                settingsBuilder = container.lookup( SettingsBuilder.class );
-
+                
+                configurationProcessors = container.lookupMap( ConfigurationProcessor.class );
+                
+                configure( cliRequest );
+                
                 MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
-                settings( cliRequest, request );
+
                 request = populateRequest( cliRequest, request );
+                
                 request = executionRequestPopulator.populateDefaults( request );
 
                 BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
+                
                 return resolver.loadCoreExtensions( request, providedArtifacts, extensions );
             }
             finally
             {
                 executionRequestPopulator = null;
-                settingsBuilder = null;
                 container.dispose();
             }
         }
@@ -979,93 +976,69 @@ public class MavenCli
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void settings( CliRequest cliRequest )
+    private void configure( CliRequest cliRequest )
         throws Exception
     {
-        settings( cliRequest, cliRequest.request );
-    }
-
-    private void settings( CliRequest cliRequest, MavenExecutionRequest request )
-        throws Exception
-    {
-        File userSettingsFile;
-
-        if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
+        //
+        // This is not ideal but there are events specifically for configuration from the CLI which I don't
+        // believe are really valid but there are ITs which assert the right events are published so this
+        // needs to be supported so the EventSpyDispatcher needs to be put in the CliRequest so that
+        // it can be accessed by configuration processors.
+        //
+        cliRequest.request.setEventSpyDispatcher( eventSpyDispatcher );
+        
+        //
+        // We expect at most 2 implementations to be available. The SettingsXmlConfigurationProcessor implementation
+        // is always available in the core and likely always will be, but we may have another ConfigurationProcessor
+        // present supplied by the user. The rule is that we only allow the execution of one ConfigurationProcessor.
+        // If there is more than one then we execute the one supplied by the user, otherwise we execute the
+        // the default SettingsXmlConfigurationProcessor.
+        // 
+        int userSuppliedConfigurationProcessorCount = configurationProcessors.size() - 1;
+        
+        if ( userSuppliedConfigurationProcessorCount == 0 )
         {
-            userSettingsFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-            userSettingsFile = resolveFile( userSettingsFile, cliRequest.workingDirectory );
-
-            if ( !userSettingsFile.isFile() )
+            //
+            // Our settings.xml source is historically how we have configured Maven from the CLI so we are going to 
+            // have to honour its existence forever. So let's run it.
+            //
+            configurationProcessors.get( SettingsXmlConfigurationProcessor.HINT ).process( cliRequest );            
+        }        
+        else if ( userSuppliedConfigurationProcessorCount == 1 )
+        {
+            //
+            // Run the user supplied ConfigurationProcessor
+            //
+            for ( Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
             {
-                throw new FileNotFoundException( "The specified user settings file does not exist: "
-                    + userSettingsFile );
-            }
+                String hint = entry.getKey();
+                if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
+                {
+                    ConfigurationProcessor configurationProcessor = entry.getValue();
+                    configurationProcessor.process( cliRequest );
+                }
+            }            
         }
-        else
+        else if ( userSuppliedConfigurationProcessorCount > 1 )
         {
-            userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
-        }
-
-        File globalSettingsFile;
-
-        if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
-        {
-            globalSettingsFile =
-                new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
-            globalSettingsFile = resolveFile( globalSettingsFile, cliRequest.workingDirectory );
-
-            if ( !globalSettingsFile.isFile() )
+            //
+            // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
+            //
+            StringBuffer sb = new StringBuffer( 
+                String.format( "\nThere can only be one user supplied ConfigurationProcessor, there are %s:\n\n", 
+                               userSuppliedConfigurationProcessorCount ) );
+            for ( Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
             {
-                throw new FileNotFoundException( "The specified global settings file does not exist: "
-                    + globalSettingsFile );
+                String hint = entry.getKey();
+                if ( !hint.equals( SettingsXmlConfigurationProcessor.HINT ) )
+                {
+                    ConfigurationProcessor configurationProcessor = entry.getValue();
+                    sb.append( String.format( "%s\n", configurationProcessor.getClass().getName() ) );
+                }
             }
-        }
-        else
-        {
-            globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
-        }
-
-        request.setGlobalSettingsFile( globalSettingsFile );
-        request.setUserSettingsFile( userSettingsFile );
-
-        SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
-        settingsRequest.setGlobalSettingsFile( globalSettingsFile );
-        settingsRequest.setUserSettingsFile( userSettingsFile );
-        settingsRequest.setSystemProperties( cliRequest.systemProperties );
-        settingsRequest.setUserProperties( cliRequest.userProperties );
-
-        if ( eventSpyDispatcher != null )
-        {
-            eventSpyDispatcher.onEvent( settingsRequest );
-        }
-
-        slf4jLogger.debug( "Reading global settings from "
-            + getLocation( settingsRequest.getGlobalSettingsSource(),
-                                   settingsRequest.getGlobalSettingsFile() ) );
-        slf4jLogger.debug( "Reading user settings from "
-            + getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
-
-        SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
-
-        if ( eventSpyDispatcher != null )
-        {
-            eventSpyDispatcher.onEvent( settingsResult );
-        }
-
-        executionRequestPopulator.populateFromSettings( request, settingsResult.getEffectiveSettings() );
-
-        if ( !settingsResult.getProblems().isEmpty() && slf4jLogger.isWarnEnabled() )
-        {
-            slf4jLogger.warn( "" );
-            slf4jLogger.warn( "Some problems were encountered while building the effective settings" );
-
-            for ( SettingsProblem problem : settingsResult.getProblems() )
-            {
-                slf4jLogger.warn( problem.getMessage() + " @ " + problem.getLocation() );
-            }
-
-            slf4jLogger.warn( "" );
-        }
+            sb.append( String.format( "\n" ) );
+            throw new Exception( sb.toString() );
+        }                
     }
     
     @SuppressWarnings( "checkstyle:methodlength" )
@@ -1346,8 +1319,7 @@ public class MavenCli
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory )
-            ;
+            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
         {
@@ -1589,28 +1561,6 @@ public class MavenCli
         System.setProperty( name, value );
     }
 
-    static class CliRequest
-    {
-        String[] args;
-        CommandLine commandLine;
-        ClassWorld classWorld;
-        String workingDirectory;
-        File multiModuleProjectDirectory;
-        boolean debug;
-        boolean quiet;
-        boolean showErrors = true;
-        Properties userProperties = new Properties();
-        Properties systemProperties = new Properties();
-        MavenExecutionRequest request;
-
-        CliRequest( String[] args, ClassWorld classWorld )
-        {
-            this.args = args;
-            this.classWorld = classWorld;
-            this.request = new DefaultMavenExecutionRequest();
-        }
-    }
-
     static class ExitException
         extends Exception
     {
@@ -1621,7 +1571,6 @@ public class MavenCli
         {
             this.exitCode = exitCode;
         }
-
     }
 
     //

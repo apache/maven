@@ -156,7 +156,7 @@ public class DefaultMaven
     //
     @SuppressWarnings( "checkstyle:methodlength" )
     private MavenExecutionResult doExecute( MavenExecutionRequest request )
-    {
+    {        
         request.setStartTime( new Date() );
 
         MavenExecutionResult result = new DefaultMavenExecutionResult();

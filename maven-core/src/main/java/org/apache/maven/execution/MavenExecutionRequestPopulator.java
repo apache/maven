@@ -40,6 +40,7 @@ public interface MavenExecutionRequestPopulator
      * @return The populated execution request, never {@code null}.
      * @throws MavenExecutionRequestPopulationException If the execution request could not be populated.
      */
+    @Deprecated
     MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException;
 

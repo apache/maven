@@ -351,7 +351,7 @@ public class MavenRepositorySystem
         return modelRepositoryPolicy;
     }
 
-    public ArtifactRepository buildArtifactRepository( org.apache.maven.settings.Repository repo )
+    public static ArtifactRepository buildArtifactRepository( org.apache.maven.settings.Repository repo )
         throws InvalidRepositoryException
     {
         return buildArtifactRepository( fromSettingsRepository( repo ) );
