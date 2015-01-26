@@ -93,6 +93,8 @@ public class DefaultMavenExecutionRequest
     // Request
     // ----------------------------------------------------------------------------
 
+    private File projectBasedir;
+
     private File basedir;
 
     private List<String> goals;
@@ -1148,5 +1150,17 @@ public class DefaultMavenExecutionRequest
     {
         this.toolchains = toolchains;
         return this;
+    }
+
+    @Override
+    public void setProjectBaseDirectory( File directory )
+    {
+        this.projectBasedir = directory;
+    }
+
+    @Override
+    public File getProjectBaseDirectory()
+    {
+        return projectBasedir;
     }
 }

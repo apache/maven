@@ -23,8 +23,10 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +94,8 @@ import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 
 // TODO: push all common bits back to plexus cli and prepare for transition to Guice. We don't need 50 ways to make CLIs
@@ -105,6 +109,8 @@ public class MavenCli
     public static final String LOCAL_REPO_PROPERTY = "maven.repo.local";
 
     public static final String THREADS_DEPRECATED = "maven.threads.experimental";
+
+    public static final String PROJECT_BASEDIR = "maven.projectBasedir";
 
     @SuppressWarnings( "checkstyle:constantname" )
     public static final String userHome = System.getProperty( "user.home" );
@@ -257,11 +263,25 @@ public class MavenCli
         }
     }
 
-    private void initialize( CliRequest cliRequest )
+    void initialize( CliRequest cliRequest )
     {
         if ( cliRequest.workingDirectory == null )
         {
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
+        }
+
+        if ( cliRequest.projectBaseDirectory == null )
+        {
+            String basedirProperty = System.getProperty( PROJECT_BASEDIR );
+            File basedir = basedirProperty != null ? new File( basedirProperty ) : new File( "" );
+            try
+            {
+                cliRequest.projectBaseDirectory = basedir.getCanonicalFile();
+            }
+            catch ( IOException e )
+            {
+                cliRequest.projectBaseDirectory = basedir.getAbsoluteFile();
+            }
         }
 
         //
@@ -276,7 +296,7 @@ public class MavenCli
         }
     }
 
-    private void cli( CliRequest cliRequest )
+    void cli( CliRequest cliRequest )
         throws Exception
     {
         //
@@ -287,9 +307,38 @@ public class MavenCli
 
         CLIManager cliManager = new CLIManager();
 
+        List<String> args = new ArrayList<String>();
+
         try
         {
-            cliRequest.commandLine = cliManager.parse( cliRequest.args );
+            File configFile = new File( cliRequest.projectBaseDirectory, ".mvn/maven.config" );
+
+            if ( configFile.isFile() )
+            {
+                for ( String arg : Files.toString( configFile, Charsets.UTF_8 ).split( "\\s+" ) )
+                {
+                    args.add( arg );
+                }
+
+                CommandLine config = cliManager.parse( args.toArray( new String[args.size()] ) );
+                List<?> unrecongized = config.getArgList();
+                if ( !unrecongized.isEmpty() )
+                {
+                    throw new ParseException( "Unrecognized maven.config entries: " + unrecongized );
+                }
+            }
+        }
+        catch ( ParseException e )
+        {
+            System.err.println( "Unable to parse maven.config: " + e.getMessage() );
+            cliManager.displayHelp( System.out );
+            throw e;
+        }
+
+        try
+        {
+            args.addAll( 0, Arrays.asList( cliRequest.args ) );
+            cliRequest.commandLine = cliManager.parse( args.toArray( new String[args.size()] ) );
         }
         catch ( ParseException e )
         {
@@ -1074,6 +1123,7 @@ public class MavenCli
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
+            .setProjectBaseDirectory( cliRequest.projectBaseDirectory )
             ;
 
         if ( alternatePomFile != null )
@@ -1322,6 +1372,7 @@ public class MavenCli
         CommandLine commandLine;
         ClassWorld classWorld;
         String workingDirectory;
+        File projectBaseDirectory;
         boolean debug;
         boolean quiet;
         boolean showErrors = true;

@@ -19,16 +19,39 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.File;
+
 import junit.framework.TestCase;
+
+import org.apache.commons.cli.ParseException;
+import org.apache.maven.cli.MavenCli.CliRequest;
 
 public class MavenCliTest
     extends TestCase
 {
     private MavenCli cli;
 
+    private String origBasedir;
+
     protected void setUp()
     {
         cli = new MavenCli();
+        origBasedir = System.getProperty( MavenCli.PROJECT_BASEDIR );
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        if ( origBasedir != null )
+        {
+            System.setProperty( MavenCli.PROJECT_BASEDIR, origBasedir );
+        }
+        else
+        {
+            System.getProperties().remove( MavenCli.PROJECT_BASEDIR );
+        }
+        super.tearDown();
     }
 
     public void testCalculateDegreeOfConcurrencyWithCoreMultiplier()
@@ -47,6 +70,42 @@ public class MavenCliTest
         catch ( NumberFormatException e )
         {
             // carry on
+        }
+    }
+
+    public void testMavenConfig()
+        throws Exception
+    {
+        System.setProperty( MavenCli.PROJECT_BASEDIR, new File( "src/test/projects/config" ).getCanonicalPath() );
+        CliRequest request = new CliRequest( new String[0], null );
+
+        // read .mvn/maven.config
+        cli.initialize( request );
+        cli.cli( request );
+        assertEquals( "multithreaded", request.commandLine.getOptionValue( "builder" ) );
+        assertEquals( "8", request.commandLine.getOptionValue( "threads" ) );
+
+        // override from command line
+        request = new CliRequest( new String[] { "--builder", "foobar" }, null );
+        cli.cli( request );
+        assertEquals( "foobar", request.commandLine.getOptionValue( "builder" ) );
+    }
+
+    public void testMavenConfigInvalid()
+        throws Exception
+    {
+        System.setProperty( MavenCli.PROJECT_BASEDIR, new File( "src/test/projects/config-illegal" ).getCanonicalPath() );
+        CliRequest request = new CliRequest( new String[0], null );
+
+        cli.initialize( request );
+        try
+        {
+            cli.cli( request );
+            fail();
+        }
+        catch ( ParseException expected )
+        {
+
         }
     }
 }

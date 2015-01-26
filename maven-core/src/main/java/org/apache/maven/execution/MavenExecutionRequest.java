@@ -415,4 +415,13 @@ public interface MavenExecutionRequest
      */
     Map<String, List<ToolchainModel>> getToolchains();
 
+    /**
+     * @since 3.2.6
+     */
+    void setProjectBaseDirectory( File file );
+
+    /**
+     * @since 3.2.6
+     */
+    File getProjectBaseDirectory();
 }
