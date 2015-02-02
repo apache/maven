@@ -30,7 +30,7 @@ public class MavenITmng5742BuildExtensionClassloaderTest
 
     public MavenITmng5742BuildExtensionClassloaderTest()
     {
-        super( "[3.2.6-SNAPSHOT,)" );
+        super( "(3.2.5,)" );
     }
 
     public void testBuildExtensionClassloader()
