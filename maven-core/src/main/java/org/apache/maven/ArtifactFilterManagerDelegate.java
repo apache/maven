@@ -21,6 +21,9 @@ package org.apache.maven;
 
 import java.util.Set;
 
+/**
+ * @deprecated use {@code META-INF/maven/extension.xml} to define artifacts exported by Maven core extensions.
+ */
 public interface ArtifactFilterManagerDelegate
 {
 

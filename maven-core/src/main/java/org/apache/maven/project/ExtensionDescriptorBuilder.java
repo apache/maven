@@ -43,7 +43,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 public class ExtensionDescriptorBuilder
 {
 
-    private String getExtensionDescriptorLocation()
+    /**
+     * @since 3.2.6 
+     */
+    public String getExtensionDescriptorLocation()
     {
         return "META-INF/maven/extension.xml";
     }
@@ -71,7 +74,14 @@ public class ExtensionDescriptorBuilder
                 {
                     InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
 
-                    extensionDescriptor = build( is );
+                    try
+                    {
+                        extensionDescriptor = build( is );
+                    }
+                    finally
+                    {
+                        IOUtil.close( is );
+                    }
                 }
             }
             finally
@@ -100,7 +110,10 @@ public class ExtensionDescriptorBuilder
         return extensionDescriptor;
     }
 
-    ExtensionDescriptor build( InputStream is )
+    /**
+     * @since 3.2.6
+     */
+    public ExtensionDescriptor build( InputStream is )
         throws IOException
     {
         ExtensionDescriptor extensionDescriptor = new ExtensionDescriptor();
@@ -113,10 +126,6 @@ public class ExtensionDescriptorBuilder
         catch ( XmlPullParserException e )
         {
             throw (IOException) new IOException( e.getMessage() ).initCause( e );
-        }
-        finally
-        {
-            IOUtil.close( is );
         }
 
         if ( !"extension".equals( dom.getName() ) )
