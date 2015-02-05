@@ -30,6 +30,7 @@ import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.lifecycle.internal.builder.BuilderNotFoundException;
+import org.apache.maven.session.scope.internal.SessionScope;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -64,6 +65,9 @@ public class LifecycleStarter
 
     @Requirement
     private Map<String, Builder> builders;
+    
+    @Requirement
+    private SessionScope sessionScope;
 
     public void execute( MavenSession session )
     {
@@ -102,7 +106,9 @@ public class LifecycleStarter
 
             ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
             ReactorBuildStatus reactorBuildStatus = new ReactorBuildStatus( session.getProjectDependencyGraph() );
-            reactorContext = new ReactorContext( result, projectIndex, oldContextClassLoader, reactorBuildStatus );
+            reactorContext =
+                new ReactorContext( result, projectIndex, oldContextClassLoader, reactorBuildStatus,
+                                    sessionScope.memento() );
 
             String builderId = session.getRequest().getBuilderId();
             Builder builder = builders.get( builderId );

@@ -19,9 +19,11 @@ package org.apache.maven.session.scope.internal;
  * under the License.
  */
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
@@ -32,6 +34,19 @@ import com.google.inject.util.Providers;
 public class SessionScope
     implements Scope
 {
+    /**
+     * @since 3.2.6
+     */
+    public static class Memento
+    {
+        final Map<Key<?>, Provider<?>> seeded;
+
+        Memento( final Map<Key<?>, Provider<?>> seeded )
+        {
+            this.seeded = ImmutableMap.copyOf( seeded );
+        }
+    }
+
     private static final Provider<Object> SEEDED_KEY_PROVIDER = new Provider<Object>()
     {
         public Object get()
@@ -60,6 +75,15 @@ public class SessionScope
         stack.addFirst( new ScopeState() );
     }
 
+    /**
+     * @since 3.2.6
+     */
+    public void enter( Memento memento )
+    {
+        enter();
+        getScopeState().seeded.putAll( memento.seeded );
+    }
+
     private ScopeState getScopeState()
     {
         LinkedList<ScopeState> stack = values.get();
@@ -82,6 +106,15 @@ public class SessionScope
         {
             values.remove();
         }
+    }
+
+    /**
+     * @since 3.2.6
+     */
+    public Memento memento()
+    {
+        LinkedList<ScopeState> stack = values.get();
+        return new Memento( stack != null ? stack.getFirst().seeded : Collections.<Key<?>, Provider<?>>emptyMap() );
     }
 
     public <T> void seed( Class<T> clazz, Provider<T> value )

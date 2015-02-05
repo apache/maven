@@ -89,7 +89,7 @@ public class LifecycleModuleBuilder
 
         // session may be different from rootSession seeded in DefaultMaven
         // explicitly seed the right session here to make sure it is used by Guice
-        sessionScope.enter();
+        sessionScope.enter( reactorContext.getSessionScopeMemento() );
         sessionScope.seed( MavenSession.class, session );
         try
         {
