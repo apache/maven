@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -39,17 +42,20 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
-@Component( role = MavenExecutionRequestPopulator.class )
+@Named
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
 {
 
-    @Requirement
-    private RepositorySystem repositorySystem;
+    private final RepositorySystem repositorySystem;
+
+    @Inject
+    public DefaultMavenExecutionRequestPopulator( RepositorySystem repositorySystem )
+    {
+        this.repositorySystem = repositorySystem;
+    }
 
     @Override
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
@@ -128,6 +134,19 @@ public class DefaultMavenExecutionRequestPopulator
                     try
                     {
                         request.addRemoteRepository( MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        // do nothing for now
+                    }
+                }
+
+                List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
+                for ( Repository pluginRepository : pluginRepositories )
+                {
+                    try
+                    {
+                        request.addPluginArtifactRepository( MavenRepositorySystem.buildArtifactRepository( pluginRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
