@@ -152,6 +152,9 @@ under the License.
     <exportedArtifact>org.eclipse.aether:aether-spi</exportedArtifact>
     <exportedArtifact>org.eclipse.aether:aether-impl</exportedArtifact>
 
+    <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
+    <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
+
     <!--
       | We must also filter out the old or NoClassDefFoundErrors will surface  
      -->
