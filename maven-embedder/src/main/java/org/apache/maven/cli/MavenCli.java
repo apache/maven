@@ -27,10 +27,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.commons.cli.CommandLine;
@@ -81,6 +84,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.StringUtils;
@@ -190,6 +194,20 @@ public class MavenCli
         PrintStream oldout = System.out;
         PrintStream olderr = System.err;
 
+        final Set<String> realms;
+        if ( classWorld != null )
+        {
+            realms = new HashSet<String>();
+            for ( ClassRealm realm : classWorld.getRealms() )
+            {
+                realms.add( realm.getId() );
+            }
+        }
+        else
+        {
+            realms = Collections.emptySet();
+        }
+
         try
         {
             if ( stdout != null )
@@ -208,6 +226,24 @@ public class MavenCli
         }
         finally
         {
+            if ( classWorld != null )
+            {
+                for ( ClassRealm realm : new ArrayList<ClassRealm>( classWorld.getRealms() ) )
+                {
+                    String realmId = realm.getId();
+                    if ( !realms.contains( realmId ) )
+                    {
+                        try
+                        {
+                            classWorld.disposeRealm( realmId );
+                        }
+                        catch ( NoSuchRealmException ignored )
+                        {
+                            // can't happen
+                        }
+                    }
+                }
+            }
             System.setOut( oldout );
             System.setErr( olderr );
         }
