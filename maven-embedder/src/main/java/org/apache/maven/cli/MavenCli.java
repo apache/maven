@@ -56,6 +56,7 @@ import org.apache.maven.exception.ExceptionSummary;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -410,6 +411,7 @@ public class MavenCli
 
         container = new DefaultPlexusContainer( cc, new AbstractModule()
         {
+            @Override
             protected void configure()
             {
                 bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
@@ -590,11 +592,13 @@ public class MavenCli
         }
     }
 
-    private int execute( CliRequest cliRequest )
+    private int execute( CliRequest cliRequest ) throws MavenExecutionRequestPopulationException
     {
-        eventSpyDispatcher.onEvent( cliRequest.request );
+        MavenExecutionRequest request = executionRequestPopulator.populateDefaults( cliRequest.request );
+      
+        eventSpyDispatcher.onEvent( request );
 
-        MavenExecutionResult result = maven.execute( cliRequest.request );
+        MavenExecutionResult result = maven.execute( request );
 
         eventSpyDispatcher.onEvent( result );
 
@@ -1160,13 +1164,12 @@ public class MavenCli
         if ( localRepoProperty == null )
         {
             localRepoProperty = request.getSystemProperties().getProperty( MavenCli.LOCAL_REPO_PROPERTY );
-        }
-
+        }        
+        
         if ( localRepoProperty != null )
         {
             request.setLocalRepositoryPath( localRepoProperty );
         }
-
 
         request.setCacheNotFound( true );
         request.setCacheTransferError( false );

@@ -33,7 +33,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
     extends TestCase
 {
     DefaultMavenExecutionRequestPopulator testee =
-        new DefaultMavenExecutionRequestPopulator( new TestRepositorySystem() );
+        new DefaultMavenExecutionRequestPopulator( new TestRepositorySystem(), null );
 
     public void testPluginRepositoryInjection()
         throws Exception

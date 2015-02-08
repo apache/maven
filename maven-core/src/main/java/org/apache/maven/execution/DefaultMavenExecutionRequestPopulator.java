@@ -20,7 +20,10 @@ package org.apache.maven.execution;
  */
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,16 +33,29 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.MavenArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout2;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.repository.RepositorySystem;
+//
+// All of this needs to go away and be couched in terms of the execution request
+//
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
+//
+// Settings in core
+//
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.StringUtils;
@@ -49,12 +65,16 @@ public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
 {
 
-    private final RepositorySystem repositorySystem;
+    private static final String WILDCARD = "*";
 
+    private static final String EXTERNAL_WILDCARD = "external:*";
+
+    private final Map<String, ArtifactRepositoryLayout> layouts;
+        
     @Inject
-    public DefaultMavenExecutionRequestPopulator( RepositorySystem repositorySystem )
+    public DefaultMavenExecutionRequestPopulator( RepositorySystem repositorySystem, Map<String, ArtifactRepositoryLayout> layouts )
     {
-        this.repositorySystem = repositorySystem;
+        this.layouts = layouts;
     }
 
     @Override
@@ -182,6 +202,29 @@ public class DefaultMavenExecutionRequestPopulator
         return request;
     }
     
+    @Override
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
+        throws MavenExecutionRequestPopulationException
+    {
+        baseDirectory( request );
+
+        localRepository( request );
+
+        populateDefaultPluginGroups( request );
+
+        injectDefaultRepositories( request );
+
+        injectDefaultPluginRepositories( request );
+
+        processRepositoriesInSettings( request );
+
+        return request;
+    }
+    
+    //
+    //
+    //
+    
     private void populateDefaultPluginGroups( MavenExecutionRequest request )
     {
         request.addPluginGroup( "org.apache.maven.plugins" );
@@ -197,9 +240,9 @@ public class DefaultMavenExecutionRequestPopulator
         {
             try
             {
-                request.addRemoteRepository( repositorySystem.createDefaultRemoteRepository() );
+                request.addRemoteRepository( createDefaultRemoteRepository( request ) );
             }
-            catch ( InvalidRepositoryException e )
+            catch ( Exception e )
             {
                 throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
             }
@@ -215,15 +258,37 @@ public class DefaultMavenExecutionRequestPopulator
         {
             try
             {
-                request.addPluginArtifactRepository( repositorySystem.createDefaultRemoteRepository() );
+                request.addPluginArtifactRepository( createDefaultRemoteRepository( request ) );
             }
-            catch ( InvalidRepositoryException e )
+            catch ( Exception e )
             {
                 throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
             }
         }
     }
 
+    private ArtifactRepository createDefaultRemoteRepository( MavenExecutionRequest request )
+        throws Exception
+    {
+        return createRepository( request, RepositorySystem.DEFAULT_REMOTE_REPO_URL, RepositorySystem.DEFAULT_REMOTE_REPO_ID,
+                                 true, ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY, false,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_DAILY,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+    }
+    
+    private ArtifactRepository createRepository( MavenExecutionRequest request, String url, String repositoryId, boolean releases,
+                                                 String releaseUpdates, boolean snapshots, String snapshotUpdates,
+                                                 String checksumPolicy ) throws Exception
+    {
+        ArtifactRepositoryPolicy snapshotsPolicy =
+            new ArtifactRepositoryPolicy( snapshots, snapshotUpdates, checksumPolicy );
+
+        ArtifactRepositoryPolicy releasesPolicy =
+            new ArtifactRepositoryPolicy( releases, releaseUpdates, checksumPolicy );
+
+        return createArtifactRepository( repositoryId, url, "default", snapshotsPolicy, releasesPolicy, request );
+    }
+        
     private Set<String> getRepoIds( List<ArtifactRepository> repositories )
     {
         Set<String> repoIds = new HashSet<String>();
@@ -242,17 +307,48 @@ public class DefaultMavenExecutionRequestPopulator
     private void processRepositoriesInSettings( MavenExecutionRequest request )
         throws MavenExecutionRequestPopulationException
     {
-        repositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
-        repositorySystem.injectProxy( request.getRemoteRepositories(), request.getProxies() );
-        repositorySystem.injectAuthentication( request.getRemoteRepositories(), request.getServers() );
-
-        request.setRemoteRepositories( repositorySystem.getEffectiveRepositories( request.getRemoteRepositories() ) );
-
-        repositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );
-        repositorySystem.injectProxy( request.getPluginArtifactRepositories(), request.getProxies() );
-        repositorySystem.injectAuthentication( request.getPluginArtifactRepositories(), request.getServers() );
-
-        request.setPluginArtifactRepositories( repositorySystem.getEffectiveRepositories( request.getPluginArtifactRepositories() ) );
+        //
+        //    <settings>
+        //      <mirrors>
+        //        <mirror>
+        //          <id>central</id>
+        //          <!-- NOTE: We need to try and use the proper host name/ip as Java generally ignores proxies for "localhost" -->
+        //          <url>http://10.0.1.34:62247/</url>
+        //          <mirrorOf>central</mirrorOf>
+        //        </mirror>
+        //      </mirrors>
+        //      <proxies>
+        //        <proxy>
+        //          <active>true</active>
+        //          <protocol>http</protocol>
+        //          <host>localhost</host>
+        //          <port>62248</port>
+        //          <nonProxyHosts>10.0.1.34</nonProxyHosts>
+        //        </proxy>
+        //      </proxies>
+        //      <profiles>
+        //        <profile>
+        //          <id>it-defaults</id>
+        //          <!-- disable central override and use built-in values -->
+        //        </profile>
+        //      </profiles>
+        //      <activeProfiles>
+        //        <activeProfile>it-defaults</activeProfile>
+        //      </activeProfiles>
+        //    </settings>
+        //
+        // Turns
+        //
+        // http://repo1.maven.org/maven2
+        //
+        // to
+        //
+        // http://10.0.1.34:62247/
+        //
+        // Not sure why the DefaultMirrorSelector doesn't do this...
+        //
+        injectMirror( request, request.getRemoteRepositories(), request.getMirrors() );
+        injectMirror( request, request.getPluginArtifactRepositories(), request.getMirrors() );
     }
 
     private void localRepository( MavenExecutionRequest request )
@@ -281,7 +377,7 @@ public class DefaultMavenExecutionRequestPopulator
     // Artifact Transfer Mechanism
     // ------------------------------------------------------------------------
 
-    public ArtifactRepository createLocalRepository( MavenExecutionRequest request )
+    private ArtifactRepository createLocalRepository( MavenExecutionRequest request )
         throws MavenExecutionRequestPopulationException
     {
         String localRepositoryPath = null;
@@ -298,9 +394,9 @@ public class DefaultMavenExecutionRequestPopulator
 
         try
         {
-            return repositorySystem.createLocalRepository( new File( localRepositoryPath ) );
+            return createLocalRepository( request, new File( localRepositoryPath ) );
         }
-        catch ( InvalidRepositoryException e )
+        catch ( Exception e )
         {
             throw new MavenExecutionRequestPopulationException( "Cannot create local repository.", e );
         }
@@ -313,23 +409,344 @@ public class DefaultMavenExecutionRequestPopulator
             request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
         }
     }
-
-    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
+    
+    //
+    // Code taken from LegacyRepositorySystem
+    //
+        
+    private ArtifactRepository createLocalRepository( MavenExecutionRequest request, File localRepository )
+        throws Exception
     {
-        baseDirectory( request );
+        return createRepository( request, "file://" + localRepository.toURI().getRawPath(),
+                                 RepositorySystem.DEFAULT_LOCAL_REPO_ID, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, true,
+                                 ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                 ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+    }
+    
+    private void injectMirror( MavenExecutionRequest request, List<ArtifactRepository> repositories, List<Mirror> mirrors )
+    {
+        if ( repositories != null && mirrors != null )
+        {
+            for ( ArtifactRepository repository : repositories )
+            {
+                Mirror mirror = getMirror( repository, mirrors );
+                injectMirror( request, repository, mirror );
+            }
+        }
+    }   
 
-        localRepository( request );
+    private void injectMirror( MavenExecutionRequest request, ArtifactRepository repository, Mirror mirror )
+    {
+        if ( mirror != null )
+        {
+            ArtifactRepository original =
+                createArtifactRepository( repository.getId(), repository.getUrl(), repository.getLayout(),
+                                          repository.getSnapshots(), repository.getReleases(), request );
 
-        populateDefaultPluginGroups( request );
+            repository.setMirroredRepositories( Collections.singletonList( original ) );
 
-        injectDefaultRepositories( request );
+            repository.setId( mirror.getId() );
+            repository.setUrl( mirror.getUrl() );
 
-        injectDefaultPluginRepositories( request );
+            if ( StringUtils.isNotEmpty( mirror.getLayout() ) )
+            {
+                repository.setLayout( getLayout( mirror.getLayout() ) );
+            }
+        }
+    }    
+       
+    private ArtifactRepositoryLayout getLayout( String id )
+    {
+        ArtifactRepositoryLayout layout = layouts.get( id );
 
-        processRepositoriesInSettings( request );
+        if ( layout == null )
+        {
+            layout = new UnknownRepositoryLayout( id, layouts.get( "default" ) );
+        }
 
-        return request;
+        return layout;
     }
 
+    /**
+     * In the future, the legacy system might encounter repository types for which no layout components exists because
+     * the actual communication with the repository happens via a repository connector. As a minimum, the legacy system
+     * needs to retain the id of this layout so that the content type of the remote repository can still be accurately
+     * described.
+     */
+    private static class UnknownRepositoryLayout
+        implements ArtifactRepositoryLayout
+    {
+
+        private final String id;
+
+        private final ArtifactRepositoryLayout fallback;
+
+        public UnknownRepositoryLayout( String id, ArtifactRepositoryLayout fallback )
+        {
+            this.id = id;
+            this.fallback = fallback;
+        }
+
+        @Override
+        public String getId()
+        {
+            return id;
+        }
+
+        @Override
+        public String pathOf( Artifact artifact )
+        {
+            return fallback.pathOf( artifact );
+        }
+
+        @Override
+        public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+        {
+            return fallback.pathOfLocalRepositoryMetadata( metadata, repository );
+        }
+
+        @Override
+        public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
+        {
+            return fallback.pathOfRemoteRepositoryMetadata( metadata );
+        }
+
+        @Override
+        public String toString()
+        {
+            return getId();
+        }
+    }    
+    
+    //
+    // ArtifactRepositoryFactory
+    //
+    private ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
+                                                        ArtifactRepositoryPolicy snapshots,
+                                                        ArtifactRepositoryPolicy releases,
+                                                        MavenExecutionRequest request )
+        throws Exception
+    {
+        ArtifactRepositoryLayout layout = layouts.get( layoutId );
+
+        checkLayout( id, layoutId, layout );
+
+        return createArtifactRepository( id, url, layout, snapshots, releases, request );
+    }
+
+    private ArtifactRepository createArtifactRepository( String id, String url,
+                                                        ArtifactRepositoryLayout repositoryLayout,
+                                                        ArtifactRepositoryPolicy snapshots,
+                                                        ArtifactRepositoryPolicy releases,
+                                                        MavenExecutionRequest request )
+    {
+        String globalChecksumPolicy = request.getGlobalChecksumPolicy();
+      
+        if ( snapshots == null )
+        {
+            snapshots = new ArtifactRepositoryPolicy();
+        }
+
+        if ( releases == null )
+        {
+            releases = new ArtifactRepositoryPolicy();
+        }
+
+        if ( globalChecksumPolicy != null )
+        {
+            snapshots.setChecksumPolicy( globalChecksumPolicy );
+            releases.setChecksumPolicy( globalChecksumPolicy );
+        }
+
+        ArtifactRepository repository;
+        if ( repositoryLayout instanceof ArtifactRepositoryLayout2 )
+        {
+            repository =
+                ( (ArtifactRepositoryLayout2) repositoryLayout ).newMavenArtifactRepository( id, url, snapshots,
+                                                                                             releases );
+        }
+        else
+        {
+            repository = new MavenArtifactRepository( id, url, repositoryLayout, snapshots, releases );
+        }
+
+        return repository;
+    }
+    
+    private void checkLayout( String repositoryId, String layoutId, ArtifactRepositoryLayout layout )
+        throws Exception
+    {
+        if ( layout == null )
+        {
+            throw new Exception( String.format( "Cannot find ArtifactRepositoryLayout instance for: %s %s", layoutId, repositoryId ) );
+        }
+    }
+    
+    //
+    // MirrorSelector
+    //
+    private Mirror getMirror( ArtifactRepository repository, List<Mirror> mirrors )
+    {
+        String repoId = repository.getId();
+
+        if ( repoId != null && mirrors != null )
+        {
+            for ( Mirror mirror : mirrors )
+            {
+                if ( repoId.equals( mirror.getMirrorOf() ) && matchesLayout( repository, mirror ) )
+                {
+                    return mirror;
+                }
+            }
+
+            for ( Mirror mirror : mirrors )
+            {
+                if ( matchPattern( repository, mirror.getMirrorOf() ) && matchesLayout( repository, mirror ) )
+                {
+                    return mirror;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method checks if the pattern matches the originalRepository. Valid patterns: * =
+     * everything external:* = everything not on the localhost and not file based. repo,repo1 = repo
+     * or repo1 *,!repo1 = everything except repo1
+     *
+     * @param originalRepository to compare for a match.
+     * @param pattern used for match. Currently only '*' is supported.
+     * @return true if the repository is a match to this pattern.
+     */
+    private boolean matchPattern( ArtifactRepository originalRepository, String pattern )
+    {
+        boolean result = false;
+        String originalId = originalRepository.getId();
+
+        // simple checks first to short circuit processing below.
+        if ( WILDCARD.equals( pattern ) || pattern.equals( originalId ) )
+        {
+            result = true;
+        }
+        else
+        {
+            // process the list
+            String[] repos = pattern.split( "," );
+            for ( String repo : repos )
+            {
+                repo = repo.trim();
+                // see if this is a negative match
+                if ( repo.length() > 1 && repo.startsWith( "!" ) )
+                {
+                    if ( repo.substring( 1 ).equals( originalId ) )
+                    {
+                        // explicitly exclude. Set result and stop processing.
+                        result = false;
+                        break;
+                    }
+                }
+                // check for exact match
+                else if ( repo.equals( originalId ) )
+                {
+                    result = true;
+                    break;
+                }
+                // check for external:*
+                else if ( EXTERNAL_WILDCARD.equals( repo ) && isExternalRepo( originalRepository ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+                else if ( WILDCARD.equals( repo ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Checks the URL to see if this repository refers to an external repository
+     *
+     * @param originalRepository
+     * @return true if external.
+     */
+    private boolean isExternalRepo( ArtifactRepository originalRepository )
+    {
+        try
+        {
+            URL url = new URL( originalRepository.getUrl() );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" )
+                            || url.getProtocol().equals( "file" ) );
+        }
+        catch ( MalformedURLException e )
+        {
+            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
+            return false;
+        }
+    }
+
+    private boolean matchesLayout( ArtifactRepository repository, Mirror mirror )
+    {
+        return matchesLayout( RepositoryUtils.getLayout( repository ), mirror.getMirrorOfLayouts() );
+    }
+
+    /**
+     * Checks whether the layouts configured for a mirror match with the layout of the repository.
+     *
+     * @param repoLayout The layout of the repository, may be {@code null}.
+     * @param mirrorLayout The layouts supported by the mirror, may be {@code null}.
+     * @return {@code true} if the layouts associated with the mirror match the layout of the original repository,
+     *         {@code false} otherwise.
+     */
+    private boolean matchesLayout( String repoLayout, String mirrorLayout )
+    {
+        boolean result = false;
+
+        // simple checks first to short circuit processing below.
+        if ( StringUtils.isEmpty( mirrorLayout ) || WILDCARD.equals( mirrorLayout ) )
+        {
+            result = true;
+        }
+        else if ( mirrorLayout.equals( repoLayout ) )
+        {
+            result = true;
+        }
+        else
+        {
+            // process the list
+            String[] layouts = mirrorLayout.split( "," );
+            for ( String layout : layouts )
+            {
+                // see if this is a negative match
+                if ( layout.length() > 1 && layout.startsWith( "!" ) )
+                {
+                    if ( layout.substring( 1 ).equals( repoLayout ) )
+                    {
+                        // explicitly exclude. Set result and stop processing.
+                        result = false;
+                        break;
+                    }
+                }
+                // check for exact match
+                else if ( layout.equals( repoLayout ) )
+                {
+                    result = true;
+                    break;
+                }
+                else if ( WILDCARD.equals( layout ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+            }
+        }
+
+        return result;
+    }    
 }
