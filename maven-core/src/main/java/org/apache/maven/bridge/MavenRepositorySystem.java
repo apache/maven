@@ -52,7 +52,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.repository.Proxy;
 import org.apache.maven.repository.RepositorySystem;
 import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -73,9 +72,6 @@ public class MavenRepositorySystem
 
     @Requirement( role = ArtifactRepositoryLayout.class )
     private Map<String, ArtifactRepositoryLayout> layouts;
-
-    @Requirement
-    private SettingsDecrypter settingsDecrypter;
 
     // DefaultProjectBuilder
     public Artifact createArtifact( String groupId, String artifactId, String version, String scope, String type )
