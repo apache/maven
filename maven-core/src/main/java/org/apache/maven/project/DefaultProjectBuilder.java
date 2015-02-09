@@ -112,12 +112,14 @@ public class DefaultProjectBuilder
     // MavenProjectBuilder Implementation
     // ----------------------------------------------------------------------
 
+    @Override
     public ProjectBuildingResult build( File pomFile, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
         return build( pomFile, new FileModelSource( pomFile ), new InternalConfig( request, null ) );
     }
 
+    @Override
     public ProjectBuildingResult build( ModelSource modelSource, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
@@ -278,12 +280,14 @@ public class DefaultProjectBuilder
         return request;
     }
 
+    @Override
     public ProjectBuildingResult build( Artifact artifact, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
         return build( artifact, false, request );
     }
 
+    @Override
     public ProjectBuildingResult build( Artifact artifact, boolean allowStubModel, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
@@ -380,6 +384,7 @@ public class DefaultProjectBuilder
         return new StringModelSource( buffer, artifact.getId() );
     }
 
+    @Override
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {

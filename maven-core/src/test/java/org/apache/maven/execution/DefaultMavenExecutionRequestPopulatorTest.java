@@ -2,13 +2,13 @@ package org.apache.maven.execution;
 
 import java.util.List;
 
-import junit.framework.TestCase;
+import javax.inject.Inject;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.repository.TestRepositorySystem;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
+import org.eclipse.sisu.launch.InjectedTestCase;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -30,11 +30,11 @@ import org.apache.maven.settings.Settings;
  */
 
 public class DefaultMavenExecutionRequestPopulatorTest
-    extends TestCase
+    extends InjectedTestCase
 {
-    DefaultMavenExecutionRequestPopulator testee =
-        new DefaultMavenExecutionRequestPopulator( new TestRepositorySystem(), null );
-
+    @Inject
+    MavenExecutionRequestPopulator testee;
+        
     public void testPluginRepositoryInjection()
         throws Exception
     {
