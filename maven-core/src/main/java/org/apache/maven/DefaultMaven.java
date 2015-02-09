@@ -20,8 +20,6 @@ package org.apache.maven;
  */
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,17 +31,15 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.maven.artifact.ArtifactUtils;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.model.Plugin;
@@ -58,41 +54,18 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.apache.maven.repository.LocalRepositoryNotAccessibleException;
-import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.apache.maven.session.scope.internal.SessionScope;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.dag.CycleDetectedException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.repository.LocalRepository;
-import org.eclipse.aether.repository.NoLocalRepositoryManagerException;
-import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.resolution.ResolutionErrorPolicy;
-import org.eclipse.aether.spi.localrepo.LocalRepositoryManagerFactory;
-import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.ChainedWorkspaceReader;
-import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
-import org.eclipse.aether.util.repository.DefaultMirrorSelector;
-import org.eclipse.aether.util.repository.DefaultProxySelector;
-import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 
 /**
  * @author Jason van Zyl
@@ -118,28 +91,13 @@ public class DefaultMaven
     private ExecutionEventCatapult eventCatapult;
 
     @Requirement
-    private ArtifactHandlerManager artifactHandlerManager;
-
-    @Requirement( optional = true, hint = "ide" )
-    private WorkspaceReader workspaceRepository;
-
-    @Requirement
-    private RepositorySystem repoSystem;
-
-    @Requirement( optional = true, hint = "simple" )
-    private LocalRepositoryManagerFactory simpleLocalRepoMgrFactory;
-
-    @Requirement
-    private SettingsDecrypter settingsDecrypter;
-
-    @Requirement
     private LegacySupport legacySupport;
 
     @Requirement
-    private EventSpyDispatcher eventSpyDispatcher;
+    private SessionScope sessionScope;
 
     @Requirement
-    private SessionScope sessionScope;
+    private DefaultRepositorySystemSessionFactory repositorySessionFactory;
 
     @Override
     public MavenExecutionResult execute( MavenExecutionRequest request )
@@ -393,167 +351,7 @@ public class DefaultMaven
 
     public RepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
-        DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
-
-        session.setCache( request.getRepositoryCache() );
-
-        Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
-        configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
-        configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
-        configProps.putAll( request.getSystemProperties() );
-        configProps.putAll( request.getUserProperties() );
-
-        session.setOffline( request.isOffline() );
-        session.setChecksumPolicy( request.getGlobalChecksumPolicy() );
-        if ( request.isNoSnapshotUpdates() )
-        {
-            session.setUpdatePolicy( RepositoryPolicy.UPDATE_POLICY_NEVER );
-        }
-        else if ( request.isUpdateSnapshots() )
-        {
-            session.setUpdatePolicy( RepositoryPolicy.UPDATE_POLICY_ALWAYS );
-        }
-        else
-        {
-            session.setUpdatePolicy( null );
-        }
-
-        int errorPolicy = 0;
-        errorPolicy |= request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND : 0;
-        errorPolicy |= request.isCacheTransferError() ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR : 0;
-        session.setResolutionErrorPolicy( new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy
-            | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
-
-        session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
-
-        LocalRepository localRepo = new LocalRepository( request.getLocalRepository().getBasedir() );
-
-        if ( request.isUseLegacyLocalRepository() )
-        {
-            logger.warn( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
-                + " build reproducibility." );
-            try
-            {
-                session.setLocalRepositoryManager( simpleLocalRepoMgrFactory.newInstance( session, localRepo ) );
-            }
-            catch ( NoLocalRepositoryManagerException e )
-            {
-
-                logger.warn( "Failed to configure legacy local repository: back to default" );
-                session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
-            }
-        }
-        else
-        {
-            session.setLocalRepositoryManager( repoSystem.newLocalRepositoryManager( session, localRepo ) );
-        }
-
-        if ( request.getWorkspaceReader() != null )
-        {
-            session.setWorkspaceReader( request.getWorkspaceReader() );
-        }
-        else
-        {
-            session.setWorkspaceReader( workspaceRepository );
-        }
-
-        DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
-        decrypt.setProxies( request.getProxies() );
-        decrypt.setServers( request.getServers() );
-        SettingsDecryptionResult decrypted = settingsDecrypter.decrypt( decrypt );
-
-        if ( logger.isDebugEnabled() )
-        {
-            for ( SettingsProblem problem : decrypted.getProblems() )
-            {
-                logger.debug( problem.getMessage(), problem.getException() );
-            }
-        }
-
-        DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
-        for ( Mirror mirror : request.getMirrors() )
-        {
-            mirrorSelector.add( mirror.getId(), mirror.getUrl(), mirror.getLayout(), false, mirror.getMirrorOf(),
-                                mirror.getMirrorOfLayouts() );
-        }
-        session.setMirrorSelector( mirrorSelector );
-
-        DefaultProxySelector proxySelector = new DefaultProxySelector();
-        for ( Proxy proxy : decrypted.getProxies() )
-        {
-            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.addUsername( proxy.getUsername() ).addPassword( proxy.getPassword() );
-            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
-                                                                        proxy.getPort(), authBuilder.build() ),
-                               proxy.getNonProxyHosts() );
-        }
-        session.setProxySelector( proxySelector );
-
-        DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
-        for ( Server server : decrypted.getServers() )
-        {
-            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.addUsername( server.getUsername() ).addPassword( server.getPassword() );
-            authBuilder.addPrivateKey( server.getPrivateKey(), server.getPassphrase() );
-            authSelector.add( server.getId(), authBuilder.build() );
-
-            if ( server.getConfiguration() != null )
-            {
-                Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
-                for ( int i = dom.getChildCount() - 1; i >= 0; i-- )
-                {
-                    Xpp3Dom child = dom.getChild( i );
-                    if ( "wagonProvider".equals( child.getName() ) )
-                    {
-                        dom.removeChild( i );
-                    }
-                }
-
-                XmlPlexusConfiguration config = new XmlPlexusConfiguration( dom );
-                configProps.put( "aether.connector.wagon.config." + server.getId(), config );
-            }
-
-            configProps.put( "aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions() );
-            configProps.put( "aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions() );
-        }
-        session.setAuthenticationSelector( authSelector );
-
-        session.setTransferListener( request.getTransferListener() );
-
-        session.setRepositoryListener( eventSpyDispatcher.chainListener( new LoggingRepositoryListener( logger ) ) );
-
-        session.setUserProperties( request.getUserProperties() );
-        session.setSystemProperties( request.getSystemProperties() );
-        session.setConfigProperties( configProps );
-
-        return session;
-    }
-
-    private String getUserAgent()
-    {
-        return "Apache-Maven/" + getMavenVersion() + " (Java " + System.getProperty( "java.version" ) + "; "
-            + System.getProperty( "os.name" ) + " " + System.getProperty( "os.version" ) + ")";
-    }
-
-    private String getMavenVersion()
-    {
-        Properties props = new Properties();
-
-        InputStream is = getClass().getResourceAsStream( "/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
-        if ( is != null )
-        {
-            try
-            {
-                props.load( is );
-            }
-            catch ( IOException e )
-            {
-                logger.debug( "Failed to read Maven version", e );
-            }
-            IOUtil.close( is );
-        }
-
-        return props.getProperty( "version", "unknown-version" );
+        return repositorySessionFactory.newRepositorySession( request );
     }
 
     private void validateLocalRepository( MavenExecutionRequest request )

@@ -1,4 +1,4 @@
-package org.apache.maven;
+package org.apache.maven.internal.aether;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
