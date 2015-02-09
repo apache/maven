@@ -143,12 +143,6 @@ public class MavenSession
         return projects;
     }
 
-    @Deprecated
-    public List<MavenProject> getSortedProjects()
-    {
-        return getProjects();
-    }
-
     public String getExecutionRootDirectory()
     {
         return request.getBaseDirectory();
@@ -360,6 +354,12 @@ public class MavenSession
         setProjects( projects );
     }
 
+    @Deprecated
+    public List<MavenProject> getSortedProjects()
+    {
+        return getProjects();
+    }
+    
     @Deprecated
     //
     // Used by Tycho and will break users and force them to upgrade to Maven 3.1 so we should really leave
