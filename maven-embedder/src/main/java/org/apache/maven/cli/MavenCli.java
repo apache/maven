@@ -1382,13 +1382,10 @@ public class MavenCli
             updateSnapshots = true;
         }
 
-        String globalChecksumPolicy = null;
+        // Unless explicitly wanted, checksum failure will cause a build failure
+        String globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
 
-        if ( commandLine.hasOption( CLIManager.CHECKSUM_FAILURE_POLICY ) )
-        {
-            globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_FAIL;
-        }
-        else if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
+        if ( commandLine.hasOption( CLIManager.CHECKSUM_WARNING_POLICY ) )
         {
             globalChecksumPolicy = MavenExecutionRequest.CHECKSUM_POLICY_WARN;
         }
@@ -1475,7 +1472,7 @@ public class MavenCli
             transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
-            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
+            .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: fail
             .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory );
 
         if ( alternatePomFile != null )
