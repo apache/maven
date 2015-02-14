@@ -122,8 +122,22 @@
     </pluginManagement>
     <plugins>
       <plugin>
+        <groupId>org.eclipse.sisu</groupId>
+        <artifactId>sisu-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <configuration>
+          <version>1.0.0</version>
+          <models>
+            <model>src/main/mdo/core-extensions.mdo</model>
+          </models>
+        </configuration>
       </plugin>
     </plugins>
   </build>

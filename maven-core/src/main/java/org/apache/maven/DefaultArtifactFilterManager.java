@@ -29,9 +29,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
-import org.apache.maven.extension.internal.DefaultCoreExports;
-
-import com.google.common.collect.ImmutableSet;
+import org.apache.maven.extension.internal.CoreExportsProvider;
 
 /**
  * @author Jason van Zyl
@@ -46,16 +44,24 @@ public class DefaultArtifactFilterManager
     // this is a live injected collection
     protected final List<ArtifactFilterManagerDelegate> delegates;
 
-    protected final Set<String> coreArtifacts;
+    protected Set<String> excludedArtifacts;
 
-    protected final Set<String> excludedArtifacts;
+    private final Set<String> coreArtifacts;
 
     @Inject
-    public DefaultArtifactFilterManager( List<ArtifactFilterManagerDelegate> delegates, DefaultCoreExports extensions )
+    public DefaultArtifactFilterManager( List<ArtifactFilterManagerDelegate> delegates, CoreExportsProvider coreExports )
     {
         this.delegates = delegates;
-        this.coreArtifacts = ImmutableSet.copyOf( extensions.getExportedArtifacts() );
-        this.excludedArtifacts = new LinkedHashSet<String>( extensions.getExportedArtifacts() );
+        this.coreArtifacts = coreExports.get().getExportedArtifacts();
+    }
+
+    private synchronized Set<String> getExcludedArtifacts()
+    {
+        if ( excludedArtifacts == null )
+        {
+            excludedArtifacts = new LinkedHashSet<String>( coreArtifacts );
+        }
+        return excludedArtifacts;
     }
 
     /**
@@ -65,7 +71,7 @@ public class DefaultArtifactFilterManager
      */
     public ArtifactFilter getArtifactFilter()
     {
-        Set<String> excludes = new LinkedHashSet<String>( excludedArtifacts );
+        Set<String> excludes = new LinkedHashSet<String>( getExcludedArtifacts() );
 
         for ( ArtifactFilterManagerDelegate delegate : delegates )
         {
@@ -87,7 +93,7 @@ public class DefaultArtifactFilterManager
 
     public void excludeArtifact( String artifactId )
     {
-        excludedArtifacts.add( artifactId );
+        getExcludedArtifacts().add( artifactId );
     }
 
     public Set<String> getCoreArtifactExcludes()

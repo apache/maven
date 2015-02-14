@@ -23,7 +23,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ import javax.inject.Singleton;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
-import org.apache.maven.extension.internal.DefaultCoreExports;
+import org.apache.maven.extension.internal.CoreExportsProvider;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.MutablePlexusContainer;
@@ -48,8 +47,6 @@ import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.artifact.Artifact;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Manages the class realms used by Maven. <strong>Warning:</strong> This is an internal utility class that is only
@@ -63,6 +60,7 @@ import com.google.common.collect.ImmutableMap;
 public class DefaultClassRealmManager
     implements ClassRealmManager
 {
+    public static final String API_REALMID = "maven.api";
 
     /**
      * During normal command line build, ClassWorld is loaded by jvm system classloader, which only includes
@@ -83,25 +81,22 @@ public class DefaultClassRealmManager
     // this is a live injected collection
     private final List<ClassRealmManagerDelegate> delegates;
 
-    private final Map<String, ClassLoader> coreImports;
-
-    private ClassRealm mavenRealm;
+    private final ClassRealm mavenApiRealm;
 
     @Inject
     public DefaultClassRealmManager( Logger logger, PlexusContainer container,
-                                     List<ClassRealmManagerDelegate> delegates, DefaultCoreExports coreExtensions )
+                                     List<ClassRealmManagerDelegate> delegates, CoreExportsProvider exports )
     {
         this.logger = logger;
         this.world = ( (MutablePlexusContainer) container ).getClassWorld();
         this.containerRealm = container.getContainerRealm();
         this.delegates = delegates;
 
-        Map<String, ClassLoader> coreImports = new HashMap<String, ClassLoader>();
-        for ( String corePackage : coreExtensions.getExportedPackages() )
-        {
-            coreImports.put( corePackage, containerRealm );
-        }
-        this.coreImports = ImmutableMap.copyOf( coreImports );
+        Map<String, ClassLoader> foreignImports = exports.get().getExportedPackages();
+
+        this.mavenApiRealm =
+            createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */, 
+                         foreignImports, null /* artifacts */ );
     }
 
     private ClassRealm newRealm( String id )
@@ -133,27 +128,9 @@ public class DefaultClassRealmManager
         }
     }
 
-    public synchronized ClassRealm getMavenApiRealm()
+    public ClassRealm getMavenApiRealm()
     {
-        if ( mavenRealm == null )
-        {
-            mavenRealm = newRealm( "maven.api" );
-
-            List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
-
-            List<String> parentImports = new ArrayList<String>();
-
-            Map<String, ClassLoader> foreignImports = new HashMap<String, ClassLoader>( coreImports );
-
-            callDelegates( mavenRealm, RealmType.Core, mavenRealm.getParentClassLoader(), parentImports,
-                           foreignImports, constituents );
-
-            wireRealm( mavenRealm, parentImports, foreignImports );
-
-            populateRealm( mavenRealm, constituents );
-        }
-
-        return mavenRealm;
+        return mavenApiRealm;
     }
 
     /**

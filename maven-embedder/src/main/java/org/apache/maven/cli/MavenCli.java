@@ -19,11 +19,14 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.BufferedInputStream;
 import java.io.Console;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +50,9 @@ import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
 import org.apache.maven.cli.event.DefaultEventSpyContext;
 import org.apache.maven.cli.event.ExecutionEventLogger;
+import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
+import org.apache.maven.cli.internal.extension.model.CoreExtension;
+import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
@@ -64,6 +70,8 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.execution.MavenExecutionRequestPopulator;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.extension.internal.CoreExports;
+import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.project.MavenProject;
@@ -87,7 +95,9 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
@@ -133,6 +143,8 @@ public class MavenCli
        new File( System.getProperty( "maven.home", System.getProperty( "user.dir", "" ) ), "conf/toolchains.xml" );
 
     private static final String EXT_CLASS_PATH = "maven.ext.class.path";
+
+    private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
 
     private ClassWorld classWorld;
 
@@ -485,21 +497,44 @@ public class MavenCli
             cliRequest.classWorld = new ClassWorld( "plexus.core", Thread.currentThread().getContextClassLoader() );
         }
 
-        DefaultPlexusContainer container;
+        ClassRealm coreRealm = cliRequest.classWorld.getClassRealm( "plexus.core" );
+        if ( coreRealm == null )
+        {
+            coreRealm = cliRequest.classWorld.getRealms().iterator().next();
+        }
+
+        List<File> extClassPath = parseExtClasspath( cliRequest );
+
+        CoreExtensionEntry coreEntry = CoreExtensionEntry.discoverFrom( coreRealm );
+        List<CoreExtensionEntry> extensions =
+            loadCoreExtensions( cliRequest, coreRealm, coreEntry.getExportedArtifacts() );
+
+        ClassRealm containerRealm = setupContainerRealm( cliRequest.classWorld, coreRealm, extClassPath, extensions );
 
         ContainerConfiguration cc = new DefaultContainerConfiguration()
             .setClassWorld( cliRequest.classWorld )
-            .setRealm( setupContainerRealm( cliRequest ) )
+            .setRealm( containerRealm )
             .setClassPathScanning( PlexusConstants.SCANNING_INDEX )
             .setAutoWiring( true )
             .setName( "maven" );
 
-        container = new DefaultPlexusContainer( cc, new AbstractModule()
+        Set<String> exportedArtifacts = new HashSet<String>( coreEntry.getExportedArtifacts() );
+        Set<String> exportedPackages = new HashSet<String>( coreEntry.getExportedPackages() );
+        for ( CoreExtensionEntry extension : extensions )
+        {
+            exportedArtifacts.addAll( extension.getExportedArtifacts() );
+            exportedPackages.addAll( extension.getExportedPackages() );
+        }
+
+        final CoreExports exports = new CoreExports( containerRealm, exportedArtifacts, exportedPackages );
+
+        DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
         {
             @Override
             protected void configure()
             {
                 bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
+                bind( CoreExports.class ).toInstance( exports );
             }
         } );
 
@@ -507,6 +542,11 @@ public class MavenCli
         container.setLookupRealm( null );
 
         container.setLoggerManager( plexusLoggerManager );
+
+        for ( CoreExtensionEntry extension : extensions )
+        {
+            container.discoverComponents( extension.getClassRealm() );
+        }
 
         customizeContainer( container );
 
@@ -543,49 +583,170 @@ public class MavenCli
         return container;
     }
 
-    private ClassRealm setupContainerRealm( CliRequest cliRequest )
+    private List<CoreExtensionEntry> loadCoreExtensions( CliRequest cliRequest, ClassRealm containerRealm,
+                                                         Set<String> providedArtifacts )
+    {
+        if ( cliRequest.projectBaseDirectory == null )
+        {
+            return Collections.emptyList();
+        }
+
+        File extensionsFile = new File( cliRequest.projectBaseDirectory, EXTENSIONS_FILENAME );
+        if ( !extensionsFile.isFile() )
+        {
+            return Collections.emptyList();
+        }
+
+        try
+        {
+            List<CoreExtension> extensions = readCoreExtensionsDescriptor( extensionsFile );
+            if ( extensions.isEmpty() )
+            {
+                return Collections.emptyList();
+            }
+
+            ContainerConfiguration cc = new DefaultContainerConfiguration() //
+                .setClassWorld( cliRequest.classWorld ) //
+                .setRealm( containerRealm ) //
+                .setClassPathScanning( PlexusConstants.SCANNING_INDEX ) //
+                .setAutoWiring( true ) //
+                .setName( "maven" );
+
+            DefaultPlexusContainer container = new DefaultPlexusContainer( cc, new AbstractModule()
+            {
+                @Override
+                protected void configure()
+                {
+                    bind( ILoggerFactory.class ).toInstance( slf4jLoggerFactory );
+                }
+            } );
+
+            try
+            {
+                container.setLookupRealm( null );
+
+                container.setLoggerManager( plexusLoggerManager );
+
+                container.getLoggerManager().setThresholds( cliRequest.request.getLoggingLevel() );
+
+                Thread.currentThread().setContextClassLoader( container.getContainerRealm() );
+
+                executionRequestPopulator = container.lookup( MavenExecutionRequestPopulator.class );
+                settingsBuilder = container.lookup( SettingsBuilder.class );
+
+                MavenExecutionRequest request = DefaultMavenExecutionRequest.copy( cliRequest.request );
+                settings( cliRequest, request );
+                request = populateRequest( cliRequest, request );
+                request = executionRequestPopulator.populateDefaults( request );
+
+                BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
+                return resolver.loadCoreExtensions( request, providedArtifacts, extensions );
+            }
+            finally
+            {
+                executionRequestPopulator = null;
+                settingsBuilder = null;
+                container.dispose();
+            }
+        }
+        catch ( RuntimeException e )
+        {
+            // runtime exceptions are most likely bugs in maven, let them bubble up to the user
+            throw e;
+        }
+        catch ( Exception e )
+        {
+            slf4jLogger.warn( "Failed to read extensions descriptor " + extensionsFile + ": " + e.getMessage() );
+        }
+        return Collections.emptyList();
+    }
+
+    private List<CoreExtension> readCoreExtensionsDescriptor( File extensionsFile )
+        throws IOException, XmlPullParserException
+    {
+        CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
+        InputStream is = null;
+        try
+        {
+            is = new BufferedInputStream( new FileInputStream( extensionsFile ) );
+            return parser.read( is ).getExtensions();
+        }
+        finally
+        {
+            IOUtil.close( is );
+        }
+    }
+
+    private ClassRealm setupContainerRealm( ClassWorld classWorld, ClassRealm coreRealm, List<File> extClassPath,
+                                            List<CoreExtensionEntry> extensions )
         throws Exception
     {
-        ClassRealm containerRealm = null;
+        if ( !extClassPath.isEmpty() || !extensions.isEmpty() )
+        {
+            ClassRealm extRealm = classWorld.newRealm( "maven.ext", null );
 
+            extRealm.setParentRealm( coreRealm );
+
+            slf4jLogger.debug( "Populating class realm " + extRealm.getId() );
+
+            for ( File file : extClassPath )
+            {
+                slf4jLogger.debug( "  Included " + file );
+
+                extRealm.addURL( file.toURI().toURL() );
+            }
+
+            for ( CoreExtensionEntry entry : reverse( extensions ) )
+            {
+                Set<String> exportedPackages = entry.getExportedPackages();
+                ClassRealm realm = entry.getClassRealm();
+                for ( String exportedPackage : exportedPackages )
+                {
+                    extRealm.importFrom( realm, exportedPackage );
+                }
+                if ( exportedPackages.isEmpty() )
+                {
+                    // sisu uses realm imports to establish component visibility
+                    extRealm.importFrom( realm, realm.getId() );
+                }
+            }
+
+            return extRealm;
+        }
+
+        return coreRealm;
+    }
+
+    private static <T> List<T> reverse( List<T> list )
+    {
+        List<T> copy = new ArrayList<T>( list );
+        Collections.reverse( copy );
+        return copy;
+    }
+
+    private List<File> parseExtClasspath( CliRequest cliRequest )
+    {
         String extClassPath = cliRequest.userProperties.getProperty( EXT_CLASS_PATH );
         if ( extClassPath == null )
         {
             extClassPath = cliRequest.systemProperties.getProperty( EXT_CLASS_PATH );
         }
 
+        List<File> jars = new ArrayList<File>();
+
         if ( StringUtils.isNotEmpty( extClassPath ) )
         {
-            String[] jars = StringUtils.split( extClassPath, File.pathSeparator );
-
-            if ( jars.length > 0 )
+            for ( String jar : StringUtils.split( extClassPath, File.pathSeparator ) )
             {
-                ClassRealm coreRealm = cliRequest.classWorld.getClassRealm( "plexus.core" );
-                if ( coreRealm == null )
-                {
-                    coreRealm = cliRequest.classWorld.getRealms().iterator().next();
-                }
+                File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
 
-                ClassRealm extRealm = cliRequest.classWorld.newRealm( "maven.ext", null );
+                slf4jLogger.debug( "  Included " + file );
 
-                slf4jLogger.debug( "Populating class realm " + extRealm.getId() );
-
-                for ( String jar : jars )
-                {
-                    File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
-
-                    slf4jLogger.debug( "  Included " + file );
-
-                    extRealm.addURL( file.toURI().toURL() );
-                }
-
-                extRealm.setParentRealm( coreRealm );
-
-                containerRealm = extRealm;
+                jars.add( file );
             }
         }
 
-        return containerRealm;
+        return jars;
     }
 
     //
@@ -814,6 +975,12 @@ public class MavenCli
     private void settings( CliRequest cliRequest )
         throws Exception
     {
+        settings( cliRequest, cliRequest.request );
+    }
+
+    private void settings( CliRequest cliRequest, MavenExecutionRequest request )
+        throws Exception
+    {
         File userSettingsFile;
 
         if ( cliRequest.commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
@@ -851,8 +1018,8 @@ public class MavenCli
             globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
         }
 
-        cliRequest.request.setGlobalSettingsFile( globalSettingsFile );
-        cliRequest.request.setUserSettingsFile( userSettingsFile );
+        request.setGlobalSettingsFile( globalSettingsFile );
+        request.setUserSettingsFile( userSettingsFile );
 
         SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
         settingsRequest.setGlobalSettingsFile( globalSettingsFile );
@@ -860,7 +1027,10 @@ public class MavenCli
         settingsRequest.setSystemProperties( cliRequest.systemProperties );
         settingsRequest.setUserProperties( cliRequest.userProperties );
 
-        eventSpyDispatcher.onEvent( settingsRequest );
+        if ( eventSpyDispatcher != null )
+        {
+            eventSpyDispatcher.onEvent( settingsRequest );
+        }
 
         slf4jLogger.debug( "Reading global settings from "
             + getLocation( settingsRequest.getGlobalSettingsSource(),
@@ -870,9 +1040,12 @@ public class MavenCli
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
-        eventSpyDispatcher.onEvent( settingsResult );
+        if ( eventSpyDispatcher != null )
+        {
+            eventSpyDispatcher.onEvent( settingsResult );
+        }
 
-        executionRequestPopulator.populateFromSettings( cliRequest.request, settingsResult.getEffectiveSettings() );
+        executionRequestPopulator.populateFromSettings( request, settingsResult.getEffectiveSettings() );
 
         if ( !settingsResult.getProblems().isEmpty() && slf4jLogger.isWarnEnabled() )
         {
@@ -982,7 +1155,11 @@ public class MavenCli
 
     private MavenExecutionRequest populateRequest( CliRequest cliRequest )
     {
-        MavenExecutionRequest request = cliRequest.request;
+        return populateRequest( cliRequest, cliRequest.request );
+    }
+
+    private MavenExecutionRequest populateRequest( CliRequest cliRequest, MavenExecutionRequest request )
+    {
         CommandLine commandLine = cliRequest.commandLine;
         String workingDirectory = cliRequest.workingDirectory;
         boolean quiet = cliRequest.quiet;
@@ -1127,7 +1304,10 @@ public class MavenCli
         }
 
         ExecutionListener executionListener = new ExecutionEventLogger();
-        executionListener = eventSpyDispatcher.chainListener( executionListener );
+        if ( eventSpyDispatcher != null )
+        {
+            executionListener = eventSpyDispatcher.chainListener( executionListener );
+        }
 
         String alternatePomFile = null;
         if ( commandLine.hasOption( CLIManager.ALTERNATE_POM_FILE ) )
@@ -1172,7 +1352,7 @@ public class MavenCli
 
             request.setPom( pom );
         }
-        else
+        else if ( modelProcessor != null )
         {
             File pom = modelProcessor.locatePom( baseDirectory );
 

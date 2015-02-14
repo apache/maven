@@ -136,8 +136,30 @@ public class DefaultPluginDependenciesResolver
         return pluginArtifact;
     }
 
+    /**
+     * @since 3.2.6
+     */
+    public DependencyNode resolveCoreExtension( Plugin plugin, DependencyFilter dependencyFilter,
+                                                List<RemoteRepository> repositories, RepositorySystemSession session )
+        throws PluginResolutionException
+    {
+        return resolveInternal( plugin, null /* pluginArtifact */, dependencyFilter, null /* transformer */,
+                                repositories, session );
+    }
+
     public DependencyNode resolve( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
                                    List<RemoteRepository> repositories, RepositorySystemSession session )
+        throws PluginResolutionException
+    {
+        DependencyFilter resolutionFilter =
+            new ExclusionsDependencyFilter( artifactFilterManager.getCoreArtifactExcludes() );
+        resolutionFilter = AndDependencyFilter.newInstance( resolutionFilter, dependencyFilter );
+        return resolveInternal( plugin, pluginArtifact, resolutionFilter, new PlexusUtilsInjector(), repositories, session );
+    }
+
+    private DependencyNode resolveInternal( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,
+                                            DependencyGraphTransformer transformer,
+                                            List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
         RequestTrace trace = RequestTrace.newChild( null, plugin );
@@ -148,11 +170,7 @@ public class DefaultPluginDependenciesResolver
         }
 
         DependencyFilter collectionFilter = new ScopeDependencyFilter( "provided", "test" );
-
-        DependencyFilter resolutionFilter =
-            new ExclusionsDependencyFilter( artifactFilterManager.getCoreArtifactExcludes() );
-        resolutionFilter = AndDependencyFilter.newInstance( resolutionFilter, dependencyFilter );
-        resolutionFilter = new AndDependencyFilter( collectionFilter, resolutionFilter );
+        DependencyFilter resolutionFilter = AndDependencyFilter.newInstance( collectionFilter, dependencyFilter );
 
         DependencyNode node;
 
@@ -161,9 +179,8 @@ public class DefaultPluginDependenciesResolver
             DependencySelector selector =
                 AndDependencySelector.newInstance( session.getDependencySelector(), new WagonExcluder() );
 
-            DependencyGraphTransformer transformer =
-                ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(),
-                                                               new PlexusUtilsInjector() );
+            transformer =
+                ChainedDependencyGraphTransformer.newInstance( session.getDependencyGraphTransformer(), transformer );
 
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession( session );
             pluginSession.setDependencySelector( selector );
