@@ -170,19 +170,32 @@ public class DefaultMaven
             return addExceptionToResult( result, e );
         }
 
-        DefaultRepositorySystemSession repoSession = (DefaultRepositorySystemSession) newRepositorySession( request );
-
-        MavenSession session = new MavenSession( container, repoSession, request, result );
-
         //
         // We enter the session scope right after the MavenSession creation and before any of the AbstractLifecycleParticipant lookups
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        sessionScope.seed( MavenSession.class, session );
+        try
+        {
+            DefaultRepositorySystemSession repoSession =
+                (DefaultRepositorySystemSession) newRepositorySession( request );
+            MavenSession session = new MavenSession( container, repoSession, request, result );
 
-        legacySupport.setSession( session );
+            sessionScope.seed( MavenSession.class, session );
 
+            legacySupport.setSession( session );
+
+            return doExecute( request, session, result, repoSession );
+        }
+        finally
+        {
+            sessionScope.exit();
+        }
+    }
+
+    private MavenExecutionResult doExecute( MavenExecutionRequest request, MavenSession session,
+                                            MavenExecutionResult result, DefaultRepositorySystemSession repoSession )
+    {
         try
         {
             for ( AbstractMavenLifecycleParticipant listener : getLifecycleParticipants( Collections.<MavenProject>emptyList() ) )
@@ -320,10 +333,6 @@ public class DefaultMaven
             catch ( MavenExecutionException e )
             {
                 return addExceptionToResult( result, e );
-            }
-            finally
-            {
-                sessionScope.exit();
             }
         }
 
