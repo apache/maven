@@ -40,14 +40,21 @@ public interface ToolchainManager
     String ROLE = ToolchainManager.class.getName();
 
     /**
-     * to be used from plugins capable of working with toolchains.
+     * Retrieve toolchain of specified type from build context. It is expected that
+     * <code>maven-toolchains-plugin</code> contains the configuration to select the appropriate
+     * toolchain and is executed at the beginning of the build.
+     *
+     * @param session the Maven session, must not be {@code null}
+     * @param type the type, must not be {@code null}
+     * @return the toolchain selected by <code>maven-toolchains-plugin</code>
      */
     Toolchain getToolchainFromBuildContext( String type, MavenSession context );
     
     /**
-     * Select all toolchains matching the type and requirements
+     * Select all toolchains available in user settings matching the type and requirements,
+     * independently from <code>maven-toolchains-plugin</code>.
      * 
-     * @param session the maven session, must not be {@code null}
+     * @param session the Maven session, must not be {@code null}
      * @param type the type, must not be {@code null}
      * @param requirements the requirements, may be {@code null}
      * @return the matching toolchains, never {@code null}
