@@ -150,6 +150,7 @@ public class MultiThreadedBuilder
             }
             catch ( ExecutionException e )
             {
+                // TODO MNG-5766 changes likely made this redundant 
                 rootSession.getResult().addException( e );
                 break;
             }

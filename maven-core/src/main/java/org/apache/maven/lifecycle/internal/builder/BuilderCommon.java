@@ -19,7 +19,6 @@ package org.apache.maven.lifecycle.internal.builder;
  * under the License.
  */
 
-import org.apache.maven.InternalErrorException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
@@ -139,23 +138,28 @@ public class BuilderCommon
     }
 
     public void handleBuildError( final ReactorContext buildContext, final MavenSession rootSession,
-                                  final MavenSession currentSession, final MavenProject mavenProject, Exception e,
+                                  final MavenSession currentSession, final MavenProject mavenProject, Throwable t,
                                   final long buildStartTime )
     {
-        if ( e instanceof RuntimeException )
+        // record the error and mark the project as failed
+        long buildEndTime = System.currentTimeMillis();
+        buildContext.getResult().addException( t );
+        buildContext.getResult().addBuildSummary( new BuildFailure( mavenProject, buildEndTime - buildStartTime, t ) );
+
+        // notify listeners about "soft" project build failures only
+        if ( t instanceof Exception && !( t instanceof RuntimeException ) )
         {
-            e = new InternalErrorException( "Internal error: " + e, e );
+            eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, currentSession, null, (Exception) t );
         }
 
-        buildContext.getResult().addException( e );
-
-        long buildEndTime = System.currentTimeMillis();
-
-        buildContext.getResult().addBuildSummary( new BuildFailure( mavenProject, buildEndTime - buildStartTime, e ) );
-
-        eventCatapult.fire( ExecutionEvent.Type.ProjectFailed, currentSession, null, e );
-
-        if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( rootSession.getReactorFailureBehavior() ) )
+        // reactor failure modes
+        if ( t instanceof RuntimeException || !( t instanceof Exception ) )
+        {
+            // fail fast on RuntimeExceptions, Errors and "other" Throwables
+            // assume these are system errors and further build is meaningless
+            buildContext.getReactorBuildStatus().halt();
+        }
+        else if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( rootSession.getReactorFailureBehavior() ) )
         {
             // continue the build
         }
@@ -170,8 +174,8 @@ public class BuilderCommon
         }
         else
         {
-            throw new IllegalArgumentException(
-                "invalid reactor failure behavior " + rootSession.getReactorFailureBehavior() );
+            logger.error( "invalid reactor failure behavior " + rootSession.getReactorFailureBehavior() );
+            buildContext.getReactorBuildStatus().halt();
         }
     }
 
