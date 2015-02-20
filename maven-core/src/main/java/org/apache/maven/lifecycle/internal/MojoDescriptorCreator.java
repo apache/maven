@@ -136,7 +136,7 @@ public class MojoDescriptorCreator
         return dom;
     }
 
-    // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
+    // org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process@executionId
 
     public MojoDescriptor getMojoDescriptor( String task, MavenSession session, MavenProject project )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
@@ -218,6 +218,12 @@ public class MojoDescriptorCreator
             // repository.
 
             plugin = findPluginForPrefix( prefix, session );
+        }
+
+        int executionIdx = goal.indexOf( '@' );
+        if ( executionIdx > 0 )
+        {
+            goal = goal.substring( 0, executionIdx );
         }
 
         injectPluginDeclarationFromProject( plugin, project );

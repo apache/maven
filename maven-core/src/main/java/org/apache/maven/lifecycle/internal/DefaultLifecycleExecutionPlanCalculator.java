@@ -195,10 +195,16 @@ public class DefaultLifecycleExecutionPlanCalculator
             {
                 String pluginGoal = ( (GoalTask) task ).pluginGoal;
 
+                String executionId = "default-cli";
+                int executionIdx = pluginGoal.indexOf( '@' );
+                if ( executionIdx > 0 )
+                {
+                    executionId = pluginGoal.substring( executionIdx + 1 );
+                }
+
                 MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor( pluginGoal, session, project );
 
-                MojoExecution mojoExecution =
-                    new MojoExecution( mojoDescriptor, "default-cli", MojoExecution.Source.CLI );
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, executionId, MojoExecution.Source.CLI );
 
                 mojoExecutions.add( mojoExecution );
             }
