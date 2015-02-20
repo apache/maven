@@ -212,6 +212,7 @@ Do you want to continue?</input>
     <modello file="maven-repository-metadata/src/main/mdo/metadata.mdo" version="1.1.0" />
     <modello file="maven-compat/src/main/mdo/profiles.mdo" />
     <modello file="maven-compat/src/main/mdo/paramdoc.mdo" />
+    <modello file="maven-embedder/src/main/mdo/core-extensions.mdo" />
   </target>
 
   <target name="compile-boot" depends="generate-sources" description="compiles the bootstrap sources">
