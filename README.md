@@ -14,16 +14,10 @@ If you want to bootstrap Maven, you'll need:
 - Java 1.6+
 - Ant 1.8 or later
 
-First, give Ant a location into which the completed Maven distro should be installed:
+Run Ant, specifying a location into which the completed Maven distro should be installed:
 
 ```
-export M2_HOME=$HOME/apps/maven/apache-maven-3.2.x-SNAPSHOT
+ant -Dmaven.home="$HOME/apps/maven/apache-maven-3.2.x-SNAPSHOT"
 ```
 
-Then, run Ant:
-
-```
-ant
-```
-
-Once the build completes, you should have a new Maven distro ready to roll in your $M2_HOME directory!
+Once the build completes, you should have a new Maven distro ready to roll in that directory!
