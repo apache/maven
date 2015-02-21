@@ -430,9 +430,9 @@ public class DefaultModelValidatorTest
     {
         SimpleProblemCollector result = validate( "empty-module.xml" );
 
-        assertViolations( result, 0, 0, 1 );
+        assertViolations( result, 0, 1, 0 );
 
-        assertTrue( result.getWarnings().get( 0 ).contains( "'modules.module[0]' has been specified without a path" ) );
+        assertTrue( result.getErrors().get( 0 ).contains( "'modules.module[0]' has been specified without a path" ) );
     }
 
     public void testDuplicatePlugin()
