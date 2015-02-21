@@ -312,7 +312,7 @@ public class DefaultModelValidator
                 String module = m.getModules().get( i );
                 if ( StringUtils.isBlank( module ) )
                 {
-                    addViolation( problems, Severity.WARNING, Version.BASE, "modules.module[" + i + "]", null,
+                    addViolation( problems, Severity.ERROR, Version.BASE, "modules.module[" + i + "]", null,
                                   "has been specified without a path to the project directory.",
                                   m.getLocation( "modules" ) );
                 }
