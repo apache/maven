@@ -418,10 +418,10 @@ public interface MavenExecutionRequest
     /**
      * @since 3.2.6
      */
-    void setProjectBaseDirectory( File file );
+    void setMultiModuleProjectDirectory( File file );
 
     /**
      * @since 3.2.6
      */
-    File getProjectBaseDirectory();
+    File getMultiModuleProjectDirectory();
 }

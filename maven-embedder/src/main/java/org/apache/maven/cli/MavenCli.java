@@ -124,7 +124,7 @@ public class MavenCli
 
     public static final String THREADS_DEPRECATED = "maven.threads.experimental";
 
-    public static final String PROJECT_BASEDIR = "maven.projectBasedir";
+    public static final String MULTIMODULE_PROJECT_DIRECTORY = "maven.multiModuleProjectDirectory";
 
     @SuppressWarnings( "checkstyle:constantname" )
     public static final String userHome = System.getProperty( "user.home" );
@@ -318,17 +318,17 @@ public class MavenCli
             cliRequest.workingDirectory = System.getProperty( "user.dir" );
         }
 
-        if ( cliRequest.projectBaseDirectory == null )
+        if ( cliRequest.multiModuleProjectDirectory == null )
         {
-            String basedirProperty = System.getProperty( PROJECT_BASEDIR );
+            String basedirProperty = System.getProperty( MULTIMODULE_PROJECT_DIRECTORY );
             File basedir = basedirProperty != null ? new File( basedirProperty ) : new File( "" );
             try
             {
-                cliRequest.projectBaseDirectory = basedir.getCanonicalFile();
+                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
             }
             catch ( IOException e )
             {
-                cliRequest.projectBaseDirectory = basedir.getAbsoluteFile();
+                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
             }
         }
 
@@ -359,7 +359,7 @@ public class MavenCli
 
         try
         {
-            File configFile = new File( cliRequest.projectBaseDirectory, ".mvn/maven.config" );
+            File configFile = new File( cliRequest.multiModuleProjectDirectory, ".mvn/maven.config" );
 
             if ( configFile.isFile() )
             {
@@ -586,12 +586,12 @@ public class MavenCli
     private List<CoreExtensionEntry> loadCoreExtensions( CliRequest cliRequest, ClassRealm containerRealm,
                                                          Set<String> providedArtifacts )
     {
-        if ( cliRequest.projectBaseDirectory == null )
+        if ( cliRequest.multiModuleProjectDirectory == null )
         {
             return Collections.emptyList();
         }
 
-        File extensionsFile = new File( cliRequest.projectBaseDirectory, EXTENSIONS_FILENAME );
+        File extensionsFile = new File( cliRequest.multiModuleProjectDirectory, EXTENSIONS_FILENAME );
         if ( !extensionsFile.isFile() )
         {
             return Collections.emptyList();
@@ -1339,7 +1339,7 @@ public class MavenCli
             .setUpdateSnapshots( updateSnapshots ) // default: false
             .setNoSnapshotUpdates( noSnapshotUpdates ) // default: false
             .setGlobalChecksumPolicy( globalChecksumPolicy ) // default: warn
-            .setProjectBaseDirectory( cliRequest.projectBaseDirectory )
+            .setMultiModuleProjectDirectory( cliRequest.multiModuleProjectDirectory )
             ;
 
         if ( alternatePomFile != null )
@@ -1588,7 +1588,7 @@ public class MavenCli
         CommandLine commandLine;
         ClassWorld classWorld;
         String workingDirectory;
-        File projectBaseDirectory;
+        File multiModuleProjectDirectory;
         boolean debug;
         boolean quiet;
         boolean showErrors = true;

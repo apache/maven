@@ -93,7 +93,7 @@ public class DefaultMavenExecutionRequest
     // Request
     // ----------------------------------------------------------------------------
 
-    private File projectBasedir;
+    private File multiModuleProjectDirectory;
 
     private File basedir;
 
@@ -1153,14 +1153,14 @@ public class DefaultMavenExecutionRequest
     }
 
     @Override
-    public void setProjectBaseDirectory( File directory )
+    public void setMultiModuleProjectDirectory( File directory )
     {
-        this.projectBasedir = directory;
+        this.multiModuleProjectDirectory = directory;
     }
 
     @Override
-    public File getProjectBaseDirectory()
+    public File getMultiModuleProjectDirectory()
     {
-        return projectBasedir;
+        return multiModuleProjectDirectory;
     }
 }

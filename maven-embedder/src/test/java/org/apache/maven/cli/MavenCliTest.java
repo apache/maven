@@ -36,7 +36,7 @@ public class MavenCliTest
     protected void setUp()
     {
         cli = new MavenCli();
-        origBasedir = System.getProperty( MavenCli.PROJECT_BASEDIR );
+        origBasedir = System.getProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
     }
 
     @Override
@@ -45,11 +45,11 @@ public class MavenCliTest
     {
         if ( origBasedir != null )
         {
-            System.setProperty( MavenCli.PROJECT_BASEDIR, origBasedir );
+            System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, origBasedir );
         }
         else
         {
-            System.getProperties().remove( MavenCli.PROJECT_BASEDIR );
+            System.getProperties().remove( MavenCli.MULTIMODULE_PROJECT_DIRECTORY );
         }
         super.tearDown();
     }
@@ -76,7 +76,7 @@ public class MavenCliTest
     public void testMavenConfig()
         throws Exception
     {
-        System.setProperty( MavenCli.PROJECT_BASEDIR, new File( "src/test/projects/config" ).getCanonicalPath() );
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/config" ).getCanonicalPath() );
         CliRequest request = new CliRequest( new String[0], null );
 
         // read .mvn/maven.config
@@ -94,7 +94,7 @@ public class MavenCliTest
     public void testMavenConfigInvalid()
         throws Exception
     {
-        System.setProperty( MavenCli.PROJECT_BASEDIR, new File( "src/test/projects/config-illegal" ).getCanonicalPath() );
+        System.setProperty( MavenCli.MULTIMODULE_PROJECT_DIRECTORY, new File( "src/test/projects/config-illegal" ).getCanonicalPath() );
         CliRequest request = new CliRequest( new String[0], null );
 
         cli.initialize( request );
