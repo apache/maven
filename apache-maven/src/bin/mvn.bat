@@ -141,6 +141,48 @@ goto Win9xApp
 
 @REM Reaching here means variables are defined and arguments have been captured
 :endInit
+
+@REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
+@REM Fallback to current working directory if not found.
+
+set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
+IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
+
+set EXEC_DIR=%CD%
+set WDIR=%EXEC_DIR%
+:findBaseDir
+IF EXIST "%WDIR%"\.mvn goto baseDirFound
+cd ..
+IF "%WDIR%"=="%CD%" goto baseDirNotFound
+set WDIR=%CD%
+goto findBaseDir
+
+:baseDirFound
+set MAVEN_PROJECTBASEDIR=%WDIR%
+cd "%EXEC_DIR%"
+goto endDetectBaseDir
+
+:baseDirNotFound
+set MAVEN_PROJECTBASEDIR=%EXEC_DIR%
+cd "%EXEC_DIR%"
+
+:endDetectBaseDir
+
+IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
+
+if NOT "%OS%"=="Windows_NT" goto Win9xAdditionalConfig
+
+setlocal EnableExtensions EnableDelayedExpansion
+for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
+endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
+goto endReadAdditionalConfig
+
+:Win9xAdditionalConfig
+@REM -- Win9x can only read the first line of the file
+set /P JVM_CONFIG_MAVEN_PROPS=<"%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config"
+ 
+:endReadAdditionalConfig
+
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 @REM -- 4NT shell
@@ -158,7 +200,7 @@ goto runm2
 @REM Start MAVEN2
 :runm2
 set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
-%MAVEN_JAVA_EXE% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" "-Dmaven.projectBasedir=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
