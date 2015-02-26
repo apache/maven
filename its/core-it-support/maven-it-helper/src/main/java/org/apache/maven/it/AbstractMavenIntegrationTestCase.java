@@ -469,6 +469,11 @@ public abstract class AbstractMavenIntegrationTestCase
             {
                 verifier.getSystemProperties().put( "org.apache.maven.global-settings", path );
             }
+
+            if ( matchesVersionRange( "(3.2.5,)" ) )
+            {
+                verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", basedir );
+            }
         }
 
         return verifier;

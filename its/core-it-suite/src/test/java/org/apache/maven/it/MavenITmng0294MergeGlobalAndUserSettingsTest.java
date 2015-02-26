@@ -62,6 +62,10 @@ public class MavenITmng0294MergeGlobalAndUserSettingsTest
         {
             verifier.setSystemProperty( "org.apache.maven.global-settings", "global-settings.xml" );
         }
+        if ( matchesVersionRange( "(3.2.5,)" ) )
+        {
+            verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", testDir.getAbsolutePath() );
+        }
         verifier.executeGoal( "org.apache.maven.its.plugins:maven-it-plugin-touch:touch" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
