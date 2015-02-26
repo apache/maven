@@ -74,7 +74,7 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-verifier</artifactId>
-        <version>1.5</version>
+        <version>1.6-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

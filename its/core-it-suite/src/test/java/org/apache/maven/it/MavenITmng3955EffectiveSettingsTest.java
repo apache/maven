@@ -62,7 +62,7 @@ public class MavenITmng3955EffectiveSettingsTest
         Properties props = verifier.loadProperties( "target/settings.properties" );
         assertEquals( "true", props.getProperty( "settings.offline" ) );
         assertEquals( "false", props.getProperty( "settings.interactiveMode" ) );
-        assertEquals( new File( verifier.localRepo ).getAbsoluteFile(), 
+        assertEquals( new File( verifier.getLocalRepository() ).getAbsoluteFile(), 
             new File( props.getProperty( "settings.localRepository" ) ).getAbsoluteFile() );
     }
 

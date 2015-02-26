@@ -54,7 +54,7 @@ public class MavenITmng3951AbsolutePathsTest
          * Cut off anything before the first file separator from the local repo path. This is harmless on a Unix-like
          * filesystem but will make the path drive-relative on Windows so we can check how Maven handles it.
          */
-        String repoDir = new File( verifier.localRepo ).getAbsolutePath();
+        String repoDir = new File( verifier.getLocalRepository() ).getAbsolutePath();
         if ( getRoot( new File( repoDir ) ).equals( getRoot( testDir ) ) )
         {
             // NOTE: We can only test the local repo if it resides on the same drive as the test

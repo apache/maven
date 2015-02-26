@@ -75,7 +75,7 @@ public class MavenITmng2276ProfileActivationBySettingsPropertyTest
         verifier.deleteDirectory( "target" );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
-        verifier.setSystemProperty( "settingsProperty", "cli" );
+        verifier.addCliOption( "-DsettingsProperty=cli" );
         verifier.setLogFileName( "log-2.txt" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
