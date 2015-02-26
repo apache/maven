@@ -312,6 +312,7 @@ public class MavenCli
     }
 
     void initialize( CliRequest cliRequest )
+        throws ExitException
     {
         if ( cliRequest.workingDirectory == null )
         {
@@ -321,6 +322,12 @@ public class MavenCli
         if ( cliRequest.multiModuleProjectDirectory == null )
         {
             String basedirProperty = System.getProperty( MULTIMODULE_PROJECT_DIRECTORY );
+            if ( basedirProperty == null )
+            {
+                System.err.format( "-D%s system propery is not set."
+                    + " Check $M2_HOME environment variable and mvn script match.", MULTIMODULE_PROJECT_DIRECTORY );
+                throw new ExitException( 1 );
+            }
             File basedir = basedirProperty != null ? new File( basedirProperty ) : new File( "" );
             try
             {
