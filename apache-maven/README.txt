@@ -31,8 +31,10 @@
     that, additional disk space will be used for your local Maven repository. The size
     of your local repository will vary depending on usage but expect at least 500MB.
   Operating System:
-    No minimum requirement. Start up scripts are included as shell scripts and Windows
-    batch files.
+    Windows:
+      Windows 2000 or above.
+    Unix based systems (Linux, Solaris and Mac OS X) and others:
+      No minimum requirement.
 
   Installing Maven
   ----------------

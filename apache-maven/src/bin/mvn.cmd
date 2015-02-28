@@ -43,14 +43,17 @@ if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
 
 @REM Execute a user defined script before this one
 if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
+@REM check for pre script, once with legacy .bat ending and once with .cmd ending
 if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
+if exist "%HOME%\mavenrc_pre.cmd" call "%HOME%\mavenrc_pre.cmd"
 :skipRcPre
+
+@setlocal
 
 set ERROR_CODE=0
 
-@REM set local scope for the variables with windows NT shell
-if "%OS%"=="Windows_NT" @setlocal
-if "%OS%"=="WINNT" @setlocal
+@REM To isolate internal variables from possible post scripts, we use another setlocal
+@setlocal
 
 @REM ==== START VALIDATION ====
 if not "%JAVA_HOME%" == "" goto OkJHome
@@ -76,8 +79,7 @@ goto error
 :chkMHome
 if not "%M2_HOME%"=="" goto valMHome
 
-if "%OS%"=="Windows_NT" SET "M2_HOME=%~dp0.."
-if "%OS%"=="WINNT" SET "M2_HOME=%~dp0.."
+SET "M2_HOME=%~dp0.."
 if not "%M2_HOME%"=="" goto valMHome
 
 echo.
@@ -90,12 +92,12 @@ goto error
 :valMHome
 
 :stripMHome
-if not "_%M2_HOME:~-1%"=="_\" goto checkMBat
+if not "_%M2_HOME:~-1%"=="_\" goto checkMCmd
 set "M2_HOME=%M2_HOME:~0,-1%"
 goto stripMHome
 
-:checkMBat
-if exist "%M2_HOME%\bin\mvn.bat" goto init
+:checkMCmd
+if exist "%M2_HOME%\bin\mvn.cmd" goto init
 
 echo.
 echo Error: M2_HOME is set to an invalid directory. >&2
@@ -107,40 +109,8 @@ goto error
 @REM ==== END VALIDATION ====
 
 :init
-@REM Decide how to startup depending on the version of windows
 
-@REM -- Windows NT with Novell Login
-if "%OS%"=="WINNT" goto WinNTNovell
-
-@REM -- Win98ME
-if NOT "%OS%"=="Windows_NT" goto Win9xArg
-
-:WinNTNovell
-
-@REM -- 4NT shell
-if "%@eval[2+2]" == "4" goto 4NTArgs
-
-@REM -- Regular WinNT shell
 set MAVEN_CMD_LINE_ARGS=%*
-goto endInit
-
-@REM The 4NT Shell from jp software
-:4NTArgs
-set MAVEN_CMD_LINE_ARGS=%$
-goto endInit
-
-:Win9xArg
-@REM Slurp the command line arguments.  This loop allows for an unlimited number
-@REM of agruments (up to the command line limit, anyway).
-set MAVEN_CMD_LINE_ARGS=
-:Win9xApp
-if %1a==a goto endInit
-set MAVEN_CMD_LINE_ARGS=%MAVEN_CMD_LINE_ARGS% %1
-shift
-goto Win9xApp
-
-@REM Reaching here means variables are defined and arguments have been captured
-:endInit
 
 @REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
 @REM Fallback to current working directory if not found.
@@ -170,70 +140,37 @@ cd "%EXEC_DIR%"
 
 IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
 
-if NOT "%OS%"=="Windows_NT" goto Win9xAdditionalConfig
-
-setlocal EnableExtensions EnableDelayedExpansion
+@setlocal EnableExtensions EnableDelayedExpansion
 for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
-endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
-goto endReadAdditionalConfig
+@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
 
-:Win9xAdditionalConfig
-@REM -- Win9x can only read the first line of the file
-set /P JVM_CONFIG_MAVEN_PROPS=<"%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config"
- 
 :endReadAdditionalConfig
 
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
-@REM -- 4NT shell
-if "%@eval[2+2]" == "4" goto 4NTCWJars
-
-@REM -- Regular WinNT shell
 for %%i in ("%M2_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
-goto runm2
 
-@REM The 4NT Shell from jp software
-:4NTCWJars
-for %%i in ("%M2_HOME%\boot\plexus-classworlds-*") do set CLASSWORLDS_JAR="%%i"
-goto runm2
-
-@REM Start MAVEN2
-:runm2
 set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
-%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+
+%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
 :error
-if "%OS%"=="Windows_NT" @endlocal
-if "%OS%"=="WINNT" @endlocal
 set ERROR_CODE=1
 
 :end
-@REM set local scope for the variables with windows NT shell
-if "%OS%"=="Windows_NT" goto endNT
-if "%OS%"=="WINNT" goto endNT
-
-@REM For old DOS remove the set variables from ENV - we assume they were not set
-@REM before we started - at least we don't leave any baggage around
-set MAVEN_JAVA_EXE=
-set MAVEN_CMD_LINE_ARGS=
-goto postExec
-
-:endNT
 @endlocal & set ERROR_CODE=%ERROR_CODE%
 
-:postExec
-
 if not "%MAVEN_SKIP_RC%" == "" goto skipRcPost
+@REM check for post script, once with legacy .bat ending and once with .cmd ending
 if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
+if exist "%HOME%\mavenrc_post.cmd" call "%HOME%\mavenrc_post.cmd"
 :skipRcPost
 
-@REM pause the batch file if MAVEN_BATCH_PAUSE is set to 'on'
+@REM pause the script if MAVEN_BATCH_PAUSE is set to 'on'
 if "%MAVEN_BATCH_PAUSE%" == "on" pause
 
 if "%MAVEN_TERMINATE_CMD%" == "on" exit %ERROR_CODE%
 
-cmd /C exit /B %ERROR_CODE%
-
-
+exit /B %ERROR_CODE%
