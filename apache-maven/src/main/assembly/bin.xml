@@ -64,7 +64,7 @@ under the License.
       <directory>src/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
-        <include>*.bat</include>
+        <include>*.cmd</include>
         <include>*.conf</include>
       </includes>
       <lineEnding>dos</lineEnding>
