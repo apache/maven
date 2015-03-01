@@ -106,6 +106,7 @@ public class IntegrationTestSuite
         // -------------------------------------------------------------------------------------------------------------
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
+        suite.addTestSuite( MavenITmng5774ConfigurationProcessorsTest.class );
         suite.addTestSuite( MavenITmng5771CoreExtensionsTest.class );
         suite.addTestSuite( MavenITmng5768CliExecutionIdTest.class );
         suite.addTestSuite( MavenITmng5742BuildExtensionClassloaderTest.class );
