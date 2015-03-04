@@ -327,7 +327,8 @@ public class MavenRepositorySystem
     // Taken from LegacyRepositorySystem
     //
 
-    public static org.apache.maven.model.Repository fromSettingsRepository( org.apache.maven.settings.Repository settingsRepository )
+    public static org.apache.maven.model.Repository fromSettingsRepository( org.apache.maven.settings.Repository
+                                                                            settingsRepository )
     {
         org.apache.maven.model.Repository modelRepository = new org.apache.maven.model.Repository();
         modelRepository.setId( settingsRepository.getId() );
@@ -339,7 +340,8 @@ public class MavenRepositorySystem
         return modelRepository;
     }
 
-    public static org.apache.maven.model.RepositoryPolicy fromSettingsRepositoryPolicy( org.apache.maven.settings.RepositoryPolicy settingsRepositoryPolicy )
+    public static org.apache.maven.model.RepositoryPolicy fromSettingsRepositoryPolicy(
+                                                 org.apache.maven.settings.RepositoryPolicy settingsRepositoryPolicy )
     {
         org.apache.maven.model.RepositoryPolicy modelRepositoryPolicy = new org.apache.maven.model.RepositoryPolicy();
         if ( settingsRepositoryPolicy != null )
@@ -390,7 +392,8 @@ public class MavenRepositorySystem
         }
     }
 
-    public static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( org.apache.maven.model.RepositoryPolicy policy )
+    public static ArtifactRepositoryPolicy buildArtifactRepositoryPolicy( org.apache.maven.model.RepositoryPolicy
+                                                                          policy )
     {
         boolean enabled = true;
 
@@ -711,7 +714,8 @@ public class MavenRepositorySystem
         try
         {
             URL url = new URL( originalRepository.getUrl() );
-            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals( "file" ) );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" )
+                            || url.getProtocol().equals( "file" ) );
         }
         catch ( MalformedURLException e )
         {

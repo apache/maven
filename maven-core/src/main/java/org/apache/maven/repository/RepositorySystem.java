@@ -80,7 +80,8 @@ public interface RepositorySystem
         throws InvalidRepositoryException;
 
     ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
-                                                 ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
+                                                 ArtifactRepositoryPolicy snapshots,
+                                                 ArtifactRepositoryPolicy releases );
 
     /**
      * Calculates the effective repositories for the given input repositories which are assumed to be already mirrored

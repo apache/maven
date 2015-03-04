@@ -302,8 +302,8 @@ public class MavenSession
     private final Settings settings;
     
     @Deprecated
-    public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession, MavenExecutionRequest request,
-                         MavenExecutionResult result )
+    public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession,
+                         MavenExecutionRequest request, MavenExecutionResult result )
     {
         this.container = container;
         this.request = request;

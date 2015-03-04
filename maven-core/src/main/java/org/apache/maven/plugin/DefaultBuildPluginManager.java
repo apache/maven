@@ -75,8 +75,10 @@ public class DefaultBuildPluginManager
      * @throws PluginResolutionException The plugin could be found but could not be resolved.
      * @throws InvalidPluginDescriptorException
      */
-    public PluginDescriptor loadPlugin( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
-        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException
+    public PluginDescriptor loadPlugin( Plugin plugin, List<RemoteRepository> repositories,
+                                        RepositorySystemSession session )
+        throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        InvalidPluginDescriptorException
     {
         return mavenPluginManager.getPluginDescriptor( plugin, repositories, session );
     }

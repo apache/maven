@@ -50,7 +50,8 @@ public interface MavenPluginManager
      * @param session The repository session to use for resolving the plugin's main artifact, must not be {@code null}.
      * @return The plugin descriptor, never {@code null}.
      */
-    PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session )
+    PluginDescriptor getPluginDescriptor( Plugin plugin, List<RemoteRepository> repositories,
+                                          RepositorySystemSession session )
         throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException;
 
     /**

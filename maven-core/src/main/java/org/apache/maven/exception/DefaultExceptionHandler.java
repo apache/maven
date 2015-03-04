@@ -80,7 +80,8 @@ Plugins:
 
  */
 
-//PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException, CycleDetectedInPluginGraphException;
+// PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+// CycleDetectedInPluginGraphException;
 
 @Component( role = ExceptionHandler.class )
 public class DefaultExceptionHandler

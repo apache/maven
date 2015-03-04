@@ -203,7 +203,8 @@ public class LifecycleDependencyResolver
              * plugins that require dependency resolution although they usually run in phases of the build where project
              * artifacts haven't been assembled yet. The prime example of this is "mvn release:prepare".
              */
-            if ( aggregating && areAllDependenciesInReactor( session.getProjects(), result.getUnresolvedDependencies() ) )
+            if ( aggregating && areAllDependenciesInReactor( session.getProjects(),
+                                                             result.getUnresolvedDependencies() ) )
             {
                 logger.warn( "The following dependencies could not be resolved at this point of the build"
                     + " but seem to be part of the reactor:" );
@@ -232,7 +233,8 @@ public class LifecycleDependencyResolver
         return artifacts;
     }
 
-    private boolean areAllDependenciesInReactor( Collection<MavenProject> projects, Collection<Dependency> dependencies )
+    private boolean areAllDependenciesInReactor( Collection<MavenProject> projects,
+                                                 Collection<Dependency> dependencies )
     {
         Set<String> projectKeys = getReactorProjectKeys( projects );
 

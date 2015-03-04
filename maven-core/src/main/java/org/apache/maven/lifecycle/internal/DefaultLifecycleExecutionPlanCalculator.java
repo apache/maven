@@ -168,14 +168,15 @@ public class DefaultLifecycleExecutionPlanCalculator
         {
             mojoDescriptor =
                 pluginManager.getMojoDescriptor( mojoExecution.getPlugin(), mojoExecution.getGoal(),
-                                                 project.getRemotePluginRepositories(), session.getRepositorySession() );
+                                                 project.getRemotePluginRepositories(),
+                                                 session.getRepositorySession() );
 
             mojoExecution.setMojoDescriptor( mojoDescriptor );
         }
 
         mojoExecutionConfigurator( mojoExecution ).configure( project,
                                                               mojoExecution,
-                                                              MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
+                                                        MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) );
 
         finalizeMojoConfiguration( mojoExecution );
 
@@ -204,7 +205,8 @@ public class DefaultLifecycleExecutionPlanCalculator
 
                 MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor( pluginGoal, session, project );
 
-                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, executionId, MojoExecution.Source.CLI );
+                MojoExecution mojoExecution = new MojoExecution( mojoDescriptor, executionId,
+                                                                 MojoExecution.Source.CLI );
 
                 mojoExecutions.add( mojoExecution );
             }
@@ -298,7 +300,8 @@ public class DefaultLifecycleExecutionPlanCalculator
 
                 Xpp3Dom parameterDefaults = defaultConfiguration.getChild( parameter.getName() );
 
-                parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults, Boolean.TRUE );
+                parameterConfiguration = Xpp3Dom.mergeXpp3Dom( parameterConfiguration, parameterDefaults,
+                                                               Boolean.TRUE );
 
                 if ( parameterConfiguration != null )
                 {
@@ -369,7 +372,8 @@ public class DefaultLifecycleExecutionPlanCalculator
             }
             else
             {
-                forkedExecutions = calculateForkedGoal( mojoExecution, session, forkedProject, alreadyForkedExecutions );
+                forkedExecutions = calculateForkedGoal( mojoExecution, session, forkedProject,
+                                                        alreadyForkedExecutions );
             }
 
             mojoExecution.setForkedExecutions( BuilderCommon.getKey( forkedProject ), forkedExecutions );
@@ -389,7 +393,8 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         String forkedPhase = mojoDescriptor.getExecutePhase();
 
-        Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings( session, project, forkedPhase );
+        Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings( session, project,
+                                                                                         forkedPhase );
 
         for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
         {

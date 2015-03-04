@@ -445,7 +445,7 @@ public class MavenMetadataSource
 
     public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
                                                                                     ArtifactRepository localRepository,
-                                                                                    ArtifactRepository deploymentRepository )
+                                                                              ArtifactRepository deploymentRepository )
         throws ArtifactMetadataRetrievalException
     {
         RepositoryMetadata metadata = new ArtifactRepositoryMetadata( artifact );

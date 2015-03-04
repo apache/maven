@@ -40,7 +40,8 @@ public class DefaultMavenProjectHelper
     @Requirement
     private ArtifactHandlerManager artifactHandlerManager;
 
-    public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile )
+    public void attachArtifact( MavenProject project, String artifactType, String artifactClassifier,
+                                File artifactFile )
     {
         String type = artifactType;
 

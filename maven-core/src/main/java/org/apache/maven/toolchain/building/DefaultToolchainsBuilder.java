@@ -59,7 +59,7 @@ public class DefaultToolchainsBuilder
     {
         ProblemCollector problems = ProblemCollectorFactory.newInstance( null );
         
-        PersistedToolchains globalToolchains = readToolchains( request.getGlobalToolchainsSource() , request, problems );
+        PersistedToolchains globalToolchains = readToolchains( request.getGlobalToolchainsSource(), request, problems );
 
         PersistedToolchains userToolchains = readToolchains( request.getUserToolchainsSource(), request, problems );
 

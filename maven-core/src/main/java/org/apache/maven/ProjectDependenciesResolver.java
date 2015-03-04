@@ -30,7 +30,8 @@ import org.apache.maven.project.MavenProject;
 
 @Deprecated
 /**
- * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such, but should have been.
+ * @deprecated As of 3.2.2, and there is no direct replacement. This is an internal class which was not marked as such,
+ *             but should have been.
  * @author jvanzyl
  *
  */
@@ -84,10 +85,11 @@ public interface ProjectDependenciesResolver
      * @param projects The projects whose dependencies should be resolved, may be {@code null}.
      * @param scopes   The dependency scopes that should be resolved, may be {@code null}.
      * @param session  The current build session, must not be {@code null}.
-     * @return The transitive dependencies of the specified projects that match the requested scopes, never {@code null}
-     *         .
+     * @return The transitive dependencies of the specified projects that match the requested scopes, never
+     *         {@code null}.
      */
-    Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes, MavenSession session )
+    Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
+                           MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
 }

@@ -118,7 +118,8 @@ public class DefaultGraphBuilder
 
                 if ( activeProjects.size() != projectDependencyGraph.getSortedProjects().size() )
                 {
-                    projectDependencyGraph = new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );
+                    projectDependencyGraph =
+                        new FilteredProjectDependencyGraph( projectDependencyGraph, activeProjects );
                 }
             }
         }
@@ -377,11 +378,11 @@ public class DefaultGraphBuilder
         return result;
     }
 
-    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     // Project collection
     //
-    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private List<MavenProject> getProjectsForMavenReactor( MavenSession session )
         throws ProjectBuildingException

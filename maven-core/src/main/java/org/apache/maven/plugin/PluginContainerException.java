@@ -42,7 +42,8 @@ public class PluginContainerException
 
     private ClassRealm pluginRealm;
 
-    public PluginContainerException( MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message, Throwable e )
+    public PluginContainerException( MojoDescriptor mojoDescriptor, ClassRealm pluginRealm, String message,
+                                     Throwable e )
     {
         super( mojoDescriptor, message, e );
 

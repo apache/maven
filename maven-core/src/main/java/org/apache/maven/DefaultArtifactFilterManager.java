@@ -49,7 +49,8 @@ public class DefaultArtifactFilterManager
     private final Set<String> coreArtifacts;
 
     @Inject
-    public DefaultArtifactFilterManager( List<ArtifactFilterManagerDelegate> delegates, CoreExportsProvider coreExports )
+    public DefaultArtifactFilterManager( List<ArtifactFilterManagerDelegate> delegates,
+                                         CoreExportsProvider coreExports )
     {
         this.delegates = delegates;
         this.coreArtifacts = coreExports.get().getExportedArtifacts();

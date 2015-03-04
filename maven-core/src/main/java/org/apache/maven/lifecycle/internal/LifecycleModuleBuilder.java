@@ -120,7 +120,8 @@ public class LifecycleModuleBuilder
             projectExecutionListener.afterProjectExecutionSuccess( new ProjectExecutionEvent( session, currentProject,
                                                                                               mojoExecutions ) );
 
-            reactorContext.getResult().addBuildSummary( new BuildSuccess( currentProject, buildEndTime - buildStartTime ) );
+            reactorContext.getResult().addBuildSummary( new BuildSuccess( currentProject,
+                                                                          buildEndTime - buildStartTime ) );
 
             eventCatapult.fire( ExecutionEvent.Type.ProjectSucceeded, session, null );
         }

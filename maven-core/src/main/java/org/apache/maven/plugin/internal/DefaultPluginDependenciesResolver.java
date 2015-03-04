@@ -154,7 +154,8 @@ public class DefaultPluginDependenciesResolver
         DependencyFilter resolutionFilter =
             new ExclusionsDependencyFilter( artifactFilterManager.getCoreArtifactExcludes() );
         resolutionFilter = AndDependencyFilter.newInstance( resolutionFilter, dependencyFilter );
-        return resolveInternal( plugin, pluginArtifact, resolutionFilter, new PlexusUtilsInjector(), repositories, session );
+        return resolveInternal( plugin, pluginArtifact, resolutionFilter, new PlexusUtilsInjector(), repositories,
+                                session );
     }
 
     private DependencyNode resolveInternal( Plugin plugin, Artifact pluginArtifact, DependencyFilter dependencyFilter,

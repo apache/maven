@@ -84,7 +84,8 @@ public class ProjectModelResolver
 
     public ProjectModelResolver( RepositorySystemSession session, RequestTrace trace, RepositorySystem resolver,
                                  RemoteRepositoryManager remoteRepositoryManager, List<RemoteRepository> repositories,
-                                 ProjectBuildingRequest.RepositoryMerging repositoryMerging, ReactorModelPool modelPool )
+                                 ProjectBuildingRequest.RepositoryMerging repositoryMerging,
+                                 ReactorModelPool modelPool )
     {
         this.session = session;
         this.trace = trace;

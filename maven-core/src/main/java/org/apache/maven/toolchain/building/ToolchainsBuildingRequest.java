@@ -38,8 +38,8 @@ public interface ToolchainsBuildingRequest
     Source getGlobalToolchainsSource();
 
     /**
-     * Sets the global toolchains source. If both user toolchains and a global toolchains are given, the user toolchains take
-     * precedence.
+     * Sets the global toolchains source. If both user toolchains and a global toolchains are given, the user toolchains
+     * take precedence.
      *
      * @param globalToolchainsSource The global toolchains source, may be {@code null} to disable global toolchains.
      * @return This request, never {@code null}.
@@ -54,8 +54,8 @@ public interface ToolchainsBuildingRequest
     Source getUserToolchainsSource();
 
     /**
-     * Sets the user toolchains source. If both user toolchains and a global toolchains are given, the user toolchains take
-     * precedence.
+     * Sets the user toolchains source. If both user toolchains and a global toolchains are given, the user toolchains
+     * take precedence.
      *
      * @param userToolchainsSource The user toolchains source, may be {@code null} to disable user toolchains.
      * @return This request, never {@code null}.

@@ -1249,7 +1249,7 @@ public class MavenProject
 
         if ( project.getPluginArtifactRepositories() != null )
         {
-            setPluginArtifactRepositories( ( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) ) );
+            setPluginArtifactRepositories( Collections.unmodifiableList( project.getPluginArtifactRepositories() ) );
         }
 
         if ( project.getActiveProfiles() != null )
@@ -1458,17 +1458,17 @@ public class MavenProject
         lifecyclePhases.add( lifecyclePhase );
     }
 
-    // --------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------
     //
     //
     // D E P R E C A T E D
     //
     //
-    // --------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------
     //
     // Everything below will be removed for Maven 4.0.0
     //
-    // --------------------------------------------------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------------------------------
 
     private ProjectBuildingRequest projectBuilderConfiguration;
 
@@ -1531,7 +1531,8 @@ public class MavenProject
     }
 
     @Deprecated
-    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope, ArtifactFilter filter )
+    public Set<Artifact> createArtifacts( ArtifactFactory artifactFactory, String inheritedScope,
+                                          ArtifactFilter filter )
         throws InvalidDependencyVersionException
     {
         return MavenMetadataSource.createArtifacts( artifactFactory, getDependencies(), inheritedScope, filter, this );

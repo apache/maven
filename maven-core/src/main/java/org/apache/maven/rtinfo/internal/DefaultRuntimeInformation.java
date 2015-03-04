@@ -82,7 +82,8 @@ public class DefaultRuntimeInformation
             }
             else
             {
-                logger.warn( "Could not locate " + resource + " on classpath, Maven runtime information not available" );
+                logger.warn( "Could not locate " + resource
+                             + " on classpath, Maven runtime information not available" );
             }
 
             String version = props.getProperty( "version", "" ).trim();

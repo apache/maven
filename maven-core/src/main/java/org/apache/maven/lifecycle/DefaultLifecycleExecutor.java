@@ -170,7 +170,8 @@ public class DefaultLifecycleExecutor
     public List<MavenProject> executeForkedExecutions( MojoExecution mojoExecution, MavenSession session )
         throws LifecycleExecutionException
     {
-        return mojoExecutor.executeForkedExecutions( mojoExecution, session, new ProjectIndex( session.getProjects() ) );
+        return mojoExecutor.executeForkedExecutions( mojoExecution, session,
+                                                     new ProjectIndex( session.getProjects() ) );
     }
 
 }

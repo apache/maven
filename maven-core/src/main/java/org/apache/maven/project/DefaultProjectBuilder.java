@@ -399,7 +399,8 @@ public class DefaultProjectBuilder
         Map<String, MavenProject> projectIndex = new HashMap<String, MavenProject>( 256 );
 
         boolean noErrors =
-            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive, config );
+            build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive,
+                   config );
 
         populateReactorModelPool( modelPool, interimResults );
 
@@ -635,7 +636,8 @@ public class DefaultProjectBuilder
             }
             catch ( ModelBuildingException e )
             {
-                results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile, e.getProblems() ) );
+                results.add( new DefaultProjectBuildingResult( e.getModelId(), interimResult.pomFile,
+                                                               e.getProblems() ) );
 
                 noErrors = false;
             }
@@ -826,17 +828,19 @@ public class DefaultProjectBuilder
         project.setManagedVersionMap( map );
 
         // release artifact repository
-        if ( project.getDistributionManagement() != null && project.getDistributionManagement().getRepository() != null )
+        if ( project.getDistributionManagement() != null
+                        && project.getDistributionManagement().getRepository() != null )
         {
             try
             {
                 DeploymentRepository r = project.getDistributionManagement().getRepository();
                 if ( !StringUtils.isEmpty( r.getId() ) && !StringUtils.isEmpty( r.getUrl() ) )
                 {
-                    ArtifactRepository repo =
-                        repositorySystem.buildArtifactRepository( project.getDistributionManagement().getRepository() );
-                    repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
-                    repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
+                    ArtifactRepository repo = repositorySystem.buildArtifactRepository( r );
+                    repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(),
+                                                  Arrays.asList( repo ) );
+                    repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(),
+                                                           Arrays.asList( repo ) );
                     project.setReleaseArtifactRepository( repo );
                 }
             }
@@ -856,10 +860,11 @@ public class DefaultProjectBuilder
                 DeploymentRepository r = project.getDistributionManagement().getSnapshotRepository();
                 if ( !StringUtils.isEmpty( r.getId() ) && !StringUtils.isEmpty( r.getUrl() ) )
                 {
-                    ArtifactRepository repo =
-                        repositorySystem.buildArtifactRepository( project.getDistributionManagement().getSnapshotRepository() );
-                    repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
-                    repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(), Arrays.asList( repo ) );
+                    ArtifactRepository repo = repositorySystem.buildArtifactRepository( r );
+                    repositorySystem.injectProxy( projectBuildingRequest.getRepositorySession(),
+                                                  Arrays.asList( repo ) );
+                    repositorySystem.injectAuthentication( projectBuildingRequest.getRepositorySession(),
+                                                           Arrays.asList( repo ) );
                     project.setSnapshotArtifactRepository( repo );
                 }
             }

@@ -878,7 +878,8 @@ public class DefaultMavenPluginManager
         extensionRecord = extensionRealmCache.get( extensionKey );
         if ( extensionRecord == null )
         {
-            ClassRealm extensionRealm = classRealmManager.createExtensionRealm( plugin, toAetherArtifacts( artifacts ) );
+            ClassRealm extensionRealm = classRealmManager.createExtensionRealm( plugin,
+                                                                                toAetherArtifacts( artifacts ) );
 
             // TODO figure out how to use the same PluginDescriptor when running mojos
 

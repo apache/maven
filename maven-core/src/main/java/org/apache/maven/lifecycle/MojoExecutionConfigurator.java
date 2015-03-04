@@ -23,8 +23,8 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 /**
- * A MojoExecutionConfigurator is responsible for creating the configuration for  Mojo  based on configuration for a Mojo in the MavenProject
- * and the default configuration for the Mojo from the containing plugin's plugin.xml descriptor.
+ * A MojoExecutionConfigurator is responsible for creating the configuration for Mojo based on configuration for a Mojo
+ * in the MavenProject and the default configuration for the Mojo from the containing plugin's plugin.xml descriptor.
  * 
  * @provisional
  * @author Jason van Zyl

@@ -118,10 +118,8 @@ public class DefaultMaven
             }
             else
             {
-                result = addExceptionToResult( new DefaultMavenExecutionResult(), new InternalErrorException(
-                                                                                                              "Internal error: "
-                                                                                                                  + e,
-                                                                                                              e ) );
+                result = addExceptionToResult( new DefaultMavenExecutionResult(),
+                                               new InternalErrorException( "Internal error: " + e, e ) );
             }
         }
         finally
@@ -371,7 +369,8 @@ public class DefaultMaven
 
     private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
     {
-        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners = new LinkedHashSet<AbstractMavenLifecycleParticipant>();
+        Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
+            new LinkedHashSet<AbstractMavenLifecycleParticipant>();
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try

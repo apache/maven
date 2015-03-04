@@ -70,6 +70,7 @@ public interface MavenProjectHelper
      * @param includes include patterns.
      * @param excludes exclude patterns.
      */
-    void addTestResource( MavenProject project, String resourceDirectory, List<String> includes, List<String> excludes );
+    void addTestResource( MavenProject project, String resourceDirectory, List<String> includes,
+                          List<String> excludes );
 
 }

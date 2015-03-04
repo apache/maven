@@ -258,7 +258,8 @@ public class DefaultClassRealmManager
             parent = PARENT_CLASSLOADER;
         }
 
-        return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, parentImports, foreignImports, artifacts );
+        return createRealm( getKey( plugin, false ), RealmType.Plugin, parent, parentImports, foreignImports,
+                            artifacts );
     }
 
     private static String getKey( Plugin plugin, boolean extension )

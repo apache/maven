@@ -84,7 +84,8 @@ public class DefaultPluginVersionRequest
      * @param session The repository session to use, must not be {@code null}.
      * @param repositories The plugin repositories to query, may be {@code null}.
      */
-    public DefaultPluginVersionRequest( Plugin plugin, RepositorySystemSession session, List<RemoteRepository> repositories )
+    public DefaultPluginVersionRequest( Plugin plugin, RepositorySystemSession session,
+                                        List<RemoteRepository> repositories )
     {
         setGroupId( plugin.getGroupId() );
         setArtifactId( plugin.getArtifactId() );

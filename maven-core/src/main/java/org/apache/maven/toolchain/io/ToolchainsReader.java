@@ -55,8 +55,8 @@ public interface ToolchainsReader
         throws IOException, ToolchainsParseException;
 
     /**
-     * Reads the toolchains from the specified character reader. The reader will be automatically closed before the method
-     * returns.
+     * Reads the toolchains from the specified character reader. The reader will be automatically closed before the
+     * method returns.
      *
      * @param input The reader to deserialize the toolchains from, must not be {@code null}.
      * @param options The options to use for deserialization, may be {@code null} to use the default values.

@@ -38,20 +38,28 @@ import org.codehaus.plexus.util.introspection.ReflectionValueExtractor;
  * <tr><th>expression</th>                     <th></th>               <th>evaluation result</th></tr>
  * <tr><td><code>session</code></td>           <td></td>               <td>the actual {@link MavenSession}</td></tr>
  * <tr><td><code>session.*</code></td>         <td>(since Maven 3)</td><td></td></tr>
- * <tr><td><code>localRepository</code></td>   <td></td>               <td>{@link MavenSession#getLocalRepository()}</td></tr>
+ * <tr><td><code>localRepository</code></td>   <td></td>
+ *                                             <td>{@link MavenSession#getLocalRepository()}</td></tr>
  * <tr><td><code>reactorProjects</code></td>   <td></td>               <td>{@link MavenSession#getProjects()}</td></tr>
- * <tr><td><code>repositorySystemSession</code></td><td> (since Maven 3)</td><td>{@link MavenSession#getRepositorySession()}</td></tr>
- * <tr><td><code>project</code></td>           <td></td>               <td>{@link MavenSession#getCurrentProject()}</td></tr>
+ * <tr><td><code>repositorySystemSession</code></td><td> (since Maven 3)</td>
+ *                                             <td>{@link MavenSession#getRepositorySession()}</td></tr>
+ * <tr><td><code>project</code></td>           <td></td>
+ *                                             <td>{@link MavenSession#getCurrentProject()}</td></tr>
  * <tr><td><code>project.*</code></td>         <td></td>               <td></td></tr>
  * <tr><td><code>pom.*</code></td>             <td>(since Maven 3)</td><td>same as <code>project.*</code></td></tr>
- * <tr><td><code>executedProject</code></td>   <td></td>               <td>{@link MavenProject#getExecutionProject()}</td></tr>
+ * <tr><td><code>executedProject</code></td>   <td></td>
+ *                                             <td>{@link MavenProject#getExecutionProject()}</td></tr>
  * <tr><td><code>settings</code></td>          <td></td>               <td>{@link MavenSession#getSettings()}</td></tr>
  * <tr><td><code>settings.*</code></td>        <td></td>               <td></td></tr>
- * <tr><td><code>basedir</code></td>           <td></td>               <td>{@link MavenSession#getExecutionRootDirectory()} or <code>System.getProperty( "user.dir" )</code> if null</td></tr>
+ * <tr><td><code>basedir</code></td>           <td></td>
+ *                                             <td>{@link MavenSession#getExecutionRootDirectory()} or 
+ *                                                 <code>System.getProperty( "user.dir" )</code> if null</td></tr>
  * <tr><td><code>mojoExecution</code></td>     <td></td>               <td>the actual {@link MojoExecution}</td></tr>
  * <tr><td><code>mojo</code></td>              <td>(since Maven 3)</td><td>same as <code>mojoExecution</code></td></tr>
  * <tr><td><code>mojo.*</code></td>            <td>(since Maven 3)</td><td></td></tr>
- * <tr><td><code>plugin</code></td>            <td>(since Maven 3)</td><td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor() getPluginDescriptor()}</td></tr>
+ * <tr><td><code>plugin</code></td>            <td>(since Maven 3)</td>
+ *                             <td>{@link MojoExecution#getMojoDescriptor()}.{@link MojoDescriptor#getPluginDescriptor()
+ *                                 getPluginDescriptor()}</td></tr>
  * <tr><td><code>plugin.*</code></td>          <td></td>               <td></td></tr>
  * <tr><td><code>*</code></td>                 <td></td>               <td>system properties</td></tr>
  * <tr><td><code>*</code></td>                 <td></td>               <td>project properties</td></tr>

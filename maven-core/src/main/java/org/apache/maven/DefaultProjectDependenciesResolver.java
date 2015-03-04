@@ -127,7 +127,8 @@ public class DefaultProjectDependenciesResolver
 
         if ( ! exclusions.isEmpty() )
         {
-            filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ new ExcludesArtifactFilter( exclusions ), scopeFilter } ) );
+            filter = new AndArtifactFilter( Arrays.asList( new ArtifactFilter[]{ 
+                new ExcludesArtifactFilter( exclusions ), scopeFilter } ) );
         }
         else
         {

@@ -114,14 +114,16 @@ public class LifecycleStarter
             Builder builder = builders.get( builderId );
             if ( builder == null )
             {
-                throw new BuilderNotFoundException( String.format( "The builder requested using id = %s cannot be found", builderId ) );
+                throw new BuilderNotFoundException( String.format( "The builder requested using id = %s cannot be"
+                    + " found", builderId ) );
             }
 
             int degreeOfConcurrency = session.getRequest().getDegreeOfConcurrency();
             if ( degreeOfConcurrency >= 2 )
             {
                 logger.info( "" );
-                logger.info( String.format( "Using the %s implementation with a thread count of %d", builder.getClass().getSimpleName(), degreeOfConcurrency ) );
+                logger.info( String.format( "Using the %s implementation with a thread count of %d",
+                                            builder.getClass().getSimpleName(), degreeOfConcurrency ) );
             }
             builder.build( session, reactorContext, projectBuilds, taskSegments, reactorBuildStatus );
 

@@ -74,7 +74,8 @@ public class DefaultToolchainManager
         return selectToolchains( models, type, requirements );
     }
 
-    private List<Toolchain> selectToolchains( List<ToolchainModel> models, String type, Map<String, String> requirements )
+    private List<Toolchain> selectToolchains( List<ToolchainModel> models, String type,
+                                              Map<String, String> requirements )
     {
         List<Toolchain> toolchains = new ArrayList<Toolchain>();
 

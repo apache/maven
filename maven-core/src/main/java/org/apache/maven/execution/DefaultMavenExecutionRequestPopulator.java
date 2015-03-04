@@ -147,11 +147,11 @@ public class DefaultMavenExecutionRequestPopulator
                 }
 
                 List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
-                for ( Repository pluginRepository : pluginRepositories )
+                for ( Repository pluginRepo : pluginRepositories )
                 {
                     try
                     {
-                        request.addPluginArtifactRepository( repositorySystem.buildArtifactRepository( pluginRepository ) );
+                        request.addPluginArtifactRepository( repositorySystem.buildArtifactRepository( pluginRepo ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -260,7 +260,8 @@ public class DefaultMavenExecutionRequestPopulator
         //      <mirrors>
         //        <mirror>
         //          <id>central</id>
-        //          <!-- NOTE: We need to try and use the proper host name/ip as Java generally ignores proxies for "localhost" -->
+        //          <!-- NOTE: We need to try and use the proper host name/ip as Java generally ignores proxies for
+        //                     "localhost" -->
         //          <url>http://10.0.1.34:62247/</url>
         //          <mirrorOf>central</mirrorOf>
         //        </mirror>
