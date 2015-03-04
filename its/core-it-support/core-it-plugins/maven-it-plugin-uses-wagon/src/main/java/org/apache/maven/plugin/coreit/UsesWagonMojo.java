@@ -48,7 +48,7 @@ public class UsesWagonMojo
             getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol file" );
             fileWagon = wagonManager.getWagon( "file" );
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
@@ -56,7 +56,7 @@ public class UsesWagonMojo
         {
             FileWagon theWagon = (FileWagon) fileWagon;
         }
-        catch( ClassCastException e )
+        catch ( ClassCastException e )
         {
             getLog().error( "", e );
             getLog().error( "Plugin Class Loaded by " + FileWagon.class.getClassLoader() );
@@ -71,7 +71,7 @@ public class UsesWagonMojo
             getLog().info( "[MAVEN-CORE-IT-LOG] Looking up wagon for protocol scp" );
             scpWagon = wagonManager.getWagon( "scp" );
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             throw new MojoExecutionException( e.getMessage(), e );
         }
@@ -79,7 +79,7 @@ public class UsesWagonMojo
         {
             ScpWagon theWagon = (ScpWagon) scpWagon;
         }
-        catch( ClassCastException e )
+        catch ( ClassCastException e )
         {
             getLog().error( "", e );
             getLog().error( "Plugin Class Loaded by " + ScpWagon.class.getClassLoader() );

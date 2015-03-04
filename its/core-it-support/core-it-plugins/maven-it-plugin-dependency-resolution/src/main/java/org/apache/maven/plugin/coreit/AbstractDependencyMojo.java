@@ -295,6 +295,7 @@ public abstract class AbstractDependencyMojo
 
         for ( int i = 0; i < digest.length; i++ )
         {
+            @SuppressWarnings( "checkstyle:magicnumber" )
             int b = digest[i] & 0xFF;
 
             if ( b < 0x10 )

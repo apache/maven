@@ -45,7 +45,8 @@ public class PropertyInterpolationMojo
         
         if ( !value.equals( targetValue ) )
         {
-            throw new MojoExecutionException( "Property value of 'myDirectory': " + value + " should equal the 'foo' subpath of the project build directory: " + targetValue );
+            throw new MojoExecutionException( "Property value of 'myDirectory': " + value
+                + " should equal the 'foo' subpath of the project build directory: " + targetValue );
         }
     }
     

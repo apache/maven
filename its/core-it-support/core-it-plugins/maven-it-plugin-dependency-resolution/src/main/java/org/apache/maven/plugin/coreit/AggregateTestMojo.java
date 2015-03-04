@@ -94,7 +94,8 @@ public class AggregateTestMojo
 
                 writeArtifacts( filter( projectArtifacts, project ), project.getArtifacts() );
                 writeClassPath( filter( testClassPath, project ), project.getTestClasspathElements() );
-                writeClassPathChecksums( filter( testClassPathChecksums, project ), project.getTestClasspathElements() );
+                writeClassPathChecksums( filter( testClassPathChecksums, project ),
+                                         project.getTestClasspathElements() );
             }
         }
         catch ( DependencyResolutionRequiredException e )

@@ -1,4 +1,5 @@
 package org.apache.maven.plugin.coreit;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -33,7 +34,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Olivier Lamy
@@ -114,6 +114,9 @@ public class InstallArtifactsMojo
         }
     }
 
+    /**
+     * 
+     */
     public static class FlatRepositoryLayout
         implements ArtifactRepositoryLayout
     {

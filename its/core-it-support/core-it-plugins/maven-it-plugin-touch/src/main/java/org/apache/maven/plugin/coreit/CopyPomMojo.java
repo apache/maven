@@ -52,28 +52,28 @@ public class CopyPomMojo
     {
         try
         {
-	         File dest = new File( outputFile );
-	         File dir = dest.getParentFile();
-	
-             if ( !dir.exists() )
-             {
-                 dir.mkdirs();
-             }
+            File dest = new File( outputFile );
+            File dir = dest.getParentFile();
 
-             getLog().info( "Copying POM to file: " + dest.getAbsolutePath() );
+            if ( !dir.exists() )
+            {
+                dir.mkdirs();
+            }
 
-             FileInputStream in = new FileInputStream( pomFile );
-             FileOutputStream out = new FileOutputStream( dest );
+            getLog().info( "Copying POM to file: " + dest.getAbsolutePath() );
 
-             int read = -1;
-             byte[] buf = new byte[4096];
-			 while( ( read = in.read( buf ) ) > -1 )
-			 {
-				out.write( buf, 0, read );
-			 }
-			
-			 in.close();
-			 out.close();
+            FileInputStream in = new FileInputStream( pomFile );
+            FileOutputStream out = new FileOutputStream( dest );
+
+            int read = -1;
+            byte[] buf = new byte[4 * 1024];
+            while ( ( read = in.read( buf ) ) > -1 )
+            {
+                out.write( buf, 0, read );
+            }
+
+            in.close();
+            out.close();
         }
         catch ( IOException e )
         {

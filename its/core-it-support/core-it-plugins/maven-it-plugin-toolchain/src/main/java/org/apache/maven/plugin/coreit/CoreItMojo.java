@@ -101,7 +101,8 @@ public class CoreItMojo
             }
             else
             {
-                getLog().warn( "[MAVEN-CORE-IT-LOG] Toolchain #" + selected + " can't be selected, found only " + tcs.length );
+                getLog().warn( "[MAVEN-CORE-IT-LOG] Toolchain #" + selected + " can't be selected, found only "
+                                   + tcs.length );
             }
         }
 

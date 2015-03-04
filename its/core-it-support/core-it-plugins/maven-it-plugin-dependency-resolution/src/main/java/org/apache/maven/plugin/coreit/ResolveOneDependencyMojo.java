@@ -143,7 +143,8 @@ public class ResolveOneDependencyMojo
         }
 
         Set depArtifacts = new HashSet();
-        Artifact artifact = artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
+        Artifact artifact =
+            artifactFactory.createArtifactWithClassifier( groupId, artifactId, version, type, classifier );
         depArtifacts.add( artifact );
 
         ScopeArtifactFilter scopeFilter = new ScopeArtifactFilter( scope );
@@ -193,7 +194,7 @@ public class ResolveOneDependencyMojo
                     return;
                 }
             }
-            getLog().info(" RESOLVE-ONE-DEPENDENCY " + artifact.toString() + " $ NOT-RESOLVED" );
+            getLog().info( " RESOLVE-ONE-DEPENDENCY " + artifact.toString() + " $ NOT-RESOLVED" );
         }
     }
 }

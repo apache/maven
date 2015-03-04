@@ -26,6 +26,8 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.interpolation.ModelInterpolationException;
 import org.apache.maven.project.interpolation.ModelInterpolator;
 
+import java.util.Properties;
+
 /**
  * @goal path-interpolation
  * @phase validate
@@ -44,9 +46,11 @@ public class PathInterpolationMojo
     {
         try
         {
+            Properties props = project.getProperties();
+
             modelInterpolator.interpolate( project.getOriginalModel(),
                                            project.getBasedir(),
-                                           new DefaultProjectBuilderConfiguration().setExecutionProperties( project.getProperties() ),
+                                           new DefaultProjectBuilderConfiguration().setExecutionProperties( props ),
                                            true );
         }
         catch ( ModelInterpolationException e )

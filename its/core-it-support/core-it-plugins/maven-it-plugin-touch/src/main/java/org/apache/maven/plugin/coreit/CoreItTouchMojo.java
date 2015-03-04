@@ -98,7 +98,8 @@ public class CoreItTouchMojo
     {
         if ( fail )
         {
-            throw new MojoExecutionException( "Failing per \'fail\' parameter (specified in pom or system properties)" );
+            throw new MojoExecutionException( "Failing per \'fail\' parameter"
+                + " (specified in pom or system properties)" );
         }
 
         File outDir = new File( outputDirectory );

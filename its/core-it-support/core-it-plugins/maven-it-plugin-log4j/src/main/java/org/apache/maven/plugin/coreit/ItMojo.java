@@ -19,12 +19,14 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import java.util.*;
+import java.util.List;
 
-import org.apache.maven.artifact.*;
-import org.apache.maven.artifact.factory.*;
-import org.apache.maven.artifact.resolver.*;
-import org.apache.maven.artifact.repository.*;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 

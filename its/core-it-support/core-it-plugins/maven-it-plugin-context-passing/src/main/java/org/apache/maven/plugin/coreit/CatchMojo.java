@@ -89,6 +89,7 @@ public class CatchMojo
                 }
                 catch ( IOException e )
                 {
+                    // ignore
                 }
             }
         }

@@ -128,7 +128,8 @@ public class ResolveTransitiveMojo
 
         if ( thread.error != null )
         {
-            throw new MojoExecutionException( "Failed to resolve artifacts: " + thread.error.getMessage(), thread.error );
+            throw new MojoExecutionException( "Failed to resolve artifacts: " + thread.error.getMessage(),
+                                              thread.error );
         }
 
         if ( propertiesFile != null )
@@ -187,7 +188,8 @@ public class ResolveTransitiveMojo
                                                                   dependency.getVersion(), dependency.getType(),
                                                                   dependency.getClassifier() );
 
-                        getLog().info( "[MAVEN-CORE-IT-LOG] Resolving " + ResolveTransitiveMojo.this.getId( artifact ) );
+                        getLog().info( "[MAVEN-CORE-IT-LOG] Resolving "
+                                        + ResolveTransitiveMojo.this.getId( artifact ) );
 
                         artifacts.add( artifact );
                     }

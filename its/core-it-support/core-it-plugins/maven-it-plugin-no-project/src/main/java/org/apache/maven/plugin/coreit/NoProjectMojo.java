@@ -25,7 +25,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Mojo which touches a file without requiring a project.

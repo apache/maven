@@ -122,7 +122,7 @@ public class CoreItWagon
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String resName = inputData.getResource().getName();
-        if ( resName.endsWith( ".xml" ) ||resName.endsWith( ".md5" ) || resName.endsWith( ".sha1" ) )
+        if ( resName.endsWith( ".xml" ) || resName.endsWith( ".md5" ) || resName.endsWith( ".sha1" ) )
         {
             throw new ResourceDoesNotExistException( resName );
         }

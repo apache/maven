@@ -25,7 +25,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>22</version>
+    <version>26</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -62,6 +62,7 @@ under the License.
   <properties>
     <maven.site.path>core-its</maven.site.path>
     <maven.site.cache>${user.home}/maven-sites</maven.site.cache>
+    <rat.ignoreErrors>true</rat.ignoreErrors>
   </properties>
 
   <modules>
@@ -78,37 +79,6 @@ under the License.
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.5.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.3</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.13</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-scm-publish-plugin</artifactId>
-          <version>1.0</version>
-          <configuration>
-            <checkoutDirectory>${maven.site.cache}/${maven.site.path}</checkoutDirectory>
-            <tryUpdate>true</tryUpdate>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 
   <repositories>
     <repository>

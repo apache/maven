@@ -76,7 +76,8 @@ public class AggregateTestMojo
 
                 writeArtifacts( filter( projectArtifacts, project ), project.getArtifacts() );
 
-                // NOTE: We can't make any assumptions about the class path but as a minimum it must not cause an exception
+                // NOTE: We can't make any assumptions about the class path but as a minimum it must not cause an
+                // exception
                 project.getTestClasspathElements();
             }
         }

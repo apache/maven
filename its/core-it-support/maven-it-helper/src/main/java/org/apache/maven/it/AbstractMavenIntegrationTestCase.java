@@ -86,9 +86,9 @@ public abstract class AbstractMavenIntegrationTestCase
         {
             versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
         }
-        catch ( InvalidVersionSpecificationException e)
+        catch ( InvalidVersionSpecificationException e )
         {
-            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr ).initCause( e );
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr, e );
         }
 
         ArtifactVersion version = getMavenVersion();
@@ -177,9 +177,9 @@ public abstract class AbstractMavenIntegrationTestCase
         {
             versionRange = VersionRange.createFromVersionSpec( versionRangeStr );
         }
-        catch ( InvalidVersionSpecificationException e)
+        catch ( InvalidVersionSpecificationException e )
         {
-            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr ).initCause( e );
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRangeStr, e );
         }
 
         ArtifactVersion version = getMavenVersion();
@@ -256,7 +256,7 @@ public abstract class AbstractMavenIntegrationTestCase
         }
         catch ( InvalidVersionSpecificationException e )
         {
-            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRange ).initCause( e );
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRange, e );
         }
 
         ArtifactVersion version = getJavaVersion();
@@ -283,7 +283,7 @@ public abstract class AbstractMavenIntegrationTestCase
         }
         catch ( InvalidVersionSpecificationException e )
         {
-            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRange ).initCause( e );
+            throw (RuntimeException) new IllegalArgumentException( "Invalid version range: " + versionRange, e );
         }
 
         ArtifactVersion version = getMavenVersion();
@@ -304,9 +304,10 @@ public abstract class AbstractMavenIntegrationTestCase
     private class UnsupportedJavaVersionException
         extends RuntimeException
     {
-
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public ArtifactVersion javaVersion;
 
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public VersionRange supportedRange;
 
         public UnsupportedJavaVersionException( ArtifactVersion javaVersion, VersionRange supportedRange )
@@ -320,9 +321,10 @@ public abstract class AbstractMavenIntegrationTestCase
     private class UnsupportedMavenVersionException
         extends RuntimeException
     {
-
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public ArtifactVersion mavenVersion;
 
+        @SuppressWarnings( "checkstyle:visibilitymodifier" )
         public VersionRange supportedRange;
 
         public UnsupportedMavenVersionException( ArtifactVersion mavenVersion, VersionRange supportedRange )
@@ -444,7 +446,8 @@ public abstract class AbstractMavenIntegrationTestCase
                 else
                 {
                     //
-                    // Make is easier to run ITs from m2e in Maven IT mode without having to set any additional properties. 
+                    // Make is easier to run ITs from m2e in Maven IT mode without having to set any additional
+                    // properties.
                     //
                     settingsFile = new File( "target/test-classes", settingsFile.getPath() );                    
                 }
@@ -479,25 +482,25 @@ public abstract class AbstractMavenIntegrationTestCase
         return verifier;
     }
 
-    static public void assertCanonicalFileEquals( String message, File expected, File actual )
+    public static void assertCanonicalFileEquals( String message, File expected, File actual )
         throws IOException
     {
         assertEquals( message, expected.getCanonicalFile(), actual.getCanonicalFile() );
     }
 
-    static public void assertCanonicalFileEquals( File expected, File actual )
+    public static void assertCanonicalFileEquals( File expected, File actual )
         throws IOException
     {
         assertCanonicalFileEquals( null, expected, actual );
     }
 
-    static public void assertCanonicalFileEquals( String message, String expected, String actual )
+    public static void assertCanonicalFileEquals( String message, String expected, String actual )
         throws IOException
     {
         assertCanonicalFileEquals( message, new File( expected ), new File( actual ) );
     }
 
-    static public void assertCanonicalFileEquals( String expected, String actual )
+    public static void assertCanonicalFileEquals( String expected, String actual )
         throws IOException
     {
         assertCanonicalFileEquals( null, new File( expected ), new File( actual ) );

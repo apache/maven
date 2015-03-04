@@ -47,7 +47,9 @@ public class PluginParamInterpolationMojo
         
         if ( !myDirectory.equals( value ) )
         {
-            throw new MojoExecutionException( "Directory supplied: " + myDirectory + " is not the same as the project build directory: " + project.getBuild().getDirectory() + " + '/foo'" );
+            throw new MojoExecutionException( "Directory supplied: " + myDirectory
+                + " is not the same as the project build directory: " + project.getBuild().getDirectory()
+                + " + '/foo'" );
         }
     }
 
