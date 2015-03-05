@@ -115,6 +115,7 @@ under the License.
 
     <!-- SLF4J -->
     <exportedPackage>org.slf4j.*</exportedPackage>
+    <exportedPackage>org.slf4j.spi.*</exportedPackage>
 
   </exportedPackages>
 
