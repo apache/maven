@@ -61,7 +61,7 @@ import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
 
 /**
- * @since 3.2.6
+ * @since 3.3.0
  */
 @Named
 public class DefaultRepositorySystemSessionFactory

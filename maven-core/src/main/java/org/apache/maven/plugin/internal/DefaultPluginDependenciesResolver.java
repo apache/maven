@@ -137,7 +137,7 @@ public class DefaultPluginDependenciesResolver
     }
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public DependencyNode resolveCoreExtension( Plugin plugin, DependencyFilter dependencyFilter,
                                                 List<RemoteRepository> repositories, RepositorySystemSession session )

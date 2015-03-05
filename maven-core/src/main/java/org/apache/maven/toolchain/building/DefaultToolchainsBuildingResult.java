@@ -29,7 +29,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * Holds the result of the merged toolchains and holds the problems during this build, if any.
  * 
  * @author Robert Scholte
- * @since 3.2.6
+ * @since 3.3.0
  */
 public class DefaultToolchainsBuildingResult
     implements ToolchainsBuildingResult

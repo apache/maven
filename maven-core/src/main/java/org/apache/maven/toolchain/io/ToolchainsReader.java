@@ -31,7 +31,7 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
  * Handles deserialization of toolchains from some kind of textual format like XML.
  *
  * @author Robert Scholte
- * @since 3.2.6
+ * @since 3.3.0
  */
 public interface ToolchainsReader
 {

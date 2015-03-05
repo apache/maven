@@ -28,7 +28,7 @@ import org.apache.maven.building.Problem;
 
 /**
  * @author Robert Scholte
- * @since 3.2.6
+ * @since 3.3.0
  */
 public class ToolchainsBuildingException
     extends Exception

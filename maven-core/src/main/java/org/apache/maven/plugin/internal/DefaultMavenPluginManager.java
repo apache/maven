@@ -125,7 +125,7 @@ public class DefaultMavenPluginManager
      * class realm is used to load build extensions and load mojos for extensions=true plugins.
      * 
      * @noreference this is part of internal implementation and may be changed or removed without notice
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public static final String KEY_EXTENSIONS_REALMS = DefaultMavenPluginManager.class.getName() + "/extensionsRealms";
 

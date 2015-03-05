@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * 
  * @author Robert Scholte
- * @since 3.2.6
+ * @since 3.3.0
  */
 public class ProblemCollectorFactory
 {

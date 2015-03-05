@@ -359,7 +359,7 @@ public interface MavenExecutionRequest
      * 
      * 
      * @return the global toolchains file
-     * @since 3.2.6
+     * @since 3.3.0
      */
     File getGlobalToolchainsFile();
 
@@ -367,7 +367,7 @@ public interface MavenExecutionRequest
      * 
      * @param globalToolchainsFile the global toolchains file
      * @return this request
-     * @since 3.2.6
+     * @since 3.3.0
      */
     MavenExecutionRequest setGlobalToolchainsFile( File globalToolchainsFile );
 
@@ -405,39 +405,39 @@ public interface MavenExecutionRequest
      * 
      * @param toolchains all toolchains grouped by type 
      * @return this request 
-     * @since 3.2.6
+     * @since 3.3.0
      */
     MavenExecutionRequest setToolchains( Map<String, List<ToolchainModel>> toolchains );
     
     /**
      * 
      * @return all toolchains grouped by type, never {@code null}
-     * @since 3.2.6
+     * @since 3.3.0
      */
     Map<String, List<ToolchainModel>> getToolchains();
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     void setMultiModuleProjectDirectory( File file );
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     File getMultiModuleProjectDirectory();
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */    
     MavenExecutionRequest setEventSpyDispatcher( EventSpyDispatcher eventSpyDispatcher );
     
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     EventSpyDispatcher getEventSpyDispatcher();
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     Map<String, Object> getData();
 }

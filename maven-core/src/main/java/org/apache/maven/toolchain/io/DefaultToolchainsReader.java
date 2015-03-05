@@ -38,7 +38,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
  * Handles deserialization of toolchains from the default textual format.
  *
  * @author Robert Scholte
- * @since 3.2.6
+ * @since 3.3.0
  */
 @Named
 @Singleton

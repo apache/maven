@@ -41,7 +41,7 @@ import org.apache.maven.toolchain.model.TrackableBase;
 /**
  * 
  * @author Robert Scholte
- * @since 3.2.6
+ * @since 3.3.0
  */
 @Named
 @Singleton

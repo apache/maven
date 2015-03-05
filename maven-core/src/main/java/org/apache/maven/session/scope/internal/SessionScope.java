@@ -35,7 +35,7 @@ public class SessionScope
     implements Scope
 {
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public static class Memento
     {
@@ -76,7 +76,7 @@ public class SessionScope
     }
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public void enter( Memento memento )
     {
@@ -109,7 +109,7 @@ public class SessionScope
     }
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public Memento memento()
     {

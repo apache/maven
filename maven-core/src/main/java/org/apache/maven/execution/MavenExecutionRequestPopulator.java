@@ -53,7 +53,7 @@ public interface MavenExecutionRequestPopulator
      * @param toolchains The toolchains to copy into the execution request, may be {@code null}.
      * @return The populated execution request, never {@code null}.
      * @throws MavenExecutionRequestPopulationException If the execution request could not be populated.
-     * @since 3.2.6
+     * @since 3.3.0
      */
     MavenExecutionRequest populateFromToolchains( MavenExecutionRequest request, PersistedToolchains toolchains )
         throws MavenExecutionRequestPopulationException;

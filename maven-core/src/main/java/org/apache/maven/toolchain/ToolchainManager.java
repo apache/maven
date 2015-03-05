@@ -58,7 +58,7 @@ public interface ToolchainManager
      * @param type the type, must not be {@code null}
      * @param requirements the requirements, may be {@code null}
      * @return the matching toolchains, never {@code null}
-     * @since 3.2.6
+     * @since 3.3.0
      */
     List<Toolchain> getToolchains( MavenSession session, String type, Map<String, String> requirements );
 }

@@ -74,7 +74,7 @@ public class ReactorContext
     }
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public SessionScope.Memento getSessionScopeMemento()
     {

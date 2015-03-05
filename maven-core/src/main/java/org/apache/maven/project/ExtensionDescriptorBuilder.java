@@ -44,7 +44,7 @@ public class ExtensionDescriptorBuilder
 {
 
     /**
-     * @since 3.2.6 
+     * @since 3.3.0 
      */
     public String getExtensionDescriptorLocation()
     {
@@ -111,7 +111,7 @@ public class ExtensionDescriptorBuilder
     }
 
     /**
-     * @since 3.2.6
+     * @since 3.3.0
      */
     public ExtensionDescriptor build( InputStream is )
         throws IOException
