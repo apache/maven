@@ -134,23 +134,10 @@
         <artifactId>modello-maven-plugin</artifactId>
         <configuration>
           <version>1.0.0</version>
+          <models>
+            <model>src/main/mdo/core-extensions.mdo</model>
+          </models>
         </configuration>
-        <executions>
-          <execution>
-            <id>standard</id>
-            <configuration>
-              <models>
-                <model>src/main/mdo/core-extensions.mdo</model>
-              </models>
-            </configuration>
-          </execution>
-          <execution>
-            <id>site-docs</id>
-            <configuration>
-              <models/>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
