@@ -213,7 +213,7 @@ public class MavenCli
         final Set<String> realms;
         if ( classWorld != null )
         {
-            realms = new HashSet<String>();
+            realms = new HashSet<>();
             for ( ClassRealm realm : classWorld.getRealms() )
             {
                 realms.add( realm.getId() );
@@ -244,7 +244,7 @@ public class MavenCli
         {
             if ( classWorld != null )
             {
-                for ( ClassRealm realm : new ArrayList<ClassRealm>( classWorld.getRealms() ) )
+                for ( ClassRealm realm : new ArrayList<>( classWorld.getRealms() ) )
                 {
                     String realmId = realm.getId();
                     if ( !realms.contains( realmId ) )
@@ -366,7 +366,7 @@ public class MavenCli
 
         CLIManager cliManager = new CLIManager();
 
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         try
         {
@@ -529,8 +529,8 @@ public class MavenCli
             .setAutoWiring( true )
             .setName( "maven" );
 
-        Set<String> exportedArtifacts = new HashSet<String>( coreEntry.getExportedArtifacts() );
-        Set<String> exportedPackages = new HashSet<String>( coreEntry.getExportedPackages() );
+        Set<String> exportedArtifacts = new HashSet<>( coreEntry.getExportedArtifacts() );
+        Set<String> exportedPackages = new HashSet<>( coreEntry.getExportedPackages() );
         for ( CoreExtensionEntry extension : extensions )
         {
             exportedArtifacts.addAll( extension.getExportedArtifacts() );
@@ -734,7 +734,7 @@ public class MavenCli
 
     private static <T> List<T> reverse( List<T> list )
     {
-        List<T> copy = new ArrayList<T>( list );
+        List<T> copy = new ArrayList<>( list );
         Collections.reverse( copy );
         return copy;
     }
@@ -747,7 +747,7 @@ public class MavenCli
             extClassPath = cliRequest.systemProperties.getProperty( EXT_CLASS_PATH );
         }
 
-        List<File> jars = new ArrayList<File>();
+        List<File> jars = new ArrayList<>();
 
         if ( StringUtils.isNotEmpty( extClassPath ) )
         {
@@ -869,7 +869,7 @@ public class MavenCli
         {
             ExceptionHandler handler = new DefaultExceptionHandler();
 
-            Map<String, String> references = new LinkedHashMap<String, String>();
+            Map<String, String> references = new LinkedHashMap<>();
 
             MavenProject project = null;
 
@@ -1035,7 +1035,7 @@ public class MavenCli
             //
             // There are too many ConfigurationProcessors so we don't know which one to run so report the error.
             //
-            StringBuffer sb = new StringBuffer( 
+            StringBuilder sb = new StringBuilder(
                 String.format( "\nThere can only be one user supplied ConfigurationProcessor, there are %s:\n\n", 
                                userSuppliedConfigurationProcessorCount ) );
             for ( Entry<String, ConfigurationProcessor> entry : configurationProcessors.entrySet() )
@@ -1241,9 +1241,9 @@ public class MavenCli
         // Profile Activation
         // ----------------------------------------------------------------------
 
-        List<String> activeProfiles = new ArrayList<String>();
+        List<String> activeProfiles = new ArrayList<>();
 
-        List<String> inactiveProfiles = new ArrayList<String>();
+        List<String> inactiveProfiles = new ArrayList<>();
 
         if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
         {
@@ -1366,8 +1366,8 @@ public class MavenCli
         {
             String[] projectOptionValues = commandLine.getOptionValues( CLIManager.PROJECT_LIST );
 
-            List<String> inclProjects = new ArrayList<String>();
-            List<String> exclProjects = new ArrayList<String>();
+            List<String> inclProjects = new ArrayList<>();
+            List<String> exclProjects = new ArrayList<>();
 
             if ( projectOptionValues != null )
             {

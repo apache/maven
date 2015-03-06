@@ -34,7 +34,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class DelegatingMojoExecutionListener
     implements MojoExecutionListener
 {
-    private final List<MojoExecutionListener> listeners = new CopyOnWriteArrayList<MojoExecutionListener>();
+    private final List<MojoExecutionListener> listeners = new CopyOnWriteArrayList<>();
 
     public void beforeMojoExecution( MojoExecutionEvent event )
         throws MojoExecutionException

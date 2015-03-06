@@ -101,7 +101,7 @@ public class DefaultRepositorySystemSessionFactory
 
         session.setCache( request.getRepositoryCache() );
 
-        Map<Object, Object> configProps = new LinkedHashMap<Object, Object>();
+        Map<Object, Object> configProps = new LinkedHashMap<>();
         configProps.put( ConfigurationProperties.USER_AGENT, getUserAgent() );
         configProps.put( ConfigurationProperties.INTERACTIVE, request.isInteractiveMode() );
         configProps.putAll( request.getSystemProperties() );

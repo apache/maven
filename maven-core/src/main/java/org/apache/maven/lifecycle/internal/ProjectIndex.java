@@ -45,8 +45,8 @@ public final class ProjectIndex
 
     public ProjectIndex( List<MavenProject> projects )
     {
-        this.projects = new HashMap<String, MavenProject>( projects.size() * 2 );
-        this.indices = new HashMap<String, Integer>( projects.size() * 2 );
+        this.projects = new HashMap<>( projects.size() * 2 );
+        this.indices = new HashMap<>( projects.size() * 2 );
 
         for ( int i = 0; i < projects.size(); i++ )
         {

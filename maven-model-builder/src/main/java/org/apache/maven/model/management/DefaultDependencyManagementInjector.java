@@ -60,7 +60,7 @@ public class DefaultDependencyManagementInjector
             DependencyManagement dependencyManagement = model.getDependencyManagement();
             if ( dependencyManagement != null )
             {
-                Map<Object, Dependency> dependencies = new HashMap<Object, Dependency>();
+                Map<Object, Dependency> dependencies = new HashMap<>();
                 Map<Object, Object> context = Collections.emptyMap();
 
                 for ( Dependency dependency : model.getDependencies() )

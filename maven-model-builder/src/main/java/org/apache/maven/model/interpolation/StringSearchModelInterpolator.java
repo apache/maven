@@ -50,7 +50,7 @@ public class StringSearchModelInterpolator
 {
 
     private static final Map<Class<?>, InterpolateObjectAction.CacheItem> CACHED_ENTRIES =
-        new ConcurrentHashMap<Class<?>, InterpolateObjectAction.CacheItem>( 80, 0.75f, 2 );
+        new ConcurrentHashMap<>( 80, 0.75f, 2 );
     // Empirical data from 3.x, actual =40
 
 
@@ -114,7 +114,7 @@ public class StringSearchModelInterpolator
             this.valueSources = valueSources;
             this.postProcessors = postProcessors;
 
-            this.interpolationTargets = new LinkedList<Object>();
+            this.interpolationTargets = new LinkedList<>();
             interpolationTargets.add( target );
 
             this.modelInterpolator = modelInterpolator;
@@ -231,7 +231,7 @@ public class StringSearchModelInterpolator
             {
                 this.isQualifiedForInterpolation = isQualifiedForInterpolation( clazz );
                 this.isArray = clazz.isArray();
-                List<CacheField> fields = new ArrayList<CacheField>();
+                List<CacheField> fields = new ArrayList<>();
                 for ( Field currentField : clazz.getDeclaredFields() )
                 {
                     Class<?> type = currentField.getType();

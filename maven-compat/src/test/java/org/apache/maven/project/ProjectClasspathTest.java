@@ -20,7 +20,6 @@ package org.apache.maven.project;
  */
 
 import java.io.File;
-import java.util.Iterator;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.repository.RepositorySystem;

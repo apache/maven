@@ -50,13 +50,13 @@ public class DefaultProfileManager
     @Requirement
     private ProfileSelector profileSelector;
 
-    private List activatedIds = new ArrayList();
+    private List<String> activatedIds = new ArrayList<>();
 
-    private List deactivatedIds = new ArrayList();
+    private List<String> deactivatedIds = new ArrayList<>();
 
-    private List defaultIds = new ArrayList();
+    private List<String> defaultIds = new ArrayList<>();
 
-    private Map profilesById = new LinkedHashMap();
+    private Map<String, Profile> profilesById = new LinkedHashMap<>();
 
     private Properties requestProperties;
 
@@ -105,7 +105,7 @@ public class DefaultProfileManager
     {
         String profileId = profile.getId();
 
-        Profile existing = (Profile) profilesById.get( profileId );
+        Profile existing = profilesById.get( profileId );
         if ( existing != null )
         {
             logger.warn( "Overriding profile: \'" + profileId + "\' (source: " + existing.getSource()
@@ -186,7 +186,7 @@ public class DefaultProfileManager
         context.setSystemProperties( System.getProperties() );
         context.setUserProperties( requestProperties );
 
-        final List<ProfileActivationException> errors = new ArrayList<ProfileActivationException>();
+        final List<ProfileActivationException> errors = new ArrayList<>();
 
         List<Profile> profiles =
             profileSelector.getActiveProfiles( profilesById.values(), context, new ModelProblemCollector()
@@ -230,12 +230,12 @@ public class DefaultProfileManager
         }
     }
 
-    public List getExplicitlyActivatedIds()
+    public List<String> getExplicitlyActivatedIds()
     {
         return activatedIds;
     }
 
-    public List getExplicitlyDeactivatedIds()
+    public List<String>  getExplicitlyDeactivatedIds()
     {
         return deactivatedIds;
     }

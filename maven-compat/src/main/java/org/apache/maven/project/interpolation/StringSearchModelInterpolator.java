@@ -47,8 +47,8 @@ public class StringSearchModelInterpolator
     extends AbstractStringBasedModelInterpolator
 {
 
-    private static final Map<Class<?>, Field[]> fieldsByClass = new WeakHashMap<Class<?>, Field[]>();
-    private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass = new WeakHashMap<Class<?>, Boolean>();
+    private static final Map<Class<?>, Field[]> fieldsByClass = new WeakHashMap<>();
+    private static final Map<Class<?>, Boolean> fieldIsPrimitiveByClass = new WeakHashMap<>();
 
     public StringSearchModelInterpolator()
     {
@@ -119,7 +119,7 @@ public class StringSearchModelInterpolator
             this.postProcessors = postProcessors;
             this.debugEnabled = debugEnabled;
 
-            this.interpolationTargets = new LinkedList<Object>();
+            this.interpolationTargets = new LinkedList<>();
             interpolationTargets.add( target );
 
             this.modelInterpolator = modelInterpolator;
@@ -199,7 +199,7 @@ public class StringSearchModelInterpolator
                                     Collection<Object> c = (Collection<Object>) field.get( target );
                                     if ( c != null && !c.isEmpty() )
                                     {
-                                        List<Object> originalValues = new ArrayList<Object>( c );
+                                        List<Object> originalValues = new ArrayList<>( c );
                                         try
                                         {
                                             c.clear();
@@ -326,12 +326,7 @@ public class StringSearchModelInterpolator
                                     }
                                 }
                             }
-                            catch ( IllegalArgumentException e )
-                            {
-                                throw new ModelInterpolationException(
-                                    "Failed to interpolate field: " + field + " on class: " + cls.getName(), e );
-                            }
-                            catch ( IllegalAccessException e )
+                            catch ( IllegalArgumentException | IllegalAccessException e )
                             {
                                 throw new ModelInterpolationException(
                                     "Failed to interpolate field: " + field + " on class: " + cls.getName(), e );

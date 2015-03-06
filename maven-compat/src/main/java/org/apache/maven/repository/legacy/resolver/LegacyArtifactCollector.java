@@ -42,19 +42,19 @@ import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 public interface LegacyArtifactCollector
 {
 
-    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions,
+    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map<String, Artifact> managedVersions,
                                       ArtifactResolutionRequest repositoryRequest, ArtifactMetadataSource source,
                                       ArtifactFilter filter, List<ResolutionListener> listeners,
                                       List<ConflictResolver> conflictResolvers );
 
-    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions,
+    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map<String, Artifact> managedVersions,
                                       ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                       ArtifactMetadataSource source, ArtifactFilter filter,
                                       List<ResolutionListener> listeners, List<ConflictResolver> conflictResolvers );
 
     // used by maven-dependency-tree and maven-dependency-plugin
     @Deprecated
-    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map managedVersions,
+    ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact, Map<String, Artifact> managedVersions,
                                       ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories,
                                       ArtifactMetadataSource source, ArtifactFilter filter,
                                       List<ResolutionListener> listeners );

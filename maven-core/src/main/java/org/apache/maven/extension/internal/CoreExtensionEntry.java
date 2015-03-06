@@ -84,8 +84,8 @@ public class CoreExtensionEntry
 
     public static CoreExtensionEntry discoverFrom( ClassRealm loader )
     {
-        Set<String> artifacts = new LinkedHashSet<String>();
-        Set<String> packages = new LinkedHashSet<String>();
+        Set<String> artifacts = new LinkedHashSet<>();
+        Set<String> packages = new LinkedHashSet<>();
 
         try
         {
@@ -115,8 +115,8 @@ public class CoreExtensionEntry
 
     public static CoreExtensionEntry discoverFrom( ClassRealm loader, Collection<File> classpath )
     {
-        Set<String> artifacts = new LinkedHashSet<String>();
-        Set<String> packages = new LinkedHashSet<String>();
+        Set<String> artifacts = new LinkedHashSet<>();
+        Set<String> packages = new LinkedHashSet<>();
 
         try
         {

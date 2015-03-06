@@ -19,23 +19,13 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
-import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.SyncContext;
@@ -63,6 +53,15 @@ import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
@@ -181,7 +180,7 @@ public class DefaultVersionRangeResolver
         {
             Map<String, ArtifactRepository> versionIndex = getVersions( session, result, request );
 
-            List<Version> versions = new ArrayList<Version>();
+            List<Version> versions = new ArrayList<>();
             for ( Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet() )
             {
                 try
@@ -211,13 +210,13 @@ public class DefaultVersionRangeResolver
     {
         RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
-        Map<String, ArtifactRepository> versionIndex = new HashMap<String, ArtifactRepository>();
+        Map<String, ArtifactRepository> versionIndex = new HashMap<>();
 
         Metadata metadata =
             new DefaultMetadata( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
                                  MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
 
-        List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
+        List<MetadataRequest> metadataRequests = new ArrayList<>( request.getRepositories().size() );
 
         metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
 
@@ -274,9 +273,8 @@ public class DefaultVersionRangeResolver
         {
             if ( metadata != null )
             {
-                SyncContext syncContext = syncContextFactory.newInstance( session, true );
 
-                try
+                try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
                 {
                     syncContext.acquire( null, Collections.singleton( metadata ) );
 
@@ -287,10 +285,6 @@ public class DefaultVersionRangeResolver
                             new MetadataXpp3Reader().read( fis, false );
                         versioning = m.getVersioning();
                     }
-                }
-                finally
-                {
-                    syncContext.close();
                 }
             }
         }

@@ -129,7 +129,7 @@ public class LifecycleDependencyResolver
 
             project.setResolvedArtifacts( artifacts );
 
-            Map<String, Artifact> map = new HashMap<String, Artifact>();
+            Map<String, Artifact> map = new HashMap<>();
             for ( Artifact artifact : artifacts )
             {
                 map.put( artifact.getDependencyConflictId(), artifact );
@@ -171,10 +171,10 @@ public class LifecycleDependencyResolver
 
         if ( scopesToCollect.isEmpty() && scopesToResolve.isEmpty() )
         {
-            return new LinkedHashSet<Artifact>();
+            return new LinkedHashSet<>();
         }
 
-        scopesToCollect = new HashSet<String>( scopesToCollect );
+        scopesToCollect = new HashSet<>( scopesToCollect );
         scopesToCollect.addAll( scopesToResolve );
 
         DependencyFilter collectionFilter = new ScopeDependencyFilter( null, negate( scopesToCollect ) );
@@ -224,7 +224,7 @@ public class LifecycleDependencyResolver
 
         eventSpyDispatcher.onEvent( result );
 
-        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+        Set<Artifact> artifacts = new LinkedHashSet<>();
         if ( result.getDependencyGraph() != null && !result.getDependencyGraph().getChildren().isEmpty() )
         {
             RepositoryUtils.toArtifacts( artifacts, result.getDependencyGraph().getChildren(),
@@ -253,7 +253,7 @@ public class LifecycleDependencyResolver
 
     private Set<String> getReactorProjectKeys( Collection<MavenProject> projects )
     {
-        Set<String> projectKeys = new HashSet<String>( projects.size() * 2 );
+        Set<String> projectKeys = new HashSet<>( projects.size() * 2 );
         for ( MavenProject project : projects )
         {
             String key = ArtifactUtils.key( project.getGroupId(), project.getArtifactId(), project.getVersion() );
@@ -264,7 +264,7 @@ public class LifecycleDependencyResolver
 
     private Collection<String> negate( Collection<String> scopes )
     {
-        Collection<String> result = new HashSet<String>();
+        Collection<String> result = new HashSet<>();
         Collections.addAll( result, "system", "compile", "provided", "runtime", "test" );
 
         for ( String scope : scopes )
@@ -306,7 +306,7 @@ public class LifecycleDependencyResolver
         implements DependencyFilter
     {
 
-        private Set<String> keys = new HashSet<String>();
+        private Set<String> keys = new HashSet<>();
 
         public ReactorDependencyFilter( Collection<Artifact> artifacts )
         {

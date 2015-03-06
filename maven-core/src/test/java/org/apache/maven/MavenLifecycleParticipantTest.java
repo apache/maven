@@ -115,7 +115,7 @@ public class MavenLifecycleParticipantTest
         PlexusContainer container = getContainer();
 
         ComponentDescriptor<? extends AbstractMavenLifecycleParticipant> cd =
-            new ComponentDescriptor<InjectDependencyLifecycleListener>( InjectDependencyLifecycleListener.class,
+            new ComponentDescriptor<>( InjectDependencyLifecycleListener.class,
                                                                         container.getContainerRealm() );
         cd.setRoleClass( AbstractMavenLifecycleParticipant.class );
         container.addComponentDescriptor( cd );
@@ -132,7 +132,7 @@ public class MavenLifecycleParticipantTest
 
         assertEquals( "bar", project.getProperties().getProperty( "foo" ) );
 
-        ArrayList<Artifact> artifacts = new ArrayList<Artifact>( project.getArtifacts() );
+        ArrayList<Artifact> artifacts = new ArrayList<>( project.getArtifacts() );
 
         assertEquals( 1, artifacts.size() );
         assertEquals( INJECTED_ARTIFACT_ID, artifacts.get( 0 ).getArtifactId() );
@@ -151,7 +151,7 @@ public class MavenLifecycleParticipantTest
     {
         PlexusContainer container = getContainer();
 
-        ComponentDescriptor<T> cd = new ComponentDescriptor<T>( participant, container.getContainerRealm() );
+        ComponentDescriptor<T> cd = new ComponentDescriptor<>( participant, container.getContainerRealm() );
         cd.setRoleClass( AbstractMavenLifecycleParticipant.class );
         container.addComponentDescriptor( cd );
 
@@ -163,7 +163,7 @@ public class MavenLifecycleParticipantTest
 
         assertFalse( result.getExceptions().toString(), result.hasExceptions() );
 
-        List<String> order = new ArrayList<String>();
+        List<String> order = new ArrayList<>();
         for ( MavenProject project : result.getTopologicallySortedProjects() )
         {
             order.add( project.getArtifactId() );

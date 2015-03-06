@@ -68,11 +68,7 @@ public abstract class AbstractRepositoryMetadata
         {
             updateRepositoryMetadata( localRepository, remoteRepository );
         }
-        catch ( IOException e )
-        {
-            throw new RepositoryMetadataStoreException( "Error updating group repository metadata", e );
-        }
-        catch ( XmlPullParserException e )
+        catch ( IOException | XmlPullParserException e )
         {
             throw new RepositoryMetadataStoreException( "Error updating group repository metadata", e );
         }

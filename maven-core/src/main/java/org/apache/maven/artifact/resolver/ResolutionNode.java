@@ -64,7 +64,7 @@ public class ResolutionNode
         this.artifact = artifact;
         this.remoteRepositories = remoteRepositories;
         depth = parent.depth + 1;
-        parents = new ArrayList<Object>();
+        parents = new ArrayList<>();
         parents.addAll( parent.parents );
         parents.add( parent.getKey() );
         this.parent = parent;
@@ -86,7 +86,7 @@ public class ResolutionNode
     {
         if ( artifacts != null && !artifacts.isEmpty() )
         {
-            children = new ArrayList<ResolutionNode>( artifacts.size() );
+            children = new ArrayList<>( artifacts.size() );
 
             for ( Artifact a : artifacts )
             {
@@ -116,7 +116,7 @@ public class ResolutionNode
     {
         List<Artifact> trial = getTrail();
 
-        List<String> ret = new ArrayList<String>( trial.size() );
+        List<String> ret = new ArrayList<>( trial.size() );
 
         for ( Artifact artifact : trial )
         {
@@ -131,7 +131,7 @@ public class ResolutionNode
     {
         if ( trail == null )
         {
-            List<Artifact> ids = new LinkedList<Artifact>();
+            List<Artifact> ids = new LinkedList<>();
             ResolutionNode node = this;
             while ( node != null )
             {

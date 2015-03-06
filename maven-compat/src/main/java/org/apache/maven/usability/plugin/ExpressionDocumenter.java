@@ -43,14 +43,14 @@ public class ExpressionDocumenter
 
     private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
 
-    private static Map expressionDocumentation;
+    private static Map<String, Expression> expressionDocumentation;
 
     public static Map load()
         throws ExpressionDocumentationException
     {
         if ( expressionDocumentation == null )
         {
-            expressionDocumentation = new HashMap();
+            expressionDocumentation = new HashMap<>();
 
             ClassLoader docLoader = initializeDocLoader();
 
@@ -64,7 +64,7 @@ public class ExpressionDocumenter
 
                     if ( docStream != null )
                     {
-                        Map doco = parseExpressionDocumentation( docStream );
+                        Map<String, Expression> doco = parseExpressionDocumentation( docStream );
 
                         expressionDocumentation.putAll( doco );
                     }
@@ -114,7 +114,7 @@ public class ExpressionDocumenter
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static Map parseExpressionDocumentation( InputStream docStream )
+    private static Map<String, Expression> parseExpressionDocumentation( InputStream docStream )
         throws IOException, XmlPullParserException
     {
         Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
@@ -125,7 +125,7 @@ public class ExpressionDocumenter
 
         List expressions = documentation.getExpressions();
 
-        Map bySyntax = new HashMap();
+        Map<String, Expression> bySyntax = new HashMap<>();
 
         if ( expressions != null && !expressions.isEmpty() )
         {

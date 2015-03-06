@@ -83,7 +83,7 @@ public class DefaultResolutionErrorHandler
 
     private static <T> List<T> toList( Collection<T> items )
     {
-        return ( items != null ) ? new ArrayList<T>( items ) : null;
+        return ( items != null ) ? new ArrayList<>( items ) : null;
     }
 
 }

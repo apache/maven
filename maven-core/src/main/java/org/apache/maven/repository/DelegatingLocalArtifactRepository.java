@@ -90,7 +90,7 @@ public class DelegatingLocalArtifactRepository
     @Override
     public List<String> findVersions( Artifact artifact )
     {
-        Collection<String> versions = new LinkedHashSet<String>();
+        Collection<String> versions = new LinkedHashSet<>();
 
         if ( buildReactor != null )
         {
@@ -104,7 +104,7 @@ public class DelegatingLocalArtifactRepository
 
         versions.addAll( userLocalArtifactRepository.findVersions( artifact ) );
 
-        return Collections.unmodifiableList( new ArrayList<String>( versions ) );
+        return Collections.unmodifiableList( new ArrayList<>( versions ) );
     }
 
     public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )

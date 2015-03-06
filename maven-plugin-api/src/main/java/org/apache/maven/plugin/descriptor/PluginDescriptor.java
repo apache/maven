@@ -389,7 +389,7 @@ public class PluginDescriptor
                 IOUtil.close( reader );
             }
 
-            lifecycleMappings = new HashMap<String, Lifecycle>();
+            lifecycleMappings = new HashMap<>();
 
             for ( Lifecycle lifecycle : lifecycleConfiguration.getLifecycles() )
             {

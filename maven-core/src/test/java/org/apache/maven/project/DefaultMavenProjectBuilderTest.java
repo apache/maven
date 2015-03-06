@@ -21,7 +21,6 @@ package org.apache.maven.project;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -33,7 +32,7 @@ public class DefaultMavenProjectBuilderTest
     extends AbstractMavenProjectTestCase
 {
 
-    private List<File> filesToDelete = new ArrayList<File>();
+    private List<File> filesToDelete = new ArrayList<>();
 
     private File localRepoDir;
 

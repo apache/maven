@@ -150,7 +150,7 @@ public class LifecycleExecutorTest
 
     List<MojoExecution> getExecutions( MavenExecutionPlan mavenExecutionPlan )
     {
-        List<MojoExecution> result = new ArrayList<MojoExecution>();
+        List<MojoExecution> result = new ArrayList<>();
         for ( ExecutionPlanItem executionPlanItem : mavenExecutionPlan )
         {
             result.add( executionPlanItem.getMojoExecution() );
@@ -285,7 +285,7 @@ public class LifecycleExecutorTest
         throws Exception
     {
         List<Plugin> plugins =
-            new ArrayList<Plugin>( lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles( "jar" ) );
+            new ArrayList<>( lifecycleExecutor.getPluginsBoundByDefaultToAllLifecycles( "jar" ) );
 
         assertEquals( 8, plugins.size() );
     }
@@ -416,7 +416,7 @@ public class LifecycleExecutorTest
             }
         } );
 
-        final List<String> log = new ArrayList<String>();
+        final List<String> log = new ArrayList<>();
 
         MojoExecutionListener mojoListener = new MojoExecutionListener()
         {

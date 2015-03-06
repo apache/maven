@@ -55,8 +55,8 @@ class VersionsMetadataGenerator
 
     private VersionsMetadataGenerator( RepositorySystemSession session, Collection<? extends Metadata> metadatas )
     {
-        versions = new LinkedHashMap<Object, VersionsMetadata>();
-        processedVersions = new LinkedHashMap<Object, VersionsMetadata>();
+        versions = new LinkedHashMap<>();
+        processedVersions = new LinkedHashMap<>();
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

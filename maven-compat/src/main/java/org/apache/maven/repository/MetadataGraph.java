@@ -45,7 +45,7 @@ public class MetadataGraph
 
     public MetadataGraph()
     {
-        nodes = new ArrayList<MetadataGraphNode>( 64 );
+        nodes = new ArrayList<>( 64 );
     }
 
     public void addNode( MetadataGraphNode node )

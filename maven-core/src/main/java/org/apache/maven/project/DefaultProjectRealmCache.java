@@ -84,7 +84,7 @@ public class DefaultProjectRealmCache
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
+    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
     @Override
     public Key createKey( List<? extends ClassRealm> extensionRealms )

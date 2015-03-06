@@ -50,7 +50,7 @@ public class DefaultLifecyclesStub
         @SuppressWarnings( "unchecked" )
         Iterator<List<String>> lcs = Arrays.asList( stubDefaultCycle, stubCleanCycle, stubSiteCycle ).iterator();
 
-        Map<String, Lifecycle> lifeCycles = new HashMap<String, Lifecycle>();
+        Map<String, Lifecycle> lifeCycles = new HashMap<>();
         for ( String s : DefaultLifecycles.STANDARD_LIFECYCLES )
         {
             final Lifecycle lifecycle = new Lifecycle( s, lcs.next(), null );

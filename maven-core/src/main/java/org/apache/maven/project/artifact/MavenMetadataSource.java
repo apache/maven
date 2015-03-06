@@ -215,11 +215,11 @@ public class MavenMetadataSource
             }
         }
 
-        Set<Artifact> artifacts = Collections.<Artifact>emptySet();
+        Set<Artifact> artifacts = Collections.emptySet();
 
         if ( !artifact.getArtifactHandler().isIncludesDependencies() )
         {
-            artifacts = new LinkedHashSet<Artifact>();
+            artifacts = new LinkedHashSet<>();
 
             for ( Dependency dependency : dependencies )
             {
@@ -236,7 +236,7 @@ public class MavenMetadataSource
 
         if ( managedDependencies != null && request.isResolveManagedVersions() )
         {
-            managedVersions = new HashMap<String, Artifact>();
+            managedVersions = new HashMap<>();
 
             for ( Dependency managedDependency : managedDependencies )
             {
@@ -270,7 +270,7 @@ public class MavenMetadataSource
 
         if ( pomRepositories != null && !pomRepositories.isEmpty() )
         {
-            Map<String, ArtifactRepository> repos = new LinkedHashMap<String, ArtifactRepository>();
+            Map<String, ArtifactRepository> repos = new LinkedHashMap<>();
 
             for ( ArtifactRepository repo : requestRepositories )
             {
@@ -288,7 +288,7 @@ public class MavenMetadataSource
                 }
             }
 
-            repositories = new ArrayList<ArtifactRepository>( repos.values() );
+            repositories = new ArrayList<>( repos.values() );
         }
 
         return repositories;
@@ -394,7 +394,7 @@ public class MavenMetadataSource
 
         if ( !dependency.getExclusions().isEmpty() )
         {
-            List<String> exclusions = new ArrayList<String>();
+            List<String> exclusions = new ArrayList<>();
 
             for ( Exclusion e : dependency.getExclusions() )
             {
@@ -467,7 +467,7 @@ public class MavenMetadataSource
     private List<ArtifactVersion> retrieveAvailableVersionsFromMetadata( Metadata repoMetadata,
                                                                          List<String> availableVersions )
     {
-        Collection<String> versions = new LinkedHashSet<String>();
+        Collection<String> versions = new LinkedHashSet<>();
 
         if ( ( repoMetadata != null ) && ( repoMetadata.getVersioning() != null ) )
         {
@@ -476,7 +476,7 @@ public class MavenMetadataSource
 
         versions.addAll( availableVersions );
 
-        List<ArtifactVersion> artifactVersions = new ArrayList<ArtifactVersion>( versions.size() );
+        List<ArtifactVersion> artifactVersions = new ArrayList<>( versions.size() );
 
         for ( String version : versions )
         {
@@ -493,7 +493,7 @@ public class MavenMetadataSource
                                                  MavenProject project )
         throws InvalidDependencyVersionException
     {
-        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+        Set<Artifact> artifacts = new LinkedHashSet<>();
 
         for ( Dependency d : dependencies )
         {

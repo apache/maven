@@ -60,7 +60,7 @@ public class DefaultArtifactFilterManager
     {
         if ( excludedArtifacts == null )
         {
-            excludedArtifacts = new LinkedHashSet<String>( coreArtifacts );
+            excludedArtifacts = new LinkedHashSet<>( coreArtifacts );
         }
         return excludedArtifacts;
     }
@@ -72,7 +72,7 @@ public class DefaultArtifactFilterManager
      */
     public ArtifactFilter getArtifactFilter()
     {
-        Set<String> excludes = new LinkedHashSet<String>( getExcludedArtifacts() );
+        Set<String> excludes = new LinkedHashSet<>( getExcludedArtifacts() );
 
         for ( ArtifactFilterManagerDelegate delegate : delegates )
         {
@@ -99,7 +99,7 @@ public class DefaultArtifactFilterManager
 
     public Set<String> getCoreArtifactExcludes()
     {
-        Set<String> excludes = new LinkedHashSet<String>( coreArtifacts );
+        Set<String> excludes = new LinkedHashSet<>( coreArtifacts );
 
         for ( ArtifactFilterManagerDelegate delegate : delegates )
         {

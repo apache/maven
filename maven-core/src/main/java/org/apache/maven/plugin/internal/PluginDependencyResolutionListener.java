@@ -46,11 +46,11 @@ class PluginDependencyResolutionListener
 
     private ArtifactFilter coreFilter;
 
-    private LinkedList<Artifact> coreArtifacts = new LinkedList<Artifact>();
+    private LinkedList<Artifact> coreArtifacts = new LinkedList<>();
 
     private Artifact wagonProvider;
 
-    private Map<Artifact, Object> bannedArtifacts = new IdentityHashMap<Artifact, Object>();
+    private Map<Artifact, Object> bannedArtifacts = new IdentityHashMap<>();
 
     public PluginDependencyResolutionListener( ArtifactFilter coreFilter )
     {

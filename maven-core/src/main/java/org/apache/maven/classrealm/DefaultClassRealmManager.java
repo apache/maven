@@ -156,9 +156,9 @@ public class DefaultClassRealmManager
     private ClassRealm createRealm( String baseRealmId, RealmType type, ClassLoader parent, List<String> parentImports,
                                     Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
     {
-        Set<String> artifactIds = new LinkedHashSet<String>();
+        Set<String> artifactIds = new LinkedHashSet<>();
 
-        List<ClassRealmConstituent> constituents = new ArrayList<ClassRealmConstituent>();
+        List<ClassRealmConstituent> constituents = new ArrayList<>();
 
         if ( artifacts != null )
         {
@@ -177,20 +177,20 @@ public class DefaultClassRealmManager
 
         if ( parentImports != null )
         {
-            parentImports = new ArrayList<String>( parentImports );
+            parentImports = new ArrayList<>( parentImports );
         }
         else
         {
-            parentImports = new ArrayList<String>();
+            parentImports = new ArrayList<>();
         }
 
         if ( foreignImports != null )
         {
-            foreignImports = new TreeMap<String, ClassLoader>( foreignImports );
+            foreignImports = new TreeMap<>( foreignImports );
         }
         else
         {
-            foreignImports = new TreeMap<String, ClassLoader>();
+            foreignImports = new TreeMap<>();
         }
 
         ClassRealm classRealm = newRealm( baseRealmId );
@@ -305,7 +305,7 @@ public class DefaultClassRealmManager
     private void callDelegates( ClassRealm classRealm, RealmType type, ClassLoader parent, List<String> parentImports,
                                 Map<String, ClassLoader> foreignImports, List<ClassRealmConstituent> constituents )
     {
-        List<ClassRealmManagerDelegate> delegates = new ArrayList<ClassRealmManagerDelegate>( this.delegates );
+        List<ClassRealmManagerDelegate> delegates = new ArrayList<>( this.delegates );
 
         if ( !delegates.isEmpty() )
         {
@@ -329,7 +329,7 @@ public class DefaultClassRealmManager
 
     private Set<String> populateRealm( ClassRealm classRealm, List<ClassRealmConstituent> constituents )
     {
-        Set<String> includedIds = new LinkedHashSet<String>();
+        Set<String> includedIds = new LinkedHashSet<>();
 
         if ( logger.isDebugEnabled() )
         {

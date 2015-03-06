@@ -47,9 +47,9 @@ public interface ProfileManager
 
     Map getProfilesById();
 
-    List getExplicitlyActivatedIds();
+    List<String> getExplicitlyActivatedIds();
 
-    List getExplicitlyDeactivatedIds();
+    List<String> getExplicitlyDeactivatedIds();
 
     List getIdsActivatedByDefault();
 

@@ -33,7 +33,7 @@ import org.apache.maven.execution.ProjectExecutionListener;
 public class DelegatingProjectExecutionListener
     implements ProjectExecutionListener
 {
-    private final List<ProjectExecutionListener> listeners = new CopyOnWriteArrayList<ProjectExecutionListener>();
+    private final List<ProjectExecutionListener> listeners = new CopyOnWriteArrayList<>();
 
     public void beforeProjectExecution( ProjectExecutionEvent event )
         throws LifecycleExecutionException

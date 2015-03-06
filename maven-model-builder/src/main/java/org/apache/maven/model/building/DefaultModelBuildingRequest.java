@@ -196,7 +196,7 @@ public class DefaultModelBuildingRequest
     {
         if ( profiles == null )
         {
-            profiles = new ArrayList<Profile>();
+            profiles = new ArrayList<>();
         }
 
         return profiles;
@@ -207,7 +207,7 @@ public class DefaultModelBuildingRequest
     {
         if ( profiles != null )
         {
-            this.profiles = new ArrayList<Profile>( profiles );
+            this.profiles = new ArrayList<>( profiles );
         }
         else
         {
@@ -222,7 +222,7 @@ public class DefaultModelBuildingRequest
     {
         if ( activeProfileIds == null )
         {
-            activeProfileIds = new ArrayList<String>();
+            activeProfileIds = new ArrayList<>();
         }
 
         return activeProfileIds;
@@ -233,7 +233,7 @@ public class DefaultModelBuildingRequest
     {
         if ( activeProfileIds != null )
         {
-            this.activeProfileIds = new ArrayList<String>( activeProfileIds );
+            this.activeProfileIds = new ArrayList<>( activeProfileIds );
         }
         else
         {
@@ -248,7 +248,7 @@ public class DefaultModelBuildingRequest
     {
         if ( inactiveProfileIds == null )
         {
-            inactiveProfileIds = new ArrayList<String>();
+            inactiveProfileIds = new ArrayList<>();
         }
 
         return inactiveProfileIds;
@@ -259,7 +259,7 @@ public class DefaultModelBuildingRequest
     {
         if ( inactiveProfileIds != null )
         {
-            this.inactiveProfileIds = new ArrayList<String>( inactiveProfileIds );
+            this.inactiveProfileIds = new ArrayList<>( inactiveProfileIds );
         }
         else
         {

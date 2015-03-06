@@ -39,7 +39,7 @@ public class DefaultArtifactHandlerManager
     @Requirement( role = ArtifactHandler.class )
     private Map<String, ArtifactHandler> artifactHandlers;
 
-    private Map<String, ArtifactHandler> unmanagedHandlers = new ConcurrentHashMap<String, ArtifactHandler>();
+    private Map<String, ArtifactHandler> unmanagedHandlers = new ConcurrentHashMap<>();
 
     public ArtifactHandler getArtifactHandler( String type )
     {

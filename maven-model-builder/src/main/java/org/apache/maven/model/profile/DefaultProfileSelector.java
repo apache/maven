@@ -45,7 +45,7 @@ public class DefaultProfileSelector
 {
 
     @Requirement( role = ProfileActivator.class )
-    private List<ProfileActivator> activators = new ArrayList<ProfileActivator>();
+    private List<ProfileActivator> activators = new ArrayList<>();
 
     public DefaultProfileSelector addProfileActivator( ProfileActivator profileActivator )
     {
@@ -60,11 +60,11 @@ public class DefaultProfileSelector
     public List<Profile> getActiveProfiles( Collection<Profile> profiles, ProfileActivationContext context,
                                             ModelProblemCollector problems )
     {
-        Collection<String> activatedIds = new HashSet<String>( context.getActiveProfileIds() );
-        Collection<String> deactivatedIds = new HashSet<String>( context.getInactiveProfileIds() );
+        Collection<String> activatedIds = new HashSet<>( context.getActiveProfileIds() );
+        Collection<String> deactivatedIds = new HashSet<>( context.getInactiveProfileIds() );
 
-        List<Profile> activeProfiles = new ArrayList<Profile>( profiles.size() );
-        List<Profile> activePomProfilesByDefault = new ArrayList<Profile>();
+        List<Profile> activeProfiles = new ArrayList<>( profiles.size() );
+        List<Profile> activePomProfilesByDefault = new ArrayList<>();
         boolean activatedPomProfileNotByDefault = false;
 
         for ( Profile profile : profiles )

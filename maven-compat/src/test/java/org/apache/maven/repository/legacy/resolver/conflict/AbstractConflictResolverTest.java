@@ -21,11 +21,14 @@ package org.apache.maven.repository.legacy.resolver.conflict;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.repository.legacy.resolver.conflict.ConflictResolver;
 import org.codehaus.plexus.PlexusTestCase;
+
+import java.util.Collections;
 
 /**
  * Provides a basis for testing conflict resolvers.
@@ -108,22 +111,9 @@ public abstract class AbstractConflictResolverTest
         assertEquals( "Resolution node", expectedNode, resolvedNode );
     }
 
-    protected void assertUnresolvableConflict( ResolutionNode actualNode1, ResolutionNode actualNode2 )
-    {
-        ResolutionNode resolvedNode = getConflictResolver().resolveConflict( actualNode1, actualNode2 );
-
-        assertNull( "Expected unresolvable", resolvedNode );
-    }
-
     protected Artifact createArtifact( String id, String version ) throws InvalidVersionSpecificationException
     {
         return createArtifact( id, version, Artifact.SCOPE_COMPILE );
-    }
-
-    protected Artifact createArtifact( String id, String version, boolean optional )
-        throws InvalidVersionSpecificationException
-    {
-        return createArtifact( id, version, Artifact.SCOPE_COMPILE, null, optional );
     }
 
     protected Artifact createArtifact( String id, String version, String scope )
@@ -140,4 +130,14 @@ public abstract class AbstractConflictResolverTest
         return artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope,
                                                          inheritedScope, optional );
     }
+
+    protected ResolutionNode createResolutionNode( Artifact Artifact )
+    {
+        return new ResolutionNode( Artifact, Collections.<ArtifactRepository>emptyList() );
+    }
+    protected ResolutionNode createResolutionNode( Artifact Artifact, ResolutionNode parent )
+    {
+        return new ResolutionNode( Artifact, Collections.<ArtifactRepository>emptyList(), parent );
+    }
+
 }

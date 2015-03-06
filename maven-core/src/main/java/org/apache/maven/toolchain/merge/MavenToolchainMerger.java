@@ -50,7 +50,7 @@ public class MavenToolchainMerger
     private void shallowMerge( List<ToolchainModel> dominant, List<ToolchainModel> recessive,
                                String recessiveSourceLevel )
     {
-        Map<Object, ToolchainModel> merged = new LinkedHashMap<Object, ToolchainModel>();
+        Map<Object, ToolchainModel> merged = new LinkedHashMap<>();
 
         for ( ToolchainModel dominantModel : dominant )
         {

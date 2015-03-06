@@ -38,7 +38,7 @@ class UrlNormalizingPostProcessor
 
     static
     {
-        Set<String> expressions = new HashSet<String>();
+        Set<String> expressions = new HashSet<>();
         expressions.add( "project.url" );
         expressions.add( "project.scm.url" );
         expressions.add( "project.scm.connection" );

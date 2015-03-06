@@ -370,7 +370,7 @@ public class DefaultMaven
     private Collection<AbstractMavenLifecycleParticipant> getLifecycleParticipants( Collection<MavenProject> projects )
     {
         Collection<AbstractMavenLifecycleParticipant> lifecycleListeners =
-            new LinkedHashSet<AbstractMavenLifecycleParticipant>();
+            new LinkedHashSet<>();
 
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         try
@@ -385,7 +385,7 @@ public class DefaultMaven
                 logger.warn( "Failed to lookup lifecycle participants: " + e.getMessage() );
             }
 
-            Collection<ClassLoader> scannedRealms = new HashSet<ClassLoader>();
+            Collection<ClassLoader> scannedRealms = new HashSet<>();
 
             for ( MavenProject project : projects )
             {
@@ -427,7 +427,7 @@ public class DefaultMaven
 
     private void validateActivatedProfiles( List<MavenProject> projects, List<String> activeProfileIds )
     {
-        Collection<String> notActivatedProfileIds = new LinkedHashSet<String>( activeProfileIds );
+        Collection<String> notActivatedProfileIds = new LinkedHashSet<>( activeProfileIds );
 
         for ( MavenProject project : projects )
         {
@@ -447,8 +447,8 @@ public class DefaultMaven
     private Map<String, MavenProject> getProjectMap( Collection<MavenProject> projects )
         throws DuplicateProjectException
     {
-        Map<String, MavenProject> index = new LinkedHashMap<String, MavenProject>();
-        Map<String, List<File>> collisions = new LinkedHashMap<String, List<File>>();
+        Map<String, MavenProject> index = new LinkedHashMap<>();
+        Map<String, List<File>> collisions = new LinkedHashMap<>();
 
         for ( MavenProject project : projects )
         {
@@ -466,7 +466,7 @@ public class DefaultMaven
 
                 if ( pomFiles == null )
                 {
-                    pomFiles = new ArrayList<File>( Arrays.asList( collision.getFile(), project.getFile() ) );
+                    pomFiles = new ArrayList<>( Arrays.asList( collision.getFile(), project.getFile() ) );
                     collisions.put( projectId, pomFiles );
                 }
                 else

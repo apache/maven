@@ -66,7 +66,7 @@ public class DefaultSettingsDecryptionRequest
      */
     public DefaultSettingsDecryptionRequest( Server server )
     {
-        this.servers = new ArrayList<Server>( Arrays.asList( server ) );
+        this.servers = new ArrayList<>( Arrays.asList( server ) );
     }
 
     /**
@@ -76,7 +76,7 @@ public class DefaultSettingsDecryptionRequest
      */
     public DefaultSettingsDecryptionRequest( Proxy proxy )
     {
-        this.proxies = new ArrayList<Proxy>( Arrays.asList( proxy ) );
+        this.proxies = new ArrayList<>( Arrays.asList( proxy ) );
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DefaultSettingsDecryptionRequest
     {
         if ( servers == null )
         {
-            servers = new ArrayList<Server>();
+            servers = new ArrayList<>();
         }
 
         return servers;
@@ -103,7 +103,7 @@ public class DefaultSettingsDecryptionRequest
     {
         if ( proxies == null )
         {
-            proxies = new ArrayList<Proxy>();
+            proxies = new ArrayList<>();
         }
 
         return proxies;

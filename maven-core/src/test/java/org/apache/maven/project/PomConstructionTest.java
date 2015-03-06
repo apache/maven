@@ -1741,7 +1741,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "plugin-inheritance-merge-order/sub" );
 
-        List<String> expected = new ArrayList<String>();
+        List<String> expected = new ArrayList<>();
         expected.add( "maven-it-plugin-error" );
         expected.add( "maven-it-plugin-configuration" );
         expected.add( "maven-it-plugin-dependency-resolution" );
@@ -1751,7 +1751,7 @@ public class PomConstructionTest
         expected.add( "maven-it-plugin-fork" );
         expected.add( "maven-it-plugin-touch" );
 
-        List<String> actual = new ArrayList<String>();
+        List<String> actual = new ArrayList<>();
         @SuppressWarnings( "unchecked" )
         List<Plugin> plugins = (List<Plugin>) pom.getValue( "build/plugins" );
         for ( Plugin plugin : plugins )
@@ -1770,7 +1770,7 @@ public class PomConstructionTest
     {
         PomTestWrapper pom = buildPom( "plugin-injection-merge-order" );
 
-        List<String> expected = new ArrayList<String>();
+        List<String> expected = new ArrayList<>();
         expected.add( "maven-it-plugin-error" );
         expected.add( "maven-it-plugin-configuration" );
         expected.add( "maven-it-plugin-dependency-resolution" );
@@ -1780,7 +1780,7 @@ public class PomConstructionTest
         expected.add( "maven-it-plugin-fork" );
         expected.add( "maven-it-plugin-touch" );
 
-        List<String> actual = new ArrayList<String>();
+        List<String> actual = new ArrayList<>();
         @SuppressWarnings( "unchecked" )
         List<Plugin> plugins = (List<Plugin>) pom.getValue( "build/plugins" );
         for ( Plugin plugin : plugins )

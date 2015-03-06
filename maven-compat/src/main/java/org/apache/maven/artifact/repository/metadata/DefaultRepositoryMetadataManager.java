@@ -204,7 +204,7 @@ public class DefaultRepositoryMetadataManager
         // TODO: this needs to be repeated here so the merging doesn't interfere with the written metadata
         //  - we'd be much better having a pristine input, and an ongoing metadata for merging instead
 
-        Map<ArtifactRepository, Metadata> previousMetadata = new HashMap<ArtifactRepository, Metadata>();
+        Map<ArtifactRepository, Metadata> previousMetadata = new HashMap<>();
         ArtifactRepository selected = null;
         for ( ArtifactRepository repository : remoteRepositories )
         {
@@ -334,12 +334,7 @@ public class DefaultRepositoryMetadataManager
         {
             throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "'", e );
         }
-        catch ( IOException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
-        }
-        catch ( XmlPullParserException e )
+        catch ( IOException | XmlPullParserException e )
         {
             throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
                 + e.getMessage(), e );

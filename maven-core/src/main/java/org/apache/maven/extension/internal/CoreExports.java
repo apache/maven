@@ -47,7 +47,7 @@ public class CoreExports
 
     public CoreExports( ClassRealm realm, Set<String> exportedArtifacts, Set<String> exportedPackages )
     {
-        Map<String, ClassLoader> packages = new LinkedHashMap<String, ClassLoader>();
+        Map<String, ClassLoader> packages = new LinkedHashMap<>();
         for ( String pkg : exportedPackages )
         {
             packages.put( pkg, realm );

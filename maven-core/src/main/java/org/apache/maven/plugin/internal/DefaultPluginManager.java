@@ -248,11 +248,7 @@ public class DefaultPluginManager
         {
             throw new PluginNotFoundException( plugin, project.getPluginArtifactRepositories() );
         }
-        catch ( PluginDescriptorParsingException e )
-        {
-            throw new PluginManagerException( plugin, e.getMessage(), e );
-        }
-        catch ( InvalidPluginDescriptorException e )
+        catch ( PluginDescriptorParsingException | InvalidPluginDescriptorException e )
         {
             throw new PluginManagerException( plugin, e.getMessage(), e );
         }

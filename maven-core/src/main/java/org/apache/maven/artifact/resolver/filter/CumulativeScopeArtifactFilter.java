@@ -45,7 +45,7 @@ public class CumulativeScopeArtifactFilter
      */
     public CumulativeScopeArtifactFilter( Collection<String> scopes )
     {
-        this.scopes = new HashSet<String>();
+        this.scopes = new HashSet<>();
 
         addScopes( scopes );
     }
@@ -57,7 +57,7 @@ public class CumulativeScopeArtifactFilter
      */
     public CumulativeScopeArtifactFilter( CumulativeScopeArtifactFilter... filters )
     {
-        this.scopes = new HashSet<String>();
+        this.scopes = new HashSet<>();
 
         if ( filters != null )
         {

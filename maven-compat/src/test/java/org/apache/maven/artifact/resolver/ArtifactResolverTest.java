@@ -35,7 +35,6 @@ import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.repository.legacy.metadata.MetadataResolutionRequest;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 
 // It would be cool if there was a hook that i could use to setup a test environment.
 // I want to setup a local/remote repositories for testing but i don't want to have
@@ -174,7 +173,7 @@ public class ArtifactResolverTest
         Artifact l = createRemoteArtifact( "l", "1.0-SNAPSHOT" );
         deleteLocalArtifact( l );
 
-        List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> repositories = new ArrayList<>();
         repositories.add( remoteRepository() );
         repositories.add( badRemoteRepository() );
 
@@ -196,7 +195,7 @@ public class ArtifactResolverTest
                                              List<ArtifactRepository> remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
-                Set dependencies = new HashSet();
+                Set<Artifact> dependencies = new HashSet<>();
 
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
             }
@@ -233,7 +232,7 @@ public class ArtifactResolverTest
 
         ArtifactResolutionResult result = null;
 
-        Set set = new LinkedHashSet();
+        Set<Artifact> set = new LinkedHashSet<>();
         set.add( n );
         set.add( m );
 
@@ -247,7 +246,7 @@ public class ArtifactResolverTest
         assertEquals( "m should be second", m, i.next() );
 
         // inverse order
-        set = new LinkedHashSet();
+        set = new LinkedHashSet<>();
         set.add( m );
         set.add( n );
 

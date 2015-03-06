@@ -236,7 +236,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected List<ArtifactRepository> remoteRepositories()
         throws Exception
     {
-        List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> remoteRepositories = new ArrayList<>();
 
         remoteRepositories.add( remoteRepository() );
 

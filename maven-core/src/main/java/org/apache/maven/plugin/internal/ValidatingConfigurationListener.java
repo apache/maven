@@ -47,7 +47,7 @@ class ValidatingConfigurationListener
     {
         this.mojo = mojo;
         this.delegate = delegate;
-        this.missingParameters = new HashMap<String, Parameter>();
+        this.missingParameters = new HashMap<>();
 
         if ( mojoDescriptor.getParameters() != null )
         {

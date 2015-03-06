@@ -45,14 +45,9 @@ public class GlobalSettingsTest
         File globalSettingsFile = new File( basedir, "src/conf/settings.xml" );
         assertTrue( globalSettingsFile.getAbsolutePath(), globalSettingsFile.isFile() );
 
-        Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), "UTF-8" );
-        try
+        try (Reader reader = new InputStreamReader( new FileInputStream( globalSettingsFile ), "UTF-8" ))
         {
             new SettingsXpp3Reader().read( reader );
-        }
-        finally
-        {
-            reader.close();
         }
     }
 

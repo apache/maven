@@ -46,7 +46,7 @@ public class ClasspathArtifactResolver
                                                   Collection<? extends ArtifactRequest> requests )
         throws ArtifactResolutionException
     {
-        List<ArtifactResult> results = new ArrayList<ArtifactResult>();
+        List<ArtifactResult> results = new ArrayList<>();
 
         for ( ArtifactRequest request : requests )
         {

@@ -188,7 +188,7 @@ public class DefaultLifecycleExecutionPlanCalculator
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginVersionResolutionException, LifecyclePhaseNotFoundException
     {
-        final List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+        final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
         for ( Object task : tasks )
         {
@@ -416,7 +416,7 @@ public class DefaultLifecycleExecutionPlanCalculator
 
         injectLifecycleOverlay( lifecycleMappings, mojoExecution, session, project );
 
-        List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+        List<MojoExecution> mojoExecutions = new ArrayList<>();
 
         for ( List<MojoExecution> forkedExecutions : lifecycleMappings.values() )
         {
@@ -459,11 +459,7 @@ public class DefaultLifecycleExecutionPlanCalculator
         {
             lifecycleOverlay = pluginDescriptor.getLifecycleMapping( forkedLifecycle );
         }
-        catch ( IOException e )
-        {
-            throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e );
-        }
-        catch ( XmlPullParserException e )
+        catch ( IOException | XmlPullParserException e )
         {
             throw new PluginDescriptorParsingException( pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e );
         }

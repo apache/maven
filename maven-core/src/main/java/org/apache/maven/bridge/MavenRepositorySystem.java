@@ -114,7 +114,7 @@ public class MavenRepositorySystem
 
         if ( !d.getExclusions().isEmpty() )
         {
-            List<String> exclusions = new ArrayList<String>();
+            List<String> exclusions = new ArrayList<>();
 
             for ( Exclusion exclusion : d.getExclusions() )
             {
@@ -593,7 +593,7 @@ public class MavenRepositorySystem
         
     public Set<String> getRepoIds( List<ArtifactRepository> repositories )
     {
-        Set<String> repoIds = new HashSet<String>();
+        Set<String> repoIds = new HashSet<>();
 
         if ( repositories != null )
         {
