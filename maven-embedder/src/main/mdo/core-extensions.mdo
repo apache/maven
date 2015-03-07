@@ -26,7 +26,7 @@
   xml.schemaLocation="http://maven.apache.org/xsd/core-extensions-${version}.xsd">
 
   <id>core-extensions</id>
-  <name>Core Extensions</name>
+  <name>CoreExtensions</name>
   <description><![CDATA[
   <p>This is a reference for the Core Extensions descriptor.</p>
   <p>The default location for the Core Extensions descriptor file is <code>${maven.projectBasedir}/.mvn/extensions.xml</code></p>
