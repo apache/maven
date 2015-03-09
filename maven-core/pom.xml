@@ -190,6 +190,21 @@
             <model>src/main/mdo/toolchains.mdo</model>
           </models>
         </configuration>
+        <executions>
+          <execution>
+            <id>plugin-site-doc</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>xdoc</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>src/main/mdo/extension.mdo</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
