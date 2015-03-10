@@ -83,6 +83,12 @@ public class DefaultClassRealmManager
 
     private final ClassRealm mavenApiRealm;
 
+    /**
+     * Patterns of artifacts provided by maven core and exported via maven api realm. These artifacts are filtered from
+     * plugin and build extensions realms to avoid presence of duplicate and possibly conflicting classes on classpath.
+     */
+    private final Set<String> providedArtifacts;
+
     @Inject
     public DefaultClassRealmManager( Logger logger, PlexusContainer container,
                                      List<ClassRealmManagerDelegate> delegates, CoreExportsProvider exports )
@@ -97,6 +103,8 @@ public class DefaultClassRealmManager
         this.mavenApiRealm =
             createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */, 
                          foreignImports, null /* artifacts */ );
+
+        this.providedArtifacts = exports.get().getExportedArtifacts();
     }
 
     private ClassRealm newRealm( String id )
@@ -156,10 +164,13 @@ public class DefaultClassRealmManager
         {
             for ( Artifact artifact : artifacts )
             {
-                artifactIds.add( getId( artifact ) );
-                if ( artifact.getFile() != null )
+                if ( !isProvidedArtifact( artifact ) )
                 {
-                    constituents.add( new ArtifactClassRealmConstituent( artifact ) );
+                    artifactIds.add( getId( artifact ) );
+                    if ( artifact.getFile() != null )
+                    {
+                        constituents.add( new ArtifactClassRealmConstituent( artifact ) );
+                    }
                 }
             }
         }
@@ -243,6 +254,11 @@ public class DefaultClassRealmManager
             Collections.<String, ClassLoader>singletonMap( "", getMavenApiRealm() );
 
         return createRealm( getKey( plugin, true ), RealmType.Extension, parent, null, foreignImports, artifacts );
+    }
+
+    private boolean isProvidedArtifact( Artifact artifact )
+    {
+        return providedArtifacts.contains( artifact.getGroupId() + ":" + artifact.getArtifactId() );
     }
 
     public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,

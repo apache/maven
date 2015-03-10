@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.ArtifactFilterManager;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -54,7 +53,6 @@ import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
-import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
 import org.eclipse.aether.util.filter.ScopeDependencyFilter;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
@@ -77,9 +75,6 @@ public class DefaultPluginDependenciesResolver
 
     @Requirement
     private Logger logger;
-
-    @Requirement
-    private ArtifactFilterManager artifactFilterManager;
 
     @Requirement
     private RepositorySystem repoSystem;
@@ -151,10 +146,7 @@ public class DefaultPluginDependenciesResolver
                                    List<RemoteRepository> repositories, RepositorySystemSession session )
         throws PluginResolutionException
     {
-        DependencyFilter resolutionFilter =
-            new ExclusionsDependencyFilter( artifactFilterManager.getCoreArtifactExcludes() );
-        resolutionFilter = AndDependencyFilter.newInstance( resolutionFilter, dependencyFilter );
-        return resolveInternal( plugin, pluginArtifact, resolutionFilter, new PlexusUtilsInjector(), repositories,
+        return resolveInternal( plugin, pluginArtifact, dependencyFilter, new PlexusUtilsInjector(), repositories,
                                 session );
     }
 
