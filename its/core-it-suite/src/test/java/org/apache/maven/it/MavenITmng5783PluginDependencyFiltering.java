@@ -18,7 +18,7 @@ public class MavenITmng5783PluginDependencyFiltering
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5783-plugin-dependency-filtering" );
-        Verifier verifier = newVerifier( new File( testDir, "plugin" ).getAbsolutePath() );
+        Verifier verifier = newVerifier( new File( testDir, "plugin" ).getAbsolutePath(), "remote" );
         verifier.executeGoal( "install" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
