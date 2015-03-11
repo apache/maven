@@ -130,6 +130,17 @@ public class MavenCli
     @SuppressWarnings( "checkstyle:constantname" )
     public static final File userMavenConfigurationHome = new File( userHome, ".m2" );
 
+    /**
+     * @deprecated use {@link SettingsXmlConfigurationProcessor#DEFAULT_USER_SETTINGS_FILE}
+     */
+    public static final File DEFAULT_USER_SETTINGS_FILE = SettingsXmlConfigurationProcessor.DEFAULT_USER_SETTINGS_FILE;
+
+    /**
+     * @deprecated use {@link SettingsXmlConfigurationProcessor#DEFAULT_GLOBAL_SETTINGS_FILE}
+     */
+    public static final File DEFAULT_GLOBAL_SETTINGS_FILE =
+        SettingsXmlConfigurationProcessor.DEFAULT_GLOBAL_SETTINGS_FILE;
+
     public static final File DEFAULT_USER_TOOLCHAINS_FILE = new File( userMavenConfigurationHome, "toolchains.xml" );
 
     public static final File DEFAULT_GLOBAL_TOOLCHAINS_FILE = 
