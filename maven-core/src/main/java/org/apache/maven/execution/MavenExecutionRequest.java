@@ -388,6 +388,16 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepository );
 
     /**
+     * @since 3.3.0
+     */
+    boolean isUseLegacyReactorResolution();
+
+    /**
+     * @since 3.3.0
+     */
+    MavenExecutionRequest setUseLegacyReactorResolution( boolean value );
+
+    /**
      * Controls the {@link Builder} used by Maven by specification of the builder's id.
      *
      * @since 3.2.0
