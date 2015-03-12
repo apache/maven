@@ -37,4 +37,6 @@ ${project.name}
 
    * <<<.mvn/jvm.config>>> containing jvm options,
 
-   * <<<.mvn/maven.config>>> containing Maven command-line parameter.
+   * <<<.mvn/maven.config>>> containing Maven command-line parameter,
+
+   * <<<.mvn/extensions.xml>>> containing {{{./core-extensions.html}a list of extensions}}.
