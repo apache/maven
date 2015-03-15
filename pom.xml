@@ -546,6 +546,7 @@
             <exclude>README.bootstrap.txt</exclude>
             <exclude>.repository/**</exclude> <!-- jenkins with local maven repository -->
             <exclude>.maven/spy.log</exclude> <!-- hudson maven3 integration log -->
+            <exclude>.java-version</exclude>
           </excludes>
         </configuration>
       </plugin>
