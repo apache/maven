@@ -12,3 +12,4 @@ out/
 .DS_Store
 /bootstrap
 /dependencies.xml
+.java-version
