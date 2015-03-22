@@ -30,7 +30,7 @@ public class MavenITmng5753CustomMojoExecutionConfiguratorTest
 
     public MavenITmng5753CustomMojoExecutionConfiguratorTest()
     {
-        super( "[3.2.6-SNAPSHOT,)" );
+        super( "[3.3.0-alpha,)" );
     }
 
     public void testCustomMojoExecutionConfigurator()
