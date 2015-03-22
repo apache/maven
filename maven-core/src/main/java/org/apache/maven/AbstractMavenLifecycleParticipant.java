@@ -67,6 +67,7 @@ public abstract class AbstractMavenLifecycleParticipant
      * allocated external resources after the build. It is invoked on best-effort
      * basis and may be missed due to an Error or RuntimeException in Maven core
      * code.
+     * @since 3.2.1, MNG-5389
      */
     public void afterSessionEnd( MavenSession session )
         throws MavenExecutionException

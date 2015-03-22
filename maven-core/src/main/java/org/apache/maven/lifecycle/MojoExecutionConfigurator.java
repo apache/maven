@@ -28,6 +28,7 @@ import org.apache.maven.project.MavenProject;
  * 
  * @provisional
  * @author Jason van Zyl
+ * @since 3.3.1, MNG-5753
  */
 public interface MojoExecutionConfigurator
 {

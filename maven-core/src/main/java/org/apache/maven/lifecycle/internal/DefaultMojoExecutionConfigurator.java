@@ -30,6 +30,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+/**
+ * @since 3.3.1, MNG-5753
+ */
 @Component( role = MojoExecutionConfigurator.class )
 public class DefaultMojoExecutionConfigurator
     implements MojoExecutionConfigurator
