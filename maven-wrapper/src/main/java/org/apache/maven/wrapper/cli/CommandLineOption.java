@@ -19,114 +19,94 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class CommandLineOption
-{
-    private final Set<String> options = new HashSet<String>();
+public class CommandLineOption {
+  private final Set<String> options = new HashSet<String>();
 
-    private Class<?> argumentType = Void.TYPE;
+  private Class<?> argumentType = Void.TYPE;
 
-    private String description;
+  private String description;
 
-    private String subcommand;
+  private String subcommand;
 
-    private String deprecationWarning;
+  private String deprecationWarning;
 
-    private boolean incubating;
+  private boolean incubating;
 
-    public CommandLineOption( Iterable<String> options )
-    {
-        for ( String option : options )
-        {
-            this.options.add( option );
-        }
+  public CommandLineOption(Iterable<String> options) {
+    for (String option : options) {
+      this.options.add(option);
     }
+  }
 
-    public Set<String> getOptions()
-    {
-        return options;
-    }
+  public Set<String> getOptions() {
+    return options;
+  }
 
-    public CommandLineOption hasArgument()
-    {
-        argumentType = String.class;
-        return this;
-    }
+  public CommandLineOption hasArgument() {
+    argumentType = String.class;
+    return this;
+  }
 
-    public CommandLineOption hasArguments()
-    {
-        argumentType = List.class;
-        return this;
-    }
+  public CommandLineOption hasArguments() {
+    argumentType = List.class;
+    return this;
+  }
 
-    public String getSubcommand()
-    {
-        return subcommand;
-    }
+  public String getSubcommand() {
+    return subcommand;
+  }
 
-    public CommandLineOption mapsToSubcommand( String command )
-    {
-        this.subcommand = command;
-        return this;
-    }
+  public CommandLineOption mapsToSubcommand(String command) {
+    this.subcommand = command;
+    return this;
+  }
 
-    public String getDescription()
-    {
-        StringBuilder result = new StringBuilder();
-        if ( description != null )
-        {
-            result.append( description );
-        }
-        if ( deprecationWarning != null )
-        {
-            if ( result.length() > 0 )
-            {
-                result.append( ' ' );
-            }
-            result.append( "[deprecated - " );
-            result.append( deprecationWarning );
-            result.append( "]" );
-        }
-        if ( incubating )
-        {
-            if ( result.length() > 0 )
-            {
-                result.append( ' ' );
-            }
-            result.append( "[incubating]" );
-        }
-        return result.toString();
+  public String getDescription() {
+    StringBuilder result = new StringBuilder();
+    if (description != null) {
+      result.append(description);
     }
+    if (deprecationWarning != null) {
+      if (result.length() > 0) {
+        result.append(' ');
+      }
+      result.append("[deprecated - ");
+      result.append(deprecationWarning);
+      result.append("]");
+    }
+    if (incubating) {
+      if (result.length() > 0) {
+        result.append(' ');
+      }
+      result.append("[incubating]");
+    }
+    return result.toString();
+  }
 
-    public CommandLineOption hasDescription( String description )
-    {
-        this.description = description;
-        return this;
-    }
+  public CommandLineOption hasDescription(String description) {
+    this.description = description;
+    return this;
+  }
 
-    public boolean getAllowsArguments()
-    {
-        return argumentType != Void.TYPE;
-    }
+  public boolean getAllowsArguments() {
+    return argumentType != Void.TYPE;
+  }
 
-    public boolean getAllowsMultipleArguments()
-    {
-        return argumentType == List.class;
-    }
+  public boolean getAllowsMultipleArguments() {
+    return argumentType == List.class;
+  }
 
-    public CommandLineOption deprecated( String deprecationWarning )
-    {
-        this.deprecationWarning = deprecationWarning;
-        return this;
-    }
+  public CommandLineOption deprecated(String deprecationWarning) {
+    this.deprecationWarning = deprecationWarning;
+    return this;
+  }
 
-    public CommandLineOption incubating()
-    {
-        incubating = true;
-        return this;
-    }
+  public CommandLineOption incubating() {
+    incubating = true;
+    return this;
+  }
 
-    public String getDeprecationWarning()
-    {
-        return deprecationWarning;
-    }
+  public String getDeprecationWarning() {
+    return deprecationWarning;
+  }
 }

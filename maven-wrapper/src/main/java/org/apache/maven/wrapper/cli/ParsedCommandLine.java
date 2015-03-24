@@ -23,111 +23,93 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ParsedCommandLine
-{
-    private final Map<String, ParsedCommandLineOption> optionsByString = new HashMap<String, ParsedCommandLineOption>();
+public class ParsedCommandLine {
+  private final Map<String, ParsedCommandLineOption> optionsByString = new HashMap<String, ParsedCommandLineOption>();
 
-    private final Set<String> presentOptions = new HashSet<String>();
+  private final Set<String> presentOptions = new HashSet<String>();
 
-    private final List<String> extraArguments = new ArrayList<String>();
+  private final List<String> extraArguments = new ArrayList<String>();
 
-    ParsedCommandLine( Iterable<CommandLineOption> options )
-    {
-        for ( CommandLineOption option : options )
-        {
-            ParsedCommandLineOption parsedOption = new ParsedCommandLineOption();
-            for ( String optionStr : option.getOptions() )
-            {
-                optionsByString.put( optionStr, parsedOption );
-            }
-        }
+  ParsedCommandLine(Iterable<CommandLineOption> options) {
+    for (CommandLineOption option : options) {
+      ParsedCommandLineOption parsedOption = new ParsedCommandLineOption();
+      for (String optionStr : option.getOptions()) {
+        optionsByString.put(optionStr, parsedOption);
+      }
     }
+  }
 
-    @Override
-    public String toString()
-    {
-        return String.format( "options: %s, extraArguments: %s", quoteAndJoin( presentOptions ),
-                              quoteAndJoin( extraArguments ) );
-    }
+  @Override
+  public String toString() {
+    return String.format("options: %s, extraArguments: %s", quoteAndJoin(presentOptions), quoteAndJoin(extraArguments));
+  }
 
-    private String quoteAndJoin( Iterable<String> strings )
-    {
-        StringBuilder output = new StringBuilder();
-        boolean isFirst = true;
-        for ( String string : strings )
-        {
-            if ( !isFirst )
-            {
-                output.append( ", " );
-            }
-            output.append( "'" );
-            output.append( string );
-            output.append( "'" );
-            isFirst = false;
-        }
-        return output.toString();
+  private String quoteAndJoin(Iterable<String> strings) {
+    StringBuilder output = new StringBuilder();
+    boolean isFirst = true;
+    for (String string : strings) {
+      if (!isFirst) {
+        output.append(", ");
+      }
+      output.append("'");
+      output.append(string);
+      output.append("'");
+      isFirst = false;
     }
+    return output.toString();
+  }
 
-    /**
-     * Returns true if the given option is present in this command-line.
-     * 
-     * @param option The option, without the '-' or '--' prefix.
-     * @return true if the option is present.
-     */
-    public boolean hasOption( String option )
-    {
-        option( option );
-        return presentOptions.contains( option );
-    }
+  /**
+   * Returns true if the given option is present in this command-line.
+   * 
+   * @param option The option, without the '-' or '--' prefix.
+   * @return true if the option is present.
+   */
+  public boolean hasOption(String option) {
+    option(option);
+    return presentOptions.contains(option);
+  }
 
-    /**
-     * See also {@link #hasOption}.
-     * 
-     * @param logLevelOptions the options to check
-     * @return true if any of the passed options is present
-     */
-    public boolean hasAnyOption( Collection<String> logLevelOptions )
-    {
-        for ( String option : logLevelOptions )
-        {
-            if ( hasOption( option ) )
-            {
-                return true;
-            }
-        }
-        return false;
+  /**
+   * See also {@link #hasOption}.
+   * 
+   * @param logLevelOptions the options to check
+   * @return true if any of the passed options is present
+   */
+  public boolean hasAnyOption(Collection<String> logLevelOptions) {
+    for (String option : logLevelOptions) {
+      if (hasOption(option)) {
+        return true;
+      }
     }
+    return false;
+  }
 
-    /**
-     * Returns the value of the given option.
-     * 
-     * @param option The option, without the '-' or '--' prefix.
-     * @return The option. never returns null.
-     */
-    public ParsedCommandLineOption option( String option )
-    {
-        ParsedCommandLineOption parsedOption = optionsByString.get( option );
-        if ( parsedOption == null )
-        {
-            throw new IllegalArgumentException( String.format( "Option '%s' not defined.", option ) );
-        }
-        return parsedOption;
+  /**
+   * Returns the value of the given option.
+   * 
+   * @param option The option, without the '-' or '--' prefix.
+   * @return The option. never returns null.
+   */
+  public ParsedCommandLineOption option(String option) {
+    ParsedCommandLineOption parsedOption = optionsByString.get(option);
+    if (parsedOption == null) {
+      throw new IllegalArgumentException(String.format("Option '%s' not defined.", option));
     }
+    return parsedOption;
+  }
 
-    public List<String> getExtraArguments()
-    {
-        return extraArguments;
-    }
+  public List<String> getExtraArguments() {
+    return extraArguments;
+  }
 
-    void addExtraValue( String value )
-    {
-        extraArguments.add( value );
-    }
+  void addExtraValue(String value) {
+    extraArguments.add(value);
+  }
 
-    ParsedCommandLineOption addOption( String optionStr, CommandLineOption option )
-    {
-        ParsedCommandLineOption parsedOption = optionsByString.get( optionStr );
-        presentOptions.addAll( option.getOptions() );
-        return parsedOption;
-    }
+  ParsedCommandLineOption addOption(String optionStr, CommandLineOption option) {
+    ParsedCommandLineOption parsedOption = optionsByString.get(optionStr);
+    presentOptions.addAll(option.getOptions());
+    return parsedOption;
+  }
 }
