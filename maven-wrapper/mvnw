@@ -166,5 +166,5 @@ fi
 
 exec "$JAVACMD" \
   $MAVEN_OPTS \
-  -classpath "./maven/wrapper/maven-wrapper.jar" \
+  -classpath "./.mvn/wrapper/maven-wrapper.jar" \
   ${WRAPPER_LAUNCHER} "$@"
