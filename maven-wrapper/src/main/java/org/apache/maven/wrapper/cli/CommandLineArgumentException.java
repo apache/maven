@@ -20,16 +20,12 @@ package org.apache.maven.wrapper.cli;
  * 
  * @author Hans Dockter
  */
-public class CommandLineArgumentException
-    extends RuntimeException
-{
-    public CommandLineArgumentException( String message )
-    {
-        super( message );
-    }
+public class CommandLineArgumentException extends RuntimeException {
+  public CommandLineArgumentException(String message) {
+    super(message);
+  }
 
-    public CommandLineArgumentException( String message, Throwable cause )
-    {
-        super( message, cause );
-    }
+  public CommandLineArgumentException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

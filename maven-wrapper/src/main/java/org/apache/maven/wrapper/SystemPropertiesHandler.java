@@ -27,47 +27,35 @@ import java.util.regex.Pattern;
 /**
  * @author Hans Dockter
  */
-public class SystemPropertiesHandler
-{
+public class SystemPropertiesHandler {
 
-    public static Map<String, String> getSystemProperties( File propertiesFile )
-    {
-        Map<String, String> propertyMap = new HashMap<String, String>();
-        if ( !propertiesFile.isFile() )
-        {
-            return propertyMap;
-        }
-        Properties properties = new Properties();
-        try
-        {
-            FileInputStream inStream = new FileInputStream( propertiesFile );
-            try
-            {
-                properties.load( inStream );
-            }
-            finally
-            {
-                inStream.close();
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new RuntimeException( "Error when loading properties file=" + propertiesFile, e );
-        }
-
-        Pattern pattern = Pattern.compile( "systemProp\\.(.*)" );
-        for ( Object argument : properties.keySet() )
-        {
-            Matcher matcher = pattern.matcher( argument.toString() );
-            if ( matcher.find() )
-            {
-                String key = matcher.group( 1 );
-                if ( key.length() > 0 )
-                {
-                    propertyMap.put( key, properties.get( argument ).toString() );
-                }
-            }
-        }
-        return propertyMap;
+  public static Map<String, String> getSystemProperties(File propertiesFile) {
+    Map<String, String> propertyMap = new HashMap<String, String>();
+    if (!propertiesFile.isFile()) {
+      return propertyMap;
     }
+    Properties properties = new Properties();
+    try {
+      FileInputStream inStream = new FileInputStream(propertiesFile);
+      try {
+        properties.load(inStream);
+      } finally {
+        inStream.close();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Error when loading properties file=" + propertiesFile, e);
+    }
+
+    Pattern pattern = Pattern.compile("systemProp\\.(.*)");
+    for (Object argument : properties.keySet()) {
+      Matcher matcher = pattern.matcher(argument.toString());
+      if (matcher.find()) {
+        String key = matcher.group(1);
+        if (key.length() > 0) {
+          propertyMap.put(key, properties.get(argument).toString());
+        }
+      }
+    }
+    return propertyMap;
+  }
 }
