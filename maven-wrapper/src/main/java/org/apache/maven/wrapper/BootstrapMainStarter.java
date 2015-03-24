@@ -32,6 +32,7 @@ public class BootstrapMainStarter {
     Thread.currentThread().setContextClassLoader(contextClassLoader);
     Class<?> mainClass = contextClassLoader.loadClass("org.codehaus.plexus.classworlds.launcher.Launcher");
 
+    System.setProperty("maven.multiModuleProjectDirectory", System.getProperty("user.dir"));
     System.setProperty("maven.home", mavenHome.getAbsolutePath());
     System.setProperty("classworlds.conf", new File(mavenHome, "/bin/m2.conf").getAbsolutePath());
 
@@ -48,5 +49,5 @@ public class BootstrapMainStarter {
       }
     }
     throw new RuntimeException(String.format("Could not locate the Maven launcher JAR in Maven distribution '%s'.", mavenHome));
-  }
+  }  
 }
