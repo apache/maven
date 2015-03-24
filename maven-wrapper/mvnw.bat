@@ -144,7 +144,7 @@ goto Win9xApp
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
 @REM -- Regular WinNT shell
-set WRAPPER_JAR="".\maven\wrapper\maven-wrapper.jar""
+set WRAPPER_JAR="".\.mvn\wrapper\maven-wrapper.jar""
 goto runm2
 
 @REM Start MAVEN2
