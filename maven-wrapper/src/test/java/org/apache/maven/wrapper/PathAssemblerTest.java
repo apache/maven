@@ -33,113 +33,91 @@ import org.junit.Test;
 /**
  * @author Hans Dockter
  */
-public class PathAssemblerTest
-{
-    public static final String TEST_MAVEN_USER_HOME = "someUserHome";
+public class PathAssemblerTest {
+  public static final String TEST_MAVEN_USER_HOME = "someUserHome";
 
-    private PathAssembler pathAssembler = new PathAssembler( new File( TEST_MAVEN_USER_HOME ) );
+  private PathAssembler pathAssembler = new PathAssembler(new File(TEST_MAVEN_USER_HOME));
 
-    final WrapperConfiguration configuration = new WrapperConfiguration();
+  final WrapperConfiguration configuration = new WrapperConfiguration();
 
-    @Before
-    public void setup()
-    {
-        configuration.setDistributionBase( PathAssembler.MAVEN_USER_HOME_STRING );
-        configuration.setDistributionPath( "somePath" );
-        configuration.setZipBase( PathAssembler.MAVEN_USER_HOME_STRING );
-        configuration.setZipPath( "somePath" );
+  @Before
+  public void setup() {
+    configuration.setDistributionBase(PathAssembler.MAVEN_USER_HOME_STRING);
+    configuration.setDistributionPath("somePath");
+    configuration.setZipBase(PathAssembler.MAVEN_USER_HOME_STRING);
+    configuration.setZipPath("somePath");
+  }
+
+  @Test
+  public void distributionDirWithMavenUserHomeBase() throws Exception {
+    configuration.setDistribution(new URI("http://server/dist/maven-0.9-bin.zip"));
+
+    File distributionDir = pathAssembler.getDistribution(configuration).getDistributionDir();
+    assertThat(distributionDir.getName(), matchesRegexp("[a-z0-9]+"));
+    assertThat(distributionDir.getParentFile(), equalTo(file(TEST_MAVEN_USER_HOME + "/somePath/maven-0.9-bin")));
+  }
+
+  @Test
+  public void distributionDirWithProjectBase() throws Exception {
+    configuration.setDistributionBase(PathAssembler.PROJECT_STRING);
+    configuration.setDistribution(new URI("http://server/dist/maven-0.9-bin.zip"));
+
+    File distributionDir = pathAssembler.getDistribution(configuration).getDistributionDir();
+    assertThat(distributionDir.getName(), matchesRegexp("[a-z0-9]+"));
+    assertThat(distributionDir.getParentFile(), equalTo(file(currentDirPath() + "/somePath/maven-0.9-bin")));
+  }
+
+  @Test
+  public void distributionDirWithUnknownBase() throws Exception {
+    configuration.setDistribution(new URI("http://server/dist/maven-1.0.zip"));
+    configuration.setDistributionBase("unknownBase");
+
+    try {
+      pathAssembler.getDistribution(configuration);
+      fail();
+    } catch (RuntimeException e) {
+      assertEquals("Base: unknownBase is unknown", e.getMessage());
     }
+  }
 
-    @Test
-    public void distributionDirWithMavenUserHomeBase()
-        throws Exception
-    {
-        configuration.setDistribution( new URI( "http://server/dist/maven-0.9-bin.zip" ) );
+  @Test
+  public void distZipWithMavenUserHomeBase() throws Exception {
+    configuration.setDistribution(new URI("http://server/dist/maven-1.0.zip"));
 
-        File distributionDir = pathAssembler.getDistribution( configuration ).getDistributionDir();
-        assertThat( distributionDir.getName(), matchesRegexp( "[a-z0-9]+" ) );
-        assertThat( distributionDir.getParentFile(), equalTo( file( TEST_MAVEN_USER_HOME + "/somePath/maven-0.9-bin" ) ) );
-    }
+    File dist = pathAssembler.getDistribution(configuration).getZipFile();
+    assertThat(dist.getName(), equalTo("maven-1.0.zip"));
+    assertThat(dist.getParentFile().getName(), matchesRegexp("[a-z0-9]+"));
+    assertThat(dist.getParentFile().getParentFile(), equalTo(file(TEST_MAVEN_USER_HOME + "/somePath/maven-1.0")));
+  }
 
-    @Test
-    public void distributionDirWithProjectBase()
-        throws Exception
-    {
-        configuration.setDistributionBase( PathAssembler.PROJECT_STRING );
-        configuration.setDistribution( new URI( "http://server/dist/maven-0.9-bin.zip" ) );
+  @Test
+  public void distZipWithProjectBase() throws Exception {
+    configuration.setZipBase(PathAssembler.PROJECT_STRING);
+    configuration.setDistribution(new URI("http://server/dist/maven-1.0.zip"));
 
-        File distributionDir = pathAssembler.getDistribution( configuration ).getDistributionDir();
-        assertThat( distributionDir.getName(), matchesRegexp( "[a-z0-9]+" ) );
-        assertThat( distributionDir.getParentFile(), equalTo( file( currentDirPath() + "/somePath/maven-0.9-bin" ) ) );
-    }
+    File dist = pathAssembler.getDistribution(configuration).getZipFile();
+    assertThat(dist.getName(), equalTo("maven-1.0.zip"));
+    assertThat(dist.getParentFile().getName(), matchesRegexp("[a-z0-9]+"));
+    assertThat(dist.getParentFile().getParentFile(), equalTo(file(currentDirPath() + "/somePath/maven-1.0")));
+  }
 
-    @Test
-    public void distributionDirWithUnknownBase()
-        throws Exception
-    {
-        configuration.setDistribution( new URI( "http://server/dist/maven-1.0.zip" ) );
-        configuration.setDistributionBase( "unknownBase" );
+  private File file(String path) {
+    return new File(path);
+  }
 
-        try
-        {
-            pathAssembler.getDistribution( configuration );
-            fail();
-        }
-        catch ( RuntimeException e )
-        {
-            assertEquals( "Base: unknownBase is unknown", e.getMessage() );
-        }
-    }
+  private String currentDirPath() {
+    return System.getProperty("user.dir");
+  }
 
-    @Test
-    public void distZipWithMavenUserHomeBase()
-        throws Exception
-    {
-        configuration.setDistribution( new URI( "http://server/dist/maven-1.0.zip" ) );
+  public static <T extends CharSequence> Matcher<T> matchesRegexp(final String pattern) {
+    return new BaseMatcher<T>() {
+      public boolean matches(Object o) {
+        return Pattern.compile(pattern).matcher((CharSequence) o).matches();
+      }
 
-        File dist = pathAssembler.getDistribution( configuration ).getZipFile();
-        assertThat( dist.getName(), equalTo( "maven-1.0.zip" ) );
-        assertThat( dist.getParentFile().getName(), matchesRegexp( "[a-z0-9]+" ) );
-        assertThat( dist.getParentFile().getParentFile(),
-                    equalTo( file( TEST_MAVEN_USER_HOME + "/somePath/maven-1.0" ) ) );
-    }
-
-    @Test
-    public void distZipWithProjectBase()
-        throws Exception
-    {
-        configuration.setZipBase( PathAssembler.PROJECT_STRING );
-        configuration.setDistribution( new URI( "http://server/dist/maven-1.0.zip" ) );
-
-        File dist = pathAssembler.getDistribution( configuration ).getZipFile();
-        assertThat( dist.getName(), equalTo( "maven-1.0.zip" ) );
-        assertThat( dist.getParentFile().getName(), matchesRegexp( "[a-z0-9]+" ) );
-        assertThat( dist.getParentFile().getParentFile(), equalTo( file( currentDirPath() + "/somePath/maven-1.0" ) ) );
-    }
-
-    private File file( String path )
-    {
-        return new File( path );
-    }
-
-    private String currentDirPath()
-    {
-        return System.getProperty( "user.dir" );
-    }
-
-    public static <T extends CharSequence> Matcher<T> matchesRegexp( final String pattern )
-    {
-        return new BaseMatcher<T>()
-        {
-            public boolean matches( Object o )
-            {
-                return Pattern.compile( pattern ).matcher( (CharSequence) o ).matches();
-            }
-
-            public void describeTo( Description description )
-            {
-                description.appendText( "a CharSequence that matches regexp " ).appendValue( pattern );
-            }
-        };
-    }
+      public void describeTo(Description description) {
+        description.appendText("a CharSequence that matches regexp ").appendValue(pattern);
+      }
+    };
+  }
 }
