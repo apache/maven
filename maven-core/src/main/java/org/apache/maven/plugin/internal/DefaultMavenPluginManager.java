@@ -333,35 +333,63 @@ public class DefaultMavenPluginManager
         throws PluginResolutionException, PluginContainerException
     {
         Plugin plugin = pluginDescriptor.getPlugin();
-
         MavenProject project = session.getCurrentProject();
 
-        Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
-
-        PluginRealmCache.Key cacheKey =
-            pluginRealmCache.createKey( plugin, parent, foreignImports, filter, project.getRemotePluginRepositories(),
-                                        session.getRepositorySession() );
-
-        PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
-
-        if ( cacheRecord != null )
+        if ( plugin.isExtensions() )
         {
-            pluginDescriptor.setClassRealm( cacheRecord.realm );
-            pluginDescriptor.setArtifacts( new ArrayList<Artifact>( cacheRecord.artifacts ) );
+            ExtensionRealmCache.CacheRecord extensionRecord;
+            try
+            {
+                RepositorySystemSession repositorySession = session.getRepositorySession();
+                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
+            }
+            catch ( PluginManagerException e )
+            {
+                // extensions realm is expected to be fully setup at this point
+                // any exception means a problem in maven code, not a user error
+                throw new IllegalStateException( e );
+            }
+
+            ClassRealm pluginRealm = extensionRecord.realm;
+            List<Artifact> pluginArtifacts = extensionRecord.artifacts;
+
             for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
             {
-                componentDescriptor.setRealm( cacheRecord.realm );
+                componentDescriptor.setRealm( pluginRealm );
             }
+
+            pluginDescriptor.setClassRealm( pluginRealm );
+            pluginDescriptor.setArtifacts( pluginArtifacts );
         }
         else
         {
-            createPluginRealm( pluginDescriptor, session, parent, foreignImports, filter );
+            Map<String, ClassLoader> foreignImports = calcImports( project, parent, imports );
 
-            cacheRecord =
-                pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
+            PluginRealmCache.Key cacheKey =
+                pluginRealmCache.createKey( plugin, parent, foreignImports, filter,
+                                            project.getRemotePluginRepositories(), session.getRepositorySession() );
+
+            PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get( cacheKey );
+
+            if ( cacheRecord != null )
+            {
+                pluginDescriptor.setClassRealm( cacheRecord.realm );
+                pluginDescriptor.setArtifacts( new ArrayList<Artifact>( cacheRecord.artifacts ) );
+                for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
+                {
+                    componentDescriptor.setRealm( cacheRecord.realm );
+                }
+            }
+            else
+            {
+                createPluginRealm( pluginDescriptor, session, parent, foreignImports, filter );
+
+                cacheRecord =
+                    pluginRealmCache.put( cacheKey, pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts() );
+            }
+
+            pluginRealmCache.register( project, cacheKey, cacheRecord );
         }
-
-        pluginRealmCache.register( project, cacheKey, cacheRecord );
     }
 
     private void createPluginRealm( PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
@@ -388,49 +416,24 @@ public class DefaultMavenPluginManager
         final List<Artifact> pluginArtifacts;
 
         RepositorySystemSession repositorySession = session.getRepositorySession();
-        if ( plugin.isExtensions() )
-        {
-            ExtensionRealmCache.CacheRecord extensionRecord;
-            try
-            {
-                extensionRecord = setupExtensionsRealm( project, plugin, repositorySession );
-            }
-            catch ( PluginManagerException e )
-            {
-                // extensions realm is expected to be fully setup at this point
-                // any exception means a problem in maven code, not a user error
-                throw new IllegalStateException( e );
-            }
+        DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
+        dependencyFilter = AndDependencyFilter.newInstance( dependencyFilter, filter );
 
-            pluginRealm = extensionRecord.realm;
-            pluginArtifacts = extensionRecord.artifacts;
+        DependencyNode root =
+            pluginDependenciesResolver.resolve( plugin, RepositoryUtils.toArtifact( pluginArtifact ),
+                                                dependencyFilter, project.getRemotePluginRepositories(),
+                                                repositorySession );
 
-            for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
-            {
-                componentDescriptor.setRealm( pluginRealm );
-            }
-        }
-        else
-        {
-            DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
-            dependencyFilter = AndDependencyFilter.newInstance( dependencyFilter, filter );
+        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+        root.accept( nlg );
 
-            DependencyNode root =
-                pluginDependenciesResolver.resolve( plugin, RepositoryUtils.toArtifact( pluginArtifact ),
-                                                    dependencyFilter, project.getRemotePluginRepositories(),
-                                                    repositorySession );
+        pluginArtifacts = toMavenArtifacts( root, nlg );
 
-            PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
-            root.accept( nlg );
+        pluginRealm =
+            classRealmManager.createPluginRealm( plugin, parent, null, foreignImports,
+                                                 toAetherArtifacts( pluginArtifacts ) );
 
-            pluginArtifacts = toMavenArtifacts( root, nlg );
-
-            pluginRealm =
-                classRealmManager.createPluginRealm( plugin, parent, null, foreignImports,
-                                                     toAetherArtifacts( pluginArtifacts ) );
-
-            discoverPluginComponents( pluginRealm, plugin, pluginDescriptor );
-        }
+        discoverPluginComponents( pluginRealm, plugin, pluginDescriptor );
 
         pluginDescriptor.setClassRealm( pluginRealm );
         pluginDescriptor.setArtifacts( pluginArtifacts );
