@@ -105,7 +105,7 @@
     <downloadUrl>http://maven.apache.org/download.html</downloadUrl>
     <site>
       <id>apache.website</id>
-      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/content/${maven.site.path}</url>
+      <url>scm:svn:https://svn.apache.org/repos/infra/websites/production/maven/components/${maven.site.path}</url>
     </site>
   </distributionManagement>
 
