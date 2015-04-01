@@ -34,7 +34,7 @@ END SNIPPET: ant-bootstrap -->
   <property name="distributionDirectory" value="apache-maven"/>
   <property name="distributionId" value="apache-maven"/>
   <property name="distributionShortName" value="Maven"/>
-  <property name="distributionName" value="Apache Maven"/>
+  <property name="distributionName" value="Apache Maven with Logxj II"/>
   <property name="it.workdir.version" value="3.0.x" />
   <property name="maven-compile.jvmargs" value="-Xmx512m -Xms512m"/>
   <property name="maven-compile.fork" value="true"/>
