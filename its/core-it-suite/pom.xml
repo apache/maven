@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+  license agreements. See the NOTICE file distributed with this work for additional 
+  information regarding copyright ownership. The ASF licenses this file to 
+  you under the Apache License, Version 2.0 (the "License"); you may not use 
+  this file except in compliance with the License. You may obtain a copy of 
+  the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+  by applicable law or agreed to in writing, software distributed under the 
+  License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+  OF ANY KIND, either express or implied. See the License for the specific 
+  language governing permissions and limitations under the License. -->
 
-  http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
--->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -33,40 +26,31 @@ under the License.
   <name>Maven ITs</name>
   <description>The effective Maven Integration Tests suite.</description>
 
-  <!--
-  By default, the project just packages the tests in an artifact. To actually run them, activate the profile "run-its":
-  
-    mvn clean test -Prun-its
-  
-  This will subject the Maven version running the build to the integration tests. If you would like to test a different
-  Maven distribution, you can use the system property "mavenHome" to specify the path of the Maven distribution to test:
-  
-    mvn clean test -Prun-its -DmavenHome=<maven-under-test>
-  
-  Alternatively, you can just specify the version of a previously installed/deployed Maven distribution which will be
-  downloaded, unpacked and tested:
-  
-    mvn clean test -Prun-its -DmavenVersion=2.2.1
-  
-  It's also possible to point the ITs at an already downloaded Maven distribution:
-  
-    mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive>
-  
-  To run the ITs using embedded Maven 3.x, additionally activate the profile "embedded".
-  
-  ITs that don't require to fork Maven can also be run from the IDE using the Maven projects from the workspace if the
-  Maven dependencies are added to the test class path.
-  
-  If you're behind a proxy, use the system properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the
-  required proxy setup for the ITs. Alternatively, set the system property maven.it.central to a URL of a local
-  repository manager that proxies the required artifacts.
-  -->
+  <!-- By default, the project just packages the tests in an artifact. To 
+    actually run them, activate the profile "run-its": mvn clean test -Prun-its 
+    This will subject the Maven version running the build to the integration 
+    tests. If you would like to test a different Maven distribution, you can 
+    use the system property "mavenHome" to specify the path of the Maven distribution 
+    to test: mvn clean test -Prun-its -DmavenHome=<maven-under-test> Alternatively, 
+    you can just specify the version of a previously installed/deployed Maven 
+    distribution which will be downloaded, unpacked and tested: mvn clean test 
+    -Prun-its -DmavenVersion=2.2.1 It's also possible to point the ITs at an 
+    already downloaded Maven distribution: mvn clean test -Prun-its -DmavenDistro=<path-to-bin-archive> 
+    To run the ITs using embedded Maven 3.x, additionally activate the profile 
+    "embedded". ITs that don't require to fork Maven can also be run from the 
+    IDE using the Maven projects from the workspace if the Maven dependencies 
+    are added to the test class path. If you're behind a proxy, use the system 
+    properties proxy.host, proxy.port, proxy.user and proxy.pass to specify the 
+    required proxy setup for the ITs. Alternatively, set the system property 
+    maven.it.central to a URL of a local repository manager that proxies the 
+    required artifacts. -->
 
   <properties>
     <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
     <!-- The original Maven distribution to test. -->
     <mavenHome>${maven.home}</mavenHome>
-    <!-- The (possibly instrumented copy of the) Maven distribution we actually use for the tests. -->
+    <!-- The (possibly instrumented copy of the) Maven distribution we actually 
+      use for the tests. -->
     <preparedMavenHome>${mavenHome}</preparedMavenHome>
     <!-- default properties used to filter the global settings -->
     <maven.it.central>http://repo1.maven.org/maven2</maven.it.central>
@@ -77,6 +61,7 @@ under the License.
     <proxy.user></proxy.user>
     <proxy.pass></proxy.pass>
     <slf4jVersion>1.6.1</slf4jVersion>
+    <jetty9Version>9.0.4.v20130625</jetty9Version>
   </properties>
 
   <dependencies>
@@ -85,7 +70,7 @@ under the License.
       <artifactId>junit</artifactId>
       <version>4.8.2</version>
       <!-- NOTE: Use compile scope for transitivity. -->
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
@@ -96,34 +81,63 @@ under the License.
       <groupId>org.apache.maven.its</groupId>
       <artifactId>maven-it-helper</artifactId>
       <version>2.1-SNAPSHOT</version>
-<!-- TODO: not transitive in tests artifact, so must be left in main scope
-      <scope>test</scope>
--->
+      <!-- TODO: not transitive in tests artifact, so must be left in main 
+        scope <scope>test</scope> -->
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-<!-- TODO: not transitive in tests artifact, so must be left in main scope
-      <scope>test</scope>
--->
+      <!-- TODO: not transitive in tests artifact, so must be left in main 
+        scope <scope>test</scope> -->
     </dependency>
-    <!--
-      Should be fine to introduce this here, even if we use the embedder as it should be using an isolated classloader 
-      Used to simplify tests that provide a test HTTP server.
-      -->
+    <!-- Should be fine to introduce this here, even if we use the embedder 
+      as it should be using an isolated classloader Used to simplify tests that 
+      provide a test HTTP server. -->
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jetty</artifactId>
       <version>6.1.14</version>
-<!-- TODO: not transitive in tests artifact, so must be left in main scope
-      <scope>test</scope>
--->
+      <!-- TODO: not transitive in tests artifact, so must be left in main 
+        scope <scope>test</scope> -->
+      <exclusions>
+        <exclusion>
+          <artifactId>servlet-api-2.5</artifactId>
+          <groupId>org.mortbay.jetty</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-shared-utils</artifactId>
       <version>0.6</version>
-    </dependency>    
+    </dependency>
+
+    <!-- Jetty9 server for testing -->
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>${jetty9Version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-security</artifactId>
+      <version>${jetty9Version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>${jetty9Version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty.orbit</groupId>
+      <artifactId>javax.servlet</artifactId>
+      <version>3.0.0.v201112011016</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>16.0</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -178,19 +192,19 @@ under the License.
 
   <profiles>
     <profile>
-        <id>parallel</id>
-        <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <configuration>
-                        <parallel>classes</parallel>
-                        <threadCount>6</threadCount>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </build>
+      <id>parallel</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <parallel>classes</parallel>
+              <threadCount>6</threadCount>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>run-its</id>
@@ -241,7 +255,8 @@ under the License.
             <configuration>
               <systemProperties combine.children="append">
                 <property>
-                  <!-- Pass this through to the tests (if set!) to have them pick the right repository -->
+                  <!-- Pass this through to the tests (if set!) to have them 
+                    pick the right repository -->
                   <name>maven.repo.local</name>
                   <value>${maven.repo.local}</value>
                 </property>
@@ -265,7 +280,8 @@ under the License.
             <configuration>
               <systemProperties combine.children="append">
                 <property>
-                  <!-- Pass this through to the tests (if set!) to have them pick the right repository layout -->
+                  <!-- Pass this through to the tests (if set!) to have them 
+                    pick the right repository layout -->
                   <name>maven.repo.local.layout</name>
                   <value>${maven.repo.local.layout}</value>
                 </property>
@@ -284,8 +300,10 @@ under the License.
             <configuration>
               <skip>false</skip>
               <forkMode>once</forkMode>
-              <argLine>${surefireMemory} -Dcom.sun.management.jmxremote=true</argLine>
-              <!-- NOTE: Maven plugins have access to the system class path so keep it clean -->
+              <argLine>${surefireMemory}
+                -Dcom.sun.management.jmxremote=true</argLine>
+              <!-- NOTE: Maven plugins have access to the system class path 
+                so keep it clean -->
               <useSystemClassLoader>false</useSystemClassLoader>
               <systemProperties combine.children="append">
                 <property>
@@ -360,11 +378,14 @@ under the License.
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete dir="${mavenHome}"/>
-                    <unzip src="${project.build.directory}/maven-bin.zip" dest="${mavenHome}">
-                      <globmapper from="apache-maven-${mavenVersion}/*" to="*" handledirsep="true" />
+                    <delete dir="${mavenHome}" />
+                    <unzip src="${project.build.directory}/maven-bin.zip"
+                      dest="${mavenHome}">
+                      <globmapper from="apache-maven-${mavenVersion}/*"
+                        to="*" handledirsep="true" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" perm="ugo+rx" includes="mvn,mvnDebug"/>
+                    <chmod dir="${mavenHome}/bin" perm="ugo+rx"
+                      includes="mvn,mvnDebug" />
                   </tasks>
                 </configuration>
               </execution>
@@ -404,11 +425,13 @@ under the License.
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete dir="${mavenHome}"/>
+                    <delete dir="${mavenHome}" />
                     <unzip src="${mavenDistro}" dest="${mavenHome}">
-                      <regexpmapper from="^([^/]+)/(.*)$" to="\2" handledirsep="true" />
+                      <regexpmapper from="^([^/]+)/(.*)$"
+                        to="\2" handledirsep="true" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" perm="ugo+rx" includes="mvn,mvnDebug"/>
+                    <chmod dir="${mavenHome}/bin" perm="ugo+rx"
+                      includes="mvn,mvnDebug" />
                   </tasks>
                 </configuration>
               </execution>
@@ -444,11 +467,12 @@ under the License.
                 </goals>
                 <configuration>
                   <tasks>
-                    <delete dir="${preparedMavenHome}"/>
+                    <delete dir="${preparedMavenHome}" />
                     <copy todir="${preparedMavenHome}" overwrite="true">
-                      <fileset dir="${mavenHome}"/>
+                      <fileset dir="${mavenHome}" />
                     </copy>
-                    <chmod dir="${preparedMavenHome}/bin" perm="ugo+rx" includes="mvn,mvnDebug"/>
+                    <chmod dir="${preparedMavenHome}/bin" perm="ugo+rx"
+                      includes="mvn,mvnDebug" />
                   </tasks>
                 </configuration>
               </execution>

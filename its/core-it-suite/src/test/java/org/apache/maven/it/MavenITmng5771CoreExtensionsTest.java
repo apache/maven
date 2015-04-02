@@ -1,6 +1,7 @@
 package org.apache.maven.it;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.apache.maven.it.util.ResourceExtractor;
 
@@ -30,6 +31,36 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.resetStreams();
     }
 
+    public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
+
+        HttpServer server = HttpServer.builder() //
+            .port(0) //
+            .username("maven") //
+            .password("secret") //
+            .source(new File(testDir, "repo")) //
+            .build();
+        server.start();
+        
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        Properties properties = verifier.newDefaultFilterProperties();
+        properties.setProperty("@port@", Integer.toString(server.port()));
+        verifier.filterFile( "settings-template-mirror-auth.xml", "settings.xml", "UTF-8", properties );
+
+        verifier = newVerifier( new File( testDir, "client" ).getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+        
+        server.stop();
+    }
+    
     public void testCoreExtensionNoDescriptor()
         throws Exception
     {

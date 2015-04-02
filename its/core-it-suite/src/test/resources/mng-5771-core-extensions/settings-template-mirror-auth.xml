@@ -1,0 +1,41 @@
+<settings>
+  <servers>        
+    <server>
+      <id>repoman</id>
+      <username>maven</username>
+      <password>secret</password>
+    </server>
+  </servers>
+  
+  <mirrors>
+    <mirror>
+      <id>repoman</id>
+      <name>Mirror</name>
+      <url>http://localhost:@port@</url>
+      <mirrorOf>external:*</mirrorOf>
+    </mirror>
+  </mirrors>
+  
+  <profiles>
+    <profile>
+      <id>development</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://central</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://central</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>development</activeProfile>
+  </activeProfiles>
+</settings>
+
