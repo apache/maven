@@ -272,13 +272,6 @@ public class MavenSession
         this.projectMap = projectMap;
     }
     
-    @Deprecated
-    /** @deprecated This appears to only be used in the ReactorReader and we can do any processing required there */
-    public Map<String, MavenProject> getProjectMap() 
-    {
-        return projectMap;
-    }
-
     /** This is a provisional method and may be removed */
     public List<MavenProject> getAllProjects()
     {
@@ -300,6 +293,13 @@ public class MavenSession
     private PlexusContainer container;    
     
     private final Settings settings;
+    
+    @Deprecated
+    /** @deprecated This appears to only be used in the ReactorReader and we can do any processing required there */
+    public Map<String, MavenProject> getProjectMap() 
+    {
+        return projectMap;
+    }
     
     @Deprecated
     public MavenSession( PlexusContainer container, RepositorySystemSession repositorySession,
