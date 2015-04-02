@@ -243,11 +243,11 @@ public class DefaultWagonManager
         // See org.eclipse.aether.connector.wagon.WagonRepositoryConnector.connectWagon(Wagon)
         if( legacySupport.getRepositorySession() != null )
         {
-            String userAgent = ConfigUtils.getString( legacySupport.getRepositorySession(), ConfigurationProperties.USER_AGENT );
+            String userAgent = ConfigUtils.getString( legacySupport.getRepositorySession(), null, ConfigurationProperties.USER_AGENT );
             if( userAgent == null)
             {
                 Properties headers = new Properties();
-    
+                    
                 headers.put( "User-Agent", ConfigUtils.getString( legacySupport.getRepositorySession(), "Maven",
                                                                   ConfigurationProperties.USER_AGENT ) );
                 try
