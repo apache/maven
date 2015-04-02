@@ -31,9 +31,32 @@ public class MavenITmng5771CoreExtensionsTest
         verifier.resetStreams();
     }
 
+    public void testCoreExtensionNoDescriptor()
+        throws Exception
+    {
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
+
+        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+
+        verifier = newVerifier( new File( testDir, "client-no-descriptor" ).getAbsolutePath() );
+        verifier.deleteDirectory( "target" );
+        verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
+        verifier.getCliOptions().add( "-s" );
+        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
+        verifier.executeGoal( "validate" );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
+    }
+    
+    //
+    // https://jira.codehaus.org/browse/MNG-5795: Maven extensions can not be retrieved from authenticated repositories
+    //
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication()
         throws Exception
     {
+        requiresMavenVersion( "[3.3.2-SNAPSHOT,)" );
+
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
 
         HttpServer server = HttpServer.builder() //
@@ -61,22 +84,5 @@ public class MavenITmng5771CoreExtensionsTest
         server.stop();
     }
     
-    public void testCoreExtensionNoDescriptor()
-        throws Exception
-    {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5771-core-extensions" );
-
-        Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-
-        verifier = newVerifier( new File( testDir, "client-no-descriptor" ).getAbsolutePath() );
-        verifier.deleteDirectory( "target" );
-        verifier.deleteArtifacts( "org.apache.maven.its.it-core-extensions" );
-        verifier.getCliOptions().add( "-s" );
-        verifier.getCliOptions().add( new File( testDir, "settings.xml" ).getAbsolutePath() );
-        verifier.executeGoal( "validate" );
-        verifier.verifyErrorFreeLog();
-        verifier.resetStreams();
-    }
 
 }
