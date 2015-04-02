@@ -84,6 +84,7 @@ public class DefaultWagonManager
     //
     // Retriever
     //
+    @Override
     public void getArtifact( Artifact artifact, ArtifactRepository repository, TransferListener downloadMonitor,
                              boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
@@ -148,6 +149,7 @@ public class DefaultWagonManager
         }
     }
 
+    @Override
     public void getArtifact( Artifact artifact, List<ArtifactRepository> remoteRepositories,
                              TransferListener downloadMonitor, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
@@ -206,6 +208,7 @@ public class DefaultWagonManager
         }
     }
 
+    @Override
     public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository repository, File destination,
                                      String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
@@ -215,6 +218,7 @@ public class DefaultWagonManager
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
     }
 
+    @Override
     public void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository repository,
                                                              File destination, String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
@@ -239,22 +243,26 @@ public class DefaultWagonManager
         // See org.eclipse.aether.connector.wagon.WagonRepositoryConnector.connectWagon(Wagon)
         if( legacySupport.getRepositorySession() != null )
         {
-            Properties headers = new Properties();
-
-            headers.put( "User-Agent", ConfigUtils.getString( legacySupport.getRepositorySession(), "Maven",
-                                                              ConfigurationProperties.USER_AGENT ) );
-            try
+            String userAgent = ConfigUtils.getString( legacySupport.getRepositorySession(), ConfigurationProperties.USER_AGENT );
+            if( userAgent == null)
             {
-                Method setHttpHeaders = wagon.getClass().getMethod( "setHttpHeaders", Properties.class );
-                setHttpHeaders.invoke( wagon, headers );
-            }
-            catch ( NoSuchMethodException e )
-            {
-                // normal for non-http wagons
-            }
-            catch ( Exception e )
-            {
-                logger.debug( "Could not set user agent for wagon " + wagon.getClass().getName() + ": " + e );
+                Properties headers = new Properties();
+    
+                headers.put( "User-Agent", ConfigUtils.getString( legacySupport.getRepositorySession(), "Maven",
+                                                                  ConfigurationProperties.USER_AGENT ) );
+                try
+                {
+                    Method setHttpHeaders = wagon.getClass().getMethod( "setHttpHeaders", Properties.class );
+                    setHttpHeaders.invoke( wagon, headers );
+                }
+                catch ( NoSuchMethodException e )
+                {
+                    // normal for non-http wagons
+                }
+                catch ( Exception e )
+                {
+                    logger.debug( "Could not set user agent for wagon " + wagon.getClass().getName() + ": " + e );
+                }
             }
         }
 
@@ -304,6 +312,7 @@ public class DefaultWagonManager
         return proxyInfo;
     }
 
+    @Override
     public void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
                                TransferListener downloadMonitor, String checksumPolicy, boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
@@ -522,6 +531,7 @@ public class DefaultWagonManager
     //
     // Publisher
     //
+    @Override
     public void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository,
                              TransferListener downloadMonitor )
         throws TransferFailedException
@@ -529,6 +539,7 @@ public class DefaultWagonManager
         putRemoteFile( deploymentRepository, source, deploymentRepository.pathOf( artifact ), downloadMonitor );
     }
 
+    @Override
     public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
         throws TransferFailedException
     {
@@ -536,6 +547,7 @@ public class DefaultWagonManager
         putRemoteFile( repository, source, repository.pathOfRemoteRepositoryMetadata( artifactMetadata ), null );
     }
 
+    @Override
     public void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
                                TransferListener downloadMonitor )
         throws TransferFailedException
@@ -774,6 +786,7 @@ public class DefaultWagonManager
         }
     }
 
+    @Override
     @Deprecated
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException
@@ -781,6 +794,7 @@ public class DefaultWagonManager
         return getWagon( repository.getProtocol() );
     }
 
+    @Override
     @Deprecated
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
