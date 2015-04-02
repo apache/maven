@@ -30,6 +30,7 @@ import javax.inject.Named;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -91,6 +92,9 @@ public class DefaultRepositorySystemSessionFactory
     @Inject
     private EventSpyDispatcher eventSpyDispatcher;
 
+    @Inject
+    MavenRepositorySystem mavenRepositorySystem;
+    
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -225,6 +229,14 @@ public class DefaultRepositorySystemSessionFactory
         session.setUserProperties( request.getUserProperties() );
         session.setSystemProperties( request.getSystemProperties() );
         session.setConfigProperties( configProps );
+
+        mavenRepositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
+        mavenRepositorySystem.injectProxy( session, request.getRemoteRepositories() );
+        mavenRepositorySystem.injectAuthentication( session, request.getRemoteRepositories() );
+
+        mavenRepositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );        
+        mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
+        mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
         return session;
     }

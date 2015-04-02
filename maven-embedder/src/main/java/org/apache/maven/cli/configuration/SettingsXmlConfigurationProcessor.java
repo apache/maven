@@ -42,9 +42,7 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.crypto.DefaultSettingsDecryptionRequest;
 import org.apache.maven.settings.crypto.SettingsDecrypter;
-import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
@@ -156,25 +154,9 @@ public class SettingsXmlConfigurationProcessor
             }
             logger.warn( "" );
         }
-
-        DefaultSettingsDecryptionRequest decrypt = new DefaultSettingsDecryptionRequest();
-        decrypt.setProxies( request.getProxies() );
-        decrypt.setServers( request.getServers() );
-        SettingsDecryptionResult decrypted = settingsDecrypter.decrypt( decrypt );
-
-        if ( logger.isDebugEnabled() )
-        {
-            for ( SettingsProblem problem : decrypted.getProblems() )
-            {
-                logger.debug( problem.getMessage(), problem.getException() );
-            }
-        }
-
-        request.setProxies( decrypt.getProxies() );
-        request.setServers( decrypt.getServers() );
     }
 
-    public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
+    private MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException
     {
         if ( settings == null )

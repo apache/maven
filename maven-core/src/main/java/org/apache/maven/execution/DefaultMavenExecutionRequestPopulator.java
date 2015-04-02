@@ -62,7 +62,156 @@ public class DefaultMavenExecutionRequestPopulator
         this.repositorySystem = repositorySystem;
     }
 
+
     @Override
+    public MavenExecutionRequest populateFromToolchains( MavenExecutionRequest request, PersistedToolchains toolchains )
+        throws MavenExecutionRequestPopulationException
+    {
+        if ( toolchains != null )
+        {
+            Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<String, List<ToolchainModel>>( 2 );
+
+            for ( ToolchainModel model : toolchains.getToolchains() )
+            {
+                if ( !groupedToolchains.containsKey( model.getType() ) )
+                {
+                    groupedToolchains.put( model.getType(), new ArrayList<ToolchainModel>() );
+                }
+
+                groupedToolchains.get( model.getType() ).add( model );
+            }
+
+            request.setToolchains( groupedToolchains );
+        }
+        return request;
+    }
+    
+    @Override
+    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
+        throws MavenExecutionRequestPopulationException
+    {
+        baseDirectory( request );
+
+        localRepository( request );
+
+        populateDefaultPluginGroups( request );
+
+        injectDefaultRepositories( request );
+
+        injectDefaultPluginRepositories( request );
+
+        return request;
+    }
+    
+    //
+    //
+    //
+    
+    private void populateDefaultPluginGroups( MavenExecutionRequest request )
+    {
+        request.addPluginGroup( "org.apache.maven.plugins" );
+        request.addPluginGroup( "org.codehaus.mojo" );
+    }
+
+    private void injectDefaultRepositories( MavenExecutionRequest request )
+        throws MavenExecutionRequestPopulationException
+    {
+        Set<String> definedRepositories = repositorySystem.getRepoIds( request.getRemoteRepositories() );
+
+        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+        {
+            try
+            {
+                request.addRemoteRepository( repositorySystem.createDefaultRemoteRepository( request ) );
+            }
+            catch ( Exception e )
+            {
+                throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
+            }
+        }
+    }
+
+    private void injectDefaultPluginRepositories( MavenExecutionRequest request )
+        throws MavenExecutionRequestPopulationException
+    {
+        Set<String> definedRepositories = repositorySystem.getRepoIds( request.getPluginArtifactRepositories() );
+
+        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
+        {
+            try
+            {
+                request.addPluginArtifactRepository( repositorySystem.createDefaultRemoteRepository( request ) );
+            }
+            catch ( Exception e )
+            {
+                throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
+            }
+        }
+    }
+
+    private void localRepository( MavenExecutionRequest request )
+        throws MavenExecutionRequestPopulationException
+    {
+        // ------------------------------------------------------------------------
+        // Local Repository
+        //
+        // 1. Use a value has been passed in via the configuration
+        // 2. Use value in the resultant settings
+        // 3. Use default value
+        // ------------------------------------------------------------------------
+
+        if ( request.getLocalRepository() == null )
+        {
+            request.setLocalRepository( createLocalRepository( request ) );
+        }
+
+        if ( request.getLocalRepositoryPath() == null )
+        {
+            request.setLocalRepositoryPath( new File( request.getLocalRepository().getBasedir() ).getAbsoluteFile() );
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Artifact Transfer Mechanism
+    // ------------------------------------------------------------------------
+
+    private ArtifactRepository createLocalRepository( MavenExecutionRequest request )
+        throws MavenExecutionRequestPopulationException
+    {
+        String localRepositoryPath = null;
+
+        if ( request.getLocalRepositoryPath() != null )
+        {
+            localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
+        }
+
+        if ( StringUtils.isEmpty( localRepositoryPath ) )
+        {
+            localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
+        }
+
+        try
+        {
+            return repositorySystem.createLocalRepository( request, new File( localRepositoryPath ) );
+        }
+        catch ( Exception e )
+        {
+            throw new MavenExecutionRequestPopulationException( "Cannot create local repository.", e );
+        }
+    }
+
+    private void baseDirectory( MavenExecutionRequest request )
+    {
+        if ( request.getBaseDirectory() == null && request.getPom() != null )
+        {
+            request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
+        }
+    }   
+    
+    /*if_not[MAVEN4]*/
+    
+    @Override
+    @Deprecated
     public MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException
     {
@@ -162,200 +311,8 @@ public class DefaultMavenExecutionRequestPopulator
         }
 
         return request;
-    }
-
-    @Override
-    public MavenExecutionRequest populateFromToolchains( MavenExecutionRequest request, PersistedToolchains toolchains )
-        throws MavenExecutionRequestPopulationException
-    {
-        if ( toolchains != null )
-        {
-            Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<String, List<ToolchainModel>>( 2 );
-
-            for ( ToolchainModel model : toolchains.getToolchains() )
-            {
-                if ( !groupedToolchains.containsKey( model.getType() ) )
-                {
-                    groupedToolchains.put( model.getType(), new ArrayList<ToolchainModel>() );
-                }
-
-                groupedToolchains.get( model.getType() ).add( model );
-            }
-
-            request.setToolchains( groupedToolchains );
-        }
-        return request;
-    }
+    }    
     
-    @Override
-    public MavenExecutionRequest populateDefaults( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
-    {
-        baseDirectory( request );
+    /*end[MAVEN4]*/
 
-        localRepository( request );
-
-        populateDefaultPluginGroups( request );
-
-        injectDefaultRepositories( request );
-
-        injectDefaultPluginRepositories( request );
-
-        processRepositoriesInSettings( request );
-
-        return request;
-    }
-    
-    //
-    //
-    //
-    
-    private void populateDefaultPluginGroups( MavenExecutionRequest request )
-    {
-        request.addPluginGroup( "org.apache.maven.plugins" );
-        request.addPluginGroup( "org.codehaus.mojo" );
-    }
-
-    private void injectDefaultRepositories( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
-    {
-        Set<String> definedRepositories = repositorySystem.getRepoIds( request.getRemoteRepositories() );
-
-        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
-        {
-            try
-            {
-                request.addRemoteRepository( repositorySystem.createDefaultRemoteRepository( request ) );
-            }
-            catch ( Exception e )
-            {
-                throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
-            }
-        }
-    }
-
-    private void injectDefaultPluginRepositories( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
-    {
-        Set<String> definedRepositories = repositorySystem.getRepoIds( request.getPluginArtifactRepositories() );
-
-        if ( !definedRepositories.contains( RepositorySystem.DEFAULT_REMOTE_REPO_ID ) )
-        {
-            try
-            {
-                request.addPluginArtifactRepository( repositorySystem.createDefaultRemoteRepository( request ) );
-            }
-            catch ( Exception e )
-            {
-                throw new MavenExecutionRequestPopulationException( "Cannot create default remote repository.", e );
-            }
-        }
-    }
-
-    private void processRepositoriesInSettings( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
-    {
-        //
-        //    <settings>
-        //      <mirrors>
-        //        <mirror>
-        //          <id>central</id>
-        //          <!-- NOTE: We need to try and use the proper host name/ip as Java generally ignores proxies for
-        //                     "localhost" -->
-        //          <url>http://10.0.1.34:62247/</url>
-        //          <mirrorOf>central</mirrorOf>
-        //        </mirror>
-        //      </mirrors>
-        //      <proxies>
-        //        <proxy>
-        //          <active>true</active>
-        //          <protocol>http</protocol>
-        //          <host>localhost</host>
-        //          <port>62248</port>
-        //          <nonProxyHosts>10.0.1.34</nonProxyHosts>
-        //        </proxy>
-        //      </proxies>
-        //      <profiles>
-        //        <profile>
-        //          <id>it-defaults</id>
-        //          <!-- disable central override and use built-in values -->
-        //        </profile>
-        //      </profiles>
-        //      <activeProfiles>
-        //        <activeProfile>it-defaults</activeProfile>
-        //      </activeProfiles>
-        //    </settings>
-        //
-        // Turns
-        //
-        // http://repo1.maven.org/maven2
-        //
-        // to
-        //
-        // http://10.0.1.34:62247/
-        //
-        // Not sure why the DefaultMirrorSelector doesn't do this...
-        //
-        repositorySystem.injectMirror( request.getRemoteRepositories(), request.getMirrors() );
-        repositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );
-    }
-
-    private void localRepository( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
-    {
-        // ------------------------------------------------------------------------
-        // Local Repository
-        //
-        // 1. Use a value has been passed in via the configuration
-        // 2. Use value in the resultant settings
-        // 3. Use default value
-        // ------------------------------------------------------------------------
-
-        if ( request.getLocalRepository() == null )
-        {
-            request.setLocalRepository( createLocalRepository( request ) );
-        }
-
-        if ( request.getLocalRepositoryPath() == null )
-        {
-            request.setLocalRepositoryPath( new File( request.getLocalRepository().getBasedir() ).getAbsoluteFile() );
-        }
-    }
-
-    // ------------------------------------------------------------------------
-    // Artifact Transfer Mechanism
-    // ------------------------------------------------------------------------
-
-    private ArtifactRepository createLocalRepository( MavenExecutionRequest request )
-        throws MavenExecutionRequestPopulationException
-    {
-        String localRepositoryPath = null;
-
-        if ( request.getLocalRepositoryPath() != null )
-        {
-            localRepositoryPath = request.getLocalRepositoryPath().getAbsolutePath();
-        }
-
-        if ( StringUtils.isEmpty( localRepositoryPath ) )
-        {
-            localRepositoryPath = RepositorySystem.defaultUserLocalRepository.getAbsolutePath();
-        }
-
-        try
-        {
-            return repositorySystem.createLocalRepository( request, new File( localRepositoryPath ) );
-        }
-        catch ( Exception e )
-        {
-            throw new MavenExecutionRequestPopulationException( "Cannot create local repository.", e );
-        }
-    }
-
-    private void baseDirectory( MavenExecutionRequest request )
-    {
-        if ( request.getBaseDirectory() == null && request.getPom() != null )
-        {
-            request.setBaseDirectory( request.getPom().getAbsoluteFile().getParentFile() );
-        }
-    }   
 }
