@@ -86,7 +86,7 @@ public class MavenWrapperMain {
 
   static String wrapperVersion() {
     try {
-      InputStream resourceAsStream = MavenWrapperMain.class.getResourceAsStream("/META-INF/maven/org.apache.maven/maven-wapper/pom.properties");
+      InputStream resourceAsStream = MavenWrapperMain.class.getResourceAsStream("/META-INF/maven/io.takari/maven-wapper/pom.properties");
       if (resourceAsStream == null) {
         throw new RuntimeException("No maven properties found.");
       }
