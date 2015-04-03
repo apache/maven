@@ -8,16 +8,22 @@ The easiest way to setup the Maven Wrapper for your project is to use the [Takar
 mvn -N io.takari:maven:wrapper
 ```
 
-Normally you might tell users to use the normal `mvn` command like the following:
+Normally you instruct user to run the `mvn` command like the following:
 
 ```
 $ mvn clean install
 ```
 
-But now, with a Maven Wrapper setup, you can instruct users to run the following instead:
+But now, with a Maven Wrapper setup, you can instruct users to run wrapper scripts:
 
 ```
 $ ./mvnw clean install
+```
+
+or
+
+```
+$ ./mvnw.bat clean install
 ```
 
 A normal Maven build will be executed with the one important change that if the user doesn't have the necessary version of Maven specified in `.mvn/wrapper/maven-wrapper.properties` it will be downloaed for the user first.
