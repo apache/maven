@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
@@ -141,6 +142,23 @@ public class DefaultSettingsValidator
                     + "pluginRepositories.pluginRepository" );
             }
         }
+
+        List<Proxy> proxies = settings.getProxies();
+
+        if ( proxies != null )
+        {
+            Set<String> proxyIds = new HashSet<String>();
+            
+            for ( Proxy proxy : proxies )
+            {
+                if ( !proxyIds.add( proxy.getId() ) )
+                {
+                    addViolation( problems, Severity.WARNING, "proxies.proxy.id", null,
+                                  "must be unique but found duplicate proxy with id " + proxy.getId() );
+                }
+                validateStringNotEmpty( problems, "proxies.proxy.host", proxy.getHost(), proxy.getId() );
+            }
+        }
     }
 
     private void validateRepositories( SettingsProblemCollector problems, List<Repository> repositories, String prefix )
@@ -189,7 +207,7 @@ public class DefaultSettingsValidator
      * <li><code>string.length > 0</code>
      * </ul>
      */
-    private boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string,
+    private static boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string,
                                             String sourceHint )
     {
         if ( !validateNotNull( problems, fieldName, string, sourceHint ) )
@@ -214,7 +232,7 @@ public class DefaultSettingsValidator
      * <li><code>string != null</code>
      * </ul>
      */
-    private boolean validateNotNull( SettingsProblemCollector problems, String fieldName, Object object,
+    private static boolean validateNotNull( SettingsProblemCollector problems, String fieldName, Object object,
                                      String sourceHint )
     {
         if ( object != null )
@@ -227,7 +245,7 @@ public class DefaultSettingsValidator
         return false;
     }
 
-    private boolean validateBannedCharacters( SettingsProblemCollector problems, String fieldName, Severity severity,
+    private static boolean validateBannedCharacters( SettingsProblemCollector problems, String fieldName, Severity severity,
                                               String string, String sourceHint, String banned )
     {
         if ( string != null )
@@ -247,7 +265,7 @@ public class DefaultSettingsValidator
         return true;
     }
 
-    private void addViolation( SettingsProblemCollector problems, Severity severity, String fieldName,
+    private static void addViolation( SettingsProblemCollector problems, Severity severity, String fieldName,
                                String sourceHint, String message )
     {
         StringBuilder buffer = new StringBuilder( 256 );

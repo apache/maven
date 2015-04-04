@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
@@ -193,6 +194,38 @@ public class DefaultSettingsValidatorTest
         assertEquals( 1, problems.messages.size() );
         assertContains( problems.messages.get( 0 ), "'profiles.profile[pro].repositories.repository.id' must be unique"
             + " but found duplicate repository with id test" );
+    }
+
+    public void testValidateUniqueProxyId()
+        throws Exception
+    {
+        Settings settings = new Settings();
+        Proxy proxy = new Proxy();
+        String id = null;
+        proxy.setId( id );
+        proxy.setHost("www.example.com");
+        settings.addProxy( proxy );
+        settings.addProxy( proxy );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate( settings, problems );
+        assertEquals( 1, problems.messages.size() );
+        assertContains( problems.messages.get( 0 ), "'proxies.proxy.id' must be unique"
+            + " but found duplicate proxy with id " + id );
+
+    }
+
+    public void testValidateProxy()
+        throws Exception
+    {
+        Settings settings = new Settings();
+        Proxy proxy1 = new Proxy();
+        settings.addProxy( proxy1 );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate( settings, problems );
+        assertEquals( 1, problems.messages.size() );
+        assertContains( problems.messages.get( 0 ), "'proxies.proxy.host' for default is missing" );
     }
 
     private static class SimpleProblemCollector
