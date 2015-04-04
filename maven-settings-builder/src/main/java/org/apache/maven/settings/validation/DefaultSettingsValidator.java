@@ -233,7 +233,7 @@ public class DefaultSettingsValidator
      * </ul>
      */
     private static boolean validateNotNull( SettingsProblemCollector problems, String fieldName, Object object,
-                                     String sourceHint )
+                                            String sourceHint )
     {
         if ( object != null )
         {
@@ -245,8 +245,9 @@ public class DefaultSettingsValidator
         return false;
     }
 
-    private static boolean validateBannedCharacters( SettingsProblemCollector problems, String fieldName, Severity severity,
-                                              String string, String sourceHint, String banned )
+    private static boolean validateBannedCharacters( SettingsProblemCollector problems, String fieldName,
+                                                     Severity severity, String string, String sourceHint,
+                                                     String banned )
     {
         if ( string != null )
         {
