@@ -100,9 +100,16 @@ public class PluginParameterExpressionEvaluator
     {
         this.session = session;
         this.mojoExecution = mojoExecution;
-        this.properties = session.getExecutionProperties();
+        this.properties = new Properties();
         this.project = session.getCurrentProject();
 
+        //
+        // Maven4: We may want to evaluate how this is used but we add these separate as the 
+        // getExecutionProperties is deprecated in MavenSession.
+        //
+        this.properties.putAll( session.getUserProperties() );
+        this.properties.putAll( session.getSystemProperties() );
+        
         String basedir = null;
 
         if ( project != null )
@@ -129,12 +136,14 @@ public class PluginParameterExpressionEvaluator
         this.basedir = basedir;
     }
 
+    @Override
     public Object evaluate( String expr )
         throws ExpressionEvaluationException
     {
         return evaluate( expr, null );
     }
 
+    @Override
     public Object evaluate( String expr, Class<?> type )
         throws ExpressionEvaluationException
     {
@@ -445,6 +454,7 @@ public class PluginParameterExpressionEvaluator
         return expr;
     }
 
+    @Override
     public File alignToBaseDirectory( File file )
     {
         // TODO: Copied from the DefaultInterpolator. We likely want to resurrect the PathTranslator or at least a

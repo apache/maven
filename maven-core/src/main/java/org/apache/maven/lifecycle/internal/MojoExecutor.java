@@ -19,6 +19,15 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -39,15 +48,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Executes an individual mojo
@@ -169,7 +169,7 @@ public class MojoExecutor
             throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
         }
 
-        if ( mojoDescriptor.isProjectRequired() && !session.isUsingPOMsFromFilesystem() )
+        if ( mojoDescriptor.isProjectRequired() && !session.getRequest().isProjectPresent() )
         {
             Throwable cause =
                 new MissingProjectException( "Goal requires a project to execute"
