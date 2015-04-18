@@ -32,7 +32,7 @@ public class DefaultLifecycleMapping
     private Map<String, Lifecycle> lifecycleMap;
 
     /** @deprecated use lifecycles instead */
-    private Map<String, String> phases;
+    private Map<String, LifecyclePhase> phases;
 
     /**
      * Populates the lifecycle map from the injected list of lifecycle mappings (if not already done).
@@ -61,7 +61,7 @@ public class DefaultLifecycleMapping
 
                 for ( String lifecycleId : lifecycleIds )
                 {
-                    Map<String, String> phases = getPhases( lifecycleId );
+                    Map<String, LifecyclePhase> phases = getPhases( lifecycleId );
                     if ( phases != null )
                     {
                         Lifecycle lifecycle = new Lifecycle();
@@ -88,7 +88,7 @@ public class DefaultLifecycleMapping
         return null;
     }
 
-    public Map<String, String> getPhases( String lifecycle )
+    public Map<String, LifecyclePhase> getPhases( String lifecycle )
     {
         initLifecycleMap();
 

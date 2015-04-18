@@ -23,6 +23,8 @@ import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.lifecycle.mapping.LifecycleMojo;
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.codehaus.plexus.component.annotations.Component;
@@ -98,7 +100,7 @@ public class DefaultLifecyclePluginAnalyzer
             org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
                 lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
 
-            Map<String, String> phaseToGoalMapping = null;
+            Map<String, LifecyclePhase> phaseToGoalMapping = null;
 
             if ( lifecycleConfiguration != null )
             {
@@ -111,14 +113,10 @@ public class DefaultLifecyclePluginAnalyzer
 
             if ( phaseToGoalMapping != null )
             {
-                // These are of the form:
-                //
-                // compile -> org.apache.maven.plugins:maven-compiler-plugin:compile[,gid:aid:goal,...]
-                //
-                for ( Map.Entry<String, String> goalsForLifecyclePhase : phaseToGoalMapping.entrySet() )
+                for ( Map.Entry<String, LifecyclePhase> goalsForLifecyclePhase : phaseToGoalMapping.entrySet() )
                 {
                     String phase = goalsForLifecyclePhase.getKey();
-                    String goals = goalsForLifecyclePhase.getValue();
+                    LifecyclePhase goals = goalsForLifecyclePhase.getValue();
                     if ( goals != null )
                     {
                         parseLifecyclePhaseDefinitions( plugins, phase, goals );
@@ -149,47 +147,54 @@ public class DefaultLifecyclePluginAnalyzer
         return lifecycles;
     }
 
-    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, String goals )
+    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )
     {
-        String[] mojos = StringUtils.split( goals, "," );
-
-        for ( int i = 0; i < mojos.length; i++ )
+        List<LifecycleMojo> mojos = goals.getMojos();
+        if ( mojos != null )
         {
-            GoalSpec gs = parseGoalSpec( mojos[i].trim() );
-
-            if ( gs == null )
+            
+            for ( int i = 0; i < mojos.size(); i++ )
             {
-                logger.warn( "Ignored invalid goal specification '" + mojos[i] + "' from lifecycle mapping for phase "
-                    + phase );
-                continue;
-            }
-
-            Plugin plugin = new Plugin();
-            plugin.setGroupId( gs.groupId );
-            plugin.setArtifactId( gs.artifactId );
-            plugin.setVersion( gs.version );
-
-            Plugin existing = plugins.get( plugin );
-            if ( existing != null )
-            {
-                if ( existing.getVersion() == null )
+                LifecycleMojo mojo = mojos.get( i );
+                
+                GoalSpec gs = parseGoalSpec( mojo.getGoal() );
+    
+                if ( gs == null )
                 {
-                    existing.setVersion( plugin.getVersion() );
+                    logger.warn( "Ignored invalid goal specification '" + mojo.getGoal()
+                            + "' from lifecycle mapping for phase " + phase );
+                    continue;
                 }
-                plugin = existing;
+    
+                Plugin plugin = new Plugin();
+                plugin.setGroupId( gs.groupId );
+                plugin.setArtifactId( gs.artifactId );
+                plugin.setVersion( gs.version );
+    
+                Plugin existing = plugins.get( plugin );
+                if ( existing != null )
+                {
+                    if ( existing.getVersion() == null )
+                    {
+                        existing.setVersion( plugin.getVersion() );
+                    }
+                    plugin = existing;
+                }
+                else
+                {
+                    plugins.put( plugin, plugin );
+                }
+    
+                PluginExecution execution = new PluginExecution();
+                execution.setId( getExecutionId( plugin, gs.goal ) );
+                execution.setPhase( phase );
+                execution.setPriority( i - mojos.size() );
+                execution.getGoals().add( gs.goal );
+                execution.setConfiguration( mojo.getConfiguration() );
+                
+                plugin.setDependencies( mojo.getDependencies() );
+                plugin.getExecutions().add( execution );
             }
-            else
-            {
-                plugins.put( plugin, plugin );
-            }
-
-            PluginExecution execution = new PluginExecution();
-            execution.setId( getExecutionId( plugin, gs.goal ) );
-            execution.setPhase( phase );
-            execution.setPriority( i - mojos.length );
-            execution.getGoals().add( gs.goal );
-
-            plugin.getExecutions().add( execution );
         }
     }
 
