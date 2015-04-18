@@ -45,7 +45,14 @@ public class FileSource
         {
             throw new IllegalArgumentException( "no file specified" );
         }
-        this.file = file.getAbsoluteFile();
+        try
+        {
+            this.file = file.getCanonicalFile();
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalArgumentException( "Cannot read " + file, e );
+        }
     }
 
     @Override
