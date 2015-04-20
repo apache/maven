@@ -20,20 +20,44 @@ package org.apache.maven.lifecycle.mapping;
  */
 
 import java.util.List;
-import java.util.Map;
 
-public interface LifecycleMapping
+import org.apache.maven.model.Dependency;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+
+public class LifecycleMojo
 {
-
-    @Deprecated
-    String ROLE = LifecycleMapping.class.getName();
-
-    Map<String, Lifecycle> getLifecycles();
-
-    @Deprecated
-    List<String> getOptionalMojos( String lifecycle );
-
-    @Deprecated
-    Map<String, LifecyclePhase> getPhases( String lifecycle );
-
+    
+    private String goal;
+    private Xpp3Dom configuration;
+    private List<Dependency> dependencies;
+    
+    public String getGoal()
+    {
+        return goal;
+    }
+    
+    public Xpp3Dom getConfiguration()
+    {
+        return configuration;
+    }
+    
+    public List<Dependency> getDependencies()
+    {
+        return dependencies;
+    }
+    
+    public void setGoal( String goal )
+    {
+        this.goal = goal;
+    }
+    
+    public void setConfiguration( Xpp3Dom configuration )
+    {
+        this.configuration = configuration;
+    }
+    
+    public void setDependencies( List<Dependency> dependencies )
+    {
+        this.dependencies = dependencies;
+    }
 }

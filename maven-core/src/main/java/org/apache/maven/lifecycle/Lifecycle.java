@@ -22,6 +22,8 @@ package org.apache.maven.lifecycle;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
+
 /**
  * Class Lifecycle.
  */
@@ -31,7 +33,7 @@ public class Lifecycle
     {
     }
 
-    public Lifecycle( String id, List<String> phases, Map<String, String> defaultPhases )
+    public Lifecycle( String id, List<String> phases, Map<String, LifecyclePhase> defaultPhases )
     {
         this.id = id;
         this.phases = phases;
@@ -54,7 +56,7 @@ public class Lifecycle
 
     private List<String> phases;
 
-    private Map<String, String> defaultPhases;
+    private Map<String, LifecyclePhase> defaultPhases;
 
     public String getId()
     {
@@ -66,7 +68,7 @@ public class Lifecycle
         return this.phases;
     }
 
-    public Map<String, String> getDefaultPhases()
+    public Map<String, LifecyclePhase> getDefaultPhases()
     {
         return defaultPhases;
     }

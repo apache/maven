@@ -19,21 +19,46 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-public interface LifecycleMapping
+import org.codehaus.plexus.util.StringUtils;
+
+public class LifecyclePhase
 {
-
-    @Deprecated
-    String ROLE = LifecycleMapping.class.getName();
-
-    Map<String, Lifecycle> getLifecycles();
-
-    @Deprecated
-    List<String> getOptionalMojos( String lifecycle );
-
-    @Deprecated
-    Map<String, LifecyclePhase> getPhases( String lifecycle );
-
+    
+    private List<LifecycleMojo> mojos;
+    
+    public LifecyclePhase()
+    {
+    }
+    
+    public LifecyclePhase( String goals )
+    {
+        set( goals );
+    }
+    
+    public List<LifecycleMojo> getMojos()
+    {
+        return mojos;
+    }
+    
+    public void setMojos( List<LifecycleMojo> mojos )
+    {
+        this.mojos = mojos;
+    }
+    
+    public void set( String goals )
+    {
+        mojos = new ArrayList<LifecycleMojo>();
+        
+        String[] mojoGoals = StringUtils.split( goals, "," );
+        
+        for ( String mojoGoal: mojoGoals )
+        {
+            LifecycleMojo lifecycleMojo = new LifecycleMojo();
+            lifecycleMojo.setGoal( mojoGoal.trim() );
+            mojos.add( lifecycleMojo );
+        }
+    }
 }
