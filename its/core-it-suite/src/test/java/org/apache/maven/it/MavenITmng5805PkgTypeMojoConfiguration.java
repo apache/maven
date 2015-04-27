@@ -10,7 +10,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration
 
     public MavenITmng5805PkgTypeMojoConfiguration()
     {
-        super( "(3.3.2,)" );
+        super( "(3.3.3,)" );
     }
 
     public void testPkgTypeMojoConfiguration()
@@ -38,6 +38,7 @@ public class MavenITmng5805PkgTypeMojoConfiguration
         verifier = newVerifier( new File( testDir, "project" ).getAbsolutePath() );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
+        verifier.verifyTextInLog( "CLASS_NAME=org.apache.maven.its.mng5805.TestClass1" );
         verifier.resetStreams();
     }
 }
