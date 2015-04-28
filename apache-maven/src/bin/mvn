@@ -34,7 +34,11 @@
 #   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 # ----------------------------------------------------------------------------
 
+
+
 if [ -z "$MAVEN_SKIP_RC" ] ; then
+
+  MAVEN_OPTS_TEMP="$MAVEN_OPTS"
 
   if [ -f /etc/mavenrc ] ; then
     . /etc/mavenrc
@@ -43,6 +47,8 @@ if [ -z "$MAVEN_SKIP_RC" ] ; then
   if [ -f "$HOME/.mavenrc" ] ; then
     . "$HOME/.mavenrc"
   fi
+
+  MAVEN_OPTS="$MAVEN_OPTS $MAVEN_OPTS_TEMP"
 
 fi
 
