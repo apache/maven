@@ -377,7 +377,10 @@ public class MavenCli
             {
                 for ( String arg : Files.toString( configFile, Charsets.UTF_8 ).split( "\\s+" ) )
                 {
-                    args.add( arg );
+                    if ( !arg.isEmpty() )
+                    {
+                        args.add( arg );
+                    }
                 }
 
                 CommandLine config = cliManager.parse( args.toArray( new String[args.size()] ) );
