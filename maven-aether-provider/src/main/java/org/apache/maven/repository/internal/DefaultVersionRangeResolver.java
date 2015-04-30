@@ -53,9 +53,11 @@ import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
+import org.eclipse.sisu.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -68,7 +70,8 @@ import java.util.Map;
  * @author Benjamin Bentmann
  */
 @Named
-@Component( role = VersionRangeResolver.class )
+@Singleton
+@Component( role = VersionRangeResolver.class, hint = "default" )
 public class DefaultVersionRangeResolver
     implements VersionRangeResolver, Service
 {
@@ -88,6 +91,9 @@ public class DefaultVersionRangeResolver
     @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
 
+    @Requirement( role = VersionRangeResultFilter.class, optional = true )
+    private VersionRangeResultFilter versionRangeResultFilter = new DefaultVersionRangeResultFilter();
+
     public DefaultVersionRangeResolver()
     {
         // enable default constructor
@@ -95,12 +101,17 @@ public class DefaultVersionRangeResolver
 
     @Inject
     DefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-                                 RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+                                 RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory,
+                                 @Nullable VersionRangeResultFilter versionRangeResultFilter )
     {
         setMetadataResolver( metadataResolver );
         setSyncContextFactory( syncContextFactory );
         setLoggerFactory( loggerFactory );
         setRepositoryEventDispatcher( repositoryEventDispatcher );
+        if ( versionRangeResultFilter != null )
+        {
+            setVersionRangeResultFilter( versionRangeResultFilter );
+        }
     }
 
     public void initService( ServiceLocator locator )
@@ -109,6 +120,11 @@ public class DefaultVersionRangeResolver
         setMetadataResolver( locator.getService( MetadataResolver.class ) );
         setSyncContextFactory( locator.getService( SyncContextFactory.class ) );
         setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
+        final VersionRangeResultFilter versionRangeResultFilter = locator.getService( VersionRangeResultFilter.class );
+        if ( versionRangeResultFilter != null )
+        {
+            setVersionRangeResultFilter( versionRangeResultFilter );
+        }
     }
 
     public DefaultVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
@@ -140,6 +156,13 @@ public class DefaultVersionRangeResolver
     {
         this.repositoryEventDispatcher = Validate.notNull( repositoryEventDispatcher,
             "repositoryEventDispatcher cannot be null" );
+        return this;
+    }
+
+    public DefaultVersionRangeResolver setVersionRangeResultFilter( VersionRangeResultFilter versionRangeResultFilter )
+    {
+        this.versionRangeResultFilter = Validate.notNull( versionRangeResultFilter,
+                "versionRangeResultFilter cannot be null" );
         return this;
     }
 
@@ -193,7 +216,7 @@ public class DefaultVersionRangeResolver
             result.setVersions( versions );
         }
 
-        return result;
+        return versionRangeResultFilter.filterVersionRangeResult( result );
     }
 
     private Map<String, ArtifactRepository> getVersions( RepositorySystemSession session, VersionRangeResult result,
