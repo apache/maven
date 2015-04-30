@@ -13,3 +13,5 @@ out/
 /bootstrap
 /dependencies.xml
 .java-version
+nb-configuration.xml
+

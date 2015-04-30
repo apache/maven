@@ -19,6 +19,14 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
@@ -54,15 +62,6 @@ import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Benjamin Bentmann
  */
@@ -86,6 +85,9 @@ public class DefaultVersionRangeResolver
 
     @Requirement
     private RepositoryEventDispatcher repositoryEventDispatcher;
+
+    @Requirement( optional = true )
+    private VersionRangeResultFilter versionRangeResultFilter = new DefaultVersionRangeResultFilter();
 
     public DefaultVersionRangeResolver()
     {
@@ -152,6 +154,16 @@ public class DefaultVersionRangeResolver
         return this;
     }
 
+    public DefaultVersionRangeResolver setVersionRageResultFilter( VersionRangeResultFilter versionRangeResultFilter )
+    {
+        if ( versionRangeResultFilter == null )
+        {
+            throw new IllegalArgumentException( "version range result filter has not been specified" );
+        }
+        this.versionRangeResultFilter = versionRangeResultFilter;
+        return this;
+    }
+
     public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
         throws VersionRangeResolutionException
     {
@@ -202,7 +214,7 @@ public class DefaultVersionRangeResolver
             result.setVersions( versions );
         }
 
-        return result;
+      return versionRangeResultFilter.filterVersionRangeResult( result );
     }
 
     private Map<String, ArtifactRepository> getVersions( RepositorySystemSession session, VersionRangeResult result,
