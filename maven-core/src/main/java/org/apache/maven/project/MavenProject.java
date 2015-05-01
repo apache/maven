@@ -995,11 +995,13 @@ public class MavenProject
      * @return {@link Set} &lt; {@link Artifact} >
      * @see #getArtifacts() to get all transitive dependencies
      */
+    @Deprecated
     public Set<Artifact> getDependencyArtifacts()
     {
         return dependencyArtifacts;
     }
 
+    @Deprecated
     public void setDependencyArtifacts( Set<Artifact> dependencyArtifacts )
     {
         this.dependencyArtifacts = dependencyArtifacts;
