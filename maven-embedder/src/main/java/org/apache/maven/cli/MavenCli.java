@@ -328,7 +328,7 @@ public class MavenCli
             String basedirProperty = System.getProperty( MULTIMODULE_PROJECT_DIRECTORY );
             if ( basedirProperty == null )
             {
-                System.err.format( "-D%s system propery is not set."
+                System.err.format( "-D%s system property is not set."
                     + " Check $M2_HOME environment variable and mvn script match.", MULTIMODULE_PROJECT_DIRECTORY );
                 throw new ExitException( 1 );
             }
