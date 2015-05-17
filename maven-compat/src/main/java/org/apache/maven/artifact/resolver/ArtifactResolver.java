@@ -68,6 +68,7 @@ public interface ArtifactResolver
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    // USED BY INVOKER PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
                                                   List<ArtifactRepository> remoteRepositories,
@@ -89,7 +90,7 @@ public interface ArtifactResolver
                                                   List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    // USED BY REMOTE RESOURCES PLUGIN, DEPENDENCY PLUGIN
+    // USED BY REMOTE RESOURCES PLUGIN, DEPENDENCY PLUGIN, SHADE PLUGIN
     @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
