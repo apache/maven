@@ -31,6 +31,8 @@
 #   MAVEN_OPTS - parameters passed to the Java VM when running Maven
 #     e.g. to debug Maven itself, use
 #       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+#   MAVEN_ARGS - parameters passed to Maven. Useful for settings defaults
+#     e.g. MAVEN_ARGS="--settings $HOME/settings.xml"
 #   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 # ----------------------------------------------------------------------------
 
@@ -221,7 +223,7 @@ MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
 
 # Provide a "standardized" way to retrieve the CLI args that will 
 # work with both Windows and non-Windows executions.
-MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
+MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $MAVEN_ARGS $@"
 export MAVEN_CMD_LINE_ARGS
 
 exec "$JAVACMD" \
@@ -229,4 +231,4 @@ exec "$JAVACMD" \
   -classpath "${M2_HOME}"/boot/plexus-classworlds-*.jar \
   "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
   "-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
-  ${CLASSWORLDS_LAUNCHER} "$@"
+  ${CLASSWORLDS_LAUNCHER} $MAVEN_CMD_LINE_ARGS
