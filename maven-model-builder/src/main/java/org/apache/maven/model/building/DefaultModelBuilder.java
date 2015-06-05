@@ -919,6 +919,11 @@ public class DefaultModelBuilder
                 .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ) );
             return null;
         }
+        if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
+        {
+            // version skew drop back to resolution from the repository
+            return null;
+        }
 
         //
         // Here we just need to know that a version is fine to use but this validation we can do in our workspace
