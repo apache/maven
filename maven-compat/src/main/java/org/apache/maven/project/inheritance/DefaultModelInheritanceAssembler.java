@@ -261,6 +261,12 @@ public class DefaultModelInheritanceAssembler
             child.setCiManagement( parent.getCiManagement() );
         }
 
+        // qualityManagement
+        if ( child.getQualityManagement() == null )
+        {
+            child.setQualityManagement( parent.getQualityManagement() );
+        }
+
         // developers
         if ( child.getDevelopers().size() == 0 )
         {

@@ -30,6 +30,7 @@ import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.CiManagement;
+import org.apache.maven.model.QualityManagement;
 import org.apache.maven.model.ConfigurationContainer;
 import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
@@ -145,6 +146,7 @@ public class ModelMerger
         mergeModel_IssueManagement( target, source, sourceDominant, context );
         mergeModel_Scm( target, source, sourceDominant, context );
         mergeModel_CiManagement( target, source, sourceDominant, context );
+        mergeModel_QualityManagement( target, source, sourceDominant, context );
         mergeModel_Prerequisites( target, source, sourceDominant, context );
         mergeModel_Build( target, source, sourceDominant, context );
         mergeModel_Profiles( target, source, sourceDominant, context );
@@ -463,6 +465,22 @@ public class ModelMerger
                 target.setCiManagement( tgt );
             }
             mergeCiManagement( tgt, src, sourceDominant, context );
+        }
+    }
+
+    protected void mergeModel_QualityManagement( Model target, Model source, boolean sourceDominant,
+                                                 Map<Object, Object> context )
+    {
+        QualityManagement src = source.getQualityManagement();
+        if ( src != null )
+        {
+            QualityManagement tgt = target.getQualityManagement();
+            if ( tgt == null )
+            {
+                tgt = new QualityManagement();
+                target.setQualityManagement( tgt );
+            }
+            mergeQualityManagement( tgt, src, sourceDominant, context );
         }
     }
 
@@ -2138,6 +2156,41 @@ public class ModelMerger
         if ( sourceDominant )
         {
             target.setSendOnWarning( source.isSendOnWarning() );
+        }
+    }
+
+    protected void mergeQualityManagement( QualityManagement target, QualityManagement source, boolean sourceDominant,
+                                           Map<Object, Object> context )
+    {
+        mergeQualityManagement_System( target, source, sourceDominant, context );
+        mergeQualityManagement_Url( target, source, sourceDominant, context );
+    }
+
+    protected void mergeQualityManagement_System( QualityManagement target, QualityManagement source,
+                                                  boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getSystem();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getSystem() == null )
+            {
+                target.setSystem( src );
+                target.setLocation( "system", source.getLocation( "system" ) );
+            }
+        }
+    }
+
+    protected void mergeQualityManagement_Url( QualityManagement target, QualityManagement source,
+                                               boolean sourceDominant, Map<Object, Object> context )
+    {
+        String src = source.getUrl();
+        if ( src != null )
+        {
+            if ( sourceDominant || target.getUrl() == null )
+            {
+                target.setUrl( src );
+                target.setLocation( "url", source.getLocation( "url" ) );
+            }
         }
     }
 
