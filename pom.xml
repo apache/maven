@@ -137,6 +137,9 @@
     <contributor>
       <name>Anton Tanasenko</name>
     </contributor>
+    <contributor>
+      <name>Joseph Walton (MNG-5297)</name>
+    </contributor>
   </contributors>
 
   <prerequisites>
