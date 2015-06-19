@@ -52,26 +52,10 @@ public class UrlSourceTest
     {
         URL txtFile = new File( "target/test-classes/source.txt" ).toURI().toURL();
         UrlSource source = new UrlSource( txtFile );
-
-        Scanner scanner = null;
-        InputStream is = null;
-        try
-        {
-            is = source.getInputStream();
-
-            scanner = new Scanner( is );
+        try(InputStream is = source.getInputStream();
+        		Scanner scanner = new Scanner( is ))
+        {  
             assertEquals( "Hello World!", scanner.nextLine() );
-        }
-        finally
-        {
-            if ( scanner != null )
-            {
-                scanner.close();
-            }
-            if ( is != null )
-            {
-                is.close();
-            }
         }
     }
 

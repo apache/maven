@@ -131,13 +131,9 @@ public class DefaultToolchainTest
     @Test
     public void testEquals() throws Exception
     {
-        InputStream jdksIS = null;
-        InputStream jdksExtraIS = null;
-        try
+        try(InputStream jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
+        		InputStream jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" ))
         {
-            jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
-            jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" );
-
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
 
@@ -148,11 +144,6 @@ public class DefaultToolchainTest
             assertFalse( tc1.equals( tc2 ) );
             assertFalse( tc2.equals( tc1 ) );
             assertTrue( tc2.equals( tc2 ) );
-        }
-        finally
-        {
-            IOUtil.close( jdksIS );
-            IOUtil.close( jdksExtraIS );
         }
     }
 }

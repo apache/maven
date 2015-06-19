@@ -108,17 +108,9 @@ public abstract class AbstractRepositoryMetadata
         }
         else if ( metadataFile.exists() )
         {
-            Reader reader = null;
-
-            try
+            try(Reader reader = ReaderFactory.newXmlReader( metadataFile ))
             {
-                reader = ReaderFactory.newXmlReader( metadataFile );
-
                 metadata = mappingReader.read( reader, false );
-            }
-            finally
-            {
-                IOUtil.close( reader );
             }
         }
 
@@ -147,19 +139,12 @@ public abstract class AbstractRepositoryMetadata
 
         if ( changed || !metadataFile.exists() )
         {
-            Writer writer = null;
-            try
+        	metadataFile.getParentFile().mkdirs();
+            try(Writer writer = WriterFactory.newXmlWriter( metadataFile ))
             {
-                metadataFile.getParentFile().mkdirs();
-                writer = WriterFactory.newXmlWriter( metadataFile );
-
                 MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
-
+                
                 mappingWriter.write( writer, metadata );
-            }
-            finally
-            {
-                IOUtil.close( writer );
             }
         }
         else

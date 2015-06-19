@@ -122,9 +122,7 @@ public class ProjectBuildingException
     private static String createMessage( List<ProjectBuildingResult> results )
     {
         StringWriter buffer = new StringWriter( 1024 );
-
-        PrintWriter writer = new PrintWriter( buffer );
-        try
+        try(PrintWriter writer = new PrintWriter( buffer ))
         {
         	writer.println( "Some problems were encountered while processing the POMs:" );
             for ( ProjectBuildingResult result : results )
@@ -139,9 +137,6 @@ public class ProjectBuildingException
                     writer.println( ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
                 }
             }
-        }
-        finally{
-        	writer.close();
         }
         return buffer.toString();
     }

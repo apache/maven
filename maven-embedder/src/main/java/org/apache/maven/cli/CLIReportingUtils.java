@@ -105,11 +105,10 @@ public final class CLIReportingUtils
     static Properties getBuildProperties()
     {
         Properties properties = new Properties();
-        InputStream resourceAsStream = null;
-        try
+        
+        try(InputStream resourceAsStream = MavenCli.class.getResourceAsStream( "/org/apache/maven/messages/build.properties" ))
         {
-            resourceAsStream = MavenCli.class.getResourceAsStream( "/org/apache/maven/messages/build.properties" );
-
+            
             if ( resourceAsStream != null )
             {
                 properties.load( resourceAsStream );
@@ -118,10 +117,6 @@ public final class CLIReportingUtils
         catch ( IOException e )
         {
             System.err.println( "Unable determine version from JAR file: " + e.getMessage() );
-        }
-        finally
-        {
-            IOUtil.close( resourceAsStream );
         }
 
         return properties;

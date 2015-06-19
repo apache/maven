@@ -56,36 +56,31 @@ public class DefaultRuntimeInformation
 
             String resource = "META-INF/maven/org.apache.maven/maven-core/pom.properties";
 
-            InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource );
-            if ( is != null )
+            try(InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource ))
             {
-                try
+            	if ( is != null )
                 {
-                    props.load( is );
+            		props.load( is );
                 }
-                catch ( IOException e )
+                else
                 {
-                    String msg = "Could not parse " + resource + ", Maven runtime information not available";
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.warn( msg, e );
-                    }
-                    else
-                    {
-                        logger.warn( msg );
-                    }
-                }
-                finally
-                {
-                    IOUtil.close( is );
+                    logger.warn( "Could not locate " + resource
+                                 + " on classpath, Maven runtime information not available" );
                 }
             }
-            else
+            catch ( IOException e )
             {
-                logger.warn( "Could not locate " + resource
-                             + " on classpath, Maven runtime information not available" );
+                String msg = "Could not parse " + resource + ", Maven runtime information not available";
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.warn( msg, e );
+                }
+                else
+                {
+                    logger.warn( msg );
+                }
             }
-
+            
             String version = props.getProperty( "version", "" ).trim();
 
             if ( !version.startsWith( "${" ) )

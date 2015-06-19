@@ -56,12 +56,9 @@ public class ExpressionDocumenter
 
             for ( String EXPRESSION_ROOT : EXPRESSION_ROOTS )
             {
-                InputStream docStream = null;
-                try
+                try(InputStream docStream =
+                        docLoader.getResourceAsStream( EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOT + ".paramdoc.xml" ))
                 {
-                    docStream =
-                        docLoader.getResourceAsStream( EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOT + ".paramdoc.xml" );
-
                     if ( docStream != null )
                     {
                         Map doco = parseExpressionDocumentation( docStream );
@@ -79,10 +76,7 @@ public class ExpressionDocumenter
                     throw new ExpressionDocumentationException(
                         "Failed to parse documentation for expression root: " + EXPRESSION_ROOT, e );
                 }
-                finally
-                {
-                    IOUtil.close( docStream );
-                }
+                
             }
         }
 

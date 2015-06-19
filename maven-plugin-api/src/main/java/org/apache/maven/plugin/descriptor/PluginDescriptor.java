@@ -377,18 +377,11 @@ public class PluginDescriptor
         {
             LifecycleConfiguration lifecycleConfiguration;
 
-            Reader reader = null;
-            try
+            try(Reader reader= ReaderFactory.newXmlReader( getDescriptorStream( LIFECYCLE_DESCRIPTOR ) ))
             {
-                reader = ReaderFactory.newXmlReader( getDescriptorStream( LIFECYCLE_DESCRIPTOR ) );
-
                 lifecycleConfiguration = new LifecycleMappingsXpp3Reader().read( reader );
             }
-            finally
-            {
-                IOUtil.close( reader );
-            }
-
+            
             lifecycleMappings = new HashMap<String, Lifecycle>();
 
             for ( Lifecycle lifecycle : lifecycleConfiguration.getLifecycles() )

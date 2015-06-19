@@ -92,16 +92,12 @@ public class CoreExtensionEntry
             Enumeration<URL> urls = loader.getResources( builder.getExtensionDescriptorLocation() );
             while ( urls.hasMoreElements() )
             {
-                InputStream is = urls.nextElement().openStream();
-                try
+                
+                try(InputStream is = urls.nextElement().openStream())
                 {
                     ExtensionDescriptor descriptor = builder.build( is );
                     artifacts.addAll( descriptor.getExportedArtifacts() );
                     packages.addAll( descriptor.getExportedPackages() );
-                }
-                finally
-                {
-                    IOUtil.close( is );
                 }
             }
         }

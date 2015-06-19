@@ -97,9 +97,8 @@ abstract class MavenMetadata
         }
 
         Reader reader = null;
-        try
+        try(Reader reader = ReaderFactory.newXmlReader( metadataFile ))
         {
-            reader = ReaderFactory.newXmlReader( metadataFile );
             return new MetadataXpp3Reader().read( reader, false );
         }
         catch ( IOException e )
@@ -110,29 +109,19 @@ abstract class MavenMetadata
         {
             throw new RepositoryException( "Could not parse metadata " + metadataFile + ": " + e.getMessage(), e );
         }
-        finally
-        {
-            IOUtil.close( reader );
-        }
     }
 
     private void write( File metadataFile, Metadata metadata )
         throws RepositoryException
     {
-        Writer writer = null;
-        try
+    	metadataFile.getParentFile().mkdirs();
+        try(Writer writer = WriterFactory.newXmlWriter( metadataFile ))
         {
-            metadataFile.getParentFile().mkdirs();
-            writer = WriterFactory.newXmlWriter( metadataFile );
             new MetadataXpp3Writer().write( writer, metadata );
         }
         catch ( IOException e )
         {
             throw new RepositoryException( "Could not write metadata " + metadataFile + ": " + e.getMessage(), e );
-        }
-        finally
-        {
-            IOUtil.close( writer );
         }
     }
 

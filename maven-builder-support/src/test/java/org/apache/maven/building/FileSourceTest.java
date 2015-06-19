@@ -52,25 +52,12 @@ public class FileSourceTest
         File txtFile = new File( "target/test-classes/source.txt" );
         FileSource source = new FileSource( txtFile );
 
-        Scanner scanner = null;
-        InputStream is = null;
-        try
+        
+        try(InputStream is = source.getInputStream();
+        		Scanner scanner = new Scanner( is );)
         {
-            is = source.getInputStream();
-
-            scanner = new Scanner( is );
+        	
             assertEquals( "Hello World!", scanner.nextLine() );
-        }
-        finally
-        {
-            if ( scanner != null )
-            {
-                scanner.close();
-            }
-            if ( is != null )
-            {
-                is.close();
-            }
         }
     }
 
