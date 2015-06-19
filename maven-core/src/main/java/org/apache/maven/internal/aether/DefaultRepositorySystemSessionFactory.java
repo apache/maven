@@ -262,7 +262,10 @@ public class DefaultRepositorySystemSessionFactory
             {
                 logger.debug( "Failed to read Maven version", e );
             }
-            IOUtil.close( is );
+            finally
+            {
+            	IOUtil.close( is );
+            }
         }
 
         return props.getProperty( "version", "unknown-version" );

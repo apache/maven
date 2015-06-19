@@ -98,7 +98,7 @@ public class DefaultInheritanceAssemblerTest
             XMLUnit.setIgnoreWhitespace( true );
             XMLAssert.assertXMLEqual( control, test );
         }
-        catch ( IOException ioe )
+        finally
         {
             IOUtil.close( control );
             IOUtil.close( test );

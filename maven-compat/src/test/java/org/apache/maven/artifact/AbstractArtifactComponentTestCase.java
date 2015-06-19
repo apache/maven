@@ -292,10 +292,14 @@ public abstract class AbstractArtifactComponentTestCase
         }
 
         Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" );
-
-        writer.write( artifact.getId() );
-
-        writer.close();
+        try
+        {
+        	writer.write( artifact.getId() );
+        }
+        finally
+        {
+        	writer.close();
+        }
     }
 
     protected Artifact createArtifact( String artifactId, String version )
