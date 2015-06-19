@@ -52,13 +52,9 @@ public class DefaultMavenProfilesBuilder
         if ( profilesXml.exists() )
         {
             ProfilesXpp3Reader reader = new ProfilesXpp3Reader();
-            Reader profileReader = null;
-            try
+            try ( Reader profileReader = ReaderFactory.newXmlReader( profilesXml );
+                  StringWriter sWriter = new StringWriter() )
             {
-                profileReader = ReaderFactory.newXmlReader( profilesXml );
-
-                StringWriter sWriter = new StringWriter();
-
                 IOUtil.copy( profileReader, sWriter );
 
                 String rawInput = sWriter.toString();
@@ -72,8 +68,9 @@ public class DefaultMavenProfilesBuilder
                 }
                 catch ( Exception e )
                 {
-                    getLogger().warn( "Failed to initialize environment variable resolver. Skipping environment "
-                                          + "substitution in " + PROFILES_XML_FILE + "." );
+                    getLogger().warn(
+                        "Failed to initialize environment variable resolver. Skipping environment " + "substitution in "
+                            + PROFILES_XML_FILE + "." );
                     getLogger().debug( "Failed to initialize envar resolver. Skipping resolution.", e );
                 }
 
@@ -81,10 +78,7 @@ public class DefaultMavenProfilesBuilder
 
                 profilesRoot = reader.read( sReader );
             }
-            finally
-            {
-                IOUtil.close( profileReader );
-            }
+
         }
 
         return profilesRoot;

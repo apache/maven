@@ -19,21 +19,20 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 
 /**
  * Shared methods of the repository metadata handling.
@@ -60,8 +59,7 @@ public abstract class AbstractRepositoryMetadata
         return "maven-metadata-" + repository.getKey() + ".xml";
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository,
-                                        ArtifactRepository remoteRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException
     {
         try
@@ -74,8 +72,7 @@ public abstract class AbstractRepositoryMetadata
         }
     }
 
-    protected void updateRepositoryMetadata( ArtifactRepository localRepository,
-                                             ArtifactRepository remoteRepository )
+    protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
         throws IOException, XmlPullParserException
     {
         MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
@@ -83,7 +80,7 @@ public abstract class AbstractRepositoryMetadata
         Metadata metadata = null;
 
         File metadataFile = new File( localRepository.getBasedir(),
-            localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
+                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
         if ( metadataFile.length() == 0 )
         {
@@ -99,22 +96,14 @@ public abstract class AbstractRepositoryMetadata
                     // ignore
                 }
                 metadataFile.delete(); // if this fails, forget about it, we'll try to overwrite it anyway so no need
-                                       // to delete on exit
+                // to delete on exit
             }
         }
         else if ( metadataFile.exists() )
         {
-            Reader reader = null;
-
-            try
+            try ( Reader reader = ReaderFactory.newXmlReader( metadataFile ) )
             {
-                reader = ReaderFactory.newXmlReader( metadataFile );
-
                 metadata = mappingReader.read( reader, false );
-            }
-            finally
-            {
-                IOUtil.close( reader );
             }
         }
 
@@ -143,19 +132,12 @@ public abstract class AbstractRepositoryMetadata
 
         if ( changed || !metadataFile.exists() )
         {
-            Writer writer = null;
-            try
+            metadataFile.getParentFile().mkdirs();
+            try ( Writer writer = WriterFactory.newXmlWriter( metadataFile ) )
             {
-                metadataFile.getParentFile().mkdirs();
-                writer = WriterFactory.newXmlWriter( metadataFile );
-
                 MetadataXpp3Writer mappingWriter = new MetadataXpp3Writer();
 
                 mappingWriter.write( writer, metadata );
-            }
-            finally
-            {
-                IOUtil.close( writer );
             }
         }
         else
@@ -169,8 +151,7 @@ public abstract class AbstractRepositoryMetadata
         return "repository metadata for: \'" + getKey() + "\'";
     }
 
-    protected static Metadata createMetadata( Artifact artifact,
-                                              Versioning versioning )
+    protected static Metadata createMetadata( Artifact artifact, Versioning versioning )
     {
         Metadata metadata = new Metadata();
         metadata.setGroupId( artifact.getGroupId() );
@@ -200,14 +181,16 @@ public abstract class AbstractRepositoryMetadata
 
     public void merge( org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata )
     {
-        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact replaces?
+        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
+        // replaces?
         AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
         this.metadata.merge( repoMetadata.getMetadata() );
     }
 
     public void merge( ArtifactMetadata metadata )
     {
-        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact replaces?
+        // TODO: not sure that it should assume this, maybe the calls to addMetadata should pre-merge, then artifact
+        // replaces?
         AbstractRepositoryMetadata repoMetadata = (AbstractRepositoryMetadata) metadata;
         this.metadata.merge( repoMetadata.getMetadata() );
     }

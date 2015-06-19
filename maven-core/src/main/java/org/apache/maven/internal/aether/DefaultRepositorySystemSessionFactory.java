@@ -19,15 +19,6 @@ package org.apache.maven.internal.aether;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.bridge.MavenRepositorySystem;
@@ -43,7 +34,6 @@ import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.apache.maven.settings.crypto.SettingsDecryptionResult;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -60,6 +50,14 @@ import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
 import org.eclipse.aether.util.repository.SimpleResolutionErrorPolicy;
 import org.eclipse.sisu.Nullable;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * @since 3.3.0
@@ -94,7 +92,7 @@ public class DefaultRepositorySystemSessionFactory
 
     @Inject
     MavenRepositorySystem mavenRepositorySystem;
-    
+
     public DefaultRepositorySystemSession newRepositorySession( MavenExecutionRequest request )
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
@@ -125,8 +123,8 @@ public class DefaultRepositorySystemSessionFactory
         int errorPolicy = 0;
         errorPolicy |= request.isCacheNotFound() ? ResolutionErrorPolicy.CACHE_NOT_FOUND : 0;
         errorPolicy |= request.isCacheTransferError() ? ResolutionErrorPolicy.CACHE_TRANSFER_ERROR : 0;
-        session.setResolutionErrorPolicy( new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy
-            | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
+        session.setResolutionErrorPolicy(
+            new SimpleResolutionErrorPolicy( errorPolicy, errorPolicy | ResolutionErrorPolicy.CACHE_NOT_FOUND ) );
 
         session.setArtifactTypeRegistry( RepositoryUtils.newArtifactTypeRegistry( artifactHandlerManager ) );
 
@@ -135,7 +133,7 @@ public class DefaultRepositorySystemSessionFactory
         if ( request.isUseLegacyLocalRepository() )
         {
             logger.warn( "Disabling enhanced local repository: using legacy is strongly discouraged to ensure"
-                + " build reproducibility." );
+                             + " build reproducibility." );
             try
             {
                 session.setLocalRepositoryManager( simpleLocalRepoMgrFactory.newInstance( session, localRepo ) );
@@ -187,9 +185,9 @@ public class DefaultRepositorySystemSessionFactory
         {
             AuthenticationBuilder authBuilder = new AuthenticationBuilder();
             authBuilder.addUsername( proxy.getUsername() ).addPassword( proxy.getPassword() );
-            proxySelector.add( new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(),
-                                                                        proxy.getPort(), authBuilder.build() ),
-                               proxy.getNonProxyHosts() );
+            proxySelector.add(
+                new org.eclipse.aether.repository.Proxy( proxy.getProtocol(), proxy.getHost(), proxy.getPort(),
+                                                         authBuilder.build() ), proxy.getNonProxyHosts() );
         }
         session.setProxySelector( proxySelector );
 
@@ -234,7 +232,7 @@ public class DefaultRepositorySystemSessionFactory
         mavenRepositorySystem.injectProxy( session, request.getRemoteRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getRemoteRepositories() );
 
-        mavenRepositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );        
+        mavenRepositorySystem.injectMirror( request.getPluginArtifactRepositories(), request.getMirrors() );
         mavenRepositorySystem.injectProxy( session, request.getPluginArtifactRepositories() );
         mavenRepositorySystem.injectAuthentication( session, request.getPluginArtifactRepositories() );
 
@@ -251,18 +249,17 @@ public class DefaultRepositorySystemSessionFactory
     {
         Properties props = new Properties();
 
-        InputStream is = getClass().getResourceAsStream( "/META-INF/maven/org.apache.maven/maven-core/pom.properties" );
-        if ( is != null )
+        try ( InputStream is = getClass().getResourceAsStream(
+            "/META-INF/maven/org.apache.maven/maven-core/pom.properties" ) )
         {
-            try
+            if ( is != null )
             {
                 props.load( is );
             }
-            catch ( IOException e )
-            {
-                logger.debug( "Failed to read Maven version", e );
-            }
-            IOUtil.close( is );
+        }
+        catch ( IOException e )
+        {
+            logger.debug( "Failed to read Maven version", e );
         }
 
         return props.getProperty( "version", "unknown-version" );

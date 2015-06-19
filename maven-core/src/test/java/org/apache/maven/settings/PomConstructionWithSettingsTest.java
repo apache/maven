@@ -19,10 +19,6 @@ package org.apache.maven.settings;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.DefaultProjectBuilder;
@@ -36,12 +32,15 @@ import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
 
 public class PomConstructionWithSettingsTest
     extends PlexusTestCase
@@ -81,14 +80,18 @@ public class PomConstructionWithSettingsTest
         super.tearDown();
     }
 
-    public void testSettingsNoPom() throws Exception
+    public void testSettingsNoPom()
+        throws Exception
     {
         PomTestWrapper pom = buildPom( "settings-no-pom" );
         assertEquals( "local-profile-prop-value", pom.getValue( "properties/local-profile-prop" ) );
     }
 
-    /**MNG-4107 */
-    public void testPomAndSettingsInterpolation() throws Exception
+    /**
+     * MNG-4107
+     */
+    public void testPomAndSettingsInterpolation()
+        throws Exception
     {
         PomTestWrapper pom = buildPom( "test-pom-and-settings-interpolation" );
         assertEquals( "applied", pom.getValue( "properties/settingsProfile" ) );
@@ -97,8 +100,11 @@ public class PomConstructionWithSettingsTest
         assertEquals( "settings", pom.getValue( "properties/pomVsSettingsInterpolated" ) );
     }
 
-    /**MNG-4107 */
-    public void testRepositories() throws Exception
+    /**
+     * MNG-4107
+     */
+    public void testRepositories()
+        throws Exception
     {
         PomTestWrapper pom = buildPom( "repositories" );
         assertEquals( "maven-core-it-0", pom.getValue( "repositories[1]/id" ) );
@@ -122,13 +128,15 @@ public class PomConstructionWithSettingsTest
         String localRepoUrl =
             System.getProperty( "maven.repo.local", System.getProperty( "user.home" ) + "/.m2/repository" );
         localRepoUrl = "file://" + localRepoUrl;
-        config.setLocalRepository( repositorySystem.createArtifactRepository( "local", localRepoUrl,
-                                                                              new DefaultRepositoryLayout(), null, null ) );
+        config.setLocalRepository(
+            repositorySystem.createArtifactRepository( "local", localRepoUrl, new DefaultRepositoryLayout(), null,
+                                                       null ) );
         config.setActiveProfileIds( settings.getActiveProfiles() );
 
         DefaultRepositorySystemSession repoSession = MavenRepositorySystemUtils.newSession();
         LocalRepository localRepo = new LocalRepository( config.getLocalRepository().getBasedir() );
-        repoSession.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
+        repoSession.setLocalRepositoryManager(
+            new SimpleLocalRepositoryManagerFactory().newInstance( repoSession, localRepo ) );
         config.setRepositorySession( repoSession );
 
         return new PomTestWrapper( pomFile, projectBuilder.build( pomFile, config ).getProject() );
@@ -139,21 +147,12 @@ public class PomConstructionWithSettingsTest
     {
         Settings settings = null;
 
-        Reader reader = null;
-
-        try
+        try ( Reader reader = ReaderFactory.newXmlReader( settingsFile ) )
         {
-            reader = ReaderFactory.newXmlReader( settingsFile );
-
             SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
             settings = modelReader.read( reader );
         }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
         return settings;
     }
 }

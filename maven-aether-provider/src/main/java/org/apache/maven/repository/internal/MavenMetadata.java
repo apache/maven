@@ -19,23 +19,22 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.Map;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.RepositoryException;
 import org.eclipse.aether.metadata.AbstractMetadata;
 import org.eclipse.aether.metadata.MergeableMetadata;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
@@ -96,10 +95,8 @@ abstract class MavenMetadata
             return new Metadata();
         }
 
-        Reader reader = null;
-        try
+        try ( Reader reader = ReaderFactory.newXmlReader( metadataFile ) )
         {
-            reader = ReaderFactory.newXmlReader( metadataFile );
             return new MetadataXpp3Reader().read( reader, false );
         }
         catch ( IOException e )
@@ -110,29 +107,19 @@ abstract class MavenMetadata
         {
             throw new RepositoryException( "Could not parse metadata " + metadataFile + ": " + e.getMessage(), e );
         }
-        finally
-        {
-            IOUtil.close( reader );
-        }
     }
 
     private void write( File metadataFile, Metadata metadata )
         throws RepositoryException
     {
-        Writer writer = null;
-        try
+        metadataFile.getParentFile().mkdirs();
+        try ( Writer writer = WriterFactory.newXmlWriter( metadataFile ) )
         {
-            metadataFile.getParentFile().mkdirs();
-            writer = WriterFactory.newXmlWriter( metadataFile );
             new MetadataXpp3Writer().write( writer, metadata );
         }
         catch ( IOException e )
         {
             throw new RepositoryException( "Could not write metadata " + metadataFile + ": " + e.getMessage(), e );
-        }
-        finally
-        {
-            IOUtil.close( writer );
         }
     }
 

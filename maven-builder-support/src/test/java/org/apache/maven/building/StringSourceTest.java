@@ -19,12 +19,12 @@ package org.apache.maven.building;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.Scanner;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 public class StringSourceTest
 {
@@ -34,25 +34,10 @@ public class StringSourceTest
     {
         StringSource source = new StringSource( "Hello World!" );
 
-        Scanner scanner = null;
-        InputStream is = null;
-        try
+        try ( InputStream is = source.getInputStream();
+              Scanner scanner = new Scanner( is ) )
         {
-            is = source.getInputStream();
-
-            scanner = new Scanner( is );
             assertEquals( "Hello World!", scanner.nextLine() );
-        }
-        finally
-        {
-            if ( scanner != null )
-            {
-                scanner.close();
-            }
-            if ( is != null )
-            {
-                is.close();
-            }
         }
     }
 

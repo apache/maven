@@ -19,7 +19,6 @@ package org.apache.maven.project;
  * under the License.
  */
 
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -71,15 +70,9 @@ public class ExtensionDescriptorBuilder
 
                 if ( pluginDescriptorEntry != null )
                 {
-                    InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
-
-                    try
+                    try ( InputStream is = pluginJar.getInputStream( pluginDescriptorEntry ) )
                     {
                         extensionDescriptor = build( is );
-                    }
-                    finally
-                    {
-                        IOUtil.close( is );
                     }
                 }
             }
@@ -90,14 +83,9 @@ public class ExtensionDescriptorBuilder
 
             if ( pluginXml.canRead() )
             {
-                InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) );
-                try
+                try ( InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ) )
                 {
                     extensionDescriptor = build( is );
-                }
-                finally
-                {
-                    IOUtil.close( is );
                 }
             }
         }

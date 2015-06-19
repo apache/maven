@@ -19,6 +19,11 @@ package org.apache.maven.extension.internal;
  * under the License.
  */
 
+import com.google.common.collect.ImmutableSet;
+import org.apache.maven.project.ExtensionDescriptor;
+import org.apache.maven.project.ExtensionDescriptorBuilder;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,17 +33,10 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.maven.project.ExtensionDescriptor;
-import org.apache.maven.project.ExtensionDescriptorBuilder;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.util.IOUtil;
-
-import com.google.common.collect.ImmutableSet;
-
 /**
  * Provides information about artifacts (identified by groupId:artifactId string key) and classpath elements exported by
  * Maven core itself or a Maven core extension.
- * 
+ *
  * @since 3.3.0
  */
 public class CoreExtensionEntry
@@ -92,16 +90,12 @@ public class CoreExtensionEntry
             Enumeration<URL> urls = loader.getResources( builder.getExtensionDescriptorLocation() );
             while ( urls.hasMoreElements() )
             {
-                InputStream is = urls.nextElement().openStream();
-                try
+
+                try ( InputStream is = urls.nextElement().openStream() )
                 {
                     ExtensionDescriptor descriptor = builder.build( is );
                     artifacts.addAll( descriptor.getExportedArtifacts() );
                     packages.addAll( descriptor.getExportedPackages() );
-                }
-                finally
-                {
-                    IOUtil.close( is );
                 }
             }
         }
