@@ -364,7 +364,9 @@ public class DefaultUpdateCheckManager
             try
             {
                 Properties props = new Properties();
-                try(FileInputStream stream = new FileInputStream( touchfile ))
+                
+                FileInputStream stream = new FileInputStream( touchfile );
+                try
                 {
                     channel = stream.getChannel();
                     lock = channel.lock( 0, channel.size(), true );
@@ -373,6 +375,10 @@ public class DefaultUpdateCheckManager
                     props.load( stream );
 
                     return props;
+                }
+                finally
+                {
+                	IOUtil.close( stream );
                 }
             }
             catch ( IOException e )
