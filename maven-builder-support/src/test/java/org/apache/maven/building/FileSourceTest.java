@@ -54,7 +54,7 @@ public class FileSourceTest
 
         
         try(InputStream is = source.getInputStream();
-        		Scanner scanner = new Scanner( is );)
+        		Scanner scanner = new Scanner( is ))
         {
         	
             assertEquals( "Hello World!", scanner.nextLine() );
