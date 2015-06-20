@@ -85,8 +85,8 @@ public class DefaultInheritanceAssemblerTest
         writer.write( actual, null, child );
 
         // check with getPom( "plugin-configuration-effective" )
-        try(File expected = getPom( "plugin-configuration-expected");
-        		Reader control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
+        File expected = getPom( "plugin-configuration-expected");
+        try(Reader control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
         		Reader test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" ))
         {
             
