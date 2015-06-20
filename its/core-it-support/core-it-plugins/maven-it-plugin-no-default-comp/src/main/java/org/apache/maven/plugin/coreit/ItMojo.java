@@ -19,22 +19,21 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
  * Requires a component with a non-default role hint and dumps this hint to a properties file.
- * 
- * @goal it
- * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal it
+ * @phase initialize
  */
 public class ItMojo
     extends AbstractMojo
@@ -42,21 +41,21 @@ public class ItMojo
 
     /**
      * The path to the output file.
-     * 
+     *
      * @parameter property="touch.outputFile" default-value="target/comp.properties"
      */
     private File outputFile;
 
     /**
      * NOTE: We don't specify a role hint here!
-     * 
+     *
      * @component
      */
     private Component component;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -72,14 +71,9 @@ public class ItMojo
         try
         {
             outputFile.getParentFile().mkdirs();
-            FileOutputStream os = new FileOutputStream( outputFile );
-            try
+            try ( FileOutputStream os = new FileOutputStream( outputFile ) )
             {
                 props.store( os, "MAVEN-CORE-IT-LOG" );
-            }
-            finally
-            {
-                os.close();
             }
         }
         catch ( IOException e )

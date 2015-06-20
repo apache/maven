@@ -19,25 +19,23 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 /**
  * Injects artifacts from the plugin into the dependency artifacts of the project.
- * 
- * @goal inject
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal inject
  */
 public class InjectMojo
     extends AbstractMojo
@@ -46,7 +44,7 @@ public class InjectMojo
     /**
      * The version-less keys in the form <code>groupId:artifactId</code> of the plugin artifacts to inject into
      * dependency artifacts of the project.
-     * 
+     *
      * @parameter
      */
     private String[] artifacts;
@@ -59,7 +57,7 @@ public class InjectMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -68,14 +66,14 @@ public class InjectMojo
 
     /**
      * The artifact factory.
-     * 
+     *
      * @component
      */
     private ArtifactFactory factory;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If an error occured.
      */
     public void execute()
@@ -99,16 +97,17 @@ public class InjectMojo
             dependencyArtifacts = new LinkedHashSet();
         }
 
-        for ( Iterator it = pluginArtifacts.iterator(); it.hasNext(); )
+        for ( Object pluginArtifact : pluginArtifacts )
         {
-            Artifact artifact = (Artifact) it.next();
+            Artifact artifact = (Artifact) pluginArtifact;
 
             String artifactKey = artifact.getGroupId() + ':' + artifact.getArtifactId();
 
             if ( artifactKeys.remove( artifactKey ) )
             {
-                artifact = factory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), 
-                    artifact.getVersion(), Artifact.SCOPE_COMPILE, artifact.getType() );
+                artifact =
+                    factory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+                                            Artifact.SCOPE_COMPILE, artifact.getType() );
 
                 getLog().info( "[MAVEN-CORE-IT-LOG] Injecting dependency artifact " + artifact );
 

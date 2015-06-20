@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -28,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4696">MNG-4696</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4696MavenProjectDependencyArtifactsTest
@@ -63,7 +62,7 @@ public class MavenITmng4696MavenProjectDependencyArtifactsTest
         Properties props = verifier.loadProperties( "target/artifact.properties" );
         assertEquals( "3", props.getProperty( "project.dependencyArtifacts.size" ) );
 
-        HashSet<String> ids = new HashSet<String>();
+        HashSet<String> ids = new HashSet<>();
         ids.add( props.getProperty( "project.dependencyArtifacts.0.artifactId" ) );
         ids.add( props.getProperty( "project.dependencyArtifacts.1.artifactId" ) );
         ids.add( props.getProperty( "project.dependencyArtifacts.2.artifactId" ) );

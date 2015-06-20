@@ -19,6 +19,9 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,17 +29,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-
 /**
  * Requires a singleton component in various ways and dumps the ids to a properties file.
- * 
- * @goal it
- * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal it
+ * @phase initialize
  */
 public class ItMojo
     extends AbstractMojo
@@ -44,42 +43,42 @@ public class ItMojo
 
     /**
      * The path to the output file.
-     * 
+     *
      * @parameter property="touch.outputFile" default-value="target/comp.properties"
      */
     private File outputFile;
 
     /**
      * Component lookup without role hint.
-     * 
+     *
      * @component
      */
     private Component componentWithoutRoleHint;
 
     /**
      * Component lookup with explicit role hint.
-     * 
+     *
      * @component roleHint="default"
      */
     private Component componentWithRoleHint;
 
     /**
      * Component lookup via active map.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private Map componentMap;
 
     /**
      * Component lookup via active list.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private List componentList;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -104,14 +103,9 @@ public class ItMojo
         try
         {
             outputFile.getParentFile().mkdirs();
-            FileOutputStream os = new FileOutputStream( outputFile );
-            try
+            try ( FileOutputStream os = new FileOutputStream( outputFile ) )
             {
                 props.store( os, "MAVEN-CORE-IT-LOG" );
-            }
-            finally
-            {
-                os.close();
             }
         }
         catch ( IOException e )

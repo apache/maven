@@ -19,15 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.mortbay.jetty.Handler;
@@ -35,9 +26,17 @@ import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3415">MNG-3415</a>.
- * 
+ *
  * @version $Id$
  */
 public class MavenITmng3415JunkRepositoryMetadataTest
@@ -56,25 +55,25 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     /**
      * This test simply verifies that when a metadata transfer fails (network error, etc.)
      * no metadata file is written to the local repository.
-     *
+     * <p/>
      * Steps executed to verify this test:
-     *
+     * <p/>
      * 0. Find the local repository directory:
-     *    a. build the maven-find-local-repo-plugin, then run it, to spit out the path of the
-     *       local repository in use by default. Read the output file to get this path.
-     *       (Yes, it's heavy, but it's reliable.)
+     * a. build the maven-find-local-repo-plugin, then run it, to spit out the path of the
+     * local repository in use by default. Read the output file to get this path.
+     * (Yes, it's heavy, but it's reliable.)
      * 1. Setup the test:
-     *    a. Make sure the metadata for the test-repo is NOT in the local repository.
-     *    b. Make sure the dependency POM IS in the local repository, so we're not
-     *       distracted by failed builds that are unrelated.
-     *    c. Create the settings file for use in this test, which contains the invalid
-     *       remote repository entry.
+     * a. Make sure the metadata for the test-repo is NOT in the local repository.
+     * b. Make sure the dependency POM IS in the local repository, so we're not
+     * distracted by failed builds that are unrelated.
+     * c. Create the settings file for use in this test, which contains the invalid
+     * remote repository entry.
      * 2. Build the test project the first time
-     *    a. Verify that a TransferFailedException is in the build output for the test-repo
-     *    b. Verify that the metadata for the dependency POM is NOT in the local
-     *       repository afterwards.
+     * a. Verify that a TransferFailedException is in the build output for the test-repo
+     * b. Verify that the metadata for the dependency POM is NOT in the local
+     * repository afterwards.
      * 3. Build the test project the second time
-     *    a. See (2.a) and (2.b) above; the same criteria applies here.
+     * a. See (2.a) and (2.b) above; the same criteria applies here.
      */
     public void testitTransferFailed()
         throws Exception
@@ -126,25 +125,25 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     /**
      * This test simply verifies that when metadata doesn't exist on the remote
      * repository, a basic metadata file is written to the local repository.
-     *
+     * <p/>
      * Steps executed to verify this test:
-     *
+     * <p/>
      * 0. Find the local repository directory:
-     *    a. build the maven-find-local-repo-plugin, then run it, to spit out the path of the
-     *       local repository in use by default. Read the output file to get this path.
-     *       (Yes, it's heavy, but it's reliable.)
+     * a. build the maven-find-local-repo-plugin, then run it, to spit out the path of the
+     * local repository in use by default. Read the output file to get this path.
+     * (Yes, it's heavy, but it's reliable.)
      * 1. Setup the test:
-     *    a. Make sure the metadata for the test-repo is NOT in the local repository.
-     *    b. Make sure the dependency POM IS in the local repository, so we're not
-     *       distracted by failed builds that are unrelated.
-     *    c. Create the settings file for use in this test, which contains the VALID
-     *       remote repository entry.
+     * a. Make sure the metadata for the test-repo is NOT in the local repository.
+     * b. Make sure the dependency POM IS in the local repository, so we're not
+     * distracted by failed builds that are unrelated.
+     * c. Create the settings file for use in this test, which contains the VALID
+     * remote repository entry.
      * 2. Build the test project the first time
-     *    a. Verify that the remote repository is checked for the metadata file
+     * a. Verify that the remote repository is checked for the metadata file
      * 3. Build the test project the second time
-     *    a. Verify that the remote repository is NOT checked for the metadata file again
-     *    b. Verify that the file used for updateInterval calculations was NOT changed from
-     *       the first build.
+     * a. Verify that the remote repository is NOT checked for the metadata file again
+     * b. Verify that the file used for updateInterval calculations was NOT changed from
+     * the first build.
      */
     public void testShouldNotRepeatedlyUpdateOnResourceNotFoundException()
         throws Exception
@@ -159,7 +158,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest
         verifier.setAutoclean( false );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3415" );
 
-        final List<String> requestUris = new ArrayList<String>();
+        final List<String> requestUris = new ArrayList<>();
 
         Handler repoHandler = new AbstractHandler()
         {
@@ -199,8 +198,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
 
             verifier.verifyErrorFreeLog();
 
-            assertTrue( requestUris.toString(), 
-                requestUris.contains( "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
+            assertTrue( requestUris.toString(), requestUris.contains(
+                "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
             requestUris.clear();
 
@@ -215,10 +214,13 @@ public class MavenITmng3415JunkRepositoryMetadataTest
             verifier.verifyErrorFreeLog();
             verifier.resetStreams();
 
-            assertFalse( requestUris.toString(), 
-                requestUris.contains( "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
+            assertFalse( requestUris.toString(), requestUris.contains(
+                "/org/apache/maven/its/mng3415/missing/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-            assertEquals( "Last-modified time should be unchanged from first build through second build for the file we use for updateInterval checks.", firstLastMod, updateCheckFile.lastModified() );
+            assertEquals(
+                "Last-modified time should be unchanged from first build through second build for the file we use for"
+                    + " updateInterval checks.",
+                firstLastMod, updateCheckFile.lastModified() );
         }
         finally
         {
@@ -231,8 +233,8 @@ public class MavenITmng3415JunkRepositoryMetadataTest
     {
         File metadata = getMetadataFile( verifier );
 
-        assertFalse( "Metadata file should NOT be present in local repository: "
-                     + metadata.getAbsolutePath(), metadata.exists() );
+        assertFalse( "Metadata file should NOT be present in local repository: " + metadata.getAbsolutePath(),
+                     metadata.exists() );
     }
 
     private void setupDummyDependency( Verifier verifier, File testDir, boolean resetUpdateInterval )

@@ -19,15 +19,15 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.util.Properties;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
+import java.io.File;
+import java.util.Properties;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4745">MNG-4745</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4745PluginVersionUpdateTest
@@ -142,7 +142,7 @@ public class MavenITmng4745PluginVersionUpdateTest
     private static void writeMetadata( File testdir, String version, String timestamp )
         throws Exception
     {
-        StringBuffer content = new StringBuffer( 1024 );
+        StringBuilder content = new StringBuilder( 1024 );
         content.append( "<?xml version=\"1.0\"?>\n" );
         content.append( "<metadata>\n" );
         content.append( "  <groupId>org.apache.maven.its.mng4745</groupId>\n" );

@@ -19,18 +19,16 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.TreeSet;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3843">MNG-3843</a>.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -100,7 +98,8 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "1", props.getProperty( "project.build.resources" ) );
         assertPathEquals( basedir, "src/main/resources", props.getProperty( "project.build.resources.0.directory" ) );
         assertEquals( "1", props.getProperty( "project.build.testResources" ) );
-        assertPathEquals( basedir, "src/test/resources", props.getProperty( "project.build.testResources.0.directory" ) );
+        assertPathEquals( basedir, "src/test/resources",
+                          props.getProperty( "project.build.testResources.0.directory" ) );
         assertPathEquals( basedir, "target", props.getProperty( "project.build.directory" ) );
         assertPathEquals( basedir, "target/classes", props.getProperty( "project.build.outputDirectory" ) );
         assertPathEquals( basedir, "target/test-classes", props.getProperty( "project.build.testOutputDirectory" ) );
@@ -147,9 +146,11 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "http://parent.url/ci", props.getProperty( "project.ciManagement.url" ) );
         assertEquals( "http://parent.url/issues", props.getProperty( "project.issueManagement.url" ) );
         assertEquals( "http://parent.url/dist", props.getProperty( "project.distributionManagement.repository.url" ) );
-        assertEquals( "http://parent.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
+        assertEquals( "http://parent.url/snaps",
+                      props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
         assertUrlCommon( "http://parent.url/site", props.getProperty( "project.distributionManagement.site.url" ) );
-        assertUrlCommon( "http://parent.url/download", props.getProperty( "project.distributionManagement.downloadUrl" ) );
+        assertUrlCommon( "http://parent.url/download",
+                         props.getProperty( "project.distributionManagement.downloadUrl" ) );
         if ( matchesVersionRange( "(2.0.2,)" ) )
         {
             assertMissing( props, "project.distributionManagement.relocation." );
@@ -214,9 +215,11 @@ public class MavenITmng3843PomInheritanceTest
         assertEquals( "http://child.url/ci", props.getProperty( "project.ciManagement.url" ) );
         assertEquals( "http://child.url/issues", props.getProperty( "project.issueManagement.url" ) );
         assertEquals( "http://child.url/dist", props.getProperty( "project.distributionManagement.repository.url" ) );
-        assertEquals( "http://child.url/snaps", props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
+        assertEquals( "http://child.url/snaps",
+                      props.getProperty( "project.distributionManagement.snapshotRepository.url" ) );
         assertUrlCommon( "http://child.url/site", props.getProperty( "project.distributionManagement.site.url" ) );
-        assertUrlCommon( "http://child.url/download", props.getProperty( "project.distributionManagement.downloadUrl" ) );
+        assertUrlCommon( "http://child.url/download",
+                         props.getProperty( "project.distributionManagement.downloadUrl" ) );
         assertEquals( "child-reloc-msg", props.getProperty( "project.distributionManagement.relocation.message" ) );
         assertMissing( props, "project.profiles." );
         assertEquals( "coreit", props.getProperty( "project.build.finalName" ) );
@@ -239,22 +242,22 @@ public class MavenITmng3843PomInheritanceTest
             assertEquals( "1", props.getProperty( "project.build.plugins" ) );
         }
         assertEquals( "4", props.getProperty( "project.dependencies" ) );
-        Collection<String> actualDeps = new TreeSet<String>();
+        Collection<String> actualDeps = new TreeSet<>();
         actualDeps.add( props.getProperty( "project.dependencies.0.artifactId" ) );
         actualDeps.add( props.getProperty( "project.dependencies.1.artifactId" ) );
         actualDeps.add( props.getProperty( "project.dependencies.2.artifactId" ) );
         actualDeps.add( props.getProperty( "project.dependencies.3.artifactId" ) );
-        Collection<String> expectedDeps = new TreeSet<String>();
+        Collection<String> expectedDeps = new TreeSet<>();
         expectedDeps.add( "parent-dep-b" );
         expectedDeps.add( "child-dep-b" );
         expectedDeps.add( "child-dep-c" );
         expectedDeps.add( "child-dep-d" );
         assertEquals( expectedDeps, actualDeps );
         assertEquals( "2", props.getProperty( "project.dependencyManagement.dependencies" ) );
-        Collection<String> actualMngtDeps = new TreeSet<String>();
+        Collection<String> actualMngtDeps = new TreeSet<>();
         actualMngtDeps.add( props.getProperty( "project.dependencyManagement.dependencies.0.artifactId" ) );
         actualMngtDeps.add( props.getProperty( "project.dependencyManagement.dependencies.1.artifactId" ) );
-        Collection<String> expectedMngtDeps = new TreeSet<String>();
+        Collection<String> expectedMngtDeps = new TreeSet<>();
         expectedMngtDeps.add( "parent-dep-a" );
         expectedMngtDeps.add( "child-dep-a" );
         assertEquals( expectedMngtDeps, actualMngtDeps );
@@ -286,9 +289,9 @@ public class MavenITmng3843PomInheritanceTest
 
     private void assertMissing( Properties props, String prefix )
     {
-        for ( Iterator<?> it = props.keySet().iterator(); it.hasNext(); )
+        for ( Object o : props.keySet() )
         {
-            String key = it.next().toString();
+            String key = o.toString();
             assertFalse( "Found unexpected key: " + key, key.startsWith( prefix ) );
         }
     }

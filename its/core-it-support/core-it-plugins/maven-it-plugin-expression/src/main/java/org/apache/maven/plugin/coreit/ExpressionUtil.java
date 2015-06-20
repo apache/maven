@@ -32,7 +32,7 @@ import java.util.Map;
 
 /**
  * Assists in evaluating expressions.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -55,11 +55,11 @@ class ExpressionUtil
      * objects are available. For instance, if <code>contexts</code> maps the token "project" to a Maven project
      * instance, the expression "project/build/resources/0/directory" specifies the first resource directory of the
      * project.
-     * 
+     *
      * @param expression The expression to evaluate, may be <code>null</code>.
-     * @param context The object to start expression evaluation at, must not be <code>null</code>.
+     * @param context    The object to start expression evaluation at, must not be <code>null</code>.
      * @return The values of the evaluation, indexed by expression, or an empty map if the segments could not be
-     *         evaluated.
+     * evaluated.
      */
     public static Map evaluate( String expression, Object context )
     {
@@ -76,12 +76,12 @@ class ExpressionUtil
 
     /**
      * Evaluates the given expression segments against the specified object.
-     * 
-     * @param prefix The expression prefix that led to the current context, must not be <code>null</code>.
+     *
+     * @param prefix   The expression prefix that led to the current context, must not be <code>null</code>.
      * @param segments The expression segments to evaluate, must not be <code>null</code>.
-     * @param context The object to evaluate the segments against, may be <code>null</code>.
+     * @param context  The object to evaluate the segments against, may be <code>null</code>.
      * @return The values of the evaluation, indexed by expression, or an empty map if the segments could not be
-     *         evaluated.
+     * evaluated.
      */
     private static Map evaluate( String prefix, List segments, Object context )
     {
@@ -142,12 +142,12 @@ class ExpressionUtil
             }
 
             values = new LinkedHashMap();
-            for ( Iterator it = targets.keySet().iterator(); it.hasNext(); )
+            for ( Object key : targets.keySet() )
             {
-                Object key = it.next();
                 Object target = targets.get( key );
-                values.putAll( evaluate( concat( prefix, String.valueOf( key ) ),
-                                         segments.subList( 1, segments.size() ), target ) );
+                values.putAll(
+                    evaluate( concat( prefix, String.valueOf( key ) ), segments.subList( 1, segments.size() ),
+                              target ) );
             }
         }
 
@@ -161,8 +161,8 @@ class ExpressionUtil
 
     /**
      * Gets the value of a (public) bean property from the specified object.
-     * 
-     * @param context The object whose bean property should be retrieved, must not be <code>null</code>.
+     *
+     * @param context  The object whose bean property should be retrieved, must not be <code>null</code>.
      * @param property The name of the bean property, must not be <code>null</code>.
      * @return The value of the bean property or <code>null</code> if the property does not exist.
      */
@@ -220,7 +220,7 @@ class ExpressionUtil
                                 method = type.getMethod( "get", OBJECT_PARAM );
                             }
                             method.setAccessible( true );
-                            value = method.invoke( context, new Object[] { property } );
+                            value = method.invoke( context, new Object[]{ property } );
                         }
                         catch ( NoSuchMethodException e3 )
                         {
@@ -234,7 +234,7 @@ class ExpressionUtil
                             {
                                 if ( "length".equals( property ) && type.isArray() )
                                 {
-                                    value = new Integer( Array.getLength( context ) );
+                                    value = Array.getLength( context );
                                 }
                                 else
                                 {

@@ -19,6 +19,12 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.toolchain.ToolchainManagerPrivate;
+import org.apache.maven.toolchain.ToolchainPrivate;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,12 +34,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Properties;
-
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.toolchain.ToolchainManagerPrivate;
-import org.apache.maven.toolchain.ToolchainPrivate;
 
 /**
  * @goal toolchain
@@ -50,7 +50,7 @@ public class CoreItMojo
 
     /**
      * The current Maven session holding the selected toolchain.
-     * 
+     *
      * @parameter default-value="${session}"
      * @required
      * @readonly
@@ -59,28 +59,28 @@ public class CoreItMojo
 
     /**
      * The path to the output file for the properties.
-     * 
+     *
      * @parameter property="toolchain.outputFile" default-value="${project.build.directory}/toolchains.properties"
      */
     private File outputFile;
 
     /**
      * The type identifier of the toolchain, e.g. "jdk".
-     * 
+     *
      * @parameter property="toolchain.type"
      */
     private String type;
 
     /**
      * The name of the tool, e.g. "javac".
-     * 
+     *
      * @parameter property="toolchain.tool"
      */
     private String tool;
 
     /**
      * The zero-based index of the toolchain to select and store in the build context.
-     * 
+     *
      * @parameter property="toolchain.selected"
      */
     private int selected;
@@ -101,8 +101,8 @@ public class CoreItMojo
             }
             else
             {
-                getLog().warn( "[MAVEN-CORE-IT-LOG] Toolchain #" + selected + " can't be selected, found only "
-                                   + tcs.length );
+                getLog().warn(
+                    "[MAVEN-CORE-IT-LOG] Toolchain #" + selected + " can't be selected, found only " + tcs.length );
             }
         }
 
@@ -157,28 +157,20 @@ public class CoreItMojo
             try
             {
                 // try 2.x style API
-                Method oldMethod = managerClass.getMethod( "getToolchainsForType", new Class[] { String.class } );
+                Method oldMethod = managerClass.getMethod( "getToolchainsForType", new Class[]{ String.class } );
 
-                return (ToolchainPrivate[]) oldMethod.invoke( toolchainManager, new Object[] { type } );
+                return (ToolchainPrivate[]) oldMethod.invoke( toolchainManager, new Object[]{ type } );
             }
             catch ( NoSuchMethodException e )
             {
                 // try 3.x style API
                 Method newMethod =
-                    managerClass.getMethod( "getToolchainsForType", new Class[] { String.class, MavenSession.class } );
+                    managerClass.getMethod( "getToolchainsForType", new Class[]{ String.class, MavenSession.class } );
 
-                return (ToolchainPrivate[]) newMethod.invoke( toolchainManager, new Object[] { type, session } );
+                return (ToolchainPrivate[]) newMethod.invoke( toolchainManager, new Object[]{ type, session } );
             }
         }
-        catch ( NoSuchMethodException e )
-        {
-            throw new MojoExecutionException( "Incompatible toolchain API", e );
-        }
-        catch ( IllegalAccessException e )
-        {
-            throw new MojoExecutionException( "Incompatible toolchain API", e );
-        }
-        catch ( InvocationTargetException e )
+        catch ( NoSuchMethodException | InvocationTargetException | IllegalAccessException e )
         {
             throw new MojoExecutionException( "Incompatible toolchain API", e );
         }

@@ -31,12 +31,11 @@ import java.io.OutputStreamWriter;
 
 /**
  * Creates a text file in the project base directory.
- * 
- * @goal resources
- * @phase process-resources
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal resources
+ * @phase process-resources
  */
 public class ResourcesMojo
     extends AbstractMojo
@@ -44,7 +43,7 @@ public class ResourcesMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -53,7 +52,7 @@ public class ResourcesMojo
 
     /**
      * The path to the output file, relative to the project base directory directory.
-     * 
+     *
      * @parameter
      */
     private String pathname = "target/resources-resources.txt";
@@ -61,16 +60,16 @@ public class ResourcesMojo
     /**
      * An optional message line to write to the output file (using UTF-8 encoding). If given, the output file will be
      * opened in append mode.
-     * 
+     *
      * @parameter
      */
     private String message;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
-     * @throws MojoFailureException If the output file has not been set.
+     * @throws MojoFailureException   If the output file has not been set.
      */
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -98,15 +97,11 @@ public class ResourcesMojo
             {
                 getLog().info( "[MAVEN-CORE-IT-LOG]   " + message );
 
-                OutputStreamWriter writer = new OutputStreamWriter( new FileOutputStream( outputFile, true ), "UTF-8" );
-                try
+                try ( OutputStreamWriter writer = new OutputStreamWriter( new FileOutputStream( outputFile, true ),
+                                                                          "UTF-8" ) )
                 {
                     writer.write( message );
                     writer.write( "\n" );
-                }
-                finally
-                {
-                    writer.close();
                 }
             }
             else

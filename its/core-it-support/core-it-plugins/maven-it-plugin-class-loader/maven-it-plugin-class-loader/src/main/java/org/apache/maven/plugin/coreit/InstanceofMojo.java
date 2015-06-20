@@ -25,7 +25,6 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -33,12 +32,11 @@ import java.util.Properties;
 /**
  * Checks whether objects obtained from the Maven core are assignment-compatible with types loaded from the plugin class
  * loader. In other words, checks that types shared with the core realm are imported into the plugin realm.
- * 
- * @goal instanceof
- * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal instanceof
+ * @phase initialize
  */
 public class InstanceofMojo
     extends AbstractMojo
@@ -46,7 +44,7 @@ public class InstanceofMojo
 
     /**
      * The path to the properties file used to track the results of the instanceof tests.
-     * 
+     *
      * @parameter property="clsldr.instanceofPropertiesFile"
      */
     private File instanceofPropertiesFile;
@@ -54,28 +52,28 @@ public class InstanceofMojo
     /**
      * The qualified name of the type to which the objects should be assignment-compatible. This type will be loaded
      * from the plugin class loader, just like as if it was imported in the plugin source code.
-     * 
+     *
      * @parameter property="clsldr.className"
      */
     private String className;
 
     /**
      * A list of expressions that denote the object instances that should be type-checked.
-     * 
+     *
      * @parameter
      */
     private String[] objectExpressions;
 
     /**
      * A list of injected component instances that should be type-checked.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private List components;
 
     /**
      * The current Maven project against which expressions are evaluated.
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
      */
@@ -83,7 +81,7 @@ public class InstanceofMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -109,9 +107,8 @@ public class InstanceofMojo
             contexts.put( "project", project );
             contexts.put( "pom", project );
 
-            for ( int i = 0; i < objectExpressions.length; i++ )
+            for ( String expression : objectExpressions )
             {
-                String expression = objectExpressions[i];
                 getLog().info( "[MAVEN-CORE-IT-LOG] Evaluating expression " + expression );
                 Object object = ExpressionUtil.evaluate( expression, contexts );
                 getLog().info( "[MAVEN-CORE-IT-LOG] Checking object " + object );
@@ -127,9 +124,8 @@ public class InstanceofMojo
 
         if ( components != null && !components.isEmpty() )
         {
-            for ( Iterator it = components.iterator(); it.hasNext(); )
+            for ( Object object : components )
             {
-                Object object = it.next();
                 getLog().info( "[MAVEN-CORE-IT-LOG] Checking component " + object );
                 getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class " + object.getClass().getName() );
                 getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded class from " + object.getClass().getClassLoader() );

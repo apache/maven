@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * 
+ *
  */
 public class DefaultStatefulSingleton
     implements StatefulSingleton
@@ -48,14 +48,9 @@ public class DefaultStatefulSingleton
     {
         propertiesFile.getParentFile().mkdirs();
 
-        FileOutputStream os = new FileOutputStream( propertiesFile );
-        try
+        try ( FileOutputStream os = new FileOutputStream( propertiesFile ) )
         {
             properties.store( os, "MAVEN-CORE-IT" );
-        }
-        finally
-        {
-            os.close();
         }
     }
 

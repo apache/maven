@@ -19,15 +19,6 @@ package org.apache.maven.wagon.providers.coreit;
  * under the License.
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
-
 import org.apache.maven.wagon.AbstractWagon;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.InputData;
@@ -37,6 +28,15 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
 
 /**
  * Shamelessly copied from ScpExternalWagon in this same project...
@@ -63,8 +63,8 @@ public class CoreItHttpWagon
 
         if ( is == null )
         {
-            throw new TransferFailedException( getRepository().getUrl()
-                + " - Could not open input stream for resource: '" + resource + "'" );
+            throw new TransferFailedException(
+                getRepository().getUrl() + " - Could not open input stream for resource: '" + resource + "'" );
         }
 
         createParentDirectories( destination );
@@ -95,8 +95,8 @@ public class CoreItHttpWagon
 
         if ( os == null )
         {
-            throw new TransferFailedException( getRepository().getUrl()
-                + " - Could not open output stream for resource: '" + resource + "'" );
+            throw new TransferFailedException(
+                getRepository().getUrl() + " - Could not open output stream for resource: '" + resource + "'" );
         }
 
         putTransfer( outputData.getResource(), source, os, true );
@@ -153,15 +153,10 @@ public class CoreItHttpWagon
         try
         {
             new File( "target" ).mkdirs();
-    
-            OutputStream os = new FileOutputStream( "target/wagon.properties" );
-            try
+
+            try ( OutputStream os = new FileOutputStream( "target/wagon.properties" ) )
             {
                 props.store( os, "MAVEN-CORE-IT-WAGON" );
-            }
-            finally
-            {
-                os.close();
             }
         }
         catch ( IOException e )

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3807">MNG-3807</a>.
- * 
+ *
  * @version $Id$
  */
 public class MavenITmng3807PluginConfigExpressionEvaluationTest
@@ -73,7 +72,7 @@ public class MavenITmng3807PluginConfigExpressionEvaluationTest
     {
         assertNotNull( value );
         assertTrue( value.length() > 0 );
-        assertTrue( value, value.indexOf( "${" ) < 0 );
+        assertTrue( value, !value.contains( "${" ) );
     }
 
 }

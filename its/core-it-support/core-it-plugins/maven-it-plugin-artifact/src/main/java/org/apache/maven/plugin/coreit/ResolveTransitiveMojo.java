@@ -31,7 +31,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
@@ -40,10 +39,9 @@ import java.util.Set;
 /**
  * Resolves user-specified artifacts transitively. As an additional exercise, the resolution happens in a forked thread
  * to test access to any shared session state.
- * 
- * @goal resolve-transitive
- * 
+ *
  * @author Benjamin Bentmann
+ * @goal resolve-transitive
  */
 public class ResolveTransitiveMojo
     extends AbstractMojo
@@ -51,7 +49,7 @@ public class ResolveTransitiveMojo
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required
@@ -60,7 +58,7 @@ public class ResolveTransitiveMojo
 
     /**
      * The remote repositories of the current Maven project.
-     * 
+     *
      * @parameter default-value="${project.remoteArtifactRepositories}"
      * @readonly
      * @required
@@ -69,42 +67,42 @@ public class ResolveTransitiveMojo
 
     /**
      * The artifact resolver.
-     * 
+     *
      * @component
      */
     private ArtifactResolver resolver;
 
     /**
      * The artifact factory.
-     * 
+     *
      * @component
      */
     private ArtifactFactory factory;
 
     /**
      * The metadata source.
-     * 
+     *
      * @component
      */
     private ArtifactMetadataSource metadataSource;
 
     /**
      * The dependencies to resolve.
-     * 
+     *
      * @parameter
      */
     private Dependency[] dependencies;
 
     /**
      * The path to a properties file to store the resolved artifact paths in.
-     * 
+     *
      * @parameter
      */
     private File propertiesFile;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the artifacts couldn't be resolved.
      */
     public void execute()
@@ -140,14 +138,9 @@ public class ResolveTransitiveMojo
             {
                 propertiesFile.getParentFile().mkdirs();
 
-                FileOutputStream fos = new FileOutputStream( propertiesFile );
-                try
+                try ( FileOutputStream fos = new FileOutputStream( propertiesFile ) )
                 {
                     thread.props.store( fos, "MAVEN-CORE-IT" );
-                }
-                finally
-                {
-                    fos.close();
                 }
             }
             catch ( IOException e )
@@ -179,30 +172,27 @@ public class ResolveTransitiveMojo
                 {
                     Set artifacts = new LinkedHashSet();
 
-                    for ( int i = 0; i < dependencies.length; i++ )
+                    for ( Dependency dependency : dependencies )
                     {
-                        Dependency dependency = dependencies[i];
-
                         Artifact artifact =
                             factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
                                                                   dependency.getVersion(), dependency.getType(),
                                                                   dependency.getClassifier() );
 
-                        getLog().info( "[MAVEN-CORE-IT-LOG] Resolving "
-                                        + ResolveTransitiveMojo.this.getId( artifact ) );
+                        getLog().info(
+                            "[MAVEN-CORE-IT-LOG] Resolving " + ResolveTransitiveMojo.this.getId( artifact ) );
 
                         artifacts.add( artifact );
                     }
 
                     Artifact origin = factory.createArtifact( "it", "it", "0.1", null, "pom" );
 
-                    artifacts =
-                        resolver.resolveTransitively( artifacts, origin, remoteRepositories, localRepository,
-                                                      metadataSource ).getArtifacts();
+                    artifacts = resolver.resolveTransitively( artifacts, origin, remoteRepositories, localRepository,
+                                                              metadataSource ).getArtifacts();
 
-                    for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+                    for ( Object artifact1 : artifacts )
                     {
-                        Artifact artifact = (Artifact) it.next();
+                        Artifact artifact = (Artifact) artifact1;
 
                         if ( artifact.getFile() != null )
                         {

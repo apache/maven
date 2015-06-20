@@ -19,19 +19,18 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.it.Verifier;
-import org.apache.maven.it.util.ResourceExtractor;
-
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3710">MNG-3710</a>.
- * 
- * @todo Fill in a better description of what this test verifies!
+ *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
+ * @todo Fill in a better description of what this test verifies!
  */
 public class MavenITmng3710PollutedClonedPluginsTest
     extends AbstractMavenIntegrationTestCase
@@ -44,8 +43,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
     public void testitMNG3710_POMInheritance()
         throws Exception
     {
-        File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3710/pom-inheritance" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3710/pom-inheritance" );
         File pluginDir = new File( testDir, "maven-mng3710-pomInheritance-plugin" );
         File projectsDir = new File( testDir, "projects" );
 
@@ -77,8 +75,7 @@ public class MavenITmng3710PollutedClonedPluginsTest
     public void testitMNG3710_OriginalModel()
         throws Exception
     {
-        File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3710/original-model" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3710/original-model" );
         File pluginsDir = new File( testDir, "plugins" );
         File projectDir = new File( testDir, "project" );
 
@@ -91,11 +88,11 @@ public class MavenITmng3710PollutedClonedPluginsTest
         verifier.resetStreams();
 
         verifier = newVerifier( projectDir.getAbsolutePath() );
-        
-        List<String> goals = new ArrayList<String>();
+
+        List<String> goals = new ArrayList<>();
         goals.add( "org.apache.maven.its.mng3710:mavenit-mng3710-directInvoke-plugin:1:run" );
         goals.add( "validate" );
-        
+
         verifier.executeGoals( goals );
 
         verifier.verifyErrorFreeLog();

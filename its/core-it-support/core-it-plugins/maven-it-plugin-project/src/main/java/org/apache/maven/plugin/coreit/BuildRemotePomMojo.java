@@ -32,11 +32,10 @@ import java.util.Properties;
 
 /**
  * Builds the remote POMs of user-specified artifacts. This mimics in part the Maven Remote Resources Plugin.
- * 
- * @goal remote-pom
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal remote-pom
  */
 public class BuildRemotePomMojo
     extends AbstractPomMojo
@@ -44,14 +43,14 @@ public class BuildRemotePomMojo
 
     /**
      * The properties file to dump the POM info to.
-     * 
+     *
      * @parameter default-value="target/pom.properties"
      */
     private File propertiesFile;
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required
@@ -60,7 +59,7 @@ public class BuildRemotePomMojo
 
     /**
      * The remote repositories of the current Maven project.
-     * 
+     *
      * @parameter default-value="${project.remoteArtifactRepositories}"
      * @readonly
      * @required
@@ -69,21 +68,21 @@ public class BuildRemotePomMojo
 
     /**
      * The artifact factory.
-     * 
+     *
      * @component
      */
     private ArtifactFactory factory;
 
     /**
      * The dependencies to resolve.
-     * 
+     *
      * @parameter
      */
     private Dependency[] dependencies;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the artifact file has not been set.
      */
     public void execute()
@@ -95,10 +94,8 @@ public class BuildRemotePomMojo
 
         if ( dependencies != null )
         {
-            for ( int i = 0; i < dependencies.length; i++ )
+            for ( Dependency dependency : dependencies )
             {
-                Dependency dependency = dependencies[i];
-
                 Artifact artifact =
                     factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
                                                           dependency.getVersion(), dependency.getType(),

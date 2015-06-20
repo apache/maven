@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 /**
  * A simple HTTP proxy that only understands the CONNECT method to check HTTPS tunneling.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class TunnelingProxyServer
@@ -166,7 +166,7 @@ public class TunnelingProxyServer
         private String readLine( PushbackInputStream is )
             throws IOException
         {
-            StringBuffer buffer = new StringBuffer( 1024 );
+            StringBuilder buffer = new StringBuilder( 1024 );
 
             while ( true )
             {
@@ -217,7 +217,7 @@ public class TunnelingProxyServer
         {
             try
             {
-                for ( byte[] buffer = new byte[1024 * 8];; )
+                for ( byte[] buffer = new byte[1024 * 8]; ; )
                 {
                     int n = is.read( buffer );
                     if ( n < 0 )

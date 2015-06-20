@@ -35,11 +35,10 @@ import java.util.Properties;
 
 /**
  * Resolves user-specified artifacts. This mimics in part the Maven Dependency Plugin and the Maven Surefire Plugin.
- * 
- * @goal resolve
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal resolve
  */
 public class ResolveMojo
     extends AbstractMojo
@@ -47,7 +46,7 @@ public class ResolveMojo
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required
@@ -56,7 +55,7 @@ public class ResolveMojo
 
     /**
      * The remote repositories of the current Maven project.
-     * 
+     *
      * @parameter default-value="${project.remoteArtifactRepositories}"
      * @readonly
      * @required
@@ -65,35 +64,35 @@ public class ResolveMojo
 
     /**
      * The artifact resolver.
-     * 
+     *
      * @component
      */
     private ArtifactResolver resolver;
 
     /**
      * The artifact factory.
-     * 
+     *
      * @component
      */
     private ArtifactFactory factory;
 
     /**
      * The dependencies to resolve.
-     * 
+     *
      * @parameter
      */
     private Dependency[] dependencies;
 
     /**
      * The path to a properties file to store the resolved artifact paths in.
-     * 
+     *
      * @parameter
      */
     private File propertiesFile;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the artifact could not be resolved
      */
     public void execute()
@@ -107,10 +106,8 @@ public class ResolveMojo
         {
             if ( dependencies != null )
             {
-                for ( int i = 0; i < dependencies.length; i++ )
+                for ( Dependency dependency : dependencies )
                 {
-                    Dependency dependency = dependencies[i];
-
                     Artifact artifact =
                         factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
                                                               dependency.getVersion(), dependency.getType(),
@@ -142,14 +139,9 @@ public class ResolveMojo
             {
                 propertiesFile.getParentFile().mkdirs();
 
-                FileOutputStream fos = new FileOutputStream( propertiesFile );
-                try
+                try ( FileOutputStream fos = new FileOutputStream( propertiesFile ) )
                 {
                     props.store( fos, "MAVEN-CORE-IT" );
-                }
-                finally
-                {
-                    fos.close();
                 }
             }
             catch ( IOException e )

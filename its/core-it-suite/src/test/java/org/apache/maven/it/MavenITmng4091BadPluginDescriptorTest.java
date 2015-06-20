@@ -19,11 +19,11 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+
 import java.io.File;
 import java.util.List;
 import java.util.Properties;
-
-import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4091">MNG-4091</a>:
@@ -61,7 +61,6 @@ public class MavenITmng4091BadPluginDescriptorTest
             verifier.resetStreams();
         }
 
-
         List<String> logFile = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
 
         String msg = "Plugin's descriptor contains the wrong version: 2.0-SNAPSHOT";
@@ -69,7 +68,7 @@ public class MavenITmng4091BadPluginDescriptorTest
         boolean foundMessage = false;
         for ( String line : logFile )
         {
-            if ( line.indexOf( msg ) > -1 )
+            if ( line.contains( msg ) )
             {
                 foundMessage = true;
                 break;

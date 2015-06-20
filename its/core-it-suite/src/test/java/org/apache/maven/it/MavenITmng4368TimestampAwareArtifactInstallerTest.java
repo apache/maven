@@ -19,14 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
+import java.io.File;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4368">MNG-4368</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4368TimestampAwareArtifactInstallerTest
@@ -63,11 +63,12 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File installedPom = new File( verifier.getArtifactPath( "org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom" ) );
+        File installedPom =
+            new File( verifier.getArtifactPath( "org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom" ) );
 
         String pom = FileUtils.fileRead( installedPom, "UTF-8" );
         assertTrue( pom.indexOf( "Branch-A" ) > 0 );
-        assertTrue( pom.indexOf( "Branch-B" ) < 0 );
+        assertTrue( !pom.contains( "Branch-B" ) );
 
         assertEquals( aPom.length(), bPom.length() );
         assertTrue( aPom.lastModified() > bPom.lastModified() );
@@ -81,7 +82,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.resetStreams();
 
         pom = FileUtils.fileRead( installedPom, "UTF-8" );
-        assertTrue( pom.indexOf( "Branch-A" ) < 0 );
+        assertTrue( !pom.contains( "Branch-A" ) );
         assertTrue( pom.indexOf( "Branch-B" ) > 0 );
     }
 
@@ -114,11 +115,12 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        File installedArtifact = new File( verifier.getArtifactPath( "org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar" ) );
+        File installedArtifact =
+            new File( verifier.getArtifactPath( "org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "jar" ) );
 
         String data = FileUtils.fileRead( installedArtifact, "UTF-8" );
         assertTrue( data.indexOf( "Branch-A" ) > 0 );
-        assertTrue( data.indexOf( "Branch-B" ) < 0 );
+        assertTrue( !data.contains( "Branch-B" ) );
 
         assertEquals( aArtifact.length(), bArtifact.length() );
         assertTrue( aArtifact.lastModified() > bArtifact.lastModified() );
@@ -132,7 +134,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.resetStreams();
 
         data = FileUtils.fileRead( installedArtifact, "UTF-8" );
-        assertTrue( data.indexOf( "Branch-A" ) < 0 );
+        assertTrue( !data.contains( "Branch-A" ) );
         assertTrue( data.indexOf( "Branch-B" ) > 0 );
 
         long lastModified = installedArtifact.lastModified();
@@ -148,7 +150,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest
         verifier.resetStreams();
 
         data = FileUtils.fileRead( installedArtifact, "UTF-8" );
-        assertTrue( data.indexOf( "Branch-B" ) < 0 );
+        assertTrue( !data.contains( "Branch-B" ) );
         assertTrue( data.indexOf( "Branch-C" ) > 0 );
     }
 

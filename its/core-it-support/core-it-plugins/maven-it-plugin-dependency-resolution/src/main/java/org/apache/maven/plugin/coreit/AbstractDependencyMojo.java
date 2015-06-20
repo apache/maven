@@ -34,12 +34,11 @@ import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Properties;
 
 /**
  * Provides common services for all mojos of this plugin.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -49,7 +48,7 @@ public abstract class AbstractDependencyMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -62,16 +61,16 @@ public abstract class AbstractDependencyMojo
      * this parameter to 1 to keep only the simple file name. The trimmed down paths will always use the forward slash
      * as directory separator. For non-positive values, the full/absolute path is returned, using the platform-specific
      * separator.
-     * 
+     *
      * @parameter property="depres.significantPathLevels"
      */
     private int significantPathLevels;
 
     /**
      * Writes the specified artifacts to the given output file.
-     * 
-     * @param pathname The path to the output file, relative to the project base directory, may be <code>null</code> or
-     *            empty if the output file should not be written.
+     *
+     * @param pathname  The path to the output file, relative to the project base directory, may be <code>null</code> or
+     *                  empty if the output file should not be written.
      * @param artifacts The list of artifacts to write to the file, may be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be written.
      */
@@ -96,9 +95,9 @@ public abstract class AbstractDependencyMojo
 
             if ( artifacts != null )
             {
-                for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+                for ( Object artifact1 : artifacts )
                 {
-                    Artifact artifact = (Artifact) it.next();
+                    Artifact artifact = (Artifact) artifact1;
                     String id = getId( artifact );
                     writer.write( id );
                     writer.newLine();
@@ -134,9 +133,9 @@ public abstract class AbstractDependencyMojo
 
     /**
      * Writes the specified class path elements to the given output file.
-     * 
-     * @param pathname The path to the output file, relative to the project base directory, may be <code>null</code> or
-     *            empty if the output file should not be written.
+     *
+     * @param pathname  The path to the output file, relative to the project base directory, may be <code>null</code> or
+     *                  empty if the output file should not be written.
      * @param classPath The list of class path elements to write to the file, may be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be written.
      */
@@ -161,9 +160,9 @@ public abstract class AbstractDependencyMojo
 
             if ( classPath != null )
             {
-                for ( Iterator it = classPath.iterator(); it.hasNext(); )
+                for ( Object aClassPath : classPath )
                 {
-                    String element = it.next().toString();
+                    String element = aClassPath.toString();
                     writer.write( stripLeadingDirs( element, significantPathLevels ) );
                     writer.newLine();
                     getLog().info( "[MAVEN-CORE-IT-LOG]   " + element );
@@ -206,9 +205,9 @@ public abstract class AbstractDependencyMojo
 
         if ( classPath != null )
         {
-            for ( Iterator it = classPath.iterator(); it.hasNext(); )
+            for ( Object aClassPath : classPath )
             {
-                String element = it.next().toString();
+                String element = aClassPath.toString();
 
                 File jarFile = new File( element );
 
@@ -274,8 +273,7 @@ public abstract class AbstractDependencyMojo
     {
         MessageDigest digester = MessageDigest.getInstance( "SHA-1" );
 
-        FileInputStream is = new FileInputStream( jarFile );
-        try
+        try ( FileInputStream is = new FileInputStream( jarFile ) )
         {
             DigestInputStream dis = new DigestInputStream( is, digester );
 
@@ -284,19 +282,14 @@ public abstract class AbstractDependencyMojo
                 // just read it
             }
         }
-        finally
-        {
-            is.close();
-        }
 
         byte[] digest = digester.digest();
 
-        StringBuffer hash = new StringBuffer( digest.length * 2 );
+        StringBuilder hash = new StringBuilder( digest.length * 2 );
 
-        for ( int i = 0; i < digest.length; i++ )
+        for ( byte aDigest : digest )
         {
-            @SuppressWarnings( "checkstyle:magicnumber" )
-            int b = digest[i] & 0xFF;
+            @SuppressWarnings( "checkstyle:magicnumber" ) int b = aDigest & 0xFF;
 
             if ( b < 0x10 )
             {
@@ -341,7 +334,7 @@ public abstract class AbstractDependencyMojo
 
         if ( pathname != null )
         {
-            if ( pathname.indexOf( "@idx@" ) >= 0 )
+            if ( pathname.contains( "@idx@" ) )
             {
                 // helps to distinguished forked executions of the same mojo
                 pathname = pathname.replaceAll( "@idx@", String.valueOf( nextCounter() ) );
@@ -366,7 +359,7 @@ public abstract class AbstractDependencyMojo
 
         synchronized ( System.class )
         {
-            counter = Integer.getInteger( key, 0 ).intValue();
+            counter = Integer.getInteger( key, 0 );
             System.setProperty( key, Integer.toString( counter + 1 ) );
         }
 

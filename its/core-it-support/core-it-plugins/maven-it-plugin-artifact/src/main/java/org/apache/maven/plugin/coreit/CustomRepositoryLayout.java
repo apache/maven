@@ -36,7 +36,7 @@ public class CustomRepositoryLayout
     {
         ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-        StringBuffer path = new StringBuffer();
+        StringBuilder path = new StringBuilder();
 
         path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
 

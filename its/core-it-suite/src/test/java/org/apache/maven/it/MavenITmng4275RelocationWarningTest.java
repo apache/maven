@@ -56,29 +56,30 @@ public class MavenITmng4275RelocationWarningTest
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        
+
         List<String> lines = verifier.loadFile( new File( testDir, verifier.getLogFileName() ), false );
         boolean foundWarning = false;
         for ( String line : lines )
         {
             if ( foundWarning )
             {
-                assertTrue(
-                            "Relocation target should have been logged right after warning.",
-                            line.indexOf( "This artifact has been relocated to org.apache.maven.its.mng4275:relocated:1" ) > -1 );
+                assertTrue( "Relocation target should have been logged right after warning.", line.contains(
+                    "This artifact has been relocated to org.apache.maven.its.mng4275:relocated:1" ) );
                 break;
             }
             else if ( line.startsWith( "[WARNING] While downloading org.apache.maven.its.mng4275:relocation:1" ) )
             {
                 foundWarning = true;
             }
-            else if ( line.matches( "\\[WARNING\\].* org.apache.maven.its.mng4275:relocation:jar:1 .* org.apache.maven.its.mng4275:relocated:jar:1.*" ) )
+            else if ( line.matches(
+                "\\[WARNING\\].* org.apache.maven.its.mng4275:relocation:jar:1 .* org.apache.maven.its"
+                    + ".mng4275:relocated:jar:1.*" ) )
             {
                 foundWarning = true;
                 break;
             }
         }
-        
+
         assertTrue( "Relocation warning should haven been logged.", foundWarning );
     }
 

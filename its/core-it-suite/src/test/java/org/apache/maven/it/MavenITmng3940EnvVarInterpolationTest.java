@@ -19,17 +19,17 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+import org.apache.maven.shared.utils.Os;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.it.util.ResourceExtractor;
-import org.apache.maven.shared.utils.Os;
-
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3940">MNG-3940</a>.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -51,7 +51,7 @@ public class MavenITmng3940EnvVarInterpolationTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3940" );
 
-        Map<String, String> envVars = new HashMap<String, String>();
+        Map<String, String> envVars = new HashMap<>();
         /*
          * NOTE: The POM is using MAVEN_MNG_3940 to reference the var (just as one would refer to PATH). On Windows,
          * this must resolve case-insensitively so we use different character casing for the variable here.
@@ -64,7 +64,7 @@ public class MavenITmng3940EnvVarInterpolationTest
         {
             envVars.put( "MAVEN_MNG_3940", "PASSED" );
         }
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );

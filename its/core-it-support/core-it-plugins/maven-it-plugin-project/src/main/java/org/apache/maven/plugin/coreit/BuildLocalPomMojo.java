@@ -28,9 +28,9 @@ import java.util.Properties;
 
 /**
  * Builds the local POMs.
- * 
- * @goal local-pom
+ *
  * @author Benjamin Bentmann
+ * @goal local-pom
  */
 public class BuildLocalPomMojo
     extends AbstractPomMojo
@@ -38,14 +38,14 @@ public class BuildLocalPomMojo
 
     /**
      * The properties file to dump the POM info to.
-     * 
+     *
      * @parameter default-value="target/pom.properties"
      */
     private File propertiesFile;
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required
@@ -54,14 +54,14 @@ public class BuildLocalPomMojo
 
     /**
      * The POM files to build.
-     * 
+     *
      * @parameter
      */
     private File[] files;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the artifact file has not been set.
      */
     public void execute()
@@ -73,10 +73,8 @@ public class BuildLocalPomMojo
 
         if ( files != null )
         {
-            for ( int i = 0; i < files.length; i++ )
+            for ( File file : files )
             {
-                File file = files[i];
-
                 getLog().info( "[MAVEN-CORE-IT-LOG] Building " + file );
 
                 try

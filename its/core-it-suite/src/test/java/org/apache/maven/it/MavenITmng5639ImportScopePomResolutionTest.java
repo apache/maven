@@ -22,9 +22,6 @@ package org.apache.maven.it;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5639">MNG-5639</a>:
@@ -58,7 +55,6 @@ public class MavenITmng5639ImportScopePomResolutionTest
         verifier.assertArtifactPresent( "org.apache.maven.its.mng5639", "b", "0.1", "jar" );
 
     }
-
 
 
 }

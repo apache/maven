@@ -19,15 +19,6 @@ package org.apache.maven.wagon.providers.ssh.external;
  * under the License.
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Properties;
-
 import org.apache.maven.wagon.AbstractWagon;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.InputData;
@@ -38,10 +29,19 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Properties;
+
 /**
  * NOTE: Plexus will only pick this correctly if the Class package and name are the same as that in core. This is
  * because the core component descriptor is read, but the class is read from the latter JAR.
- * 
+ *
  * @plexus.component role="org.apache.maven.wagon.Wagon" role-hint="scpexe" instantiation-strategy="per-lookup"
  */
 public class ScpExternalWagon
@@ -64,8 +64,8 @@ public class ScpExternalWagon
 
         if ( is == null )
         {
-            throw new TransferFailedException( getRepository().getUrl()
-                + " - Could not open input stream for resource: '" + resource + "'" );
+            throw new TransferFailedException(
+                getRepository().getUrl() + " - Could not open input stream for resource: '" + resource + "'" );
         }
 
         createParentDirectories( destination );
@@ -98,8 +98,8 @@ public class ScpExternalWagon
 
         if ( os == null )
         {
-            throw new TransferFailedException( getRepository().getUrl()
-                + " - Could not open output stream for resource: '" + resource + "'" );
+            throw new TransferFailedException(
+                getRepository().getUrl() + " - Could not open output stream for resource: '" + resource + "'" );
         }
 
         putTransfer( outputData.getResource(), source, os, true );
@@ -145,14 +145,9 @@ public class ScpExternalWagon
 
         try
         {
-            OutputStream os = new FileOutputStream( new File( dir, "wagon.properties" ) );
-            try
+            try ( OutputStream os = new FileOutputStream( new File( dir, "wagon.properties" ) ) )
             {
                 props.store( os, "MAVEN-CORE-IT-WAGON" );
-            }
-            finally
-            {
-                os.close();
             }
         }
         catch ( IOException e )

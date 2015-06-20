@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -28,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -52,11 +50,11 @@ public class MavenIT0144LifecycleExecutionOrderTest
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.deleteDirectory( "target" );
         verifier.setAutoclean( false );
-        verifier.executeGoals( Arrays.asList( new String[] { "post-clean", "deploy", "site-deploy" } ) );
+        verifier.executeGoals( Arrays.asList( new String[]{ "post-clean", "deploy", "site-deploy" } ) );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        List<String> expected = new ArrayList<String>();
+        List<String> expected = new ArrayList<>();
 
         expected.add( "pre-clean" );
         expected.add( "clean" );

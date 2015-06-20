@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -28,7 +26,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3220">MNG-3220</a>.
- * 
+ *
  * @version $Id$
  */
 public class MavenITmng3220ImportScopeTest
@@ -50,7 +48,8 @@ public class MavenITmng3220ImportScopeTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3220" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
+                             verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
@@ -69,7 +68,8 @@ public class MavenITmng3220ImportScopeTest
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng3220" );
-        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
+        verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
+                             verifier.newDefaultFilterProperties() );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
 
@@ -91,8 +91,8 @@ public class MavenITmng3220ImportScopeTest
         boolean found = false;
         for ( String line : lines )
         {
-            if ( line.indexOf( "\'dependencies.dependency.version\' is missing for junit:junit" ) > -1
-                || line.indexOf( "\'dependencies.dependency.version\' for junit:junit:jar is missing" ) > -1 )
+            if ( line.contains( "\'dependencies.dependency.version\' is missing for junit:junit" ) || line.contains(
+                "\'dependencies.dependency.version\' for junit:junit:jar is missing" ) )
             {
                 found = true;
                 break;

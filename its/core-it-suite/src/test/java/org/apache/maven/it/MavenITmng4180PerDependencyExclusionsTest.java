@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -29,7 +28,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4180">MNG-4180</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4180PerDependencyExclusionsTest
@@ -64,7 +63,7 @@ public class MavenITmng4180PerDependencyExclusionsTest
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         Collections.sort( artifacts );
 
-        List<String> expected = new ArrayList<String>();
+        List<String> expected = new ArrayList<>();
         expected.add( "org.apache.maven.its.mng4180:a:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4180:b:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4180:c:jar:0.1" );

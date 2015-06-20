@@ -19,14 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
+import java.io.File;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2362">MNG-2362</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2362DeployedPomEncodingTest
@@ -92,8 +92,8 @@ public class MavenITmng2362DeployedPomEncodingTest
     {
         String prefix = "TEST-CHARS: ";
         int pos = pom.indexOf( prefix );
-        assertTrue( "Corrupt data " + pom.substring( pos, pos + prefix.length() + chars.length() ) + " in " + pomFile, 
-            pom.indexOf( prefix + chars ) >= 0 );
+        assertTrue( "Corrupt data " + pom.substring( pos, pos + prefix.length() + chars.length() ) + " in " + pomFile,
+                    pom.contains( prefix + chars ) );
     }
 
 }

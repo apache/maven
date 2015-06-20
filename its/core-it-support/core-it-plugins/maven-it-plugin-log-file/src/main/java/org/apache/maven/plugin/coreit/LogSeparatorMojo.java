@@ -23,12 +23,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Appends a separator line to the log file.
- * 
- * @goal log-separator
- * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal log-separator
+ * @phase initialize
  */
 public class LogSeparatorMojo
     extends AbstractLogMojo
@@ -36,20 +35,20 @@ public class LogSeparatorMojo
 
     /**
      * The length of the separator line.
-     * 
+     *
      * @parameter property="log.length" default-value="80"
      */
     private int length;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
         throws MojoExecutionException
     {
-        StringBuffer buffer = new StringBuffer( length );
+        StringBuilder buffer = new StringBuilder( length );
         for ( int i = 0; i < length; i++ )
         {
             buffer.append( '-' );

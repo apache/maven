@@ -19,6 +19,7 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import junit.framework.TestCase;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
@@ -33,8 +34,6 @@ import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import junit.framework.TestCase;
 
 /**
  * @author Jason van Zyl
@@ -58,7 +57,7 @@ public abstract class AbstractMavenIntegrationTestCase
      * The zero-based column index where to print the test result.
      */
     private static final int RESULT_COLUMN = 60;
-    
+
     private boolean skip;
 
     private static ArtifactVersion javaVersion;
@@ -99,13 +98,13 @@ public abstract class AbstractMavenIntegrationTestCase
         else
         {
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
-                + "' supplied but no Maven version - not skipping test." );
+                             + "' supplied but no Maven version - not skipping test." );
         }
     }
 
     /**
      * Gets the Java version used to run this test.
-     * 
+     *
      * @return The Java version, never <code>null</code>.
      */
     private ArtifactVersion getJavaVersion()
@@ -126,7 +125,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
     /**
      * Gets the Maven version used to run this test.
-     * 
+     *
      * @return The Maven version or <code>null</code> if unknown.
      */
     private ArtifactVersion getMavenVersion()
@@ -190,7 +189,7 @@ public abstract class AbstractMavenIntegrationTestCase
         else
         {
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
-                + "' supplied but no Maven version found - returning true for match check." );
+                             + "' supplied but no Maven version found - returning true for match check." );
 
             return true;
         }
@@ -243,9 +242,9 @@ public abstract class AbstractMavenIntegrationTestCase
      * Guards the execution of a test case by checking that the current Java version matches the specified version
      * range. If the check fails, an exception will be thrown which aborts the current test and marks it as skipped. One
      * would usually call this method right at the start of a test method.
-     * 
+     *
      * @param versionRange The version range that specifies the acceptable Java versions for the test, must not be
-     *            <code>null</code>.
+     *                     <code>null</code>.
      */
     protected void requiresJavaVersion( String versionRange )
     {
@@ -270,9 +269,9 @@ public abstract class AbstractMavenIntegrationTestCase
      * Guards the execution of a test case by checking that the current Maven version matches the specified version
      * range. If the check fails, an exception will be thrown which aborts the current test and marks it as skipped. One
      * would usually call this method right at the start of a test method.
-     * 
+     *
      * @param versionRange The version range that specifies the acceptable Maven versions for the test, must not be
-     *            <code>null</code>.
+     *                     <code>null</code>.
      */
     protected void requiresMavenVersion( String versionRange )
     {
@@ -297,7 +296,7 @@ public abstract class AbstractMavenIntegrationTestCase
         else
         {
             out.println( "WARNING: " + getITName() + ": version range '" + versionRange
-                + "' supplied but no Maven version found - not skipping test." );
+                             + "' supplied but no Maven version found - not skipping test." );
         }
     }
 
@@ -358,7 +357,7 @@ public abstract class AbstractMavenIntegrationTestCase
 
     private String pad( int chars )
     {
-        StringBuffer buffer = new StringBuffer( 128 );
+        StringBuilder buffer = new StringBuilder( 128 );
         for ( int i = 0; i < chars; i++ )
         {
             buffer.append( '.' );
@@ -449,7 +448,7 @@ public abstract class AbstractMavenIntegrationTestCase
                     // Make is easier to run ITs from m2e in Maven IT mode without having to set any additional
                     // properties.
                     //
-                    settingsFile = new File( "target/test-classes", settingsFile.getPath() );                    
+                    settingsFile = new File( "target/test-classes", settingsFile.getPath() );
                 }
             }
 

@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -45,7 +44,7 @@ public class MavenIT0090EnvVarInterpolationTest
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/it0090" );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
-        Map<String, String> envVars = new HashMap<String, String>();
+        Map<String, String> envVars = new HashMap<>();
         envVars.put( "MAVEN_TEST_ENVAR", "MAVEN_TEST_ENVAR_VALUE" );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "target" );

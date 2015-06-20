@@ -1,17 +1,6 @@
 package org.apache.maven.it;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.Collections;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.common.io.ByteStreams;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
@@ -25,13 +14,22 @@ import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
-import com.google.common.io.ByteStreams;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Collections;
 
 /**
  * An HTTP server that handles all requests on a given port from a specified source, optionally secured using BASIC auth
  * by providing a username and password. The source can either be a URL or a directory. When a request is made the
  * request is satisfied from the provided source.
- * 
+ *
  * @author Jason van Zyl
  */
 public class HttpServer
@@ -89,7 +87,7 @@ public class HttpServer
         if ( username != null && password != null )
         {
             HashLoginService loginService = new HashLoginService( "Test Server" );
-            loginService.putUser( username, new Password( password ), new String[] { "user" } );
+            loginService.putUser( username, new Password( password ), new String[]{ "user" } );
             server.addBean( loginService );
 
             ConstraintSecurityHandler security = new ConstraintSecurityHandler();
@@ -98,7 +96,7 @@ public class HttpServer
             Constraint constraint = new Constraint();
             constraint.setName( "auth" );
             constraint.setAuthenticate( true );
-            constraint.setRoles( new String[] { "user", "admin" } );
+            constraint.setRoles( new String[]{ "user", "admin" } );
 
             ConstraintMapping mapping = new ConstraintMapping();
             mapping.setPathSpec( "/*" );
@@ -184,7 +182,7 @@ public class HttpServer
         }
     }
 
-    public static interface StreamSource
+    public interface StreamSource
     {
         InputStream stream( String path )
             throws IOException;
@@ -204,13 +202,15 @@ public class HttpServer
         @Override
         public void handle( String target, Request baseRequest, HttpServletRequest request,
                             HttpServletResponse response )
-                                throws IOException, ServletException
+            throws IOException, ServletException
         {
             response.setContentType( "application/octet-stream" );
             response.setStatus( HttpServletResponse.SC_OK );
-            try(InputStream in = source.stream( target.substring( 1 ) ); OutputStream out = response.getOutputStream() ) {
-                ByteStreams.copy( in, out );                
-            }            
+            try ( InputStream in = source.stream(
+                target.substring( 1 ) ); OutputStream out = response.getOutputStream() )
+            {
+                ByteStreams.copy( in, out );
+            }
             baseRequest.setHandled( true );
         }
     }
@@ -219,11 +219,11 @@ public class HttpServer
         throws Exception
     {
         HttpServer server = HttpServer.builder() //
-        .port( 0 ) //
-        .username( "maven" ) //
-        .password( "secret" ) //
-        .source( new File( "/tmp/repo" ) ) //
-        .build();
+            .port( 0 ) //
+            .username( "maven" ) //
+            .password( "secret" ) //
+            .source( new File( "/tmp/repo" ) ) //
+            .build();
         server.start();
     }
 }

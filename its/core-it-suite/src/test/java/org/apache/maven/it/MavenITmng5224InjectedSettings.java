@@ -99,7 +99,7 @@ public class MavenITmng5224InjectedSettings
          </profiles>
          **/
 
-        List<String> profileIds = new ArrayList<String>( 4 );
+        List<String> profileIds = new ArrayList<>( 4 );
 
         for ( Xpp3Dom node : profileNodes )
         {
@@ -149,7 +149,7 @@ public class MavenITmng5224InjectedSettings
             assertEquals( 1, activeProfilesNode.getChildCount() );
         }
 
-        List<String> activeProfiles = new ArrayList<String>( 2 );
+        List<String> activeProfiles = new ArrayList<>( 2 );
 
         for ( Xpp3Dom node : activeProfilesNode.getChildren() )
         {

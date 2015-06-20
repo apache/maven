@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,11 +33,10 @@ import java.util.Vector;
 
 /**
  * Checks the thread-safe retrieval of components from active component collections.
- * 
+ *
+ * @author Benjamin Bentmann
  * @goal check-thread-safety
  * @phase validate
- * 
- * @author Benjamin Bentmann
  */
 public class CheckThreadSafetyMojo
     extends AbstractMojo
@@ -46,7 +44,7 @@ public class CheckThreadSafetyMojo
 
     /**
      * Project base directory used for manual path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -54,28 +52,28 @@ public class CheckThreadSafetyMojo
 
     /**
      * The available components, as a map.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private Map componentMap;
 
     /**
      * The available components, as a list.
-     * 
+     *
      * @component role="org.apache.maven.plugin.coreit.Component"
      */
     private List componentList;
 
     /**
      * The path to the properties file to create.
-     * 
+     *
      * @parameter property="collections.outputFile"
      */
     private File outputFile;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the output file could not be created.
      */
     public void execute()
@@ -114,13 +112,13 @@ public class CheckThreadSafetyMojo
                     {
                         try
                         {
-                            for ( Iterator it = map.values().iterator(); it.hasNext(); )
+                            for ( Object o : map.values() )
                             {
-                                it.next().toString();
+                                o.toString();
                             }
-                            for ( Iterator it = list.iterator(); it.hasNext(); )
+                            for ( Object aList : list )
                             {
-                                it.next().toString();
+                                aList.toString();
                             }
                         }
                         catch ( Exception e )
@@ -135,15 +133,15 @@ public class CheckThreadSafetyMojo
         }
 
         go.add( null );
-        for ( int i = 0; i < threads.length; i++ )
+        for ( Thread thread : threads )
         {
             try
             {
-                threads[i].join();
+                thread.join();
             }
             catch ( InterruptedException e )
             {
-                getLog().warn( "[MAVEN-CORE-IT-LOG] Interrupted while joining " + threads[i] );
+                getLog().warn( "[MAVEN-CORE-IT-LOG] Interrupted while joining " + thread );
             }
         }
 

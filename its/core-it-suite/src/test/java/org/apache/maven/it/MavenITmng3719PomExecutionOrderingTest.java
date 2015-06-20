@@ -19,16 +19,16 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+
 import java.io.File;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.it.util.ResourceExtractor;
-
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3719">MNG-3719</a>.
- * 
+ *
  * @author Brett Porter
  * @version $Id$
  */
@@ -63,11 +63,11 @@ public class MavenITmng3719PomExecutionOrderingTest
         for ( int i = 0; i < content.size(); i++ )
         {
             String line = (String) content.get( i );
-            
+
             Matcher m = pattern.matcher( line );
             if ( m.matches() )
             {
-                int step = Integer.valueOf( m.group( 1 ) ).intValue();
+                int step = Integer.valueOf( m.group( 1 ) );
                 stepLines[step - 1] = i + 1;
             }
         }

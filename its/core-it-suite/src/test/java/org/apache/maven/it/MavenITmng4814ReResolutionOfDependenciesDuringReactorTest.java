@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -28,7 +27,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4814">MNG-4814</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
@@ -57,7 +56,7 @@ public class MavenITmng4814ReResolutionOfDependenciesDuringReactorTest
         verifier.addCliOption( "-s" );
         verifier.addCliOption( "settings.xml" );
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", verifier.newDefaultFilterProperties() );
-        List<String> goals = new ArrayList<String>();
+        List<String> goals = new ArrayList<>();
         goals.add( "org.apache.maven.its.plugins:maven-it-plugin-dependency-resolution:2.1-SNAPSHOT:aggregate-test" );
         goals.add( "validate" );
         verifier.executeGoals( goals );

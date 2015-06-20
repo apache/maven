@@ -29,11 +29,10 @@ import java.util.Properties;
 /**
  * Checks whether API classes exported by the Maven core are assignment-compatible with types loaded from the plugin
  * class loader. In other words, checks that types shared with the core realm are imported into the plugin realm.
- * 
+ *
+ * @author Benjamin Bentmann
  * @goal assignment-compatible
  * @phase initialize
- * 
- * @author Benjamin Bentmann
  */
 public class AssignmentCompatibleMojo
     extends AbstractMojo
@@ -41,21 +40,21 @@ public class AssignmentCompatibleMojo
 
     /**
      * The path to the properties file used to track the results of the assignment compatibility tests.
-     * 
+     *
      * @parameter property="clsldr.assigncompatPropertiesFile"
      */
     private File assigncompatPropertiesFile;
 
     /**
      * The qualified names of the types to check.
-     * 
+     *
      * @parameter
      */
     private String[] classNames;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -73,9 +72,8 @@ public class AssignmentCompatibleMojo
 
         if ( classNames != null )
         {
-            for ( int i = 0; i < classNames.length; i++ )
+            for ( String className : classNames )
             {
-                String className = classNames[i];
                 String result;
 
                 getLog().info( "[MAVEN-CORE-IT-LOG] Loading class " + className );

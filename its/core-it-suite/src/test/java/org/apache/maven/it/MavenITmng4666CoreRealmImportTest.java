@@ -19,18 +19,16 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4666">MNG-4666</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4666CoreRealmImportTest
@@ -97,10 +95,10 @@ public class MavenITmng4666CoreRealmImportTest
 
     private List<String> getTypes( Properties props )
     {
-        List<String> types = new ArrayList<String>();
-        for ( Iterator<?> it = props.keySet().iterator(); it.hasNext(); )
+        List<String> types = new ArrayList<>();
+        for ( Object o : props.keySet() )
         {
-            String key = it.next().toString();
+            String key = o.toString();
             if ( key.startsWith( "core." ) )
             {
                 String type = key.substring( 5 );

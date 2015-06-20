@@ -35,7 +35,7 @@ import java.util.Properties;
 
 /**
  * Assists in serializing primitives and beans into properties for later inspection/verification.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -49,10 +49,10 @@ class PropertyUtil
     /**
      * Serializes the specified object into the given properties, using the provided key. The object may be a scalar
      * value like a string or some array/collection/map or a bean.
-     * 
+     *
      * @param props The properties to serialize into, must not be <code>null</code>.
-     * @param key The key to use for serialization of the object data, must not be <code>null</code>.
-     * @param obj The object to serialize, may be <code>null</code>.
+     * @param key   The key to use for serialization of the object data, must not be <code>null</code>.
+     * @param obj   The object to serialize, may be <code>null</code>.
      */
     public static void store( Properties props, String key, Object obj )
     {
@@ -62,12 +62,12 @@ class PropertyUtil
     /**
      * Serializes the specified object into the given properties, using the provided key. The object may be a scalar
      * value like a string or some array/collection/map or a bean.
-     * 
-     * @param props The properties to serialize into, must not be <code>null</code>.
-     * @param key The key to use for serialization of the object data, must not be <code>null</code>.
-     * @param obj The object to serialize, may be <code>null</code>.
+     *
+     * @param props   The properties to serialize into, must not be <code>null</code>.
+     * @param key     The key to use for serialization of the object data, must not be <code>null</code>.
+     * @param obj     The object to serialize, may be <code>null</code>.
      * @param visited The set/stack of already visited objects, used to detect back references in the object graph, must
-     *            not be <code>null</code>.
+     *                not be <code>null</code>.
      */
     private static void store( Properties props, String key, Object obj, Collection visited )
     {
@@ -132,21 +132,19 @@ class PropertyUtil
                     props.put( key + ".children", Integer.toString( children.length ) );
 
                     Map indices = new HashMap();
-                    for ( int i = 0; i < children.length; i++ )
+                    for ( Object child : children )
                     {
-                        Object child = children[i];
-
                         String name = (String) getName.invoke( child, NO_ARGS );
 
                         Integer index = (Integer) indices.get( name );
                         if ( index == null )
                         {
-                            index = new Integer( 0 );
+                            index = 0;
                         }
 
                         store( props, key + ".children." + name + "." + index, child, visited );
 
-                        indices.put( name, new Integer( index.intValue() + 1 ) );
+                        indices.put( name, index + 1 );
                     }
                 }
                 catch ( Exception e )
@@ -158,13 +156,12 @@ class PropertyUtil
             {
                 Class type = obj.getClass();
                 Method[] methods = type.getMethods();
-                for ( int i = 0; i < methods.length; i++ )
+                for ( Method method : methods )
                 {
-                    Method method = methods[i];
                     if ( Modifier.isStatic( method.getModifiers() ) || method.getParameterTypes().length > 0
                         || !method.getName().matches( "(get|is)\\p{Lu}.*" ) || method.getName().endsWith( "AsMap" )
-                        || Class.class.isAssignableFrom( method.getReturnType() )
-                        || Object.class.equals( method.getReturnType() ) )
+                        || Class.class.isAssignableFrom( method.getReturnType() ) || Object.class.equals(
+                        method.getReturnType() ) )
                     {
                         continue;
                     }
@@ -186,7 +183,7 @@ class PropertyUtil
 
     /**
      * Derives the bean property name from the specified method for its getter.
-     * 
+     *
      * @param methodName The method name of the property's getter, must not be <code>null</code>.
      * @return The property name, never <code>null</code>.
      */
@@ -206,9 +203,9 @@ class PropertyUtil
 
     /**
      * Writes the specified properties to the given file.
-     * 
+     *
      * @param props The properties to write, must not be <code>null</code>.
-     * @param file The output file for the properties, must not be <code>null</code>.
+     * @param file  The output file for the properties, must not be <code>null</code>.
      * @throws IOException If the properties could not be written to the file.
      */
     public static void write( Properties props, File file )

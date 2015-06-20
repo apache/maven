@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.List;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1803">MNG-1803</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
@@ -67,7 +66,7 @@ public class MavenITmng1803PomValidationErrorIncludesLineNumberTest
         List<String> lines = verifier.loadLines( verifier.getLogFileName(), null );
         for ( String line : lines )
         {
-            if ( line.indexOf( ":bad/id:" ) >= 0 )
+            if ( line.contains( ":bad/id:" ) )
             {
                 assertTrue( "Line number not found in: " + line, line.indexOf( "38" ) > 0 );
                 assertTrue( "Column number not found in: " + line, line.indexOf( "19" ) > 0 );

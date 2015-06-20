@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -27,7 +26,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4353">MNG-4353</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
@@ -53,15 +52,17 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest
         verifier.deleteArtifacts( "org.apache.maven.its.mng4353" );
         Properties filterProps = verifier.newDefaultFilterProperties();
         verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", filterProps );
-        verifier.filterFile( "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/template.pom", 
-            "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1.pom", "UTF-8", filterProps );
+        verifier.filterFile( "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/template.pom",
+                             "repo-1/org/apache/maven/its/mng4353/maven-mng4353-plugin/0.1/maven-mng4353-plugin-0.1"
+                                 + ".pom",
+                             "UTF-8", filterProps );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
 
-        Properties props = verifier.loadProperties( "target/touch.properties" );;
+        Properties props = verifier.loadProperties( "target/touch.properties" );
         assertEquals( "passed", props.getProperty( "test" ) );
     }
 

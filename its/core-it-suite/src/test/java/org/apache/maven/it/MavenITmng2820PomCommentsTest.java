@@ -19,14 +19,14 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
+import java.io.File;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2820">MNG-2820</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng2820PomCommentsTest
@@ -78,7 +78,7 @@ public class MavenITmng2820PomCommentsTest
     private void assertPomComment( String pom, String comment )
         throws Exception
     {
-        assertTrue( "Missing comment: " + comment, pom.indexOf( comment ) >= 0 );
+        assertTrue( "Missing comment: " + comment, pom.contains( comment ) );
     }
 
 }

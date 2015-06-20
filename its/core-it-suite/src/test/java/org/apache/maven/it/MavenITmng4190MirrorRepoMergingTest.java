@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -30,7 +29,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4190">MNG-4190</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4190MirrorRepoMergingTest
@@ -66,7 +65,7 @@ public class MavenITmng4190MirrorRepoMergingTest
         List<String> artifacts = verifier.loadLines( "target/artifacts.txt", "UTF-8" );
         Collections.sort( artifacts );
 
-        List<String> expected = new ArrayList<String>();
+        List<String> expected = new ArrayList<>();
         expected.add( "org.apache.maven.its.mng4190:a:jar:0.1" );
         expected.add( "org.apache.maven.its.mng4190:b:jar:0.1-SNAPSHOT" );
 

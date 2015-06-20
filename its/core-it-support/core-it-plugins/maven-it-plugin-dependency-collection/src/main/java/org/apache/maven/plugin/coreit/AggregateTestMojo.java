@@ -19,24 +19,22 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+
+import java.util.List;
 
 /**
  * Combines dependency collection with aggregation. The path parameters of this mojo support the token
  * <code>&#64;artifactId&#64;</code> to dynamically adjust the output file for each project in the reactor whose
  * dependencies are dumped.
- * 
+ *
+ * @author Benjamin Bentmann
+ * @version $Id$
  * @goal aggregate-test
  * @requiresDependencyCollection test
  * @aggregator true
- * 
- * @author Benjamin Bentmann
- * @version $Id$
  */
 public class AggregateTestMojo
     extends AbstractDependencyMojo
@@ -47,14 +45,14 @@ public class AggregateTestMojo
      * UTF-8 encoded file specifies an artifact identifier. If not specified, the artifact list will not be written to
      * disk. Unlike the test artifacts, the collection of project artifacts additionally contains those artifacts that
      * do not contribute to the class path.
-     * 
+     *
      * @parameter property="depres.projectArtifacts"
      */
     private String projectArtifacts;
 
     /**
      * The Maven projects in the reactor.
-     * 
+     *
      * @parameter default-value="${reactorProjects}"
      * @readonly
      */
@@ -62,7 +60,7 @@ public class AggregateTestMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created or any dependency could not be resolved.
      */
     public void execute()
@@ -70,9 +68,9 @@ public class AggregateTestMojo
     {
         try
         {
-            for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+            for ( Object reactorProject : reactorProjects )
             {
-                MavenProject project = (MavenProject) it.next();
+                MavenProject project = (MavenProject) reactorProject;
 
                 writeArtifacts( filter( projectArtifacts, project ), project.getArtifacts() );
 

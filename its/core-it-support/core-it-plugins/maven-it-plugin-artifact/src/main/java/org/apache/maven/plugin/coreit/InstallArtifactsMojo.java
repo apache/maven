@@ -32,7 +32,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -87,9 +86,9 @@ public class InstallArtifactsMojo
         ArtifactRepository artifactRepository =
             artifactRepositoryFactory.createDeploymentArtifactRepository( "appassembler", "file://"
                 + assembleDirectory.getAbsolutePath() + "/" + repositoryName, artifactRepositoryLayout, false );
-        for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+        for ( Object artifact1 : artifacts )
         {
-            Artifact artifact = (Artifact) it.next();
+            Artifact artifact = (Artifact) artifact1;
 
             installArtifact( artifactRepository, artifact );
         }
@@ -115,7 +114,7 @@ public class InstallArtifactsMojo
     }
 
     /**
-     * 
+     *
      */
     public static class FlatRepositoryLayout
         implements ArtifactRepositoryLayout
@@ -128,7 +127,7 @@ public class InstallArtifactsMojo
         {
             ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
-            StringBuffer path = new StringBuffer();
+            StringBuilder path = new StringBuilder();
 
             path.append( artifact.getArtifactId() ).append( ARTIFACT_SEPARATOR ).append( artifact.getVersion() );
 
@@ -152,7 +151,7 @@ public class InstallArtifactsMojo
 
         private String pathOfRepositoryMetadata( String filename )
         {
-            StringBuffer path = new StringBuffer();
+            StringBuilder path = new StringBuilder();
 
             path.append( filename );
 

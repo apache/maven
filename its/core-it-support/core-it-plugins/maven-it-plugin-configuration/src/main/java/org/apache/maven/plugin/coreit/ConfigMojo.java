@@ -19,6 +19,10 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -28,18 +32,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-
 /**
  * Dumps this mojo's configuration into a properties file.
- * 
- * @goal config
- * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal config
+ * @phase validate
  */
 public class ConfigMojo
     extends AbstractMojo
@@ -47,7 +46,7 @@ public class ConfigMojo
 
     /**
      * The current project's base directory, used for path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -55,210 +54,210 @@ public class ConfigMojo
 
     /**
      * The path to the properties file into which to save the mojo configuration.
-     * 
+     *
      * @parameter property="config.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * A parameter with an alias.
-     * 
+     *
      * @parameter alias="aliasParamLegacy"
      */
     private String aliasParam;
 
     /**
      * A parameter with a constant default value.
-     * 
+     *
      * @parameter default-value="maven-core-it"
      */
     private String defaultParam;
 
     /**
      * A parameter with a default value using multiple expressions.
-     * 
+     *
      * @parameter default-value="${project.groupId}:${project.artifactId}:${project.version}"
      */
     private String defaultParamWithExpression;
 
     /**
      * A parameter that combines all of the annotations.
-     * 
+     *
      * @parameter alias="fullyAnnotatedParam" property="config.aliasDefaultExpressionParam" default-value="test"
      */
     private String aliasDefaultExpressionParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean}.
-     * 
+     *
      * @parameter property="config.booleanParam"
      */
     private Boolean booleanParam;
 
     /**
      * A simple parameter of type {@link java.lang.Boolean#TYPE}.
-     * 
+     *
      * @parameter property="config.primitiveBooleanParam"
      */
     private boolean primitiveBooleanParam;
 
     /**
      * A simple parameter of type {@link java.lang.Byte}.
-     * 
+     *
      * @parameter property="config.byteParam"
      */
     private Byte byteParam;
 
     /**
      * A simple parameter of type {@link java.lang.Short}.
-     * 
+     *
      * @parameter property="config.shortParam"
      */
     private Short shortParam;
 
     /**
      * A simple parameter of type {@link java.lang.Integer}.
-     * 
+     *
      * @parameter property="config.intergerParam"
      */
     private Integer integerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Integer#TYPE}.
-     * 
+     *
      * @parameter property="config.primitiveIntegerParam"
      */
     private int primitiveIntegerParam;
 
     /**
      * A simple parameter of type {@link java.lang.Long}.
-     * 
+     *
      * @parameter property="config.longParam"
      */
     private Long longParam;
 
     /**
      * A simple parameter of type {@link java.lang.Float}.
-     * 
+     *
      * @parameter property="config.floatParam"
      */
     private Float floatParam;
 
     /**
      * A simple parameter of type {@link java.lang.Double}.
-     * 
+     *
      * @parameter property="config.doubleParam"
      */
     private Double doubleParam;
 
     /**
      * A simple parameter of type {@link java.lang.Character}.
-     * 
+     *
      * @parameter property="config.characterParam"
      */
     private Character characterParam;
 
     /**
      * A simple parameter of type {@link java.lang.String}.
-     * 
+     *
      * @parameter property="config.stringParam"
      */
     private String stringParam;
 
     /**
      * A simple parameter of type {@link java.io.File}.
-     * 
+     *
      * @parameter property="config.fileParam"
      */
     private File fileParam;
 
     /**
      * A simple parameter of type {@link java.util.Date}.
-     * 
+     *
      * @parameter property="config.dateParam"
      */
     private Date dateParam;
 
     /**
      * A simple parameter of type {@link java.net.URL}.
-     * 
+     *
      * @parameter property="config.urlParam"
      */
     private URL urlParam;
 
     /**
      * A simple parameter of type {@link java.net.URI} (requires Maven 3.x).
-     * 
+     *
      * @parameter
      */
     private URI uriParam;
 
     /**
      * An array parameter of component type {@link java.lang.String}.
-     * 
+     *
      * @parameter
      */
     private String[] stringParams;
 
     /**
      * An array parameter of component type {@link java.io.File}.
-     * 
+     *
      * @parameter
      */
     private File[] fileParams;
 
     /**
      * A collection parameter of type {@link java.util.List}.
-     * 
+     *
      * @parameter
      */
     private List listParam;
 
     /**
      * A collection parameter of type {@link java.util.Set}.
-     * 
+     *
      * @parameter
      */
     private Set setParam;
 
     /**
      * A collection parameter of type {@link java.util.Map}.
-     * 
+     *
      * @parameter
      */
     private Map mapParam;
 
     /**
      * A collection parameter of type {@link java.util.Properties}.
-     * 
+     *
      * @parameter
      */
     private Properties propertiesParam;
 
     /**
      * A complex parameter with an alias.
-     * 
+     *
      * @parameter alias="aliasStringParamsLegacy"
      */
     private String[] aliasStringParams;
 
     /**
      * A complex parameter of type {@link org.apache.maven.plugin.coreit.Bean}.
-     * 
+     *
      * @parameter
      */
     private Bean beanParam;
 
     /**
      * A raw DOM snippet.
-     * 
+     *
      * @parameter
      */
     private PlexusConfiguration domParam;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -289,7 +288,7 @@ public class ConfigMojo
 
     /**
      * Dumps the mojo configuration into the specified properties.
-     * 
+     *
      * @param props The properties to dump the configuration into, must not be <code>null</code>.
      */
     private void dumpConfiguration( Properties props )
@@ -306,14 +305,14 @@ public class ConfigMojo
         PropertiesUtil.serialize( props, "booleanParam", booleanParam );
         if ( primitiveBooleanParam )
         {
-            PropertiesUtil.serialize( props, "primitiveBooleanParam", Boolean.valueOf( primitiveBooleanParam ) );
+            PropertiesUtil.serialize( props, "primitiveBooleanParam", primitiveBooleanParam );
         }
         PropertiesUtil.serialize( props, "byteParam", byteParam );
         PropertiesUtil.serialize( props, "shortParam", shortParam );
         PropertiesUtil.serialize( props, "integerParam", integerParam );
         if ( primitiveIntegerParam != 0 )
         {
-            PropertiesUtil.serialize( props, "primitiveIntegerParam", new Integer( primitiveIntegerParam ) );
+            PropertiesUtil.serialize( props, "primitiveIntegerParam", primitiveIntegerParam );
         }
         PropertiesUtil.serialize( props, "longParam", longParam );
         PropertiesUtil.serialize( props, "floatParam", floatParam );
@@ -336,7 +335,7 @@ public class ConfigMojo
         {
             PropertiesUtil.serialize( props, "beanParam.fieldParam", beanParam.fieldParam );
             PropertiesUtil.serialize( props, "beanParam.setterParam", beanParam.setterParam );
-            PropertiesUtil.serialize( props, "beanParam.setterCalled", Boolean.valueOf( beanParam.setterCalled ) );
+            PropertiesUtil.serialize( props, "beanParam.setterCalled", beanParam.setterCalled );
         }
     }
 

@@ -19,26 +19,23 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.AbstractHandler;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4555">MNG-4555</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4555MetaversionResolutionOfflineTest
@@ -58,7 +55,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4555" );
 
-        final List<String> uris = new ArrayList<String>();
+        final List<String> uris = new ArrayList<>();
 
         Handler repoHandler = new AbstractHandler()
         {

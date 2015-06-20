@@ -38,7 +38,7 @@ public abstract class AbstractPomMojo
 
     /**
      * The project builder.
-     * 
+     *
      * @component
      */
     protected MavenProjectBuilder builder;
@@ -69,14 +69,9 @@ public abstract class AbstractPomMojo
         {
             file.getParentFile().mkdirs();
 
-            FileOutputStream os = new FileOutputStream( file );
-            try
+            try ( FileOutputStream os = new FileOutputStream( file ) )
             {
                 props.store( os, "[MAVEN-CORE-IT-LOG]" );
-            }
-            finally
-            {
-                os.close();
             }
         }
         catch ( IOException e )

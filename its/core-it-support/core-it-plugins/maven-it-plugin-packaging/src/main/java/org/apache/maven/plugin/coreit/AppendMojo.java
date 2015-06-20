@@ -29,7 +29,7 @@ import java.io.OutputStreamWriter;
 
 /**
  * Appends a message to an UTF-8 encoded plain text file.
- * 
+ *
  * @author Benjamin Bentmann
  * @goal append
  */
@@ -58,15 +58,11 @@ public class AppendMojo
 
             getLog().info( "[MAVEN-CORE-IT-LOG]   " + message );
 
-            OutputStreamWriter writer = new OutputStreamWriter( new FileOutputStream( outputFile, true ), "UTF-8" );
-            try
+            try ( OutputStreamWriter writer = new OutputStreamWriter( new FileOutputStream( outputFile, true ),
+                                                                      "UTF-8" ) )
             {
                 writer.write( message );
                 writer.write( "\n" );
-            }
-            finally
-            {
-                writer.close();
             }
         }
         catch ( IOException e )

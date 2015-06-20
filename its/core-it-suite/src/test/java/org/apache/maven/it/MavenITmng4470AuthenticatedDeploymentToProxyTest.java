@@ -19,17 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.it.utils.DeployedResource;
 import org.codehaus.plexus.util.StringUtils;
@@ -44,9 +33,18 @@ import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4470">MNG-4470</a>.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -60,7 +58,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
     private volatile boolean deployed;
 
-    List<DeployedResource> deployedResources = new ArrayList<DeployedResource>();
+    List<DeployedResource> deployedResources = new ArrayList<>();
 
     public MavenITmng4470AuthenticatedDeploymentToProxyTest()
     {
@@ -138,7 +136,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
         Constraint constraint = new Constraint();
         constraint.setName( Constraint.__BASIC_AUTH );
-        constraint.setRoles( new String[] { "deployer" } );
+        constraint.setRoles( new String[]{ "deployer" } );
         constraint.setAuthenticate( true );
 
         ConstraintMapping constraintMapping = new ConstraintMapping();
@@ -151,7 +149,7 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
 
         SecurityHandler securityHandler = new SecurityHandler();
         securityHandler.setUserRealm( userRealm );
-        securityHandler.setConstraintMappings( new ConstraintMapping[] { constraintMapping } );
+        securityHandler.setConstraintMappings( new ConstraintMapping[]{ constraintMapping } );
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler( proxyHandler );
@@ -201,14 +199,14 @@ public class MavenITmng4470AuthenticatedDeploymentToProxyTest
         throws Exception
     {
 
-        deployedResources = new ArrayList<DeployedResource>();
+        deployedResources = new ArrayList<>();
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-4470/" + project );
 
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
-        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8", 
-            Collections.singletonMap( "@port@", Integer.toString( port ) ) );
+        verifier.filterFile( "settings-template.xml", "settings.xml", "UTF-8",
+                             Collections.singletonMap( "@port@", Integer.toString( port ) ) );
         verifier.addCliOption( "--settings" );
         verifier.addCliOption( "settings.xml" );
         verifier.executeGoal( "validate" );

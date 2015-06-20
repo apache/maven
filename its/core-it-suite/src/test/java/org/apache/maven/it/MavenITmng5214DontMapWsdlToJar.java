@@ -1,10 +1,9 @@
 package org.apache.maven.it;
 
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.it.util.ResourceExtractor;
+
+import java.io.File;
+import java.util.List;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -26,22 +25,23 @@ import org.apache.maven.it.util.ResourceExtractor;
  */
 
 
-public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTestCase
+public class MavenITmng5214DontMapWsdlToJar
+    extends AbstractMavenIntegrationTestCase
 {
     public MavenITmng5214DontMapWsdlToJar()
     {
         super( "[3.1,)" );
     }
-    
+
     /**
-     * Test that the code that allows test-jar and ejb-client dependencies to resolve to the 
+     * Test that the code that allows test-jar and ejb-client dependencies to resolve to the
      * target/classes or target/test-class is *not* applies to other types, e.g. wsdl.
      */
     public void testitTestPhase()
         throws Exception
     {
         File setupDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5214/dependency" );
-        
+
         Verifier setupVerifier = newVerifier( setupDir.getAbsolutePath() );
         setupVerifier.setAutoclean( false );
         setupVerifier.setMavenDebug( true );
@@ -52,7 +52,7 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         setupVerifier.executeGoal( "generate-resources" );
 
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5214" );
-        
+
         Verifier verifier = newVerifier( testDir.getAbsolutePath() );
         verifier.setAutoclean( false );
         verifier.deleteDirectory( "consumer/target" );
@@ -61,12 +61,11 @@ public class MavenITmng5214DontMapWsdlToJar extends AbstractMavenIntegrationTest
         verifier.executeGoal( "test" );
         verifier.verifyErrorFreeLog();
         List<String> lines = verifier.loadFile( verifier.getBasedir(), verifier.getLogFileName(), false );
-        Iterator<String> lineIt = lines.iterator();
-        // RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT $ /tmp/it.repo/org/apache/maven/its/mng5214/dependency/1.0-SNAPSHOT/dependency-1.0-SNAPSHOT.wsdl
-        while ( lineIt.hasNext() )
+        // RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT $ /tmp/it
+        // .repo/org/apache/maven/its/mng5214/dependency/1.0-SNAPSHOT/dependency-1.0-SNAPSHOT.wsdl
+        for ( String line : lines )
         {
-            String line = (String) lineIt.next();
-            if ( line.contains( "RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT"  ) )
+            if ( line.contains( "RESOLVE-ONE-DEPENDENCY org.apache.maven.its.mng5214:dependency:wsdl:1.0-SNAPSHOT" ) )
             {
                 assertFalse( line.contains( "classes-main" ) );
                 assertTrue( line.endsWith( ".wsdl" ) );

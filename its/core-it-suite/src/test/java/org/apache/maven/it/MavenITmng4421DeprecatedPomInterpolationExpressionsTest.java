@@ -19,7 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -28,7 +27,7 @@ import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4421">MNG-4421</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
@@ -60,19 +59,19 @@ public class MavenITmng4421DeprecatedPomInterpolationExpressionsTest
         assertEquals( "0.1", props.getProperty( "project.properties.property2" ) );
 
         List<String> lines = verifier.loadLines( "log.txt", null );
-        
+
         boolean warnedPomPrefix = false;
         boolean warnedEmptyPrefix = false;
-        
+
         for ( String line : lines )
         {
             if ( line.startsWith( "[WARN" ) )
             {
-                if ( line.indexOf( "${pom.version}" ) >= 0 )
+                if ( line.contains( "${pom.version}" ) )
                 {
                     warnedPomPrefix = true;
                 }
-                if ( line.indexOf( "${version}" ) >= 0 )
+                if ( line.contains( "${version}" ) )
                 {
                     warnedEmptyPrefix = true;
                 }

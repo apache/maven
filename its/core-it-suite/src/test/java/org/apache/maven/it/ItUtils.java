@@ -35,9 +35,8 @@ class ItUtils
     {
         MessageDigest digester = MessageDigest.getInstance( algo );
 
-        FileInputStream is = new FileInputStream( file );
         DigestInputStream dis;
-        try
+        try ( FileInputStream is = new FileInputStream( file ) )
         {
             dis = new DigestInputStream( is, digester );
 
@@ -46,18 +45,14 @@ class ItUtils
                 // just read it
             }
         }
-        finally
-        {
-            is.close();
-        }
 
         byte[] digest = digester.digest();
 
-        StringBuffer hash = new StringBuffer( digest.length * 2 );
+        StringBuilder hash = new StringBuilder( digest.length * 2 );
 
-        for ( int i = 0; i < digest.length; i++ )
+        for ( byte aDigest : digest )
         {
-            int b = digest[i] & 0xFF;
+            int b = aDigest & 0xFF;
 
             if ( b < 0x10 )
             {

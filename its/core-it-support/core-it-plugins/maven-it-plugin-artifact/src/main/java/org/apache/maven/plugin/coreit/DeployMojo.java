@@ -24,16 +24,13 @@ import org.apache.maven.artifact.deployer.ArtifactDeployer;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.util.Iterator;
-
 /**
  * Deploys the project artifacts to the distribution repository. This is the essence of the Maven Deploy Plugin.
- * 
- * @goal deploy
- * @phase deploy
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal deploy
+ * @phase deploy
  */
 public class DeployMojo
     extends AbstractRepoMojo
@@ -41,7 +38,7 @@ public class DeployMojo
 
     /**
      * The distribution repository.
-     * 
+     *
      * @parameter default-value="${project.distributionManagementArtifactRepository}"
      * @readonly
      * @required
@@ -50,14 +47,14 @@ public class DeployMojo
 
     /**
      * The artifact deployer.
-     * 
+     *
      * @component
      */
     private ArtifactDeployer deployer;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
     public void execute()
@@ -78,9 +75,9 @@ public class DeployMojo
 
             if ( attachedArtifacts != null )
             {
-                for ( Iterator it = attachedArtifacts.iterator(); it.hasNext(); )
+                for ( Object attachedArtifact1 : attachedArtifacts )
                 {
-                    Artifact attachedArtifact = (Artifact) it.next();
+                    Artifact attachedArtifact = (Artifact) attachedArtifact1;
                     deployer.deploy( attachedArtifact.getFile(), attachedArtifact, deploymentRepository,
                                      localRepository );
                 }

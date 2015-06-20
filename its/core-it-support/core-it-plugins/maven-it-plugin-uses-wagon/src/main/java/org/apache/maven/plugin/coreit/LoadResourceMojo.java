@@ -37,12 +37,11 @@ import java.util.Properties;
 /**
  * Loads resources from a class loader used to load a wagon provider. The wagon is merely used to access the extension
  * class loader it came from which is otherwise not accessible to a plugin.
- * 
- * @goal load-resource
- * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal load-resource
+ * @phase validate
  */
 public class LoadResourceMojo
     extends AbstractMojo
@@ -50,14 +49,14 @@ public class LoadResourceMojo
 
     /**
      * The Wagon manager used to retrieve wagon providers.
-     * 
+     *
      * @component
      */
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to track the results of the resource loading via the wagon's class loader.
-     * 
+     *
      * @parameter property="wagon.wagonClassLoaderOutput"
      */
     private File wagonClassLoaderOutput;
@@ -65,14 +64,14 @@ public class LoadResourceMojo
     /**
      * The role hint for the wagon provider to load. The class loader of this provider will be used to load the
      * resources.
-     * 
+     *
      * @parameter property="wagon.wagonProtocol"
      */
     private String wagonProtocol;
 
     /**
      * The repository to load the wagon for, if applicable.
-     * 
+     *
      * @parameter property="wagon.repositoryId"
      */
     private String repositoryId;
@@ -82,14 +81,14 @@ public class LoadResourceMojo
      * loaded, the generated properties files will contain a key named <code>ARP</code> whose value gives the URL to the
      * resource. In addition, the keys <code>ARP.count</code>, <code>ARP.0</code>, <code>ARP.1</code> etc. will
      * enumerate all URLs matching the resource name.
-     * 
+     *
      * @parameter
      */
     private String[] resourcePaths;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the attached file has not been set.
      */
     public void execute()
@@ -123,18 +122,17 @@ public class LoadResourceMojo
 
         if ( resourcePaths != null )
         {
-            for ( int i = 0; i < resourcePaths.length; i++ )
+            for ( String path : resourcePaths )
             {
-                String path = resourcePaths[i];
                 getLog().info( "[MAVEN-CORE-IT-LOG] Loading resource " + path );
-    
+
                 URL url = classLoader.getResource( path );
                 getLog().info( "[MAVEN-CORE-IT-LOG]   Loaded resource from " + url );
                 if ( url != null )
                 {
                     loaderProperties.setProperty( path, url.toString() );
                 }
-    
+
                 try
                 {
                     List urls = Collections.list( classLoader.getResources( path ) );

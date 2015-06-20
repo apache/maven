@@ -33,12 +33,11 @@ import java.util.Properties;
 
 /**
  * Dumps the authentication info registered with the wagon manager for a server to a properties file.
- * 
- * @goal dump-auth
- * @phase validate
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal dump-auth
+ * @phase validate
  */
 public class DumpAuthMojo
     extends AbstractMojo
@@ -46,7 +45,7 @@ public class DumpAuthMojo
 
     /**
      * Project base directory used for manual path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -54,28 +53,28 @@ public class DumpAuthMojo
 
     /**
      * The Wagon manager used to retrieve authentication infos.
-     * 
+     *
      * @component
      */
     private WagonManager wagonManager;
 
     /**
      * The path to the properties file used to dump the auth infos.
-     * 
+     *
      * @parameter property="wagon.propertiesFile"
      */
     private File propertiesFile;
 
     /**
      * The set of server identifiers whose auth infos should be dumped.
-     * 
+     *
      * @parameter
      */
     private String[] serverIds;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the output file could not be created.
      */
     public void execute()
@@ -83,9 +82,8 @@ public class DumpAuthMojo
     {
         Properties authProperties = new Properties();
 
-        for ( int i = 0; i < serverIds.length; i++ )
+        for ( String serverId : serverIds )
         {
-            String serverId = serverIds[i];
             getLog().info( "[MAVEN-CORE-IT-LOG] Getting authentication info for server " + serverId );
 
             AuthenticationInfo authInfo = wagonManager.getAuthenticationInfo( serverId );

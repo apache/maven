@@ -19,13 +19,13 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 
 /**
  * Check that we correctly use the implementation parameter.
@@ -38,14 +38,14 @@ public class ParameterImplementationMojo
 
     /**
      * The path to the properties file for the parameter information.
-     * 
+     *
      * @parameter
      */
     private File outputFile;
 
     /**
      * A parameter whose type is an interface but with a default implementation class.
-     * 
+     *
      * @parameter implementation="org.apache.maven.plugin.coreit.sub.AnImplementation"
      */
     private AnInterface theParameter;
@@ -69,14 +69,9 @@ public class ParameterImplementationMojo
         {
             outputFile.getParentFile().mkdirs();
 
-            FileOutputStream os = new FileOutputStream( outputFile );
-            try
+            try ( FileOutputStream os = new FileOutputStream( outputFile ) )
             {
                 props.store( os, "[MAVEN-CORE-IT-LOG]" );
-            }
-            finally
-            {
-                os.close();
             }
         }
         catch ( IOException e )

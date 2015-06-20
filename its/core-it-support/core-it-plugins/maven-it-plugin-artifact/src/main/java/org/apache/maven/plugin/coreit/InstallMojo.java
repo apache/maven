@@ -23,16 +23,13 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.installer.ArtifactInstaller;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.util.Iterator;
-
 /**
  * Installs the project artifacts into the local repository. This is the essence of the Maven Install Plugin.
- * 
- * @goal install
- * @phase install
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal install
+ * @phase install
  */
 public class InstallMojo
     extends AbstractRepoMojo
@@ -40,14 +37,14 @@ public class InstallMojo
 
     /**
      * The artifact installer.
-     * 
+     *
      * @component
      */
     private ArtifactInstaller installer;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If any artifact could not be installed.
      */
     public void execute()
@@ -68,9 +65,9 @@ public class InstallMojo
 
             if ( attachedArtifacts != null )
             {
-                for ( Iterator it = attachedArtifacts.iterator(); it.hasNext(); )
+                for ( Object attachedArtifact1 : attachedArtifacts )
                 {
-                    Artifact attachedArtifact = (Artifact) it.next();
+                    Artifact attachedArtifact = (Artifact) attachedArtifact1;
                     installer.install( attachedArtifact.getFile(), attachedArtifact, localRepository );
                 }
             }

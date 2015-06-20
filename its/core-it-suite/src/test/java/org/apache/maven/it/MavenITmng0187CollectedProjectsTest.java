@@ -19,20 +19,18 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-187">MNG-187</a>.
- * 
+ *
  * @author Benjamin Bentmann
  */
 public class MavenITmng0187CollectedProjectsTest
@@ -66,24 +64,24 @@ public class MavenITmng0187CollectedProjectsTest
 
         props = verifier.loadProperties( "target/project.properties" );
         assertEquals( "2", props.getProperty( "project.collectedProjects.size" ) );
-        assertEquals( Arrays.asList( new String[] { "sub-1", "sub-2" } ), getProjects( props ) );
+        assertEquals( Arrays.asList( new String[]{ "sub-1", "sub-2" } ), getProjects( props ) );
 
         props = verifier.loadProperties( "sub-1/target/project.properties" );
         assertEquals( "1", props.getProperty( "project.collectedProjects.size" ) );
-        assertEquals( Arrays.asList( new String[] { "sub-2" } ), getProjects( props ) );
+        assertEquals( Arrays.asList( new String[]{ "sub-2" } ), getProjects( props ) );
 
         props = verifier.loadProperties( "sub-1/sub-2/target/project.properties" );
         assertEquals( "0", props.getProperty( "project.collectedProjects.size" ) );
-        assertEquals( Arrays.asList( new String[] {} ), getProjects( props ) );
+        assertEquals( Arrays.asList( new String[]{} ), getProjects( props ) );
     }
 
     private List<String> getProjects( Properties props )
     {
-        List<String> projects = new ArrayList<String>();
+        List<String> projects = new ArrayList<>();
 
-        for ( Iterator<?> it = props.keySet().iterator(); it.hasNext(); )
+        for ( Object o : props.keySet() )
         {
-            String key = it.next().toString();
+            String key = o.toString();
             if ( key.startsWith( "project.collectedProjects." ) && !key.endsWith( ".size" ) )
             {
                 projects.add( props.getProperty( key ) );

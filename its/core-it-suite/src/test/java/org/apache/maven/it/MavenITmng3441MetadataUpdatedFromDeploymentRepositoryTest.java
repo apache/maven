@@ -19,19 +19,19 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3441">MNG-3441</a>.
- * 
+ *
  * @version $Id$
  */
 public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
@@ -45,8 +45,7 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     public void testitMNG3441()
         throws Exception
     {
-        File testDir =
-            ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-3441" );
 
         File targetRepository = new File( testDir, "target-repo" );
         FileUtils.deleteDirectory( targetRepository );
@@ -63,7 +62,8 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
         verifier.verifyErrorFreeLog();
 
         Xpp3Dom dom = readDom( new File( targetRepository,
-                                         "org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml" ) );
+                                         "org/apache/maven/its/mng3441/test-artifact/1.0-SNAPSHOT/maven-metadata.xml"
+        ) );
         assertEquals( "2", dom.getChild( "versioning" ).getChild( "snapshot" ).getChild( "buildNumber" ).getValue() );
 
         dom = readDom( new File( targetRepository, "org/apache/maven/its/mng3441/maven-metadata.xml" ) );
@@ -77,14 +77,9 @@ public class MavenITmng3441MetadataUpdatedFromDeploymentRepositoryTest
     private Xpp3Dom readDom( File file )
         throws XmlPullParserException, IOException
     {
-        FileReader reader = new FileReader( file );
-        try
+        try ( FileReader reader = new FileReader( file ) )
         {
             return Xpp3DomBuilder.build( reader );
-        }
-        finally
-        {
-            reader.close();
         }
     }
 }

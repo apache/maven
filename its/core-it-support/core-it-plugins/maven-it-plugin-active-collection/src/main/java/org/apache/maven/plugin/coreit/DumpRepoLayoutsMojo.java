@@ -27,18 +27,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 /**
  * Dumps the role hints of the available repository layouts to a properties file.
- * 
+ *
+ * @author Benjamin Bentmann
  * @goal dump-repo-layouts
  * @phase validate
- * 
- * @author Benjamin Bentmann
  */
 public class DumpRepoLayoutsMojo
     extends AbstractMojo
@@ -46,7 +44,7 @@ public class DumpRepoLayoutsMojo
 
     /**
      * Project base directory used for manual path alignment.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -54,28 +52,28 @@ public class DumpRepoLayoutsMojo
 
     /**
      * The available repository layouts, as a map.
-     * 
+     *
      * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
      */
     private Map repositoryLayouts;
 
     /**
      * The available repository layouts, as a list.
-     * 
+     *
      * @component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout"
      */
     private List repoLayouts;
 
     /**
      * The path to the properties file used to dump the repository layouts.
-     * 
+     *
      * @parameter property="collections.layoutsFile"
      */
     private File layoutsFile;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the output file could not be created.
      */
     public void execute()
@@ -87,9 +85,9 @@ public class DumpRepoLayoutsMojo
 
         layoutProperties.setProperty( "layouts", Integer.toString( repositoryLayouts.size() ) );
 
-        for ( Iterator it = repositoryLayouts.keySet().iterator(); it.hasNext(); )
+        for ( Object o : repositoryLayouts.keySet() )
         {
-            String roleHint = (String) it.next();
+            String roleHint = (String) o;
             Object repoLayout = repositoryLayouts.get( roleHint );
             if ( repoLayout != null )
             {

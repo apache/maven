@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -32,7 +30,6 @@ import java.util.List;
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2883">MNG-2883</a>.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
- *
  */
 public class MavenITmng2883LegacyRepoOfflineTest
     extends AbstractMavenIntegrationTestCase
@@ -56,7 +53,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
-        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
+        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
                                              verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
@@ -72,7 +69,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
         catch ( VerificationException e )
         {
-            throw new VerificationException( "Build should succeed the first time through when NOT in offline mode!", e );
+            throw new VerificationException( "Build should succeed the first time through when NOT in offline mode!",
+                                             e );
         }
 
         // the centerpiece of these tests!
@@ -97,7 +95,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
             // expected
         }
 
-        List<String> missingMessages = new ArrayList<String>();
+        List<String> missingMessages = new ArrayList<>();
         missingMessages.add( " is offline" );
         missingMessages.add( "org.apache.maven.its.mng2883:parent:pom:1.0-SNAPSHOT" );
 
@@ -109,7 +107,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
             {
                 String message = messageIt.next();
 
-                if ( line.indexOf( message ) > -1 )
+                if ( line.contains( message ) )
                 {
                     messageIt.remove();
                 }
@@ -118,7 +116,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         if ( !missingMessages.isEmpty() )
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             buffer.append( "The following key messages were missing from build output:\n\n" );
 
@@ -148,7 +146,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
-        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
+        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
                                              verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
@@ -164,7 +162,8 @@ public class MavenITmng2883LegacyRepoOfflineTest
         }
         catch ( VerificationException e )
         {
-            throw new VerificationException( "Build should succeed the first time through when NOT in offline mode!", e );
+            throw new VerificationException( "Build should succeed the first time through when NOT in offline mode!",
+                                             e );
         }
 
         // the centerpiece of these tests!
@@ -189,7 +188,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
             // expected
         }
 
-        List<String> missingMessages = new ArrayList<String>();
+        List<String> missingMessages = new ArrayList<>();
 
         // FIXME: We need a more prominent diagnosis including system being in offline mode for 2.0.x.
         missingMessages.add( "offline mode." );
@@ -203,7 +202,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
             {
                 String message = (String) messageIt.next();
 
-                if ( line.indexOf( message ) > -1 )
+                if ( line.contains( message ) )
                 {
                     messageIt.remove();
                 }
@@ -212,7 +211,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         if ( !missingMessages.isEmpty() )
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             buffer.append( "The following key messages were missing from build output:\n\n" );
 
@@ -242,7 +241,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
         verifier.deleteDirectory( "target" );
         verifier.deleteArtifacts( "org.apache.maven.its.mng2883" );
 
-        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8", 
+        File settings = verifier.filterFile( "../settings-template.xml", "settings.xml", "UTF-8",
                                              verifier.newDefaultFilterProperties() );
 
         // used to inject the remote repository
@@ -274,7 +273,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
             // expected
         }
 
-        List<String> missingMessages = new ArrayList<String>();
+        List<String> missingMessages = new ArrayList<>();
         missingMessages.add( " is offline" );
         missingMessages.add( "org.apache.maven.its.mng2883:plugin" );
 
@@ -286,7 +285,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
             {
                 String message = messageIt.next();
 
-                if ( line.indexOf( message ) > -1 )
+                if ( line.contains( message ) )
                 {
                     messageIt.remove();
                 }
@@ -295,7 +294,7 @@ public class MavenITmng2883LegacyRepoOfflineTest
 
         if ( !missingMessages.isEmpty() )
         {
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
 
             buffer.append( "The following key messages were missing from build output:\n\n" );
 

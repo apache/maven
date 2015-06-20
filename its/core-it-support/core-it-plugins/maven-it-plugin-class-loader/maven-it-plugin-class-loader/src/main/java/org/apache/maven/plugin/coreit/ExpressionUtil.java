@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  * Assists in evaluating expressions.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -52,10 +52,11 @@ class ExpressionUtil
      * root objects are available. For instance, if <code>contexts</code> maps the token "project" to a Maven project
      * instance, the expression "project/build/resources/0/directory" specifies the first resource directory of the
      * project.
-     * 
+     *
      * @param expression The expression to evaluate, may be <code>null</code>.
-     * @param contexts The possible root objects for the expression evaluation, indexed by their identifying token, must
-     *            not be <code>null</code>.
+     * @param contexts   The possible root objects for the expression evaluation, indexed by their identifying token,
+     *                   must
+     *                   not be <code>null</code>.
      * @return The value of the expression or <code>null</code> if the expression could not be evaluated.
      */
     public static Object evaluate( String expression, Map contexts )
@@ -80,8 +81,8 @@ class ExpressionUtil
 
     /**
      * Evaluates the given expression segments against the specified object.
-     * 
-     * @param context The object to evaluate the segments against, may be <code>null</code>.
+     *
+     * @param context  The object to evaluate the segments against, may be <code>null</code>.
      * @param segments The expression segments to evaluate, must not be <code>null</code>.
      * @return The value of the evaluation or <code>null</code> if the segments could not be evaluated.
      */
@@ -137,8 +138,8 @@ class ExpressionUtil
 
     /**
      * Gets the value of a (public) bean property from the specified object.
-     * 
-     * @param context The object whose bean property should be retrieved, must not be <code>null</code>.
+     *
+     * @param context  The object whose bean property should be retrieved, must not be <code>null</code>.
      * @param property The name of the bean property, must not be <code>null</code>.
      * @return The value of the bean property or <code>null</code> if the property does not exist.
      */
@@ -192,7 +193,7 @@ class ExpressionUtil
                             {
                                 method = type.getMethod( "get", OBJECT_PARAM );
                             }
-                            value = method.invoke( context, new Object[] { property } );
+                            value = method.invoke( context, new Object[]{ property } );
                         }
                         catch ( NoSuchMethodException e3 )
                         {
@@ -205,7 +206,7 @@ class ExpressionUtil
                             {
                                 if ( "length".equals( property ) && type.isArray() )
                                 {
-                                    value = new Integer( Array.getLength( context ) );
+                                    value = Array.getLength( context );
                                 }
                                 else
                                 {

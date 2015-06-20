@@ -19,17 +19,15 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 
+import java.util.List;
+
 /**
  * @goal fork-goal-aggregator
  * @aggregator true
- *
  * @execute goal="touch"
  */
 public class ForkGoalAggregatorMojo
@@ -48,22 +46,23 @@ public class ForkGoalAggregatorMojo
     public void execute()
         throws MojoExecutionException
     {
-        for ( Iterator it = reactorProjects.iterator(); it.hasNext(); )
+        for ( Object reactorProject : reactorProjects )
         {
-            MavenProject executedProject = ( (MavenProject) it.next() ).getExecutionProject();
+            MavenProject executedProject = ( (MavenProject) reactorProject ).getExecutionProject();
 
             if ( !executedProject.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
             {
-                throw new MojoExecutionException( "Unexpected result, final name of executed project "
-                    + executedProject + " is " + executedProject.getBuild().getFinalName() + " (should be \'"
-                    + TouchMojo.FINAL_NAME + "\')." );
+                throw new MojoExecutionException(
+                    "Unexpected result, final name of executed project " + executedProject + " is "
+                        + executedProject.getBuild().getFinalName() + " (should be \'" + TouchMojo.FINAL_NAME
+                        + "\')." );
             }
         }
 
         if ( project.getBuild().getFinalName().equals( TouchMojo.FINAL_NAME ) )
         {
-            throw new MojoExecutionException( "forked project was polluted. (should NOT be \'" + TouchMojo.FINAL_NAME
-                + "\')." );
+            throw new MojoExecutionException(
+                "forked project was polluted. (should NOT be \'" + TouchMojo.FINAL_NAME + "\')." );
         }
     }
 }

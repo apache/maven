@@ -175,7 +175,7 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
     public static class RepoHandler
         extends ResourceHandler
     {
-        List<DeployedResource> deployedResources = new ArrayList<DeployedResource>();
+        List<DeployedResource> deployedResources = new ArrayList<>();
 
         public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
             throws IOException, ServletException
@@ -193,17 +193,11 @@ public class MavenITmng4235HttpAuthDeploymentChecksumsTest
                     dir.mkdirs();
                 }
 
-                OutputStream os = resource.getOutputStream();
-
                 request.getContentLength();
 
-                try
+                try ( OutputStream os = resource.getOutputStream() )
                 {
                     IO.copy( request.getInputStream(), os );
-                }
-                finally
-                {
-                    os.close();
                 }
 
                 DeployedResource deployedResource = new DeployedResource();

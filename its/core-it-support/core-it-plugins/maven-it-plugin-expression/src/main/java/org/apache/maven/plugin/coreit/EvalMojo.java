@@ -26,7 +26,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
@@ -37,7 +36,7 @@ import java.util.Properties;
  * value but can also be a collection/array or a bean-like object (from the Maven model). For example, the expression
  * "project/dependencies/0" would extract the first project dependency. In more detail, this example expression could
  * output the following keys to the properties file:
- * 
+ * <p/>
  * <pre>
  * project.dependencies.0.groupId = org.apache.maven
  * project.dependencies.0.artifactId = maven-project
@@ -50,15 +49,14 @@ import java.util.Properties;
  * project.dependencies.0.exclusions.1.groupId = plexus
  * project.dependencies.0.exclusions.1.artifactId = plexus-container-default
  * </pre>
- * 
+ * <p/>
  * Expressions that reference non-existing objects or use invalid collection/array indices silently resolve to
  * <code>null</code>. For collections and arrays, the special index "*" can be used to iterate all elements.
- * 
- * @goal eval
- * @phase initialize
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal eval
+ * @phase initialize
  */
 public class EvalMojo
     extends AbstractMojo
@@ -66,7 +64,7 @@ public class EvalMojo
 
     /**
      * The project's base directory, used for manual path translation.
-     * 
+     *
      * @parameter default-value="${basedir}"
      * @readonly
      */
@@ -76,28 +74,28 @@ public class EvalMojo
      * The path to the output file for the properties with the expression values. For each expression given by the
      * parameter {@link #expressions} an similar named properties key will be used to save the expression value. If an
      * expression evaluated to <code>null</code>, there will be no corresponding key in the properties file.
-     * 
+     *
      * @parameter property="expression.outputFile"
      */
     private File outputFile;
 
     /**
      * The set of expressions to evaluate.
-     * 
+     *
      * @parameter
      */
     private String[] expressions;
 
     /**
      * The comma separated set of expressions to evaluate.
-     * 
+     *
      * @parameter property="expression.expressions"
      */
     private String expressionList;
 
     /**
      * The current Maven project against which expressions are evaluated.
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
      */
@@ -105,7 +103,7 @@ public class EvalMojo
 
     /**
      * The forked Maven project against which expressions are evaluated.
-     * 
+     *
      * @parameter default-value="${executedProject}"
      * @readonly
      */
@@ -113,7 +111,7 @@ public class EvalMojo
 
     /**
      * The merged user/global settings of the current build against which expressions are evaluated.
-     * 
+     *
      * @parameter default-value="${settings}"
      * @readonly
      */
@@ -121,7 +119,7 @@ public class EvalMojo
 
     /**
      * The session context of the current build against which expressions are evaluated.
-     * 
+     *
      * @parameter default-value="${session}"
      * @readonly
      */
@@ -129,7 +127,7 @@ public class EvalMojo
 
     /**
      * The local repository of the current build against which expressions are evaluated.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      */
@@ -137,9 +135,9 @@ public class EvalMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
-     * @throws MojoFailureException If the output file has not been set.
+     * @throws MojoFailureException   If the output file has not been set.
      */
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -175,12 +173,11 @@ public class EvalMojo
             contexts.put( "session", session );
             contexts.put( "localRepository", localRepository );
 
-            for ( int i = 0; i < expressions.length; i++ )
+            for ( String expression : expressions )
             {
-                Map values = ExpressionUtil.evaluate( expressions[i], contexts );
-                for ( Iterator it = values.keySet().iterator(); it.hasNext(); )
+                Map values = ExpressionUtil.evaluate( expression, contexts );
+                for ( Object key : values.keySet() )
                 {
-                    Object key = it.next();
                     Object value = values.get( key );
                     PropertyUtil.store( expressionProperties, key.toString().replace( '/', '.' ), value );
                 }

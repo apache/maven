@@ -30,11 +30,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Provides common services for all mojos of this plugin.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -44,7 +43,7 @@ public abstract class AbstractDependencyMojo
 
     /**
      * The current Maven project.
-     * 
+     *
      * @parameter default-value="${project}"
      * @required
      * @readonly
@@ -53,9 +52,9 @@ public abstract class AbstractDependencyMojo
 
     /**
      * Writes the specified artifacts to the given output file.
-     * 
-     * @param pathname The path to the output file, relative to the project base directory, may be <code>null</code> or
-     *            empty if the output file should not be written.
+     *
+     * @param pathname  The path to the output file, relative to the project base directory, may be <code>null</code> or
+     *                  empty if the output file should not be written.
      * @param artifacts The list of artifacts to write to the file, may be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be written.
      */
@@ -80,9 +79,9 @@ public abstract class AbstractDependencyMojo
 
             if ( artifacts != null )
             {
-                for ( Iterator it = artifacts.iterator(); it.hasNext(); )
+                for ( Object artifact1 : artifacts )
                 {
-                    Artifact artifact = (Artifact) it.next();
+                    Artifact artifact = (Artifact) artifact1;
                     writer.write( artifact.getId() );
                     writer.newLine();
                     getLog().info( "[MAVEN-CORE-IT-LOG]   " + artifact.getId() );

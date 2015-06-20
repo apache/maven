@@ -19,12 +19,12 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import junit.framework.TestCase;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 /**
  * @author Benjamin Bentmann
@@ -36,8 +36,8 @@ public class ExpressionUtilTest
 
     public void testEvaluate()
     {
-        Object array = new String[] { "one", "two", "three" };
-        Object list = Arrays.asList( new String[] { "0", "-1", "-2" } );
+        Object array = new String[]{ "one", "two", "three" };
+        Object list = Arrays.asList( new String[]{ "0", "-1", "-2" } );
         Object map = Collections.singletonMap( "some.key", "value" );
         Object bean = new BeanTwo();
 
@@ -54,9 +54,9 @@ public class ExpressionUtilTest
         assertSame( bean, evaluate( "bean", contexts ) );
         assertNull( evaluate( "no-root", contexts ) );
 
-        assertEquals( new Integer( 3 ), evaluate( "array/length", contexts ) );
+        assertEquals( 3, evaluate( "array/length", contexts ) );
         assertEquals( "three", evaluate( "array/2", contexts ) );
-        assertEquals( new Integer( 5 ), evaluate( "array/2/length", contexts ) );
+        assertEquals( 5, evaluate( "array/2/length", contexts ) );
         assertNull( evaluate( "array/invalid", contexts ) );
         assertNull( evaluate( "array/-1", contexts ) );
         assertNull( evaluate( "array/999", contexts ) );
@@ -65,7 +65,7 @@ public class ExpressionUtilTest
         assertEquals( "two", ExpressionUtil.evaluate( "array/*", contexts ).get( "array/1" ) );
         assertEquals( "three", ExpressionUtil.evaluate( "array/*", contexts ).get( "array/2" ) );
 
-        assertEquals( new Integer( 3 ), evaluate( "list/size", contexts ) );
+        assertEquals( 3, evaluate( "list/size", contexts ) );
         assertEquals( "-2", evaluate( "list/2", contexts ) );
         assertNull( evaluate( "list/invalid", contexts ) );
         assertNull( evaluate( "list/-1", contexts ) );
@@ -75,7 +75,7 @@ public class ExpressionUtilTest
         assertEquals( "-1", ExpressionUtil.evaluate( "list/*", contexts ).get( "list/1" ) );
         assertEquals( "-2", ExpressionUtil.evaluate( "list/*", contexts ).get( "list/2" ) );
 
-        assertEquals( new Integer( 1 ), evaluate( "map/size", contexts ) );
+        assertEquals( 1, evaluate( "map/size", contexts ) );
         assertEquals( "value", evaluate( "map/some.key", contexts ) );
         assertNull( evaluate( "map/invalid", contexts ) );
 
@@ -104,7 +104,7 @@ public class ExpressionUtilTest
         assertEquals( bean2.field, ExpressionUtil.getProperty( bean2, "field" ) );
         assertSame( bean2.bean, ExpressionUtil.getProperty( bean2, "bean" ) );
 
-        assertEquals( new Integer( 0 ), ExpressionUtil.getProperty( new String[0], "length" ) );
+        assertEquals( 0, ExpressionUtil.getProperty( new String[0], "length" ) );
     }
 
     public static class BeanOne

@@ -34,13 +34,12 @@ import java.util.Locale;
 
 /**
  * Generates the available/configured reports.
- * 
+ *
+ * @author Benjamin Bentmann
+ * @version $Id$
  * @goal generate
  * @phase site
  * @requiresReports true
- * 
- * @author Benjamin Bentmann
- * @version $Id$
  */
 public class GenerateMojo
     extends AbstractMojo
@@ -48,28 +47,28 @@ public class GenerateMojo
 
     /**
      * The path to the output directory of the site.
-     * 
+     *
      * @parameter default-value="${project.reporting.outputDirectory}"
      */
     private File outputDirectory;
 
     /**
      * The language for the reports.
-     * 
+     *
      * @parameter default-value="en"
      */
     private String language = "en";
 
     /**
      * A flag whether to ignore errors from reports and continue the generation.
-     * 
+     *
      * @parameter default-value="false"
      */
     private boolean ignoreErrors;
 
     /**
      * The reports configured for the current build.
-     * 
+     *
      * @parameter default-value="${reports}"
      * @required
      * @readonly
@@ -78,7 +77,7 @@ public class GenerateMojo
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoExecutionException If the output file could not be created.
      */
     public void execute()
@@ -99,11 +98,11 @@ public class GenerateMojo
             }
 
         };
-        Sink sink = (Sink) Proxy.newProxyInstance( getClass().getClassLoader(), new Class[] { Sink.class }, handler );
+        Sink sink = (Sink) Proxy.newProxyInstance( getClass().getClassLoader(), new Class[]{ Sink.class }, handler );
 
-        for ( int i = 0; i < reports.size(); i++ )
+        for ( Object report1 : reports )
         {
-            MavenReport report = (MavenReport) reports.get( i );
+            MavenReport report = (MavenReport) report1;
 
             if ( report.canGenerateReport() )
             {

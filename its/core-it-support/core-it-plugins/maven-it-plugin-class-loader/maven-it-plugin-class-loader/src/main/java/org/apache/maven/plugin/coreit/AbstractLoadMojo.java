@@ -30,13 +30,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
 /**
  * Loads classes and/or resources from a class loader and records the results in a properties file.
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
  */
@@ -50,7 +49,7 @@ public abstract class AbstractLoadMojo
      * key will be the hash code of the requested class. In addition, a key named <code>QCN.methods</code> holds the
      * comma separated list of all public methods declared directly in that class, in alphabetic order and possibly with
      * duplicates to account for overloaded methods.
-     * 
+     *
      * @parameter property="clsldr.classNames"
      */
     protected String classNames;
@@ -60,15 +59,15 @@ public abstract class AbstractLoadMojo
      * successfully loaded, the generated properties files will contain a key named <code>ARP</code> whose value gives
      * the URL to the resource. In addition, the keys <code>ARP.count</code>, <code>ARP.0</code>, <code>ARP.1</code>
      * etc. will enumerate all URLs matching the resource name.
-     * 
+     *
      * @parameter property="clsldr.resourcePaths"
      */
     protected String resourcePaths;
 
     /**
      * Loads the classes/resources.
-     * 
-     * @param outputFile The path to the properties file to generate, must not be <code>null</code>.
+     *
+     * @param outputFile  The path to the properties file to generate, must not be <code>null</code>.
      * @param classLoader The class loader to use, must not be <code>null</code>.
      * @throws MojoExecutionException If the output file could not be created.
      */
@@ -94,9 +93,8 @@ public abstract class AbstractLoadMojo
         if ( classNames != null && classNames.length() > 0 )
         {
             String[] names = classNames.split( "," );
-            for ( int i = 0; i < names.length; i++ )
+            for ( String name : names )
             {
-                String name = names[i];
                 getLog().info( "[MAVEN-CORE-IT-LOG] Loading class " + name );
 
                 // test ClassLoader.loadClass(String) and (indirectly) ClassLoader.loadClass(String, boolean)
@@ -120,22 +118,22 @@ public abstract class AbstractLoadMojo
 
                     Method[] methods = type.getDeclaredMethods();
                     List methodNames = new ArrayList();
-                    for ( int j = 0; j < methods.length; j++ )
+                    for ( Method method : methods )
                     {
-                        if ( Modifier.isPublic( methods[j].getModifiers() ) )
+                        if ( Modifier.isPublic( method.getModifiers() ) )
                         {
-                            methodNames.add( methods[j].getName() );
+                            methodNames.add( method.getName() );
                         }
                     }
                     Collections.sort( methodNames );
-                    StringBuffer buffer = new StringBuffer( 1024 );
-                    for ( Iterator it = methodNames.iterator(); it.hasNext(); )
+                    StringBuilder buffer = new StringBuilder( 1024 );
+                    for ( Object methodName : methodNames )
                     {
                         if ( buffer.length() > 0 )
                         {
                             buffer.append( ',' );
                         }
-                        buffer.append( it.next() );
+                        buffer.append( methodName );
                     }
 
                     loaderProperties.setProperty( name + ".methods", buffer.toString() );
@@ -156,9 +154,8 @@ public abstract class AbstractLoadMojo
         if ( resourcePaths != null && resourcePaths.length() > 0 )
         {
             String[] paths = resourcePaths.split( "," );
-            for ( int i = 0; i < paths.length; i++ )
+            for ( String path : paths )
             {
-                String path = paths[i];
                 getLog().info( "[MAVEN-CORE-IT-LOG] Loading resource " + path );
 
                 // test ClassLoader.getResource()

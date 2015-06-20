@@ -19,12 +19,12 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import junit.framework.TestCase;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
 
 /**
  * @author Benjamin Bentmann
@@ -36,8 +36,8 @@ public class ExpressionUtilTest
 
     public void testEvaluate()
     {
-        Object array = new String[] { "one", "two", "three" };
-        Object list = Arrays.asList( new String[] { "0", "-1", "-2" } );
+        Object array = new String[]{ "one", "two", "three" };
+        Object list = Arrays.asList( new String[]{ "0", "-1", "-2" } );
         Object map = Collections.singletonMap( "some.key", "value" );
         Object bean = new BeanTwo();
 
@@ -54,20 +54,20 @@ public class ExpressionUtilTest
         assertSame( bean, ExpressionUtil.evaluate( "bean", contexts ) );
         assertNull( ExpressionUtil.evaluate( "no-root", contexts ) );
 
-        assertEquals( new Integer( 3 ), ExpressionUtil.evaluate( "array/length", contexts ) );
+        assertEquals( 3, ExpressionUtil.evaluate( "array/length", contexts ) );
         assertEquals( "three", ExpressionUtil.evaluate( "array/2", contexts ) );
-        assertEquals( new Integer( 5 ), ExpressionUtil.evaluate( "array/2/length", contexts ) );
+        assertEquals( 5, ExpressionUtil.evaluate( "array/2/length", contexts ) );
         assertNull( ExpressionUtil.evaluate( "array/invalid", contexts ) );
         assertNull( ExpressionUtil.evaluate( "array/-1", contexts ) );
         assertNull( ExpressionUtil.evaluate( "array/999", contexts ) );
 
-        assertEquals( new Integer( 3 ), ExpressionUtil.evaluate( "list/size", contexts ) );
+        assertEquals( 3, ExpressionUtil.evaluate( "list/size", contexts ) );
         assertEquals( "-2", ExpressionUtil.evaluate( "list/2", contexts ) );
         assertNull( ExpressionUtil.evaluate( "list/invalid", contexts ) );
         assertNull( ExpressionUtil.evaluate( "list/-1", contexts ) );
         assertNull( ExpressionUtil.evaluate( "list/999", contexts ) );
 
-        assertEquals( new Integer( 1 ), ExpressionUtil.evaluate( "map/size", contexts ) );
+        assertEquals( 1, ExpressionUtil.evaluate( "map/size", contexts ) );
         assertEquals( "value", ExpressionUtil.evaluate( "map/some.key", contexts ) );
         assertNull( ExpressionUtil.evaluate( "map/invalid", contexts ) );
 
@@ -91,7 +91,7 @@ public class ExpressionUtilTest
         assertEquals( bean2.field, ExpressionUtil.getProperty( bean2, "field" ) );
         assertSame( bean2.bean, ExpressionUtil.getProperty( bean2, "bean" ) );
 
-        assertEquals( new Integer( 0 ), ExpressionUtil.getProperty( new String[0], "length" ) );
+        assertEquals( 0, ExpressionUtil.getProperty( new String[0], "length" ) );
     }
 
     public static class BeanOne

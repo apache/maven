@@ -19,8 +19,6 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
@@ -29,11 +27,9 @@ import java.util.List;
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2739">MNG-2739</a>.
  *
- * @todo Fill in a better description of what this test verifies!
- *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey
- *
+ * @todo Fill in a better description of what this test verifies!
  */
 public class MavenITmng2739RequiredRepositoryElementsTest
     extends AbstractMavenIntegrationTestCase
@@ -57,8 +53,8 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         {
             verifier.executeGoal( "validate" );
 
-            fail( "POM should NOT validate: repository <id/> element is missing in: "
-                  + new File( testDir, "pom.xml" ) );
+            fail(
+                "POM should NOT validate: repository <id/> element is missing in: " + new File( testDir, "pom.xml" ) );
         }
         catch ( VerificationException e )
         {
@@ -71,7 +67,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         boolean foundNpe = false;
         for ( String line : listing )
         {
-            if ( line.indexOf( "NullPointerException" ) > -1 )
+            if ( line.contains( "NullPointerException" ) )
             {
                 foundNpe = true;
                 break;
@@ -97,8 +93,8 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         {
             verifier.executeGoal( "validate" );
 
-            fail( "POM should NOT validate: repository <url/> element is missing in: "
-                  + new File( testDir, "pom.xml" ) );
+            fail(
+                "POM should NOT validate: repository <url/> element is missing in: " + new File( testDir, "pom.xml" ) );
         }
         catch ( VerificationException e )
         {
@@ -111,7 +107,7 @@ public class MavenITmng2739RequiredRepositoryElementsTest
         boolean foundNpe = false;
         for ( String line : listing )
         {
-            if ( line.indexOf( "NullPointerException" ) > -1 )
+            if ( line.contains( "NullPointerException" ) )
             {
                 foundNpe = true;
                 break;

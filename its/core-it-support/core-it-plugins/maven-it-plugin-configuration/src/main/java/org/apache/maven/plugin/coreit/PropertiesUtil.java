@@ -19,6 +19,9 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,12 +37,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-
 /**
  * Assists in handling properties.
- * 
+ *
  * @author Benjamin Bentmann
  */
 class PropertiesUtil
@@ -164,18 +164,17 @@ class PropertiesUtil
 
             PlexusConfiguration children[] = config.getChildren();
             props.setProperty( key + ".children", Integer.toString( children.length ) );
-            Map indices = new HashMap();
-            for ( int i = 0; i < children.length; i++ )
+            Map<String, Integer> indices = new HashMap<>();
+            for ( PlexusConfiguration child : children )
             {
-                PlexusConfiguration child = children[i];
                 String name = child.getName();
-                Integer index = (Integer) indices.get( name );
+                Integer index = indices.get( name );
                 if ( index == null )
                 {
-                    index = new Integer( 0 );
+                    index = 0;
                 }
                 serialize( props, key + ".children." + name + "." + index, child );
-                indices.put( name, new Integer( index.intValue() + 1 ) );
+                indices.put( name, index + 1 );
             }
         }
         else if ( value instanceof Date )

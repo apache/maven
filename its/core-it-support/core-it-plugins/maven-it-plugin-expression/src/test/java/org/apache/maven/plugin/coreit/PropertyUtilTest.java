@@ -19,12 +19,12 @@ package org.apache.maven.plugin.coreit;
  * under the License.
  */
 
+import junit.framework.TestCase;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
-
-import junit.framework.TestCase;
 
 /**
  * @author Benjamin Bentmann
@@ -40,7 +40,7 @@ public class PropertyUtilTest
         PropertyUtil.store( props, "null", null );
         PropertyUtil.store( props, "string", "str" );
         PropertyUtil.store( props, "boolean", Boolean.TRUE );
-        PropertyUtil.store( props, "int", new Integer( 7 ) );
+        PropertyUtil.store( props, "int", 7 );
         PropertyUtil.store( props, "file", new File( "pom.xml" ) );
 
         assertNull( props.get( "null" ) );
@@ -54,7 +54,7 @@ public class PropertyUtilTest
     public void testStoreArray()
     {
         Properties props = new Properties();
-        PropertyUtil.store( props, "arr", new String[] { "one", "two" } );
+        PropertyUtil.store( props, "arr", new String[]{ "one", "two" } );
 
         assertEquals( "2", props.get( "arr" ) );
         assertEquals( "one", props.get( "arr.0" ) );
@@ -65,7 +65,7 @@ public class PropertyUtilTest
     public void testStoreList()
     {
         Properties props = new Properties();
-        PropertyUtil.store( props, "arr", Arrays.asList( new String[] { "one", "two" } ) );
+        PropertyUtil.store( props, "arr", Arrays.asList( new String[]{ "one", "two" } ) );
 
         assertEquals( "2", props.get( "arr" ) );
         assertEquals( "one", props.get( "arr.0" ) );

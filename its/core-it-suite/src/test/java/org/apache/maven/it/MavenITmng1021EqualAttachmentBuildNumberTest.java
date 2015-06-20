@@ -19,14 +19,13 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 import java.io.File;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1021">MNG-1021</a>.
- * 
+ *
  * @author John Casey
  * @version $Id$
  */
@@ -81,9 +80,9 @@ public class MavenITmng1021EqualAttachmentBuildNumberTest
     private String getSnapshotVersion( File artifactDir )
     {
         File[] files = artifactDir.listFiles();
-        for ( int i = 0; i < files.length; i++ )
+        for ( File file : files )
         {
-            String name = files[i].getName();
+            String name = file.getName();
             if ( name.endsWith( ".pom" ) )
             {
                 return name.substring( "test-".length(), name.length() - ".pom".length() );

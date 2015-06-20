@@ -19,12 +19,11 @@ package org.apache.maven.it;
  * under the License.
  */
 
+import org.apache.maven.it.util.ResourceExtractor;
+
 import java.io.File;
 import java.util.List;
-import java.util.Properties;
 import java.util.regex.Pattern;
-
-import org.apache.maven.it.util.ResourceExtractor;
 
 /**
  * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5608">MNG-5608</a>:
@@ -63,12 +62,13 @@ public class MavenITmng5608ProfileActivationWarningTest
     private void assertFileExists( File dir, String filename )
     {
         File file = new File( dir, filename );
-        assertTrue( "expected file: " + file , file.exists() );
+        assertTrue( "expected file: " + file, file.exists() );
     }
 
     private String findWarning( List<String> logLines, String profileId )
     {
-        Pattern pattern = Pattern.compile( "(?i).*Failed to interpolate file location ..project.basedir./pom.xml for profile " + profileId + ": .*" );
+        Pattern pattern = Pattern.compile(
+            "(?i).*Failed to interpolate file location ..project.basedir./pom.xml for profile " + profileId + ": .*" );
 
         for ( String logLine : logLines )
         {

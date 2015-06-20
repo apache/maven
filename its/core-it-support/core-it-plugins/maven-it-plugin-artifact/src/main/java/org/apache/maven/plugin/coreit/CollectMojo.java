@@ -36,11 +36,10 @@ import java.util.Set;
 
 /**
  * Collects user-specified artifacts. This mimics in part the Maven Assembly Plugin.
- * 
- * @goal collect
- * 
+ *
  * @author Benjamin Bentmann
  * @version $Id$
+ * @goal collect
  */
 public class CollectMojo
     extends AbstractMojo
@@ -48,7 +47,7 @@ public class CollectMojo
 
     /**
      * The local repository.
-     * 
+     *
      * @parameter default-value="${localRepository}"
      * @readonly
      * @required
@@ -57,7 +56,7 @@ public class CollectMojo
 
     /**
      * The remote repositories of the current Maven project.
-     * 
+     *
      * @parameter default-value="${project.remoteArtifactRepositories}"
      * @readonly
      * @required
@@ -66,35 +65,35 @@ public class CollectMojo
 
     /**
      * The artifact collector.
-     * 
+     *
      * @component
      */
     private ArtifactCollector collector;
 
     /**
      * The artifact factory.
-     * 
+     *
      * @component
      */
     private ArtifactFactory factory;
 
     /**
      * The metadata source.
-     * 
+     *
      * @component
      */
     private ArtifactMetadataSource metadataSource;
 
     /**
      * The dependencies to resolve.
-     * 
+     *
      * @parameter
      */
     private Dependency[] dependencies;
 
     /**
      * Runs this mojo.
-     * 
+     *
      * @throws MojoFailureException If the artifact file has not been set.
      */
     public void execute()
@@ -110,10 +109,8 @@ public class CollectMojo
 
             if ( dependencies != null )
             {
-                for ( int i = 0; i < dependencies.length; i++ )
+                for ( Dependency dependency : dependencies )
                 {
-                    Dependency dependency = dependencies[i];
-
                     Artifact artifact =
                         factory.createArtifactWithClassifier( dependency.getGroupId(), dependency.getArtifactId(),
                                                               dependency.getVersion(), dependency.getType(),
