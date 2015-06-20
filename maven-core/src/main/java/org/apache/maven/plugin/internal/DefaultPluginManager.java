@@ -19,8 +19,6 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
-import java.util.Map;
-
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -58,6 +56,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
+import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
@@ -121,7 +121,7 @@ public class DefaultPluginManager
         }
     }
 
-    public Map getPluginComponents( Plugin plugin, String role )
+    public Map<String, Object> getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException
     {
         MavenSession session = legacySupport.getSession();

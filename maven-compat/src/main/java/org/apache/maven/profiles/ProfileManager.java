@@ -34,16 +34,16 @@ public interface ProfileManager
 
     void explicitlyActivate( String profileId );
 
-    void explicitlyActivate( List profileIds );
+    void explicitlyActivate( List<String> profileIds );
 
     void explicitlyDeactivate( String profileId );
 
-    void explicitlyDeactivate( List profileIds );
+    void explicitlyDeactivate( List<String> profileIds );
 
     List getActiveProfiles()
         throws ProfileActivationException;
 
-    void addProfiles( List profiles );
+    void addProfiles( List<Profile> profiles );
 
     Map getProfilesById();
 

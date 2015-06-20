@@ -203,8 +203,7 @@ public class DefaultMavenPluginManager
         {
             if ( pluginFile.isFile() )
             {
-                JarFile pluginJar = new JarFile( pluginFile, false );
-                try
+                try ( JarFile pluginJar = new JarFile( pluginFile, false ) )
                 {
                     ZipEntry pluginDescriptorEntry = pluginJar.getEntry( getPluginDescriptorLocation() );
 
@@ -214,10 +213,6 @@ public class DefaultMavenPluginManager
 
                         pluginDescriptor = parsePluginDescriptor( is, plugin, pluginFile.getAbsolutePath() );
                     }
-                }
-                finally
-                {
-                    pluginJar.close();
                 }
             }
             else
@@ -274,11 +269,7 @@ public class DefaultMavenPluginManager
 
             return pluginDescriptor;
         }
-        catch ( IOException e )
-        {
-            throw new PluginDescriptorParsingException( plugin, descriptorLocation, e );
-        }
-        catch ( PlexusConfigurationException e )
+        catch ( IOException | PlexusConfigurationException e )
         {
             throw new PluginDescriptorParsingException( plugin, descriptorLocation, e );
         }
@@ -369,7 +360,7 @@ public class DefaultMavenPluginManager
             if ( cacheRecord != null )
             {
                 pluginDescriptor.setClassRealm( cacheRecord.realm );
-                pluginDescriptor.setArtifacts( new ArrayList<Artifact>( cacheRecord.artifacts ) );
+                pluginDescriptor.setArtifacts( new ArrayList<>( cacheRecord.artifacts ) );
                 for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
                 {
                     componentDescriptor.setRealm( cacheRecord.realm );
@@ -450,13 +441,7 @@ public class DefaultMavenPluginManager
             ( (DefaultPlexusContainer) container ).discoverComponents( pluginRealm, new SessionScopeModule( container ),
                                                                        new MojoExecutionScopeModule( container ) );
         }
-        catch ( ComponentLookupException e )
-        {
-            throw new PluginContainerException( plugin, pluginRealm,
-                                                "Error in component graph of plugin " + plugin.getId() + ": "
-                                                    + e.getMessage(), e );
-        }
-        catch ( CycleDetectedInComponentGraphException e )
+        catch ( ComponentLookupException | CycleDetectedInComponentGraphException e )
         {
             throw new PluginContainerException( plugin, pluginRealm,
                                                 "Error in component graph of plugin " + plugin.getId() + ": "
@@ -466,12 +451,12 @@ public class DefaultMavenPluginManager
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts( final List<Artifact> pluginArtifacts )
     {
-        return new ArrayList<org.eclipse.aether.artifact.Artifact>( RepositoryUtils.toArtifacts( pluginArtifacts ) );
+        return new ArrayList<>( RepositoryUtils.toArtifacts( pluginArtifacts ) );
     }
 
     private List<Artifact> toMavenArtifacts( DependencyNode root, PreorderNodeListGenerator nlg )
     {
-        List<Artifact> artifacts = new ArrayList<Artifact>( nlg.getNodes().size() );
+        List<Artifact> artifacts = new ArrayList<>( nlg.getNodes().size() );
         RepositoryUtils.toArtifacts( artifacts, Collections.singleton( root ), Collections.<String>emptyList(), null );
         for ( Iterator<Artifact> it = artifacts.iterator(); it.hasNext(); )
         {
@@ -486,7 +471,7 @@ public class DefaultMavenPluginManager
 
     private Map<String, ClassLoader> calcImports( MavenProject project, ClassLoader parent, List<String> imports )
     {
-        Map<String, ClassLoader> foreignImports = new HashMap<String, ClassLoader>();
+        Map<String, ClassLoader> foreignImports = new HashMap<>();
 
         ClassLoader projectRealm = project.getClassRealm();
         if ( projectRealm != null )
@@ -661,7 +646,7 @@ public class DefaultMavenPluginManager
             {
                 if ( "basic".equals( configuratorId ) )
                 {
-                    throw new PluginParameterException( mojoDescriptor, new ArrayList<Parameter>( missingParameters ) );
+                    throw new PluginParameterException( mojoDescriptor, new ArrayList<>( missingParameters ) );
                 }
                 else
                 {
@@ -736,7 +721,7 @@ public class DefaultMavenPluginManager
             return;
         }
 
-        List<Parameter> invalidParameters = new ArrayList<Parameter>();
+        List<Parameter> invalidParameters = new ArrayList<>();
 
         for ( Parameter parameter : mojoDescriptor.getParameters() )
         {
@@ -811,7 +796,7 @@ public class DefaultMavenPluginManager
             (Map<String, ExtensionRealmCache.CacheRecord>) project.getContextValue( KEY_EXTENSIONS_REALMS );
         if ( pluginRealms == null )
         {
-            pluginRealms = new HashMap<String, ExtensionRealmCache.CacheRecord>();
+            pluginRealms = new HashMap<>();
             project.setContextValue( KEY_EXTENSIONS_REALMS, pluginRealms );
         }
 
@@ -890,11 +875,7 @@ public class DefaultMavenPluginManager
                 {
                     pluginDescriptor = extractPluginDescriptor( artifacts.get( 0 ), plugin );
                 }
-                catch ( PluginDescriptorParsingException e )
-                {
-                    // ignore, see above
-                }
-                catch ( InvalidPluginDescriptorException e )
+                catch ( PluginDescriptorParsingException | InvalidPluginDescriptorException e )
                 {
                     // ignore, see above
                 }

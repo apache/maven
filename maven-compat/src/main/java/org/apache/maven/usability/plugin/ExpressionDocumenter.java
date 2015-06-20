@@ -44,7 +44,7 @@ public class ExpressionDocumenter
 
     private static Map<String, Expression> expressionDocumentation;
 
-    public static Map load()
+    public static Map<String, Expression> load()
         throws ExpressionDocumentationException
     {
         if ( expressionDocumentation == null )
@@ -117,17 +117,15 @@ public class ExpressionDocumenter
 
         ExpressionDocumentation documentation = paramdocReader.read( reader, true );
 
-        List expressions = documentation.getExpressions();
+        List<Expression> expressions = documentation.getExpressions();
 
         Map<String, Expression> bySyntax = new HashMap<>();
 
         if ( expressions != null && !expressions.isEmpty() )
         {
-            for ( Object expression : expressions )
+            for ( Expression expression : expressions )
             {
-                Expression expr = (Expression) expression;
-
-                bySyntax.put( expr.getSyntax(), expr );
+                bySyntax.put( expression.getSyntax(), expression );
             }
         }
 

@@ -78,5 +78,5 @@ public interface ArtifactTransformationManager
                                  ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
 
-    List getArtifactTransformations();
+    List<ArtifactTransformation> getArtifactTransformations();
 }

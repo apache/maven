@@ -147,7 +147,7 @@ public class DefaultSettingsValidator
 
         if ( proxies != null )
         {
-            Set<String> proxyIds = new HashSet<String>();
+            Set<String> proxyIds = new HashSet<>();
             
             for ( Proxy proxy : proxies )
             {

@@ -342,9 +342,9 @@ public class DefaultLegacyArtifactCollector
 
                         // Conflict Resolution
                         ResolutionNode resolved = null;
-                        for ( Iterator j = conflictResolvers.iterator(); ( resolved == null ) && j.hasNext(); )
+                        for ( Iterator<ConflictResolver> j = conflictResolvers.iterator(); ( resolved == null ) && j.hasNext(); )
                         {
-                            ConflictResolver conflictResolver = (ConflictResolver) j.next();
+                            ConflictResolver conflictResolver = j.next();
 
                             resolved = conflictResolver.resolveConflict( previous, node );
                         }
@@ -424,9 +424,9 @@ public class DefaultLegacyArtifactCollector
 
             Artifact parentArtifact = node.getArtifact();
 
-            for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
+            for ( Iterator<ResolutionNode> i = node.getChildrenIterator(); i.hasNext(); )
             {
-                ResolutionNode child = (ResolutionNode) i.next();
+                ResolutionNode child = i.next();
 
                 try
                 {

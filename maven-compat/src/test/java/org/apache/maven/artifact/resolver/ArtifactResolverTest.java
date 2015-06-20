@@ -241,7 +241,7 @@ public class ArtifactResolverTest
 
         printErrors( result );
 
-        Iterator i = result.getArtifacts().iterator();
+        Iterator<Artifact> i = result.getArtifacts().iterator();
         assertEquals( "n should be first", n, i.next() );
         assertEquals( "m should be second", m, i.next() );
 

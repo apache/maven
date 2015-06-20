@@ -93,7 +93,7 @@ public class DefaultProfileManager
         return requestProperties;
     }
 
-    public Map getProfilesById()
+    public Map<String, Profile> getProfilesById()
     {
         return profilesById;
     }
@@ -138,13 +138,11 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#explicitlyActivate(java.util.List)
     */
-    public void explicitlyActivate( List profileIds )
+    public void explicitlyActivate( List<String> profileIds )
     {
-        for ( Object profileId1 : profileIds )
+        for ( String profileId1 : profileIds )
         {
-            String profileId = (String) profileId1;
-
-            explicitlyActivate( profileId );
+            explicitlyActivate( profileId1 );
         }
     }
 
@@ -164,13 +162,11 @@ public class DefaultProfileManager
     /* (non-Javadoc)
     * @see org.apache.maven.profiles.ProfileManager#explicitlyDeactivate(java.util.List)
     */
-    public void explicitlyDeactivate( List profileIds )
+    public void explicitlyDeactivate( List<String> profileIds )
     {
-        for ( Object profileId1 : profileIds )
+        for ( String profileId1 : profileIds )
         {
-            String profileId = (String) profileId1;
-
-            explicitlyDeactivate( profileId );
+            explicitlyDeactivate( profileId1 );
         }
     }
 
@@ -212,13 +208,11 @@ public class DefaultProfileManager
     /* (non-Javadoc)
      * @see org.apache.maven.profiles.ProfileManager#addProfiles(java.util.List)
      */
-    public void addProfiles( List profiles )
+    public void addProfiles( List<Profile> profiles )
     {
-        for ( Object profile1 : profiles )
+        for ( Profile profile1 : profiles )
         {
-            Profile profile = (Profile) profile1;
-
-            addProfile( profile );
+            addProfile( profile1 );
         }
     }
 
