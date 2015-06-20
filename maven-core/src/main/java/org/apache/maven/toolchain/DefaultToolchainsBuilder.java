@@ -51,10 +51,8 @@ public class DefaultToolchainsBuilder
 
         if ( userToolchainsFile != null && userToolchainsFile.isFile() )
         {
-            Reader in = null;
-            try
+            try(Reader in = ReaderFactory.newXmlReader( userToolchainsFile ))
             {
-                in = ReaderFactory.newXmlReader( userToolchainsFile );
                 toolchains = new MavenToolchainsXpp3Reader().read( in );
             }
             catch ( Exception e )
@@ -62,10 +60,7 @@ public class DefaultToolchainsBuilder
                 throw new MisconfiguredToolchainException( "Cannot read toolchains file at "
                     + userToolchainsFile.getAbsolutePath(), e );
             }
-            finally
-            {
-                IOUtil.close( in );
-            }
+            
         }
         else if ( userToolchainsFile != null )
         {

@@ -320,12 +320,9 @@ public class DefaultRepositoryMetadataManager
         throws RepositoryMetadataReadException
     {
         Metadata result;
-
-        Reader reader = null;
-        try
+        
+        try(Reader reader = ReaderFactory.newXmlReader( mappingFile ))
         {
-            reader = ReaderFactory.newXmlReader( mappingFile );
-
             MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
             result = mappingReader.read( reader, false );
@@ -344,11 +341,6 @@ public class DefaultRepositoryMetadataManager
             throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
                 + e.getMessage(), e );
         }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
         return result;
     }
 
@@ -385,10 +377,8 @@ public class DefaultRepositoryMetadataManager
         {
             getLogger().debug( "Repairing metadata in " + metadataFile );
 
-            Writer writer = null;
-            try
+            try(Writer writer = WriterFactory.newXmlWriter( metadataFile ))
             {
-                writer = WriterFactory.newXmlWriter( metadataFile );
                 new MetadataXpp3Writer().write( writer, metadata );
             }
             catch ( IOException e )
@@ -402,10 +392,6 @@ public class DefaultRepositoryMetadataManager
                 {
                     getLogger().warn( msg );
                 }
-            }
-            finally
-            {
-                IOUtil.close( writer );
             }
         }
     }

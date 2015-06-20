@@ -72,15 +72,9 @@ public class ExtensionDescriptorBuilder
 
                 if ( pluginDescriptorEntry != null )
                 {
-                    InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
-
-                    try
+                    try(InputStream is = pluginJar.getInputStream( pluginDescriptorEntry ))
                     {
                         extensionDescriptor = build( is );
-                    }
-                    finally
-                    {
-                        IOUtil.close( is );
                     }
                 }
             }
@@ -95,14 +89,9 @@ public class ExtensionDescriptorBuilder
 
             if ( pluginXml.canRead() )
             {
-                InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) );
-                try
+                try(InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ))
                 {
                     extensionDescriptor = build( is );
-                }
-                finally
-                {
-                    IOUtil.close( is );
                 }
             }
         }

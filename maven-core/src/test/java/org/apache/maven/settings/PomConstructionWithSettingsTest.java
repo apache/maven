@@ -139,21 +139,12 @@ public class PomConstructionWithSettingsTest
     {
         Settings settings = null;
 
-        Reader reader = null;
-
-        try
+        try(Reader reader = ReaderFactory.newXmlReader( settingsFile ))
         {
-            reader = ReaderFactory.newXmlReader( settingsFile );
-
             SettingsXpp3Reader modelReader = new SettingsXpp3Reader();
 
             settings = modelReader.read( reader );
         }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
         return settings;
     }
 }

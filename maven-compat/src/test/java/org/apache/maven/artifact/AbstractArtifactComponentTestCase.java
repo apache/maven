@@ -290,12 +290,10 @@ public abstract class AbstractArtifactComponentTestCase
         {
             artifactFile.getParentFile().mkdirs();
         }
-
-        Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" );
-
-        writer.write( artifact.getId() );
-
-        writer.close();
+        try(Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" ))
+        {
+        	writer.write( artifact.getId() );
+        }
     }
 
     protected Artifact createArtifact( String artifactId, String version )

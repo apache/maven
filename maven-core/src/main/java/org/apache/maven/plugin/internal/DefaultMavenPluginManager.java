@@ -227,14 +227,9 @@ public class DefaultMavenPluginManager
 
                 if ( pluginXml.isFile() )
                 {
-                    InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) );
-                    try
+                	try(InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ))
                     {
                         pluginDescriptor = parsePluginDescriptor( is, plugin, pluginXml.getAbsolutePath() );
-                    }
-                    finally
-                    {
-                        IOUtil.close( is );
                     }
                 }
             }

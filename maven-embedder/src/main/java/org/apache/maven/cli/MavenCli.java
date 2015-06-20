@@ -680,16 +680,13 @@ public class MavenCli
         throws IOException, XmlPullParserException
     {
         CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
-        InputStream is = null;
-        try
+
+        try(InputStream is = new BufferedInputStream( new FileInputStream( extensionsFile ) ))
         {
-            is = new BufferedInputStream( new FileInputStream( extensionsFile ) );
+            
             return parser.read( is ).getExtensions();
         }
-        finally
-        {
-            IOUtil.close( is );
-        }
+
     }
 
     private ClassRealm setupContainerRealm( ClassWorld classWorld, ClassRealm coreRealm, List<File> extClassPath,

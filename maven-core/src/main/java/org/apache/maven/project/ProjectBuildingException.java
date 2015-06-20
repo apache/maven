@@ -122,23 +122,22 @@ public class ProjectBuildingException
     private static String createMessage( List<ProjectBuildingResult> results )
     {
         StringWriter buffer = new StringWriter( 1024 );
-
-        PrintWriter writer = new PrintWriter( buffer );
-        writer.println( "Some problems were encountered while processing the POMs:" );
-        for ( ProjectBuildingResult result : results )
+        try(PrintWriter writer = new PrintWriter( buffer ))
         {
-            for ( ModelProblem problem : result.getProblems() )
+        	writer.println( "Some problems were encountered while processing the POMs:" );
+            for ( ProjectBuildingResult result : results )
             {
-                writer.print( "[" );
-                writer.print( problem.getSeverity() );
-                writer.print( "] " );
-                writer.print( problem.getMessage() );
-                writer.print( " @ " );
-                writer.println( ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
+                for ( ModelProblem problem : result.getProblems() )
+                {
+                    writer.print( "[" );
+                    writer.print( problem.getSeverity() );
+                    writer.print( "] " );
+                    writer.print( problem.getMessage() );
+                    writer.print( " @ " );
+                    writer.println( ModelProblemUtils.formatLocation( problem, result.getProjectId() ) );
+                }
             }
         }
-        writer.close();
-
         return buffer.toString();
     }
 

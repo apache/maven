@@ -34,25 +34,11 @@ public class StringSourceTest
     {
         StringSource source = new StringSource( "Hello World!" );
 
-        Scanner scanner = null;
-        InputStream is = null;
-        try
-        {
-            is = source.getInputStream();
 
-            scanner = new Scanner( is );
-            assertEquals( "Hello World!", scanner.nextLine() );
-        }
-        finally
+        try(InputStream is = source.getInputStream();
+        		Scanner scanner = new Scanner( is ))
         {
-            if ( scanner != null )
-            {
-                scanner.close();
-            }
-            if ( is != null )
-            {
-                is.close();
-            }
+            assertEquals( "Hello World!", scanner.nextLine() );
         }
     }
 

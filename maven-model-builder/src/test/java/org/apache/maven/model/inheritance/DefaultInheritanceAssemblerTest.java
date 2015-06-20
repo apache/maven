@@ -85,24 +85,16 @@ public class DefaultInheritanceAssemblerTest
         writer.write( actual, null, child );
 
         // check with getPom( "plugin-configuration-effective" )
-        Reader control = null;
-        Reader test = null;
-        try
+        try(File expected = getPom( "plugin-configuration-expected");
+        		Reader control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
+        		Reader test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" ))
         {
-            File expected = getPom( "plugin-configuration-expected" );
-            control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
-
-            test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" );
-
+            
             XMLUnit.setIgnoreComments( true );
             XMLUnit.setIgnoreWhitespace( true );
             XMLAssert.assertXMLEqual( control, test );
         }
-        catch ( IOException ioe )
-        {
-            IOUtil.close( control );
-            IOUtil.close( test );
-        }
+
     }
 
 }
