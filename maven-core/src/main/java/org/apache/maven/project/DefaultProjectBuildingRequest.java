@@ -68,13 +68,13 @@ public class DefaultProjectBuildingRequest
     public DefaultProjectBuildingRequest()
     {
         processPlugins = true;
-        profiles = new ArrayList<Profile>();
-        activeProfileIds = new ArrayList<String>();
-        inactiveProfileIds = new ArrayList<String>();
+        profiles = new ArrayList<>();
+        activeProfileIds = new ArrayList<>();
+        inactiveProfileIds = new ArrayList<>();
         systemProperties = new Properties();
         userProperties = new Properties();
-        remoteRepositories = new ArrayList<ArtifactRepository>();
-        pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+        remoteRepositories = new ArrayList<>();
+        pluginArtifactRepositories = new ArrayList<>();
     }
 
     public DefaultProjectBuildingRequest( ProjectBuildingRequest request )
@@ -126,7 +126,7 @@ public class DefaultProjectBuildingRequest
     {
         if ( remoteRepositories != null )
         {
-            this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+            this.remoteRepositories = new ArrayList<>( remoteRepositories );
         }
         else
         {
@@ -145,7 +145,7 @@ public class DefaultProjectBuildingRequest
     {
         if ( pluginArtifactRepositories != null )
         {
-            this.pluginArtifactRepositories = new ArrayList<ArtifactRepository>( pluginArtifactRepositories );
+            this.pluginArtifactRepositories = new ArrayList<>( pluginArtifactRepositories );
         }
         else
         {
@@ -253,7 +253,7 @@ public class DefaultProjectBuildingRequest
     {
         if ( activeProfileIds != null )
         {
-            this.activeProfileIds = new ArrayList<String>( activeProfileIds );
+            this.activeProfileIds = new ArrayList<>( activeProfileIds );
         }
         else
         {
@@ -270,7 +270,7 @@ public class DefaultProjectBuildingRequest
     {
         if ( inactiveProfileIds != null )
         {
-            this.inactiveProfileIds = new ArrayList<String>( inactiveProfileIds );
+            this.inactiveProfileIds = new ArrayList<>( inactiveProfileIds );
         }
         else
         {
@@ -282,7 +282,7 @@ public class DefaultProjectBuildingRequest
     {
         if ( profiles != null )
         {
-            this.profiles = new ArrayList<Profile>( profiles );
+            this.profiles = new ArrayList<>( profiles );
         }
         else
         {

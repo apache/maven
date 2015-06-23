@@ -19,18 +19,6 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -40,8 +28,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
-import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.RepositoryEvent.EventType;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.SyncContext;
@@ -69,6 +57,17 @@ import org.eclipse.aether.spi.log.Logger;
 import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.util.ConfigUtils;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Benjamin Bentmann
@@ -187,8 +186,8 @@ public class DefaultVersionResolver
             {
                 Record record = (Record) obj;
                 result.setVersion( record.version );
-                result.setRepository( CacheUtils.getRepository( session, request.getRepositories(), record.repoClass,
-                                                                record.repoId ) );
+                result.setRepository(
+                    CacheUtils.getRepository( session, request.getRepositories(), record.repoClass, record.repoId ) );
                 return result;
             }
         }
@@ -197,15 +196,13 @@ public class DefaultVersionResolver
 
         if ( RELEASE.equals( version ) )
         {
-            metadata =
-                new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                     Metadata.Nature.RELEASE );
+            metadata = new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
+                                            Metadata.Nature.RELEASE );
         }
         else if ( LATEST.equals( version ) )
         {
-            metadata =
-                new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
-                                     Metadata.Nature.RELEASE_OR_SNAPSHOT );
+            metadata = new DefaultMetadata( artifact.getGroupId(), artifact.getArtifactId(), MAVEN_METADATA_XML,
+                                            Metadata.Nature.RELEASE_OR_SNAPSHOT );
         }
         else if ( version.endsWith( SNAPSHOT ) )
         {
@@ -233,7 +230,7 @@ public class DefaultVersionResolver
         }
         else
         {
-            List<MetadataRequest> metadataReqs = new ArrayList<MetadataRequest>( request.getRepositories().size() );
+            List<MetadataRequest> metadataReqs = new ArrayList<>( request.getRepositories().size() );
 
             metadataReqs.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
 
@@ -249,7 +246,7 @@ public class DefaultVersionResolver
 
             List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataReqs );
 
-            Map<String, VersionInfo> infos = new HashMap<String, VersionInfo>();
+            Map<String, VersionInfo> infos = new HashMap<>();
 
             for ( MetadataResult metadataResult : metadataResults )
             {
@@ -343,9 +340,8 @@ public class DefaultVersionResolver
         {
             if ( metadata != null )
             {
-                SyncContext syncContext = syncContextFactory.newInstance( session, true );
 
-                try
+                try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
                 {
                     syncContext.acquire( null, Collections.singleton( metadata ) );
 
@@ -373,15 +369,11 @@ public class DefaultVersionResolver
                                 versioning = repaired;
 
                                 throw new IOException( "Snapshot information corrupted with remote repository data"
-                                    + ", please verify that no remote repository uses the id '" + repository.getId()
-                                    + "'" );
+                                                           + ", please verify that no remote repository uses the id '"
+                                                           + repository.getId() + "'" );
                             }
                         }
                     }
-                }
-                finally
-                {
-                    syncContext.close();
                 }
             }
         }
@@ -467,9 +459,8 @@ public class DefaultVersionResolver
         VersionInfo srcInfo = infos.get( srcKey );
         VersionInfo dstInfo = infos.get( dstKey );
 
-        if ( dstInfo == null
-            || ( srcInfo != null && dstInfo.isOutdated( srcInfo.timestamp )
-                 && srcInfo.repository != dstInfo.repository ) )
+        if ( dstInfo == null || ( srcInfo != null && dstInfo.isOutdated( srcInfo.timestamp )
+            && srcInfo.repository != dstInfo.repository ) )
         {
             infos.put( dstKey, srcInfo );
         }
@@ -554,7 +545,7 @@ public class DefaultVersionResolver
             version = artifact.getVersion();
             localRepo = session.getLocalRepository().getBasedir();
             workspace = CacheUtils.getWorkspace( session );
-            repositories = new ArrayList<RemoteRepository>( request.getRepositories().size() );
+            repositories = new ArrayList<>( request.getRepositories().size() );
             boolean repoMan = false;
             for ( RemoteRepository repository : request.getRepositories() )
             {
@@ -594,10 +585,10 @@ public class DefaultVersionResolver
             }
 
             Key that = (Key) obj;
-            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId )
-                && classifier.equals( that.classifier ) && extension.equals( that.extension )
-                && version.equals( that.version ) && context.equals( that.context )
-                && localRepo.equals( that.localRepo ) && CacheUtils.eq( workspace, that.workspace )
+            return artifactId.equals( that.artifactId ) && groupId.equals( that.groupId ) && classifier.equals(
+                that.classifier ) && extension.equals( that.extension ) && version.equals( that.version )
+                && context.equals( that.context ) && localRepo.equals( that.localRepo )
+                && CacheUtils.eq( workspace, that.workspace )
                 && CacheUtils.repositoriesEquals( repositories, that.repositories );
         }
 

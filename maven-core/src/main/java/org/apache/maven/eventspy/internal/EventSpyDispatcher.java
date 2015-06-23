@@ -46,7 +46,7 @@ public class EventSpyDispatcher
     public void setEventSpies( List<EventSpy> eventSpies )
     {
         // make copy to get rid of needless overhead for dynamic lookups
-        this.eventSpies = new ArrayList<EventSpy>( eventSpies );
+        this.eventSpies = new ArrayList<>( eventSpies );
     }
 
     public List<EventSpy> getEventSpies()
@@ -84,11 +84,7 @@ public class EventSpyDispatcher
             {
                 eventSpy.init( context );
             }
-            catch ( Exception e )
-            {
-                logError( "initialize", e, eventSpy );
-            }
-            catch ( LinkageError e )
+            catch ( Exception | LinkageError e )
             {
                 logError( "initialize", e, eventSpy );
             }
@@ -107,11 +103,7 @@ public class EventSpyDispatcher
             {
                 eventSpy.onEvent( event );
             }
-            catch ( Exception e )
-            {
-                logError( "notify", e, eventSpy );
-            }
-            catch ( LinkageError e )
+            catch ( Exception | LinkageError e )
             {
                 logError( "notify", e, eventSpy );
             }
@@ -130,11 +122,7 @@ public class EventSpyDispatcher
             {
                 eventSpy.close();
             }
-            catch ( Exception e )
-            {
-                logError( "close", e, eventSpy );
-            }
-            catch ( LinkageError e )
+            catch ( Exception | LinkageError e )
             {
                 logError( "close", e, eventSpy );
             }

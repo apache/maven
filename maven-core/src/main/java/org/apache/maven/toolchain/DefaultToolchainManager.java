@@ -77,7 +77,7 @@ public class DefaultToolchainManager
     private List<Toolchain> selectToolchains( List<ToolchainModel> models, String type,
                                               Map<String, String> requirements )
     {
-        List<Toolchain> toolchains = new ArrayList<Toolchain>();
+        List<Toolchain> toolchains = new ArrayList<>();
 
         if ( models != null )
         {

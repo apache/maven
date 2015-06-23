@@ -50,11 +50,11 @@ class DefaultModelBuildingResult
 
     public DefaultModelBuildingResult()
     {
-        modelIds = new ArrayList<String>();
-        rawModels = new HashMap<String, Model>();
-        activePomProfiles = new HashMap<String, List<Profile>>();
-        activeExternalProfiles = new ArrayList<Profile>();
-        problems = new ArrayList<ModelProblem>();
+        modelIds = new ArrayList<>();
+        rawModels = new HashMap<>();
+        activePomProfiles = new HashMap<>();
+        activeExternalProfiles = new ArrayList<>();
+        problems = new ArrayList<>();
     }
 
     @Override
@@ -127,7 +127,7 @@ class DefaultModelBuildingResult
 
         if ( activeProfiles != null )
         {
-            this.activePomProfiles.put( modelId, new ArrayList<Profile>( activeProfiles ) );
+            this.activePomProfiles.put( modelId, new ArrayList<>( activeProfiles ) );
         }
         else
         {
@@ -147,7 +147,7 @@ class DefaultModelBuildingResult
     {
         if ( activeProfiles != null )
         {
-            this.activeExternalProfiles = new ArrayList<Profile>( activeProfiles );
+            this.activeExternalProfiles = new ArrayList<>( activeProfiles );
         }
         else
         {
@@ -167,7 +167,7 @@ class DefaultModelBuildingResult
     {
         if ( problems != null )
         {
-            this.problems = new ArrayList<ModelProblem>( problems );
+            this.problems = new ArrayList<>( problems );
         }
         else
         {

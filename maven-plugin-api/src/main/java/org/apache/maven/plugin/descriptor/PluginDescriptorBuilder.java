@@ -92,7 +92,7 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] dependencyConfigurations = c.getChild( "dependencies" ).getChildren( "dependency" );
 
-        List<ComponentDependency> dependencies = new ArrayList<ComponentDependency>();
+        List<ComponentDependency> dependencies = new ArrayList<>();
 
         for ( PlexusConfiguration d : dependencyConfigurations )
         {
@@ -267,7 +267,7 @@ public class PluginDescriptorBuilder
 
         PlexusConfiguration[] parameterConfigurations = c.getChild( "parameters" ).getChildren( "parameter" );
 
-        List<Parameter> parameters = new ArrayList<Parameter>();
+        List<Parameter> parameters = new ArrayList<>();
 
         for ( PlexusConfiguration d : parameterConfigurations )
         {
@@ -346,11 +346,7 @@ public class PluginDescriptorBuilder
         {
             return new XmlPlexusConfiguration( Xpp3DomBuilder.build( configuration ) );
         }
-        catch ( IOException e )
-        {
-            throw new PlexusConfigurationException( e.getMessage(), e );
-        }
-        catch ( XmlPullParserException e )
+        catch ( IOException | XmlPullParserException e )
         {
             throw new PlexusConfigurationException( e.getMessage(), e );
         }

@@ -153,10 +153,10 @@ public class DefaultGraphConflictResolver
             return g;
         }
 
-        List<MetadataGraphVertex> visited = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
+        List<MetadataGraphVertex> visited = new ArrayList<>( g.getVertices().size() );
         visit( g.getEntry(), visited, g );
 
-        List<MetadataGraphVertex> dropList = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
+        List<MetadataGraphVertex> dropList = new ArrayList<>( g.getVertices().size() );
 
         // collect drop list
         for ( MetadataGraphVertex v : g.getVertices() )

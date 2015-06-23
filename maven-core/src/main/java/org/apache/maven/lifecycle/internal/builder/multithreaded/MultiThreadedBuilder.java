@@ -76,7 +76,7 @@ public class MultiThreadedBuilder
         ExecutorService executor =
             Executors.newFixedThreadPool( Math.min( session.getRequest().getDegreeOfConcurrency(),
                                                     session.getProjects().size() ), new BuildThreadFactory() );
-        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
+        CompletionService<ProjectSegment> service = new ExecutorCompletionService<>( executor );
         ConcurrencyDependencyGraph analyzer =
             new ConcurrencyDependencyGraph( projectBuilds, session.getProjectDependencyGraph() );
 
@@ -165,11 +165,7 @@ public class MultiThreadedBuilder
             {
                 unprocessed.get();
             }
-            catch ( InterruptedException e )
-            {
-                throw new RuntimeException( e );
-            }
-            catch ( ExecutionException e )
+            catch ( InterruptedException | ExecutionException e )
             {
                 throw new RuntimeException( e );
             }

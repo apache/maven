@@ -56,7 +56,7 @@ public class MavenSettingsMerger
         {
             if ( dominantActiveProfiles == null )
             {
-                dominantActiveProfiles = new ArrayList<String>();
+                dominantActiveProfiles = new ArrayList<>();
                 dominant.setActiveProfiles( dominantActiveProfiles );
             }
 
@@ -77,7 +77,7 @@ public class MavenSettingsMerger
         {
             if ( dominantPluginGroupIds == null )
             {
-                dominantPluginGroupIds = new ArrayList<String>();
+                dominantPluginGroupIds = new ArrayList<>();
                 dominant.setPluginGroups( dominantPluginGroupIds );
             }
 
@@ -129,7 +129,7 @@ public class MavenSettingsMerger
      */
     private static <T extends IdentifiableBase> Map<String, T> mapById( List<T> identifiables )
     {
-        Map<String, T> byId = new HashMap<String, T>();
+        Map<String, T> byId = new HashMap<>();
 
         for ( T identifiable : identifiables )
         {

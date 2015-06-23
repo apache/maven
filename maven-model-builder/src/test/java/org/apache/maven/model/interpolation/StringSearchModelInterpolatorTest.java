@@ -128,7 +128,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
 
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add( "${key}" );
         values.add( "${key2}" );
 
@@ -155,7 +155,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
 
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add( "key" );
         values.add( "${key2}" );
 
@@ -208,7 +208,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key3", "value3" );
         p.setProperty( "key4", "value4" );
 
-        List<String[]> values = new ArrayList<String[]>();
+        List<String[]> values = new ArrayList<>();
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
 
@@ -237,7 +237,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
 
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, String> values = new HashMap<>();
         values.put( "key", "${key}" );
         values.put( "key2", "${key2}" );
 
@@ -264,7 +264,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key", "value" );
         p.setProperty( "key2", "value2" );
 
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, String> values = new HashMap<>();
         values.put( "key", "val" );
         values.put( "key2", "${key2}" );
 
@@ -317,7 +317,7 @@ public class StringSearchModelInterpolatorTest
         p.setProperty( "key3", "value3" );
         p.setProperty( "key4", "value4" );
 
-        Map<String, String[]> values = new HashMap<String, String[]>();
+        Map<String, String[]> values = new HashMap<>();
         values.put( "key", new String[] { "${key}", "${key2}" } );
         values.put( "key2", new String[] { "${key3}", "${key4}" } );
 
@@ -356,7 +356,7 @@ public class StringSearchModelInterpolatorTest
         int numItems = 100;
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        List<Future<SimpleProblemCollector>>  futures = new ArrayList<Future<SimpleProblemCollector>>();
+        List<Future<SimpleProblemCollector>>  futures = new ArrayList<>();
         for ( int i = 0; i < numItems; i++ )
         {
             Callable<SimpleProblemCollector> future = new Callable<SimpleProblemCollector>()
@@ -373,7 +373,7 @@ public class StringSearchModelInterpolatorTest
                     return collector;
                 }
             };
-            FutureTask<SimpleProblemCollector> task = new FutureTask<SimpleProblemCollector>( future );
+            FutureTask<SimpleProblemCollector> task = new FutureTask<>( future );
             futures.add( task );
             new Thread( task ).start();
         }
@@ -387,14 +387,14 @@ public class StringSearchModelInterpolatorTest
 
     private ObjectWithMixedProtection getValueList()
     {
-        List<String[]> values = new ArrayList<String[]>();
+        List<String[]> values = new ArrayList<>();
 
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
-        List<String> values2 = new ArrayList<String>();
+        List<String> values2 = new ArrayList<>();
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
-        List<String> values3 = new ArrayList<String>();
+        List<String> values3 = new ArrayList<>();
         values.add( new String[] { "${key}", "${key2}" } );
         values.add( new String[] { "${key3}", "${key4}" } );
 

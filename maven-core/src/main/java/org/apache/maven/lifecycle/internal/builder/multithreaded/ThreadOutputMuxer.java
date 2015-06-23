@@ -45,12 +45,12 @@ public class ThreadOutputMuxer
 {
     private final Iterator<ProjectSegment> projects;
 
-    private final ThreadLocal<ProjectSegment> projectBuildThreadLocal = new ThreadLocal<ProjectSegment>();
+    private final ThreadLocal<ProjectSegment> projectBuildThreadLocal = new ThreadLocal<>();
 
     private final Map<ProjectSegment, ByteArrayOutputStream> streams =
-        new HashMap<ProjectSegment, ByteArrayOutputStream>();
+        new HashMap<>();
 
-    private final Map<ProjectSegment, PrintStream> printStreams = new HashMap<ProjectSegment, PrintStream>();
+    private final Map<ProjectSegment, PrintStream> printStreams = new HashMap<>();
 
     private final ByteArrayOutputStream defaultOutputStreamForUnknownData = new ByteArrayOutputStream();
 

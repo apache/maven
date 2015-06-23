@@ -65,7 +65,7 @@ public class DefaultPathTranslator
 
             if ( build.getFilters() != null )
             {
-                List<String> filters = new ArrayList<String>();
+                List<String> filters = new ArrayList<>();
                 for ( String filter : build.getFilters() )
                 {
                     filters.add( alignToBaseDirectory( filter, basedir ) );
@@ -203,7 +203,7 @@ public class DefaultPathTranslator
 
             if ( build.getFilters() != null )
             {
-                List<String> filters = new ArrayList<String>();
+                List<String> filters = new ArrayList<>();
                 for ( String filter : build.getFilters() )
                 {
                     filters.add( unalignFromBaseDirectory( filter, basedir ) );

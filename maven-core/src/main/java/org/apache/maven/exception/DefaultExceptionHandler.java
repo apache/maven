@@ -103,7 +103,7 @@ public class DefaultExceptionHandler
         {
             List<ProjectBuildingResult> results = ( (ProjectBuildingException) exception ).getResults();
 
-            children = new ArrayList<ExceptionSummary>();
+            children = new ArrayList<>();
 
             for ( ProjectBuildingResult result : results )
             {
@@ -126,7 +126,7 @@ public class DefaultExceptionHandler
 
     private ExceptionSummary handle( ProjectBuildingResult result )
     {
-        List<ExceptionSummary> children = new ArrayList<ExceptionSummary>();
+        List<ExceptionSummary> children = new ArrayList<>();
 
         for ( ModelProblem problem : result.getProblems() )
         {

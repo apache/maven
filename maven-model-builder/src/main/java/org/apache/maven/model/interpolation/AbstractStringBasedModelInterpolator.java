@@ -62,7 +62,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
     static
     {
-        Collection<String> translatedPrefixes = new HashSet<String>();
+        Collection<String> translatedPrefixes = new HashSet<>();
 
         // MNG-1927, MNG-2124, MNG-3355:
         // If the build section is present and the project directory is non-null, we should make
@@ -127,7 +127,7 @@ public abstract class AbstractStringBasedModelInterpolator
         }
 
         // NOTE: Order counts here!
-        List<ValueSource> valueSources = new ArrayList<ValueSource>( 9 );
+        List<ValueSource> valueSources = new ArrayList<>( 9 );
 
         if ( projectDir != null )
         {
@@ -187,7 +187,7 @@ public abstract class AbstractStringBasedModelInterpolator
                                                                                final File projectDir,
                                                                                final ModelBuildingRequest config )
     {
-        List<InterpolationPostProcessor> processors = new ArrayList<InterpolationPostProcessor>( 2 );
+        List<InterpolationPostProcessor> processors = new ArrayList<>( 2 );
         if ( projectDir != null )
         {
             processors.add( new PathTranslatingPostProcessor( PROJECT_PREFIXES, TRANSLATED_PATH_EXPRESSIONS,

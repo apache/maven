@@ -29,7 +29,7 @@ public class MavenPluginValidator
 {
     private final Artifact pluginArtifact;
 
-    private List<String> errors = new ArrayList<String>();
+    private List<String> errors = new ArrayList<>();
 
     private boolean firstDescriptor = true;
 

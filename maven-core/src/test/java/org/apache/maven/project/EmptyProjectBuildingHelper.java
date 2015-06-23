@@ -45,7 +45,7 @@ public class EmptyProjectBuildingHelper
         }
         else
         {
-            return new ArrayList<ArtifactRepository>();
+            return new ArrayList<>();
         }
     }
 

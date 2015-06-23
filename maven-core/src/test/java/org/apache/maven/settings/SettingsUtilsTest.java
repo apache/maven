@@ -82,7 +82,7 @@ public class SettingsUtilsTest
         }
         p.setProperties( props );
         count = entropy.nextInt( 3 );
-        List<Repository> repos = new ArrayList<Repository>();
+        List<Repository> repos = new ArrayList<>();
         for ( int i = 0; i < count; i++ )
         {
             Repository r = new Repository();
@@ -93,7 +93,7 @@ public class SettingsUtilsTest
         }
         p.setRepositories( repos );
         count = entropy.nextInt( 3 );
-        repos = new ArrayList<Repository>();
+        repos = new ArrayList<>();
         for ( int i = 0; i < count; i++ )
         {
             Repository r = new Repository();

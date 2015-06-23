@@ -67,7 +67,7 @@ class ReactorReader
     {
         projectsByGAV = session.getProjectMap();
 
-        projectsByGA = new HashMap<String, List<MavenProject>>( projectsByGAV.size() * 2 );
+        projectsByGA = new HashMap<>( projectsByGAV.size() * 2 );
         for ( MavenProject project : projectsByGAV.values() )
         {
             String key = ArtifactUtils.versionlessKey( project.getGroupId(), project.getArtifactId() );
@@ -76,14 +76,14 @@ class ReactorReader
 
             if ( projects == null )
             {
-                projects = new ArrayList<MavenProject>( 1 );
+                projects = new ArrayList<>( 1 );
                 projectsByGA.put( key, projects );
             }
 
             projects.add( project );
         }
 
-        repository = new WorkspaceRepository( "reactor", new HashSet<String>( projectsByGAV.keySet() ) );
+        repository = new WorkspaceRepository( "reactor", new HashSet<>( projectsByGAV.keySet() ) );
     }
 
     //
@@ -124,7 +124,7 @@ class ReactorReader
             return Collections.emptyList();
         }
 
-        List<String> versions = new ArrayList<String>();
+        List<String> versions = new ArrayList<>();
 
         for ( MavenProject project : projects )
         {

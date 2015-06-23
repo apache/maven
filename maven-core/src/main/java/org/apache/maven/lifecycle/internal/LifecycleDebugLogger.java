@@ -155,8 +155,8 @@ public class LifecycleDebugLogger
 
     private void debugDependencyRequirements( List<MojoExecution> mojoExecutions )
     {
-        Set<String> scopesToCollect = new TreeSet<String>();
-        Set<String> scopesToResolve = new TreeSet<String>();
+        Set<String> scopesToCollect = new TreeSet<>();
+        Set<String> scopesToResolve = new TreeSet<>();
 
         for ( MojoExecution mojoExecution : mojoExecutions )
         {

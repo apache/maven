@@ -114,7 +114,7 @@ public class ModelMerger
             return;
         }
 
-        Map<Object, Object> context = new HashMap<Object, Object>();
+        Map<Object, Object> context = new HashMap<>();
         if ( hints != null )
         {
             context.putAll( hints );
@@ -313,7 +313,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<License> tgt = target.getLicenses();
-            Map<Object, License> merged = new LinkedHashMap<Object, License>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, License> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( License element : tgt )
             {
@@ -330,7 +330,7 @@ public class ModelMerger
                 }
             }
 
-            target.setLicenses( new ArrayList<License>( merged.values() ) );
+            target.setLicenses( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -341,7 +341,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<MailingList> tgt = target.getMailingLists();
-            Map<Object, MailingList> merged = new LinkedHashMap<Object, MailingList>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, MailingList> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( MailingList element : tgt )
             {
@@ -358,7 +358,7 @@ public class ModelMerger
                 }
             }
 
-            target.setMailingLists( new ArrayList<MailingList>( merged.values() ) );
+            target.setMailingLists( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -369,7 +369,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Developer> tgt = target.getDevelopers();
-            Map<Object, Developer> merged = new LinkedHashMap<Object, Developer>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Developer> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Developer element : tgt )
             {
@@ -386,7 +386,7 @@ public class ModelMerger
                 }
             }
 
-            target.setDevelopers( new ArrayList<Developer>( merged.values() ) );
+            target.setDevelopers( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -397,7 +397,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Contributor> tgt = target.getContributors();
-            Map<Object, Contributor> merged = new LinkedHashMap<Object, Contributor>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Contributor> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Contributor element : tgt )
             {
@@ -414,7 +414,7 @@ public class ModelMerger
                 }
             }
 
-            target.setContributors( new ArrayList<Contributor>( merged.values() ) );
+            target.setContributors( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -505,7 +505,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Profile> tgt = target.getProfiles();
-            Map<Object, Profile> merged = new LinkedHashMap<Object, Profile>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Profile> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Profile element : tgt )
             {
@@ -522,7 +522,7 @@ public class ModelMerger
                 }
             }
 
-            target.setProfiles( new ArrayList<Profile>( merged.values() ) );
+            target.setProfiles( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -546,7 +546,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getModules();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setModules( merged );
@@ -560,7 +560,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Dependency> tgt = target.getDependencies();
-            Map<Object, Dependency> merged = new LinkedHashMap<Object, Dependency>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Dependency> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Dependency element : tgt )
             {
@@ -577,7 +577,7 @@ public class ModelMerger
                 }
             }
 
-            target.setDependencies( new ArrayList<Dependency>( merged.values() ) );
+            target.setDependencies( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -588,7 +588,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Repository> tgt = target.getRepositories();
-            Map<Object, Repository> merged = new LinkedHashMap<Object, Repository>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Repository> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Repository element : tgt )
             {
@@ -605,7 +605,7 @@ public class ModelMerger
                 }
             }
 
-            target.setRepositories( new ArrayList<Repository>( merged.values() ) );
+            target.setRepositories( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -616,7 +616,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Repository> tgt = target.getPluginRepositories();
-            Map<Object, Repository> merged = new LinkedHashMap<Object, Repository>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Repository> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Repository element : tgt )
             {
@@ -633,7 +633,7 @@ public class ModelMerger
                 }
             }
 
-            target.setPluginRepositories( new ArrayList<Repository>( merged.values() ) );
+            target.setPluginRepositories( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -1211,7 +1211,7 @@ public class ModelMerger
         {
             List<Exclusion> tgt = target.getExclusions();
 
-            Map<Object, Exclusion> merged = new LinkedHashMap<Object, Exclusion>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Exclusion> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Exclusion element : tgt )
             {
@@ -1228,7 +1228,7 @@ public class ModelMerger
                 }
             }
 
-            target.setExclusions( new ArrayList<Exclusion>( merged.values() ) );
+            target.setExclusions( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -1311,7 +1311,7 @@ public class ModelMerger
         {
             List<ReportPlugin> tgt = target.getPlugins();
             Map<Object, ReportPlugin> merged =
-                new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
+                new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( ReportPlugin element : tgt )
             {
@@ -1328,7 +1328,7 @@ public class ModelMerger
                 }
             }
 
-            target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+            target.setPlugins( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -1391,7 +1391,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<ReportSet> tgt = target.getReportSets();
-            Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, ReportSet> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( ReportSet element : tgt )
             {
@@ -1408,7 +1408,7 @@ public class ModelMerger
                 }
             }
 
-            target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
+            target.setReportSets( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -1441,7 +1441,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getReports();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setReports( merged );
@@ -1461,7 +1461,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Dependency> tgt = target.getDependencies();
-            Map<Object, Dependency> merged = new LinkedHashMap<Object, Dependency>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Dependency> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Dependency element : tgt )
             {
@@ -1478,7 +1478,7 @@ public class ModelMerger
                 }
             }
 
-            target.setDependencies( new ArrayList<Dependency>( merged.values() ) );
+            target.setDependencies( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -1732,7 +1732,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getOtherArchives();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setOtherArchives( merged );
@@ -1864,7 +1864,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getRoles();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setRoles( merged );
@@ -2029,7 +2029,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Notifier> tgt = target.getNotifiers();
-            Map<Object, Notifier> merged = new LinkedHashMap<Object, Notifier>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Notifier> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Notifier element : tgt )
             {
@@ -2046,7 +2046,7 @@ public class ModelMerger
                 }
             }
 
-            target.setNotifiers( new ArrayList<Notifier>( merged.values() ) );
+            target.setNotifiers( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2249,7 +2249,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Extension> tgt = target.getExtensions();
-            Map<Object, Extension> merged = new LinkedHashMap<Object, Extension>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Extension> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Extension element : tgt )
             {
@@ -2266,7 +2266,7 @@ public class ModelMerger
                 }
             }
 
-            target.setExtensions( new ArrayList<Extension>( merged.values() ) );
+            target.setExtensions( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2381,7 +2381,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getFilters();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setFilters( merged );
@@ -2395,7 +2395,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Resource> tgt = target.getResources();
-            Map<Object, Resource> merged = new LinkedHashMap<Object, Resource>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Resource> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Resource element : tgt )
             {
@@ -2412,7 +2412,7 @@ public class ModelMerger
                 }
             }
 
-            target.setResources( new ArrayList<Resource>( merged.values() ) );
+            target.setResources( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2423,7 +2423,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Resource> tgt = target.getTestResources();
-            Map<Object, Resource> merged = new LinkedHashMap<Object, Resource>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Resource> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Resource element : tgt )
             {
@@ -2440,7 +2440,7 @@ public class ModelMerger
                 }
             }
 
-            target.setTestResources( new ArrayList<Resource>( merged.values() ) );
+            target.setTestResources( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2480,7 +2480,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Plugin> tgt = target.getPlugins();
-            Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Plugin> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Plugin element : tgt )
             {
@@ -2497,7 +2497,7 @@ public class ModelMerger
                 }
             }
 
-            target.setPlugins( new ArrayList<Plugin>( merged.values() ) );
+            target.setPlugins( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2581,7 +2581,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<Dependency> tgt = target.getDependencies();
-            Map<Object, Dependency> merged = new LinkedHashMap<Object, Dependency>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Dependency> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( Dependency element : tgt )
             {
@@ -2598,7 +2598,7 @@ public class ModelMerger
                 }
             }
 
-            target.setDependencies( new ArrayList<Dependency>( merged.values() ) );
+            target.setDependencies( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2611,7 +2611,7 @@ public class ModelMerger
             List<PluginExecution> tgt = target.getExecutions();
 
             Map<Object, PluginExecution> merged =
-                new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
+                new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( PluginExecution element : tgt )
             {
@@ -2628,7 +2628,7 @@ public class ModelMerger
                 }
             }
 
-            target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
+            target.setExecutions( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -2717,7 +2717,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getGoals();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setGoals( merged );
@@ -2808,7 +2808,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getIncludes();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setIncludes( merged );
@@ -2822,7 +2822,7 @@ public class ModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getExcludes();
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             merged.addAll( src );
             target.setExcludes( merged );

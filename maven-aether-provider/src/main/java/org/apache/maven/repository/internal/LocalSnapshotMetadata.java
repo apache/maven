@@ -38,7 +38,7 @@ final class LocalSnapshotMetadata
     extends MavenMetadata
 {
 
-    private final Collection<Artifact> artifacts = new ArrayList<Artifact>();
+    private final Collection<Artifact> artifacts = new ArrayList<>();
 
     private final boolean legacyFormat;
 
@@ -104,7 +104,7 @@ final class LocalSnapshotMetadata
         {
             String lastUpdated = metadata.getVersioning().getLastUpdated();
 
-            Map<String, SnapshotVersion> versions = new LinkedHashMap<String, SnapshotVersion>();
+            Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
             for ( Artifact artifact : artifacts )
             {
@@ -129,7 +129,7 @@ final class LocalSnapshotMetadata
                 }
             }
 
-            metadata.getVersioning().setSnapshotVersions( new ArrayList<SnapshotVersion>( versions.values() ) );
+            metadata.getVersioning().setSnapshotVersions( new ArrayList<>( versions.values() ) );
         }
 
         artifacts.clear();

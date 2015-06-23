@@ -101,9 +101,9 @@ public class ThreadOutputMuxerTest
         Iterator<String> lyrics = stringList.iterator();
 
         ExecutorService executor = Executors.newFixedThreadPool( 10 );
-        CompletionService<ProjectSegment> service = new ExecutorCompletionService<ProjectSegment>( executor );
+        CompletionService<ProjectSegment> service = new ExecutorCompletionService<>( executor );
 
-        List<Future<ProjectSegment>> futures = new ArrayList<Future<ProjectSegment>>();
+        List<Future<ProjectSegment>> futures = new ArrayList<>();
         for ( ProjectSegment projectBuild : projectBuildList )
         {
             final Future<ProjectSegment> buildFuture =

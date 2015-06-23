@@ -151,7 +151,7 @@ public class DefaultMavenProjectBuilder
         {
             boolean normalized = false;
 
-            List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>( repositories.size() );
+            List<ArtifactRepository> repos = new ArrayList<>( repositories.size() );
 
             for ( Object repository : repositories )
             {

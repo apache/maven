@@ -274,8 +274,8 @@ public class DefaultModelBuilder
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
         ModelData superData = new ModelData( null, getSuperModel() );
 
-        Collection<String> parentIds = new LinkedHashSet<String>();
-        List<ModelData> lineage = new ArrayList<ModelData>();
+        Collection<String> parentIds = new LinkedHashSet<>();
+        List<ModelData> lineage = new ArrayList<>();
 
         for ( ModelData currentData = resultData; currentData != null; )
         {
@@ -519,7 +519,7 @@ public class DefaultModelBuilder
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
             InputSource source = request.isLocationTracking() ? new InputSource() : null;
 
-            Map<String, Object> options = new HashMap<String, Object>();
+            Map<String, Object> options = new HashMap<>();
             options.put( ModelProcessor.IS_STRICT, strict );
             options.put( ModelProcessor.INPUT_SOURCE, source );
             options.put( ModelProcessor.SOURCE, modelSource );
@@ -660,9 +660,9 @@ public class DefaultModelBuilder
             return;
         }
 
-        Map<String, Plugin> plugins = new HashMap<String, Plugin>();
-        Map<String, String> versions = new HashMap<String, String>();
-        Map<String, String> managedVersions = new HashMap<String, String>();
+        Map<String, Plugin> plugins = new HashMap<>();
+        Map<String, String> versions = new HashMap<>();
+        Map<String, String> managedVersions = new HashMap<>();
 
         for ( int i = lineage.size() - 1; i >= 0; i-- )
         {
@@ -720,7 +720,7 @@ public class DefaultModelBuilder
 
     private Map<String, Activation> getProfileActivations( Model model, boolean clone )
     {
-        Map<String, Activation> activations = new HashMap<String, Activation>();
+        Map<String, Activation> activations = new HashMap<>();
         for ( Profile profile : model.getProfiles() )
         {
             Activation activation = profile.getActivation();
@@ -919,6 +919,11 @@ public class DefaultModelBuilder
                 .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ) );
             return null;
         }
+        if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
+        {
+            // version skew drop back to resolution from the repository
+            return null;
+        }
 
         //
         // Here we just need to know that a version is fine to use but this validation we can do in our workspace
@@ -1032,7 +1037,8 @@ public class DefaultModelBuilder
             }
             else
             {
-                if ( childModel.getVersion().indexOf( "${" ) > -1 )
+                if ( childModel.getVersion()
+                               .contains( "${" ) )
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
                         .setMessage( "Version must be a constant" )
@@ -1223,7 +1229,7 @@ public class DefaultModelBuilder
 
             if ( importMngts == null )
             {
-                importMngts = new ArrayList<DependencyManagement>();
+                importMngts = new ArrayList<>();
             }
 
             importMngts.add( importMngt );

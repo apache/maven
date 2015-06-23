@@ -37,7 +37,7 @@ public class ModelValidationResult
 
     public ModelValidationResult()
     {
-        messages = new ArrayList<String>();
+        messages = new ArrayList<>();
     }
 
     public int getMessageCount()

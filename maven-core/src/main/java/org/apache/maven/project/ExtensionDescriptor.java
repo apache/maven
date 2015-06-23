@@ -45,7 +45,7 @@ public class ExtensionDescriptor
     {
         if ( exportedPackages == null )
         {
-            exportedPackages = new ArrayList<String>();
+            exportedPackages = new ArrayList<>();
         }
 
         return exportedPackages;
@@ -59,7 +59,7 @@ public class ExtensionDescriptor
         }
         else
         {
-            this.exportedPackages = new ArrayList<String>( exportedPackages );
+            this.exportedPackages = new ArrayList<>( exportedPackages );
         }
     }
 
@@ -67,7 +67,7 @@ public class ExtensionDescriptor
     {
         if ( exportedArtifacts == null )
         {
-            exportedArtifacts = new ArrayList<String>();
+            exportedArtifacts = new ArrayList<>();
         }
 
         return exportedArtifacts;
@@ -81,7 +81,7 @@ public class ExtensionDescriptor
         }
         else
         {
-            this.exportedArtifacts = new ArrayList<String>( exportedArtifacts );
+            this.exportedArtifacts = new ArrayList<>( exportedArtifacts );
         }
     }
 

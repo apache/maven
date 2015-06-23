@@ -83,7 +83,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
 
-        List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> repos = new ArrayList<>();
         repos.add( artifactRepositoryFactory.createArtifactRepository( "repo1", "string://url1",
                                                                        new ArtifactRepositoryLayoutStub(), null, null ) );
         repos.add( artifactRepositoryFactory.createArtifactRepository( "repo2", "string://url2",
@@ -96,7 +96,7 @@ public class DefaultWagonManagerTest
         class TransferListener
             extends AbstractTransferListener
         {
-            public List<TransferEvent> events = new ArrayList<TransferEvent>();
+            public List<TransferEvent> events = new ArrayList<>();
 
             @Override
             public void transferInitiated( TransferEvent transferEvent )

@@ -60,7 +60,7 @@ public interface PluginManager
     Object getPluginComponent( Plugin plugin, String role, String roleHint )
         throws PluginManagerException, ComponentLookupException;
 
-    Map getPluginComponents( Plugin plugin, String role )
+    Map<String, Object> getPluginComponents( Plugin plugin, String role )
         throws ComponentLookupException, PluginManagerException;
 
     /**

@@ -33,7 +33,7 @@ class ReactorModelCache
     implements ModelCache
 {
 
-    private final Map<CacheKey, Object> models = new HashMap<CacheKey, Object>( 256 );
+    private final Map<CacheKey, Object> models = new HashMap<>( 256 );
 
     public Object get( String groupId, String artifactId, String version, String tag )
     {

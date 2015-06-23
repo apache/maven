@@ -74,7 +74,7 @@ public class Result<T>
     public static <T> Result<T> success( T model, Iterable<? extends ModelProblem> problems )
     {
         assert !hasErrors( problems );
-        return new Result<T>( false, model, problems );
+        return new Result<>( false, model, problems );
     }
 
     /**
@@ -124,7 +124,7 @@ public class Result<T>
      */
     public static <T> Result<T> error( T model, Iterable<? extends ModelProblem> problems )
     {
-        return new Result<T>( true, model, problems );
+        return new Result<>( true, model, problems );
     }
 
     /**
@@ -136,7 +136,7 @@ public class Result<T>
      */
     public static <T> Result<T> newResult( T model, Iterable<? extends ModelProblem> problems )
     {
-        return new Result<T>( hasErrors( problems ), model, problems );
+        return new Result<>( hasErrors( problems ), model, problems );
     }
 
     /**
@@ -161,7 +161,7 @@ public class Result<T>
      */
     public static <T> Result<T> addProblems( Result<T> result, Iterable<? extends ModelProblem> problems )
     {
-        return new Result<T>( result.hasErrors() || hasErrors( problems ), result.get(), concat( result.getProblems(),
+        return new Result<>( result.hasErrors() || hasErrors( problems ), result.get(), concat( result.getProblems(),
                                                                                                  problems ) );
     }
 
@@ -195,7 +195,7 @@ public class Result<T>
             }
         } );
         final Iterable<ModelProblem> problems = concat( transform( results, GET_PROBLEMS ) );
-        return new Result<Iterable<T>>( hasErrors, models, problems );
+        return new Result<>( hasErrors, models, problems );
     }
 
     // helper to determine if problems contain error

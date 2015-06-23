@@ -65,7 +65,7 @@ public class DefaultToolchainManagerTest
 
         MockitoAnnotations.initMocks( this );
 
-        toolchainManager.factories = new HashMap<String, ToolchainFactory>();
+        toolchainManager.factories = new HashMap<>();
         toolchainManager.factories.put( "basic", toolchainFactory_basicType );
         toolchainManager.factories.put( "rare", toolchainFactory_rareType );
     }
@@ -87,7 +87,7 @@ public class DefaultToolchainManagerTest
     {
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
-        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<String, List<ToolchainModel>>();
+        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
         toolchainModels.put( "unknown", Collections.singletonList( new ToolchainModel() ) );
         executionRequest.setToolchains( toolchainModels );
         when( session.getRequest() ).thenReturn( executionRequest );
@@ -103,7 +103,7 @@ public class DefaultToolchainManagerTest
     {
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
-        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<String, List<ToolchainModel>>();
+        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
         toolchainModels.put( "basic", Arrays.asList( new ToolchainModel(), new ToolchainModel() ) );
         toolchainModels.put( "rare", Collections.singletonList( new ToolchainModel() ) );
         executionRequest.setToolchains( toolchainModels );
@@ -119,7 +119,7 @@ public class DefaultToolchainManagerTest
     {
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
-        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<String, List<ToolchainModel>>();
+        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
         toolchainModels.put( "basic", Arrays.asList( new ToolchainModel(), new ToolchainModel() ) );
         toolchainModels.put( "rare", Collections.singletonList( new ToolchainModel() ) );
         executionRequest.setToolchains( toolchainModels );
@@ -136,7 +136,7 @@ public class DefaultToolchainManagerTest
     {
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
-        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<String, List<ToolchainModel>>();
+        Map<String, List<ToolchainModel>> toolchainModels = new HashMap<>();
         toolchainModels.put( "basic", Arrays.asList( new ToolchainModel(), new ToolchainModel() ) );
         toolchainModels.put( "rare", Collections.singletonList( new ToolchainModel() ) );
         executionRequest.setToolchains( toolchainModels );

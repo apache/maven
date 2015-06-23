@@ -59,7 +59,7 @@ public class DefaultArtifactDeployer
     @Requirement
     private LegacySupport legacySupport;
 
-    private Map<Object, MergeableMetadata> relatedMetadata = new ConcurrentHashMap<Object, MergeableMetadata>();
+    private Map<Object, MergeableMetadata> relatedMetadata = new ConcurrentHashMap<>();
 
     /**
      * @deprecated we want to use the artifact method only, and ensure artifact.file is set

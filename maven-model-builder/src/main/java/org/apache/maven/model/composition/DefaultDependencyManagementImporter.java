@@ -47,7 +47,7 @@ public class DefaultDependencyManagementImporter
     {
         if ( sources != null && !sources.isEmpty() )
         {
-            Map<String, Dependency> dependencies = new LinkedHashMap<String, Dependency>();
+            Map<String, Dependency> dependencies = new LinkedHashMap<>();
 
             DependencyManagement depMngt = target.getDependencyManagement();
 
@@ -76,7 +76,7 @@ public class DefaultDependencyManagementImporter
                 }
             }
 
-            depMngt.setDependencies( new ArrayList<Dependency>( dependencies.values() ) );
+            depMngt.setDependencies( new ArrayList<>( dependencies.values() ) );
         }
     }
 

@@ -126,7 +126,7 @@ public class LifecycleExecutionPlanCalculatorStub
             return getProjectBExecutionPlan();
         }
         // The remaining are basically "for future expansion"
-        List<MojoExecution> me = new ArrayList<MojoExecution>();
+        List<MojoExecution> me = new ArrayList<>();
         me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
         me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
         return createExecutionPlan( project, me );
@@ -152,7 +152,7 @@ public class LifecycleExecutionPlanCalculatorStub
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
-        List<MojoExecution> me = new ArrayList<MojoExecution>();
+        List<MojoExecution> me = new ArrayList<>();
         me.add( createMojoExecution( "initialize", "default-initialize", INITIALIZE ) );
         me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
         me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
@@ -169,7 +169,7 @@ public class LifecycleExecutionPlanCalculatorStub
         PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
         NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException
     {
-        List<MojoExecution> me = new ArrayList<MojoExecution>();
+        List<MojoExecution> me = new ArrayList<>();
         me.add( createMojoExecution( "enforce", "enforce-versions", VALIDATE ) );
         me.add( createMojoExecution( "resources", "default-resources", PROCESS_RESOURCES ) );
         me.add( createMojoExecution( "compile", "default-compile", COMPILE ) );
@@ -225,7 +225,7 @@ public class LifecycleExecutionPlanCalculatorStub
 
     public static Set<String> getScopes()
     {
-        return new HashSet<String>( Arrays.asList( "compile" ) );
+        return new HashSet<>( Arrays.asList( "compile" ) );
     }
 
 }

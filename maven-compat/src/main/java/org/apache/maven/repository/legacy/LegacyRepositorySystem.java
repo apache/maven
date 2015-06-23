@@ -158,7 +158,7 @@ public class LegacyRepositorySystem
 
         if ( !d.getExclusions().isEmpty() )
         {
-            List<String> exclusions = new ArrayList<String>();
+            List<String> exclusions = new ArrayList<>();
 
             for ( Exclusion exclusion : d.getExclusions() )
             {
@@ -377,7 +377,7 @@ public class LegacyRepositorySystem
             return null;
         }
 
-        Map<String, List<ArtifactRepository>> reposByKey = new LinkedHashMap<String, List<ArtifactRepository>>();
+        Map<String, List<ArtifactRepository>> reposByKey = new LinkedHashMap<>();
 
         for ( ArtifactRepository repository : repositories )
         {
@@ -387,21 +387,21 @@ public class LegacyRepositorySystem
 
             if ( aliasedRepos == null )
             {
-                aliasedRepos = new ArrayList<ArtifactRepository>();
+                aliasedRepos = new ArrayList<>();
                 reposByKey.put( key, aliasedRepos );
             }
 
             aliasedRepos.add( repository );
         }
 
-        List<ArtifactRepository> effectiveRepositories = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> effectiveRepositories = new ArrayList<>();
 
         for ( List<ArtifactRepository> aliasedRepos : reposByKey.values() )
         {
-            List<ArtifactRepository> mirroredRepos = new ArrayList<ArtifactRepository>();
+            List<ArtifactRepository> mirroredRepos = new ArrayList<>();
 
             List<ArtifactRepositoryPolicy> releasePolicies =
-                new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
+                new ArrayList<>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -412,7 +412,7 @@ public class LegacyRepositorySystem
             ArtifactRepositoryPolicy releasePolicy = getEffectivePolicy( releasePolicies );
 
             List<ArtifactRepositoryPolicy> snapshotPolicies =
-                new ArrayList<ArtifactRepositoryPolicy>( aliasedRepos.size() );
+                new ArrayList<>( aliasedRepos.size() );
 
             for ( ArtifactRepository aliasedRepo : aliasedRepos )
             {
@@ -532,7 +532,7 @@ public class LegacyRepositorySystem
     {
         if ( repositories != null )
         {
-            Map<String, Server> serversById = new HashMap<String, Server>();
+            Map<String, Server> serversById = new HashMap<>();
 
             if ( servers != null )
             {

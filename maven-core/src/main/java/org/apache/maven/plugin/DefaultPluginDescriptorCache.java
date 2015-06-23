@@ -50,7 +50,7 @@ public class DefaultPluginDescriptorCache
     implements PluginDescriptorCache
 {
 
-    private Map<Key, PluginDescriptor> descriptors = new HashMap<Key, PluginDescriptor>( 128 );
+    private Map<Key, PluginDescriptor> descriptors = new HashMap<>( 128 );
 
     public void flush()
     {
@@ -109,7 +109,7 @@ public class DefaultPluginDescriptorCache
 
         if ( mojos != null )
         {
-            clones = new ArrayList<ComponentDescriptor<?>>( mojos.size() );
+            clones = new ArrayList<>( mojos.size() );
 
             for ( MojoDescriptor mojo : mojos )
             {
@@ -148,7 +148,7 @@ public class DefaultPluginDescriptorCache
 
             workspace = CacheUtils.getWorkspace( session );
             localRepo = session.getLocalRepository();
-            this.repositories = new ArrayList<RemoteRepository>( repositories.size() );
+            this.repositories = new ArrayList<>( repositories.size() );
             for ( RemoteRepository repository : repositories )
             {
                 if ( repository.isRepositoryManager() )

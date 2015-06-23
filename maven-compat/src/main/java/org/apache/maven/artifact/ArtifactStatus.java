@@ -73,7 +73,7 @@ public final class ArtifactStatus
 
         if ( map == null )
         {
-            map = new HashMap<String, ArtifactStatus>();
+            map = new HashMap<>();
         }
         map.put( key, this );
     }

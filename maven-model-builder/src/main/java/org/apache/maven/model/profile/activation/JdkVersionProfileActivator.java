@@ -129,8 +129,8 @@ public class JdkVersionProfileActivator
 
         value = value.replaceAll( "[^0-9\\.\\-\\_]", "" );
 
-        List<String> valueTokens = new ArrayList<String>( Arrays.asList( value.split( "[\\.\\-\\_]" ) ) );
-        List<String> rangeValueTokens = new ArrayList<String>( Arrays.asList( rangeValue.value.split( "\\." ) ) );
+        List<String> valueTokens = new ArrayList<>( Arrays.asList( value.split( "[\\.\\-\\_]" ) ) );
+        List<String> rangeValueTokens = new ArrayList<>( Arrays.asList( rangeValue.value.split( "\\." ) ) );
 
         addZeroTokens( valueTokens, 3 );
         addZeroTokens( rangeValueTokens, 3 );
@@ -170,7 +170,7 @@ public class JdkVersionProfileActivator
 
     private static List<RangeValue> getRange( String range )
     {
-        List<RangeValue> ranges = new ArrayList<RangeValue>();
+        List<RangeValue> ranges = new ArrayList<>();
 
         for ( String token : range.split( "," ) )
         {

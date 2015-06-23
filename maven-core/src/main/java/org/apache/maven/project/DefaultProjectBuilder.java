@@ -219,7 +219,7 @@ public class DefaultProjectBuilder
             resolutionResult = e.getResult();
         }
 
-        Set<Artifact> artifacts = new LinkedHashSet<Artifact>();
+        Set<Artifact> artifacts = new LinkedHashSet<>();
         if ( resolutionResult.getDependencyGraph() != null )
         {
             RepositoryUtils.toArtifacts( artifacts, resolutionResult.getDependencyGraph().getChildren(),
@@ -244,7 +244,7 @@ public class DefaultProjectBuilder
 
     private List<String> getProfileIds( List<Profile> profiles )
     {
-        List<String> ids = new ArrayList<String>( profiles.size() );
+        List<String> ids = new ArrayList<>( profiles.size() );
 
         for ( Profile profile : profiles )
         {
@@ -388,15 +388,15 @@ public class DefaultProjectBuilder
     public List<ProjectBuildingResult> build( List<File> pomFiles, boolean recursive, ProjectBuildingRequest request )
         throws ProjectBuildingException
     {
-        List<ProjectBuildingResult> results = new ArrayList<ProjectBuildingResult>();
+        List<ProjectBuildingResult> results = new ArrayList<>();
 
-        List<InterimResult> interimResults = new ArrayList<InterimResult>();
+        List<InterimResult> interimResults = new ArrayList<>();
 
         ReactorModelPool modelPool = new ReactorModelPool();
 
         InternalConfig config = new InternalConfig( request, modelPool );
 
-        Map<String, MavenProject> projectIndex = new HashMap<String, MavenProject>( 256 );
+        Map<String, MavenProject> projectIndex = new HashMap<>( 256 );
 
         boolean noErrors =
             build( results, interimResults, projectIndex, pomFiles, new LinkedHashSet<File>(), true, recursive,
@@ -479,7 +479,7 @@ public class DefaultProjectBuilder
             {
                 File basedir = pomFile.getParentFile();
 
-                List<File> moduleFiles = new ArrayList<File>();
+                List<File> moduleFiles = new ArrayList<>();
 
                 for ( String module : model.getModules() )
                 {
@@ -550,7 +550,7 @@ public class DefaultProjectBuilder
                     moduleFiles.add( moduleFile );
                 }
 
-                interimResult.modules = new ArrayList<InterimResult>();
+                interimResult.modules = new ArrayList<>();
 
                 if ( !build( results, interimResult.modules, projectIndex, moduleFiles, aggregatorFiles, false,
                              recursive, config ) )
@@ -622,7 +622,7 @@ public class DefaultProjectBuilder
                 MavenProject project = interimResult.listener.getProject();
                 initProject( project, projectIndex, result, profilesXmls, request );
 
-                List<MavenProject> modules = new ArrayList<MavenProject>();
+                List<MavenProject> modules = new ArrayList<>();
                 noErrors =
                     build( results, modules, projectIndex, interimResult.modules, request, profilesXmls ) && noErrors;
 
@@ -714,7 +714,7 @@ public class DefaultProjectBuilder
             project.addTestCompileSourceRoot( build.getTestSourceDirectory() );
         }
 
-        List<Profile> activeProfiles = new ArrayList<Profile>();
+        List<Profile> activeProfiles = new ArrayList<>();
         activeProfiles.addAll( result.getActivePomProfiles( result.getModelIds().get( 0 ) ) );
         activeProfiles.addAll( result.getActiveExternalProfiles() );
         project.setActiveProfiles( activeProfiles );
@@ -742,7 +742,7 @@ public class DefaultProjectBuilder
         project.setProjectBuildingRequest( projectBuildingRequest );
 
         // pluginArtifacts
-        Set<Artifact> pluginArtifacts = new HashSet<Artifact>();
+        Set<Artifact> pluginArtifacts = new HashSet<>();
         for ( Plugin plugin : project.getBuildPlugins() )
         {
             Artifact artifact = repositorySystem.createPluginArtifact( plugin );
@@ -755,7 +755,7 @@ public class DefaultProjectBuilder
         project.setPluginArtifacts( pluginArtifacts );
 
         // reportArtifacts
-        Set<Artifact> reportArtifacts = new HashSet<Artifact>();
+        Set<Artifact> reportArtifacts = new HashSet<>();
         for ( ReportPlugin report : project.getReportPlugins() )
         {
             Plugin pp = new Plugin();
@@ -773,7 +773,7 @@ public class DefaultProjectBuilder
         project.setReportArtifacts( reportArtifacts );
 
         // extensionArtifacts
-        Set<Artifact> extensionArtifacts = new HashSet<Artifact>();
+        Set<Artifact> extensionArtifacts = new HashSet<>();
         List<Extension> extensions = project.getBuildExtensions();
         if ( extensions != null )
         {
@@ -809,7 +809,7 @@ public class DefaultProjectBuilder
             if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null )
                 && ( deps.size() > 0 ) )
             {
-                map = new HashMap<String, Artifact>();
+                map = new HashMap<>();
                 for ( Dependency d : dependencyManagement.getDependencies() )
                 {
                     Artifact artifact = repositorySystem.createDependencyArtifact( d );

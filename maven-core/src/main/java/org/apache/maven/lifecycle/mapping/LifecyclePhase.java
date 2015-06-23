@@ -50,7 +50,7 @@ public class LifecyclePhase
     
     public void set( String goals )
     {
-        mojos = new ArrayList<LifecycleMojo>();
+        mojos = new ArrayList<>();
         
         String[] mojoGoals = StringUtils.split( goals, "," );
         

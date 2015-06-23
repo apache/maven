@@ -45,7 +45,7 @@ public class ToolchainsBuildingException
     {
         super( toMessage( problems ) );
 
-        this.problems = new ArrayList<Problem>();
+        this.problems = new ArrayList<>();
         if ( problems != null )
         {
             this.problems.addAll( problems );

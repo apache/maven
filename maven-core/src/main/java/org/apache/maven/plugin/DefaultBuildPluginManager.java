@@ -189,7 +189,7 @@ public class DefaultBuildPluginManager
 
             ByteArrayOutputStream os = new ByteArrayOutputStream( 1024 );
             PrintStream ps = new PrintStream( os );
-            ps.println( "A type incompatibility occured while executing " + mojoDescriptor.getId() + ": "
+            ps.println( "A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
                 + e.getMessage() );
             pluginRealm.display( ps );
 

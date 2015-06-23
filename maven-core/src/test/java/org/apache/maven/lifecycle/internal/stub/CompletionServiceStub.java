@@ -50,7 +50,7 @@ public class CompletionServiceStub
 
     public Future<ProjectSegment> submit( Callable<ProjectSegment> task )
     {
-        FutureTask<ProjectSegment> projectBuildFutureTask = new FutureTask<ProjectSegment>( task );
+        FutureTask<ProjectSegment> projectBuildFutureTask = new FutureTask<>( task );
         projectBuildFutureTasks.add( projectBuildFutureTask );
         if ( finishImmediately )
         {
@@ -61,7 +61,7 @@ public class CompletionServiceStub
 
     public Future<ProjectSegment> submit( Runnable task, ProjectSegment result )
     {
-        FutureTask<ProjectSegment> projectBuildFutureTask = new FutureTask<ProjectSegment>( task, result );
+        FutureTask<ProjectSegment> projectBuildFutureTask = new FutureTask<>( task, result );
         projectBuildFutureTasks.add( projectBuildFutureTask );
         if ( finishImmediately )
         {

@@ -40,7 +40,7 @@ public abstract class DefaultToolchain // should have been AbstractToolchain...
 
     private String type;
 
-    private Map<String, RequirementMatcher> provides = new HashMap<String, RequirementMatcher>();
+    private Map<String, RequirementMatcher> provides = new HashMap<>();
 
     public static final String KEY_TYPE = "type"; //NOI18N
 

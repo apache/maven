@@ -37,15 +37,15 @@ class DefaultDependencyResolutionResult
 
     private DependencyNode root;
 
-    private List<Dependency> dependencies = new ArrayList<Dependency>();
+    private List<Dependency> dependencies = new ArrayList<>();
 
-    private List<Dependency> resolvedDependencies = new ArrayList<Dependency>();
+    private List<Dependency> resolvedDependencies = new ArrayList<>();
 
-    private List<Dependency> unresolvedDependencies = new ArrayList<Dependency>();
+    private List<Dependency> unresolvedDependencies = new ArrayList<>();
 
-    private List<Exception> collectionErrors = new ArrayList<Exception>();
+    private List<Exception> collectionErrors = new ArrayList<>();
 
-    private Map<Dependency, List<Exception>> resolutionErrors = new IdentityHashMap<Dependency, List<Exception>>();
+    private Map<Dependency, List<Exception>> resolutionErrors = new IdentityHashMap<>();
 
     public DependencyNode getDependencyGraph()
     {
@@ -91,7 +91,7 @@ class DefaultDependencyResolutionResult
         }
         else
         {
-            this.collectionErrors = new ArrayList<Exception>();
+            this.collectionErrors = new ArrayList<>();
         }
     }
 

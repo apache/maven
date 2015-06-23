@@ -44,7 +44,7 @@ public class ConcurrencyDependencyGraph
 
     private final ProjectDependencyGraph projectDependencyGraph;
 
-    private final HashSet<MavenProject> finishedProjects = new HashSet<MavenProject>();
+    private final HashSet<MavenProject> finishedProjects = new HashSet<>();
 
     public ConcurrencyDependencyGraph( ProjectBuildList projectBuilds, ProjectDependencyGraph projectDependencyGraph )
     {
@@ -65,7 +65,7 @@ public class ConcurrencyDependencyGraph
 
     public List<MavenProject> getRootSchedulableBuilds()
     {
-        List<MavenProject> result = new ArrayList<MavenProject>();
+        List<MavenProject> result = new ArrayList<>();
         for ( ProjectSegment projectBuild : projectBuilds )
         {
             if ( projectDependencyGraph.getUpstreamProjects( projectBuild.getProject(), false ).size() == 0 )
@@ -90,7 +90,7 @@ public class ConcurrencyDependencyGraph
 
     private List<MavenProject> getSchedulableNewProcesses( MavenProject finishedProject )
     {
-        List<MavenProject> result = new ArrayList<MavenProject>();
+        List<MavenProject> result = new ArrayList<>();
         // schedule dependent projects, if all of their requirements are met
         for ( MavenProject dependentProject : projectDependencyGraph.getDownstreamProjects( finishedProject, false ) )
         {
@@ -109,7 +109,7 @@ public class ConcurrencyDependencyGraph
      */
     public Set<MavenProject> getUnfinishedProjects()
     {
-        Set<MavenProject> unfinished = new HashSet<MavenProject>( projectBuilds.getProjects() );
+        Set<MavenProject> unfinished = new HashSet<>( projectBuilds.getProjects() );
         unfinished.remove( finishedProjects );
         return unfinished;
     }

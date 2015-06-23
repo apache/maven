@@ -63,7 +63,7 @@ public final class ModelUtils
 
         if ( ( parentPlugins != null ) && !parentPlugins.isEmpty() )
         {
-            parentPlugins = new ArrayList<Plugin>( parentPlugins );
+            parentPlugins = new ArrayList<>( parentPlugins );
 
             // If we're processing this merge as an inheritance, we have to build up a list of
             // plugins that were considered for inheritance.
@@ -82,7 +82,7 @@ public final class ModelUtils
                 }
             }
 
-            List<Plugin> assembledPlugins = new ArrayList<Plugin>();
+            List<Plugin> assembledPlugins = new ArrayList<>();
 
             Map<String, Plugin> childPlugins = childContainer.getPluginsAsMap();
 
@@ -134,16 +134,16 @@ public final class ModelUtils
     public static List<Plugin> orderAfterMerge( List<Plugin> merged, List<Plugin> highPrioritySource,
                                                 List<Plugin> lowPrioritySource )
     {
-        List<Plugin> results = new ArrayList<Plugin>();
+        List<Plugin> results = new ArrayList<>();
 
         if ( !merged.isEmpty() )
         {
             results.addAll( merged );
         }
 
-        List<Plugin> missingFromResults = new ArrayList<Plugin>();
+        List<Plugin> missingFromResults = new ArrayList<>();
 
-        List<List<Plugin>> sources = new ArrayList<List<Plugin>>();
+        List<List<Plugin>> sources = new ArrayList<>();
 
         sources.add( highPrioritySource );
         sources.add( lowPrioritySource );
@@ -222,9 +222,9 @@ public final class ModelUtils
 
         if ( ( parentExecutions != null ) && !parentExecutions.isEmpty() )
         {
-            List<PluginExecution> mergedExecutions = new ArrayList<PluginExecution>();
+            List<PluginExecution> mergedExecutions = new ArrayList<>();
 
-            Map<String, PluginExecution> assembledExecutions = new TreeMap<String, PluginExecution>();
+            Map<String, PluginExecution> assembledExecutions = new TreeMap<>();
 
             Map<String, PluginExecution> childExecutions = child.getExecutionsAsMap();
 
@@ -282,7 +282,7 @@ public final class ModelUtils
         List<String> parentGoals = parent.getGoals();
         List<String> childGoals = child.getGoals();
 
-        List<String> goals = new ArrayList<String>();
+        List<String> goals = new ArrayList<>();
 
         if ( ( childGoals != null ) && !childGoals.isEmpty() )
         {
@@ -312,7 +312,7 @@ public final class ModelUtils
 
     public static List<Repository> mergeRepositoryLists( List<Repository> dominant, List<Repository> recessive )
     {
-        List<Repository> repositories = new ArrayList<Repository>();
+        List<Repository> repositories = new ArrayList<>();
 
         for ( Repository repository : dominant )
         {
@@ -343,7 +343,7 @@ public final class ModelUtils
 
     private static List<Dependency> mergeDependencyList( List<Dependency> child, List<Dependency> parent )
     {
-        Map<String, Dependency> depsMap = new LinkedHashMap<String, Dependency>();
+        Map<String, Dependency> depsMap = new LinkedHashMap<>();
 
         if ( parent != null )
         {
@@ -361,7 +361,7 @@ public final class ModelUtils
             }
         }
 
-        return new ArrayList<Dependency>( depsMap.values() );
+        return new ArrayList<>( depsMap.values() );
     }
 
 }

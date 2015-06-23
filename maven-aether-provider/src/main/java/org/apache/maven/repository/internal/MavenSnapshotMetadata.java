@@ -34,7 +34,7 @@ abstract class MavenSnapshotMetadata
 {
     static final String SNAPSHOT = "SNAPSHOT";
 
-    protected final Collection<Artifact> artifacts = new ArrayList<Artifact>();
+    protected final Collection<Artifact> artifacts = new ArrayList<>();
 
     protected final boolean legacyFormat;
 

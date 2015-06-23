@@ -91,14 +91,14 @@ public class ProjectModelResolver
         this.trace = trace;
         this.resolver = resolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
-        this.pomRepositories = new ArrayList<RemoteRepository>();
-        List<RemoteRepository> externalRepositories = new ArrayList<RemoteRepository>();
+        this.pomRepositories = new ArrayList<>();
+        List<RemoteRepository> externalRepositories = new ArrayList<>();
         externalRepositories.addAll( repositories );
         this.externalRepositories = Collections.unmodifiableList( externalRepositories );
-        this.repositories = new ArrayList<RemoteRepository>();
+        this.repositories = new ArrayList<>();
         this.repositories.addAll( externalRepositories );
         this.repositoryMerging = repositoryMerging;
-        this.repositoryIds = new HashSet<String>();
+        this.repositoryIds = new HashSet<>();
         this.modelPool = modelPool;
     }
 
@@ -108,11 +108,11 @@ public class ProjectModelResolver
         this.trace = original.trace;
         this.resolver = original.resolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
-        this.pomRepositories = new ArrayList<RemoteRepository>( original.pomRepositories );
+        this.pomRepositories = new ArrayList<>( original.pomRepositories );
         this.externalRepositories = original.externalRepositories;
-        this.repositories = new ArrayList<RemoteRepository>( original.repositories );
+        this.repositories = new ArrayList<>( original.repositories );
         this.repositoryMerging = original.repositoryMerging;
-        this.repositoryIds = new HashSet<String>( original.repositoryIds );
+        this.repositoryIds = new HashSet<>( original.repositoryIds );
         this.modelPool = original.modelPool;
     }
 

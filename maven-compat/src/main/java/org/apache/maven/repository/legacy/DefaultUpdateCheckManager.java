@@ -19,6 +19,17 @@ package org.apache.maven.repository.legacy;
  * under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.Authentication;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.apache.maven.repository.Proxy;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,17 +41,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Properties;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.Authentication;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
-import org.apache.maven.repository.Proxy;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
 
 @Component( role = UpdateCheckManager.class )
 public class DefaultUpdateCheckManager
@@ -75,8 +75,8 @@ public class DefaultUpdateCheckManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "Skipping update check for " + artifact + " (" + file + ") from "
-                                       + repository.getId() + " (" + repository.getUrl() + ")" );
+                    "Skipping update check for " + artifact + " (" + file + ") from " + repository.getId() + " ("
+                        + repository.getUrl() + ")" );
             }
 
             return false;
@@ -85,8 +85,8 @@ public class DefaultUpdateCheckManager
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Determining update check for " + artifact + " (" + file + ") from "
-                                   + repository.getId() + " (" + repository.getUrl() + ")" );
+                "Determining update check for " + artifact + " (" + file + ") from " + repository.getId() + " ("
+                    + repository.getUrl() + ")" );
         }
 
         if ( file == null )
@@ -99,7 +99,7 @@ public class DefaultUpdateCheckManager
 
         if ( file.exists() )
         {
-            lastCheckDate = new Date ( file.lastModified() );
+            lastCheckDate = new Date( file.lastModified() );
         }
         else
         {
@@ -125,8 +125,8 @@ public class DefaultUpdateCheckManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "Skipping update check for " + metadata.getKey() + " (" + file + ") from "
-                                       + repository.getId() + " (" + repository.getUrl() + ")" );
+                    "Skipping update check for " + metadata.getKey() + " (" + file + ") from " + repository.getId()
+                        + " (" + repository.getUrl() + ")" );
             }
 
             return false;
@@ -135,8 +135,8 @@ public class DefaultUpdateCheckManager
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Determining update check for " + metadata.getKey() + " (" + file + ") from "
-                                   + repository.getId() + " (" + repository.getUrl() + ")" );
+                "Determining update check for " + metadata.getKey() + " (" + file + ") from " + repository.getId()
+                    + " (" + repository.getUrl() + ")" );
         }
 
         if ( file == null )
@@ -282,8 +282,9 @@ public class DefaultUpdateCheckManager
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Failed to record lastUpdated information for resolution.\nFile: "
-                                       + touchfile.toString() + "; key: " + key, e );
+                getLogger().debug(
+                    "Failed to record lastUpdated information for resolution.\nFile: " + touchfile.toString()
+                        + "; key: " + key, e );
             }
             finally
             {
@@ -295,8 +296,8 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: "
-                                               + touchfile, e );
+                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: " + touchfile,
+                                           e );
                     }
                 }
 
@@ -308,8 +309,7 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error closing FileChannel for resolution tracking file: "
-                                               + touchfile, e );
+                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " + touchfile, e );
                     }
                 }
             }

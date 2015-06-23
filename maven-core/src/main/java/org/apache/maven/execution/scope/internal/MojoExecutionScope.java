@@ -54,7 +54,7 @@ public class MojoExecutionScope
         public final Map<Key<?>, Object> provided = Maps.newHashMap();
     }
 
-    private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<LinkedList<ScopeState>>();
+    private final ThreadLocal<LinkedList<ScopeState>> values = new ThreadLocal<>();
 
     public MojoExecutionScope()
     {
@@ -65,7 +65,7 @@ public class MojoExecutionScope
         LinkedList<ScopeState> stack = values.get();
         if ( stack == null )
         {
-            stack = new LinkedList<ScopeState>();
+            stack = new LinkedList<>();
             values.set( stack );
         }
         stack.addFirst( new ScopeState() );
@@ -177,7 +177,7 @@ public class MojoExecutionScope
         // the same instance can be provided multiple times under different Key's
         // deduplicate instances to avoid redundant beforeXXX/afterXXX callbacks
         IdentityHashMap<WeakMojoExecutionListener, Object> listeners =
-            new IdentityHashMap<WeakMojoExecutionListener, Object>();
+            new IdentityHashMap<>();
         for ( Object provided : getScopeState().provided.values() )
         {
             if ( provided instanceof WeakMojoExecutionListener )

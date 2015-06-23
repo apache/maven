@@ -69,7 +69,7 @@ public class DefaultMavenExecutionRequestPopulator
     {
         if ( toolchains != null )
         {
-            Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<String, List<ToolchainModel>>( 2 );
+            Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<>( 2 );
 
             for ( ToolchainModel model : toolchains.getToolchains() )
             {

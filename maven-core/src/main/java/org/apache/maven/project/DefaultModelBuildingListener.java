@@ -114,19 +114,7 @@ public class DefaultModelBuildingListener
                 project.setClassRealm( record.realm );
                 project.setExtensionDependencyFilter( record.extensionArtifactFilter );
             }
-            catch ( PluginResolutionException e )
-            {
-                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Unresolveable build extension: " + e.getMessage() )
-                        .setException( e ) );
-            }
-            catch ( PluginVersionResolutionException e )
-            {
-                event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                        .setMessage( "Unresolveable build extension: " + e.getMessage() )
-                        .setException( e ) );
-            }
-            catch ( PluginManagerException e )
+            catch ( PluginResolutionException | PluginManagerException | PluginVersionResolutionException e )
             {
                 event.getProblems().add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
                         .setMessage( "Unresolveable build extension: " + e.getMessage() )

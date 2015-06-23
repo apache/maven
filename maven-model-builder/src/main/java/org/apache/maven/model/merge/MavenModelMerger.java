@@ -28,17 +28,13 @@ import java.util.Set;
 
 import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.CiManagement;
-import org.apache.maven.model.Contributor;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DeploymentRepository;
-import org.apache.maven.model.Developer;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.IssueManagement;
-import org.apache.maven.model.License;
-import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Organization;
@@ -204,7 +200,7 @@ public class MavenModelMerger
     {
         if ( target.getLicenses().isEmpty() )
         {
-            target.setLicenses( new ArrayList<License>( source.getLicenses() ) );
+            target.setLicenses( new ArrayList<>( source.getLicenses() ) );
         }
     }
 
@@ -214,7 +210,7 @@ public class MavenModelMerger
     {
         if ( target.getDevelopers().isEmpty() )
         {
-            target.setDevelopers( new ArrayList<Developer>( source.getDevelopers() ) );
+            target.setDevelopers( new ArrayList<>( source.getDevelopers() ) );
         }
     }
 
@@ -224,7 +220,7 @@ public class MavenModelMerger
     {
         if ( target.getContributors().isEmpty() )
         {
-            target.setContributors( new ArrayList<Contributor>( source.getContributors() ) );
+            target.setContributors( new ArrayList<>( source.getContributors() ) );
         }
     }
 
@@ -234,7 +230,7 @@ public class MavenModelMerger
     {
         if ( target.getMailingLists().isEmpty() )
         {
-            target.setMailingLists( new ArrayList<MailingList>( source.getMailingLists() ) );
+            target.setMailingLists( new ArrayList<>( source.getMailingLists() ) );
         }
     }
 
@@ -245,10 +241,10 @@ public class MavenModelMerger
         List<String> src = source.getModules();
         if ( !src.isEmpty() && sourceDominant )
         {
-            List<Integer> indices = new ArrayList<Integer>();
+            List<Integer> indices = new ArrayList<>();
             List<String> tgt = target.getModules();
-            Set<String> excludes = new LinkedHashSet<String>( tgt );
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            Set<String> excludes = new LinkedHashSet<>( tgt );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             for ( int i = 0, n = tgt.size(); i < n; i++ )
             {
@@ -281,7 +277,7 @@ public class MavenModelMerger
         if ( !src.isEmpty() )
         {
             List<Repository> tgt = target.getRepositories();
-            Map<Object, Repository> merged = new LinkedHashMap<Object, Repository>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Repository> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             List<Repository> dominant, recessive;
             if ( sourceDominant )
@@ -310,7 +306,7 @@ public class MavenModelMerger
                 }
             }
 
-            target.setRepositories( new ArrayList<Repository>( merged.values() ) );
+            target.setRepositories( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -322,7 +318,7 @@ public class MavenModelMerger
         if ( !src.isEmpty() )
         {
             List<Repository> tgt = target.getPluginRepositories();
-            Map<Object, Repository> merged = new LinkedHashMap<Object, Repository>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, Repository> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             List<Repository> dominant, recessive;
             if ( sourceDominant )
@@ -351,7 +347,7 @@ public class MavenModelMerger
                 }
             }
 
-            target.setPluginRepositories( new ArrayList<Repository>( merged.values() ) );
+            target.setPluginRepositories( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -366,8 +362,8 @@ public class MavenModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getFilters();
-            Set<String> excludes = new LinkedHashSet<String>( tgt );
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            Set<String> excludes = new LinkedHashSet<>( tgt );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             for ( String s : src )
             {
@@ -543,7 +539,7 @@ public class MavenModelMerger
         {
             List<PluginExecution> tgt = target.getExecutions();
             Map<Object, PluginExecution> merged =
-                new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
+                new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( PluginExecution element : src )
             {
@@ -566,7 +562,7 @@ public class MavenModelMerger
                 merged.put( key, element );
             }
 
-            target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
+            target.setExecutions( new ArrayList<>( merged.values() ) );
         }
     }
 
@@ -578,8 +574,8 @@ public class MavenModelMerger
         if ( !src.isEmpty() )
         {
             List<String> tgt = target.getGoals();
-            Set<String> excludes = new LinkedHashSet<String>( tgt );
-            List<String> merged = new ArrayList<String>( tgt.size() + src.size() );
+            Set<String> excludes = new LinkedHashSet<>( tgt );
+            List<String> merged = new ArrayList<>( tgt.size() + src.size() );
             merged.addAll( tgt );
             for ( String s : src )
             {
@@ -600,7 +596,7 @@ public class MavenModelMerger
         if ( !src.isEmpty() )
         {
             List<ReportSet> tgt = target.getReportSets();
-            Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
+            Map<Object, ReportSet> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
             for ( ReportSet rset : src )
             {
@@ -622,7 +618,7 @@ public class MavenModelMerger
                 merged.put( key, element );
             }
 
-            target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
+            target.setReportSets( new ArrayList<>( merged.values() ) );
         }
     }
 

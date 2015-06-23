@@ -50,7 +50,7 @@ public class ExecutionPlanItem
     {
         BuilderCommon.attachToThread( mavenProject );
 
-        List<ExecutionPlanItem> result = new ArrayList<ExecutionPlanItem>();
+        List<ExecutionPlanItem> result = new ArrayList<>();
         for ( MojoExecution mojoExecution : executions )
         {
             result.add( new ExecutionPlanItem( mojoExecution ) );

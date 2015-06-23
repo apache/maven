@@ -90,7 +90,7 @@ public class BootstrapCoreExtensionManager
                                                             List<CoreExtension> configuration )
         throws Exception
     {
-        List<CoreExtensionEntry> extensions = new ArrayList<CoreExtensionEntry>();
+        List<CoreExtensionEntry> extensions = new ArrayList<>();
 
         DependencyFilter dependencyFilter = new ExclusionsDependencyFilter( providedArtifacts );
 

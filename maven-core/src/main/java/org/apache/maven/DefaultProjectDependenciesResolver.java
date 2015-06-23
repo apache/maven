@@ -91,7 +91,7 @@ public class DefaultProjectDependenciesResolver
                                        Set<String> projectIds )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        Set<Artifact> resolved = new LinkedHashSet<Artifact>();
+        Set<Artifact> resolved = new LinkedHashSet<>();
 
         if ( projects == null || projects.isEmpty() )
         {
@@ -166,7 +166,7 @@ public class DefaultProjectDependenciesResolver
             catch ( MultipleArtifactsNotFoundException e )
             {
 
-                Collection<Artifact> missing = new HashSet<Artifact>( e.getMissingArtifacts() );
+                Collection<Artifact> missing = new HashSet<>( e.getMissingArtifacts() );
 
                 for ( Iterator<Artifact> it = missing.iterator(); it.hasNext(); )
                 {
@@ -192,7 +192,7 @@ public class DefaultProjectDependenciesResolver
 
     private Set<String> getIgnorableArtifacts( Collection<? extends MavenProject> projects )
     {
-        Set<String> projectIds = new HashSet<String>( projects.size() * 2 );
+        Set<String> projectIds = new HashSet<>( projects.size() * 2 );
 
         for ( MavenProject p : projects )
         {
@@ -204,7 +204,7 @@ public class DefaultProjectDependenciesResolver
 
     private Set<String> getIgnorableArtifacts( Iterable<Artifact> artifactIterable )
     {
-        Set<String> projectIds = new HashSet<String>();
+        Set<String> projectIds = new HashSet<>();
 
         for ( Artifact artifact : artifactIterable )
         {

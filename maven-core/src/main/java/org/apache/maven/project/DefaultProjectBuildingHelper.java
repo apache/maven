@@ -88,7 +88,7 @@ public class DefaultProjectBuildingHelper
                                                                 ProjectBuildingRequest request )
         throws InvalidRepositoryException
     {
-        List<ArtifactRepository> internalRepositories = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> internalRepositories = new ArrayList<>();
 
         for ( Repository repository : pomRepositories )
         {
@@ -115,8 +115,8 @@ public class DefaultProjectBuildingHelper
             recessiveRepositories = externalRepositories;
         }
 
-        List<ArtifactRepository> artifactRepositories = new ArrayList<ArtifactRepository>();
-        Collection<String> repoIds = new HashSet<String>();
+        List<ArtifactRepository> artifactRepositories = new ArrayList<>();
+        Collection<String> repoIds = new HashSet<>();
 
         if ( dominantRepositories != null )
         {
@@ -149,7 +149,7 @@ public class DefaultProjectBuildingHelper
     {
         ClassRealm projectRealm;
 
-        List<Plugin> extensionPlugins = new ArrayList<Plugin>();
+        List<Plugin> extensionPlugins = new ArrayList<>();
 
         Build build = model.getBuild();
 
@@ -183,13 +183,13 @@ public class DefaultProjectBuildingHelper
             return new ProjectRealmCache.CacheRecord( null, null );
         }
 
-        List<ClassRealm> extensionRealms = new ArrayList<ClassRealm>();
+        List<ClassRealm> extensionRealms = new ArrayList<>();
 
-        Map<ClassRealm, List<String>> exportedPackages = new HashMap<ClassRealm, List<String>>();
+        Map<ClassRealm, List<String>> exportedPackages = new HashMap<>();
 
-        Map<ClassRealm, List<String>> exportedArtifacts = new HashMap<ClassRealm, List<String>>();
+        Map<ClassRealm, List<String>> exportedArtifacts = new HashMap<>();
 
-        List<Artifact> publicArtifacts = new ArrayList<Artifact>();
+        List<Artifact> publicArtifacts = new ArrayList<>();
 
         for ( Plugin plugin : extensionPlugins )
         {
@@ -232,7 +232,7 @@ public class DefaultProjectBuildingHelper
         {
             projectRealm = classRealmManager.createProjectRealm( model, toAetherArtifacts( publicArtifacts ) );
 
-            Set<String> exclusions = new LinkedHashSet<String>();
+            Set<String> exclusions = new LinkedHashSet<>();
 
             for ( ClassRealm extensionRealm : extensionRealms )
             {
@@ -289,7 +289,7 @@ public class DefaultProjectBuildingHelper
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts( final List<Artifact> pluginArtifacts )
     {
-        return new ArrayList<org.eclipse.aether.artifact.Artifact>( RepositoryUtils.toArtifacts( pluginArtifacts ) );
+        return new ArrayList<>( RepositoryUtils.toArtifacts( pluginArtifacts ) );
     }
 
 }
