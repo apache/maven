@@ -21,11 +21,9 @@ package org.apache.maven.repository.internal;
 
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.impl.VersionRangeResolver;
-import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResult;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.Version;
-import org.eclipse.aether.version.VersionScheme;
 
 /**
  * Tests the {@link DefaultVersionRangeResolver} based on 'virtual' repository data stored at
@@ -35,26 +33,22 @@ import org.eclipse.aether.version.VersionScheme;
  * Design document for dependency version ranges: <a
  * href="http://docs.codehaus.org/display/MAVEN/Dependency+Mediation+and+Conflict+Resolution"
  * >http://docs.codehaus.org/display/MAVEN/Dependency+Mediation+and+Conflict+Resolution</a>
- * </p>
  */
-public class DefaultVersionRangeResolverTest
-    extends AbstractRepositoryTestCase
+public class MavenDefaultVersionRangeResolverTest
+        extends AbstractVersionRangeTestCase
 {
-    private final VersionScheme versionScheme = new GenericVersionScheme();
-
-    private DefaultVersionRangeResolver sut;
-
-    private VersionRangeRequest request;
+  private MavenDefaultVersionRangeResolver sut;
 
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        // be sure we're testing the right class, i.e. DefaultVersionRangeResolver.class
-        sut = (DefaultVersionRangeResolver) lookup( VersionRangeResolver.class, "default" );
-        request = new VersionRangeRequest();
-        request.addRepository( newTestRepository() );
+      // be sure we're testing the right class, i.e. DefaultVersionRangeResolver.class
+      final VersionRangeResolver resolver = lookup(VersionRangeResolver.class,
+              MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY );
+      assertTrue( MavenDefaultVersionRangeResolver.class.isInstance( resolver ) );
+      sut = (MavenDefaultVersionRangeResolver) resolver;
     }
 
     @Override
