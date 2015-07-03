@@ -26,7 +26,7 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.Version;
 
 /**
- * Tests the {@link DefaultVersionRangeResolver} based on 'virtual' repository data stored at
+ * Tests the {@link MavenDefaultVersionRangeResolver} based on 'virtual' repository data stored at
  * {@literal /maven-aether-provider/src/test/resources/repo/org/apache/maven/its/mng-3092/maven-metadata.xml}
  * <p>
  * Note: Information about the version scheme: {@link org.eclipse.aether.util.version.GenericVersionScheme}.<br/>
