@@ -60,6 +60,8 @@ public class StrategyVersionRangeResolver
           hint = MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY )
   private VersionRangeResolver defaultMavenVersionRangeResolver;
 
+  private VersionRangeResolver actualVersionRangeResolver;
+
   // the key of the entry is the component`s hint.
   @Requirement( role = VersionRangeResolver.class )
   private Map<String, VersionRangeResolver> versionrangeResolverStrategies;
@@ -101,7 +103,7 @@ public class StrategyVersionRangeResolver
   {
     if ( versionRangeResolverStrategies == null )
     {
-      throw new IllegalArgumentException( "version range resolver  not been specified" );
+      throw new IllegalArgumentException( "version range resolver strategy not been specified" );
     }
     for ( VersionRangeResolver versionRangeResolverStrategy : versionRangeResolverStrategies )
     {
@@ -119,7 +121,7 @@ public class StrategyVersionRangeResolver
   {
     if ( versionRangeResolverStrategies == null )
     {
-      throw new IllegalArgumentException( "version range resolver  not been specified" );
+      throw new IllegalArgumentException( "version range resolver strategy not been specified" );
     }
     this.versionrangeResolverStrategies = versionRangeResolverStrategies;
     return this;
@@ -145,17 +147,25 @@ public class StrategyVersionRangeResolver
    */
   VersionRangeResolver getVersionRangeResolverStrategy() throws VersionRangeResolutionException
   {
+    if ( actualVersionRangeResolver != null )
+    {
+      return actualVersionRangeResolver;
+    }
+    final String strategyName = getStrategyName();
     final VersionRangeResolver versionRangeResolver = null == getVersionrangeResolverStrategies() ? null
-            : getVersionrangeResolverStrategies().get( getStrategyName() );
+            : getVersionrangeResolverStrategies().get( strategyName );
     if ( null == versionRangeResolver )
     {
+      logger.debug( String.format( "Could not find a version range resolver strategy for name: %1$s", strategyName ) );
       if ( defaultMavenVersionRangeResolver != null )
       {
-        return defaultMavenVersionRangeResolver;
+        return actualVersionRangeResolver = defaultMavenVersionRangeResolver;
       }
       throw new VersionRangeResolutionException( null, "Invalid version range resolver strategy." );
     }
-    return versionRangeResolver;
+    logger.debug( String.format( "Using version range resolver strategy: %1$s [%2$s]", versionRangeResolver.getClass().
+            getName(), strategyName ) );
+    return actualVersionRangeResolver = versionRangeResolver;
   }
 
   /**
@@ -164,10 +174,10 @@ public class StrategyVersionRangeResolver
    */
   String getStrategyName()
   {
-    final String strategyName = StringUtils.trim( System.getProperty( STRATEGY_PROPERTY_KEY,
+    String strategyName = StringUtils.trim( System.getProperty( STRATEGY_PROPERTY_KEY,
             MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY ) );
-    return StringUtils.isBlank( strategyName ) ? MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY
-            : strategyName;
+    return StringUtils.isBlank( strategyName )
+            ? MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY : strategyName;
   }
 
 }
