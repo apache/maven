@@ -28,7 +28,7 @@ import static org.apache.maven.repository.internal.AbstractRepositoryTestCase.ne
  *
  *
  */
-public class AbstractVersionRangeTestCase extends AbstractRepositoryTestCase
+public abstract class AbstractVersionRangeTestCase extends AbstractRepositoryTestCase
 {
 
   protected final VersionRangeRequest request = new VersionRangeRequest();
