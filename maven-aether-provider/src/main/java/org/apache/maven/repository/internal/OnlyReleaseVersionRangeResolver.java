@@ -36,9 +36,19 @@ import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.version.Version;
 
 /**
- * This implementation resolve <b>only released</b> artifact versions in a version range.
- *
+ * This implementation ({@value #VERSION_RANGE_RESOLVER_STRATEGY}) resolve all artifact versions in a version range and
+ * removes all "SNAPSHOT" versions.
+ * <p>
+ * Use the delegate {@link VersionRangeResolver} to resolve all versions within the version range and remove all
+ * "SNAPSHOT" version.
+ * </p>
+ * <p>
+ * version range: (,3.0.0]<br/>
+ * found versions: 1.0.0-SNAPSHOT,1.0.0, 1.0.1-SNAPSHOT, 2.0.0-SNAPSHOT, 2.0.0, 2.1.0-SNAPSHOT, 3.0.0-SNAPSHOT<br/>
+ * returned versions: 1.0.0, 2.0.0
+ * </p>
  */
+
 @Named
 @Component( role = VersionRangeResolver.class, hint = OnlyReleaseVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY )
 public class OnlyReleaseVersionRangeResolver
@@ -60,30 +70,42 @@ public class OnlyReleaseVersionRangeResolver
   }
 
   @Override
-  public void initService( ServiceLocator locator )
+  public void initService( final ServiceLocator locator )
   {
     setLoggerFactory( locator.getService( LoggerFactory.class ) );
-    MavenDefaultVersionRangeResolver mavenDefaultVersionRangeResolver = new MavenDefaultVersionRangeResolver();
-    mavenDefaultVersionRangeResolver.initService( locator );
-    setDelegateVersionRangeResolver( mavenDefaultVersionRangeResolver );
+    if ( null == delegateVersionRangeResolver )
+    {
+      MavenDefaultVersionRangeResolver mavenDefaultVersionRangeResolver = new MavenDefaultVersionRangeResolver();
+      mavenDefaultVersionRangeResolver.initService( locator );
+      setDelegateVersionRangeResolver( mavenDefaultVersionRangeResolver );
+    }
   }
 
-  public final OnlyReleaseVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
+  public final OnlyReleaseVersionRangeResolver setLoggerFactory( final LoggerFactory loggerFactory )
   {
     this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
     return this;
   }
 
-  void setLogger( LoggerFactory loggerFactory )
+  void setLogger( final LoggerFactory loggerFactory )
   {
     // plexus support
     setLoggerFactory( loggerFactory );
   }
 
+  /**
+   * Set the {@link VersionRangeResolver} who resolves all versions within the version range.
+   *
+   * @param delegateVersionRangeResolver must not be {@code null}
+   *
+   * @return this instance for fluent API
+   *
+   * @throws IllegalArgumentException if passed {@link VersionRangeResolver} is {@code null}
+   */
   public final OnlyReleaseVersionRangeResolver setDelegateVersionRangeResolver(
-          VersionRangeResolver delegateVersionRangeResolver )
+          final VersionRangeResolver delegateVersionRangeResolver )
   {
-    if ( delegateVersionRangeResolver == null )
+    if ( null == delegateVersionRangeResolver )
     {
       throw new IllegalArgumentException( "all version range resolver has not been specified" );
     }
@@ -92,15 +114,18 @@ public class OnlyReleaseVersionRangeResolver
   }
 
   @Override
-  public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
-          throws VersionRangeResolutionException
+  public VersionRangeResult resolveVersionRange( final RepositorySystemSession session,
+          final VersionRangeRequest request ) throws VersionRangeResolutionException
   {
-    VersionRangeResult resolveVersionRange = delegateVersionRangeResolver.resolveVersionRange( session, request );
+    if ( null == delegateVersionRangeResolver )
+    {
+      throw new VersionRangeResolutionException( null, "No internal version range resolver available." );
+    }
+    final VersionRangeResult resolveVersionRange = delegateVersionRangeResolver.resolveVersionRange( session, request );
     for ( Iterator<Version> it = resolveVersionRange.getVersions().iterator(); it.hasNext(); )
     {
-      String version = it.next().toString();
       // XXX: better way to identify a SNAPSHOT version
-      if ( version.endsWith( "SNAPSHOT" ) )
+      if ( String.valueOf( it.next() ).endsWith( "SNAPSHOT" ) )
       {
         it.remove();
       }

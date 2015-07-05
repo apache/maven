@@ -19,6 +19,8 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -38,8 +40,16 @@ import org.eclipse.aether.spi.log.LoggerFactory;
 import org.eclipse.aether.spi.log.NullLoggerFactory;
 
 /**
- * <a href="http://blog.sonatype.com/2009/05/plexus-container-five-minute-tutorial/#.VZMjgeeX2Rs">
- * http://blog.sonatype.com/2009/05/plexus-container-five-minute-tutorial/#.VZMjgeeX2Rs</a>
+ * This {@link VersionRangeResolver} implementation choose a named {@link VersionRangeResolver} based on system property
+ * {@value StrategyVersionRangeResolver#STRATEGY_PROPERTY_KEY}.
+ *
+ * <p>
+ * This implementation is the default implementation of {@link VersionRangeResolver}.
+ * It choose the concrete strategy out of all registered {@link VersionRangeResolver} instances.
+ * <br/>
+ * If the strategy is unknown the {@link MavenDefaultVersionRangeResolver}
+ * ({@value MavenDefaultVersionRangeResolver#VERSION_RANGE_RESOLVER_STRATEGY}) is used.
+ * </p>
  */
 @Named
 @Component( role = VersionRangeResolver.class )
@@ -64,7 +74,8 @@ public class StrategyVersionRangeResolver
 
   // the key of the entry is the component`s hint.
   @Requirement( role = VersionRangeResolver.class )
-  private Map<String, VersionRangeResolver> versionrangeResolverStrategies;
+  private Map<String, VersionRangeResolver> versionrangeResolverStrategies
+          = new HashMap<String, VersionRangeResolver>();
 
   public StrategyVersionRangeResolver()
   {
@@ -98,13 +109,23 @@ public class StrategyVersionRangeResolver
     setLoggerFactory( loggerFactory );
   }
 
+  /**
+   * Replace all {@link VersionRangeResolver} strategies with the passed list.
+   *
+   * @param versionRangeResolverStrategies must not be {@code null}
+   *
+   * @return this instance for fluent API
+   *
+   * @throws IllegalArgumentException if the passed list is {@code null}
+   */
   public final StrategyVersionRangeResolver setVersionRangeResolverStrategies(
           List<VersionRangeResolver> versionRangeResolverStrategies )
   {
-    if ( versionRangeResolverStrategies == null )
+    if ( null == versionRangeResolverStrategies )
     {
       throw new IllegalArgumentException( "version range resolver strategy not been specified" );
     }
+    this.versionrangeResolverStrategies.clear();
     for ( VersionRangeResolver versionRangeResolverStrategy : versionRangeResolverStrategies )
     {
       if ( null == versionRangeResolverStrategy )
@@ -112,24 +133,42 @@ public class StrategyVersionRangeResolver
         continue;
       }
       final Component component = versionRangeResolverStrategy.getClass().getAnnotation( Component.class );
+      if ( component != null && ! ! !versionrangeResolverStrategies.containsKey( component.hint() ) )
+      {
+        versionrangeResolverStrategies.put( component.hint(), versionRangeResolverStrategy );
+      }
     }
     return this;
   }
 
+  /**
+   * Replace all {@link VersionRangeResolver} strategies with the passed map.
+   *
+   * @param versionRangeResolverStrategies must not be {@code null}
+   *
+   * @return this instance for fluent API
+   *
+   * @throws IllegalArgumentException if the passed map is {@code null}
+   */
   public final StrategyVersionRangeResolver setVersionRangeResolverStrategies(
           Map<String, VersionRangeResolver> versionRangeResolverStrategies )
   {
-    if ( versionRangeResolverStrategies == null )
+    if ( null == versionRangeResolverStrategies )
     {
-      throw new IllegalArgumentException( "version range resolver strategy not been specified" );
+      throw new IllegalArgumentException( "version range resolver strategy map not been specified" );
     }
-    this.versionrangeResolverStrategies = versionRangeResolverStrategies;
+    this.versionrangeResolverStrategies.clear();
+    this.versionrangeResolverStrategies.putAll( versionRangeResolverStrategies );
     return this;
   }
 
+  /**
+   *
+   * @return unmodifiable map of {@link VersionRangeResolver} strategies.
+   */
   Map<String, VersionRangeResolver> getVersionrangeResolverStrategies()
   {
-    return versionrangeResolverStrategies;
+    return Collections.unmodifiableMap( versionrangeResolverStrategies );
   }
 
   @Override

@@ -36,9 +36,19 @@ import org.eclipse.aether.spi.log.NullLoggerFactory;
 import org.eclipse.aether.version.Version;
 
 /**
- * This implementation resolve <b>only released</b> artifact versions in a version range.
- *
+ * This implementation ({@value #VERSION_RANGE_RESOLVER_STRATEGY}) resolve all artifact versions in a version range but
+ * <b>only released</b> at the version range boundaries.
+ * <p>
+ * Use the delegate {@link VersionRangeResolver} to resolve all versions within the version range and remove every
+ * "SNAPSHOT" version at the begin and the end of the version range.
+ * </p>
+ * <p>
+ * version range: (,3.0.0]<br/>
+ * found versions: 1.0.0-SNAPSHOT,1.0.0, 1.0.1-SNAPSHOT, 2.0.0-SNAPSHOT, 2.0.0, 2.1.0-SNAPSHOT, 3.0.0-SNAPSHOT<br/>
+ * returned versions: 1.0.0, 1.0.1-SNAPSHOT, 2.0.0-SNAPSHOT, 2.0.0
+ * </p>
  */
+
 @Named
 @Component( role = VersionRangeResolver.class,
         hint = ReleaseOnBoundariesVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY )
@@ -61,30 +71,42 @@ public class ReleaseOnBoundariesVersionRangeResolver
   }
 
   @Override
-  public void initService( ServiceLocator locator )
+  public void initService( final ServiceLocator locator )
   {
     setLoggerFactory( locator.getService( LoggerFactory.class ) );
-    MavenDefaultVersionRangeResolver mavenDefaultVersionRangeResolver = new MavenDefaultVersionRangeResolver();
-    mavenDefaultVersionRangeResolver.initService( locator );
-    setDelegateVersionRangeResolver( mavenDefaultVersionRangeResolver );
+    if ( null == delegateVersionRangeResolver )
+    {
+      final MavenDefaultVersionRangeResolver mavenDefaultVersionRangeResolver = new MavenDefaultVersionRangeResolver();
+      mavenDefaultVersionRangeResolver.initService( locator );
+      setDelegateVersionRangeResolver( mavenDefaultVersionRangeResolver );
+    }
   }
 
-  public final ReleaseOnBoundariesVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
+  public final ReleaseOnBoundariesVersionRangeResolver setLoggerFactory( final LoggerFactory loggerFactory )
   {
     this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
     return this;
   }
 
-  void setLogger( LoggerFactory loggerFactory )
+  void setLogger( final LoggerFactory loggerFactory )
   {
     // plexus support
     setLoggerFactory( loggerFactory );
   }
 
+  /**
+   * Set the {@link VersionRangeResolver} who resolves all versions within the version range.
+   *
+   * @param delegateVersionRangeResolver must not be {@code null}
+   *
+   * @return this instance for fluent API
+   *
+   * @throws IllegalArgumentException if passed {@link VersionRangeResolver} is {@code null}
+   */
   public final ReleaseOnBoundariesVersionRangeResolver setDelegateVersionRangeResolver(
-          VersionRangeResolver delegateVersionRangeResolver )
+          final VersionRangeResolver delegateVersionRangeResolver )
   {
-    if ( delegateVersionRangeResolver == null )
+    if ( null == delegateVersionRangeResolver )
     {
       throw new IllegalArgumentException( "all version range resolver has not been specified" );
     }
@@ -93,10 +115,15 @@ public class ReleaseOnBoundariesVersionRangeResolver
   }
 
   @Override
-  public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
+  public VersionRangeResult resolveVersionRange( final RepositorySystemSession session,
+          final VersionRangeRequest request )
           throws VersionRangeResolutionException
   {
-    VersionRangeResult resolveVersionRange = delegateVersionRangeResolver.resolveVersionRange( session, request );
+    if ( null == delegateVersionRangeResolver )
+    {
+      throw new VersionRangeResolutionException( null, "No internal version range resolver available." );
+    }
+    final VersionRangeResult resolveVersionRange = delegateVersionRangeResolver.resolveVersionRange( session, request );
     // remove all SNAPSHOT versions on top of the list
     for ( Iterator<Version> it = resolveVersionRange.getVersions().iterator(); it.hasNext(); )
     {
@@ -119,10 +146,10 @@ public class ReleaseOnBoundariesVersionRangeResolver
     return resolveVersionRange;
   }
 
-  private boolean removeSNAPSHOTVersion( Iterator<Version> iterator )
+  private boolean removeSNAPSHOTVersion( final Iterator<Version> iterator )
   {
     // XXX: better way to identify a SNAPSHOT version
-    if ( ! ! !iterator.next().toString().endsWith( "SNAPSHOT" ) )
+    if ( ! ! !String.valueOf( iterator.next() ).endsWith( "SNAPSHOT" ) )
     {
       return true;
     }

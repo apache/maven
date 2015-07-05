@@ -63,13 +63,21 @@ import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
 
 /**
- * This implementation is the default version range resolve behavior of Maven.
+ * This implementation ({@value #VERSION_RANGE_RESOLVER_STRATEGY}) resolve all artifact versions in a version range.
+ * <p>
+ * version range: (,3.0.0]<br/>
+ * found versions: 1.0.0-SNAPSHOT,1.0.0, 1.0.1-SNAPSHOT, 2.0.0-SNAPSHOT, 2.0.0, 2.1.0-SNAPSHOT, 3.0.0-SNAPSHOT<br/>
+ * returned versions: 1.0.0-SNAPSHOT,1.0.0, 1.0.1-SNAPSHOT, 2.0.0-SNAPSHOT, 2.0.0, 2.1.0-SNAPSHOT, 3.0.0-SNAPSHOT
+ * </p>
  *
+ * <p>
+ * Note: This implementation is the default version range resolve behavior of Maven.</p>
  * <p>
  * Note: This class was formally known as <code>DefaultVersionRangeResolver</code>.</p>
  *
  * @author Benjamin Bentmann
  */
+
 @Named
 @Component( role = VersionRangeResolver.class, hint = MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY )
 public class MavenDefaultVersionRangeResolver
@@ -99,8 +107,9 @@ public class MavenDefaultVersionRangeResolver
   }
 
   @Inject
-  MavenDefaultVersionRangeResolver( MetadataResolver metadataResolver, SyncContextFactory syncContextFactory,
-          RepositoryEventDispatcher repositoryEventDispatcher, LoggerFactory loggerFactory )
+  MavenDefaultVersionRangeResolver( final MetadataResolver metadataResolver,
+          final SyncContextFactory syncContextFactory, final RepositoryEventDispatcher repositoryEventDispatcher,
+          final LoggerFactory loggerFactory )
   {
     setMetadataResolver( metadataResolver );
     setSyncContextFactory( syncContextFactory );
@@ -109,7 +118,7 @@ public class MavenDefaultVersionRangeResolver
   }
 
   @Override
-  public void initService( ServiceLocator locator )
+  public void initService( final ServiceLocator locator )
   {
     setLoggerFactory( locator.getService( LoggerFactory.class ) );
     setMetadataResolver( locator.getService( MetadataResolver.class ) );
@@ -117,19 +126,19 @@ public class MavenDefaultVersionRangeResolver
     setRepositoryEventDispatcher( locator.getService( RepositoryEventDispatcher.class ) );
   }
 
-  public final MavenDefaultVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
+  public final MavenDefaultVersionRangeResolver setLoggerFactory( final LoggerFactory loggerFactory )
   {
     this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
     return this;
   }
 
-  void setLogger( LoggerFactory loggerFactory )
+  void setLogger( final LoggerFactory loggerFactory )
   {
     // plexus support
     setLoggerFactory( loggerFactory );
   }
 
-  public final MavenDefaultVersionRangeResolver setMetadataResolver( MetadataResolver metadataResolver )
+  public final MavenDefaultVersionRangeResolver setMetadataResolver( final MetadataResolver metadataResolver )
   {
     if ( metadataResolver == null )
     {
@@ -139,7 +148,7 @@ public class MavenDefaultVersionRangeResolver
     return this;
   }
 
-  public final MavenDefaultVersionRangeResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
+  public final MavenDefaultVersionRangeResolver setSyncContextFactory( final SyncContextFactory syncContextFactory )
   {
     if ( syncContextFactory == null )
     {
@@ -149,7 +158,7 @@ public class MavenDefaultVersionRangeResolver
     return this;
   }
 
-  public final MavenDefaultVersionRangeResolver setRepositoryEventDispatcher( RepositoryEventDispatcher red )
+  public final MavenDefaultVersionRangeResolver setRepositoryEventDispatcher( final RepositoryEventDispatcher red )
   {
     if ( red == null )
     {
@@ -160,14 +169,15 @@ public class MavenDefaultVersionRangeResolver
   }
 
   @Override
-  public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
+  public VersionRangeResult resolveVersionRange( final RepositorySystemSession session,
+          final VersionRangeRequest request )
           throws VersionRangeResolutionException
   {
-    VersionRangeResult result = new VersionRangeResult( request );
+    final VersionRangeResult result = new VersionRangeResult( request );
 
-    VersionScheme versionScheme = new GenericVersionScheme();
+    final VersionScheme versionScheme = new GenericVersionScheme();
 
-    VersionConstraint versionConstraint;
+    final VersionConstraint versionConstraint;
     try
     {
       versionConstraint = versionScheme.parseVersionConstraint( request.getArtifact().getVersion() );
@@ -186,14 +196,14 @@ public class MavenDefaultVersionRangeResolver
     }
     else
     {
-      Map<String, ArtifactRepository> versionIndex = getVersions( session, result, request );
+      final Map<String, ArtifactRepository> versionIndex = getVersions( session, result, request );
 
-      List<Version> versions = new ArrayList<Version>();
+      final List<Version> versions = new ArrayList<Version>();
       for ( Map.Entry<String, ArtifactRepository> v : versionIndex.entrySet() )
       {
         try
         {
-          Version ver = versionScheme.parseVersion( v.getKey() );
+          final Version ver = versionScheme.parseVersion( v.getKey() );
           if ( versionConstraint.containsVersion( ver ) )
           {
             versions.add( ver );
@@ -213,42 +223,42 @@ public class MavenDefaultVersionRangeResolver
     return result;
   }
 
-  private Map<String, ArtifactRepository> getVersions( RepositorySystemSession session, VersionRangeResult result,
-          VersionRangeRequest request )
+  private Map<String, ArtifactRepository> getVersions( final RepositorySystemSession session,
+          final VersionRangeResult result, final VersionRangeRequest request )
   {
-    RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
+    final RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
-    Map<String, ArtifactRepository> versionIndex = new HashMap<String, ArtifactRepository>();
+    final Map<String, ArtifactRepository> versionIndex = new HashMap<String, ArtifactRepository>();
 
-    Metadata metadata
+    final Metadata metadata
             = new DefaultMetadata( request.getArtifact().getGroupId(), request.getArtifact().getArtifactId(),
                     MAVEN_METADATA_XML, Metadata.Nature.RELEASE_OR_SNAPSHOT );
 
-    List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
+    final List<MetadataRequest> metadataRequests = new ArrayList<MetadataRequest>( request.getRepositories().size() );
 
     metadataRequests.add( new MetadataRequest( metadata, null, request.getRequestContext() ) );
 
-    for ( RemoteRepository repository : request.getRepositories() )
+    for ( final RemoteRepository repository : request.getRepositories() )
     {
-      MetadataRequest metadataRequest = new MetadataRequest( metadata, repository, request.getRequestContext() );
+      final MetadataRequest metadataRequest = new MetadataRequest( metadata, repository, request.getRequestContext() );
       metadataRequest.setDeleteLocalCopyIfMissing( true );
       metadataRequest.setTrace( trace );
       metadataRequests.add( metadataRequest );
     }
 
-    List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
+    final List<MetadataResult> metadataResults = metadataResolver.resolveMetadata( session, metadataRequests );
 
-    WorkspaceReader workspace = session.getWorkspaceReader();
+    final WorkspaceReader workspace = session.getWorkspaceReader();
     if ( workspace != null )
     {
-      List<String> versions = workspace.findVersions( request.getArtifact() );
-      for ( String version : versions )
+      final List<String> versions = workspace.findVersions( request.getArtifact() );
+      for ( final String version : versions )
       {
         versionIndex.put( version, workspace.getRepository() );
       }
     }
 
-    for ( MetadataResult metadataResult : metadataResults )
+    for ( final MetadataResult metadataResult : metadataResults )
     {
       result.addException( metadataResult.getException() );
 
@@ -258,8 +268,8 @@ public class MavenDefaultVersionRangeResolver
         repository = session.getLocalRepository();
       }
 
-      Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
-      for ( String version : versioning.getVersions() )
+      final Versioning versioning = readVersions( session, trace, metadataResult.getMetadata(), repository, result );
+      for ( final String version : versioning.getVersions() )
       {
         if ( !versionIndex.containsKey( version ) )
         {
@@ -271,8 +281,8 @@ public class MavenDefaultVersionRangeResolver
     return versionIndex;
   }
 
-  private Versioning readVersions( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
-          ArtifactRepository repository, VersionRangeResult result )
+  private Versioning readVersions( final RepositorySystemSession session, final RequestTrace trace,
+          final Metadata metadata, final ArtifactRepository repository, final VersionRangeResult result )
   {
     Versioning versioning = null;
 
@@ -281,7 +291,7 @@ public class MavenDefaultVersionRangeResolver
     {
       if ( metadata != null )
       {
-        SyncContext syncContext = syncContextFactory.newInstance( session, true );
+        final SyncContext syncContext = syncContextFactory.newInstance( session, true );
 
         try
         {
@@ -314,10 +324,10 @@ public class MavenDefaultVersionRangeResolver
     return ( versioning != null ) ? versioning : new Versioning();
   }
 
-  private void invalidMetadata( RepositorySystemSession session, RequestTrace trace, Metadata metadata,
-          ArtifactRepository repository, Exception exception )
+  private void invalidMetadata( final RepositorySystemSession session, final RequestTrace trace,
+          final Metadata metadata, final ArtifactRepository repository, final Exception exception )
   {
-    RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
+    final RepositoryEvent.Builder event = new RepositoryEvent.Builder( session, EventType.METADATA_INVALID );
     event.setTrace( trace );
     event.setMetadata( metadata );
     event.setException( exception );
