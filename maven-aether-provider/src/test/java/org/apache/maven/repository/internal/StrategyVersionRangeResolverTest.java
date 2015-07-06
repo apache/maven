@@ -18,6 +18,8 @@ package org.apache.maven.repository.internal;
  * specific language governing permissions and limitations
  * under the License.
  */
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.aether.impl.VersionRangeResolver;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -82,46 +84,35 @@ public class StrategyVersionRangeResolverTest
 
   public void testGetStrategyName_notSet()
   {
-    assertEquals( MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY, sut.getStrategyName() );
+    assertEquals( MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY, sut.getStrategyName( session.
+            getSystemProperties() ) );
   }
 
   public void testGetStrategyName_empty()
   {
-    try
-    {
-      System.setProperty( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY, "" );
-      assertEquals( MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY, sut.getStrategyName() );
-    }
-    finally
-    {
-      System.getProperties().remove( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY );
-    }
+    final Map<String, String> systemProperties = new HashMap<String, String>();
+    systemProperties.putAll( session.getSystemProperties() );
+    systemProperties.put( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY, "" );
+    assertEquals( MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY, sut.getStrategyName(
+            systemProperties ) );
   }
 
   public void testGetStrategyName_blank()
   {
-    try
-    {
-      System.setProperty( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY, "     " );
-      assertEquals( MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY, sut.getStrategyName() );
-    }
-    finally
-    {
-      System.getProperties().remove( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY );
-    }
+    final Map<String, String> systemProperties = new HashMap<String, String>();
+    systemProperties.putAll( session.getSystemProperties() );
+    systemProperties.put( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY, "      " );
+    assertEquals( MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY, sut.getStrategyName(
+            systemProperties ) );
   }
 
   public void testGetStrategyName()
   {
-    try
-    {
-      System.setProperty( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY, "expectedStrategy" );
-      assertEquals( "expectedStrategy", sut.getStrategyName() );
-    }
-    finally
-    {
-      System.getProperties().remove( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY );
-    }
+    final Map<String, String> systemProperties = new HashMap<String, String>();
+    systemProperties.putAll( session.getSystemProperties() );
+    systemProperties.put( StrategyVersionRangeResolver.STRATEGY_PROPERTY_KEY, "expectedStrategy" );
+    assertEquals( "expectedStrategy", sut.getStrategyName(
+            systemProperties ) );
   }
 
 }

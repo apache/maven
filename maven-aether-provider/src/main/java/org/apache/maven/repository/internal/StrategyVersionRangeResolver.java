@@ -51,6 +51,7 @@ import org.eclipse.aether.spi.log.NullLoggerFactory;
  * ({@value MavenDefaultVersionRangeResolver#VERSION_RANGE_RESOLVER_STRATEGY}) is used.
  * </p>
  */
+
 @Named
 @Component( role = VersionRangeResolver.class )
 public class StrategyVersionRangeResolver
@@ -74,7 +75,7 @@ public class StrategyVersionRangeResolver
 
   // the key of the entry is the component`s hint.
   @Requirement( role = VersionRangeResolver.class )
-  private Map<String, VersionRangeResolver> versionrangeResolverStrategies
+  private final Map<String, VersionRangeResolver> versionrangeResolverStrategies
           = new HashMap<String, VersionRangeResolver>();
 
   public StrategyVersionRangeResolver()
@@ -83,7 +84,7 @@ public class StrategyVersionRangeResolver
   }
 
   @Inject
-  StrategyVersionRangeResolver( LoggerFactory loggerFactory,
+  StrategyVersionRangeResolver( final LoggerFactory loggerFactory,
           Map<String, VersionRangeResolver> versionRangeResolverStrategies )
   {
     setLoggerFactory( loggerFactory );
@@ -91,19 +92,19 @@ public class StrategyVersionRangeResolver
   }
 
   @Override
-  public void initService( ServiceLocator locator )
+  public void initService( final ServiceLocator locator )
   {
     setLoggerFactory( locator.getService( LoggerFactory.class ) );
     setVersionRangeResolverStrategies( locator.getServices( VersionRangeResolver.class ) );
   }
 
-  public final StrategyVersionRangeResolver setLoggerFactory( LoggerFactory loggerFactory )
+  public final StrategyVersionRangeResolver setLoggerFactory( final LoggerFactory loggerFactory )
   {
     this.logger = NullLoggerFactory.getSafeLogger( loggerFactory, getClass() );
     return this;
   }
 
-  void setLogger( LoggerFactory loggerFactory )
+  void setLogger( final LoggerFactory loggerFactory )
   {
     // plexus support
     setLoggerFactory( loggerFactory );
@@ -119,14 +120,14 @@ public class StrategyVersionRangeResolver
    * @throws IllegalArgumentException if the passed list is {@code null}
    */
   public final StrategyVersionRangeResolver setVersionRangeResolverStrategies(
-          List<VersionRangeResolver> versionRangeResolverStrategies )
+          final List<VersionRangeResolver> versionRangeResolverStrategies )
   {
     if ( null == versionRangeResolverStrategies )
     {
       throw new IllegalArgumentException( "version range resolver strategy not been specified" );
     }
     this.versionrangeResolverStrategies.clear();
-    for ( VersionRangeResolver versionRangeResolverStrategy : versionRangeResolverStrategies )
+    for ( final VersionRangeResolver versionRangeResolverStrategy : versionRangeResolverStrategies )
     {
       if ( null == versionRangeResolverStrategy )
       {
@@ -151,7 +152,7 @@ public class StrategyVersionRangeResolver
    * @throws IllegalArgumentException if the passed map is {@code null}
    */
   public final StrategyVersionRangeResolver setVersionRangeResolverStrategies(
-          Map<String, VersionRangeResolver> versionRangeResolverStrategies )
+          final Map<String, VersionRangeResolver> versionRangeResolverStrategies )
   {
     if ( null == versionRangeResolverStrategies )
     {
@@ -172,10 +173,11 @@ public class StrategyVersionRangeResolver
   }
 
   @Override
-  public VersionRangeResult resolveVersionRange( RepositorySystemSession session, VersionRangeRequest request )
-          throws VersionRangeResolutionException
+  public VersionRangeResult resolveVersionRange( final RepositorySystemSession session,
+          final VersionRangeRequest request ) throws VersionRangeResolutionException
   {
-    return getVersionRangeResolverStrategy().resolveVersionRange( session, request );
+    return getVersionRangeResolverStrategy( getStrategyName( session.getSystemProperties() ) ).resolveVersionRange(
+            session, request );
   }
 
   /**
@@ -184,13 +186,13 @@ public class StrategyVersionRangeResolver
    *
    * @throws VersionRangeResolutionException if default version range strategy is unavailable.
    */
-  VersionRangeResolver getVersionRangeResolverStrategy() throws VersionRangeResolutionException
+  VersionRangeResolver getVersionRangeResolverStrategy( final String strategyName )
+          throws VersionRangeResolutionException
   {
     if ( actualVersionRangeResolver != null )
     {
       return actualVersionRangeResolver;
     }
-    final String strategyName = getStrategyName();
     final VersionRangeResolver versionRangeResolver = null == getVersionrangeResolverStrategies() ? null
             : getVersionrangeResolverStrategies().get( strategyName );
     if ( null == versionRangeResolver )
@@ -211,10 +213,10 @@ public class StrategyVersionRangeResolver
    *
    * @return strategy name never {@code null}
    */
-  String getStrategyName()
+  String getStrategyName( final Map<String, String> properties )
   {
-    String strategyName = StringUtils.trim( System.getProperty( STRATEGY_PROPERTY_KEY,
-            MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY ) );
+    final String strategyName = StringUtils.defaultString( StringUtils.trim( properties.get( STRATEGY_PROPERTY_KEY ) ),
+            MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY );
     return StringUtils.isBlank( strategyName )
             ? MavenDefaultVersionRangeResolver.VERSION_RANGE_RESOLVER_STRATEGY : strategyName;
   }
