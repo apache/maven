@@ -223,7 +223,7 @@ public class MojoDescriptor
 
         if ( parameters == null )
         {
-            parameters = new LinkedList<Parameter>();
+            parameters = new LinkedList<>();
         }
 
         parameters.add( parameter );
@@ -236,7 +236,7 @@ public class MojoDescriptor
     {
         if ( parameterMap == null )
         {
-            parameterMap = new HashMap<String, Parameter>();
+            parameterMap = new HashMap<>();
 
             if ( parameters != null )
             {

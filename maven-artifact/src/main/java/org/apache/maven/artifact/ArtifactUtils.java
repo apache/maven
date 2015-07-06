@@ -109,7 +109,7 @@ public final class ArtifactUtils
 
     public static Map<String, Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
-        Map<String, Artifact> artifactMap = new LinkedHashMap<String, Artifact>();
+        Map<String, Artifact> artifactMap = new LinkedHashMap<>();
 
         if ( artifacts != null )
         {
@@ -201,7 +201,7 @@ public final class ArtifactUtils
 
         if ( original != null )
         {
-            copy = new ArrayList<T>();
+            copy = new ArrayList<>();
 
             if ( !original.isEmpty() )
             {

@@ -107,7 +107,7 @@ public class DefaultLifecycleBindingsInjector
             {
                 List<Plugin> tgt = target.getPlugins();
 
-                Map<Object, Plugin> merged = new LinkedHashMap<Object, Plugin>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, Plugin> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( Plugin element : tgt )
                 {
@@ -115,7 +115,7 @@ public class DefaultLifecycleBindingsInjector
                     merged.put( key, element );
                 }
 
-                Map<Object, Plugin> unmanaged = new LinkedHashMap<Object, Plugin>();
+                Map<Object, Plugin> unmanaged = new LinkedHashMap<>();
 
                 for ( Plugin element : src )
                 {
@@ -151,7 +151,7 @@ public class DefaultLifecycleBindingsInjector
                     }
                 }
 
-                List<Plugin> result = new ArrayList<Plugin>( merged.values() );
+                List<Plugin> result = new ArrayList<>( merged.values() );
 
                 target.setPlugins( result );
             }

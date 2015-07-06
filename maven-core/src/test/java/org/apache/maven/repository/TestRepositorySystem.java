@@ -213,7 +213,7 @@ public class TestRepositorySystem
 
         if ( request.isResolveTransitively() )
         {
-            Map<String, Artifact> artifacts = new LinkedHashMap<String, Artifact>();
+            Map<String, Artifact> artifacts = new LinkedHashMap<>();
 
             if ( request.getArtifactDependencies() != null )
             {
@@ -223,7 +223,7 @@ public class TestRepositorySystem
                 }
             }
 
-            List<Dependency> dependencies = new ArrayList<Dependency>();
+            List<Dependency> dependencies = new ArrayList<>();
             if ( request.getArtifact() instanceof ArtifactWithDependencies )
             {
                 dependencies = ( (ArtifactWithDependencies) request.getArtifact() ).getDependencies();

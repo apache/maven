@@ -97,7 +97,7 @@ public class ProjectDependencyGraphStub
         NoPluginFoundForPrefixException, PluginNotFoundException, MojoNotFoundException, PluginResolutionException,
         LifecyclePhaseNotFoundException, LifecycleNotFoundException
     {
-        List<ProjectSegment> projectBuilds = new ArrayList<ProjectSegment>();
+        List<ProjectSegment> projectBuilds = new ArrayList<>();
 
         TaskSegment segment = createTaskSegment();
         projectBuilds.add( createProjectBuild( A, session, segment ) );
@@ -159,7 +159,7 @@ public class ProjectDependencyGraphStub
 
     private List<Dependency> getDependencies()
     {
-        List<Dependency> dependencies = new ArrayList<Dependency>();
+        List<Dependency> dependencies = new ArrayList<>();
         dependencies.add( new Dependency( B, A ) );
         dependencies.add( new Dependency( C, A ) );
         dependencies.add( new Dependency( X, B ) );
@@ -180,7 +180,7 @@ public class ProjectDependencyGraphStub
         {
             throw new RuntimeException( "Not implemented yet" );
         }
-        List<MavenProject> result = new ArrayList<MavenProject>();
+        List<MavenProject> result = new ArrayList<>();
         for ( Dependency dependency : getDependencies() )
         {
             dependency.addIfDownstream( project, result );
@@ -194,7 +194,7 @@ public class ProjectDependencyGraphStub
         {
             throw new RuntimeException( "Not implemented yet" );
         }*/
-        List<MavenProject> result = new ArrayList<MavenProject>();
+        List<MavenProject> result = new ArrayList<>();
         final List<Dependency> dependencies = getDependencies();
         for ( Dependency dependency : dependencies )
         {

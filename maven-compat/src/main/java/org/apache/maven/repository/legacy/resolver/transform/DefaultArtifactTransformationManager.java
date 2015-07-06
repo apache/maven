@@ -79,7 +79,7 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public List getArtifactTransformations()
+    public List<ArtifactTransformation> getArtifactTransformations()
     {
         return artifactTransformations;
     }

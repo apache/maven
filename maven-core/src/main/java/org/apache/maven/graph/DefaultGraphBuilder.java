@@ -158,7 +158,7 @@ public class DefaultGraphBuilder
                 reactorDirectory = new File( request.getBaseDirectory() );
             }
 
-            Collection<MavenProject> selectedProjects = new LinkedHashSet<MavenProject>( projects.size() );
+            Collection<MavenProject> selectedProjects = new LinkedHashSet<>( projects.size() );
 
             for ( String selector : request.getSelectedProjects() )
             {
@@ -208,7 +208,7 @@ public class DefaultGraphBuilder
 
             if ( makeUpstream || makeDownstream )
             {
-                for ( MavenProject selectedProject : new ArrayList<MavenProject>( selectedProjects ) )
+                for ( MavenProject selectedProject : new ArrayList<>( selectedProjects ) )
                 {
                     if ( makeUpstream )
                     {
@@ -221,7 +221,7 @@ public class DefaultGraphBuilder
                 }
             }
 
-            result = new ArrayList<MavenProject>( selectedProjects.size() );
+            result = new ArrayList<>( selectedProjects.size() );
 
             for ( MavenProject project : projects )
             {
@@ -249,7 +249,7 @@ public class DefaultGraphBuilder
                 reactorDirectory = new File( request.getBaseDirectory() );
             }
 
-            Collection<MavenProject> excludedProjects = new LinkedHashSet<MavenProject>( projects.size() );
+            Collection<MavenProject> excludedProjects = new LinkedHashSet<>( projects.size() );
 
             for ( String selector : request.getExcludedProjects() )
             {
@@ -275,7 +275,7 @@ public class DefaultGraphBuilder
                 }
             }
 
-            result = new ArrayList<MavenProject>( projects.size() );
+            result = new ArrayList<>( projects.size() );
             for ( MavenProject project : projects )
             {
                 if ( !excludedProjects.contains( project ) )
@@ -303,7 +303,7 @@ public class DefaultGraphBuilder
 
             String selector = request.getResumeFrom();
 
-            result = new ArrayList<MavenProject>( projects.size() );
+            result = new ArrayList<>( projects.size() );
 
             boolean resumed = false;
 
@@ -391,7 +391,7 @@ public class DefaultGraphBuilder
 
         request.getProjectBuildingRequest().setRepositorySession( session.getRepositorySession() );
 
-        List<MavenProject> projects = new ArrayList<MavenProject>();
+        List<MavenProject> projects = new ArrayList<>();
 
         // We have no POM file.
         //
@@ -455,7 +455,7 @@ public class DefaultGraphBuilder
 
     private void validateProjects( List<MavenProject> projects )
     {
-        Map<String, MavenProject> projectsMap = new HashMap<String, MavenProject>();
+        Map<String, MavenProject> projectsMap = new HashMap<>();
 
         for ( MavenProject p : projects )
         {

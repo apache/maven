@@ -95,7 +95,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         Artifact depArtifact = createArtifact( "group", "artifact", "1" );
 
-        List<Artifact> deps = new ArrayList<Artifact>();
+        List<Artifact> deps = new ArrayList<>();
         deps.add( depArtifact );
 
         exec.getMojoDescriptor().getPluginDescriptor().setArtifacts( deps );
@@ -120,7 +120,7 @@ public class PluginParameterExpressionEvaluatorTest
 
         Artifact depArtifact = createArtifact( "group", "artifact", "1" );
 
-        List<Artifact> deps = new ArrayList<Artifact>();
+        List<Artifact> deps = new ArrayList<>();
         deps.add( depArtifact );
 
         exec.getMojoDescriptor().getPluginDescriptor().setArtifacts( deps );

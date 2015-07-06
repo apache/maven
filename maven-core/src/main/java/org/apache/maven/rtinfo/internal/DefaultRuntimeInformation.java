@@ -19,21 +19,20 @@ package org.apache.maven.rtinfo.internal;
  * under the License.
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionConstraint;
 import org.eclipse.aether.version.VersionScheme;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * Provides information about the current Maven runtime.
@@ -56,34 +55,29 @@ public class DefaultRuntimeInformation
 
             String resource = "META-INF/maven/org.apache.maven/maven-core/pom.properties";
 
-            InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource );
-            if ( is != null )
+            try ( InputStream is = DefaultRuntimeInformation.class.getResourceAsStream( "/" + resource ) )
             {
-                try
+                if ( is != null )
                 {
                     props.load( is );
                 }
-                catch ( IOException e )
+                else
                 {
-                    String msg = "Could not parse " + resource + ", Maven runtime information not available";
-                    if ( logger.isDebugEnabled() )
-                    {
-                        logger.warn( msg, e );
-                    }
-                    else
-                    {
-                        logger.warn( msg );
-                    }
-                }
-                finally
-                {
-                    IOUtil.close( is );
+                    logger.warn(
+                        "Could not locate " + resource + " on classpath, Maven runtime information not available" );
                 }
             }
-            else
+            catch ( IOException e )
             {
-                logger.warn( "Could not locate " + resource
-                             + " on classpath, Maven runtime information not available" );
+                String msg = "Could not parse " + resource + ", Maven runtime information not available";
+                if ( logger.isDebugEnabled() )
+                {
+                    logger.warn( msg, e );
+                }
+                else
+                {
+                    logger.warn( msg );
+                }
             }
 
             String version = props.getProperty( "version", "" ).trim();

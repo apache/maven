@@ -73,7 +73,7 @@ public class DefaultPluginRealmCache
             this.plugin = plugin.clone();
             this.workspace = CacheUtils.getWorkspace( session );
             this.localRepo = session.getLocalRepository();
-            this.repositories = new ArrayList<RemoteRepository>( repositories.size() );
+            this.repositories = new ArrayList<>( repositories.size() );
             for ( RemoteRepository repository : repositories )
             {
                 if ( repository.isRepositoryManager() )
@@ -146,7 +146,7 @@ public class DefaultPluginRealmCache
 
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
+    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
     public Key createKey( Plugin plugin, ClassLoader parentRealm, Map<String, ClassLoader> foreignImports,
                           DependencyFilter dependencyFilter, List<RemoteRepository> repositories,

@@ -331,9 +331,8 @@ public class ComparableVersion
         public String toString()
         {
             StringBuilder buffer = new StringBuilder();
-            for ( Iterator<Item> iter = iterator(); iter.hasNext(); )
+            for ( Item item : this )
             {
-                Item item = iter.next();
                 if ( buffer.length() > 0 )
                 {
                     buffer.append( ( item instanceof ListItem ) ? '-' : '.' );
@@ -359,7 +358,7 @@ public class ComparableVersion
 
         ListItem list = items;
 
-        Stack<Item> stack = new Stack<Item>();
+        Stack<Item> stack = new Stack<>();
         stack.push( list );
 
         boolean isDigit = false;

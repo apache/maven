@@ -96,7 +96,7 @@ class DefaultProjectBuildingResult
     {
         if ( problems == null )
         {
-            problems = new ArrayList<ModelProblem>();
+            problems = new ArrayList<>();
         }
 
         return problems;

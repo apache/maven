@@ -85,7 +85,7 @@ public class MetadataResolutionResult
     {
         if ( artifacts == null )
         {
-            artifacts = new LinkedHashSet<Artifact>();
+            artifacts = new LinkedHashSet<>();
         }
 
         artifacts.add( artifact );
@@ -100,7 +100,7 @@ public class MetadataResolutionResult
     {
         if ( requestedArtifacts == null )
         {
-            requestedArtifacts = new LinkedHashSet<Artifact>();
+            requestedArtifacts = new LinkedHashSet<>();
         }
 
         requestedArtifacts.add( artifact );
@@ -318,7 +318,7 @@ public class MetadataResolutionResult
     {
         if ( l == null )
         {
-            return new ArrayList<T>();
+            return new ArrayList<>();
         }
         return l;
     }

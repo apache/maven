@@ -39,12 +39,12 @@ public class AndArtifactFilter
 
     public AndArtifactFilter()
     {
-        this.filters = new LinkedHashSet<ArtifactFilter>();
+        this.filters = new LinkedHashSet<>();
     }
 
     public AndArtifactFilter( List<ArtifactFilter> filters )
     {
-        this.filters = new LinkedHashSet<ArtifactFilter>( filters );
+        this.filters = new LinkedHashSet<>( filters );
     }
 
     public boolean include( Artifact artifact )
@@ -68,7 +68,7 @@ public class AndArtifactFilter
 
     public List<ArtifactFilter> getFilters()
     {
-        return new ArrayList<ArtifactFilter>( filters );
+        return new ArrayList<>( filters );
     }
 
     @Override

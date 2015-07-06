@@ -59,7 +59,7 @@ public class ProjectBuildList
      */
     public ProjectBuildList getByTaskSegment( TaskSegment taskSegment )
     {
-        List<ProjectSegment> currentSegment = new ArrayList<ProjectSegment>();
+        List<ProjectSegment> currentSegment = new ArrayList<>();
         for ( ProjectSegment projectBuild : items )
         {
             if ( taskSegment == projectBuild.getTaskSegment() )
@@ -72,7 +72,7 @@ public class ProjectBuildList
 
     public Map<MavenProject, ProjectSegment> selectSegment( TaskSegment taskSegment )
     {
-        Map<MavenProject, ProjectSegment> result = new HashMap<MavenProject, ProjectSegment>();
+        Map<MavenProject, ProjectSegment> result = new HashMap<>();
         for ( ProjectSegment projectBuild : items )
         {
             if ( taskSegment == projectBuild.getTaskSegment() )
@@ -126,7 +126,7 @@ public class ProjectBuildList
 
     public Set<String> getReactorProjectKeys()
     {
-        Set<String> projectKeys = new HashSet<String>( items.size() * 2 );
+        Set<String> projectKeys = new HashSet<>( items.size() * 2 );
         for ( ProjectSegment projectBuild : items )
         {
             MavenProject project = projectBuild.getProject();
@@ -147,7 +147,7 @@ public class ProjectBuildList
      */
     public Set<MavenProject> getProjects()
     {
-        Set<MavenProject> projects = new HashSet<MavenProject>();
+        Set<MavenProject> projects = new HashSet<>();
 
         for ( ProjectSegment s : items )
         {

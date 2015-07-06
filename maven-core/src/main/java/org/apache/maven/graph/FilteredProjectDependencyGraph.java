@@ -74,7 +74,7 @@ class FilteredProjectDependencyGraph
             sortedProjects = applyFilter( projectDependencyGraph.getSortedProjects() );
         }
 
-        return new ArrayList<MavenProject>( sortedProjects );
+        return new ArrayList<>( sortedProjects );
     }
 
     public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )
@@ -89,7 +89,7 @@ class FilteredProjectDependencyGraph
 
     private List<MavenProject> applyFilter( Collection<? extends MavenProject> projects )
     {
-        List<MavenProject> filtered = new ArrayList<MavenProject>( projects.size() );
+        List<MavenProject> filtered = new ArrayList<>( projects.size() );
 
         for ( MavenProject project : projects )
         {

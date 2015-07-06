@@ -239,7 +239,7 @@ public class DefaultArtifactDescriptorReader
     {
         RequestTrace trace = RequestTrace.newChild( request.getTrace(), request );
 
-        Set<String> visited = new LinkedHashSet<String>();
+        Set<String> visited = new LinkedHashSet<>();
         for ( Artifact a = request.getArtifact();; )
         {
             Artifact pomArtifact = ArtifactDescriptorUtils.toPomArtifact( a );

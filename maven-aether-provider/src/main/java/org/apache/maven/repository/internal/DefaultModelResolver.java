@@ -89,11 +89,11 @@ class DefaultModelResolver
         this.versionRangeResolver = versionRangeResolver;
         this.remoteRepositoryManager = remoteRepositoryManager;
         this.repositories = repositories;
-        List<RemoteRepository> externalRepositories = new ArrayList<RemoteRepository>();
+        List<RemoteRepository> externalRepositories = new ArrayList<>();
         externalRepositories.addAll( repositories );
         this.externalRepositories = Collections.unmodifiableList( externalRepositories );
 
-        this.repositoryIds = new HashSet<String>();
+        this.repositoryIds = new HashSet<>();
     }
 
     private DefaultModelResolver( DefaultModelResolver original )
@@ -104,9 +104,9 @@ class DefaultModelResolver
         this.resolver = original.resolver;
         this.versionRangeResolver = original.versionRangeResolver;
         this.remoteRepositoryManager = original.remoteRepositoryManager;
-        this.repositories = new ArrayList<RemoteRepository>( original.repositories );
+        this.repositories = new ArrayList<>( original.repositories );
         this.externalRepositories = original.externalRepositories;
-        this.repositoryIds = new HashSet<String>( original.repositoryIds );
+        this.repositoryIds = new HashSet<>( original.repositoryIds );
     }
 
     @Override

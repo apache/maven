@@ -239,7 +239,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( goals == null )
         {
-            goals = new ArrayList<String>();
+            goals = new ArrayList<>();
         }
         return goals;
     }
@@ -283,7 +283,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( selectedProjects == null )
         {
-            selectedProjects = new ArrayList<String>();
+            selectedProjects = new ArrayList<>();
         }
 
         return selectedProjects;
@@ -294,7 +294,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( excludedProjects == null )
         {
-            excludedProjects = new ArrayList<String>();
+            excludedProjects = new ArrayList<>();
         }
 
         return excludedProjects;
@@ -335,7 +335,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( activeProfiles != null )
         {
-            this.activeProfiles = new ArrayList<String>( activeProfiles );
+            this.activeProfiles = new ArrayList<>( activeProfiles );
         }
         else
         {
@@ -350,7 +350,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( inactiveProfiles != null )
         {
-            this.inactiveProfiles = new ArrayList<String>( inactiveProfiles );
+            this.inactiveProfiles = new ArrayList<>( inactiveProfiles );
         }
         else
         {
@@ -365,7 +365,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( remoteRepositories != null )
         {
-            this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+            this.remoteRepositories = new ArrayList<>( remoteRepositories );
         }
         else
         {
@@ -380,7 +380,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( pluginArtifactRepositories != null )
         {
-            this.pluginArtifactRepositories = new ArrayList<ArtifactRepository>( pluginArtifactRepositories );
+            this.pluginArtifactRepositories = new ArrayList<>( pluginArtifactRepositories );
         }
         else
         {
@@ -400,7 +400,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( activeProfiles == null )
         {
-            activeProfiles = new ArrayList<String>();
+            activeProfiles = new ArrayList<>();
         }
         return activeProfiles;
     }
@@ -410,7 +410,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( inactiveProfiles == null )
         {
-            inactiveProfiles = new ArrayList<String>();
+            inactiveProfiles = new ArrayList<>();
         }
         return inactiveProfiles;
     }
@@ -490,7 +490,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( goals != null )
         {
-            this.goals = new ArrayList<String>( goals );
+            this.goals = new ArrayList<>( goals );
         }
         else
         {
@@ -574,7 +574,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( selectedProjects != null )
         {
-            this.selectedProjects = new ArrayList<String>( selectedProjects );
+            this.selectedProjects = new ArrayList<>( selectedProjects );
         }
         else
         {
@@ -589,7 +589,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( excludedProjects != null )
         {
-            this.excludedProjects = new ArrayList<String>( excludedProjects );
+            this.excludedProjects = new ArrayList<>( excludedProjects );
         }
         else
         {
@@ -756,7 +756,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( proxies == null )
         {
-            proxies = new ArrayList<Proxy>();
+            proxies = new ArrayList<>();
         }
         return proxies;
     }
@@ -766,7 +766,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( proxies != null )
         {
-            this.proxies = new ArrayList<Proxy>( proxies );
+            this.proxies = new ArrayList<>( proxies );
         }
         else
         {
@@ -802,7 +802,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( servers == null )
         {
-            servers = new ArrayList<Server>();
+            servers = new ArrayList<>();
         }
         return servers;
     }
@@ -812,7 +812,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( servers != null )
         {
-            this.servers = new ArrayList<Server>( servers );
+            this.servers = new ArrayList<>( servers );
         }
         else
         {
@@ -848,7 +848,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( mirrors == null )
         {
-            mirrors = new ArrayList<Mirror>();
+            mirrors = new ArrayList<>();
         }
         return mirrors;
     }
@@ -858,7 +858,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( mirrors != null )
         {
-            this.mirrors = new ArrayList<Mirror>( mirrors );
+            this.mirrors = new ArrayList<>( mirrors );
         }
         else
         {
@@ -894,7 +894,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( profiles == null )
         {
-            profiles = new ArrayList<Profile>();
+            profiles = new ArrayList<>();
         }
         return profiles;
     }
@@ -904,7 +904,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( profiles != null )
         {
-            this.profiles = new ArrayList<Profile>( profiles );
+            this.profiles = new ArrayList<>( profiles );
         }
         else
         {
@@ -919,7 +919,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( pluginGroups == null )
         {
-            pluginGroups = new ArrayList<String>();
+            pluginGroups = new ArrayList<>();
         }
 
         return pluginGroups;
@@ -930,7 +930,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( pluginGroups != null )
         {
-            this.pluginGroups = new ArrayList<String>( pluginGroups );
+            this.pluginGroups = new ArrayList<>( pluginGroups );
         }
         else
         {
@@ -1065,7 +1065,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( remoteRepositories == null )
         {
-            remoteRepositories = new ArrayList<ArtifactRepository>();
+            remoteRepositories = new ArrayList<>();
         }
         return remoteRepositories;
     }
@@ -1091,7 +1091,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( pluginArtifactRepositories == null )
         {
-            pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+            pluginArtifactRepositories = new ArrayList<>();
         }
         return pluginArtifactRepositories;
     }
@@ -1249,7 +1249,7 @@ public class DefaultMavenExecutionRequest
     {
         if ( toolchains == null )
         {
-            toolchains = new HashMap<String, List<ToolchainModel>>();
+            toolchains = new HashMap<>();
         }
         return toolchains;
     }

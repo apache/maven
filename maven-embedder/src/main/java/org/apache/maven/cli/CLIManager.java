@@ -163,7 +163,7 @@ public class CLIManager
 
     private String[] cleanArgs( String[] args )
     {
-        List<String> cleaned = new ArrayList<String>();
+        List<String> cleaned = new ArrayList<>();
 
         StringBuilder currentArg = null;
 

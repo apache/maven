@@ -62,11 +62,11 @@ public class DefaultLifecycleMappingDelegate
          */
 
         Map<String, Map<Integer, List<MojoExecution>>> mappings =
-            new LinkedHashMap<String, Map<Integer, List<MojoExecution>>>();
+            new LinkedHashMap<>();
 
         for ( String phase : lifecycle.getPhases() )
         {
-            Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<Integer, List<MojoExecution>>();
+            Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<>();
 
             mappings.put( phase, phaseBindings );
 
@@ -123,11 +123,11 @@ public class DefaultLifecycleMappingDelegate
             }
         }
 
-        Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<String, List<MojoExecution>>();
+        Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
 
         for ( Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet() )
         {
-            List<MojoExecution> mojoExecutions = new ArrayList<MojoExecution>();
+            List<MojoExecution> mojoExecutions = new ArrayList<>();
 
             for ( List<MojoExecution> executions : entry.getValue().values() )
             {
@@ -148,7 +148,7 @@ public class DefaultLifecycleMappingDelegate
 
         if ( mojoExecutions == null )
         {
-            mojoExecutions = new ArrayList<MojoExecution>();
+            mojoExecutions = new ArrayList<>();
             phaseBindings.put( priority, mojoExecutions );
         }
 

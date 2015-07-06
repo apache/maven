@@ -94,7 +94,7 @@ public class DefaultProfileInjector
             if ( !src.isEmpty() )
             {
                 List<Plugin> tgt = target.getPlugins();
-                Map<Object, Plugin> master = new LinkedHashMap<Object, Plugin>( tgt.size() * 2 );
+                Map<Object, Plugin> master = new LinkedHashMap<>( tgt.size() * 2 );
 
                 for ( Plugin element : tgt )
                 {
@@ -102,8 +102,8 @@ public class DefaultProfileInjector
                     master.put( key, element );
                 }
 
-                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<Object, List<Plugin>>();
-                List<Plugin> pending = new ArrayList<Plugin>();
+                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<>();
+                List<Plugin> pending = new ArrayList<>();
                 for ( Plugin element : src )
                 {
                     Object key = getPluginKey( element );
@@ -115,7 +115,7 @@ public class DefaultProfileInjector
                         if ( !pending.isEmpty() )
                         {
                             predecessors.put( key, pending );
-                            pending = new ArrayList<Plugin>();
+                            pending = new ArrayList<>();
                         }
                     }
                     else
@@ -124,7 +124,7 @@ public class DefaultProfileInjector
                     }
                 }
 
-                List<Plugin> result = new ArrayList<Plugin>( src.size() + tgt.size() );
+                List<Plugin> result = new ArrayList<>( src.size() + tgt.size() );
                 for ( Map.Entry<Object, Plugin> entry : master.entrySet() )
                 {
                     List<Plugin> pre = predecessors.get( entry.getKey() );
@@ -149,7 +149,7 @@ public class DefaultProfileInjector
             {
                 List<PluginExecution> tgt = target.getExecutions();
                 Map<Object, PluginExecution> merged =
-                    new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
+                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( PluginExecution element : tgt )
                 {
@@ -171,7 +171,7 @@ public class DefaultProfileInjector
                     }
                 }
 
-                target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
+                target.setExecutions( new ArrayList<>( merged.values() ) );
             }
         }
 
@@ -184,7 +184,7 @@ public class DefaultProfileInjector
             {
                 List<ReportPlugin> tgt = target.getPlugins();
                 Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
+                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( ReportPlugin element : tgt )
                 {
@@ -206,7 +206,7 @@ public class DefaultProfileInjector
                     }
                 }
 
-                target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+                target.setPlugins( new ArrayList<>( merged.values() ) );
             }
         }
 
@@ -218,7 +218,7 @@ public class DefaultProfileInjector
             if ( !src.isEmpty() )
             {
                 List<ReportSet> tgt = target.getReportSets();
-                Map<Object, ReportSet> merged = new LinkedHashMap<Object, ReportSet>( ( src.size() + tgt.size() ) * 2 );
+                Map<Object, ReportSet> merged = new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( ReportSet element : tgt )
                 {
@@ -240,7 +240,7 @@ public class DefaultProfileInjector
                     }
                 }
 
-                target.setReportSets( new ArrayList<ReportSet>( merged.values() ) );
+                target.setReportSets( new ArrayList<>( merged.values() ) );
             }
         }
 

@@ -41,7 +41,7 @@ public class DefaultLifecycleMapping
     {
         if ( lifecycleMap == null )
         {
-            lifecycleMap = new HashMap<String, Lifecycle>();
+            lifecycleMap = new HashMap<>();
 
             if ( lifecycles != null )
             {

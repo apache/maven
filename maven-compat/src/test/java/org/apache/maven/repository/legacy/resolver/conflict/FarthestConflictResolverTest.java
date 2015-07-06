@@ -19,10 +19,7 @@ package org.apache.maven.repository.legacy.resolver.conflict;
  * under the License.
  */
 
-import java.util.Collections;
-
 import org.apache.maven.artifact.resolver.ResolutionNode;
-import org.apache.maven.repository.legacy.resolver.conflict.FarthestConflictResolver;
 
 /**
  * Tests <code>FarthestConflictResolver</code>.
@@ -52,9 +49,9 @@ public class FarthestConflictResolverTest
      */
     public void testDepth()
     {
-        ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
-        ResolutionNode b1n = new ResolutionNode( b1, Collections.EMPTY_LIST );
-        ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST, b1n );
+        ResolutionNode a1n = createResolutionNode( a1);
+        ResolutionNode b1n = createResolutionNode( b1);
+        ResolutionNode a2n = createResolutionNode( a2,  b1n );
 
         assertResolveConflict( a2n, a1n, a2n );
     }
@@ -68,9 +65,9 @@ public class FarthestConflictResolverTest
      */
     public void testDepthReversed()
     {
-        ResolutionNode b1n = new ResolutionNode( b1, Collections.EMPTY_LIST );
-        ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST, b1n );
-        ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
+        ResolutionNode b1n = createResolutionNode( b1  );
+        ResolutionNode a2n = createResolutionNode( a2, b1n );
+        ResolutionNode a1n = createResolutionNode( a1 );
 
         assertResolveConflict( a2n, a2n, a1n );
     }
@@ -84,8 +81,8 @@ public class FarthestConflictResolverTest
      */
     public void testEqual()
     {
-        ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
-        ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST );
+        ResolutionNode a1n = createResolutionNode( a1 );
+        ResolutionNode a2n = createResolutionNode( a2 );
 
         assertResolveConflict( a1n, a1n, a2n );
     }
@@ -99,8 +96,8 @@ public class FarthestConflictResolverTest
      */
     public void testEqualReversed()
     {
-        ResolutionNode a2n = new ResolutionNode( a2, Collections.EMPTY_LIST );
-        ResolutionNode a1n = new ResolutionNode( a1, Collections.EMPTY_LIST );
+        ResolutionNode a2n = createResolutionNode( a2);
+        ResolutionNode a1n = createResolutionNode( a1);
 
         assertResolveConflict( a2n, a2n, a1n );
     }

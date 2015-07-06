@@ -89,9 +89,9 @@ final class VersionsMetadata
                 versioning.setRelease( recessive.getVersioning().getRelease() );
             }
 
-            Collection<String> versions = new LinkedHashSet<String>( recessive.getVersioning().getVersions() );
+            Collection<String> versions = new LinkedHashSet<>( recessive.getVersioning().getVersions() );
             versions.addAll( versioning.getVersions() );
-            versioning.setVersions( new ArrayList<String>( versions ) );
+            versioning.setVersions( new ArrayList<>( versions ) );
         }
     }
 

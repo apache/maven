@@ -569,9 +569,9 @@ public class DefaultWagonManager
             wagon.addTransferListener( downloadMonitor );
         }
 
-        Map<String, ChecksumObserver> checksums = new HashMap<String, ChecksumObserver>( 2 );
+        Map<String, ChecksumObserver> checksums = new HashMap<>( 2 );
 
-        Map<String, String> sums = new HashMap<String, String>( 2 );
+        Map<String, String> sums = new HashMap<>( 2 );
 
         // TODO: configure these on the repository
         for ( int i = 0; i < CHECKSUM_IDS.length; i++ )
@@ -579,7 +579,7 @@ public class DefaultWagonManager
             checksums.put( CHECKSUM_IDS[i], addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i] ) );
         }
 
-        List<File> temporaryFiles = new ArrayList<File>();
+        List<File> temporaryFiles = new ArrayList<>();
 
         try
         {

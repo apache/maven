@@ -19,38 +19,38 @@ package org.apache.maven.toolchain;
  * under the License.
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-
-import java.io.InputStream;
-import java.util.Collections;
-
 import org.apache.maven.toolchain.java.DefaultJavaToolChain;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.InputStream;
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
+
 public class DefaultToolchainTest
 {
     @Mock
     private Logger logger;
-    
+
     private MavenToolchainsXpp3Reader reader = new MavenToolchainsXpp3Reader();
-    
+
     @Before
-    public void setUp() throws Exception
+    public void setUp()
+        throws Exception
     {
         MockitoAnnotations.initMocks( this );
     }
-    
+
     private DefaultToolchain newDefaultToolchain( ToolchainModel model )
     {
         return new DefaultToolchain( model, logger )
@@ -102,14 +102,14 @@ public class DefaultToolchainTest
         DefaultToolchain toolchain = newDefaultToolchain( model );
         assertEquals( logger, toolchain.getLog() );
     }
-    
+
     @Test
     public void testMissingRequirementProperty()
     {
         ToolchainModel model = new ToolchainModel();
         model.setType( "TYPE" );
         DefaultToolchain toolchain = newDefaultToolchain( model );
-        
+
         assertFalse( toolchain.matchesRequirements( Collections.singletonMap( "name", "John Doe" ) ) );
         verify( logger ).debug( "Toolchain type:TYPE{} is missing required property: name" );
     }
@@ -122,22 +122,19 @@ public class DefaultToolchainTest
         model.setType( "TYPE" );
         DefaultToolchain toolchain = newDefaultToolchain( model );
         toolchain.addProvideToken( "name", RequirementMatcherFactory.createExactMatcher( "Jane Doe" ) );
-        
+
         assertFalse( toolchain.matchesRequirements( Collections.singletonMap( "name", "John Doe" ) ) );
         verify( logger ).debug( "Toolchain type:TYPE{name = Jane Doe} doesn't match required property: name" );
     }
 
 
     @Test
-    public void testEquals() throws Exception
+    public void testEquals()
+        throws Exception
     {
-        InputStream jdksIS = null;
-        InputStream jdksExtraIS = null;
-        try
+        try ( InputStream jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
+              InputStream jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" ) )
         {
-            jdksIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks.xml" );
-            jdksExtraIS = ToolchainModel.class.getResourceAsStream( "toolchains-jdks-extra.xml" );
-
             PersistedToolchains jdks = reader.read( jdksIS );
             PersistedToolchains jdksExtra = reader.read( jdksExtraIS );
 
@@ -148,11 +145,6 @@ public class DefaultToolchainTest
             assertFalse( tc1.equals( tc2 ) );
             assertFalse( tc2.equals( tc1 ) );
             assertTrue( tc2.equals( tc2 ) );
-        }
-        finally
-        {
-            IOUtil.close( jdksIS );
-            IOUtil.close( jdksExtraIS );
         }
     }
 }

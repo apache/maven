@@ -43,21 +43,21 @@ public class ProjectDependenciesResolverStub
     public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return new HashSet<Artifact>();
+        return new HashSet<>();
     }
 
     public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
                                   Collection<String> scopesToResolve, MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return new HashSet<Artifact>();
+        return new HashSet<>();
     }
 
     public Set<Artifact> resolve( Collection<? extends MavenProject> projects, Collection<String> scopes,
                                   MavenSession session )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return new HashSet<Artifact>();
+        return new HashSet<>();
     }
 
     public Set<Artifact> resolve( MavenProject project, Collection<String> scopesToCollect,
@@ -65,7 +65,7 @@ public class ProjectDependenciesResolverStub
                                   Set<Artifact> ignoreableArtifacts )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        return new HashSet<Artifact>();
+        return new HashSet<>();
     }
 
     public DependencyResolutionResult resolve( DependencyResolutionRequest request )

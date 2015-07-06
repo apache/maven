@@ -28,7 +28,7 @@ public class DefaultEventSpyContext
     implements EventSpy.Context
 {
 
-    private final Map<String, Object> data = new HashMap<String, Object>();
+    private final Map<String, Object> data = new HashMap<>();
 
     public Map<String, Object> getData()
     {

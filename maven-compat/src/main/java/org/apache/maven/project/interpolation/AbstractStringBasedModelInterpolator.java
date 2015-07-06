@@ -71,7 +71,7 @@ public abstract class AbstractStringBasedModelInterpolator
 
     static
     {
-        List<String> translatedPrefixes = new ArrayList<String>();
+        List<String> translatedPrefixes = new ArrayList<>();
 
         // MNG-1927, MNG-2124, MNG-3355:
         // If the build section is present and the project directory is non-null, we should make
@@ -168,12 +168,7 @@ public abstract class AbstractStringBasedModelInterpolator
         {
             model = modelReader.read( sReader );
         }
-        catch ( IOException e )
-        {
-            throw new ModelInterpolationException(
-                "Cannot read project model from interpolating filter of serialized version.", e );
-        }
-        catch ( XmlPullParserException e )
+        catch ( IOException | XmlPullParserException e )
         {
             throw new ModelInterpolationException(
                 "Cannot read project model from interpolating filter of serialized version.", e );
@@ -253,7 +248,7 @@ public abstract class AbstractStringBasedModelInterpolator
             }
         }, PROJECT_PREFIXES, false );
 
-        List<ValueSource> valueSources = new ArrayList<ValueSource>( 9 );
+        List<ValueSource> valueSources = new ArrayList<>( 9 );
 
         // NOTE: Order counts here!
         valueSources.add( basedirValueSource );

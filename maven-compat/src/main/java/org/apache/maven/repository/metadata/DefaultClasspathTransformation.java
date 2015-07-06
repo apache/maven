@@ -101,7 +101,7 @@ public class DefaultClasspathTransformation
             this.cpc = cpc;
             this.graph = cleanGraph;
 
-            visited = new ArrayList<MetadataGraphVertex>( cleanGraph.getVertices().size() );
+            visited = new ArrayList<>( cleanGraph.getVertices().size() );
         }
 
         // -----------------------------------------------------------------------

@@ -44,7 +44,7 @@ public class ArtifactResolutionExceptionTest
         String type = "jar";
         String classifier = "aClassifier";
         String downloadUrl = "http://somewhere.com/download";
-        List path = Arrays.asList( "dependency1", "dependency2" );
+        List<String> path = Arrays.asList( "dependency1", "dependency2" );
         String expected =
             "Missing artifact" + LS + LS + "  Try downloading the file manually from: " + LS
                 + "      http://somewhere.com/download" + LS + LS + "  Then, install it using the command: " + LS

@@ -53,7 +53,7 @@ public class TestFileManager
 
     public static final String TEMP_DIR_PATH = System.getProperty( "java.io.tmpdir" );
 
-    private List<File> filesToDelete = new ArrayList<File>();
+    private List<File> filesToDelete = new ArrayList<>();
 
     private final String baseFilename;
 

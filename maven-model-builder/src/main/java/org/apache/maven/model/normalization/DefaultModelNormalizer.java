@@ -54,7 +54,7 @@ public class DefaultModelNormalizer
         if ( build != null )
         {
             List<Plugin> plugins = build.getPlugins();
-            Map<Object, Plugin> normalized = new LinkedHashMap<Object, Plugin>( plugins.size() * 2 );
+            Map<Object, Plugin> normalized = new LinkedHashMap<>( plugins.size() * 2 );
 
             for ( Plugin plugin : plugins )
             {
@@ -69,7 +69,7 @@ public class DefaultModelNormalizer
 
             if ( plugins.size() != normalized.size() )
             {
-                build.setPlugins( new ArrayList<Plugin>( normalized.values() ) );
+                build.setPlugins( new ArrayList<>( normalized.values() ) );
             }
         }
 
@@ -81,7 +81,7 @@ public class DefaultModelNormalizer
          * aftereffects and bogus error messages.
          */
         List<Dependency> dependencies = model.getDependencies();
-        Map<String, Dependency> normalized = new LinkedHashMap<String, Dependency>( dependencies.size() * 2 );
+        Map<String, Dependency> normalized = new LinkedHashMap<>( dependencies.size() * 2 );
 
         for ( Dependency dependency : dependencies )
         {
@@ -90,7 +90,7 @@ public class DefaultModelNormalizer
 
         if ( dependencies.size() != normalized.size() )
         {
-            model.setDependencies( new ArrayList<Dependency>( normalized.values() ) );
+            model.setDependencies( new ArrayList<>( normalized.values() ) );
         }
     }
 

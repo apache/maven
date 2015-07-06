@@ -38,7 +38,7 @@ public class DefaultMavenExecutionResult
 
     private DependencyResolutionResult dependencyResolutionResult;
 
-    private final List<Throwable> exceptions = new CopyOnWriteArrayList<Throwable>();
+    private final List<Throwable> exceptions = new CopyOnWriteArrayList<>();
 
     private final Map<MavenProject, BuildSummary> buildSummaries =
         Collections.synchronizedMap( new IdentityHashMap<MavenProject, BuildSummary>() );

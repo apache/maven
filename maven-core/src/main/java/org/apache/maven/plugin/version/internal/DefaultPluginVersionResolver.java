@@ -121,7 +121,7 @@ public class DefaultPluginVersionResolver
             new DefaultMetadata( request.getGroupId(), request.getArtifactId(), "maven-metadata.xml",
                                  DefaultMetadata.Nature.RELEASE_OR_SNAPSHOT );
 
-        List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
+        List<MetadataRequest> requests = new ArrayList<>();
 
         requests.add( new MetadataRequest( metadata, null, REPOSITORY_CONTEXT ).setTrace( trace ) );
 
@@ -176,8 +176,8 @@ public class DefaultPluginVersionResolver
         {
             VersionScheme versionScheme = new GenericVersionScheme();
 
-            TreeSet<Version> releases = new TreeSet<Version>( Collections.reverseOrder() );
-            TreeSet<Version> snapshots = new TreeSet<Version>( Collections.reverseOrder() );
+            TreeSet<Version> releases = new TreeSet<>( Collections.reverseOrder() );
+            TreeSet<Version> snapshots = new TreeSet<>( Collections.reverseOrder() );
 
             for ( String ver : versions.versions.keySet() )
             {
@@ -401,7 +401,7 @@ public class DefaultPluginVersionResolver
 
         ArtifactRepository latestRepository;
 
-        Map<String, ArtifactRepository> versions = new LinkedHashMap<String, ArtifactRepository>();
+        Map<String, ArtifactRepository> versions = new LinkedHashMap<>();
 
     }
 

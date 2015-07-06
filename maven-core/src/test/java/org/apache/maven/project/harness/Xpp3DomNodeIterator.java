@@ -48,7 +48,7 @@ class Xpp3DomNodeIterator
 
     private Xpp3Dom[] children;
 
-    private List<Xpp3Dom> filteredChildren = new ArrayList<Xpp3Dom>();
+    private List<Xpp3Dom> filteredChildren = new ArrayList<>();
 
     private int filteredIndex;
 

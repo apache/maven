@@ -19,6 +19,11 @@ package org.apache.maven.project;
  * under the License.
  */
 
+import org.codehaus.plexus.util.ReaderFactory;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,12 +34,6 @@ import java.util.List;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-
 /**
  * Creates an extension descriptor from some XML stream.
  *
@@ -44,7 +43,7 @@ public class ExtensionDescriptorBuilder
 {
 
     /**
-     * @since 3.3.0 
+     * @since 3.3.0
      */
     public String getExtensionDescriptorLocation()
     {
@@ -65,28 +64,17 @@ public class ExtensionDescriptorBuilder
 
         if ( extensionJar.isFile() )
         {
-            JarFile pluginJar = new JarFile( extensionJar, false );
-            try
+            try ( JarFile pluginJar = new JarFile( extensionJar, false ) )
             {
                 ZipEntry pluginDescriptorEntry = pluginJar.getEntry( getExtensionDescriptorLocation() );
 
                 if ( pluginDescriptorEntry != null )
                 {
-                    InputStream is = pluginJar.getInputStream( pluginDescriptorEntry );
-
-                    try
+                    try ( InputStream is = pluginJar.getInputStream( pluginDescriptorEntry ) )
                     {
                         extensionDescriptor = build( is );
                     }
-                    finally
-                    {
-                        IOUtil.close( is );
-                    }
                 }
-            }
-            finally
-            {
-                pluginJar.close();
             }
         }
         else
@@ -95,14 +83,9 @@ public class ExtensionDescriptorBuilder
 
             if ( pluginXml.canRead() )
             {
-                InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) );
-                try
+                try ( InputStream is = new BufferedInputStream( new FileInputStream( pluginXml ) ) )
                 {
                     extensionDescriptor = build( is );
-                }
-                finally
-                {
-                    IOUtil.close( is );
                 }
             }
         }
@@ -146,7 +129,7 @@ public class ExtensionDescriptorBuilder
 
         if ( dom != null )
         {
-            strings = new ArrayList<String>();
+            strings = new ArrayList<>();
 
             for ( Xpp3Dom child : dom.getChildren() )
             {

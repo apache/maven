@@ -87,7 +87,7 @@ public class DefaultLegacyArtifactCollector
     }
 
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                             Map managedVersions, ArtifactRepository localRepository,
+                                             Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              List<ResolutionListener> listeners,
@@ -102,7 +102,7 @@ public class DefaultLegacyArtifactCollector
     }
 
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                             Map managedVersions, ArtifactResolutionRequest repositoryRequest,
+                                             Map<String, Artifact> managedVersions, ArtifactResolutionRequest repositoryRequest,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              List<ResolutionListener> listeners,
                                              List<ConflictResolver> conflictResolvers )
@@ -116,7 +116,7 @@ public class DefaultLegacyArtifactCollector
             conflictResolvers = Collections.singletonList( defaultConflictResolver );
         }
 
-        Map<Object, List<ResolutionNode>> resolvedArtifacts = new LinkedHashMap<Object, List<ResolutionNode>>();
+        Map<Object, List<ResolutionNode>> resolvedArtifacts = new LinkedHashMap<>();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, repositoryRequest.getRemoteRepositories() );
 
@@ -160,7 +160,7 @@ public class DefaultLegacyArtifactCollector
             result.addErrorArtifactException( e );
         }
 
-        Set<ResolutionNode> set = new LinkedHashSet<ResolutionNode>();
+        Set<ResolutionNode> set = new LinkedHashSet<>();
 
         for ( List<ResolutionNode> nodes : resolvedArtifacts.values() )
         {
@@ -206,7 +206,7 @@ public class DefaultLegacyArtifactCollector
      * @param originatingArtifact artifact we are processing
      * @param managedVersions original managed versions
      */
-    private ManagedVersionMap getManagedVersionsMap( Artifact originatingArtifact, Map managedVersions )
+    private ManagedVersionMap getManagedVersionsMap( Artifact originatingArtifact, Map<String,Artifact> managedVersions )
     {
         ManagedVersionMap versionMap;
         if ( ( managedVersions != null ) && ( managedVersions instanceof ManagedVersionMap ) )
@@ -342,9 +342,9 @@ public class DefaultLegacyArtifactCollector
 
                         // Conflict Resolution
                         ResolutionNode resolved = null;
-                        for ( Iterator j = conflictResolvers.iterator(); ( resolved == null ) && j.hasNext(); )
+                        for ( Iterator<ConflictResolver> j = conflictResolvers.iterator(); ( resolved == null ) && j.hasNext(); )
                         {
-                            ConflictResolver conflictResolver = (ConflictResolver) j.next();
+                            ConflictResolver conflictResolver = j.next();
 
                             resolved = conflictResolver.resolveConflict( previous, node );
                         }
@@ -406,7 +406,7 @@ public class DefaultLegacyArtifactCollector
         }
         else
         {
-            previousNodes = new ArrayList<ResolutionNode>();
+            previousNodes = new ArrayList<>();
 
             resolvedArtifacts.put( key, previousNodes );
         }
@@ -424,9 +424,9 @@ public class DefaultLegacyArtifactCollector
 
             Artifact parentArtifact = node.getArtifact();
 
-            for ( Iterator i = node.getChildrenIterator(); i.hasNext(); )
+            for ( Iterator<ResolutionNode> i = node.getChildrenIterator(); i.hasNext(); )
             {
-                ResolutionNode child = (ResolutionNode) i.next();
+                ResolutionNode child = i.next();
 
                 try
                 {
@@ -774,7 +774,7 @@ public class DefaultLegacyArtifactCollector
     }
 
     public ArtifactResolutionResult collect( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                             Map managedVersions, ArtifactRepository localRepository,
+                                             Map<String, Artifact> managedVersions, ArtifactRepository localRepository,
                                              List<ArtifactRepository> remoteRepositories,
                                              ArtifactMetadataSource source, ArtifactFilter filter,
                                              List<ResolutionListener> listeners )

@@ -59,7 +59,7 @@ public class ArtifactResolutionRequest
     private ArtifactFilter resolutionFilter;
 
     // Needs to go away
-    private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
+    private List<ResolutionListener> listeners = new ArrayList<>();
 
     // This is like a filter but overrides all transitive versions
     private Map<String, Artifact> managedVersionMap;
@@ -278,7 +278,7 @@ public class ArtifactResolutionRequest
     {
         if ( servers == null )
         {
-            servers = new ArrayList<Server>();
+            servers = new ArrayList<>();
         }
 
         return servers;
@@ -295,7 +295,7 @@ public class ArtifactResolutionRequest
     {
         if ( mirrors == null )
         {
-            mirrors = new ArrayList<Mirror>();
+            mirrors = new ArrayList<>();
         }
 
         return mirrors;
@@ -312,7 +312,7 @@ public class ArtifactResolutionRequest
     {
         if ( proxies == null )
         {
-            proxies = new ArrayList<Proxy>();
+            proxies = new ArrayList<>();
         }
 
         return proxies;

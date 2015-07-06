@@ -60,7 +60,7 @@ public class VersionRange
 
         if ( restrictions != null )
         {
-            copiedRestrictions = new ArrayList<Restriction>();
+            copiedRestrictions = new ArrayList<>();
 
             if ( !restrictions.isEmpty() )
             {
@@ -96,7 +96,7 @@ public class VersionRange
             return null;
         }
 
-        List<Restriction> restrictions = new ArrayList<Restriction>();
+        List<Restriction> restrictions = new ArrayList<>();
         String process = spec;
         ArtifactVersion version = null;
         ArtifactVersion upperBound = null;
@@ -307,7 +307,7 @@ public class VersionRange
 
     private List<Restriction> intersection( List<Restriction> r1, List<Restriction> r2 )
     {
-        List<Restriction> restrictions = new ArrayList<Restriction>( r1.size() + r2.size() );
+        List<Restriction> restrictions = new ArrayList<>( r1.size() + r2.size() );
         Iterator<Restriction> i1 = r1.iterator();
         Iterator<Restriction> i2 = r2.iterator();
         Restriction res1 = i1.next();

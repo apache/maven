@@ -82,7 +82,7 @@ public class ArtifactResolutionResult
     {
         if ( artifacts == null )
         {
-            artifacts = new LinkedHashSet<Artifact>();
+            artifacts = new LinkedHashSet<>();
         }
 
         artifacts.add( artifact );
@@ -92,7 +92,7 @@ public class ArtifactResolutionResult
     {
         if ( artifacts == null )
         {
-            artifacts = new LinkedHashSet<Artifact>();
+            artifacts = new LinkedHashSet<>();
         }
 
         return artifacts;
@@ -107,7 +107,7 @@ public class ArtifactResolutionResult
     {
         if ( resolutionNodes == null )
         {
-            resolutionNodes = new LinkedHashSet<ResolutionNode>();
+            resolutionNodes = new LinkedHashSet<>();
         }
 
         return resolutionNodes;
@@ -331,7 +331,7 @@ public class ArtifactResolutionResult
     {
         if ( l == null )
         {
-            return new ArrayList<T>();
+            return new ArrayList<>();
         }
         return l;
     }

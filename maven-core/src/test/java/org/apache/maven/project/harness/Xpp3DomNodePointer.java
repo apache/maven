@@ -89,7 +89,7 @@ class Xpp3DomNodePointer
         }
         else
         {
-            List<Object> children = new ArrayList<Object>();
+            List<Object> children = new ArrayList<>();
             for ( int i = 0; i < node.getChildCount(); i++ )
             {
                 children.add( getValue( node.getChild( i ) ) );

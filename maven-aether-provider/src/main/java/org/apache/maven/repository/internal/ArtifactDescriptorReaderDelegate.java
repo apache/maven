@@ -74,7 +74,7 @@ public class ArtifactDescriptorReaderDelegate
             }
         }
 
-        Map<String, Object> properties = new LinkedHashMap<String, Object>();
+        Map<String, Object> properties = new LinkedHashMap<>();
 
         Prerequisites prerequisites = model.getPrerequisites();
         if ( prerequisites != null )
@@ -118,7 +118,7 @@ public class ArtifactDescriptorReaderDelegate
             new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), null,
                                  dependency.getVersion(), props, stereotype );
 
-        List<Exclusion> exclusions = new ArrayList<Exclusion>( dependency.getExclusions().size() );
+        List<Exclusion> exclusions = new ArrayList<>( dependency.getExclusions().size() );
         for ( org.apache.maven.model.Exclusion exclusion : dependency.getExclusions() )
         {
             exclusions.add( convert( exclusion ) );
@@ -145,7 +145,7 @@ public class ArtifactDescriptorReaderDelegate
         if ( downloadUrl != null && downloadUrl.length() > 0 )
         {
             Artifact artifact = result.getArtifact();
-            Map<String, String> props = new HashMap<String, String>( artifact.getProperties() );
+            Map<String, String> props = new HashMap<>( artifact.getProperties() );
             props.put( ArtifactProperties.DOWNLOAD_URL, downloadUrl );
             result.setArtifact( artifact.setProperties( props ) );
         }

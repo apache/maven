@@ -41,7 +41,7 @@ public class TestMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        Set dependencies = new HashSet();
+        Set<Artifact> dependencies = new HashSet<>();
 
         if ( "g".equals( artifact.getArtifactId() ) )
         {

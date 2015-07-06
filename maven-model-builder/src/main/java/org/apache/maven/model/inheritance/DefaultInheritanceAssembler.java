@@ -52,7 +52,7 @@ public class DefaultInheritanceAssembler
     public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
                                           ModelProblemCollector problems )
     {
-        Map<Object, Object> hints = new HashMap<Object, Object>();
+        Map<Object, Object> hints = new HashMap<>();
         hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent ) );
         merger.merge( child, parent, false, hints );
     }
@@ -137,7 +137,7 @@ public class DefaultInheritanceAssembler
             if ( !src.isEmpty() )
             {
                 List<Plugin> tgt = target.getPlugins();
-                Map<Object, Plugin> master = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
+                Map<Object, Plugin> master = new LinkedHashMap<>( src.size() * 2 );
 
                 for ( Plugin element : src )
                 {
@@ -155,8 +155,8 @@ public class DefaultInheritanceAssembler
                     }
                 }
 
-                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<Object, List<Plugin>>();
-                List<Plugin> pending = new ArrayList<Plugin>();
+                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<>();
+                List<Plugin> pending = new ArrayList<>();
                 for ( Plugin element : tgt )
                 {
                     Object key = getPluginKey( element );
@@ -170,7 +170,7 @@ public class DefaultInheritanceAssembler
                         if ( !pending.isEmpty() )
                         {
                             predecessors.put( key, pending );
-                            pending = new ArrayList<Plugin>();
+                            pending = new ArrayList<>();
                         }
                     }
                     else
@@ -179,7 +179,7 @@ public class DefaultInheritanceAssembler
                     }
                 }
 
-                List<Plugin> result = new ArrayList<Plugin>( src.size() + tgt.size() );
+                List<Plugin> result = new ArrayList<>( src.size() + tgt.size() );
                 for ( Map.Entry<Object, Plugin> entry : master.entrySet() )
                 {
                     List<Plugin> pre = predecessors.get( entry.getKey() );
@@ -219,7 +219,7 @@ public class DefaultInheritanceAssembler
             {
                 List<ReportPlugin> tgt = target.getPlugins();
                 Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
+                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( ReportPlugin element :  src )
                 {
@@ -247,7 +247,7 @@ public class DefaultInheritanceAssembler
                     merged.put( key, element );
                 }
 
-                target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+                target.setPlugins( new ArrayList<>( merged.values() ) );
             }
         }
     }

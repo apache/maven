@@ -19,21 +19,20 @@ package org.apache.maven.model.inheritance;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.IOUtil;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * @author Hervé Boutemy
@@ -85,24 +84,16 @@ public class DefaultInheritanceAssemblerTest
         writer.write( actual, null, child );
 
         // check with getPom( "plugin-configuration-effective" )
-        Reader control = null;
-        Reader test = null;
-        try
+        File expected = getPom( "plugin-configuration-expected" );
+        try ( Reader control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
+              Reader test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" ) )
         {
-            File expected = getPom( "plugin-configuration-expected" );
-            control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
-
-            test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" );
 
             XMLUnit.setIgnoreComments( true );
             XMLUnit.setIgnoreWhitespace( true );
             XMLAssert.assertXMLEqual( control, test );
         }
-        catch ( IOException ioe )
-        {
-            IOUtil.close( control );
-            IOUtil.close( test );
-        }
+
     }
 
 }

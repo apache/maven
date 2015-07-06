@@ -77,10 +77,10 @@ public class ProjectSorter
         dag = new DAG();
 
         // groupId:artifactId:version -> project
-        projectMap = new HashMap<String, MavenProject>( projects.size() * 2 );
+        projectMap = new HashMap<>( projects.size() * 2 );
 
         // groupId:artifactId -> (version -> vertex)
-        Map<String, Map<String, Vertex>> vertexMap = new HashMap<String, Map<String, Vertex>>( projects.size() * 2 );
+        Map<String, Map<String, Vertex>> vertexMap = new HashMap<>( projects.size() * 2 );
 
         for ( MavenProject project : projects )
         {
@@ -99,7 +99,7 @@ public class ProjectSorter
             Map<String, Vertex> vertices = vertexMap.get( projectKey );
             if ( vertices == null )
             {
-                vertices = new HashMap<String, Vertex>( 2, 1 );
+                vertices = new HashMap<>( 2, 1 );
                 vertexMap.put( projectKey, vertices );
             }
             vertices.put( project.getVersion(), dag.addVertex( projectId ) );
@@ -154,7 +154,7 @@ public class ProjectSorter
             }
         }
 
-        List<MavenProject> sortedProjects = new ArrayList<MavenProject>( projects.size() );
+        List<MavenProject> sortedProjects = new ArrayList<>( projects.size() );
 
         List<String> sortedProjectLabels = TopologicalSorter.sort( dag );
 

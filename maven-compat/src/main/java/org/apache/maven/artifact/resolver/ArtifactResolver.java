@@ -55,7 +55,7 @@ public interface ArtifactResolver
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
@@ -63,11 +63,12 @@ public interface ArtifactResolver
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    // USED BY INVOKER PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
                                                   List<ArtifactRepository> remoteRepositories,
@@ -76,7 +77,7 @@ public interface ArtifactResolver
 
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter,
                                                   List<ResolutionListener> listeners )
@@ -89,7 +90,7 @@ public interface ArtifactResolver
                                                   List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    // USED BY REMOTE RESOURCES PLUGIN, DEPENDENCY PLUGIN
+    // USED BY REMOTE RESOURCES PLUGIN, DEPENDENCY PLUGIN, SHADE PLUGIN
     @Deprecated
     void resolve( Artifact artifact, List<ArtifactRepository> remoteRepositories, ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;

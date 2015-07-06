@@ -46,7 +46,7 @@ class RemoteSnapshotMetadataGenerator
     {
         legacyFormat = ConfigUtils.getBoolean( session.getConfigProperties(), false, "maven.metadata.legacy" );
 
-        snapshots = new LinkedHashMap<Object, RemoteSnapshotMetadata>();
+        snapshots = new LinkedHashMap<>();
 
         /*
          * NOTE: This should be considered a quirk to support interop with Maven's legacy ArtifactDeployer which

@@ -36,7 +36,7 @@ public class LifeCyclePluginAnalyzerStub
         // NOTE: The upper-case packaging name is intentional, that's a special hinting mode used for certain tests
         if ( "JAR".equals( packaging ) )
         {
-            plugins = new LinkedHashSet<Plugin>();
+            plugins = new LinkedHashSet<>();
 
             plugins.add( newPlugin( "maven-compiler-plugin", "compile", "testCompile" ) );
             plugins.add( newPlugin( "maven-resources-plugin", "resources", "testResources" ) );

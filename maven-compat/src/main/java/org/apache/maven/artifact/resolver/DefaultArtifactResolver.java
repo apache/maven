@@ -260,7 +260,7 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                          List<ArtifactRepository> remoteRepositories,
                                                          ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException
@@ -270,7 +270,7 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                          List<ArtifactRepository> remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException
@@ -300,7 +300,7 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                          List<ArtifactRepository> remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter,
                                                          List<ResolutionListener> listeners )
@@ -311,7 +311,7 @@ public class DefaultArtifactResolver
     }
 
     public ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                         Map managedVersions, ArtifactRepository localRepository,
+                                                         Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                          List<ArtifactRepository> remoteRepositories,
                                                          ArtifactMetadataSource source, ArtifactFilter filter,
                                                          List<ResolutionListener> listeners,
@@ -377,7 +377,7 @@ public class DefaultArtifactResolver
 
         if ( listeners == null )
         {
-            listeners = new ArrayList<ResolutionListener>();
+            listeners = new ArrayList<>();
 
             if ( logger.isDebugEnabled() )
             {
@@ -438,11 +438,11 @@ public class DefaultArtifactResolver
                 }
                 else
                 {
-                    List<Artifact> allArtifacts = new ArrayList<Artifact>();
+                    List<Artifact> allArtifacts = new ArrayList<>();
                     allArtifacts.addAll( artifacts );
                     allArtifacts.addAll( directArtifacts );
 
-                    Map<String, Artifact> mergedArtifacts = new LinkedHashMap<String, Artifact>();
+                    Map<String, Artifact> mergedArtifacts = new LinkedHashMap<>();
                     for ( Artifact artifact : allArtifacts )
                     {
                         String conflictId = artifact.getDependencyConflictId();
@@ -452,7 +452,7 @@ public class DefaultArtifactResolver
                         }
                     }
 
-                    artifacts = new LinkedHashSet<Artifact>( mergedArtifacts.values() );
+                    artifacts = new LinkedHashSet<>( mergedArtifacts.values() );
                 }
 
                 collectionRequest = new ArtifactResolutionRequest( request );
@@ -530,7 +530,7 @@ public class DefaultArtifactResolver
         if ( request.isResolveRoot() )
         {
             // Add the root artifact (as the first artifact to retain logical order of class path!)
-            Set<Artifact> allArtifacts = new LinkedHashSet<Artifact>();
+            Set<Artifact> allArtifacts = new LinkedHashSet<>();
             allArtifacts.add( rootArtifact );
             allArtifacts.addAll( result.getArtifacts() );
             result.setArtifacts( allArtifacts );

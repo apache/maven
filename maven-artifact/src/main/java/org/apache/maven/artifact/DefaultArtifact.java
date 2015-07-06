@@ -251,7 +251,7 @@ public class DefaultArtifact
     {
         if ( metadataMap == null )
         {
-            metadataMap = new HashMap<Object, ArtifactMetadata>();
+            metadataMap = new HashMap<>();
         }
 
         ArtifactMetadata m = metadataMap.get( metadata.getKey() );

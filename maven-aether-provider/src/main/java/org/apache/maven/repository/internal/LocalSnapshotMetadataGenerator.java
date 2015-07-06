@@ -46,7 +46,7 @@ class LocalSnapshotMetadataGenerator
     {
         legacyFormat = ConfigUtils.getBoolean( session.getConfigProperties(), false, "maven.metadata.legacy" );
 
-        snapshots = new LinkedHashMap<Object, LocalSnapshotMetadata>();
+        snapshots = new LinkedHashMap<>();
     }
 
     public Collection<? extends Metadata> prepare( Collection<? extends Artifact> artifacts )

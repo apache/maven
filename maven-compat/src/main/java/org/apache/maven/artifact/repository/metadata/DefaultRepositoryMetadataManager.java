@@ -19,16 +19,6 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -43,10 +33,19 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.WriterFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jason van Zyl
@@ -100,8 +99,7 @@ public class DefaultRepositoryMetadataManager
 
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug(
-                                           "Skipping update check for " + metadata.getKey() + " (" + file
+                        getLogger().debug( "Skipping update check for " + metadata.getKey() + " (" + file
                                                + ") from disabled repository " + repository.getId() + " ("
                                                + repository.getUrl() + ")" );
                     }
@@ -117,9 +115,8 @@ public class DefaultRepositoryMetadataManager
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug(
-                                           "Skipping update check for " + metadata.getKey() + " (" + file
-                                               + ") from repository " + repository.getId() + " (" + repository.getUrl()
-                                               + ") in favor of local copy" );
+                            "Skipping update check for " + metadata.getKey() + " (" + file + ") from repository "
+                                + repository.getId() + " (" + repository.getUrl() + ") in favor of local copy" );
                     }
                 }
                 else
@@ -183,8 +180,8 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( RepositoryMetadataStoreException e )
         {
-            throw new RepositoryMetadataResolutionException( "Unable to store local copy of metadata: "
-                + e.getMessage(), e );
+            throw new RepositoryMetadataResolutionException(
+                "Unable to store local copy of metadata: " + e.getMessage(), e );
         }
     }
 
@@ -204,7 +201,7 @@ public class DefaultRepositoryMetadataManager
         // TODO: this needs to be repeated here so the merging doesn't interfere with the written metadata
         //  - we'd be much better having a pristine input, and an ongoing metadata for merging instead
 
-        Map<ArtifactRepository, Metadata> previousMetadata = new HashMap<ArtifactRepository, Metadata>();
+        Map<ArtifactRepository, Metadata> previousMetadata = new HashMap<>();
         ArtifactRepository selected = null;
         for ( ArtifactRepository repository : remoteRepositories )
         {
@@ -267,14 +264,13 @@ public class DefaultRepositoryMetadataManager
     }
 
     private boolean loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
-                                  ArtifactRepository localRepository, Map<ArtifactRepository,
-                                  Metadata> previousMetadata )
+                                  ArtifactRepository localRepository,
+                                  Map<ArtifactRepository, Metadata> previousMetadata )
     {
         boolean setRepository = false;
 
-        File metadataFile =
-            new File( localRepository.getBasedir(), localRepository.pathOfLocalRepositoryMetadata( repoMetadata,
-                                                                                                   remoteRepository ) );
+        File metadataFile = new File( localRepository.getBasedir(),
+                                      localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
 
         if ( metadataFile.exists() )
         {
@@ -315,17 +311,16 @@ public class DefaultRepositoryMetadataManager
         return setRepository;
     }
 
-    /** @todo share with DefaultPluginMappingManager. */
+    /**
+     * @todo share with DefaultPluginMappingManager.
+     */
     protected Metadata readMetadata( File mappingFile )
         throws RepositoryMetadataReadException
     {
         Metadata result;
 
-        Reader reader = null;
-        try
+        try ( Reader reader = ReaderFactory.newXmlReader( mappingFile ) )
         {
-            reader = ReaderFactory.newXmlReader( mappingFile );
-
             MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
 
             result = mappingReader.read( reader, false );
@@ -334,21 +329,11 @@ public class DefaultRepositoryMetadataManager
         {
             throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "'", e );
         }
-        catch ( IOException e )
+        catch ( IOException | XmlPullParserException e )
         {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
+            throw new RepositoryMetadataReadException(
+                "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e );
         }
-        catch ( XmlPullParserException e )
-        {
-            throw new RepositoryMetadataReadException( "Cannot read metadata from '" + mappingFile + "': "
-                + e.getMessage(), e );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
         return result;
     }
 
@@ -371,10 +356,9 @@ public class DefaultRepositoryMetadataManager
                 if ( lastUpdated != null && now != null && now.compareTo( lastUpdated ) < 0 )
                 {
                     getLogger().warn(
-                                      "The last updated timestamp in " + metadataFile + " refers to the future (now = "
-                                          + now + ", lastUpdated = " + lastUpdated
-                                          + "). Please verify that the clocks of all"
-                                          + " deploying machines are reasonably synchronized." );
+                        "The last updated timestamp in " + metadataFile + " refers to the future (now = " + now
+                            + ", lastUpdated = " + lastUpdated + "). Please verify that the clocks of all"
+                            + " deploying machines are reasonably synchronized." );
                     versioning.setLastUpdated( now );
                     changed = true;
                 }
@@ -385,10 +369,8 @@ public class DefaultRepositoryMetadataManager
         {
             getLogger().debug( "Repairing metadata in " + metadataFile );
 
-            Writer writer = null;
-            try
+            try ( Writer writer = WriterFactory.newXmlWriter( metadataFile ) )
             {
-                writer = WriterFactory.newXmlWriter( metadataFile );
                 new MetadataXpp3Writer().write( writer, metadata );
             }
             catch ( IOException e )
@@ -402,10 +384,6 @@ public class DefaultRepositoryMetadataManager
                 {
                     getLogger().warn( msg );
                 }
-            }
-            finally
-            {
-                IOUtil.close( writer );
             }
         }
     }
@@ -421,8 +399,9 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( TransferFailedException e )
         {
-            throw new RepositoryMetadataResolutionException( metadata + " could not be retrieved from repository: "
-                + remoteRepository.getId() + " due to an error: " + e.getMessage(), e );
+            throw new RepositoryMetadataResolutionException(
+                metadata + " could not be retrieved from repository: " + remoteRepository.getId() + " due to an error: "
+                    + e.getMessage(), e );
         }
 
         try
@@ -439,8 +418,7 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private File getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata,
-                                                              ArtifactRepository localRepo,
+    private File getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository localRepo,
                                                               ArtifactRepository remoteRepository )
         throws TransferFailedException
     {
@@ -454,8 +432,8 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( ResourceDoesNotExistException e )
         {
-            getLogger().info( metadata + " could not be found on repository: " + remoteRepository.getId()
-                                  + ", so will be created" );
+            getLogger().info(
+                metadata + " could not be found on repository: " + remoteRepository.getId() + ", so will be created" );
 
             // delete the local copy so the old details aren't used.
             if ( file.exists() )
@@ -499,8 +477,9 @@ public class DefaultRepositoryMetadataManager
             }
             catch ( TransferFailedException e )
             {
-                throw new RepositoryMetadataDeploymentException( metadata + " could not be retrieved from repository: "
-                    + deploymentRepository.getId() + " due to an error: " + e.getMessage(), e );
+                throw new RepositoryMetadataDeploymentException(
+                    metadata + " could not be retrieved from repository: " + deploymentRepository.getId()
+                        + " due to an error: " + e.getMessage(), e );
             }
 
             if ( file.isFile() )
@@ -518,9 +497,8 @@ public class DefaultRepositoryMetadataManager
         else
         {
             // It's a POM - we don't need to retrieve it first
-            file =
-                new File( localRepository.getBasedir(),
-                          localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
+            file = new File( localRepository.getBasedir(),
+                             localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
         }
 
         try
