@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-187">MNG-187</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-187">MNG-187</a>.
  *
  * @author Benjamin Bentmann
  */

@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2124">MNG-2124</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2124">MNG-2124</a>.
  */
 public class MavenITmng2124PomInterpolationWithParentValuesTest
     extends AbstractMavenIntegrationTestCase

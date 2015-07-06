@@ -25,7 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3740">MNG-3740</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3740">MNG-3740</a>.
  *
  * Check that when a plugin project build uses an earlier version of itself, it
  * doesn't result in a StackOverflowError as a result of trying to calculate

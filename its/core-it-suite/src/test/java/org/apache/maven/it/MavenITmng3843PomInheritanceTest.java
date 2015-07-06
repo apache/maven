@@ -27,7 +27,7 @@ import java.util.Properties;
 import java.util.TreeSet;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3843">MNG-3843</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3843">MNG-3843</a>.
  *
  * @author Benjamin Bentmann
  * @version $Id$

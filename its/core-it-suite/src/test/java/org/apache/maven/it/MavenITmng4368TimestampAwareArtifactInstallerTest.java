@@ -25,7 +25,7 @@ import org.apache.maven.shared.utils.io.FileUtils;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4368">MNG-4368</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4368">MNG-4368</a>.
  *
  * @author Benjamin Bentmann
  */

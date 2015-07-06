@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3428">MNG-3428</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3428">MNG-3428</a>:
  * it tests that the PluginDescriptor.getArtifacts() call returns all of the dependencies of the plugin,
  * not just those that made it past the filter excluding Maven's core artifacts.
  */

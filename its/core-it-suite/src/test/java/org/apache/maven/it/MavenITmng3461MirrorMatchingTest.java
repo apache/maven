@@ -36,7 +36,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3461">MNG-3461</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3461">MNG-3461</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$

@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2234">MNG-2234</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2234">MNG-2234</a>.
  */
 public class MavenITmng2234ActiveProfilesFromSettingsTest
     extends AbstractMavenIntegrationTestCase

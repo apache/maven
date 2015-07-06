@@ -39,7 +39,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4348">MNG-4348</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4348">MNG-4348</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$

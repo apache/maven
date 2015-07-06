@@ -10,7 +10,7 @@
     This project verifies that MNG-3743 is fixed. It is controlled by a JUnit test called org.apache.maven.integrationtests.MNG3743Test
   </description>
   
-  <url>http://jira.codehaus.org/browse/MNG-3743</url>
+  <url>https://issues.apache.org/jira/browse/MNG-3743</url>
   
   <build>
     <extensions>

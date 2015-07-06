@@ -69,7 +69,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         verifier.verifyTextInLog("testApp(org.apache.maven.its.mng5640.FailingTest)");
 
         verifier.assertFilePresent( "target/afterProjectsRead.txt" );
-        // See http://jira.codehaus.org/browse/MNG-5641
+        // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.assertFilePresent( "target/afterSessionStart.txt" );
         verifier.assertFilePresent( "target/afterSessionEnd.txt" );
     }
@@ -107,7 +107,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/afterProjectsRead.txt" );
-        // See http://jira.codehaus.org/browse/MNG-5641
+        // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.assertFilePresent( "target/afterSessionStart.txt" );
         verifier.assertFilePresent( "target/afterSessionEnd.txt" );
     }
@@ -152,7 +152,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/afterProjectsRead.txt" );
-        // See http://jira.codehaus.org/browse/MNG-5641
+        // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.assertFilePresent( "target/afterSessionStart.txt" );
         verifier.assertFilePresent( "target/afterSessionEnd.txt" );
     }
@@ -197,7 +197,7 @@ public class MavenITmng5640LifecycleParticipantAfterSessionEnd
         verifier.resetStreams();
 
         verifier.assertFilePresent( "target/afterProjectsRead.txt" );
-        // See http://jira.codehaus.org/browse/MNG-5641
+        // See https://issues.apache.org/jira/browse/MNG-5641
         // verifier.assertFilePresent( "target/afterSessionStart.txt" );
         verifier.assertFilePresent( "target/afterSessionEnd.txt" );
     }}

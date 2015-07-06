@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3043">MNG-3043</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3043">MNG-3043</a>.
  * 
  * @author Benjamin Bentmann
  */

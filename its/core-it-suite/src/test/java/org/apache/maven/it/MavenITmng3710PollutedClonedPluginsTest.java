@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3710">MNG-3710</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3710">MNG-3710</a>.
  *
  * @author <a href="mailto:brianf@apache.org">Brian Fox</a>
  * @author jdcasey

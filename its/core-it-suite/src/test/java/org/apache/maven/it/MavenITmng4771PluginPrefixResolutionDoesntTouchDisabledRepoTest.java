@@ -39,7 +39,7 @@ import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerList;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4771">MNG-4771</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4771">MNG-4771</a>.
  * 
  * @author Benjamin Bentmann
  */

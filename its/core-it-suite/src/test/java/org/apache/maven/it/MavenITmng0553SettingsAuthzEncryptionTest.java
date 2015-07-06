@@ -37,7 +37,7 @@ import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-553">MNG-553</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-553">MNG-553</a>.
  * 
  * @author Benjamin Bentmann
  */

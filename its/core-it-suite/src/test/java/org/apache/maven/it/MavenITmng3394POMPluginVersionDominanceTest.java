@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3394">MNG-3394</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3394">MNG-3394</a>:
  * it checks that plugin versions in the POM obey the correct order
  * of precedence. Specifically, that mojos in the default lifecycle
  * bindings can find plugin versions in the pluginManagement section

@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5452">MNG-5452</a>
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5452">MNG-5452</a>
  * Make sure that the maven.build.timestamp is in UTC.
  */
 public class MavenITmng5452MavenBuildTimestampUTCTest

@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3498">MNG-3498</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3498">MNG-3498</a>.
  *
  * @todo Fill in a better description of what this test verifies!
  *

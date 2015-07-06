@@ -25,7 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3723">MNG-3723</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3723">MNG-3723</a>.
  *
  * Tests that the parent MavenProject instance of the current project has been 
  * transitioned into a concrete state before a mojo is executed. If this is true,

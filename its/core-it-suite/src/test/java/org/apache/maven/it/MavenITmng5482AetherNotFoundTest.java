@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5482">MNG-5482</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5482">MNG-5482</a>.
  * 
  * It checks that plugins and reports causing errors because of Aether change from Sonatype to Eclipse
  * get a dedicated message to explain solution to end-users

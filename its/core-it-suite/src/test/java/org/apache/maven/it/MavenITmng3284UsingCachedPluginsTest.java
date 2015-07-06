@@ -25,7 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3284">MNG-3284</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3284">MNG-3284</a>:
  * that explicitly defined plugins are used, not the one that is cached.
  */
 public class MavenITmng3284UsingCachedPluginsTest

@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5009">MNG-5009</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5009">MNG-5009</a>.
  */
 public class MavenITmng5009AggregationCycleTest
     extends AbstractMavenIntegrationTestCase

@@ -25,7 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2068">MNG-2068</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2068">MNG-2068</a>.
  *
  * Verify that a multimodule build, built from the middle node in an inheritance hierarchy,
  * can find all parent POMs necessary to build each project in the reactor using ONLY the

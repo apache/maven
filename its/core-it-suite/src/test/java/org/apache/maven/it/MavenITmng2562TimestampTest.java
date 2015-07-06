@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.text.SimpleDateFormat;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2562">MNG-2562</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2562">MNG-2562</a>.
  * 
  * @version $Id$
  */

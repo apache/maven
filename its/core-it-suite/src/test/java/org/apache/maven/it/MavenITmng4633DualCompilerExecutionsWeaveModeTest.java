@@ -24,7 +24,7 @@ import java.io.File;
  */
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4633">MNG-4633</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4633">MNG-4633</a>.
  * 
  * @version $Id$
  * @author Kristian Rosenvold

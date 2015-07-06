@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4387">MNG-4387</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4387">MNG-4387</a>.
  * 
  * @author Benjamin Bentmann
  */

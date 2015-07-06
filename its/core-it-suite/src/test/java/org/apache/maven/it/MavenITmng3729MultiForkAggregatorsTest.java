@@ -25,7 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3729">MNG-3729</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3729">MNG-3729</a>.
  * <br/><br/>
  * Complicated use case, but say
  * you have an aggregator plugin that forks a lifecycle, and this aggregator is bound to the main lifecycle in a

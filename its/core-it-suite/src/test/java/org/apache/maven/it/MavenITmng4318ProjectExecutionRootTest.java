@@ -26,8 +26,8 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4318">MNG-4318</a> and
- * <a href="http://jira.codehaus.org/browse/MNG-5014">MNG-5014</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4318">MNG-4318</a> and
+ * <a href="https://issues.apache.org/jira/browse/MNG-5014">MNG-5014</a>.
  * 
  * @author Benjamin Bentmann
  */

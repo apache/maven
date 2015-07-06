@@ -31,7 +31,7 @@ import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2387">MNG-2387</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2387">MNG-2387</a>.
  * 
  * @author Brett Porter
  * @version $Id$

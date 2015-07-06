@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3641">MNG-3641</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3641">MNG-3641</a>:
  * Profile activation warning test
  */
 public class MavenITmng3641ProfileActivationWarningTest

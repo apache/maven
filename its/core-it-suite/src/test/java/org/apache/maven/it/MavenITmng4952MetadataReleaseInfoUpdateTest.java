@@ -26,7 +26,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4952">MNG-4952</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4952">MNG-4952</a>.
  * 
  * @author Benjamin Bentmann
  */

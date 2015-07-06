@@ -26,7 +26,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4106">MNG-4106</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4106">MNG-4106</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$

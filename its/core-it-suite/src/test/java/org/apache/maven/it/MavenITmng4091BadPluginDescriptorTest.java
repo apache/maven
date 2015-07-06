@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4091">MNG-4091</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4091">MNG-4091</a>:
  * Bad plugin descriptor error handling
  */
 public class MavenITmng4091BadPluginDescriptorTest

@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3940">MNG-3940</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3940">MNG-3940</a>.
  *
  * @author Benjamin Bentmann
  * @version $Id$

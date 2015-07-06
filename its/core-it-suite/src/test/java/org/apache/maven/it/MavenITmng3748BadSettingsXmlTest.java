@@ -27,7 +27,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3748">MNG-3748</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3748">MNG-3748</a>.
  * 
  * Verifies that the settings.xml file is parsed using strict mode, such that invalid
  * xml will cause an error (specifically, when repositories are not contained within a profile declaration)

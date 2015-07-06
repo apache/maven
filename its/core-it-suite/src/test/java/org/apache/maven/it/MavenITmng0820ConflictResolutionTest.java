@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-820">MNG-820</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-820">MNG-820</a>.
  * 
  * @author Brett Porter
  * @version $Id$

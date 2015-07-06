@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5019">MNG-5019</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5019">MNG-5019</a>.
  */
 public class MavenITmng5019StringBasedCompLookupFromChildPluginRealmTest
     extends AbstractMavenIntegrationTestCase

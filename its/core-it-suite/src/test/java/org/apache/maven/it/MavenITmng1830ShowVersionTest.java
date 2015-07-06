@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-1830">MNG-1830</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1830">MNG-1830</a>.
  * 
  * @author Brett Porter
  * @version $Id: ba3c28edf533dba3dfa60e384a670575e0cd6901 $

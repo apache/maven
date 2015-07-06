@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3057">MNG-3057</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3057">MNG-3057</a>.
  *
  * @todo Fill in a better description of what this test verifies!
  * 

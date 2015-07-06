@@ -40,7 +40,7 @@ import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4500">MNG-4500</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4500">MNG-4500</a>.
  * 
  * @author Benjamin Bentmann
  */

@@ -38,7 +38,7 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.security.SslSocketConnector;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4428">MNG-4428</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4428">MNG-4428</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$

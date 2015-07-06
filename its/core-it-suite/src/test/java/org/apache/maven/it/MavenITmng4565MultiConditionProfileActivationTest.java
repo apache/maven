@@ -25,7 +25,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-4565">MNG-3106</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4565">MNG-3106</a>:
  * 
  * When multiple activators are present in a profile they should be AND'd. All activator must
  * conditions must be satisfied in order for the profile to be activated.

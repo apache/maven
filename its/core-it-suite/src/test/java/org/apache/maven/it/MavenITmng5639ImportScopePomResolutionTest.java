@@ -24,7 +24,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5639">MNG-5639</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5639">MNG-5639</a>:
  * Check that import POM defined in DependencyManagement can be resolved from a parameterised repository
  */
 public class MavenITmng5639ImportScopePomResolutionTest

@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.io.FileUtils;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3503">MNG-3503</a>. The first test verifies that
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3503">MNG-3503</a>. The first test verifies that
  * a plugin using plexus-utils-1.1 does not cause linkage errors. The second test verifies that a plugin with a
  * different implementation of the shaded classes is used instead.
  */

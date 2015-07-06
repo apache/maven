@@ -25,7 +25,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2720">MNG-2720</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2720">MNG-2720</a>.
  * 
  * This test will ensure that running the 'package' phase on a multimodule build with child
  * interdependency will result in one child using the JAR of the other child in its compile

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5576">MNG-5576</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5576">MNG-5576</a>.
  * 
  * @author Jason van Zyl
  */

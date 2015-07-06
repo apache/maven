@@ -26,7 +26,7 @@ import java.io.File;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5013">MNG-5013</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5013">MNG-5013</a>.
  */
 public class MavenITmng5013ConfigureParamBeanFromScalarValueTest
     extends AbstractMavenIntegrationTestCase

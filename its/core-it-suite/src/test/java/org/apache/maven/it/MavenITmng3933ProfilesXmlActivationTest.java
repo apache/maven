@@ -27,7 +27,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import org.apache.maven.shared.utils.Os;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3933">MNG-3933</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3933">MNG-3933</a>.
  * 
  * @author Benjamin Bentmann
  * @version $Id$

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5608">MNG-5608</a>:
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5608">MNG-5608</a>:
  * Profile activation warning test when file specification contains <code>${project.basedir}</code>
  * instead of <code>${basedir}</code>
  */

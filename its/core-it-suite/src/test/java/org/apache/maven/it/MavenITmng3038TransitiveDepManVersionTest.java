@@ -27,7 +27,7 @@ import org.apache.maven.it.Verifier;
 import org.apache.maven.it.util.ResourceExtractor;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3038">MNG-3038</a>
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3038">MNG-3038</a>
  * 
  * @author Joakim Erdfelt
  * @version $Id$

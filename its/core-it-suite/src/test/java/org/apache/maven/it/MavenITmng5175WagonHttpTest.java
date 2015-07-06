@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-5175">MNG-5175</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5175">MNG-5175</a>.
  * test correct integration of wagon http: read time out configuration from settings.xml
  *
  * @version $Id$

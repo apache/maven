@@ -26,8 +26,8 @@ import java.io.File;
 import java.util.Collection;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2921">MNG-2921</a>. It naturally includes the
- * test for the related issue <a href="http://jira.codehaus.org/browse/MNG-2877">MNG-2877</a> whose original test was
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2921">MNG-2921</a>. It naturally includes the
+ * test for the related issue <a href="https://issues.apache.org/jira/browse/MNG-2877">MNG-2877</a> whose original test was
  * too weak to prevent this issue.
  * 
  * @author Benjamin Bentmann

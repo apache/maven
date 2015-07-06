@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-2103">MNG-2103</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-2103">MNG-2103</a>.
  * 
  * @author Benjamin Bentmann
  */

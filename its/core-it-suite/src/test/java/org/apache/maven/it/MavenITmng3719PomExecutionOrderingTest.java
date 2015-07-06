@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3719">MNG-3719</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3719">MNG-3719</a>.
  *
  * @author Brett Porter
  * @version $Id$

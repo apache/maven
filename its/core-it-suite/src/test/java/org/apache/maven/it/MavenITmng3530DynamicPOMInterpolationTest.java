@@ -25,7 +25,7 @@ import org.apache.maven.it.util.ResourceExtractor;
 import java.io.File;
 
 /**
- * This is a test set for <a href="http://jira.codehaus.org/browse/MNG-3530">MNG-3530</a>.
+ * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3530">MNG-3530</a>.
  *
  * Contains various tests for dynamism of interpolation expressions within the POM.
  *
