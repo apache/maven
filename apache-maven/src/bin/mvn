@@ -200,11 +200,11 @@ find_maven_basedir() {
   local basedir=$(pwd)
   local wdir=$(pwd)
   while [ "$wdir" != '/' ] ; do
-    wdir=$(cd "$wdir/.."; pwd)
     if [ -d "$wdir"/.mvn ] ; then
       basedir=$wdir
       break
     fi
+    wdir=$(cd "$wdir/.."; pwd)
   done
   echo "${basedir}"
 }
