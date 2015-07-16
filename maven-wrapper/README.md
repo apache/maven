@@ -23,9 +23,23 @@ $ ./mvnw clean install
 or
 
 ```
-$ ./mvnw.bat clean install
+$ ./mvnw.cmd clean install
 ```
 
 A normal Maven build will be executed with the one important change that if the user doesn't have the necessary version of Maven specified in `.mvn/wrapper/maven-wrapper.properties` it will be downloaded for the user first.
+
+## Using a Different Version of Maven
+
+To switch the version of Maven used to build a project you can initialize it using 
+
+```
+mvn -N io.takari:maven:wrapper -Dmaven=3.3.3
+```
+
+which works for any version except snapshots. Once you have a wrapper you can change its version by setting the `distributionUrl` in `.mvn/wrapper/maven-wrapper.properties`, e.g.
+
+```
+distributionUrl=https://repo1.maven.org/maven2/org/apache/maven/apache-maven/3.2.1/apache-maven-3.2.1-bin.zip
+```
 
 [1]: https://github.com/takari/takari-maven-plugin
