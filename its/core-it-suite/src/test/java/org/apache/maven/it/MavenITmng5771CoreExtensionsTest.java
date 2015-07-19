@@ -50,7 +50,7 @@ public class MavenITmng5771CoreExtensionsTest
     }
     
     //
-    // https://jira.codehaus.org/browse/MNG-5795: Maven extensions can not be retrieved from authenticated repositories
+    // https://issues.apache.org/jira/browse/MNG-5795: Maven extensions can not be retrieved from authenticated repositories
     //
     public void testCoreExtensionRetrievedFromAMirrorWithBasicAuthentication()
         throws Exception
