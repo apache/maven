@@ -68,9 +68,15 @@ public class Lifecycle
         return this.phases;
     }
 
-    public Map<String, LifecyclePhase> getDefaultPhases()
+    public Map<String, LifecyclePhase> getDefaultLifecyclePhases()
     {
         return defaultPhases;
+    }
+    
+    @Deprecated
+    public Map<String, String> getDefaultPhases()
+    {
+        return LifecyclePhase.toLegacyMap( getDefaultLifecyclePhases() );
     }
 
     @Override
