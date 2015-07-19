@@ -34,6 +34,6 @@ public interface LifecycleMapping
     List<String> getOptionalMojos( String lifecycle );
 
     @Deprecated
-    Map<String, LifecyclePhase> getPhases( String lifecycle );
+    Map<String, String> getPhases( String lifecycle );
 
 }
