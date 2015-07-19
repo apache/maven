@@ -29,7 +29,7 @@ public class SystemProperties
     /**
      * Thread-safe System.properties copy implementation.
      *
-     * @see http://jira.codehaus.org/browse/MNG-5670
+     * @see https://issues.apache.org/jira/browse/MNG-5670
      */
     public static void addSystemProperties( Properties props )
     {
