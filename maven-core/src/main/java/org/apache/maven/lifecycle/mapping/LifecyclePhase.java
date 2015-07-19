@@ -20,7 +20,10 @@ package org.apache.maven.lifecycle.mapping;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -61,4 +64,46 @@ public class LifecyclePhase
             mojos.add( lifecycleMojo );
         }
     }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for ( LifecycleMojo mojo: getMojos() )
+        {
+            if ( first )
+            {
+                first = false;
+            }
+            else
+            {
+                sb.append( "," );
+            }
+            sb.append( mojo.getGoal() );
+        }
+        return sb.toString();
+    }
+    
+    @Deprecated
+    public static Map<String, String> toLegacyMap( Map<String, LifecyclePhase> lifecyclePhases )
+    {
+        if ( lifecyclePhases == null )
+        {
+            return null;
+        }
+        
+        if ( lifecyclePhases.isEmpty() )
+        {
+            return Collections.emptyMap();
+        }
+        
+        Map<String, String> phases = new LinkedHashMap<>();
+        for ( Map.Entry<String, LifecyclePhase> e: lifecyclePhases.entrySet() )
+        {
+            phases.put( e.getKey(), e.getValue().toString() );
+        }
+        return phases;
+    }
+    
 }

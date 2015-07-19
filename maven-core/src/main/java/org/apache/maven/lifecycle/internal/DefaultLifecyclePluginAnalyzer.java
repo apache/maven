@@ -104,11 +104,11 @@ public class DefaultLifecyclePluginAnalyzer
 
             if ( lifecycleConfiguration != null )
             {
-                phaseToGoalMapping = lifecycleConfiguration.getPhases();
+                phaseToGoalMapping = lifecycleConfiguration.getLifecyclePhases();
             }
-            else if ( lifecycle.getDefaultPhases() != null )
+            else if ( lifecycle.getDefaultLifecyclePhases() != null )
             {
-                phaseToGoalMapping = lifecycle.getDefaultPhases();
+                phaseToGoalMapping = lifecycle.getDefaultLifecyclePhases();
             }
 
             if ( phaseToGoalMapping != null )
