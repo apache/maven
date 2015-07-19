@@ -446,7 +446,7 @@ public class MavenCli
             slf4jConfiguration.setRootLoggerLevel( Slf4jConfiguration.Level.ERROR );
         }
         // else fall back to default log level specified in conf
-        // see http://jira.codehaus.org/browse/MNG-2570
+        // see https://issues.apache.org/jira/browse/MNG-2570
 
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {

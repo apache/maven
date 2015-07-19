@@ -64,7 +64,7 @@ public class DefaultClassRealmManager
 
     /**
      * During normal command line build, ClassWorld is loaded by jvm system classloader, which only includes
-     * plexus-classworlds jar and possibly javaagent classes, see http://jira.codehaus.org/browse/MNG-4747.
+     * plexus-classworlds jar and possibly javaagent classes, see https://issues.apache.org/jira/browse/MNG-4747.
      * <p>
      * Using ClassWorld to determine plugin/extensions realm parent classloaders gives m2e and integration test harness
      * flexibility to load multiple version of maven into dedicated classloaders without assuming state of jvm system
