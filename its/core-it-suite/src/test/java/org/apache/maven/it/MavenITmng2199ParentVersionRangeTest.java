@@ -157,6 +157,27 @@ public class MavenITmng2199ParentVersionRangeTest
         }
     }
 
+    public void testValidLocalParentVersionRange()
+        throws Exception
+    {
+        Verifier verifier = null;
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-2199-parent-version-range/local-parent" );
+
+        try
+        {
+            verifier = newVerifier( testDir.getAbsolutePath(), "remote" );
+            verifier.addCliOption( "-U" );
+            verifier.setAutoclean( false );
+
+            verifier.executeGoal( "verify" );
+            verifier.verifyErrorFreeLog();
+        }
+        finally
+        {
+            verifier.resetStreams();
+        }
+    }
+
     private static int indexOf( final List<String> logLines, final String regex )
     {
         final Pattern pattern = Pattern.compile( regex );
