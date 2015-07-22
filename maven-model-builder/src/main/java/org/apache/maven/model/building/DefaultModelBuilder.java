@@ -20,20 +20,9 @@ package org.apache.maven.model.building;
  */
 
 
-import static org.apache.maven.model.building.Result.error;
-import static org.apache.maven.model.building.Result.newResult;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -72,6 +61,20 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
 
 /**
  * @author Benjamin Bentmann
@@ -921,15 +924,18 @@ public class DefaultModelBuilder
         }
         if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
         {
-            //
-            // If the parent version is a range we will let it through here as we do not have the classes
-            // for determining if the parent is within the range in scope. This may lead to MNG-5840 style
-            // regressions in the range, but without this the parent version range will not work at all.
-            //
-
-            if ( !parent.getVersion().startsWith( "[" ) && !parent.getVersion().startsWith( "(" ) )
+            try
             {
-                // version skew drop back to resolution from the repository
+                VersionRange parentRange = VersionRange.createFromVersionSpec( parent.getVersion() );
+                if ( !parentRange.containsVersion( new DefaultArtifactVersion( version ) ) )
+                {
+                    // version skew drop back to resolution from the repository
+                    return null;
+                }
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                // invalid version range, so drop back to resolution from the repository
                 return null;
             }
         }
