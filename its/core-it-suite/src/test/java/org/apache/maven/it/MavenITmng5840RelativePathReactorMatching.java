@@ -12,7 +12,7 @@ public class MavenITmng5840RelativePathReactorMatching
         super( ALL_MAVEN_VERSIONS );
     }
     
-    public void testPkgTypeMojoConfiguration()
+    public void testRelativePathPointsToWrongVersion()
         throws Exception
     {
         File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5840-relative-path-reactor-matching" );
@@ -27,5 +27,4 @@ public class MavenITmng5840RelativePathReactorMatching
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
-    
 }
