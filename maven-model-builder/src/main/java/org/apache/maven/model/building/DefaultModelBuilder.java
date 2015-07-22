@@ -513,7 +513,7 @@ public class DefaultModelBuilder
             }
         }
 
-        problems.setSource( modelSource.getLocation() );
+        problems.setSource(modelSource.getLocation());
         try
         {
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
@@ -594,10 +594,10 @@ public class DefaultModelBuilder
             throw problems.newModelBuildingException();
         }
 
-        model.setPomFile( pomFile );
+        model.setPomFile(pomFile);
 
-        problems.setSource( model );
-        modelValidator.validateRawModel( model, request, problems );
+        problems.setSource(model);
+        modelValidator.validateRawModel(model, request, problems);
 
         if ( hasFatalErrors( problems ) )
         {
@@ -615,7 +615,7 @@ public class DefaultModelBuilder
         context.setInactiveProfileIds( request.getInactiveProfileIds() );
         context.setSystemProperties( request.getSystemProperties() );
         context.setUserProperties( request.getUserProperties() );
-        context.setProjectDirectory( ( request.getPomFile() != null ) ? request.getPomFile().getParentFile() : null );
+        context.setProjectDirectory((request.getPomFile() != null) ? request.getPomFile().getParentFile() : null);
 
         return context;
     }
@@ -735,7 +735,7 @@ public class DefaultModelBuilder
                 activation = activation.clone();
             }
 
-            activations.put( profile.getId(), activation );
+            activations.put(profile.getId(), activation);
         }
 
         return activations;
@@ -921,8 +921,17 @@ public class DefaultModelBuilder
         }
         if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
         {
-            // version skew drop back to resolution from the repository
-            return null;
+            //
+            // If the parent version is a range we will let it through here as we do not have the classes
+            // for determining if the parent is within the range in scope. This may lead to MNG-5840 style
+            // regressions in the range, but without this the parent version range will not work at all.
+            //
+            
+            if ( !parent.getVersion().startsWith("[") && !parent.getVersion().startsWith("(") ) 
+            {
+                // version skew drop back to resolution from the repository
+                return null;
+            }
         }
 
         //
