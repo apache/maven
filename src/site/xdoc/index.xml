@@ -57,13 +57,13 @@
           <area shape="rect" coords="409,342,500,378" alt="maven-model" href="maven-model/" />
           <area shape="rect" coords="551,58,707,94"   alt="commons-cli" href="http://commons.apache.org/cli/" />
           <area shape="rect" coords="551,116,739,152" alt="wagon-provider-api" href="http://maven.apache.org/wagon/wagon-provider-api/" />
-          <area shape="rect" coords="550,175,690,211" alt="plexus-sec-dispatcher" href="http://plexus.codehaus.org/plexus-components/plexus-sec-dispatcher/project-reports.html" />
-          <area shape="rect" coords="581,230,660,265" alt="plexus-cipher" href="http://plexus.codehaus.org/plexus-components/plexus-cipher/project-reports.html" />
-          <area shape="rect" coords="551,284,707,320" alt="plexus-interpolation" href="http://plexus.codehaus.org/plexus-components/plexus-interpolation/" />
-          <area shape="rect" coords="551,359,776,395" alt="plexus-component-annotations" href="http://plexus.codehaus.org/plexus-containers/plexus-component-annotations/" />
-          <area shape="rect" coords="550,401,682,437" alt="plexus-classworlds" href="http://plexus.codehaus.org/plexus-classworlds/" />
-          <area shape="rect" coords="685,455,775,491" alt="plexus-utils" href="http://plexus.codehaus.org/plexus-utils/" />
-          <area shape="rect" coords="542,167,783,502" alt="plexus" href="http://plexus.codehaus.org/" />
+          <area shape="rect" coords="550,175,690,211" alt="plexus-sec-dispatcher" href="https://github.com/codehaus-plexus/plexus-sec-dispatcher" />
+          <area shape="rect" coords="581,230,660,265" alt="plexus-cipher" href="hhttps://github.com/codehaus-plexus/plexus-cipher" />
+          <area shape="rect" coords="551,284,707,320" alt="plexus-interpolation" href="https://github.com/codehaus-plexus/plexus-interpolation" />
+          <area shape="rect" coords="551,359,776,395" alt="plexus-component-annotations" href="https://github.com/codehaus-plexus/plexus-containers" />
+          <area shape="rect" coords="550,401,682,437" alt="plexus-classworlds" href="https://github.com/codehaus-plexus/plexus-classworlds" />
+          <area shape="rect" coords="685,455,775,491" alt="plexus-utils" href="https://github.com/codehaus-plexus/plexus-utils" />
+          <area shape="rect" coords="542,167,783,502" alt="plexus" href="https://github.com/codehaus-plexus" />
           <area shape="rect" coords="68,338,240,482"  alt="aether" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.aether" />
           <area shape="rect" coords="388,393,520,594" alt="sisu" href="http://www.eclipse.org/projects/project_summary.php?projectid=technology.sisu" />
           <area shape="rect" coords="519,518,621,554" alt="guice" href="http://code.google.com/p/google-guice/" />
