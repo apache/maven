@@ -175,7 +175,7 @@ Maven Model Builder
   compatibility with previous Maven versions:
 
     * <<<$\{project.build.sourceEncoding\}>>> for
-    {{{http://docs.codehaus.org/display/MAVENUSER/POM+Element+for+Source+File+Encoding}source files encoding}}
+    {{{https://cwiki.apache.org/confluence/display/MAVEN/POM+Element+for+Source+File+Encoding}source files encoding}}
     (defaults to platform encoding)
 
     * <<<$\{project.reporting.outputEncoding\}>>> for
