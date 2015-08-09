@@ -59,7 +59,10 @@ Maven Model Builder
 
    ** inheritance assembly: <<<InheritanceAssembler>>> ({{{./apidocs/org/apache/maven/model/inheritance/InheritanceAssembler.html}javadoc}}),
    with its <<<DefaultInheritanceAssembler>>> implementation
-   ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}})
+   ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}}). Notice that
+   <<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>, <<<project.scm.url>>> and
+   <<<project.distributionManagement.site.url>>> have a special treatment: if not overridden in child, the default value is parent's one
+   with child artifact id appended
 
    ** model interpolation (see below)
 
