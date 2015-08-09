@@ -24,12 +24,6 @@
   <name>Maven Model Builder</name>
   <description>The effective model builder, with inheritance, profile activation, interpolation, ...</description>
 
-  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

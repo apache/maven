@@ -34,12 +34,6 @@
     <distributionFileName>${distributionId}-${project.version}</distributionFileName>
   </properties>
 
-  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

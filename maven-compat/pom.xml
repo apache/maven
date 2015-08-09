@@ -24,12 +24,6 @@
   <name>Maven Compat</name>
   <description>Maven2 classes maintained as compatibility layer.</description>
 
-  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
   <properties>
     <checkstyle.failOnViolation>false</checkstyle.failOnViolation><!-- lazyness for code that will disappear in future... -->
   </properties>

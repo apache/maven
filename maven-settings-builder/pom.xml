@@ -33,12 +33,6 @@ under the License.
   <name>Maven Settings Builder</name>
   <description>The effective settings builder, with inheritance and password decryption.</description>
 
-  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
   <contributors>
     <contributor>
       <name>Thomas Meyer</name>

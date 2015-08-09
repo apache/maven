@@ -24,12 +24,6 @@
   <name>Maven Core</name>
   <description>Maven Core classes.</description>
 
-  <scm><!-- remove when git scm url format can accept artifact-id at the end, as automatically inherited -->
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-
   <properties>
     <checkstyle.violation.ignore>RedundantThrows,NewlineAtEndOfFile,ParameterNumber,MethodLength,FileLength,JavadocType,MethodName,MagicNumber,ConstantName,VisibilityModifier,InnerAssignment</checkstyle.violation.ignore>
   </properties>
