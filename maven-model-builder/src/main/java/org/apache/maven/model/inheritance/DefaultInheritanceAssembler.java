@@ -84,7 +84,8 @@ public class DefaultInheritanceAssembler
             String childName = child.getArtifactId();
 
             /*
-             * This logic (using filesystem) exists only for the sake of backward-compat with 2.x (MNG-5000). In general, it is wrong to
+             * This logic (using filesystem, against wanted independance from the user environment) exists only for the
+             * sake of backward-compat with 2.x (MNG-5000). In general, it is wrong to
              * base URL inheritance on the module directory names as this information is unavailable for POMs in the
              * repository. In other words, modules where artifactId != moduleDirName will see different effective URLs
              * depending on how the model was constructed (from filesystem or from repository).
