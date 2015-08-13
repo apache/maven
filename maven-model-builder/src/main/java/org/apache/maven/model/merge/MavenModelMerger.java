@@ -65,7 +65,7 @@ public class MavenModelMerger
     /**
      * The context key for the artifact id of the target model.
      */
-    private static final String ARTIFACT_ID = "artifact-id";
+    public static final String ARTIFACT_ID = "artifact-id";
 
     @Override
     protected void mergeModel( Model target, Model source, boolean sourceDominant, Map<Object, Object> context )
@@ -102,7 +102,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( appendPath( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -466,7 +466,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( appendPath( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -485,7 +485,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( appendPath( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -504,7 +504,7 @@ public class MavenModelMerger
             }
             else if ( target.getConnection() == null )
             {
-                target.setConnection( appendPath( src, context ) );
+                target.setConnection( extrapolateChildUrl( src, context ) );
                 target.setLocation( "connection", source.getLocation( "connection" ) );
             }
         }
@@ -524,7 +524,7 @@ public class MavenModelMerger
             }
             else if ( target.getDeveloperConnection() == null )
             {
-                target.setDeveloperConnection( appendPath( src, context ) );
+                target.setDeveloperConnection( extrapolateChildUrl( src, context ) );
                 target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
@@ -670,56 +670,9 @@ public class MavenModelMerger
         return exclusion.getGroupId() + ':' + exclusion.getArtifactId();
     }
 
-    private String appendPath( String parentPath, Map<Object, Object> context )
+    protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
     {
-        Object artifactId = context.get( ARTIFACT_ID );
-        Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
-
-        if ( artifactId != null && childPathAdjustment != null )
-        {
-            return appendPath( parentPath, artifactId.toString(), childPathAdjustment.toString() );
-        }
-        else
-        {
-            return parentPath;
-        }
-    }
-
-    private String appendPath( String parentPath, String childPath, String pathAdjustment )
-    {
-        String path = parentPath;
-        path = concatPath( path, pathAdjustment );
-        path = concatPath( path, childPath );
-        return path;
-    }
-
-    private String concatPath( String base, String path )
-    {
-        String result = base;
-
-        if ( path != null && path.length() > 0 )
-        {
-            if ( ( result.endsWith( "/" ) && !path.startsWith( "/" ) )
-                || ( !result.endsWith( "/" ) && path.startsWith( "/" ) ) )
-            {
-                result += path;
-            }
-            else if ( result.endsWith( "/" ) && path.startsWith( "/" ) )
-            {
-                result += path.substring( 1 );
-            }
-            else
-            {
-                result += '/';
-                result += path;
-            }
-            if ( base.endsWith( "/" ) && !result.endsWith( "/" ) )
-            {
-                result += '/';
-            }
-        }
-
-        return result;
+        return parentUrl;
     }
 
 }

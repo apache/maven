@@ -131,6 +131,60 @@ public class DefaultInheritanceAssembler
     {
 
         @Override
+        protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
+        {
+            Object artifactId = context.get( ARTIFACT_ID );
+            Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
+
+            if ( artifactId != null && childPathAdjustment != null )
+            {
+                // append childPathAdjustment and artifactId to parent url
+                return appendPath( parentUrl, artifactId.toString(), childPathAdjustment.toString() );
+            }
+            else
+            {
+                return parentUrl;
+            }
+        }
+
+        private String appendPath( String parentUrl, String childPath, String pathAdjustment )
+        {
+            String url = parentUrl;
+            url = concatPath( url, pathAdjustment );
+            url = concatPath( url, childPath );
+            return url;
+        }
+
+        private String concatPath( String base, String path )
+        {
+            String result = base;
+
+            if ( path != null && path.length() > 0 )
+            {
+                if ( ( result.endsWith( "/" ) && !path.startsWith( "/" ) )
+                    || ( !result.endsWith( "/" ) && path.startsWith( "/" ) ) )
+                {
+                    result += path;
+                }
+                else if ( result.endsWith( "/" ) && path.startsWith( "/" ) )
+                {
+                    result += path.substring( 1 );
+                }
+                else
+                {
+                    result += '/';
+                    result += path;
+                }
+                if ( base.endsWith( "/" ) && !result.endsWith( "/" ) )
+                {
+                    result += '/';
+                }
+            }
+
+            return result;
+        }
+
+        @Override
         protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
                                                      boolean sourceDominant, Map<Object, Object> context )
         {
