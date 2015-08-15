@@ -34,6 +34,36 @@ public class MavenModelMergerTest
 {
     private MavenModelMerger modelMerger = new MavenModelMerger();
 
+    // modelVersion is neither inherited nor injected
+    @Test
+    public void testMergeModel_ModelVersion()
+    {
+        Model parent = new Model();
+        parent.setModelVersion( "4.0.0" );
+        Model model = new Model();
+        modelMerger.mergeModel_ModelVersion( model, parent, false, null );
+        assertNull( model.getModelVersion() );
+
+        model.setModelVersion( "5.0.0" );
+        modelMerger.mergeModel_ModelVersion( model, parent, false, null );
+        assertEquals( "5.0.0", model.getModelVersion() );
+    }
+
+    // ArtifactId is neither inherited nor injected
+    @Test
+    public void testMergeModel_ArtifactId()
+    {
+        Model parent = new Model();
+        parent.setArtifactId( "PARENT" );
+        Model model = new Model();
+        modelMerger.mergeModel_ArtifactId( model, parent, false, null );
+        assertNull( model.getArtifactId() );
+
+        model.setArtifactId( "MODEL" );
+        modelMerger.mergeModel_ArtifactId( model, parent, false, null );
+        assertEquals( "MODEL", model.getArtifactId() );
+    }
+
     // Prerequisites are neither inherited nor injected
     @Test
     public void testMergeModel_Prerequisites()
@@ -41,13 +71,13 @@ public class MavenModelMergerTest
         Model parent = new Model();
         parent.setPrerequisites( new Prerequisites() );
         Model model = new Model();
-        modelMerger.mergeModel_Prerequisites( model, parent, true, null );
+        modelMerger.mergeModel_Prerequisites( model, parent, false, null );
         assertNull( model.getPrerequisites() );
         
         Prerequisites modelPrerequisites = new Prerequisites();
         modelPrerequisites.setMaven( "3.0" );
         model.setPrerequisites( modelPrerequisites );
-        modelMerger.mergeModel_Prerequisites( model, parent, true, null );
+        modelMerger.mergeModel_Prerequisites( model, parent, false, null );
         assertEquals( modelPrerequisites, model.getPrerequisites() );
     }
 
@@ -58,13 +88,13 @@ public class MavenModelMergerTest
         Model parent = new Model();
         parent.setProfiles( Collections.singletonList( new Profile() ) );;
         Model model = new Model();
-        modelMerger.mergeModel_Profiles( model, parent, true, null );
+        modelMerger.mergeModel_Profiles( model, parent, false, null );
         assertEquals( 0, model.getProfiles().size() );
         
         Profile modelProfile = new Profile();
         modelProfile.setId( "MODEL" );
         model.setProfiles( Collections.singletonList( modelProfile ) );
-        modelMerger.mergeModel_Prerequisites( model, parent, true, null );
+        modelMerger.mergeModel_Prerequisites( model, parent, false, null );
         assertEquals( Collections.singletonList( modelProfile ), model.getProfiles() );
     }
 
