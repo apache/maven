@@ -8,7 +8,7 @@ The easiest way to setup the Maven Wrapper for your project is to use the [Takar
 mvn -N io.takari:maven:wrapper
 ```
 
-Normally you instruct user to run the `mvn` command like the following:
+Normally you instruct users to run the `mvn` command like the following:
 
 ```
 $ mvn clean install
