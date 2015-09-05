@@ -57,7 +57,7 @@
     <wagonVersion>2.9</wagonVersion> <!-- Verify SNAPSHOT for MNG-5605 -->
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
-    <modelloVersion>1.8.1</modelloVersion>
+    <modelloVersion>1.8.3</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
     <aetherVersion>1.0.2.v20150114</aetherVersion>
     <slf4jVersion>1.7.5</slf4jVersion>
