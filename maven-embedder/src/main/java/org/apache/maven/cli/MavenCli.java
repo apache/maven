@@ -148,6 +148,8 @@ public class MavenCli
 
     private static final String EXTENSIONS_FILENAME = ".mvn/extensions.xml";
 
+    private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
+
     private ClassWorld classWorld;
 
     private LoggerManager plexusLoggerManager;
@@ -371,7 +373,7 @@ public class MavenCli
 
         try
         {
-            File configFile = new File( cliRequest.multiModuleProjectDirectory, ".mvn/maven.config" );
+            File configFile = new File( cliRequest.multiModuleProjectDirectory, MVN_MAVEN_CONFIG );
 
             if ( configFile.isFile() )
             {
