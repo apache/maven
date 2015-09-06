@@ -149,39 +149,45 @@ public class DefaultInheritanceAssembler
 
         private String appendPath( String parentUrl, String childPath, String pathAdjustment )
         {
-            String url = parentUrl;
-            url = concatPath( url, pathAdjustment );
-            url = concatPath( url, childPath );
-            return url;
+            StringBuilder url = new StringBuilder( parentUrl.length() + pathAdjustment.length() + childPath.length()
+                + ( ( pathAdjustment.length() == 0 ) ? 1 : 2 ) );
+
+            url.append( parentUrl );
+            concatPath( url, pathAdjustment );
+            concatPath( url, childPath );
+
+            return url.toString();
         }
 
-        private String concatPath( String base, String path )
+        private void concatPath( StringBuilder url, String path )
         {
-            String result = base;
-
-            if ( path != null && path.length() > 0 )
+            if ( path.length() > 0 )
             {
-                if ( ( result.endsWith( "/" ) && !path.startsWith( "/" ) )
-                    || ( !result.endsWith( "/" ) && path.startsWith( "/" ) ) )
+                boolean initialUrlEndsWithSlash = url.charAt( url.length() - 1 ) == '/';
+                boolean pathStartsWithSlash = path.charAt( 0 ) ==  '/';
+
+                if ( pathStartsWithSlash )
                 {
-                    result += path;
+                    if ( initialUrlEndsWithSlash )
+                    {
+                        // 1 extra '/' to remove
+                        url.setLength( url.length() - 1 );
+                    }
                 }
-                else if ( result.endsWith( "/" ) && path.startsWith( "/" ) )
+                else if ( !initialUrlEndsWithSlash )
                 {
-                    result += path.substring( 1 );
+                    // add missing '/' between url and path
+                    url.append( '/' );
                 }
-                else
+
+                url.append( path );
+
+                // ensure resulting url ends with slash if initial url was
+                if ( initialUrlEndsWithSlash && !path.endsWith( "/" ) )
                 {
-                    result += '/';
-                    result += path;
-                }
-                if ( base.endsWith( "/" ) && !result.endsWith( "/" ) )
-                {
-                    result += '/';
+                    url.append( '/' );
                 }
             }
-
-            return result;
         }
 
         @Override
