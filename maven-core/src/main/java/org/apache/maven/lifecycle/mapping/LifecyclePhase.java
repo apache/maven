@@ -55,13 +55,16 @@ public class LifecyclePhase
     {
         mojos = new ArrayList<>();
         
-        String[] mojoGoals = StringUtils.split( goals, "," );
-        
-        for ( String mojoGoal: mojoGoals )
+        if ( StringUtils.isNotEmpty( goals ) )
         {
-            LifecycleMojo lifecycleMojo = new LifecycleMojo();
-            lifecycleMojo.setGoal( mojoGoal.trim() );
-            mojos.add( lifecycleMojo );
+            String[] mojoGoals = StringUtils.split( goals, "," );
+            
+            for ( String mojoGoal: mojoGoals )
+            {
+                LifecycleMojo lifecycleMojo = new LifecycleMojo();
+                lifecycleMojo.setGoal( mojoGoal.trim() );
+                mojos.add( lifecycleMojo );
+            }
         }
     }
     
@@ -70,17 +73,21 @@ public class LifecyclePhase
     {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
-        for ( LifecycleMojo mojo: getMojos() )
+        List<LifecycleMojo> mojos = getMojos();
+        if ( mojos != null )
         {
-            if ( first )
+            for ( LifecycleMojo mojo: mojos )
             {
-                first = false;
+                if ( first )
+                {
+                    first = false;
+                }
+                else
+                {
+                    sb.append( "," );
+                }
+                sb.append( mojo.getGoal() );
             }
-            else
-            {
-                sb.append( "," );
-            }
-            sb.append( mojo.getGoal() );
         }
         return sb.toString();
     }
