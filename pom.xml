@@ -49,7 +49,7 @@
     <junitVersion>4.11</junitVersion>
     <plexusVersion>1.6</plexusVersion>
     <plexusInterpolationVersion>1.21</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.0.20</plexusUtilsVersion>
+    <plexusUtilsVersion>3.0.22</plexusUtilsVersion>
     <!-- Latest version of Guava that works with Sisu -->
     <guavaVersion>18.0</guavaVersion>
     <guiceVersion>3.2.5</guiceVersion>
