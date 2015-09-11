@@ -197,27 +197,29 @@ fi
 # traverses directory structure from process work directory to filesystem root
 # first directory with .mvn subdirectory is considered project base directory
 find_maven_basedir() {
-  local basedir="$(pwd)"
-  local wdir="$(pwd)"
+(
+  basedir="`pwd`"
+  wdir="`pwd`"
   while [ "$wdir" != '/' ] ; do
-    wdir="$(cd "$wdir/.."; pwd)"
+    wdir="`cd "$wdir/.."; pwd`"
     if [ -d "$wdir"/.mvn ] ; then
       basedir=$wdir
       break
     fi
   done
   echo "${basedir}"
+)
 }
 
 # concatenates all lines of a file
 concat_lines() {
   if [ -f "$1" ]; then
-    echo "$(tr -s '\n' ' ' < "$1")"
+    echo "`tr -s '\n' ' ' < "$1"`"
   fi
 }
 
-MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-$(find_maven_basedir)}"
-MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
+MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-`find_maven_basedir`}"
+MAVEN_OPTS="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"` $MAVEN_OPTS"
 
 # For Cygwin, switch project base directory path to Windows format before
 # executing Maven. Otherwise this will cause Maven not to consider it.
