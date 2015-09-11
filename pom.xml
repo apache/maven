@@ -47,7 +47,7 @@
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
     <junitVersion>4.11</junitVersion>
-    <plexusVersion>1.5.5</plexusVersion>
+    <plexusVersion>1.6</plexusVersion>
     <plexusInterpolationVersion>1.21</plexusInterpolationVersion>
     <plexusUtilsVersion>3.0.20</plexusUtilsVersion>
     <!-- Latest version of Guava that works with Sisu -->
