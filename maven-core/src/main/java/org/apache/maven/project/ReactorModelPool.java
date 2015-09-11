@@ -32,7 +32,7 @@ import java.util.Map;
 class ReactorModelPool
 {
 
-    private final Map<CacheKey, File> pomFiles = new HashMap<CacheKey, File>();
+    private final Map<CacheKey, File> pomFiles = new HashMap<>();
 
     public File get( String groupId, String artifactId, String version )
     {

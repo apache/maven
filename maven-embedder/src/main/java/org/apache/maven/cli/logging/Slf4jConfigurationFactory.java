@@ -45,7 +45,7 @@ public class Slf4jConfigurationFactory
 
     public static Slf4jConfiguration getConfiguration( ILoggerFactory loggerFactory )
     {
-        Map<URL, Set<Object>> supported = new LinkedHashMap<URL, Set<Object>>();
+        Map<URL, Set<Object>> supported = new LinkedHashMap<>();
 
         String slf4jBinding = loggerFactory.getClass().getCanonicalName();
 
@@ -69,19 +69,7 @@ public class Slf4jConfigurationFactory
                 supported.put( resource, conf.keySet() );
             }
         }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( InstantiationException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( IllegalAccessException e )
-        {
-            e.printStackTrace();
-        }
-        catch ( ClassNotFoundException e )
+        catch ( IOException | ClassNotFoundException | IllegalAccessException | InstantiationException e )
         {
             e.printStackTrace();
         }

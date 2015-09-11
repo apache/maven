@@ -64,7 +64,7 @@ public class ArtifactUtilsTest
     public void testArtifactMapByVersionlessIdOrdering()
         throws Exception
     {
-        List<Artifact> list = new ArrayList<Artifact>();
+        List<Artifact> list = new ArrayList<>();
         list.add( newArtifact( "b" ) );
         list.add( newArtifact( "a" ) );
         list.add( newArtifact( "c" ) );
@@ -73,7 +73,7 @@ public class ArtifactUtilsTest
 
         Map<String, Artifact> map = ArtifactUtils.artifactMapByVersionlessId( list );
         assertNotNull( map );
-        assertEquals( list, new ArrayList<Artifact>( map.values() ) );
+        assertEquals( list, new ArrayList<>( map.values() ) );
     }
 
 }

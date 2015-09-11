@@ -74,7 +74,7 @@ public class MavenSession
     private boolean parallel;
 
     private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
-        new ConcurrentHashMap<String, Map<String, Map<String, Object>>>();
+        new ConcurrentHashMap<>();
 
 
     public void setProjects( List<MavenProject> projects )
@@ -198,7 +198,7 @@ public class MavenSession
 
         if ( pluginContextsByKey == null )
         {
-            pluginContextsByKey = new ConcurrentHashMap<String, Map<String, Object>>();
+            pluginContextsByKey = new ConcurrentHashMap<>();
 
             pluginContextsByProjectAndPluginKey.put( projectKey, pluginContextsByKey );
         }
@@ -209,7 +209,7 @@ public class MavenSession
 
         if ( pluginContext == null )
         {
-            pluginContext = new ConcurrentHashMap<String, Object>();
+            pluginContext = new ConcurrentHashMap<>();
 
             pluginContextsByKey.put( pluginKey, pluginContext );
         }

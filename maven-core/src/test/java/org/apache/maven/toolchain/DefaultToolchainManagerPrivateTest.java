@@ -65,7 +65,7 @@ public class DefaultToolchainManagerPrivateTest
 
         MockitoAnnotations.initMocks( this );
 
-        toolchainManager.factories = new HashMap<String, ToolchainFactory>();
+        toolchainManager.factories = new HashMap<>();
         toolchainManager.factories.put( "basic", toolchainFactory_basicType );
         toolchainManager.factories.put( "rare", toolchainFactory_rareType );
     }
@@ -122,17 +122,17 @@ public class DefaultToolchainManagerPrivateTest
         MavenSession session = mock( MavenSession.class );
         MavenExecutionRequest req = new DefaultMavenExecutionRequest();
         when( session.getRequest() ).thenReturn( req );
-        Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<String, List<ToolchainModel>>();
+        Map<String, List<ToolchainModel>> groupedToolchains = new HashMap<>();
         req.setToolchains( groupedToolchains );
 
-        List<ToolchainModel> basicToolchains = new ArrayList<ToolchainModel>();
+        List<ToolchainModel> basicToolchains = new ArrayList<>();
         ToolchainModel basicToolchainModel = new ToolchainModel();
         basicToolchainModel.setType( "basic" );
         basicToolchains.add( basicToolchainModel );
         basicToolchains.add( basicToolchainModel );
         groupedToolchains.put( "basic", basicToolchains );
 
-        List<ToolchainModel> rareToolchains = new ArrayList<ToolchainModel>();
+        List<ToolchainModel> rareToolchains = new ArrayList<>();
         ToolchainModel rareToolchainModel = new ToolchainModel();
         rareToolchainModel.setType( "rare" );
         rareToolchains.add( rareToolchainModel );

@@ -61,7 +61,7 @@ public class DefaultLifecycles
 
     public DefaultLifecycles( Map<String, Lifecycle> lifecycles, Logger logger )
     {
-        this.lifecycles = new LinkedHashMap<String, Lifecycle>();
+        this.lifecycles = new LinkedHashMap<>();
         this.logger = logger;
         this.lifecycles = lifecycles;
     }
@@ -82,7 +82,7 @@ public class DefaultLifecycles
         // If people are going to make their own lifecycles then we need to tell people how to namespace them correctly
         // so that they don't interfere with internally defined lifecycles.
 
-        HashMap<String, Lifecycle> phaseToLifecycleMap = new HashMap<String, Lifecycle>();
+        HashMap<String, Lifecycle> phaseToLifecycleMap = new HashMap<>();
 
         for ( Lifecycle lifecycle : getLifeCycles() )
         {
@@ -113,12 +113,12 @@ public class DefaultLifecycles
     public List<Lifecycle> getLifeCycles()
     {
         // ensure canonical order of standard lifecycles
-        Map<String, Lifecycle> lifecycles = new LinkedHashMap<String, Lifecycle>( this.lifecycles );
+        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>( this.lifecycles );
 
-        LinkedHashSet<String> lifecycleNames = new LinkedHashSet<String>( Arrays.asList( STANDARD_LIFECYCLES ) );
+        LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>( Arrays.asList( STANDARD_LIFECYCLES ) );
         lifecycleNames.addAll( lifecycles.keySet() );
 
-        ArrayList<Lifecycle> result = new ArrayList<Lifecycle>();
+        ArrayList<Lifecycle> result = new ArrayList<>();
         for ( String name : lifecycleNames )
         {
             Lifecycle lifecycle = lifecycles.get( name );
@@ -131,7 +131,7 @@ public class DefaultLifecycles
 
     public String getLifecyclePhaseList()
     {
-        Set<String> phases = new LinkedHashSet<String>();
+        Set<String> phases = new LinkedHashSet<>();
 
         for ( Lifecycle lifecycle : getLifeCycles() )
         {

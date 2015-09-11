@@ -145,7 +145,7 @@ public class DefaultModelValidator
                 }
             }
 
-            Set<String> profileIds = new HashSet<String>();
+            Set<String> profileIds = new HashSet<>();
 
             for ( Profile profile : m.getProfiles() )
             {
@@ -255,7 +255,7 @@ public class DefaultModelValidator
     {
         Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
-        Map<String, Plugin> index = new HashMap<String, Plugin>();
+        Map<String, Plugin> index = new HashMap<>();
 
         for ( Plugin plugin : plugins )
         {
@@ -273,7 +273,7 @@ public class DefaultModelValidator
                 index.put( key, plugin );
             }
 
-            Set<String> executionIds = new HashSet<String>();
+            Set<String> executionIds = new HashSet<>();
 
             for ( PluginExecution exec : plugin.getExecutions() )
             {
@@ -333,7 +333,7 @@ public class DefaultModelValidator
 
         if ( request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
         {
-            Set<String> modules = new HashSet<String>();
+            Set<String> modules = new HashSet<>();
             for ( int i = 0, n = m.getModules().size(); i < n; i++ )
             {
                 String module = m.getModules().get( i );
@@ -425,7 +425,7 @@ public class DefaultModelValidator
         Severity errOn30 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0 );
         Severity errOn31 = getSeverity( request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1 );
 
-        Map<String, Dependency> index = new HashMap<String, Dependency>();
+        Map<String, Dependency> index = new HashMap<>();
 
         for ( Dependency dependency : dependencies )
         {
@@ -639,7 +639,7 @@ public class DefaultModelValidator
     private void validateRawRepositories( ModelProblemCollector problems, List<Repository> repositories, String prefix,
                                        ModelBuildingRequest request )
     {
-        Map<String, Repository> index = new HashMap<String, Repository>();
+        Map<String, Repository> index = new HashMap<>();
 
         for ( Repository repository : repositories )
         {

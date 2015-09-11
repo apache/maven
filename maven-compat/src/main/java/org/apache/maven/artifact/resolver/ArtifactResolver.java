@@ -55,7 +55,7 @@ public interface ArtifactResolver
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
@@ -63,7 +63,7 @@ public interface ArtifactResolver
     // USED BY MAVEN ASSEMBLY PLUGIN
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
@@ -77,7 +77,7 @@ public interface ArtifactResolver
 
     @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts, Artifact originatingArtifact,
-                                                  Map managedVersions, ArtifactRepository localRepository,
+                                                  Map<String,Artifact> managedVersions, ArtifactRepository localRepository,
                                                   List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source, ArtifactFilter filter,
                                                   List<ResolutionListener> listeners )

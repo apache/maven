@@ -52,7 +52,7 @@ public class DefaultInheritanceAssembler
     public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
                                           ModelProblemCollector problems )
     {
-        Map<Object, Object> hints = new HashMap<Object, Object>();
+        Map<Object, Object> hints = new HashMap<>();
         hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent ) );
         merger.merge( child, parent, false, hints );
     }
@@ -84,10 +84,11 @@ public class DefaultInheritanceAssembler
             String childName = child.getArtifactId();
 
             /*
-             * This logic exists only for the sake of backward-compat with 2.x (MNG-5000). In generally, it is wrong to
-             * base URL inheritance on the project directory names as this information is unavailable for POMs in the
-             * repository. In other words, projects where artifactId != projectDirName will see different effective URLs
-             * depending on how the POM was constructed.
+             * This logic (using filesystem, against wanted independance from the user environment) exists only for the
+             * sake of backward-compat with 2.x (MNG-5000). In general, it is wrong to
+             * base URL inheritance on the module directory names as this information is unavailable for POMs in the
+             * repository. In other words, modules where artifactId != moduleDirName will see different effective URLs
+             * depending on how the model was constructed (from filesystem or from repository).
              */
             File childDirectory = child.getProjectDirectory();
             if ( childDirectory != null )
@@ -130,6 +131,66 @@ public class DefaultInheritanceAssembler
     {
 
         @Override
+        protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
+        {
+            Object artifactId = context.get( ARTIFACT_ID );
+            Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
+
+            if ( artifactId != null && childPathAdjustment != null )
+            {
+                // append childPathAdjustment and artifactId to parent url
+                return appendPath( parentUrl, artifactId.toString(), childPathAdjustment.toString() );
+            }
+            else
+            {
+                return parentUrl;
+            }
+        }
+
+        private String appendPath( String parentUrl, String childPath, String pathAdjustment )
+        {
+            StringBuilder url = new StringBuilder( parentUrl.length() + pathAdjustment.length() + childPath.length()
+                + ( ( pathAdjustment.length() == 0 ) ? 1 : 2 ) );
+
+            url.append( parentUrl );
+            concatPath( url, pathAdjustment );
+            concatPath( url, childPath );
+
+            return url.toString();
+        }
+
+        private void concatPath( StringBuilder url, String path )
+        {
+            if ( path.length() > 0 )
+            {
+                boolean initialUrlEndsWithSlash = url.charAt( url.length() - 1 ) == '/';
+                boolean pathStartsWithSlash = path.charAt( 0 ) ==  '/';
+
+                if ( pathStartsWithSlash )
+                {
+                    if ( initialUrlEndsWithSlash )
+                    {
+                        // 1 extra '/' to remove
+                        url.setLength( url.length() - 1 );
+                    }
+                }
+                else if ( !initialUrlEndsWithSlash )
+                {
+                    // add missing '/' between url and path
+                    url.append( '/' );
+                }
+
+                url.append( path );
+
+                // ensure resulting url ends with slash if initial url was
+                if ( initialUrlEndsWithSlash && !path.endsWith( "/" ) )
+                {
+                    url.append( '/' );
+                }
+            }
+        }
+
+        @Override
         protected void mergePluginContainer_Plugins( PluginContainer target, PluginContainer source,
                                                      boolean sourceDominant, Map<Object, Object> context )
         {
@@ -137,7 +198,7 @@ public class DefaultInheritanceAssembler
             if ( !src.isEmpty() )
             {
                 List<Plugin> tgt = target.getPlugins();
-                Map<Object, Plugin> master = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
+                Map<Object, Plugin> master = new LinkedHashMap<>( src.size() * 2 );
 
                 for ( Plugin element : src )
                 {
@@ -155,8 +216,8 @@ public class DefaultInheritanceAssembler
                     }
                 }
 
-                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<Object, List<Plugin>>();
-                List<Plugin> pending = new ArrayList<Plugin>();
+                Map<Object, List<Plugin>> predecessors = new LinkedHashMap<>();
+                List<Plugin> pending = new ArrayList<>();
                 for ( Plugin element : tgt )
                 {
                     Object key = getPluginKey( element );
@@ -170,7 +231,7 @@ public class DefaultInheritanceAssembler
                         if ( !pending.isEmpty() )
                         {
                             predecessors.put( key, pending );
-                            pending = new ArrayList<Plugin>();
+                            pending = new ArrayList<>();
                         }
                     }
                     else
@@ -179,7 +240,7 @@ public class DefaultInheritanceAssembler
                     }
                 }
 
-                List<Plugin> result = new ArrayList<Plugin>( src.size() + tgt.size() );
+                List<Plugin> result = new ArrayList<>( src.size() + tgt.size() );
                 for ( Map.Entry<Object, Plugin> entry : master.entrySet() )
                 {
                     List<Plugin> pre = predecessors.get( entry.getKey() );
@@ -219,7 +280,7 @@ public class DefaultInheritanceAssembler
             {
                 List<ReportPlugin> tgt = target.getPlugins();
                 Map<Object, ReportPlugin> merged =
-                    new LinkedHashMap<Object, ReportPlugin>( ( src.size() + tgt.size() ) * 2 );
+                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( ReportPlugin element :  src )
                 {
@@ -247,7 +308,7 @@ public class DefaultInheritanceAssembler
                     merged.put( key, element );
                 }
 
-                target.setPlugins( new ArrayList<ReportPlugin>( merged.values() ) );
+                target.setPlugins( new ArrayList<>( merged.values() ) );
             }
         }
     }

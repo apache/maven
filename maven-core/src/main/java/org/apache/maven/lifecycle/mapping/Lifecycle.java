@@ -19,8 +19,11 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Class Lifecycle.
@@ -35,7 +38,7 @@ public class Lifecycle
     /**
      * Field phases
      */
-    private Map<String, LifecyclePhase> phases;
+    private Map<String, LifecyclePhase> lifecyclePhases;
 
     /*
      * NOTE: This exists merely for backward-compat with legacy-style lifecycle definitions and allows configuration
@@ -53,13 +56,13 @@ public class Lifecycle
     }
 
     /**
-     * Method getPhases
+     * Method getLifecyclePhases
      */
-    public Map<String, LifecyclePhase> getPhases()
+    public Map<String, LifecyclePhase> getLifecyclePhases()
     {
-        return this.phases;
+        return this.lifecyclePhases;
     }
-
+    
     /**
      * Method setId
      *
@@ -71,13 +74,40 @@ public class Lifecycle
     }
 
     /**
-     * Method setPhases
+     * Method setLifecyclePhases
      *
      * @param phases
      */
+    public void setLifecyclePhases( Map<String, LifecyclePhase> lifecyclePhases )
+    {
+        this.lifecyclePhases = lifecyclePhases;
+    }
+
+    @Deprecated
+    public Map<String, String> getPhases()
+    {
+        Map<String, LifecyclePhase> lphases = getLifecyclePhases();
+        if ( lphases == null )
+        {
+            return null;
+        }
+        
+        if ( lphases.isEmpty() )
+        {
+            return Collections.emptyMap();
+        }
+        
+        Map<String, String> phases = new LinkedHashMap<>();
+        for ( Map.Entry<String, LifecyclePhase> e: lphases.entrySet() )
+        {
+            phases.put( e.getKey(), e.getValue().toString() );
+        }
+        return phases;
+    }
+
+    @Deprecated
     public void setPhases( Map<String, LifecyclePhase> phases )
     {
-        this.phases = phases;
-    } //-- void setPhases(java.util.List)
-
+        setLifecyclePhases( phases );
+    }
 }

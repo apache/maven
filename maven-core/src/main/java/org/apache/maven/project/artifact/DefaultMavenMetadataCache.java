@@ -41,14 +41,14 @@ public class DefaultMavenMetadataCache
     implements MavenMetadataCache
 {
 
-    protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<CacheKey, CacheRecord>();
+    protected final Map<CacheKey, CacheRecord> cache = new ConcurrentHashMap<>();
 
     public static class CacheKey
     {
         private final Artifact artifact;
         private final long pomHash;
         private final boolean resolveManagedVersions;
-        private final List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
+        private final List<ArtifactRepository> repositories = new ArrayList<>();
         private final int hashCode;
 
         public CacheKey( Artifact artifact, boolean resolveManagedVersions, ArtifactRepository localRepository,
@@ -215,7 +215,7 @@ public class DefaultMavenMetadataCache
             this.pomArtifact = ArtifactUtils.copyArtifact( pomArtifact );
             this.relocatedArtifact = ArtifactUtils.copyArtifactSafe( relocatedArtifact );
             this.artifacts = ArtifactUtils.copyArtifacts( artifacts, new ArrayList<Artifact>() );
-            this.remoteRepositories = new ArrayList<ArtifactRepository>( remoteRepositories );
+            this.remoteRepositories = new ArrayList<>( remoteRepositories );
 
             this.managedVersions = managedVersions;
             if ( managedVersions != null )

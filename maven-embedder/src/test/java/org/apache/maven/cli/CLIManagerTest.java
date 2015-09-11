@@ -56,7 +56,7 @@ public class CLIManagerTest
         public Collection<Option> getOptions()
         {
             @SuppressWarnings( "unchecked" )
-            List<Option> optList = new ArrayList<Option>( options.getOptions() );
+            List<Option> optList = new ArrayList<>( options.getOptions() );
             Collections.sort( optList, new OptionComparator() );
             return optList;
         }

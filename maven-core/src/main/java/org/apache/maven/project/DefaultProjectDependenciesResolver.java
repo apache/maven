@@ -119,7 +119,7 @@ public class DefaultProjectDependenciesResolver
         }
         else
         {
-            Map<String, Dependency> dependencies = new HashMap<String, Dependency>();
+            Map<String, Dependency> dependencies = new HashMap<>();
             for ( Dependency dependency : project.getDependencies() )
             {
                 String classifier = dependency.getClassifier();
@@ -298,7 +298,7 @@ public class DefaultProjectDependenciesResolver
         {
             if ( managed == null )
             {
-                managed = new HashMap<String, Dependency>();
+                managed = new HashMap<>();
                 if ( project.getDependencyManagement() != null )
                 {
                     for ( Dependency dep : project.getDependencyManagement().getDependencies() )

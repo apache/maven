@@ -39,7 +39,7 @@ public class DefaultLegacySupport
 {
 
     private static final ThreadLocal<AtomicReference<MavenSession>> SESSION =
-        new InheritableThreadLocal<AtomicReference<MavenSession>>();
+        new InheritableThreadLocal<>();
 
     public void setSession( MavenSession session )
     {
@@ -55,7 +55,7 @@ public class DefaultLegacySupport
         }
         else
         {
-            DefaultLegacySupport.SESSION.set( new AtomicReference<MavenSession>( session ) );
+            DefaultLegacySupport.SESSION.set( new AtomicReference<>( session ) );
         }
     }
 

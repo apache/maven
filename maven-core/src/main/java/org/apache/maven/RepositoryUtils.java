@@ -97,7 +97,7 @@ public class RepositoryUtils
         result.setFile( artifact.getFile() );
         result.setResolved( artifact.getFile() != null );
 
-        List<String> trail = new ArrayList<String>( 1 );
+        List<String> trail = new ArrayList<>( 1 );
         trail.add( result.getId() );
         result.setDependencyTrail( trail );
 
@@ -112,7 +112,7 @@ public class RepositoryUtils
         {
             org.apache.maven.artifact.Artifact artifact = toArtifact( node.getDependency() );
 
-            List<String> nodeTrail = new ArrayList<String>( trail.size() + 1 );
+            List<String> nodeTrail = new ArrayList<>( trail.size() + 1 );
             nodeTrail.addAll( trail );
             nodeTrail.add( artifact.getId() );
 
@@ -168,7 +168,7 @@ public class RepositoryUtils
         List<Exclusion> excl = null;
         if ( exclusions != null )
         {
-            excl = new ArrayList<Exclusion>( exclusions.size() );
+            excl = new ArrayList<>( exclusions.size() );
             for ( org.apache.maven.model.Exclusion exclusion : exclusions )
             {
                 excl.add( toExclusion( exclusion ) );
@@ -185,7 +185,7 @@ public class RepositoryUtils
             return null;
         }
 
-        List<RemoteRepository> results = new ArrayList<RemoteRepository>( repos.size() );
+        List<RemoteRepository> results = new ArrayList<>( repos.size() );
         for ( ArtifactRepository repo : repos )
         {
             results.add( toRepo( repo ) );
@@ -310,7 +310,7 @@ public class RepositoryUtils
             new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), dependency.getClassifier(), null,
                                  dependency.getVersion(), props, stereotype );
 
-        List<Exclusion> exclusions = new ArrayList<Exclusion>( dependency.getExclusions().size() );
+        List<Exclusion> exclusions = new ArrayList<>( dependency.getExclusions().size() );
         for ( org.apache.maven.model.Exclusion exclusion : dependency.getExclusions() )
         {
             exclusions.add( toExclusion( exclusion ) );
@@ -352,7 +352,7 @@ public class RepositoryUtils
 
     public static Collection<Artifact> toArtifacts( Collection<org.apache.maven.artifact.Artifact> artifactsToConvert )
     {
-        List<Artifact> artifacts = new ArrayList<Artifact>();
+        List<Artifact> artifacts = new ArrayList<>();
         for ( org.apache.maven.artifact.Artifact a : artifactsToConvert )
         {
             artifacts.add( toArtifact( a ) );

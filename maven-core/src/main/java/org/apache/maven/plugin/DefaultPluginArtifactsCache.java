@@ -66,7 +66,7 @@ public class DefaultPluginArtifactsCache
             this.plugin = plugin.clone();
             workspace = CacheUtils.getWorkspace( session );
             this.localRepo = session.getLocalRepository();
-            this.repositories = new ArrayList<RemoteRepository>( repositories.size() );
+            this.repositories = new ArrayList<>( repositories.size() );
             for ( RemoteRepository repository : repositories )
             {
                 if ( repository.isRepositoryManager() )
@@ -133,7 +133,7 @@ public class DefaultPluginArtifactsCache
 
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
+    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
     public Key createKey( Plugin plugin, DependencyFilter extensionFilter, List<RemoteRepository> repositories,
                           RepositorySystemSession session )
@@ -164,7 +164,7 @@ public class DefaultPluginArtifactsCache
         assertUniqueKey( key );
 
         CacheRecord record =
-            new CacheRecord( Collections.unmodifiableList( new ArrayList<Artifact>( pluginArtifacts ) ) );
+            new CacheRecord( Collections.unmodifiableList( new ArrayList<>( pluginArtifacts ) ) );
 
         cache.put( key, record );
 

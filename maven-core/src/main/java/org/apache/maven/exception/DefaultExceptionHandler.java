@@ -110,7 +110,7 @@ public class DefaultExceptionHandler
             {
                 message = getMessage( message, exception );
             }
-            else 
+            else
             {
                 for ( ProjectBuildingResult result : results )
                 {

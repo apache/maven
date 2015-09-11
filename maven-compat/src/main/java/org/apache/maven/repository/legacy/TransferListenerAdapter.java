@@ -55,8 +55,8 @@ public class TransferListenerAdapter
     private TransferListenerAdapter( ArtifactTransferListener listener )
     {
         this.listener = listener;
-        this.artifacts = new IdentityHashMap<Resource, ArtifactTransferResource>();
-        this.transfers = new IdentityHashMap<Resource, Long>();
+        this.artifacts = new IdentityHashMap<>();
+        this.transfers = new IdentityHashMap<>();
     }
 
     public void debug( String message )

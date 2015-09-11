@@ -46,7 +46,7 @@ public interface ProfileActivator
     /**
      * Determines whether specified activation method is present in configuration or not. It should help to have AND
      * between activation conditions
-     * Need for solving http://jira.codehaus.org/browse/MNG-4565
+     * Need for solving https://issues.apache.org/jira/browse/MNG-4565
      * @param profile The profile whose activation status should be determined, must not be {@code null}.
      * @param context The environmental context used to determine the activation status of the profile, must not be
      *            {@code null}.

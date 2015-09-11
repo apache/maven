@@ -20,7 +20,6 @@ package org.apache.maven.usability.plugin;
  */
 
 import org.apache.maven.usability.plugin.io.xpp3.ParamdocXpp3Reader;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
@@ -43,28 +42,25 @@ public class ExpressionDocumenter
 
     private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
 
-    private static Map expressionDocumentation;
+    private static Map<String, Expression> expressionDocumentation;
 
-    public static Map load()
+    public static Map<String, Expression> load()
         throws ExpressionDocumentationException
     {
         if ( expressionDocumentation == null )
         {
-            expressionDocumentation = new HashMap();
+            expressionDocumentation = new HashMap<>();
 
             ClassLoader docLoader = initializeDocLoader();
 
             for ( String EXPRESSION_ROOT : EXPRESSION_ROOTS )
             {
-                InputStream docStream = null;
-                try
+                try ( InputStream docStream = docLoader.getResourceAsStream(
+                    EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOT + ".paramdoc.xml" ) )
                 {
-                    docStream =
-                        docLoader.getResourceAsStream( EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOT + ".paramdoc.xml" );
-
                     if ( docStream != null )
                     {
-                        Map doco = parseExpressionDocumentation( docStream );
+                        Map<String, Expression> doco = parseExpressionDocumentation( docStream );
 
                         expressionDocumentation.putAll( doco );
                     }
@@ -79,10 +75,7 @@ public class ExpressionDocumenter
                     throw new ExpressionDocumentationException(
                         "Failed to parse documentation for expression root: " + EXPRESSION_ROOT, e );
                 }
-                finally
-                {
-                    IOUtil.close( docStream );
-                }
+
             }
         }
 
@@ -91,30 +84,31 @@ public class ExpressionDocumenter
 
     /**
      * <expressions>
-     *   <expression>
-     *     <syntax>project.distributionManagementArtifactRepository</syntax>
-     *     <origin><![CDATA[
-     *   <distributionManagement>
-     *     <repository>
-     *       <id>some-repo</id>
-     *       <url>scp://host/path</url>
-     *     </repository>
-     *     <snapshotRepository>
-     *       <id>some-snap-repo</id>
-     *       <url>scp://host/snapshot-path</url>
-     *     </snapshotRepository>
-     *   </distributionManagement>
-     *   ]]></origin>
-     *     <usage><![CDATA[
-     *   The repositories onto which artifacts should be deployed.
-     *   One is for releases, the other for snapshots.
-     *   ]]></usage>
-     *   </expression>
+     * <expression>
+     * <syntax>project.distributionManagementArtifactRepository</syntax>
+     * <origin><![CDATA[
+     * <distributionManagement>
+     * <repository>
+     * <id>some-repo</id>
+     * <url>scp://host/path</url>
+     * </repository>
+     * <snapshotRepository>
+     * <id>some-snap-repo</id>
+     * <url>scp://host/snapshot-path</url>
+     * </snapshotRepository>
+     * </distributionManagement>
+     * ]]></origin>
+     * <usage><![CDATA[
+     * The repositories onto which artifacts should be deployed.
+     * One is for releases, the other for snapshots.
+     * ]]></usage>
+     * </expression>
      * <expressions>
+     *
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private static Map parseExpressionDocumentation( InputStream docStream )
+    private static Map<String, Expression> parseExpressionDocumentation( InputStream docStream )
         throws IOException, XmlPullParserException
     {
         Reader reader = new BufferedReader( ReaderFactory.newXmlReader( docStream ) );
@@ -123,17 +117,15 @@ public class ExpressionDocumenter
 
         ExpressionDocumentation documentation = paramdocReader.read( reader, true );
 
-        List expressions = documentation.getExpressions();
+        List<Expression> expressions = documentation.getExpressions();
 
-        Map bySyntax = new HashMap();
+        Map<String, Expression> bySyntax = new HashMap<>();
 
         if ( expressions != null && !expressions.isEmpty() )
         {
-            for ( Object expression : expressions )
+            for ( Expression expression : expressions )
             {
-                Expression expr = (Expression) expression;
-
-                bySyntax.put( expr.getSyntax(), expr );
+                bySyntax.put( expression.getSyntax(), expression );
             }
         }
 
@@ -165,11 +157,11 @@ public class ExpressionDocumenter
         }
         catch ( MalformedURLException e )
         {
-            throw new ExpressionDocumentationException( "Cannot construct expression documentation classpath"
-                + " resource base.", e );
+            throw new ExpressionDocumentationException(
+                "Cannot construct expression documentation classpath" + " resource base.", e );
         }
 
-        return new URLClassLoader( new URL[] { docResource } );
+        return new URLClassLoader( new URL[]{ docResource } );
     }
 
 }

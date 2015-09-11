@@ -21,12 +21,10 @@ package org.apache.maven.project.inheritance.t02;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Build;
-import org.apache.maven.model.MailingList;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
@@ -118,7 +116,7 @@ public class ProjectInheritanceTest
         Build build = project4.getBuild();
         List<Plugin> plugins = build.getPlugins();
 
-        Map validPluginCounts = new HashMap();
+        Map<String, Integer> validPluginCounts = new HashMap<>();
 
         String testPluginArtifactId = "maven-compiler-plugin";
 
@@ -147,7 +145,7 @@ public class ProjectInheritanceTest
                     testPlugin = plugin;
                 }
 
-                Integer count = (Integer) validPluginCounts.get( pluginArtifactId );
+                Integer count = validPluginCounts.get( pluginArtifactId );
 
                 if ( count > 0 )
                 {

@@ -39,7 +39,7 @@ public class IncludesArtifactFilter
 
     public IncludesArtifactFilter( List<String> patterns )
     {
-        this.patterns = new LinkedHashSet<String>( patterns );
+        this.patterns = new LinkedHashSet<>( patterns );
     }
 
     public boolean include( Artifact artifact )
@@ -60,7 +60,7 @@ public class IncludesArtifactFilter
 
     public List<String> getPatterns()
     {
-        return new ArrayList<String>( patterns );
+        return new ArrayList<>( patterns );
     }
 
     @Override

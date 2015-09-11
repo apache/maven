@@ -41,7 +41,7 @@ import org.codehaus.plexus.component.annotations.Component;
 public class StringWagon
     extends StreamWagon
 {
-    private Map<String, String> expectedContent = new HashMap<String, String>();
+    private Map<String, String> expectedContent = new HashMap<>();
 
     public void addExpectedContent( String resourceName, String expectedContent )
     {

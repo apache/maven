@@ -38,7 +38,7 @@ public class BuildListCalculator
 {
     public ProjectBuildList calculateProjectBuilds( MavenSession session, List<TaskSegment> taskSegments )
     {
-        List<ProjectSegment> projectBuilds = new ArrayList<ProjectSegment>();
+        List<ProjectSegment> projectBuilds = new ArrayList<>();
 
         MavenProject rootProject = session.getTopLevelProject();
 

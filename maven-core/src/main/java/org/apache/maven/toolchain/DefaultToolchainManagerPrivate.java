@@ -41,7 +41,7 @@ public class DefaultToolchainManagerPrivate
     public ToolchainPrivate[] getToolchainsForType( String type, MavenSession context )
         throws MisconfiguredToolchainException
     {
-        List<ToolchainPrivate> toRet = new ArrayList<ToolchainPrivate>();
+        List<ToolchainPrivate> toRet = new ArrayList<>();
 
         ToolchainFactory fact = factories.get( type );
         if ( fact == null )

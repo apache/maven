@@ -62,7 +62,7 @@ implements Iterable<ArtifactMetadata>
     {
         if ( classpath == null )
         {
-            classpath = new ArrayList<ArtifactMetadata>( 16 );
+            classpath = new ArrayList<>( 16 );
         }
 
         classpath.add( md );

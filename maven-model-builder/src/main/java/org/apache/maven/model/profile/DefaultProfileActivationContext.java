@@ -247,7 +247,7 @@ public class DefaultProfileActivationContext
         {
             return Collections.emptyMap();
         }
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         Enumeration keys = properties.keys();
         while ( keys.hasMoreElements() )
         {

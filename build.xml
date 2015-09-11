@@ -224,7 +224,7 @@ Do you want to continue?</input>
     </path>
 
     <mkdir dir="bootstrap/target/classes" />
-    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.6" target="1.6" debug="true" includeAntRuntime="false">
+    <javac destdir="bootstrap/target/classes" encoding="UTF-8" source="1.7" target="1.7" debug="true" includeAntRuntime="false">
       <src refid="sources" />
       <classpath refid="pom.pathid" />
     </javac>

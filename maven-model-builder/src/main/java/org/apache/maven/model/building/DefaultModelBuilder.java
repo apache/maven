@@ -20,20 +20,9 @@ package org.apache.maven.model.building;
  */
 
 
-import static org.apache.maven.model.building.Result.error;
-import static org.apache.maven.model.building.Result.newResult;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -72,6 +61,20 @@ import org.apache.maven.model.superpom.SuperPomProvider;
 import org.apache.maven.model.validation.ModelValidator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import static org.apache.maven.model.building.Result.error;
+import static org.apache.maven.model.building.Result.newResult;
 
 /**
  * @author Benjamin Bentmann
@@ -274,8 +277,8 @@ public class DefaultModelBuilder
         ModelData resultData = new ModelData( request.getModelSource(), inputModel );
         ModelData superData = new ModelData( null, getSuperModel() );
 
-        Collection<String> parentIds = new LinkedHashSet<String>();
-        List<ModelData> lineage = new ArrayList<ModelData>();
+        Collection<String> parentIds = new LinkedHashSet<>();
+        List<ModelData> lineage = new ArrayList<>();
 
         for ( ModelData currentData = resultData; currentData != null; )
         {
@@ -519,7 +522,7 @@ public class DefaultModelBuilder
             boolean strict = request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
             InputSource source = request.isLocationTracking() ? new InputSource() : null;
 
-            Map<String, Object> options = new HashMap<String, Object>();
+            Map<String, Object> options = new HashMap<>();
             options.put( ModelProcessor.IS_STRICT, strict );
             options.put( ModelProcessor.INPUT_SOURCE, source );
             options.put( ModelProcessor.SOURCE, modelSource );
@@ -660,9 +663,9 @@ public class DefaultModelBuilder
             return;
         }
 
-        Map<String, Plugin> plugins = new HashMap<String, Plugin>();
-        Map<String, String> versions = new HashMap<String, String>();
-        Map<String, String> managedVersions = new HashMap<String, String>();
+        Map<String, Plugin> plugins = new HashMap<>();
+        Map<String, String> versions = new HashMap<>();
+        Map<String, String> managedVersions = new HashMap<>();
 
         for ( int i = lineage.size() - 1; i >= 0; i-- )
         {
@@ -720,7 +723,7 @@ public class DefaultModelBuilder
 
     private Map<String, Activation> getProfileActivations( Model model, boolean clone )
     {
-        Map<String, Activation> activations = new HashMap<String, Activation>();
+        Map<String, Activation> activations = new HashMap<>();
         for ( Profile profile : model.getProfiles() )
         {
             Activation activation = profile.getActivation();
@@ -921,8 +924,20 @@ public class DefaultModelBuilder
         }
         if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
         {
-            // version skew drop back to resolution from the repository
-            return null;
+            try
+            {
+                VersionRange parentRange = VersionRange.createFromVersionSpec( parent.getVersion() );
+                if ( !parentRange.containsVersion( new DefaultArtifactVersion( version ) ) )
+                {
+                    // version skew drop back to resolution from the repository
+                    return null;
+                }
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                // invalid version range, so drop back to resolution from the repository
+                return null;
+            }
         }
 
         //
@@ -1037,7 +1052,8 @@ public class DefaultModelBuilder
             }
             else
             {
-                if ( childModel.getVersion().indexOf( "${" ) > -1 )
+                if ( childModel.getVersion()
+                               .contains( "${" ) )
                 {
                     problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
                         .setMessage( "Version must be a constant" )
@@ -1228,7 +1244,7 @@ public class DefaultModelBuilder
 
             if ( importMngts == null )
             {
-                importMngts = new ArrayList<DependencyManagement>();
+                importMngts = new ArrayList<>();
             }
 
             importMngts.add( importMngt );

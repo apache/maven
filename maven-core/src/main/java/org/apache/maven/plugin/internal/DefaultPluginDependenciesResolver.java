@@ -107,7 +107,7 @@ public class DefaultPluginDependenciesResolver
             String requiredMavenVersion = (String) result.getProperties().get( "prerequisites.maven" );
             if ( requiredMavenVersion != null )
             {
-                Map<String, String> props = new LinkedHashMap<String, String>( pluginArtifact.getProperties() );
+                Map<String, String> props = new LinkedHashMap<>( pluginArtifact.getProperties() );
                 props.put( "requiredMavenVersion", requiredMavenVersion );
                 pluginArtifact = pluginArtifact.setProperties( props );
             }

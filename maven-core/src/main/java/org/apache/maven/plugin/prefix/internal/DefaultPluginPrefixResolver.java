@@ -164,7 +164,7 @@ public class DefaultPluginPrefixResolver
     {
         RequestTrace trace = RequestTrace.newChild( null, request );
 
-        List<MetadataRequest> requests = new ArrayList<MetadataRequest>();
+        List<MetadataRequest> requests = new ArrayList<>();
 
         for ( String pluginGroup : request.getPluginGroups() )
         {

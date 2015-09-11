@@ -19,23 +19,15 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.plugin.LegacySupport;
-import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.LegacySupport;
+import org.apache.maven.repository.legacy.repository.ArtifactRepositoryFactory;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
@@ -54,13 +46,21 @@ import org.eclipse.aether.util.graph.selector.OptionalDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.eclipse.aether.util.graph.transformer.ChainedDependencyGraphTransformer;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
 import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
-import org.eclipse.aether.util.graph.transformer.JavaDependencyContextRefiner;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.graph.traverser.FatArtifactTraverser;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
@@ -85,15 +85,14 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         super.setUp();
-        artifactFactory = lookup( ArtifactFactory.class);
+        artifactFactory = lookup( ArtifactFactory.class );
         artifactRepositoryFactory = lookup( ArtifactRepositoryFactory.class );
 
         RepositorySystemSession repoSession = initRepoSession();
-        MavenSession session =
-            new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
-                              new DefaultMavenExecutionResult() );
+        MavenSession session = new MavenSession( getContainer(), repoSession, new DefaultMavenExecutionRequest(),
+                                                 new DefaultMavenExecutionResult() );
 
-        LegacySupport legacySupport = lookup(LegacySupport.class);
+        LegacySupport legacySupport = lookup( LegacySupport.class );
         legacySupport.setSession( session );
     }
 
@@ -125,7 +124,8 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout, null, null );
+        return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout, null,
+                                                                   null );
     }
 
     protected String getRepositoryLayout()
@@ -143,7 +143,8 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return artifactRepositoryFactory.createArtifactRepository( "local", "file://" + f.getPath(), repoLayout, null, null );
+        return artifactRepositoryFactory.createArtifactRepository( "local", "file://" + f.getPath(), repoLayout, null,
+                                                                   null );
     }
 
     protected ArtifactRepository remoteRepository()
@@ -157,7 +158,8 @@ public abstract class AbstractArtifactComponentTestCase
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
         return artifactRepositoryFactory.createArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
-                                              new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
+                                                                   new ArtifactRepositoryPolicy(),
+                                                                   new ArtifactRepositoryPolicy() );
     }
 
     protected ArtifactRepository badRemoteRepository()
@@ -166,7 +168,8 @@ public abstract class AbstractArtifactComponentTestCase
         ArtifactRepositoryLayout repoLayout =
             (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
-        return artifactRepositoryFactory.createArtifactRepository( "test", "http://foo.bar/repository", repoLayout, null, null );
+        return artifactRepositoryFactory.createArtifactRepository( "test", "http://foo.bar/repository", repoLayout,
+                                                                   null, null );
     }
 
     protected void assertRemoteArtifactPresent( Artifact artifact )
@@ -236,7 +239,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected List<ArtifactRepository> remoteRepositories()
         throws Exception
     {
-        List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> remoteRepositories = new ArrayList<>();
 
         remoteRepositories.add( remoteRepository() );
 
@@ -290,12 +293,10 @@ public abstract class AbstractArtifactComponentTestCase
         {
             artifactFile.getParentFile().mkdirs();
         }
-
-        Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" );
-
-        writer.write( artifact.getId() );
-
-        writer.close();
+        try ( Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" ) )
+        {
+            writer.write( artifact.getId() );
+        }
     }
 
     protected Artifact createArtifact( String artifactId, String version )
@@ -351,9 +352,9 @@ public abstract class AbstractArtifactComponentTestCase
         DependencyManager depManager = new ClassicDependencyManager();
         session.setDependencyManager( depManager );
 
-        DependencySelector depFilter =
-            new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
-                                       new OptionalDependencySelector(), new ExclusionDependencySelector() );
+        DependencySelector depFilter = new AndDependencySelector( new ScopeDependencySelector( "test", "provided" ),
+                                                                  new OptionalDependencySelector(),
+                                                                  new ExclusionDependencySelector() );
         session.setDependencySelector( depFilter );
 
         DependencyGraphTransformer transformer =
@@ -363,7 +364,8 @@ public abstract class AbstractArtifactComponentTestCase
         session.setDependencyGraphTransformer( transformer );
 
         LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
-        session.setLocalRepositoryManager( new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
+        session.setLocalRepositoryManager(
+            new SimpleLocalRepositoryManagerFactory().newInstance( session, localRepo ) );
 
         return session;
     }

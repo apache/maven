@@ -2,7 +2,7 @@
 
 Maven is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-- [Maven Issue Tracker](http://jira.codehaus.org/browse/MNG)
+- [Maven Issue Tracker](https://issues.apache.org/jira/browse/MNG)
 - [Maven Wiki](https://cwiki.apache.org/confluence/display/MAVEN/Index)
 - [Building Maven](http://maven.apache.org/guides/development/guide-building-m2.html)
 - [Running Core ITs](http://maven.apache.org/core-its/core-it-suite/)

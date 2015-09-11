@@ -61,11 +61,7 @@ public class DefaultBeanConfiguratorTest
         {
             return Xpp3DomBuilder.build( new StringReader( "<configuration>" + xml + "</configuration>" ) );
         }
-        catch ( XmlPullParserException e )
-        {
-            throw new IllegalArgumentException( e );
-        }
-        catch ( IOException e )
+        catch ( XmlPullParserException | IOException e )
         {
             throw new IllegalArgumentException( e );
         }

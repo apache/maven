@@ -82,7 +82,7 @@ public class DefaultModelPathTranslator
 
             if ( build.getFilters() != null )
             {
-                List<String> filters = new ArrayList<String>( build.getFilters().size() );
+                List<String> filters = new ArrayList<>( build.getFilters().size() );
                 for ( String filter : build.getFilters() )
                 {
                     filters.add( alignToBaseDirectory( filter, basedir ) );

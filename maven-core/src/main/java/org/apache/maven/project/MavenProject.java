@@ -127,19 +127,19 @@ public class MavenProject
 
     private List<MavenProject> collectedProjects;
 
-    private List<String> compileSourceRoots = new ArrayList<String>();
+    private List<String> compileSourceRoots = new ArrayList<>();
 
-    private List<String> testCompileSourceRoots = new ArrayList<String>();
+    private List<String> testCompileSourceRoots = new ArrayList<>();
 
-    private List<String> scriptSourceRoots = new ArrayList<String>();
+    private List<String> scriptSourceRoots = new ArrayList<>();
 
     private ArtifactRepository releaseArtifactRepository;
 
     private ArtifactRepository snapshotArtifactRepository;
 
-    private List<Profile> activeProfiles = new ArrayList<Profile>();
+    private List<Profile> activeProfiles = new ArrayList<>();
 
-    private Map<String, List<String>> injectedProfileIds = new LinkedHashMap<String, List<String>>();
+    private Map<String, List<String>> injectedProfileIds = new LinkedHashMap<>();
 
     private Set<Artifact> dependencyArtifacts;
 
@@ -162,7 +162,7 @@ public class MavenProject
 
     private Map<String, Artifact> managedVersionMap;
 
-    private Map<String, MavenProject> projectReferences = new HashMap<String, MavenProject>();
+    private Map<String, MavenProject> projectReferences = new HashMap<>();
 
     private boolean executionRoot;
 
@@ -340,7 +340,7 @@ public class MavenProject
     public List<String> getCompileClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() + 1 );
+        List<String> list = new ArrayList<>( getArtifacts().size() + 1 );
 
         String d = getBuild().getOutputDirectory();
         if ( d != null )
@@ -369,7 +369,7 @@ public class MavenProject
     public List<String> getTestClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() + 2 );
+        List<String> list = new ArrayList<>( getArtifacts().size() + 2 );
 
         String d = getBuild().getTestOutputDirectory();
         if ( d != null )
@@ -397,7 +397,7 @@ public class MavenProject
     public List<String> getRuntimeClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() + 1 );
+        List<String> list = new ArrayList<>( getArtifacts().size() + 1 );
 
         String d = getBuild().getOutputDirectory();
         if ( d != null )
@@ -705,11 +705,11 @@ public class MavenProject
         {
             if ( artifactFilter == null || resolvedArtifacts == null )
             {
-                artifacts = new LinkedHashSet<Artifact>();
+                artifacts = new LinkedHashSet<>();
             }
             else
             {
-                artifacts = new LinkedHashSet<Artifact>( resolvedArtifacts.size() * 2 );
+                artifacts = new LinkedHashSet<>( resolvedArtifacts.size() * 2 );
                 for ( Artifact artifact : resolvedArtifacts )
                 {
                     if ( artifactFilter.include( artifact ) )
@@ -823,7 +823,7 @@ public class MavenProject
     {
         if ( remoteArtifactRepositories == null )
         {
-            remoteArtifactRepositories = new ArrayList<ArtifactRepository>();
+            remoteArtifactRepositories = new ArrayList<>();
         }
 
         return remoteArtifactRepositories;
@@ -843,7 +843,7 @@ public class MavenProject
     {
         if ( pluginArtifactRepositories == null )
         {
-            pluginArtifactRepositories = new ArrayList<ArtifactRepository>();
+            pluginArtifactRepositories = new ArrayList<>();
         }
 
         return pluginArtifactRepositories;
@@ -885,7 +885,7 @@ public class MavenProject
     {
         if ( injectedProfileIds != null )
         {
-            this.injectedProfileIds.put( source, new ArrayList<String>( injectedProfileIds ) );
+            this.injectedProfileIds.put( source, new ArrayList<>( injectedProfileIds ) );
         }
         else
         {
@@ -928,7 +928,7 @@ public class MavenProject
     {
         if ( attachedArtifacts == null )
         {
-            attachedArtifacts = new ArrayList<Artifact>();
+            attachedArtifacts = new ArrayList<>();
         }
         return attachedArtifacts;
     }
@@ -1262,23 +1262,23 @@ public class MavenProject
         if ( project.getAttachedArtifacts() != null )
         {
             // clone properties modifyable by plugins in a forked lifecycle
-            setAttachedArtifacts( new ArrayList<Artifact>( project.getAttachedArtifacts() ) );
+            setAttachedArtifacts( new ArrayList<>( project.getAttachedArtifacts() ) );
         }
 
         if ( project.getCompileSourceRoots() != null )
         {
             // clone source roots
-            setCompileSourceRoots( ( new ArrayList<String>( project.getCompileSourceRoots() ) ) );
+            setCompileSourceRoots( ( new ArrayList<>( project.getCompileSourceRoots() ) ) );
         }
 
         if ( project.getTestCompileSourceRoots() != null )
         {
-            setTestCompileSourceRoots( ( new ArrayList<String>( project.getTestCompileSourceRoots() ) ) );
+            setTestCompileSourceRoots( ( new ArrayList<>( project.getTestCompileSourceRoots() ) ) );
         }
 
         if ( project.getScriptSourceRoots() != null )
         {
-            setScriptSourceRoots( ( new ArrayList<String>( project.getScriptSourceRoots() ) ) );
+            setScriptSourceRoots( ( new ArrayList<>( project.getScriptSourceRoots() ) ) );
         }
 
         if ( project.getModel() != null )
@@ -1300,7 +1300,7 @@ public class MavenProject
 
         if ( project.getManagedVersionMap() != null )
         {
-            setManagedVersionMap( new HashMap<String, Artifact>( project.getManagedVersionMap() ) );
+            setManagedVersionMap( new HashMap<>( project.getManagedVersionMap() ) );
         }
 
         lifecyclePhases.addAll( project.lifecyclePhases );
@@ -1331,7 +1331,7 @@ public class MavenProject
     {
         if ( context == null )
         {
-            context = new HashMap<String, Object>();
+            context = new HashMap<>();
         }
         if ( value != null )
         {
@@ -1495,7 +1495,7 @@ public class MavenProject
 
         if ( moduleAdjustments == null )
         {
-            moduleAdjustments = new HashMap<String, String>();
+            moduleAdjustments = new HashMap<>();
 
             List<String> modules = getModules();
             if ( modules != null )
@@ -1571,7 +1571,7 @@ public class MavenProject
     @Deprecated
     public List<Artifact> getCompileArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
 
         for ( Artifact a : getArtifacts() )
         {
@@ -1599,7 +1599,7 @@ public class MavenProject
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>( artifacts.size() );
 
         for ( Artifact a : getArtifacts() )
         {
@@ -1625,7 +1625,7 @@ public class MavenProject
     @Deprecated
     public List<Artifact> getTestArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
 
         for ( Artifact a : getArtifacts() )
         {
@@ -1648,7 +1648,7 @@ public class MavenProject
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>( artifacts.size() );
 
         for ( Artifact a : getArtifacts() )
         {
@@ -1676,7 +1676,7 @@ public class MavenProject
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>( artifacts.size() );
 
         for ( Artifact a : getArtifacts()  )
         {
@@ -1701,7 +1701,7 @@ public class MavenProject
     @Deprecated
     public List<Artifact> getRuntimeArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
 
         for ( Artifact a : getArtifacts()  )
         {
@@ -1720,7 +1720,7 @@ public class MavenProject
     public List<String> getSystemClasspathElements()
         throws DependencyResolutionRequiredException
     {
-        List<String> list = new ArrayList<String>( getArtifacts().size() );
+        List<String> list = new ArrayList<>( getArtifacts().size() );
 
         String d = getBuild().getOutputDirectory();
         if ( d != null )
@@ -1745,7 +1745,7 @@ public class MavenProject
     @Deprecated
     public List<Artifact> getSystemArtifacts()
     {
-        List<Artifact> list = new ArrayList<Artifact>( getArtifacts().size() );
+        List<Artifact> list = new ArrayList<>( getArtifacts().size() );
 
         for ( Artifact a : getArtifacts() )
         {
@@ -1772,7 +1772,7 @@ public class MavenProject
             return Collections.emptyList();
         }
 
-        List<Dependency> list = new ArrayList<Dependency>( artifacts.size() );
+        List<Dependency> list = new ArrayList<>( artifacts.size() );
 
         for ( Artifact a : getArtifacts() )
         {

@@ -51,7 +51,7 @@ public final class ProjectUtils
         throws InvalidRepositoryException
     {
 
-        List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
+        List<ArtifactRepository> remoteRepositories = new ArrayList<>();
 
         for ( Repository r : repositories )
         {

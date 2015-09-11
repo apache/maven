@@ -57,10 +57,10 @@ public class DefaultExtensionRealmCache
 
         public CacheKey( List<Artifact> extensionArtifacts )
         {
-            this.files = new ArrayList<File>( extensionArtifacts.size() );
-            this.timestamps = new ArrayList<Long>( extensionArtifacts.size() );
-            this.sizes = new ArrayList<Long>( extensionArtifacts.size() );
-            this.ids = new ArrayList<String>( extensionArtifacts.size() );
+            this.files = new ArrayList<>( extensionArtifacts.size() );
+            this.timestamps = new ArrayList<>( extensionArtifacts.size() );
+            this.sizes = new ArrayList<>( extensionArtifacts.size() );
+            this.ids = new ArrayList<>( extensionArtifacts.size() );
 
             for ( Artifact artifact : extensionArtifacts )
             {
@@ -107,7 +107,7 @@ public class DefaultExtensionRealmCache
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<Key, CacheRecord>();
+    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
 
     @Override
     public Key createKey( List<Artifact> extensionArtifacts )

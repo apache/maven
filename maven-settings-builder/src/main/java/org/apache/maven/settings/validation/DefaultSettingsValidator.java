@@ -81,7 +81,7 @@ public class DefaultSettingsValidator
 
         if ( servers != null )
         {
-            Set<String> serverIds = new HashSet<String>();
+            Set<String> serverIds = new HashSet<>();
 
             for ( int i = 0; i < servers.size(); i++ )
             {
@@ -125,7 +125,7 @@ public class DefaultSettingsValidator
 
         if ( profiles != null )
         {
-            Set<String> profileIds = new HashSet<String>();
+            Set<String> profileIds = new HashSet<>();
 
             for ( Profile profile : profiles )
             {
@@ -147,7 +147,7 @@ public class DefaultSettingsValidator
 
         if ( proxies != null )
         {
-            Set<String> proxyIds = new HashSet<String>();
+            Set<String> proxyIds = new HashSet<>();
             
             for ( Proxy proxy : proxies )
             {
@@ -163,7 +163,7 @@ public class DefaultSettingsValidator
 
     private void validateRepositories( SettingsProblemCollector problems, List<Repository> repositories, String prefix )
     {
-        Set<String> repoIds = new HashSet<String>();
+        Set<String> repoIds = new HashSet<>();
 
         for ( Repository repository : repositories )
         {

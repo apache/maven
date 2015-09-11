@@ -19,7 +19,6 @@ package org.apache.maven.project.inheritance.t00;
  * under the License.
  */
 
-import org.apache.maven.model.MailingList;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.inheritance.AbstractProjectInheritanceTestCase;
 

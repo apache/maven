@@ -38,12 +38,12 @@ public class OrArtifactFilter
 
     public OrArtifactFilter()
     {
-        this.filters = new LinkedHashSet<ArtifactFilter>();
+        this.filters = new LinkedHashSet<>();
     }
 
     public OrArtifactFilter( Collection<ArtifactFilter> filters )
     {
-        this.filters = new LinkedHashSet<ArtifactFilter>( filters );
+        this.filters = new LinkedHashSet<>( filters );
     }
 
     public boolean include( Artifact artifact )

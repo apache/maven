@@ -19,21 +19,22 @@ package org.apache.maven.model.inheritance;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.io.ModelReader;
 import org.apache.maven.model.io.ModelWriter;
 import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.util.IOUtil;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
+
+import junit.framework.AssertionFailedError;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 /**
  * @author Hervé Boutemy
@@ -72,37 +73,109 @@ public class DefaultInheritanceAssemblerTest
     public void testPluginConfiguration()
         throws Exception
     {
-        Model parent = getModel( "plugin-configuration-parent" );
+        testInheritance( "plugin-configuration" );
+    }
 
-        Model child = getModel( "plugin-configuration-child" );
+    /**
+     * Check most classical urls inheritance: directory structure where parent POM in parent directory
+     * and child directory == artifatId
+     * @throws Exception
+     */
+    public void testUrls()
+        throws Exception
+    {
+        testInheritance( "urls" );
+    }
+
+    /**
+     * Flat directory structure: parent & child POMs in sibling directories, child directory == artifactId.
+     * @throws Exception
+     */
+    public void testFlatUrls()
+        throws Exception
+    {
+        testInheritance( "flat-urls" );
+    }
+
+    /**
+     * Tricky case: flat directory structure, but child directory != artifactId.
+     * Model interpolation does not give same result when calculated from build or from repo...
+     * This is why MNG-5000 fix in code is marked as bad practice (uses file names)
+     * @throws Exception
+     */
+    public void testFlatTrickyUrls()
+        throws Exception
+    {
+        // parent references child with artifactId (which is not directory name)
+        // then relative path calculation will fail during build from disk but success when calculated from repo
+        try
+        {
+            // build from disk expected to fail
+            testInheritance( "tricky-flat-artifactId-urls", false );
+            fail( "should have failed since module reference == artifactId != directory name" );
+        }
+        catch ( AssertionFailedError afe )
+        {
+            // expected failure: wrong relative path calculation
+            assertTrue( afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
+        }
+        // but ok from repo: local disk is ignored
+        testInheritance( "tricky-flat-artifactId-urls", true );
+
+        // parent references child with directory name (which is not artifact id)
+        // then relative path calculation will success during build from disk but failwhen calculated from repo
+        testInheritance( "tricky-flat-directory-urls", false );
+        try
+        {
+            testInheritance( "tricky-flat-directory-urls", true );
+            fail( "should have failed since module reference == directory name != artifactId" );
+        }
+        catch ( AssertionFailedError afe )
+        {
+            // expected failure
+            assertTrue( afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
+        }
+    }
+
+    public void testInheritance( String baseName )
+        throws Exception
+    {
+        testInheritance( baseName, false );
+        testInheritance( baseName, true );
+    }
+
+    public void testInheritance( String baseName, boolean fromRepo )
+        throws Exception
+    {
+        Model parent = getModel( baseName + "-parent" );
+
+        Model child = getModel( baseName + "-child" );
+
+        if ( fromRepo )
+        {
+            // when model is read from repo, a stream is used, then pomFile == null
+            // (has consequences in inheritance algorithm since getProjectDirectory() returns null)
+            parent.setPomFile( null );
+            child.setPomFile( null );
+        }
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
         assembler.assembleModelInheritance( child, parent, null, problems );
 
-        File actual = getTestFile( "target/test-classes/poms/inheritance/plugin-configuration-actual.xml" );
-
+        // write baseName + "-actual"
+        File actual = getTestFile( "target/test-classes/poms/inheritance/" + baseName
+            + ( fromRepo ? "-build" : "-repo" ) + "-actual.xml" );
         writer.write( actual, null, child );
 
-        // check with getPom( "plugin-configuration-effective" )
-        Reader control = null;
-        Reader test = null;
-        try
+        // check with getPom( baseName + "-expected" )
+        File expected = getPom( baseName + "-expected" );
+        try ( Reader control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
+              Reader test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" ) )
         {
-            File expected = getPom( "plugin-configuration-expected" );
-            control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
-
-            test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" );
-
             XMLUnit.setIgnoreComments( true );
             XMLUnit.setIgnoreWhitespace( true );
             XMLAssert.assertXMLEqual( control, test );
         }
-        catch ( IOException ioe )
-        {
-            IOUtil.close( control );
-            IOUtil.close( test );
-        }
     }
-
 }

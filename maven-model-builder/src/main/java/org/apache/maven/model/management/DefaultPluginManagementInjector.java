@@ -78,7 +78,7 @@ public class DefaultPluginManagementInjector
             {
                 List<Plugin> tgt = target.getPlugins();
 
-                Map<Object, Plugin> managedPlugins = new LinkedHashMap<Object, Plugin>( src.size() * 2 );
+                Map<Object, Plugin> managedPlugins = new LinkedHashMap<>( src.size() * 2 );
 
                 Map<Object, Object> context = Collections.emptyMap();
 
@@ -110,7 +110,7 @@ public class DefaultPluginManagementInjector
                 List<PluginExecution> tgt = target.getExecutions();
 
                 Map<Object, PluginExecution> merged =
-                    new LinkedHashMap<Object, PluginExecution>( ( src.size() + tgt.size() ) * 2 );
+                    new LinkedHashMap<>( ( src.size() + tgt.size() ) * 2 );
 
                 for ( PluginExecution element : src )
                 {
@@ -129,7 +129,7 @@ public class DefaultPluginManagementInjector
                     merged.put( key, element );
                 }
 
-                target.setExecutions( new ArrayList<PluginExecution>( merged.values() ) );
+                target.setExecutions( new ArrayList<>( merged.values() ) );
             }
         }
     }

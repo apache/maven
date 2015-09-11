@@ -46,7 +46,7 @@ public class SettingsBuildingException
     {
         super( toMessage( problems ) );
 
-        this.problems = new ArrayList<SettingsProblem>();
+        this.problems = new ArrayList<>();
         if ( problems != null )
         {
             this.problems.addAll( problems );

@@ -44,13 +44,13 @@ public final class TaskSegment
     public TaskSegment( boolean aggregating )
     {
         this.aggregating = aggregating;
-        tasks = new ArrayList<Object>();
+        tasks = new ArrayList<>();
     }
 
     public TaskSegment( boolean aggregating, Object... tasks )
     {
         this.aggregating = aggregating;
-        this.tasks = new ArrayList<Object>( Arrays.asList( tasks ) );
+        this.tasks = new ArrayList<>( Arrays.asList( tasks ) );
     }
 
     @Override

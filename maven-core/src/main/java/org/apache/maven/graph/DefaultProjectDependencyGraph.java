@@ -57,7 +57,7 @@ public class DefaultProjectDependencyGraph
 
     public List<MavenProject> getSortedProjects()
     {
-        return new ArrayList<MavenProject>( sorter.getSortedProjects() );
+        return new ArrayList<>( sorter.getSortedProjects() );
     }
 
     public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )
@@ -67,7 +67,7 @@ public class DefaultProjectDependencyGraph
             throw new IllegalArgumentException( "project missing" );
         }
 
-        Set<String> projectIds = new HashSet<String>();
+        Set<String> projectIds = new HashSet<>();
 
         getDownstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
 
@@ -92,7 +92,7 @@ public class DefaultProjectDependencyGraph
             throw new IllegalArgumentException( "project missing" );
         }
 
-        Set<String> projectIds = new HashSet<String>();
+        Set<String> projectIds = new HashSet<>();
 
         getUpstreamProjects( ProjectSorter.getId( project ), projectIds, transitive );
 
@@ -112,7 +112,7 @@ public class DefaultProjectDependencyGraph
 
     private List<MavenProject> getSortedProjects( Set<String> projectIds )
     {
-        List<MavenProject> result = new ArrayList<MavenProject>( projectIds.size() );
+        List<MavenProject> result = new ArrayList<>( projectIds.size() );
 
         for ( MavenProject mavenProject : sorter.getSortedProjects() )
         {

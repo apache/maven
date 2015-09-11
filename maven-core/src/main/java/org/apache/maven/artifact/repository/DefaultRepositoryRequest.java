@@ -118,7 +118,7 @@ public class DefaultRepositoryRequest
     {
         if ( remoteRepositories == null )
         {
-            remoteRepositories = new ArrayList<ArtifactRepository>();
+            remoteRepositories = new ArrayList<>();
         }
 
         return remoteRepositories;

@@ -88,7 +88,7 @@ public class DefaultLifecycleTaskSegmentCalculator
         MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
         PluginVersionResolutionException
     {
-        List<TaskSegment> taskSegments = new ArrayList<TaskSegment>( tasks.size() );
+        List<TaskSegment> taskSegments = new ArrayList<>( tasks.size() );
 
         TaskSegment currentSegment = null;
 

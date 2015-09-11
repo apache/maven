@@ -19,6 +19,9 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import org.codehaus.plexus.util.Os;
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
@@ -26,15 +29,10 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.Os;
-import org.slf4j.Logger;
-
 /**
  * Utility class used to report errors, statistics, application version info, etc.
  *
  * @author jdcasey
- *
  */
 public final class CLIReportingUtils
 {
@@ -42,8 +40,11 @@ public final class CLIReportingUtils
     public static final long MB = 1024 * 1024;
 
     private static final long ONE_SECOND = 1000L;
+
     private static final long ONE_MINUTE = 60 * ONE_SECOND;
+
     private static final long ONE_HOUR = 60 * ONE_MINUTE;
+
     private static final long ONE_DAY = 24 * ONE_HOUR;
     // CHECKSTYLE_ON: MagicNumber
 
@@ -55,8 +56,12 @@ public final class CLIReportingUtils
         Properties properties = getBuildProperties();
         StringBuilder version = new StringBuilder();
         version.append( createMavenVersionString( properties ) ).append( ls );
-        version.append( reduce( properties.getProperty( "distributionShortName" ) + " home: "
-                            + System.getProperty( "maven.home", "<unknown maven home>" ) ) ).append( ls );
+        version.append( reduce(
+            properties.getProperty( "distributionShortName" ) + " home: " + System.getProperty( "maven.home",
+                                                                                                "<unknown maven "
+                                                                                                    + "home>" ) ) )
+            .append(
+            ls );
         version.append( "Java version: " ).append(
             System.getProperty( "java.version", "<unknown java version>" ) ).append( ", vendor: " ).append(
             System.getProperty( "java.vendor", "<unknown vendor>" ) ).append( ls );
@@ -105,10 +110,10 @@ public final class CLIReportingUtils
     static Properties getBuildProperties()
     {
         Properties properties = new Properties();
-        InputStream resourceAsStream = null;
-        try
+
+        try ( InputStream resourceAsStream = MavenCli.class.getResourceAsStream(
+            "/org/apache/maven/messages/build.properties" ) )
         {
-            resourceAsStream = MavenCli.class.getResourceAsStream( "/org/apache/maven/messages/build.properties" );
 
             if ( resourceAsStream != null )
             {
@@ -118,10 +123,6 @@ public final class CLIReportingUtils
         catch ( IOException e )
         {
             System.err.println( "Unable determine version from JAR file: " + e.getMessage() );
-        }
-        finally
-        {
-            IOUtil.close( resourceAsStream );
         }
 
         return properties;

@@ -19,10 +19,6 @@ package org.apache.maven.repository.metadata;
  * under the License.
  */
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -34,6 +30,10 @@ import org.apache.maven.repository.legacy.metadata.ResolutionGroup;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Component(role = ArtifactMetadataSource.class)
 public class TestMetadataSource
     implements ArtifactMetadataSource
@@ -44,7 +44,7 @@ public class TestMetadataSource
     public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        Set dependencies = new HashSet();
+        Set<Artifact> dependencies = new HashSet<>();
 
         if ( "g".equals( artifact.getArtifactId() ) )
         {

@@ -75,11 +75,11 @@ public class GroupRepositoryMetadata
                                   String artifactId,
                                   String name )
     {
-        List plugins = getMetadata().getPlugins();
+        List<Plugin> plugins = getMetadata().getPlugins();
         boolean found = false;
-        for ( Iterator i = plugins.iterator(); i.hasNext() && !found; )
+        for ( Iterator<Plugin> i = plugins.iterator(); i.hasNext() && !found; )
         {
-            Plugin plugin = (Plugin) i.next();
+            Plugin plugin = i.next();
             if ( plugin.getPrefix().equals( goalPrefix ) )
             {
                 found = true;

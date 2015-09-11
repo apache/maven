@@ -69,7 +69,7 @@ public class MojoExecution
      * The executions to fork before this execution, indexed by the groupId:artifactId:version of the project on which
      * the forked execution are to be run and in reactor build order.
      */
-    private Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<String, List<MojoExecution>>();
+    private Map<String, List<MojoExecution>> forkedExecutions = new LinkedHashMap<>();
 
     public MojoExecution( Plugin plugin, String goal, String executionId )
     {

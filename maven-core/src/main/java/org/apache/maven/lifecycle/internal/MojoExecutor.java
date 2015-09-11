@@ -19,15 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.CumulativeScopeArtifactFilter;
@@ -49,15 +40,24 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Executes an individual mojo
  *
- * @since 3.0
  * @author Jason van Zyl
  * @author Benjamin Bentmann
  * @author Kristian Rosenvold
  *         <p/>
  *         NOTE: This class is not part of any public api and can be changed or deleted without prior notice.
+ * @since 3.0
  */
 @Component( role = MojoExecutor.class )
 public class MojoExecutor
@@ -81,8 +81,8 @@ public class MojoExecutor
 
     public DependencyContext newDependencyContext( MavenSession session, List<MojoExecution> mojoExecutions )
     {
-        Set<String> scopesToCollect = new TreeSet<String>();
-        Set<String> scopesToResolve = new TreeSet<String>();
+        Set<String> scopesToCollect = new TreeSet<>();
+        Set<String> scopesToResolve = new TreeSet<>();
 
         collectDependencyRequirements( scopesToResolve, scopesToCollect, mojoExecutions );
 
@@ -171,9 +171,9 @@ public class MojoExecutor
 
         if ( mojoDescriptor.isProjectRequired() && !session.getRequest().isProjectPresent() )
         {
-            Throwable cause =
-                new MissingProjectException( "Goal requires a project to execute"
-                    + " but there is no POM in this directory (" + session.getExecutionRootDirectory() + ")."
+            Throwable cause = new MissingProjectException(
+                "Goal requires a project to execute" + " but there is no POM in this directory ("
+                    + session.getExecutionRootDirectory() + ")."
                     + " Please verify you invoked Maven from the correct directory." );
             throw new LifecycleExecutionException( mojoExecution, null, cause );
         }
@@ -182,9 +182,8 @@ public class MojoExecutor
         {
             if ( MojoExecution.Source.CLI.equals( mojoExecution.getSource() ) )
             {
-                Throwable cause =
-                    new IllegalStateException( "Goal requires online mode for execution"
-                        + " but Maven is currently offline." );
+                Throwable cause = new IllegalStateException(
+                    "Goal requires online mode for execution" + " but Maven is currently offline." );
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), cause );
             }
             else
@@ -207,19 +206,8 @@ public class MojoExecutor
             {
                 pluginManager.executeMojo( session, mojoExecution );
             }
-            catch ( MojoFailureException e )
-            {
-                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
-            }
-            catch ( MojoExecutionException e )
-            {
-                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
-            }
-            catch ( PluginConfigurationException e )
-            {
-                throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
-            }
-            catch ( PluginManagerException e )
+            catch ( MojoFailureException | PluginManagerException | PluginConfigurationException
+                | MojoExecutionException e )
             {
                 throw new LifecycleExecutionException( mojoExecution, session.getCurrentProject(), e );
             }
@@ -242,7 +230,7 @@ public class MojoExecutor
     }
 
     public void ensureDependenciesAreResolved( MojoDescriptor mojoDescriptor, MavenSession session,
-                                                DependencyContext dependencyContext )
+                                               DependencyContext dependencyContext )
         throws LifecycleExecutionException
 
     {
@@ -294,7 +282,7 @@ public class MojoExecutor
         String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
 
-        List<String> scopes = new ArrayList<String>( 2 );
+        List<String> scopes = new ArrayList<>( 2 );
         if ( StringUtils.isNotEmpty( scopeToCollect ) )
         {
             scopes.add( scopeToCollect );
@@ -328,7 +316,7 @@ public class MojoExecutor
 
             MavenProject project = session.getCurrentProject();
 
-            forkedProjects = new ArrayList<MavenProject>( forkedExecutions.size() );
+            forkedProjects = new ArrayList<>( forkedExecutions.size() );
 
             try
             {
