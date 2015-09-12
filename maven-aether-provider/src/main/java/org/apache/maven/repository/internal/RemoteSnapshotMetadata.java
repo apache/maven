@@ -24,6 +24,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -73,6 +74,7 @@ final class RemoteSnapshotMetadata
         if ( metadata.getVersioning() == null )
         {
             DateFormat utcDateFormatter = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
+            utcDateFormatter.setCalendar( new GregorianCalendar() );
             utcDateFormatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
 
             snapshot = new Snapshot();
