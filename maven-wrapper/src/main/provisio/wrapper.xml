@@ -6,6 +6,10 @@
   </artifactSet>
   
   <fileSet to="/">
-    <directory path="${basedir}/src/main/wrapper"/>
+    <directory path="${basedir}">
+      <include>mvnw</include>
+      <include>mvnw.cmd</include>
+      <include>.mvn/**</include>
+    </directory>
   </fileSet>
 </runtime>
