@@ -135,7 +135,7 @@ public class CLIManager
         options.addOption( OptionBuilder.withLongOpt( "projects" ).withDescription( "Comma-delimited list of specified reactor projects to build instead of all projects. A project can be specified by [groupId]:artifactId or by its relative path." ).hasArg().create( PROJECT_LIST ) );
         options.addOption( OptionBuilder.withLongOpt( "also-make" ).withDescription( "If project list is specified, also build projects required by the list" ).create( ALSO_MAKE ) );
         options.addOption( OptionBuilder.withLongOpt( "also-make-dependents" ).withDescription( "If project list is specified, also build projects that depend on projects on the list" ).create( ALSO_MAKE_DEPENDENTS ) );
-        options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file to where all build output will go." ).create( LOG_FILE ) );
+        options.addOption( OptionBuilder.withLongOpt( "log-file" ).hasArg().withDescription( "Log file where all build output will go." ).create( LOG_FILE ) );
         options.addOption( OptionBuilder.withLongOpt( "show-version" ).withDescription( "Display version information WITHOUT stopping build" ).create( SHOW_VERSION ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-master-password" ).hasOptionalArg().withDescription( "Encrypt master security password" ).create( ENCRYPT_MASTER_PASSWORD ) );
         options.addOption( OptionBuilder.withLongOpt( "encrypt-password" ).hasOptionalArg().withDescription( "Encrypt server password" ).create( ENCRYPT_PASSWORD ) );
