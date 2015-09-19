@@ -46,7 +46,7 @@
     required artifacts. -->
 
   <properties>
-    <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
+    <surefireMemory>-Xmx384m</surefireMemory>
     <!-- The original Maven distribution to test. -->
     <mavenHome>${maven.home}</mavenHome>
     <!-- The (possibly instrumented copy of the) Maven distribution we actually 
@@ -291,6 +291,15 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>jdk-properties</id>
+      <activation>
+        <jdk>(,1.8)</jdk>
+      </activation>
+      <properties>
+         <surefireMemory>-Xmx384m -XX:MaxPermSize=192m</surefireMemory>
+      </properties>
+    </profile> 
     <profile>
       <id>embedded</id>
       <build>
