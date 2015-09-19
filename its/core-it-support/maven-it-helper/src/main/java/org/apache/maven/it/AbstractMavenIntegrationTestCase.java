@@ -471,13 +471,28 @@ public abstract class AbstractMavenIntegrationTestCase
             {
                 verifier.getSystemProperties().put( "org.apache.maven.global-settings", path );
             }
-
-            if ( matchesVersionRange( "(3.2.5,)" ) )
-            {
-                verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", basedir );
-            }
         }
 
+        if ( matchesVersionRange( "(3.2.5,)" ) )
+        {
+            verifier.getSystemProperties().put( "maven.multiModuleProjectDirectory", basedir );
+        }
+
+        try
+        {
+            // auto set source+target to lowest accepted value based on java version
+            // Java9 requires at least 1.6
+            if ( VersionRange.createFromVersionSpec( "[1.9,)" ).containsVersion( getJavaVersion() ) )
+            {
+                verifier.getSystemProperties().put( "maven.compiler.source", "1.6" );
+                verifier.getSystemProperties().put( "maven.compiler.target", "1.6" );
+            }
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            // noop
+        }
+        
         return verifier;
     }
 
