@@ -17,6 +17,9 @@
               <configuration>
                 <source>1.5</source>
                 <target>1.5</target>
+                <includes>
+                  <include>**/App.java</include>
+                </includes>
               </configuration>
             </execution>
           </executions>
@@ -24,4 +27,34 @@
       </plugins>
     </pluginManagement>
   </build>
+  
+  <profiles>
+    <profile>
+      <id>diamond-generics</id>
+      <activation>
+        <jdk>[1.7,)</jdk>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>default-compile</id>
+                  <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <includes>
+                      <include>**/Diamond.java</include>
+                    </includes>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
 </project>
