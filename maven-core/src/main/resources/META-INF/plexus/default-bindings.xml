@@ -290,7 +290,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-ear-plugin:2.8:generate-application-xml
               </generate-resources>
               <process-resources>
-                org.apache.maven.plugins:maven-resources-plugin:2.4.3:resources
+                org.apache.maven.plugins:maven-resources-plugin:2.6:resources
               </process-resources>
               <package>
                 org.apache.maven.plugins:maven-ear-plugin:2.8:ear
