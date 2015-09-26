@@ -114,9 +114,9 @@ public class DebugResolutionListener
 
     /**
      * The logic used here used to be a copy of the logic used in the DefaultArtifactCollector, and this method was
-     * called right before the actual version/artifactScope changes were done. However, a different set of conditionals (and
-     * more information) is needed to be able to determine when and if the version and/or artifactScope changes. See the two
-     * added methods, manageArtifactVersion and manageArtifactScope.
+     * called right before the actual version/artifactScope changes were done. However, a different set of conditionals
+     * (and more information) is needed to be able to determine when and if the version and/or artifactScope changes.
+     * See the two added methods, manageArtifactVersion and manageArtifactScope.
      */
     public void manageArtifact( Artifact artifact, Artifact replacement )
     {

@@ -22,7 +22,9 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
-/** @author jdcasey */
+/**
+ * @author jdcasey
+ */
 public interface ArtifactRepositoryFactory
 {
     String ROLE = ArtifactRepositoryFactory.class.getName();
@@ -36,18 +38,20 @@ public interface ArtifactRepositoryFactory
         throws UnknownRepositoryLayoutException;
 
     @Deprecated
-    ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId, boolean uniqueVersion )
-        throws UnknownRepositoryLayoutException;
+    ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
+                                                           boolean uniqueVersion )
+                                                               throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createDeploymentArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
                                                            boolean uniqueVersion );
 
     ArtifactRepository createArtifactRepository( String id, String url, String layoutId,
                                                  ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
-        throws UnknownRepositoryLayoutException;
+                                                     throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
-                                                 ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
+                                                 ArtifactRepositoryPolicy snapshots,
+                                                 ArtifactRepositoryPolicy releases );
 
     void setGlobalUpdatePolicy( String snapshotPolicy );
 
