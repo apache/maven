@@ -53,6 +53,7 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
+import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -806,8 +807,10 @@ public class DefaultModelValidator
         // revision
         // sha1
         //
-        if ( string.trim().contains( "${changelist}" ) || string.trim().contains( "${revision}" )
-            || string.trim().contains( "${sha1}" ) )
+        string = string.trim();
+        if ( string.contains( "${" + AbstractStringBasedModelInterpolator.CHANGELIST_PROPERTY + "}" )
+            || string.contains( "${" + AbstractStringBasedModelInterpolator.REVISION_PROPERTY + "}" )
+            || string.contains( "${" + AbstractStringBasedModelInterpolator.SHA1_PROPERTY + "}" ) )
         {
             return true;
         }

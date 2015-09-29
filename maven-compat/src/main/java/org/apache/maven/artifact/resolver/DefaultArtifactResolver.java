@@ -376,7 +376,7 @@ public class DefaultArtifactResolver
         ArtifactFilter resolutionFilter = request.getResolutionFilter();
         RepositorySystemSession session = getSession( request.getLocalRepository() );
 
-        // TODO hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the
+        // TODO: hack because metadata isn't generated in m2e correctly and i want to run the maven i have in the
         // workspace
         if ( source == null )
         {
@@ -506,6 +506,7 @@ public class DefaultArtifactResolver
         if ( result.hasMetadataResolutionExceptions() || result.hasVersionRangeViolations()
             || result.hasCircularDependencyExceptions() )
         {
+            logger.info( "Failure detected." );
             return result;
         }
 
