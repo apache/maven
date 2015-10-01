@@ -304,17 +304,6 @@ public class DefaultArtifactDescriptorReader
 
             Model model;
 
-            // hack: don't rebuild model if it was already loaded during reactor resolution
-            final WorkspaceReader workspace = session.getWorkspaceReader();
-            if ( workspace instanceof MavenWorkspaceReader )
-            {
-                model = ( (MavenWorkspaceReader) workspace ).findModel( pomArtifact );
-                if ( model != null )
-                {
-                    return model;
-                }
-            }
-
             try
             {
                 ModelBuildingRequest modelRequest = new DefaultModelBuildingRequest();
