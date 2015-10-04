@@ -54,7 +54,7 @@ under the License.
     <exportedPackage>org.apache.maven.wagon.repository</exportedPackage>
     <exportedPackage>org.apache.maven.wagon.resource</exportedPackage>
 
-    <!-- aether-api, aether-spi, aether-impl, aether-util -->
+    <!-- aether-api, aether-spi, aether-impl -->
     <exportedPackage>org.eclipse.aether.*</exportedPackage>
     <exportedPackage>org.eclipse.aether.artifact</exportedPackage>
     <exportedPackage>org.eclipse.aether.collection</exportedPackage>
@@ -68,7 +68,6 @@ under the License.
     <exportedPackage>org.eclipse.aether.resolution</exportedPackage>
     <exportedPackage>org.eclipse.aether.spi</exportedPackage>
     <exportedPackage>org.eclipse.aether.transfer</exportedPackage>
-    <exportedPackage>org.eclipse.aether.util.artifact</exportedPackage>
     <exportedPackage>org.eclipse.aether.version</exportedPackage>
 
     <!-- plexus-classworlds -->
@@ -154,7 +153,6 @@ under the License.
     <exportedArtifact>org.eclipse.aether:aether-api</exportedArtifact>
     <exportedArtifact>org.eclipse.aether:aether-spi</exportedArtifact>
     <exportedArtifact>org.eclipse.aether:aether-impl</exportedArtifact>
-    <exportedArtifact>org.eclipse.aether:aether-util</exportedArtifact>
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
