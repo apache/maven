@@ -32,11 +32,10 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 
 /**
- * Pseudo test to generate documentation fragment about supported CLI options.
- * TODO such documentation generation code should not be necessary as unit test but should be run
- * during site generation (Velocity? Doxia macro?)
+ * Pseudo test to generate documentation fragment about supported CLI options. TODO such documentation generation code
+ * should not be necessary as unit test but should be run during site generation (Velocity? Doxia macro?)
  */
-public class CLIManagerTest
+public class CLIManagerDocumentationTest
     extends PlexusTestCase
 {
     private final static String LS = System.getProperty( "line.separator" );
@@ -55,7 +54,6 @@ public class CLIManagerTest
     {
         public Collection<Option> getOptions()
         {
-            @SuppressWarnings( "unchecked" )
             List<Option> optList = new ArrayList<>( options.getOptions() );
             Collections.sort( optList, new OptionComparator() );
             return optList;
@@ -105,4 +103,5 @@ public class CLIManagerTest
         File options = getTestFile( "target/test-classes/options.html" );
         FileUtils.fileWrite( options, "UTF-8", getOptionsAsHtml() );
     }
+
 }
