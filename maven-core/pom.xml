@@ -210,7 +210,7 @@
               <goal>create-timestamp</goal>
             </goals>
             <configuration>
-              <timestampFormat>'NON-CANONICAL_'yyyy-MM-dd'T'HH:mm:ss_'${user.name}'</timestampFormat>
+              <timestampFormat>'NON-CANONICAL_'yyyy-MM-dd'T'HH:mm:ssXXX_'${user.name}'</timestampFormat>
               <timestampPropertyName>nonCanonicalRevision</timestampPropertyName>
             </configuration>
           </execution>
