@@ -22,6 +22,7 @@ package org.apache.maven.repository.legacy.resolver.transform;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.apache.maven.artifact.Artifact;
@@ -164,6 +165,7 @@ public class SnapshotTransformation
     public static DateFormat getUtcDateFormatter()
     {
         DateFormat utcDateFormatter = new SimpleDateFormat( DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT );
+        utcDateFormatter.setCalendar( new GregorianCalendar() );
         utcDateFormatter.setTimeZone( DEFAULT_SNAPSHOT_TIME_ZONE );
         return utcDateFormatter;
     }
