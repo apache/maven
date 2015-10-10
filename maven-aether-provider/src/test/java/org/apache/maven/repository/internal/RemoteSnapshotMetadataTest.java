@@ -49,13 +49,14 @@ public class RemoteSnapshotMetadataTest
     @After
     public void restoreLocale()
     {
-        Locale.setDefault(defaultLocale);
+        Locale.setDefault( defaultLocale );
     }
 
     static String gregorianDate()
     {
         SimpleDateFormat df = new SimpleDateFormat( "yyyyMMdd" );
-        df.setCalendar(new GregorianCalendar());
+        df.setCalendar( new GregorianCalendar() );
+        df.setTimeZone( RemoteSnapshotMetadata.DEFAULT_SNAPSHOT_TIME_ZONE );
         return df.format( new Date() );
     }
 
@@ -66,7 +67,7 @@ public class RemoteSnapshotMetadataTest
 
         RemoteSnapshotMetadata metadata = new RemoteSnapshotMetadata(
                 new DefaultArtifact( "a:b:1-SNAPSHOT" ), false);
-        metadata.merge(new Metadata());
+        metadata.merge( new Metadata() );
 
         String dateAfter = gregorianDate();
 
@@ -76,6 +77,6 @@ public class RemoteSnapshotMetadataTest
         /* Allow for this test running across midnight */
         Set<String> expected = new HashSet<String>( Arrays.asList( dateBefore, dateAfter ) );
         assertTrue( "Expected " + datePart + " to be in " + expected,
-                expected.contains(datePart) );
+                expected.contains( datePart ) );
     }
 }
