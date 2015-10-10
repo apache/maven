@@ -31,6 +31,8 @@ public class MavenBuildTimestamp
 
     public static final String BUILD_TIMESTAMP_FORMAT_PROPERTY = "maven.build.timestamp.format";
 
+    public static final TimeZone DEFAULT_BUILD_TIME_ZONE = TimeZone.getTimeZone( "Etc/UTC" );
+
     private String formattedTimestamp;
 
     public MavenBuildTimestamp()
@@ -59,7 +61,7 @@ public class MavenBuildTimestamp
             time = new Date();
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat( timestampFormat );
-        dateFormat.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+        dateFormat.setTimeZone( DEFAULT_BUILD_TIME_ZONE );
         formattedTimestamp = dateFormat.format( time );
     }
 

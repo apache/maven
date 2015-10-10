@@ -88,7 +88,7 @@ public abstract class AbstractModelInterpolatorTest
     public void testDefaultBuildTimestampFormatShouldFormatTimeIn24HourFormat()
     {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+        cal.setTimeZone( MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE );
         cal.set( Calendar.HOUR, 12 );
         cal.set( Calendar.AM_PM, Calendar.AM );
 
@@ -112,7 +112,7 @@ public abstract class AbstractModelInterpolatorTest
 
         SimpleDateFormat format =
             new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        format.setTimeZone( MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE );
         assertEquals( "1976-11-11T00:16:00Z", format.format( firstTestDate ) );
         assertEquals( "1976-11-11T23:16:00Z", format.format( secondTestDate ) );
     }
@@ -120,7 +120,7 @@ public abstract class AbstractModelInterpolatorTest
     public void testDefaultBuildTimestampFormatWithLocalTimeZoneMidnightRollover()
     {
         Calendar cal = Calendar.getInstance();
-        cal.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
+        cal.setTimeZone( TimeZone.getTimeZone( "Europe/Berlin" ) );
 
         cal.set( Calendar.HOUR_OF_DAY, 1 );
         cal.set( Calendar.MINUTE, 16 );
@@ -137,7 +137,7 @@ public abstract class AbstractModelInterpolatorTest
 
         SimpleDateFormat format =
             new SimpleDateFormat( MavenBuildTimestamp.DEFAULT_BUILD_TIMESTAMP_FORMAT );
-        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        format.setTimeZone( MavenBuildTimestamp.DEFAULT_BUILD_TIME_ZONE );
         assertEquals( "2014-06-15T23:16:00Z", format.format( firstTestDate ) );
         assertEquals( "2014-11-16T00:16:00Z", format.format( secondTestDate ) );
     }

@@ -41,6 +41,9 @@ import org.eclipse.aether.artifact.Artifact;
 final class RemoteSnapshotMetadata
     extends MavenSnapshotMetadata
 {
+    private static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
+
+    private static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone( "Etc/UTC" );
 
     private final Map<String, SnapshotVersion> versions = new LinkedHashMap<>();
 
@@ -73,9 +76,9 @@ final class RemoteSnapshotMetadata
 
         if ( metadata.getVersioning() == null )
         {
-            DateFormat utcDateFormatter = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
+            DateFormat utcDateFormatter = new SimpleDateFormat( DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT );
             utcDateFormatter.setCalendar( new GregorianCalendar() );
-            utcDateFormatter.setTimeZone( TimeZone.getTimeZone( "UTC" ) );
+            utcDateFormatter.setTimeZone( DEFAULT_SNAPSHOT_TIME_ZONE );
 
             snapshot = new Snapshot();
             snapshot.setBuildNumber( getBuildNumber( recessive ) + 1 );

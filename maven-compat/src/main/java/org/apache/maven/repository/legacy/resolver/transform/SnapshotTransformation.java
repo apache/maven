@@ -46,11 +46,11 @@ import org.codehaus.plexus.util.StringUtils;
 public class SnapshotTransformation
     extends AbstractVersionTransformation
 {
+    private static final String DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT = "yyyyMMdd.HHmmss";
+
+    private static final TimeZone DEFAULT_SNAPSHOT_TIME_ZONE = TimeZone.getTimeZone( "Etc/UTC" );
+
     private String deploymentTimestamp;
-
-    private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone( "UTC" );
-
-    private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
     public void transformForResolve( Artifact artifact, RepositoryRequest request )
         throws ArtifactResolutionException
@@ -163,8 +163,8 @@ public class SnapshotTransformation
 
     public static DateFormat getUtcDateFormatter()
     {
-        DateFormat utcDateFormatter = new SimpleDateFormat( UTC_TIMESTAMP_PATTERN );
-        utcDateFormatter.setTimeZone( UTC_TIME_ZONE );
+        DateFormat utcDateFormatter = new SimpleDateFormat( DEFAULT_SNAPSHOT_TIMESTAMP_FORMAT );
+        utcDateFormatter.setTimeZone( DEFAULT_SNAPSHOT_TIME_ZONE );
         return utcDateFormatter;
     }
 
