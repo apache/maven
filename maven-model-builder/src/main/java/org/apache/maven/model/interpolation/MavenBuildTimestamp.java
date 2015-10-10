@@ -21,6 +21,7 @@ package org.apache.maven.model.interpolation;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -61,6 +62,7 @@ public class MavenBuildTimestamp
             time = new Date();
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat( timestampFormat );
+        dateFormat.setCalendar( new GregorianCalendar() );
         dateFormat.setTimeZone( DEFAULT_BUILD_TIME_ZONE );
         formattedTimestamp = dateFormat.format( time );
     }
