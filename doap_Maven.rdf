@@ -33,6 +33,28 @@ under the License.
     <release>
       <Version>
         <name>Latest stable release</name>
+        <created>2015-04-28</created>
+        <revision>3.3.3</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.3/source/apache-maven-3.3.3-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.3/source/apache-maven-3.3.3-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.3.1</name>
+        <created>2015-03-18</created>
+        <revision>3.3.1</revision>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.1/binaries/apache-maven-3.3.1-bin.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.1/binaries/apache-maven-3.3.1-bin.tar.gz</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.1/source/apache-maven-3.3.1-src.zip</file-release>
+        <file-release>http://archive.apache.org/dist/maven/maven-3/3.3.1/source/apache-maven-3.3.1-src.tar.gz</file-release>
+      </Version>
+    </release>
+    <release>
+      <Version>
+        <name>Apache Maven 3.2.5</name>
         <created>2014-12-20</created>
         <revision>3.2.5</revision>
         <file-release>http://archive.apache.org/dist/maven/maven-3/3.2.5/binaries/apache-maven-3.2.5-bin.zip</file-release>
