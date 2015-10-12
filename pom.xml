@@ -449,7 +449,11 @@
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes>
+            <excludes combine.children="merge">
+              <exclude>**/.settings/**</exclude>
+              <exclude>**/.project</exclude>
+              <exclude>**/.classpath</exclude>
+              <exclude>**/target/**</exclude>
               <exclude>src/test/resources*/**</exclude>
               <exclude>src/test/projects/**</exclude>
               <exclude>src/test/remote-repo/**</exclude>
