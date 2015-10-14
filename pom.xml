@@ -21,7 +21,7 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>26</version>
+    <version>27</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
@@ -507,11 +507,6 @@
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
-        <plugin><!-- TODO remove when upgrading parent to 27 -->
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.14</version>
-        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
@@ -609,11 +604,6 @@
       <id>reporting</id>
       <reporting>
         <plugins>
-          <plugin><!-- TODO remove when upgrading parent to 27 -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-project-info-reports-plugin</artifactId>
-            <version>2.8.1</version>
-          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -648,11 +638,6 @@
                 </reports>
               </reportSet>
             </reportSets>
-          </plugin>
-          <plugin><!-- TODO remove when upgrading parent to 27 -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>2.13</version>
           </plugin>
         </plugins>
       </reporting>
