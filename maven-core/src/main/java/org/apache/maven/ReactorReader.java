@@ -165,7 +165,6 @@ class ReactorReader
         else if ( !hasBeenPackaged( project ) )
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
-            // and only for plain old jars. Not war files, not ear files, not anything else.
 
             if ( isTestArtifact( artifact ) )
             {
@@ -176,8 +175,7 @@ class ReactorReader
             }
             else
             {
-                String type = artifact.getProperty( "type", "" );
-                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
+                if ( project.hasLifecyclePhase( "compile" ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
@@ -221,7 +219,10 @@ class ReactorReader
         {
             if ( attachedArtifactComparison( requestedArtifact, attachedArtifact ) )
             {
-                return attachedArtifact;
+                if ( requestedRepositoryConflictId.equals( ArtifactIdUtils.toVersionlessId( attachedArtifact ) ) )
+                {
+                    return attachedArtifact;
+                }
             }
         }
 
