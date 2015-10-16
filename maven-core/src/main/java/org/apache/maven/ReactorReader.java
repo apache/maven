@@ -54,8 +54,7 @@ class ReactorReader
 {
     public static final String HINT = "reactor";
 
-    private static final Collection<String> COMPILE_PHASE_TYPES =
-        Arrays.asList( "war", "rar", "jar", "ejb-client", "wsdl" );
+    private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "war", "rar", "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
 
@@ -176,8 +175,7 @@ class ReactorReader
             }
             else
             {
-                String type = artifact.getProperty( "type", "" );
-                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
+                if ( project.hasLifecyclePhase( "compile" ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
@@ -221,10 +219,7 @@ class ReactorReader
         {
             if ( attachedArtifactComparison( requestedArtifact, attachedArtifact ) )
             {
-                if ( requestedRepositoryConflictId.equals( ArtifactIdUtils.toVersionlessId( attachedArtifact ) ) )
-                {
-                    return attachedArtifact;
-                }
+                return attachedArtifact;
             }
         }
 
