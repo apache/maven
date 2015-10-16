@@ -27,6 +27,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Relocation;
@@ -150,62 +151,41 @@ public class DefaultArtifactDescriptorReader
 
     public DefaultArtifactDescriptorReader setRemoteRepositoryManager( RemoteRepositoryManager remoteRepositoryManager )
     {
-        if ( remoteRepositoryManager == null )
-        {
-            throw new IllegalArgumentException( "remote repository manager has not been specified" );
-        }
-        this.remoteRepositoryManager = remoteRepositoryManager;
+        this.remoteRepositoryManager = Validate.notNull( remoteRepositoryManager,
+            "remoteRepositoryManager cannot be null" );
         return this;
     }
 
     public DefaultArtifactDescriptorReader setVersionResolver( VersionResolver versionResolver )
     {
-        if ( versionResolver == null )
-        {
-            throw new IllegalArgumentException( "version resolver has not been specified" );
-        }
-        this.versionResolver = versionResolver;
+        this.versionResolver = Validate.notNull( versionResolver, "versionResolver cannot be null" );
         return this;
     }
 
     /** @since 3.2.2 */
     public DefaultArtifactDescriptorReader setVersionRangeResolver( VersionRangeResolver versionRangeResolver )
     {
-        if ( versionRangeResolver == null )
-        {
-            throw new IllegalArgumentException( "version range resolver has not been specified" );
-        }
-        this.versionRangeResolver = versionRangeResolver;
+        this.versionRangeResolver = Validate.notNull( versionRangeResolver, "versionRangeResolver cannot be null" );
         return this;
     }
 
     public DefaultArtifactDescriptorReader setArtifactResolver( ArtifactResolver artifactResolver )
     {
-        if ( artifactResolver == null )
-        {
-            throw new IllegalArgumentException( "artifact resolver has not been specified" );
-        }
-        this.artifactResolver = artifactResolver;
+        this.artifactResolver = Validate.notNull( artifactResolver, "artifactResolver cannot be null" );
         return this;
     }
 
-    public DefaultArtifactDescriptorReader setRepositoryEventDispatcher( RepositoryEventDispatcher red )
+    public DefaultArtifactDescriptorReader setRepositoryEventDispatcher(
+        RepositoryEventDispatcher repositoryEventDispatcher )
     {
-        if ( red == null )
-        {
-            throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
-        }
-        this.repositoryEventDispatcher = red;
+        this.repositoryEventDispatcher = Validate.notNull( repositoryEventDispatcher,
+            "repositoryEventDispatcher cannot be null" );
         return this;
     }
 
     public DefaultArtifactDescriptorReader setModelBuilder( ModelBuilder modelBuilder )
     {
-        if ( modelBuilder == null )
-        {
-            throw new IllegalArgumentException( "model builder has not been specified" );
-        }
-        this.modelBuilder = modelBuilder;
+        this.modelBuilder = Validate.notNull( modelBuilder, "modelBuilder cannot be null" );
         return this;
     }
 

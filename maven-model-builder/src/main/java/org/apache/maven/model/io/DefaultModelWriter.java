@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,15 +47,8 @@ public class DefaultModelWriter
     public void write( File output, Map<String, Object> options, Model model )
         throws IOException
     {
-        if ( output == null )
-        {
-            throw new IllegalArgumentException( "output file missing" );
-        }
-
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model missing" );
-        }
+        Validate.notNull( output, "output cannot be null" );
+        Validate.notNull( model, "model cannot be null" );
 
         output.getParentFile().mkdirs();
 
@@ -65,15 +59,8 @@ public class DefaultModelWriter
     public void write( Writer output, Map<String, Object> options, Model model )
         throws IOException
     {
-        if ( output == null )
-        {
-            throw new IllegalArgumentException( "output writer missing" );
-        }
-
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model missing" );
-        }
+        Validate.notNull( output, "output cannot be null" );
+        Validate.notNull( model, "model cannot be null" );
 
         try
         {
@@ -90,19 +77,13 @@ public class DefaultModelWriter
     public void write( OutputStream output, Map<String, Object> options, Model model )
         throws IOException
     {
-        if ( output == null )
-        {
-            throw new IllegalArgumentException( "output stream missing" );
-        }
-
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model missing" );
-        }
+        Validate.notNull( output, "output cannot be null" );
+        Validate.notNull( model, "model cannot be null" );
 
         try
         {
             String encoding = model.getModelEncoding();
+            // TODO Use StringUtils here
             if ( encoding == null || encoding.length() <= 0 )
             {
                 encoding = "UTF-8";

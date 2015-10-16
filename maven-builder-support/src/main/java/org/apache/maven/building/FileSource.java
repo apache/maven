@@ -24,6 +24,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang3.Validate;
+
 /**
  * Wraps an ordinary {@link File} as a source.
  *
@@ -41,11 +43,7 @@ public class FileSource
      */
     public FileSource( File file )
     {
-        if ( file == null )
-        {
-            throw new IllegalArgumentException( "no file specified" );
-        }
-        this.file = file.getAbsoluteFile();
+        this.file = Validate.notNull( file, "file cannot be null" ).getAbsoluteFile();
     }
 
     @Override

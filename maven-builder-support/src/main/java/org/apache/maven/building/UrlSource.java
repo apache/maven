@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.apache.commons.lang3.Validate;
+
 /**
  * Wraps an ordinary {@link URL} as a source.
  *
@@ -41,11 +43,7 @@ public class UrlSource
      */
     public UrlSource( URL url )
     {
-        if ( url == null )
-        {
-            throw new IllegalArgumentException( "no url specified" );
-        }
-        this.url = url;
+        this.url = Validate.notNull( url, "url cannot be null" );
     }
 
     @Override

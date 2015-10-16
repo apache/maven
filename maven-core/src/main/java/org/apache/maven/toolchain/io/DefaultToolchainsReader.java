@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.io.xpp3.MavenToolchainsXpp3Reader;
 import org.codehaus.plexus.util.IOUtil;
@@ -50,10 +51,7 @@ public class DefaultToolchainsReader
     public PersistedToolchains read( File input, Map<String, ?> options )
         throws IOException
     {
-        if ( input == null )
-        {
-            throw new IllegalArgumentException( "input file missing" );
-        }
+        Validate.notNull( input, "input cannot be null" );
 
         return read( ReaderFactory.newXmlReader( input ), options );
     }
@@ -62,10 +60,7 @@ public class DefaultToolchainsReader
     public PersistedToolchains read( Reader input, Map<String, ?> options )
         throws IOException
     {
-        if ( input == null )
-        {
-            throw new IllegalArgumentException( "input reader missing" );
-        }
+        Validate.notNull( input, "input cannot be null" );
 
         try
         {
@@ -86,10 +81,7 @@ public class DefaultToolchainsReader
     public PersistedToolchains read( InputStream input, Map<String, ?> options )
         throws IOException
     {
-        if ( input == null )
-        {
-            throw new IllegalArgumentException( "input stream missing" );
-        }
+        Validate.notNull( input, "input cannot be null" );
 
         try
         {

@@ -19,6 +19,7 @@ package org.apache.maven.plugin.internal;
  * under the License.
  */
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
@@ -382,19 +383,10 @@ public class DefaultMavenPluginManager
                                     Map<String, ClassLoader> foreignImports, DependencyFilter filter )
         throws PluginResolutionException, PluginContainerException
     {
-        Plugin plugin = pluginDescriptor.getPlugin();
+        Plugin plugin = Validate.notNull( pluginDescriptor.getPlugin(), "pluginDescriptor.plugin cannot be null" );
 
-        if ( plugin == null )
-        {
-            throw new IllegalArgumentException( "incomplete plugin descriptor, plugin missing" );
-        }
-
-        Artifact pluginArtifact = pluginDescriptor.getPluginArtifact();
-
-        if ( pluginArtifact == null )
-        {
-            throw new IllegalArgumentException( "incomplete plugin descriptor, plugin artifact missing" );
-        }
+        Artifact pluginArtifact =
+            Validate.notNull( pluginDescriptor.getPluginArtifact(), "pluginDescriptor.pluginArtifact cannot be null" );
 
         MavenProject project = session.getCurrentProject();
 

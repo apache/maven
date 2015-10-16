@@ -39,9 +39,9 @@ public class FileSourceTest
             new FileSource( null );
             fail( "Should fail, since you must specify a file" );
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException e )
         {
-            assertEquals( "no file specified", e.getMessage() );
+            assertEquals( "file cannot be null", e.getMessage() );
         }
     }
 

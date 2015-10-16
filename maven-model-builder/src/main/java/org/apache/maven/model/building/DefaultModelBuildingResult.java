@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 
@@ -78,10 +79,8 @@ class DefaultModelBuildingResult
 
     public DefaultModelBuildingResult addModelId( String modelId )
     {
-        if ( modelId == null )
-        {
-            throw new IllegalArgumentException( "no model identifier specified" );
-        }
+        // Intentionally notNull because Super POM may not contain a modelId
+        Validate.notNull( modelId, "modelId cannot null" );
 
         modelIds.add( modelId );
 
@@ -102,10 +101,8 @@ class DefaultModelBuildingResult
 
     public DefaultModelBuildingResult setRawModel( String modelId, Model rawModel )
     {
-        if ( modelId == null )
-        {
-            throw new IllegalArgumentException( "no model identifier specified" );
-        }
+        // Intentionally notNull because Super POM may not contain a modelId
+        Validate.notNull( modelId, "modelId cannot null" );
 
         rawModels.put( modelId, rawModel );
 
@@ -120,10 +117,8 @@ class DefaultModelBuildingResult
 
     public DefaultModelBuildingResult setActivePomProfiles( String modelId, List<Profile> activeProfiles )
     {
-        if ( modelId == null )
-        {
-            throw new IllegalArgumentException( "no model identifier specified" );
-        }
+        // Intentionally notNull because Super POM may not contain a modelId
+        Validate.notNull( modelId, "modelId cannot null" );
 
         if ( activeProfiles != null )
         {

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
@@ -156,10 +157,7 @@ public class DefaultPluginArtifactsCache
 
     public CacheRecord put( Key key, List<Artifact> pluginArtifacts )
     {
-        if ( pluginArtifacts == null )
-        {
-            throw new NullPointerException();
-        }
+        Validate.notNull( pluginArtifacts, "pluginArtifacts cannot be null" );
 
         assertUniqueKey( key );
 
@@ -181,10 +179,7 @@ public class DefaultPluginArtifactsCache
 
     public CacheRecord put( Key key, PluginResolutionException exception )
     {
-        if ( exception == null )
-        {
-            throw new NullPointerException();
-        }
+        Validate.notNull( exception, "exception cannot be null" );
 
         assertUniqueKey( key );
 

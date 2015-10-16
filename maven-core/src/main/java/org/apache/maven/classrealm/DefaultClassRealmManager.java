@@ -34,6 +34,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExportsProvider;
@@ -101,7 +102,7 @@ public class DefaultClassRealmManager
         Map<String, ClassLoader> foreignImports = exports.get().getExportedPackages();
 
         this.mavenApiRealm =
-            createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */, 
+            createRealm( API_REALMID, RealmType.Core, null /* parent */, null /* parentImports */,
                          foreignImports, null /* artifacts */ );
 
         this.providedArtifacts = exports.get().getExportedArtifacts();
@@ -226,10 +227,7 @@ public class DefaultClassRealmManager
 
     public ClassRealm createProjectRealm( Model model, List<Artifact> artifacts )
     {
-        if ( model == null )
-        {
-            throw new IllegalArgumentException( "model missing" );
-        }
+        Validate.notNull( model, "model cannot be null" );
 
         ClassLoader parent = getMavenApiRealm();
 
@@ -243,10 +241,7 @@ public class DefaultClassRealmManager
 
     public ClassRealm createExtensionRealm( Plugin plugin, List<Artifact> artifacts )
     {
-        if ( plugin == null )
-        {
-            throw new IllegalArgumentException( "extension plugin missing" );
-        }
+        Validate.notNull( plugin, "plugin cannot be null" );
 
         ClassLoader parent = PARENT_CLASSLOADER;
 
@@ -264,10 +259,7 @@ public class DefaultClassRealmManager
     public ClassRealm createPluginRealm( Plugin plugin, ClassLoader parent, List<String> parentImports,
                                          Map<String, ClassLoader> foreignImports, List<Artifact> artifacts )
     {
-        if ( plugin == null )
-        {
-            throw new IllegalArgumentException( "plugin missing" );
-        }
+        Validate.notNull( plugin, "plugin cannot be null" );
 
         if ( parent == null )
         {

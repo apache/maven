@@ -26,6 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Writer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,15 +47,8 @@ public class DefaultSettingsWriter
     public void write( File output, Map<String, Object> options, Settings settings )
         throws IOException
     {
-        if ( output == null )
-        {
-            throw new IllegalArgumentException( "output file missing" );
-        }
-
-        if ( settings == null )
-        {
-            throw new IllegalArgumentException( "settings missing" );
-        }
+        Validate.notNull( output, "output cannot be null" );
+        Validate.notNull( settings, "settings cannot be null" );
 
         output.getParentFile().mkdirs();
 
@@ -65,15 +59,8 @@ public class DefaultSettingsWriter
     public void write( Writer output, Map<String, Object> options, Settings settings )
         throws IOException
     {
-        if ( output == null )
-        {
-            throw new IllegalArgumentException( "output writer missing" );
-        }
-
-        if ( settings == null )
-        {
-            throw new IllegalArgumentException( "settings missing" );
-        }
+        Validate.notNull( output, "output cannot be null" );
+        Validate.notNull( settings, "settings cannot be null" );
 
         try
         {
@@ -90,19 +77,13 @@ public class DefaultSettingsWriter
     public void write( OutputStream output, Map<String, Object> options, Settings settings )
         throws IOException
     {
-        if ( output == null )
-        {
-            throw new IllegalArgumentException( "output stream missing" );
-        }
-
-        if ( settings == null )
-        {
-            throw new IllegalArgumentException( "settings missing" );
-        }
+        Validate.notNull( output, "output cannot be null" );
+        Validate.notNull( settings, "settings cannot be null" );
 
         try
         {
             String encoding = settings.getModelEncoding();
+            // TODO Use StringUtils here
             if ( encoding == null || encoding.length() <= 0 )
             {
                 encoding = "UTF-8";

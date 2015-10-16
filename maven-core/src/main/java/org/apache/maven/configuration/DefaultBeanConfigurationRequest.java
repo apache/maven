@@ -19,6 +19,7 @@ package org.apache.maven.configuration;
  * under the License.
  */
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -120,14 +121,8 @@ public class DefaultBeanConfigurationRequest
 
     private Plugin findPlugin( Model model, String groupId, String artifactId )
     {
-        if ( StringUtils.isEmpty( groupId ) )
-        {
-            throw new IllegalArgumentException( "group id for plugin has not been specified" );
-        }
-        if ( StringUtils.isEmpty( artifactId ) )
-        {
-            throw new IllegalArgumentException( "artifact id for plugin has not been specified" );
-        }
+        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
+        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
 
         if ( model != null )
         {

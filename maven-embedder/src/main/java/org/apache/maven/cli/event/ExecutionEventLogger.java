@@ -22,6 +22,7 @@ package org.apache.maven.cli.event;
 import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -58,12 +59,7 @@ public class ExecutionEventLogger
     // TODO should we deprecate?
     public ExecutionEventLogger( Logger logger )
     {
-        if ( logger == null )
-        {
-            throw new IllegalArgumentException( "logger missing" );
-        }
-
-        this.logger = logger;
+        this.logger = Validate.notNull( logger, "logger cannot be null" );
     }
 
     private static String chars( char c, int count )

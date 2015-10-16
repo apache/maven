@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -323,11 +324,7 @@ public class DefaultProjectBuildingRequest
 
     public DefaultProjectBuildingRequest setRepositoryMerging( RepositoryMerging repositoryMerging )
     {
-        if ( repositoryMerging == null )
-        {
-            throw new IllegalArgumentException( "repository merge mode not specified" );
-        }
-        this.repositoryMerging = repositoryMerging;
+        this.repositoryMerging = Validate.notNull( repositoryMerging, "repositoryMerging cannot be null" );
         return this;
     }
 

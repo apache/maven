@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,10 +47,7 @@ public class DefaultSettingsReader
     public Settings read( File input, Map<String, ?> options )
         throws IOException
     {
-        if ( input == null )
-        {
-            throw new IllegalArgumentException( "input file missing" );
-        }
+        Validate.notNull( input, "input cannot be null" );
 
         Settings settings = read( ReaderFactory.newXmlReader( input ), options );
 
@@ -60,10 +58,7 @@ public class DefaultSettingsReader
     public Settings read( Reader input, Map<String, ?> options )
         throws IOException
     {
-        if ( input == null )
-        {
-            throw new IllegalArgumentException( "input reader missing" );
-        }
+        Validate.notNull( input, "input cannot be null" );
 
         try
         {
@@ -84,10 +79,7 @@ public class DefaultSettingsReader
     public Settings read( InputStream input, Map<String, ?> options )
         throws IOException
     {
-        if ( input == null )
-        {
-            throw new IllegalArgumentException( "input stream missing" );
-        }
+        Validate.notNull( input, "input cannot be null" );
 
         try
         {

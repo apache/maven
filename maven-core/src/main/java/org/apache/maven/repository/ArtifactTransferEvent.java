@@ -141,12 +141,10 @@ public class ArtifactTransferEvent
     {
         switch ( requestType )
         {
-
             case REQUEST_PUT:
                 break;
             case REQUEST_GET:
                 break;
-
             default :
                 throw new IllegalArgumentException( "Illegal request type: " + requestType );
         }
@@ -169,7 +167,6 @@ public class ArtifactTransferEvent
     {
         switch ( eventType )
         {
-
             case TRANSFER_INITIATED:
                 break;
             case TRANSFER_STARTED:

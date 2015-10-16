@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
@@ -124,31 +125,21 @@ public class DefaultVersionRangeResolver
 
     public DefaultVersionRangeResolver setMetadataResolver( MetadataResolver metadataResolver )
     {
-        if ( metadataResolver == null )
-        {
-            throw new IllegalArgumentException( "metadata resolver has not been specified" );
-        }
-        this.metadataResolver = metadataResolver;
+        this.metadataResolver = Validate.notNull( metadataResolver, "metadataResolver cannot be null" );
         return this;
     }
 
     public DefaultVersionRangeResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
     {
-        if ( syncContextFactory == null )
-        {
-            throw new IllegalArgumentException( "sync context factory has not been specified" );
-        }
-        this.syncContextFactory = syncContextFactory;
+        this.syncContextFactory = Validate.notNull( syncContextFactory, "syncContextFactory cannot be null" );
         return this;
     }
 
-    public DefaultVersionRangeResolver setRepositoryEventDispatcher( RepositoryEventDispatcher red )
+    public DefaultVersionRangeResolver setRepositoryEventDispatcher(
+        RepositoryEventDispatcher repositoryEventDispatcher )
     {
-        if ( red == null )
-        {
-            throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
-        }
-        this.repositoryEventDispatcher = red;
+        this.repositoryEventDispatcher = Validate.notNull( repositoryEventDispatcher,
+            "repositoryEventDispatcher cannot be null" );
         return this;
     }
 

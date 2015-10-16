@@ -40,9 +40,9 @@ public class UrlSourceTest
             new UrlSource( null );
             fail( "Should fail, since you must specify a url" );
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException e )
         {
-            assertEquals( "no url specified", e.getMessage() );
+            assertEquals( "url cannot be null", e.getMessage() );
         }
     }
 

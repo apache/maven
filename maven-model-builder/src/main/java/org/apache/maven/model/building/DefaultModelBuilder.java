@@ -20,6 +20,7 @@ package org.apache.maven.model.building;
  */
 
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -486,7 +487,7 @@ public class DefaultModelBuilder
     {
         final ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( validationLevel )
             .setLocationTracking( locationTracking );
-        final DefaultModelProblemCollector collector = 
+        final DefaultModelProblemCollector collector =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
         try
         {
@@ -512,7 +513,7 @@ public class DefaultModelBuilder
             }
             else
             {
-                throw new IllegalArgumentException( "neither model source nor input file are specified" );
+                throw new NullPointerException( "neither pomFile nor modelSource can be null" );
             }
         }
 
@@ -985,12 +986,8 @@ public class DefaultModelBuilder
 
         ModelResolver modelResolver = request.getModelResolver();
 
-        if ( modelResolver == null )
-        {
-            throw new IllegalArgumentException( "no model resolver provided, cannot resolve parent POM "
-                + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
-                + ModelProblemUtils.toSourceHint( childModel ) );
-        }
+        Validate.notNull( modelResolver, "request.modelResolver cannot be null (parent POM %s and POM %s)",
+            ModelProblemUtils.toId( groupId, artifactId, version ), ModelProblemUtils.toSourceHint( childModel ) );
 
         ModelSource modelSource;
         try
@@ -1159,9 +1156,11 @@ public class DefaultModelBuilder
             {
                 if ( workspaceResolver == null && modelResolver == null )
                 {
-                    throw new IllegalArgumentException( "no model resolver provided, cannot resolve import POM "
-                        + ModelProblemUtils.toId( groupId, artifactId, version ) + " for POM "
-                        + ModelProblemUtils.toSourceHint( model ) );
+                    throw new NullPointerException( String.format(
+                        "request.workspaceModelResolver and request.modelResolver cannot be null"
+                        + " (parent POM %s and POM %s)",
+                        ModelProblemUtils.toId( groupId, artifactId, version ),
+                        ModelProblemUtils.toSourceHint( model ) ) );
                 }
 
                 Model importModel = null;

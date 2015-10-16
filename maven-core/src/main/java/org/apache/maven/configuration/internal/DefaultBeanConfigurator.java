@@ -21,6 +21,7 @@ package org.apache.maven.configuration.internal;
 
 import java.io.File;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.configuration.BeanConfigurationException;
 import org.apache.maven.configuration.BeanConfigurationPathTranslator;
 import org.apache.maven.configuration.BeanConfigurationRequest;
@@ -53,15 +54,8 @@ public class DefaultBeanConfigurator
     public void configureBean( BeanConfigurationRequest request )
         throws BeanConfigurationException
     {
-        if ( request == null )
-        {
-            throw new IllegalArgumentException( "bean configuration request not specified" );
-        }
-
-        if ( request.getBean() == null )
-        {
-            throw new IllegalArgumentException( "bean to be configured not specified" );
-        }
+        Validate.notNull( request, "request cannot be null" );
+        Validate.notNull( request.getBean(), "request.bean cannot be null" );
 
         Object configuration = request.getConfiguration();
         if ( configuration == null )

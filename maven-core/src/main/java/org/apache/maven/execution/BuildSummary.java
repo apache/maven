@@ -19,6 +19,7 @@ package org.apache.maven.execution;
  * under the License.
  */
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -47,11 +48,8 @@ public abstract class BuildSummary
      */
     protected BuildSummary( MavenProject project, long time )
     {
-        if ( project == null )
-        {
-            throw new IllegalArgumentException( "project missing" );
-        }
-        this.project = project;
+        this.project = Validate.notNull( project, "project cannot be null" );
+        // TODO Validate for < 0?
         this.time = time;
     }
 

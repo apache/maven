@@ -47,6 +47,7 @@
     <maven.compiler.target>1.7</maven.compiler.target>
     <classWorldsVersion>2.5.2</classWorldsVersion>
     <commonsCliVersion>1.2</commonsCliVersion>
+    <commonsLangVersion>3.4</commonsLangVersion>
     <junitVersion>4.11</junitVersion>
     <plexusVersion>1.6</plexusVersion>
     <plexusInterpolationVersion>1.21</plexusInterpolationVersion>
@@ -358,6 +359,11 @@
         <version>${jxpathVersion}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commonsLangVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-sec-dispatcher</artifactId>
         <version>${securityDispatcherVersion}</version>
@@ -572,7 +578,7 @@
                 <requireMavenVersion>
                   <version>${maven.version}</version>
                 </requireMavenVersion>
-              </rules>    
+              </rules>
             </configuration>
           </execution>
         </executions>

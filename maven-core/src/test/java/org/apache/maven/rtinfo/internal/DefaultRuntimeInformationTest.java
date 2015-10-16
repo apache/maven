@@ -72,7 +72,7 @@ public class DefaultRuntimeInformationTest
             rtInfo.isMavenVersion( null );
             fail( "Bad version range wasn't rejected" );
         }
-        catch ( IllegalArgumentException e )
+        catch ( NullPointerException e )
         {
             assertTrue( true );
         }

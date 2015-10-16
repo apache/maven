@@ -22,6 +22,7 @@ package org.apache.maven.repository.internal;
 import java.io.File;
 import java.util.Map;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.aether.artifact.AbstractArtifact;
 import org.eclipse.aether.artifact.Artifact;
 
@@ -42,11 +43,8 @@ final class RelocatedArtifact
 
     public RelocatedArtifact( Artifact artifact, String groupId, String artifactId, String version )
     {
-        if ( artifact == null )
-        {
-            throw new IllegalArgumentException( "no artifact specified" );
-        }
-        this.artifact = artifact;
+        this.artifact = Validate.notNull( artifact, "artifact cannot be null" );
+        // TODO Use StringUtils here
         this.groupId = ( groupId != null && groupId.length() > 0 ) ? groupId : null;
         this.artifactId = ( artifactId != null && artifactId.length() > 0 ) ? artifactId : null;
         this.version = ( version != null && version.length() > 0 ) ? version : null;

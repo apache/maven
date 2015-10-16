@@ -21,6 +21,7 @@ package org.apache.maven.model.profile.activation;
 
 import java.util.Properties;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.profile.DefaultProfileActivationContext;
@@ -45,12 +46,7 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
 
     public AbstractProfileActivatorTest( Class<T> activatorClass )
     {
-        if ( activatorClass == null )
-        {
-            throw new IllegalArgumentException( "class of profile activator to test is not specified" );
-        }
-
-        this.activatorClass = activatorClass;
+        this.activatorClass = Validate.notNull( activatorClass, "activatorClass cannot be null" );;
 
         roleHint = activatorClass.getAnnotation( Component.class ).hint();
     }

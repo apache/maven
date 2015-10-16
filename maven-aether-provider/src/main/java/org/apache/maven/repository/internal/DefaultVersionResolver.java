@@ -19,6 +19,7 @@ package org.apache.maven.repository.internal;
  * under the License.
  */
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
@@ -136,31 +137,20 @@ public class DefaultVersionResolver
 
     public DefaultVersionResolver setMetadataResolver( MetadataResolver metadataResolver )
     {
-        if ( metadataResolver == null )
-        {
-            throw new IllegalArgumentException( "metadata resolver has not been specified" );
-        }
-        this.metadataResolver = metadataResolver;
+        this.metadataResolver = Validate.notNull( metadataResolver, "metadataResolver cannot be null" );
         return this;
     }
 
     public DefaultVersionResolver setSyncContextFactory( SyncContextFactory syncContextFactory )
     {
-        if ( syncContextFactory == null )
-        {
-            throw new IllegalArgumentException( "sync context factory has not been specified" );
-        }
-        this.syncContextFactory = syncContextFactory;
+        this.syncContextFactory = Validate.notNull( syncContextFactory, "syncContextFactory cannot be null" );
         return this;
     }
 
     public DefaultVersionResolver setRepositoryEventDispatcher( RepositoryEventDispatcher repositoryEventDispatcher )
     {
-        if ( repositoryEventDispatcher == null )
-        {
-            throw new IllegalArgumentException( "repository event dispatcher has not been specified" );
-        }
-        this.repositoryEventDispatcher = repositoryEventDispatcher;
+        this.repositoryEventDispatcher = Validate.notNull( repositoryEventDispatcher,
+            "repositoryEventDispatcher cannot be null" );
         return this;
     }
 

@@ -19,11 +19,12 @@ package org.apache.maven.rtinfo.internal;
  * under the License.
  */
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
@@ -99,14 +100,7 @@ public class DefaultRuntimeInformation
     {
         VersionScheme versionScheme = new GenericVersionScheme();
 
-        if ( versionRange == null )
-        {
-            throw new IllegalArgumentException( "Version range must not be null" );
-        }
-        if ( StringUtils.isBlank( versionRange ) )
-        {
-            throw new IllegalArgumentException( "Version range must not be empty" );
-        }
+        Validate.notBlank( versionRange, "versionRange can neither be null, empty nor blank" );
 
         VersionConstraint constraint;
         try
@@ -122,10 +116,7 @@ public class DefaultRuntimeInformation
         try
         {
             String mavenVersion = getMavenVersion();
-            if ( mavenVersion.length() <= 0 )
-            {
-                throw new IllegalStateException( "Could not determine current Maven version" );
-            }
+            Validate.validState( StringUtils.isNotEmpty( mavenVersion ), "Could not determine current Maven version" );
 
             current = versionScheme.parseVersion( mavenVersion );
         }

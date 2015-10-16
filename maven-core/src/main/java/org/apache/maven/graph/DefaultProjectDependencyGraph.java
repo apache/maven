@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
@@ -62,10 +63,7 @@ public class DefaultProjectDependencyGraph
 
     public List<MavenProject> getDownstreamProjects( MavenProject project, boolean transitive )
     {
-        if ( project == null )
-        {
-            throw new IllegalArgumentException( "project missing" );
-        }
+        Validate.notNull( project, "project cannot be null" );
 
         Set<String> projectIds = new HashSet<>();
 
@@ -87,10 +85,7 @@ public class DefaultProjectDependencyGraph
 
     public List<MavenProject> getUpstreamProjects( MavenProject project, boolean transitive )
     {
-        if ( project == null )
-        {
-            throw new IllegalArgumentException( "project missing" );
-        }
+        Validate.notNull( project, "project cannot be null" );
 
         Set<String> projectIds = new HashSet<>();
 

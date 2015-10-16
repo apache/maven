@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang3.Validate;
 import org.apache.maven.artifact.versioning.VersionRange;
 
 public final class ArtifactUtils
@@ -50,10 +51,7 @@ public final class ArtifactUtils
 
     public static String toSnapshotVersion( String version )
     {
-        if ( version == null )
-        {
-            throw new IllegalArgumentException( "version: null" );
-        }
+        Validate.notBlank( version, "version can neither be null, empty nor blank" );
 
         Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
         if ( m.matches() )
@@ -73,14 +71,9 @@ public final class ArtifactUtils
 
     public static String versionlessKey( String groupId, String artifactId )
     {
-        if ( groupId == null )
-        {
-            throw new NullPointerException( "groupId is null" );
-        }
-        if ( artifactId == null )
-        {
-            throw new NullPointerException( "artifactId is null" );
-        }
+        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
+        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
+
         return groupId + ":" + artifactId;
     }
 
@@ -91,18 +84,9 @@ public final class ArtifactUtils
 
     public static String key( String groupId, String artifactId, String version )
     {
-        if ( groupId == null )
-        {
-            throw new NullPointerException( "groupId is null" );
-        }
-        if ( artifactId == null )
-        {
-            throw new NullPointerException( "artifactId is null" );
-        }
-        if ( version == null )
-        {
-            throw new NullPointerException( "version is null" );
-        }
+        Validate.notBlank( groupId, "groupId can neither be null, empty nor blank" );
+        Validate.notBlank( artifactId, "artifactId can neither be null, empty nor blank" );
+        Validate.notBlank( version, "version can neither be null, empty nor blank" );
 
         return groupId + ":" + artifactId + ":" + version;
     }
