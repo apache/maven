@@ -42,8 +42,8 @@ import org.eclipse.aether.repository.WorkspaceRepository;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
 /**
- * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either as packaged
- * jar if it has been built, or only compile output directory if packaging hasn't happened yet.
+ * An implementation of a workspace reader that knows how to search the Maven reactor for artifacts, either
+ * as packaged jar if it has been built, or only compile output directory if packaging hasn't happened yet.
  *
  * @author Jason van Zyl
  */
@@ -54,7 +54,7 @@ class ReactorReader
 {
     public static final String HINT = "reactor";
 
-    private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "war", "rar", "jar", "ejb-client" );
+    private static final Collection<String> COMPILE_PHASE_TYPES = Arrays.asList( "jar", "ejb-client" );
 
     private Map<String, MavenProject> projectsByGAV;
 
@@ -165,6 +165,7 @@ class ReactorReader
         else if ( !hasBeenPackaged( project ) )
         {
             // fallback to loose class files only if artifacts haven't been packaged yet
+            // and only for plain old jars. Not war files, not ear files, not anything else.
 
             if ( isTestArtifact( artifact ) )
             {
@@ -175,7 +176,8 @@ class ReactorReader
             }
             else
             {
-                if ( project.hasLifecyclePhase( "compile" ) )
+                String type = artifact.getProperty( "type", "" );
+                if ( project.hasLifecyclePhase( "compile" ) && COMPILE_PHASE_TYPES.contains( type ) )
                 {
                     return new File( project.getBuild().getOutputDirectory() );
                 }
