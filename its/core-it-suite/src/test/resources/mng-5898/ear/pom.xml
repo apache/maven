@@ -1,0 +1,47 @@
+<project>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>root.project</groupId>
+   <artifactId>ear</artifactId>
+   <packaging>ear</packaging>
+   <version>1.0</version>
+   <name>ear assembly</name>
+   <parent>
+      <groupId>root</groupId>
+      <artifactId>project</artifactId>
+      <version>1.0</version>
+   </parent>
+   <dependencies>
+      <dependency>
+         <groupId>root.project</groupId>
+         <artifactId>ejbs</artifactId>
+         <type>ejb</type>
+      </dependency>
+      <dependency>
+         <groupId>root.project.servlets</groupId>
+         <artifactId>servlet</artifactId>
+         <type>war</type>
+      </dependency>
+      <dependency>
+         <groupId>root.project</groupId>
+         <artifactId>primary-source</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>root.project.projects</groupId>
+         <artifactId>logging</artifactId>
+      </dependency>
+   </dependencies>
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-ear-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>

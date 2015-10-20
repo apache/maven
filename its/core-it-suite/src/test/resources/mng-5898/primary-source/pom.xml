@@ -1,0 +1,36 @@
+<project>
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>root.project</groupId>
+   <artifactId>primary-source</artifactId>
+   <packaging>jar</packaging>
+   <name>core project classes</name>
+   <parent>
+      <groupId>root</groupId>
+      <artifactId>project</artifactId>
+      <version>1.0</version>
+   </parent>
+   <dependencies>
+      <dependency>
+         <groupId>root.project.projects</groupId>
+         <artifactId>logging</artifactId>
+      </dependency>                  
+   </dependencies>
+   <build>
+      <plugins>
+         <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+               <encoding>iso-8859-1</encoding>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+               <minmemory>128m</minmemory>
+               <maxmemory>512m</maxmemory>
+            </configuration>
+         </plugin>
+      </plugins>
+   </build>
+</project>
