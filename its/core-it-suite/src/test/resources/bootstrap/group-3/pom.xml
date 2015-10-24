@@ -126,12 +126,6 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.its.plugins</groupId>
-      <artifactId>mng-5805-pkg-type-mojo-configuration-extension</artifactId>
-      <version>${itPluginVersion}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.its.plugins</groupId>
       <artifactId>mng-5805-pkg-type-mojo-configuration-plugin</artifactId>
       <version>${itPluginVersion}</version>
       <scope>runtime</scope>
