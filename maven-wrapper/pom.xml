@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.takari</groupId>
     <artifactId>takari</artifactId>
-    <version>14</version>
+    <version>19-SNAPSHOT</version>
   </parent>
   
   <artifactId>maven-wrapper</artifactId>
@@ -50,7 +50,7 @@
     </dependency>
     <!-- Using zip util class, should be replaced with a zip lib -->
     <dependency>
-      <groupId>ant</groupId>
+      <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
       <version>1.7.0</version>
       <scope>test</scope>
