@@ -137,6 +137,12 @@ public class DefaultInheritanceAssemblerTest
         }
     }
 
+    public void testWithEmptyUrl() 
+        throws Exception
+    {
+        	testInheritance( "empty", false );
+    }
+    
     public void testInheritance( String baseName )
         throws Exception
     {
@@ -177,5 +183,5 @@ public class DefaultInheritanceAssemblerTest
             XMLUnit.setIgnoreWhitespace( true );
             XMLAssert.assertXMLEqual( control, test );
         }
-    }
+    }    
 }
