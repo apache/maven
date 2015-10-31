@@ -35,6 +35,7 @@ import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles inheritance of model values.
@@ -136,7 +137,7 @@ public class DefaultInheritanceAssembler
             Object artifactId = context.get( ARTIFACT_ID );
             Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
 
-            if ( artifactId != null && childPathAdjustment != null )
+            if ( artifactId != null && childPathAdjustment != null && StringUtils.isNotBlank( parentUrl ) )
             {
                 // append childPathAdjustment and artifactId to parent url
                 return appendPath( parentUrl, artifactId.toString(), childPathAdjustment.toString() );
@@ -161,7 +162,7 @@ public class DefaultInheritanceAssembler
 
         private void concatPath( StringBuilder url, String path )
         {
-            if ( url.length() > 0 && path.length() > 0 )
+            if ( path.length() > 0 )
             {
                 boolean initialUrlEndsWithSlash = url.charAt( url.length() - 1 ) == '/';
                 boolean pathStartsWithSlash = path.charAt( 0 ) ==  '/';

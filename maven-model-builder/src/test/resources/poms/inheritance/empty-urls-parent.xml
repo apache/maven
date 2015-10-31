@@ -22,18 +22,21 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>inheritance</groupId>
-    <artifactId>empty</artifactId>
-    <version>1</version>
-  </parent>
-  <groupId>inheritance</groupId>  
-  <artifactId>child</artifactId>
+  <groupId>inheritance</groupId>
+  <artifactId>empty</artifactId>
   <version>1</version>
+  <modules>
+    <module>child</module>
+  </modules>
   <url></url>
   <scm>
-    <connection>scm:my-scm:http://domain.org/base/child</connection>
-    <developerConnection>scm:my-scm:https://domain.org/base/child/</developerConnection>
+    <connection> </connection>
+    <developerConnection>  </developerConnection>
     <url></url>
-  </scm>  
+  </scm>
+  <distributionManagement>
+    <site>
+      <url></url>
+    </site>
+  </distributionManagement>
 </project>

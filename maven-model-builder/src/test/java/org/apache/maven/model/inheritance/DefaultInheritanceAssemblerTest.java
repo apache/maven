@@ -140,7 +140,7 @@ public class DefaultInheritanceAssemblerTest
     public void testWithEmptyUrl() 
         throws Exception
     {
-        	testInheritance( "empty", false );
+        	testInheritance( "empty-urls", false );
     }
     
     public void testInheritance( String baseName )
