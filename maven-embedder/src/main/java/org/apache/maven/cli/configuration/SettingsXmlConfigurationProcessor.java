@@ -29,6 +29,7 @@ import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.Source;
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.CliRequest;
+import org.apache.maven.cli.FileResolver;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.settings.Mirror;
@@ -62,6 +63,8 @@ public class SettingsXmlConfigurationProcessor
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System.getProperty( "maven.home", System
         .getProperty( "user.dir", "" ) ), "conf/settings.xml" );
 
+    private FileResolver fileResolver = new FileResolver(  );
+
     @Requirement
     private Logger logger;
 
@@ -84,7 +87,7 @@ public class SettingsXmlConfigurationProcessor
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
         {
             userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-            userSettingsFile = resolveFile( userSettingsFile, workingDirectory );
+            userSettingsFile = fileResolver.resolveFile( userSettingsFile, workingDirectory );
 
             if ( !userSettingsFile.isFile() )
             {
@@ -102,7 +105,7 @@ public class SettingsXmlConfigurationProcessor
         if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
         {
             globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
-            globalSettingsFile = resolveFile( globalSettingsFile, workingDirectory );
+            globalSettingsFile = fileResolver.resolveFile( globalSettingsFile, workingDirectory );
 
             if ( !globalSettingsFile.isFile() )
             {
@@ -265,26 +268,5 @@ public class SettingsXmlConfigurationProcessor
             return source.getLocation();
         }
         return defaultLocation;
-    }
-
-    static File resolveFile( File file, String workingDirectory )
-    {
-        if ( file == null )
-        {
-            return null;
-        }
-        else if ( file.isAbsolute() )
-        {
-            return file;
-        }
-        else if ( file.getPath().startsWith( File.separator ) )
-        {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        }
-        else
-        {
-            return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
-        }
     }
 }
