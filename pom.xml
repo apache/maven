@@ -142,6 +142,9 @@
     <contributor>
       <name>Joseph Walton (MNG-5297)</name>
     </contributor>
+    <contributor>
+      <name>Martin W. Kirst (MNG-3525)</name>
+    </contributor>
   </contributors>
 
   <!-- This marked as deprecated for Maven 3.X. This is checked by maven-enforcer-plugin -->

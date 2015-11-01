@@ -49,6 +49,8 @@ import org.apache.maven.toolchain.model.PersistedToolchains;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.codehaus.plexus.util.StringUtils;
 
+import static org.apache.maven.bridge.MavenRepositorySystem.buildArtifactRepository;
+
 @Named
 public class DefaultMavenExecutionRequestPopulator
     implements MavenExecutionRequestPopulator
@@ -259,20 +261,7 @@ public class DefaultMavenExecutionRequestPopulator
             request.addProxy( proxy );
         }
 
-        // <mirrors>
-        //   <mirror>
-        //     <id>nexus</id>
-        //     <mirrorOf>*</mirrorOf>
-        //     <url>http://repository.sonatype.org/content/groups/public</url>
-        //   </mirror>
-        // </mirrors>
-
-        for ( Mirror mirror : settings.getMirrors() )
-        {
-            mirror = mirror.clone();
-
-            request.addMirror( mirror );
-        }
+        addAllMirrors( request, settings.getMirrors() );
 
         request.setActiveProfiles( settings.getActiveProfiles() );
 
@@ -282,12 +271,11 @@ public class DefaultMavenExecutionRequestPopulator
 
             if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
             {
-                List<Repository> remoteRepositories = rawProfile.getRepositories();
-                for ( Repository remoteRepository : remoteRepositories )
+                for ( Repository remoteRepository : rawProfile.getRepositories() )
                 {
                     try
                     {
-                        request.addRemoteRepository( repositorySystem.buildArtifactRepository( remoteRepository ) );
+                        request.addRemoteRepository(  buildArtifactRepository( remoteRepository ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
@@ -295,22 +283,40 @@ public class DefaultMavenExecutionRequestPopulator
                     }
                 }
 
-                List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
-                for ( Repository pluginRepo : pluginRepositories )
+                for ( Repository pluginRepo : rawProfile.getPluginRepositories() )
                 {
                     try
                     {
-                        request.addPluginArtifactRepository( repositorySystem.buildArtifactRepository( pluginRepo ) );
+                        request.addPluginArtifactRepository( buildArtifactRepository( pluginRepo ) );
                     }
                     catch ( InvalidRepositoryException e )
                     {
                         // do nothing for now
                     }
                 }
+
+                addAllMirrors( request, rawProfile.getMirrors() );
             }
         }
 
         return request;
+    }
+
+    private void addAllMirrors( MavenExecutionRequest request, List<Mirror> mirrors )
+    {
+        // <mirrors>
+        //   <mirror>
+        //     <id>nexus</id>
+        //     <mirrorOf>*</mirrorOf>
+        //     <url>http://repository.sonatype.org/content/groups/public</url>
+        //   </mirror>
+        // </mirrors>
+
+        for ( Mirror mirror : mirrors )
+        {
+            mirror = mirror.clone();
+            request.addMirror( mirror );
+        }
     }    
     
     /*end[MAVEN4]*/

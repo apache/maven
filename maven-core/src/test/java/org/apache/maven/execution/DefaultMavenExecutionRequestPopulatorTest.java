@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Settings;
@@ -32,14 +33,25 @@ import org.eclipse.sisu.launch.InjectedTestCase;
 public class DefaultMavenExecutionRequestPopulatorTest
     extends InjectedTestCase
 {
+    private static final String A_GLOBAL_MIRROR_ID = "a-global-mirror-id";
+    private static final String A_PROFILE_MIRROR_ID = "a-profile-mirror-id";
+
     @Inject
-    MavenExecutionRequestPopulator testee;
+    MavenExecutionRequestPopulator requestPopulator;
+    private MavenExecutionRequest request;
+    private Settings settings;
+
+    @Override
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        request = new DefaultMavenExecutionRequest();
+        settings = new Settings();
+    }
         
     public void testPluginRepositoryInjection()
         throws Exception
     {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-
         Repository r = new Repository();
         r.setId( "test" );
         r.setUrl( "file:///test" );
@@ -48,15 +60,85 @@ public class DefaultMavenExecutionRequestPopulatorTest
         p.setId( "test" );
         p.addPluginRepository( r );
 
-        Settings settings = new Settings();
         settings.addProfile( p );
         settings.addActiveProfile( p.getId() );
 
-        testee.populateFromSettings( request, settings );
+        requestPopulator.populateFromSettings( request, settings );
 
         List<ArtifactRepository> repositories = request.getPluginArtifactRepositories();
         assertEquals( 1, repositories.size() );
         assertEquals( r.getId(), repositories.get( 0 ).getId() );
         assertEquals( r.getUrl(), repositories.get( 0 ).getUrl() );
     }
+
+    public void testMirrorsFromGlobalSettingsAreCloned()
+        throws Exception
+    {
+        Mirror aGivenMirror = createMirrorWithId( A_GLOBAL_MIRROR_ID );
+        settings.addMirror( aGivenMirror );
+
+        requestPopulator.populateFromSettings( request, settings );
+
+        List<Mirror> mirrors = request.getMirrors();
+        assertEquals( 1, mirrors.size() );
+        assertNotSame( aGivenMirror, mirrors.get( 0 ) );
+        assertEquals( A_GLOBAL_MIRROR_ID, mirrors.get( 0 ).getId() );
+    }
+
+    public void testMirrorsFromGlobalSettingsArePopulated()
+        throws Exception
+    {
+        settings.addMirror( createMirrorWithId( A_GLOBAL_MIRROR_ID ) );
+
+        requestPopulator.populateFromSettings( request, settings );
+
+        List<Mirror> mirrors = request.getMirrors();
+        assertEquals( 1, mirrors.size() );
+        assertEquals( A_GLOBAL_MIRROR_ID, mirrors.get( 0 ).getId() );
+    }
+
+    public void testMirrorsFromProfileSettingsArePopulated()
+        throws Exception
+    {
+        Profile profile = new Profile();
+        profile.setId( "aProfile" );
+        profile.getMirrors().add( createMirrorWithId( A_GLOBAL_MIRROR_ID ) );
+
+        settings.addProfile( profile );
+        settings.addActiveProfile( "aProfile" );
+
+        requestPopulator.populateFromSettings( request, settings );
+
+        List<Mirror> mirrors = request.getMirrors();
+        assertEquals( 1, mirrors.size() );
+        assertEquals( A_GLOBAL_MIRROR_ID, mirrors.get( 0 ).getId() );
+    }
+
+    public void testMirrorsGlobalAndFromProfileSettingsArePopulated()
+        throws Exception
+    {
+        Profile profile = new Profile();
+        profile.setId( "aProfile" );
+        profile.getMirrors().add( createMirrorWithId( A_PROFILE_MIRROR_ID ) );
+
+        settings.addMirror( createMirrorWithId( A_GLOBAL_MIRROR_ID ) );
+        settings.addProfile( profile );
+        settings.addActiveProfile( "aProfile" );
+
+        requestPopulator.populateFromSettings( request, settings );
+
+        List<Mirror> mirrors = request.getMirrors();
+        assertEquals( 2, mirrors.size() );
+        assertEquals( A_GLOBAL_MIRROR_ID, mirrors.get( 0 ).getId() );
+        assertEquals( A_PROFILE_MIRROR_ID, mirrors.get( 1 ).getId() );
+    }
+
+    private Mirror createMirrorWithId(String id)
+    {
+        Mirror mirror = new Mirror();
+        mirror.setId( id );
+        return mirror;
+    }
+
+
 }
