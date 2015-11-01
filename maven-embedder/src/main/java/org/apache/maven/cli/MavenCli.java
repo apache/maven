@@ -1240,43 +1240,7 @@ public class MavenCli
 
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
-        // ----------------------------------------------------------------------
-        // Profile Activation
-        // ----------------------------------------------------------------------
-
-        List<String> activeProfiles = new ArrayList<>();
-
-        List<String> inactiveProfiles = new ArrayList<>();
-
-        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-        {
-            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-            if ( profileOptionValues != null )
-            {
-                for ( String profileOptionValue : profileOptionValues )
-                {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
-
-                    while ( profileTokens.hasMoreTokens() )
-                    {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
-                        {
-                            inactiveProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "+" ) )
-                        {
-                            activeProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            activeProfiles.add( profileAction );
-                        }
-                    }
-                }
-            }
-        }
+        ActiveProfileArgumentParser activeProfileArguments = new ActiveProfileArgumentParser( commandLine );
 
         TransferListener transferListener;
 
@@ -1325,8 +1289,8 @@ public class MavenCli
             reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false
-            .addActiveProfiles( activeProfiles ) // optional
-            .addInactiveProfiles( inactiveProfiles ) // optional
+            .addActiveProfiles( activeProfileArguments.getActiveProfiles() ) // optional
+            .addInactiveProfiles( activeProfileArguments.getInactiveProfiles() ) // optional
             .setExecutionListener( executionListener ).setTransferListener(
             transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false

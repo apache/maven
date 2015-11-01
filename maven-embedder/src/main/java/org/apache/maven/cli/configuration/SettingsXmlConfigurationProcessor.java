@@ -19,17 +19,9 @@ package org.apache.maven.cli.configuration;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
-
-import org.apache.commons.cli.CommandLine;
 import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.Source;
-import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.CliRequest;
-import org.apache.maven.cli.FileResolver;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.settings.Mirror;
@@ -37,16 +29,19 @@ import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.apache.maven.settings.SettingsUtils;
-import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
+
+import java.io.File;
+import java.util.List;
+
+import static org.apache.maven.bridge.MavenRepositorySystem.buildArtifactRepository;
+import static org.apache.maven.settings.SettingsUtils.convertFromSettingsProfile;
 
 @Component( role = ConfigurationProcessor.class, hint = SettingsXmlConfigurationProcessor.HINT )
 public class SettingsXmlConfigurationProcessor
@@ -63,7 +58,7 @@ public class SettingsXmlConfigurationProcessor
     public static final File DEFAULT_GLOBAL_SETTINGS_FILE = new File( System.getProperty( "maven.home", System
         .getProperty( "user.dir", "" ) ), "conf/settings.xml" );
 
-    private FileResolver fileResolver = new FileResolver(  );
+    private SettingsBuildingRequestMapper requestMapper = new SettingsBuildingRequestMapper();
 
     @Requirement
     private Logger logger;
@@ -71,61 +66,15 @@ public class SettingsXmlConfigurationProcessor
     @Requirement
     private SettingsBuilder settingsBuilder;
 
-    @Requirement
-    private SettingsDecrypter settingsDecrypter;
-
     @Override
     public void process( CliRequest cliRequest )
         throws Exception
     {
-        CommandLine commandLine = cliRequest.getCommandLine();
-        String workingDirectory = cliRequest.getWorkingDirectory();
+        SettingsBuildingRequest settingsRequest = requestMapper.mapFromCliRequest( cliRequest );
+
         MavenExecutionRequest request = cliRequest.getRequest();
-
-        File userSettingsFile;
-
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_SETTINGS ) )
-        {
-            userSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_SETTINGS ) );
-            userSettingsFile = fileResolver.resolveFile( userSettingsFile, workingDirectory );
-
-            if ( !userSettingsFile.isFile() )
-            {
-                throw new FileNotFoundException( "The specified user settings file does not exist: "
-                    + userSettingsFile );
-            }
-        }
-        else
-        {
-            userSettingsFile = DEFAULT_USER_SETTINGS_FILE;
-        }
-
-        File globalSettingsFile;
-
-        if ( commandLine.hasOption( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) )
-        {
-            globalSettingsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_SETTINGS ) );
-            globalSettingsFile = fileResolver.resolveFile( globalSettingsFile, workingDirectory );
-
-            if ( !globalSettingsFile.isFile() )
-            {
-                throw new FileNotFoundException( "The specified global settings file does not exist: "
-                    + globalSettingsFile );
-            }
-        }
-        else
-        {
-            globalSettingsFile = DEFAULT_GLOBAL_SETTINGS_FILE;
-        }
-
-        request.setGlobalSettingsFile( globalSettingsFile );
-        request.setUserSettingsFile( userSettingsFile );
-
-        SettingsBuildingRequest settingsRequest = new DefaultSettingsBuildingRequest();
-        settingsRequest.setGlobalSettingsFile( globalSettingsFile );
-        settingsRequest.setUserSettingsFile( userSettingsFile );
-        settingsRequest.setSystemProperties( cliRequest.getSystemProperties() );
-        settingsRequest.setUserProperties( cliRequest.getUserProperties() );
+        request.setGlobalSettingsFile( settingsRequest.getGlobalSettingsFile() );
+        request.setUserSettingsFile( settingsRequest.getUserSettingsFile() );
 
         if ( request.getEventSpyDispatcher() != null )
         {
@@ -159,7 +108,7 @@ public class SettingsXmlConfigurationProcessor
         }
     }
 
-    private MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
+    MavenExecutionRequest populateFromSettings( MavenExecutionRequest request, Settings settings )
         throws MavenExecutionRequestPopulationException
     {
         if ( settings == null )
@@ -206,6 +155,48 @@ public class SettingsXmlConfigurationProcessor
             request.addProxy( proxy );
         }
 
+        addAllMirrors( request, settings.getMirrors() );
+
+        request.setActiveProfiles( settings.getActiveProfiles() );
+
+        for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
+        {
+            request.addProfile( convertFromSettingsProfile( rawProfile ) );
+
+            if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
+            {
+                for ( Repository remoteRepository : rawProfile.getRepositories() )
+                {
+                    try
+                    {
+                        request.addRemoteRepository( buildArtifactRepository( remoteRepository ) );
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        // do nothing for now
+                    }
+                }
+
+                for ( Repository pluginRepository : rawProfile.getPluginRepositories() )
+                {
+                    try
+                    {
+                        request.addPluginArtifactRepository( buildArtifactRepository( pluginRepository ) );
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        // do nothing for now
+                    }
+                }
+
+                addAllMirrors( request, rawProfile.getMirrors() );
+            }
+        }
+        return request;
+    }
+
+    private void addAllMirrors( MavenExecutionRequest request, List<Mirror> mirrors )
+    {
         // <mirrors>
         //   <mirror>
         //     <id>nexus</id>
@@ -214,51 +205,12 @@ public class SettingsXmlConfigurationProcessor
         //   </mirror>
         // </mirrors>
 
-        for ( Mirror mirror : settings.getMirrors() )
+        for ( Mirror mirror : mirrors )
         {
             mirror = mirror.clone();
 
             request.addMirror( mirror );
         }
-
-        request.setActiveProfiles( settings.getActiveProfiles() );
-
-        for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
-        {
-            request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
-
-            if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
-            {
-                List<Repository> remoteRepositories = rawProfile.getRepositories();
-                for ( Repository remoteRepository : remoteRepositories )
-                {
-                    try
-                    {
-                        request.addRemoteRepository( 
-                            MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
-                    }
-                    catch ( InvalidRepositoryException e )
-                    {
-                        // do nothing for now
-                    }
-                }
-                
-                List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
-                for ( Repository pluginRepository : pluginRepositories )
-                {
-                    try
-                    {
-                        request.addPluginArtifactRepository( 
-                            MavenRepositorySystem.buildArtifactRepository( pluginRepository ) );
-                    }
-                    catch ( InvalidRepositoryException e )
-                    {
-                        // do nothing for now
-                    }
-                }                
-            }
-        }
-        return request;
     }
 
     private Object getLocation( Source source, File defaultLocation )
