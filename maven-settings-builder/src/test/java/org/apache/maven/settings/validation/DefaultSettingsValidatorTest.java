@@ -33,6 +33,8 @@ import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.building.SettingsProblemCollector;
 import org.apache.maven.settings.building.SettingsProblem.Severity;
 
+import static java.util.Collections.singletonList;
+
 /**
  * @author mkleint
  */
@@ -41,6 +43,7 @@ public class DefaultSettingsValidatorTest
 {
 
     private DefaultSettingsValidator validator;
+    private Settings settings;
 
     protected void setUp()
         throws Exception
@@ -48,6 +51,7 @@ public class DefaultSettingsValidatorTest
         super.setUp();
 
         validator = new DefaultSettingsValidator();
+        settings = new Settings();
     }
 
     protected void tearDown()
@@ -65,43 +69,35 @@ public class DefaultSettingsValidatorTest
 
     public void testValidate()
     {
-        Settings model = new Settings();
         Profile prof = new Profile();
         prof.setId( "xxx" );
-        model.addProfile( prof );
+        settings.addProfile( prof );
         SimpleProblemCollector problems = new SimpleProblemCollector();
-        validator.validate( model, problems );
+        validator.validate( settings, problems );
         assertEquals( 0, problems.messages.size() );
 
         Repository repo = new Repository();
         prof.addRepository( repo );
         problems = new SimpleProblemCollector();
-        validator.validate( model, problems );
+        validator.validate( settings, problems );
         assertEquals( 2, problems.messages.size() );
 
         repo.setUrl( "http://xxx.xxx.com" );
         problems = new SimpleProblemCollector();
-        validator.validate( model, problems );
+        validator.validate( settings, problems );
         assertEquals( 1, problems.messages.size() );
 
         repo.setId( "xxx" );
         problems = new SimpleProblemCollector();
-        validator.validate( model, problems );
+        validator.validate( settings, problems );
         assertEquals( 0, problems.messages.size() );
     }
 
-    public void testValidateMirror()
+    public void testValidateMirrorWithinGlobalSettings()
         throws Exception
     {
-        Settings settings = new Settings();
-        Mirror mirror = new Mirror();
-        mirror.setId( "local" );
-        settings.addMirror( mirror );
-        mirror = new Mirror();
-        mirror.setId( "illegal\\:/chars" );
-        mirror.setUrl( "http://void" );
-        mirror.setMirrorOf( "void" );
-        settings.addMirror( mirror );
+        settings.addMirror( createMirrorLocal() );
+        settings.addMirror( createMirrorIllegal() );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
@@ -110,6 +106,42 @@ public class DefaultSettingsValidatorTest
         assertContains( problems.messages.get( 1 ), "'mirrors.mirror.url' for local is missing" );
         assertContains( problems.messages.get( 2 ), "'mirrors.mirror.mirrorOf' for local is missing" );
         assertContains( problems.messages.get( 3 ), "'mirrors.mirror.id' must not contain any of these characters" );
+    }
+
+    public void testValidateMirrorWithinProfile()
+        throws Exception
+    {
+        Profile profile = new Profile();
+        profile.setId( "aProfile" );
+        profile.addMirror( createMirrorLocal() );
+        profile.addMirror( createMirrorIllegal() );
+
+        settings.getProfiles().add( profile );
+        settings.setActiveProfiles( singletonList( "aProfile" ) );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate( settings, problems );
+        assertEquals( 4, problems.messages.size() );
+        assertContains( problems.messages.get( 0 ), "'profiles.profile[aProfile].mirrors.mirror.id' must not be 'local'" );
+        assertContains( problems.messages.get( 1 ), "'profiles.profile[aProfile].mirrors.mirror.url' for local is missing" );
+        assertContains( problems.messages.get( 2 ), "'profiles.profile[aProfile].mirrors.mirror.mirrorOf' for local is missing" );
+        assertContains( problems.messages.get( 3 ), "'profiles.profile[aProfile].mirrors.mirror.id' must not contain any of these characters" );
+    }
+
+    private Mirror createMirrorLocal()
+    {
+        Mirror mirror = new Mirror();
+        mirror.setId( "local" );
+        return mirror;
+    }
+
+    private Mirror createMirrorIllegal()
+    {
+        Mirror mirror = new Mirror();
+        mirror.setId( "illegal\\:/chars" );
+        mirror.setUrl( "http://void" );
+        mirror.setMirrorOf( "void" );
+        return mirror;
     }
 
     public void testValidateRepository()
@@ -123,24 +155,22 @@ public class DefaultSettingsValidatorTest
         repo.setId( "illegal\\:/chars" );
         repo.setUrl( "http://void" );
         profile.addRepository( repo );
-        Settings settings = new Settings();
         settings.addProfile( profile );
 
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validate( settings, problems );
         assertEquals( 3, problems.messages.size() );
         assertContains( problems.messages.get( 0 ),
-                        "'profiles.profile[default].repositories.repository.id' must not be 'local'" );
+            "'profiles.profile[default].repositories.repository.id' must not be 'local'" );
         assertContains( problems.messages.get( 1 ),
-                        "'profiles.profile[default].repositories.repository.url' for local is missing" );
+            "'profiles.profile[default].repositories.repository.url' for local is missing" );
         assertContains( problems.messages.get( 2 ),
-                        "'profiles.profile[default].repositories.repository.id' must not contain any of these characters" );
+            "'profiles.profile[default].repositories.repository.id' must not contain any of these characters" );
     }
 
     public void testValidateUniqueServerId()
         throws Exception
     {
-        Settings settings = new Settings();
         Server server1 = new Server();
         server1.setId( "test" );
         settings.addServer( server1 );
@@ -152,13 +182,12 @@ public class DefaultSettingsValidatorTest
         validator.validate( settings, problems );
         assertEquals( 1, problems.messages.size() );
         assertContains( problems.messages.get( 0 ),
-                        "'servers.server.id' must be unique but found duplicate server with id test" );
+            "'servers.server.id' must be unique but found duplicate server with id test" );
     }
 
     public void testValidateUniqueProfileId()
         throws Exception
     {
-        Settings settings = new Settings();
         Profile profile1 = new Profile();
         profile1.setId( "test" );
         settings.addProfile( profile1 );
@@ -170,13 +199,12 @@ public class DefaultSettingsValidatorTest
         validator.validate( settings, problems );
         assertEquals( 1, problems.messages.size() );
         assertContains( problems.messages.get( 0 ),
-                        "'profiles.profile.id' must be unique but found duplicate profile with id test" );
+            "'profiles.profile.id' must be unique but found duplicate profile with id test" );
     }
 
     public void testValidateUniqueRepositoryId()
         throws Exception
     {
-        Settings settings = new Settings();
         Profile profile = new Profile();
         profile.setId( "pro" );
         settings.addProfile( profile );
@@ -199,7 +227,6 @@ public class DefaultSettingsValidatorTest
     public void testValidateUniqueProxyId()
         throws Exception
     {
-        Settings settings = new Settings();
         Proxy proxy = new Proxy();
         String id = null;
         proxy.setId( id );
@@ -218,7 +245,6 @@ public class DefaultSettingsValidatorTest
     public void testValidateProxy()
         throws Exception
     {
-        Settings settings = new Settings();
         Proxy proxy1 = new Proxy();
         settings.addProxy( proxy1 );
 

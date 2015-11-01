@@ -67,12 +67,12 @@ public class DefaultSettingsValidator
                 if ( StringUtils.isBlank( pluginGroup ) )
                 {
                     addViolation( problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null,
-                                  "must not be empty" );
+                        "must not be empty" );
                 }
                 else if ( !pluginGroup.matches( ID_REGEX ) )
                 {
                     addViolation( problems, Severity.ERROR, "pluginGroups.pluginGroup[" + i + "]", null,
-                                  "must denote a valid group id and match the pattern " + ID_REGEX );
+                        "must denote a valid group id and match the pattern " + ID_REGEX );
                 }
             }
         }
@@ -92,34 +92,12 @@ public class DefaultSettingsValidator
                 if ( !serverIds.add( server.getId() ) )
                 {
                     addViolation( problems, Severity.WARNING, "servers.server.id", null,
-                                  "must be unique but found duplicate server with id " + server.getId() );
+                        "must be unique but found duplicate server with id " + server.getId() );
                 }
             }
         }
 
-        List<Mirror> mirrors = settings.getMirrors();
-
-        if ( mirrors != null )
-        {
-            for ( Mirror mirror : mirrors )
-            {
-                validateStringNotEmpty( problems, "mirrors.mirror.id", mirror.getId(), mirror.getUrl() );
-
-                validateBannedCharacters( problems, "mirrors.mirror.id", Severity.WARNING, mirror.getId(), null,
-                                          ILLEGAL_REPO_ID_CHARS );
-
-                if ( "local".equals( mirror.getId() ) )
-                {
-                    addViolation( problems, Severity.WARNING, "mirrors.mirror.id", null, "must not be 'local'"
-                        + ", this identifier is reserved for the local repository"
-                        + ", using it for other repositories will corrupt your repository metadata." );
-                }
-
-                validateStringNotEmpty( problems, "mirrors.mirror.url", mirror.getUrl(), mirror.getId() );
-
-                validateStringNotEmpty( problems, "mirrors.mirror.mirrorOf", mirror.getMirrorOf(), mirror.getId() );
-            }
-        }
+        validateMirrors( problems, settings.getMirrors(), "mirrors.mirror" );
 
         List<Profile> profiles = settings.getProfiles();
 
@@ -132,7 +110,7 @@ public class DefaultSettingsValidator
                 if ( !profileIds.add( profile.getId() ) )
                 {
                     addViolation( problems, Severity.WARNING, "profiles.profile.id", null,
-                                  "must be unique but found duplicate profile with id " + profile.getId() );
+                        "must be unique but found duplicate profile with id " + profile.getId() );
                 }
 
                 String prefix = "profiles.profile[" + profile.getId() + "].";
@@ -140,6 +118,7 @@ public class DefaultSettingsValidator
                 validateRepositories( problems, profile.getRepositories(), prefix + "repositories.repository" );
                 validateRepositories( problems, profile.getPluginRepositories(), prefix
                     + "pluginRepositories.pluginRepository" );
+                validateMirrors( problems , profile.getMirrors(), prefix + "mirrors.mirror" );
             }
         }
 
@@ -148,15 +127,40 @@ public class DefaultSettingsValidator
         if ( proxies != null )
         {
             Set<String> proxyIds = new HashSet<>();
-            
+
             for ( Proxy proxy : proxies )
             {
                 if ( !proxyIds.add( proxy.getId() ) )
                 {
                     addViolation( problems, Severity.WARNING, "proxies.proxy.id", null,
-                                  "must be unique but found duplicate proxy with id " + proxy.getId() );
+                        "must be unique but found duplicate proxy with id " + proxy.getId() );
                 }
                 validateStringNotEmpty( problems, "proxies.proxy.host", proxy.getHost(), proxy.getId() );
+            }
+        }
+    }
+
+    private void validateMirrors( SettingsProblemCollector problems, List<Mirror> mirrors, final String prefix )
+    {
+        if ( mirrors != null )
+        {
+            for ( Mirror mirror : mirrors )
+            {
+                validateStringNotEmpty( problems, prefix + ".id", mirror.getId(), mirror.getUrl() );
+
+                validateBannedCharacters( problems, prefix + ".id", Severity.WARNING, mirror.getId(), null,
+                    ILLEGAL_REPO_ID_CHARS );
+
+                if ( "local".equals( mirror.getId() ) )
+                {
+                    addViolation( problems, Severity.WARNING, prefix + ".id", null, "must not be 'local'"
+                        + ", this identifier is reserved for the local repository"
+                        + ", using it for other repositories will corrupt your repository metadata." );
+                }
+
+                validateStringNotEmpty( problems, prefix + ".url", mirror.getUrl(), mirror.getId() );
+
+                validateStringNotEmpty( problems, prefix + ".mirrorOf", mirror.getMirrorOf(), mirror.getId() );
             }
         }
     }
@@ -170,7 +174,7 @@ public class DefaultSettingsValidator
             validateStringNotEmpty( problems, prefix + ".id", repository.getId(), repository.getUrl() );
 
             validateBannedCharacters( problems, prefix + ".id", Severity.WARNING, repository.getId(), null,
-                                      ILLEGAL_REPO_ID_CHARS );
+                ILLEGAL_REPO_ID_CHARS );
 
             if ( "local".equals( repository.getId() ) )
             {
@@ -182,7 +186,7 @@ public class DefaultSettingsValidator
             if ( !repoIds.add( repository.getId() ) )
             {
                 addViolation( problems, Severity.WARNING, prefix + ".id", null,
-                              "must be unique but found duplicate repository with id " + repository.getId() );
+                    "must be unique but found duplicate repository with id " + repository.getId() );
             }
 
             validateStringNotEmpty( problems, prefix + ".url", repository.getUrl(), repository.getId() );
@@ -190,7 +194,7 @@ public class DefaultSettingsValidator
             if ( "legacy".equals( repository.getLayout() ) )
             {
                 addViolation( problems, Severity.WARNING, prefix + ".layout", repository.getId(),
-                              "uses the unsupported value 'legacy', artifact resolution might fail." );
+                    "uses the unsupported value 'legacy', artifact resolution might fail." );
             }
         }
     }
@@ -208,7 +212,7 @@ public class DefaultSettingsValidator
      * </ul>
      */
     private static boolean validateStringNotEmpty( SettingsProblemCollector problems, String fieldName, String string,
-                                            String sourceHint )
+                                                   String sourceHint )
     {
         if ( !validateNotNull( problems, fieldName, string, sourceHint ) )
         {
@@ -256,8 +260,8 @@ public class DefaultSettingsValidator
                 if ( banned.indexOf( string.charAt( i ) ) >= 0 )
                 {
                     addViolation( problems, severity, fieldName, sourceHint,
-                                  "must not contain any of these characters " + banned + " but found "
-                                      + string.charAt( i ) );
+                        "must not contain any of these characters " + banned + " but found "
+                            + string.charAt( i ) );
                     return false;
                 }
             }
@@ -267,7 +271,7 @@ public class DefaultSettingsValidator
     }
 
     private static void addViolation( SettingsProblemCollector problems, Severity severity, String fieldName,
-                               String sourceHint, String message )
+                                      String sourceHint, String message )
     {
         StringBuilder buffer = new StringBuilder( 256 );
         buffer.append( '\'' ).append( fieldName ).append( '\'' );

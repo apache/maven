@@ -33,6 +33,13 @@ under the License.
   <name>Maven Settings</name>
   <description>Maven Settings model.</description>
 
+  <contributors>
+    <contributor>
+      <name>Martin W. Kirst (MNG-3525)</name>
+      <url>https://twitter.com/nitram509</url>
+    </contributor>
+  </contributors>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
