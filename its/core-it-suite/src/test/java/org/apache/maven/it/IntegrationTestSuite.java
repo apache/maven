@@ -107,6 +107,8 @@ public class IntegrationTestSuite
         // suite.addTestSuite( MavenIT0108SnapshotUpdateTest.class ); -- MNG-3137
 
         suite.addTestSuite( MavenITmng5898BuildMultimoduleWithEARFailsToResolveWARTest.class );
+        suite.addTestSuite( MavenITmng5840ParentVersionRanges.class );
+        suite.addTestSuite( MavenITmng5840RelativePathReactorMatching.class );
         suite.addTestSuite( MavenITmng5805PkgTypeMojoConfiguration.class );
         suite.addTestSuite( MavenITmng5783PluginDependencyFiltering.class );
         suite.addTestSuite( MavenITmng5774ConfigurationProcessorsTest.class );
