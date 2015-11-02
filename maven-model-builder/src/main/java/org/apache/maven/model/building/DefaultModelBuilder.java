@@ -928,6 +928,11 @@ public class DefaultModelBuilder
             try
             {
                 VersionRange parentRange = VersionRange.createFromVersionSpec( parent.getVersion() );
+                if ( !parentRange.hasRestrictions() )
+                {
+                    // the parent version is not a range, we have version skew, drop back to resolution from repo
+                    return null;
+                }
                 if ( !parentRange.containsVersion( new DefaultArtifactVersion( version ) ) )
                 {
                     // version skew drop back to resolution from the repository
