@@ -197,8 +197,10 @@ fi
 # traverses directory structure from process work directory to filesystem root
 # first directory with .mvn subdirectory is considered project base directory
 find_maven_basedir() {
-  local basedir="$(pwd)"
-  local wdir="$(pwd)"
+  local basedir
+  local wdir
+  basedir="$(pwd)"
+  wdir="$(pwd)"
   while [ "$wdir" != '/' ] ; do
     if [ -d "$wdir"/.mvn ] ; then
       basedir=$wdir
