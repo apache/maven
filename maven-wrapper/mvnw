@@ -54,38 +54,16 @@ case "`uname`" in
   CYGWIN*) cygwin=true ;;
   MINGW*) mingw=true;;
   Darwin*) darwin=true
-           #
-           # Look for the Apple JDKs first to preserve the existing behaviour, and then look
-           # for the new JDKs provided by Oracle.
-           #
-           if [ -z "$JAVA_HOME" ] && [ -L /System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK ] ; then
-             #
-             # Apple JDKs
-             #
-             export JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
-           fi
-
-           if [ -z "$JAVA_HOME" ] && [ -L /System/Library/Java/JavaVirtualMachines/CurrentJDK ] ; then
-             #
-             # Apple JDKs
-             #
-             export JAVA_HOME=/System/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
-           fi
-
-           if [ -z "$JAVA_HOME" ] && [ -L "/Library/Java/JavaVirtualMachines/CurrentJDK" ] ; then
-             #
-             # Oracle JDKs
-             #
-             export JAVA_HOME=/Library/Java/JavaVirtualMachines/CurrentJDK/Contents/Home
-           fi
-
-           if [ -z "$JAVA_HOME" ] && [ -x "/usr/libexec/java_home" ]; then
-             #
-             # Apple JDKs
-             #
-             export JAVA_HOME=`/usr/libexec/java_home`
-           fi
-           ;;
+    # Use /usr/libexec/java_home if available, otherwise fall back to /Library/Java/Home
+    # See https://developer.apple.com/library/mac/qa/qa1170/_index.html
+    if [ -z "$JAVA_HOME" ]; then
+      if [ -x "/usr/libexec/java_home" ]; then
+        export JAVA_HOME="`/usr/libexec/java_home`"
+      else
+        export JAVA_HOME="/Library/Java/Home"
+      fi
+    fi
+    ;;
 esac
 
 if [ -z "$JAVA_HOME" ] ; then
