@@ -42,10 +42,6 @@ Plugin Bindings for <<<default>>> Lifecycle Reference
 
 %{snippet|id=ejb-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
-* Plugin bindings for <<<ejb3>>> packaging
-
-%{snippet|id=ejb3-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
-
 * Plugin bindings for <<<maven-plugin>>> packaging
 
 %{snippet|id=maven-plugin-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
@@ -62,6 +58,3 @@ Plugin Bindings for <<<default>>> Lifecycle Reference
 
 %{snippet|id=rar-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
 
-* Plugin bindings for <<<par>>> packaging
-
-%{snippet|id=par-lifecycle|file=${project.basedir}/src/main/resources/META-INF/plexus/default-bindings.xml}
