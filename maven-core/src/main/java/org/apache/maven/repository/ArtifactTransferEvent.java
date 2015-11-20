@@ -242,7 +242,7 @@ public class ArtifactTransferEvent
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 64 );
 
         sb.append( "TransferEvent[" );
 

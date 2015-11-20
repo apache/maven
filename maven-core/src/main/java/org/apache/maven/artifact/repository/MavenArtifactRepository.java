@@ -132,7 +132,7 @@ public class MavenArtifactRepository
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 256 );
 
         sb.append( "      id: " ).append( getId() ).append( '\n' );
         sb.append( "      url: " ).append( getUrl() ).append( '\n' );

@@ -62,7 +62,7 @@ public class CLIManagerDocumentationTest
 
     public String getOptionsAsHtml()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 512 );
         boolean a = true;
         sb.append( "<table border='1' class='zebra-striped'><tr class='a'><th><b>Options</b></th><th><b>Description</b></th></tr>" );
         for ( Option option : new CLIManagerExtension().getOptions() )
