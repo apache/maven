@@ -45,10 +45,10 @@ public class ManagedVersionMap
         while ( iter.hasNext() )
         {
             String key = iter.next();
-            buffer.append( key ).append( "=" ).append( get( key ) );
+            buffer.append( key ).append( '=' ).append( get( key ) );
             if ( iter.hasNext() )
             {
-                buffer.append( "\n" );
+                buffer.append( '\n' );
             }
         }
         return buffer.toString();

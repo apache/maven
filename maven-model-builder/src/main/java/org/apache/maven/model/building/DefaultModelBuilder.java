@@ -914,8 +914,8 @@ public class DefaultModelBuilder
             {
                 buffer.append( " of POM " ).append( ModelProblemUtils.toSourceHint( childModel ) );
             }
-            buffer.append( " points at " ).append( groupId ).append( ":" ).append( artifactId );
-            buffer.append( " instead of " ).append( parent.getGroupId() ).append( ":" );
+            buffer.append( " points at " ).append( groupId ).append( ':' ).append( artifactId );
+            buffer.append( " instead of " ).append( parent.getGroupId() ).append( ':' );
             buffer.append( parent.getArtifactId() ).append( ", please verify your project structure" );
 
             problems.setSource( childModel );
@@ -1005,7 +1005,7 @@ public class DefaultModelBuilder
             buffer.append( "Non-resolvable parent POM" );
             if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
             {
-                buffer.append( " " ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+                buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
             }
             if ( childModel != problems.getRootModel() )
             {
@@ -1197,7 +1197,7 @@ public class DefaultModelBuilder
                         buffer.append( "Non-resolvable import POM" );
                         if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
                         {
-                            buffer.append( " " ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
+                            buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
                         }
                         buffer.append( ": " ).append( e.getMessage() );
 

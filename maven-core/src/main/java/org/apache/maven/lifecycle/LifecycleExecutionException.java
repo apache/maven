@@ -91,7 +91,7 @@ public class LifecycleExecutionException
             buffer.append( execution.getGoal() );
             buffer.append( " (" );
             buffer.append( execution.getExecutionId() );
-            buffer.append( ")" );
+            buffer.append( ')' );
         }
 
         if ( project != null )

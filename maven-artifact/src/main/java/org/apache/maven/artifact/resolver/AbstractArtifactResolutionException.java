@@ -175,7 +175,7 @@ public class AbstractArtifactResolutionException
             for ( Iterator<String> i = path.iterator(); i.hasNext(); num++ )
             {
                 sb.append( indentation );
-                sb.append( "\t" );
+                sb.append( '\t' );
                 sb.append( num );
                 sb.append( ") " );
                 sb.append( i.next() );
@@ -201,8 +201,8 @@ public class AbstractArtifactResolutionException
         if ( message == null || !message.contains( "from the specified remote repositories:" ) )
         {
             sb.append( LS );
-            sb.append( "  " ).append( groupId ).append( ":" ).append( artifactId ).append( ":" ).append( type ).append(
-                ":" ).append( version );
+            sb.append( "  " ).append( groupId ).append( ':' ).append( artifactId ).append( ':' ).append( type ).append(
+                ':' ).append( version );
             sb.append( LS );
             if ( remoteRepositories != null )
             {
@@ -235,10 +235,10 @@ public class AbstractArtifactResolutionException
                         sb.append( ", snapshots=" ).append( snapshots.isEnabled() );
                     }
 
-                    sb.append( ")" );
+                    sb.append( ')' );
                     if ( i.hasNext() )
                     {
-                        sb.append( "," ).append( LS ).append( "  " );
+                        sb.append( ',' ).append( LS ).append( "  " );
                     }
                 }
             }

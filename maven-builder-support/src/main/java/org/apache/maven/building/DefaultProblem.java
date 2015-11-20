@@ -151,7 +151,7 @@ class DefaultProblem
     {
         StringBuilder buffer = new StringBuilder( 128 );
 
-        buffer.append( "[" ).append( getSeverity() ).append( "] " );
+        buffer.append( '[' ).append( getSeverity() ).append( "] " );
         buffer.append( getMessage() );
         buffer.append( " @ " ).append( getLocation() );
 

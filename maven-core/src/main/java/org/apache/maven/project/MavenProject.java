@@ -1133,9 +1133,9 @@ public class MavenProject
         StringBuilder sb = new StringBuilder( 128 );
         sb.append( "MavenProject: " );
         sb.append( getGroupId() );
-        sb.append( ":" );
+        sb.append( ':' );
         sb.append( getArtifactId() );
-        sb.append( ":" );
+        sb.append( ':' );
         sb.append( getVersion() );
         sb.append( " @ " );
 

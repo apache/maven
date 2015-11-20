@@ -69,7 +69,7 @@ public final class CLIReportingUtils
         version.append( "Default locale: " ).append( Locale.getDefault() ).append( ", platform encoding: " ).append(
             System.getProperty( "file.encoding", "<unknown encoding>" ) ).append( ls );
         version.append( "OS name: \"" ).append( Os.OS_NAME ).append( "\", version: \"" ).append( Os.OS_VERSION ).append(
-            "\", arch: \"" ).append( Os.OS_ARCH ).append( "\", family: \"" ).append( Os.OS_FAMILY ).append( "\"" );
+            "\", arch: \"" ).append( Os.OS_ARCH ).append( "\", family: \"" ).append( Os.OS_FAMILY ).append( '\"' );
         return version.toString();
     }
 

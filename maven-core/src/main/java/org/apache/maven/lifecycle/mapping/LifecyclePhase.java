@@ -84,7 +84,7 @@ public class LifecyclePhase
                 }
                 else
                 {
-                    sb.append( "," );
+                    sb.append( ',' );
                 }
                 sb.append( mojo.getGoal() );
             }

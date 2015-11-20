@@ -177,9 +177,9 @@ public class DefaultArtifactRepository
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append( "       id: " ).append( getId() ).append( "\n" );
-        sb.append( "      url: " ).append( getUrl() ).append( "\n" );
-        sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( "\n" );
+        sb.append( "       id: " ).append( getId() ).append( '\n' );
+        sb.append( "      url: " ).append( getUrl() ).append( '\n' );
+        sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( '\n' );
 
         if ( snapshots != null )
         {

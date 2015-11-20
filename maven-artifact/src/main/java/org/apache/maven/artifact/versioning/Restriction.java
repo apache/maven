@@ -178,17 +178,17 @@ public class Restriction
     {
         StringBuilder buf = new StringBuilder();
 
-        buf.append( isLowerBoundInclusive() ? "[" : "(" );
+        buf.append( isLowerBoundInclusive() ? '[' : '(' );
         if ( getLowerBound() != null )
         {
             buf.append( getLowerBound().toString() );
         }
-        buf.append( "," );
+        buf.append( ',' );
         if ( getUpperBound() != null )
         {
             buf.append( getUpperBound().toString() );
         }
-        buf.append( isUpperBoundInclusive() ? "]" : ")" );
+        buf.append( isUpperBoundInclusive() ? ']' : ')' );
 
         return buf.toString();
     }

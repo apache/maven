@@ -230,7 +230,7 @@ public class DefaultArtifact
     {
         StringBuilder sb = new StringBuilder( 128 );
         sb.append( getGroupId() );
-        sb.append( ":" );
+        sb.append( ':' );
         appendArtifactTypeClassifierString( sb );
         return sb.toString();
     }
@@ -238,11 +238,11 @@ public class DefaultArtifact
     private void appendArtifactTypeClassifierString( StringBuilder sb )
     {
         sb.append( getArtifactId() );
-        sb.append( ":" );
+        sb.append( ':' );
         sb.append( getType() );
         if ( hasClassifier() )
         {
-            sb.append( ":" );
+            sb.append( ':' );
             sb.append( getClassifier() );
         }
     }
@@ -285,10 +285,10 @@ public class DefaultArtifact
         if ( getGroupId() != null )
         {
             sb.append( getGroupId() );
-            sb.append( ":" );
+            sb.append( ':' );
         }
         appendArtifactTypeClassifierString( sb );
-        sb.append( ":" );
+        sb.append( ':' );
         if ( getBaseVersionInternal() != null )
         {
             sb.append( getBaseVersionInternal() );
@@ -299,7 +299,7 @@ public class DefaultArtifact
         }
         if ( scope != null )
         {
-            sb.append( ":" );
+            sb.append( ':' );
             sb.append( scope );
         }
         return sb.toString();

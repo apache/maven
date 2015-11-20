@@ -485,13 +485,13 @@ public class MetadataGraph
         }
         for ( MetadataGraphVertex v : vertices )
         {
-            sb.append( "Vertex:  " ).append( v.getMd().toString() ).append( "\n" );
+            sb.append( "Vertex:  " ).append( v.getMd().toString() ).append( '\n' );
             List<MetadataGraphEdge> ins = getIncidentEdges( v );
             if ( ins != null )
             {
                 for ( MetadataGraphEdge e : ins )
                 {
-                    sb.append( "       from :  " ).append( e.toString() ).append( "\n" );
+                    sb.append( "       from :  " ).append( e.toString() ).append( '\n' );
                 }
             }
             else
@@ -504,7 +504,7 @@ public class MetadataGraph
             {
                 for ( MetadataGraphEdge e : outs )
                 {
-                    sb.append( "        to :  " ).append( e.toString() ).append( "\n" );
+                    sb.append( "        to :  " ).append( e.toString() ).append( '\n' );
                 }
             }
             else
