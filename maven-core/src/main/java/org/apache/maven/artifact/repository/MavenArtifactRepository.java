@@ -220,7 +220,7 @@ public class MavenArtifactRepository
      */
     private static String protocol( final String url )
     {
-        final int pos = url.indexOf( ":" );
+        final int pos = url.indexOf( ':' );
 
         if ( pos == -1 )
         {
@@ -257,7 +257,7 @@ public class MavenArtifactRepository
                 else
                 {
                     // Now we expect the host
-                    int index = retValue.indexOf( "/" );
+                    int index = retValue.indexOf( '/' );
                     if ( index >= 0 )
                     {
                         retValue = retValue.substring( index + 1 );
