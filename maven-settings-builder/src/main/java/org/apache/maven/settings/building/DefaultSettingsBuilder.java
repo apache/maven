@@ -19,14 +19,6 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
 import org.apache.maven.settings.Settings;
@@ -43,6 +35,14 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.PropertiesBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -89,28 +89,20 @@ public class DefaultSettingsBuilder
     {
         DefaultSettingsProblemCollector problems = new DefaultSettingsProblemCollector( null );
 
-        Source globalSettingsSource =
-            getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
-        Settings globalSettings = readSettings( globalSettingsSource, request, problems );
-
-        Source userSettingsSource =
-            getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
-        Settings userSettings = readSettings( userSettingsSource, request, problems );
-
-        settingsMerger.merge( userSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        Settings settings = mergeAllSettingsFromRequest( request, problems );
 
         problems.setSource( "" );
 
-        userSettings = interpolate( userSettings, request, problems );
+        settings = interpolate( settings, request, problems );
 
         // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
-        String localRepository = userSettings.getLocalRepository();
+        String localRepository = settings.getLocalRepository();
         if ( localRepository != null && localRepository.length() > 0 )
         {
             File file = new File( localRepository );
             if ( !file.isAbsolute() && file.getPath().startsWith( File.separator ) )
             {
-                userSettings.setLocalRepository( file.getAbsolutePath() );
+                settings.setLocalRepository( file.getAbsolutePath() );
             }
         }
 
@@ -119,7 +111,38 @@ public class DefaultSettingsBuilder
             throw new SettingsBuildingException( problems.getProblems() );
         }
 
-        return new DefaultSettingsBuildingResult( userSettings, problems.getProblems() );
+        return new DefaultSettingsBuildingResult( settings, problems.getProblems() );
+    }
+
+    private Settings mergeAllSettingsFromRequest( SettingsBuildingRequest request,
+                                                  DefaultSettingsProblemCollector problems )
+    {
+        Source globalSettingsSource =
+            getSettingsSource( request.getGlobalSettingsFile(), request.getGlobalSettingsSource() );
+        Settings globalSettings = readSettings( globalSettingsSource, request, problems );
+
+        Source userSettingsSource =
+            getSettingsSource( request.getUserSettingsFile(), request.getUserSettingsSource() );
+        Settings userSettings = readSettings( userSettingsSource, request, problems );
+
+        Settings commandLineSettings = createFrom( request.getCommandLineSettings() );
+
+        Settings mergedSettings = new Settings();
+
+        settingsMerger.merge( mergedSettings, commandLineSettings, TrackableBase.USER_LEVEL );
+        settingsMerger.merge( mergedSettings, userSettings, TrackableBase.USER_LEVEL );
+        settingsMerger.merge( mergedSettings, globalSettings, TrackableBase.GLOBAL_LEVEL );
+        return mergedSettings;
+    }
+
+    private Settings createFrom( CommandLineSettings commandLineSettings )
+    {
+        Settings settings = new Settings();
+        for ( String profile : commandLineSettings.getActiveProfiles() )
+        {
+            settings.addActiveProfile( profile );
+        }
+        return settings;
     }
 
     private boolean hasErrors( List<SettingsProblem> problems )

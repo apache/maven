@@ -37,6 +37,10 @@ under the License.
     <contributor>
       <name>Thomas Meyer</name>
     </contributor>
+    <contributor>
+      <name>Martin W. Kirst (MNG-3525)</name>
+      <url>https://twitter.com/nitram509</url>
+    </contributor>
   </contributors>
 
   <dependencies>

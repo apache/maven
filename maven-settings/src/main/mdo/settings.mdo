@@ -20,9 +20,9 @@
 -->
 
 <model xmlns="http://codehaus-plexus.github.io/MODELLO/1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
-  xml.namespace="http://maven.apache.org/SETTINGS/${version}"
-  xml.schemaLocation="http://maven.apache.org/xsd/settings-${version}.xsd">
+       xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/1.4.0 http://codehaus-plexus.github.io/modello/xsd/modello-1.4.0.xsd"
+       xml.namespace="http://maven.apache.org/SETTINGS/${version}"
+       xml.schemaLocation="http://maven.apache.org/xsd/settings-${version}.xsd">
   <id>settings</id>
   <name>Settings</name>
   <description>
@@ -683,6 +683,19 @@
           </description>
           <association>
             <type>Activation</type>
+          </association>
+        </field>
+        <field>
+          <name>mirrors</name>
+          <version>1.0.0+</version>
+          <description>
+            <![CDATA[
+            The list of mirrors for remote repositories.
+            ]]>
+          </description>
+          <association>
+            <type>Mirror</type>
+            <multiplicity>*</multiplicity>
           </association>
         </field>
         <field>

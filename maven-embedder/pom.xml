@@ -24,6 +24,13 @@
   <name>Maven Embedder</name>
   <description>Maven embeddable component, with CLI and logging support.</description>
 
+  <contributors>
+    <contributor>
+      <name>Martin W. Kirst (MNG-3525)</name>
+      <url>https://twitter.com/nitram509</url>
+    </contributor>
+  </contributors>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

@@ -128,4 +128,21 @@ public interface SettingsBuildingRequest
      */
     SettingsBuildingRequest setUserProperties( Properties userProperties );
 
+    /**
+     *
+     * Command line settings have the highest priority and override file based settings.
+     * E.g. {@code --activate-profiles work}
+     *
+     * @return The provided command line settings, never {@code null}.
+     */
+    CommandLineSettings getCommandLineSettings();
+
+    /**
+     * Command line settings have the highest priority and override file based settings.
+     * E.g. {@code --activate-profiles work}
+     *
+     * @param commandLineSettings The provided command line settings, may be {@code null}.
+     * @return This request, never {@code null}.
+     */
+    SettingsBuildingRequest setCommandLineSettings( CommandLineSettings commandLineSettings );
 }

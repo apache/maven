@@ -1,15 +1,4 @@
-package org.apache.maven.execution;
-
-import java.util.List;
-
-import javax.inject.Inject;
-
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.settings.Mirror;
-import org.apache.maven.settings.Profile;
-import org.apache.maven.settings.Repository;
-import org.apache.maven.settings.Settings;
-import org.eclipse.sisu.launch.InjectedTestCase;
+package org.apache.maven.cli.configuration;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,7 +9,7 @@ import org.eclipse.sisu.launch.InjectedTestCase;
  * "License"); you may not use this file except in compliance
  * with the License.  You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
@@ -30,14 +19,26 @@ import org.eclipse.sisu.launch.InjectedTestCase;
  * under the License.
  */
 
-public class DefaultMavenExecutionRequestPopulatorTest
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Repository;
+import org.apache.maven.settings.Settings;
+import org.eclipse.sisu.launch.InjectedTestCase;
+
+import javax.inject.Inject;
+import java.util.List;
+
+public class SettingsXmlConfigurationProcessorTest
     extends InjectedTestCase
 {
     private static final String A_GLOBAL_MIRROR_ID = "a-global-mirror-id";
     private static final String A_PROFILE_MIRROR_ID = "a-profile-mirror-id";
 
     @Inject
-    MavenExecutionRequestPopulator requestPopulator;
+    SettingsXmlConfigurationProcessor configurationProcessor;
     private MavenExecutionRequest request;
     private Settings settings;
 
@@ -48,7 +49,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
         request = new DefaultMavenExecutionRequest();
         settings = new Settings();
     }
-        
+
     public void testPluginRepositoryInjection()
         throws Exception
     {
@@ -63,7 +64,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
         settings.addProfile( p );
         settings.addActiveProfile( p.getId() );
 
-        requestPopulator.populateFromSettings( request, settings );
+        configurationProcessor.populateFromSettings( request, settings );
 
         List<ArtifactRepository> repositories = request.getPluginArtifactRepositories();
         assertEquals( 1, repositories.size() );
@@ -77,7 +78,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
         Mirror aGivenMirror = createMirrorWithId( A_GLOBAL_MIRROR_ID );
         settings.addMirror( aGivenMirror );
 
-        requestPopulator.populateFromSettings( request, settings );
+        configurationProcessor.populateFromSettings( request, settings );
 
         List<Mirror> mirrors = request.getMirrors();
         assertEquals( 1, mirrors.size() );
@@ -90,7 +91,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
     {
         settings.addMirror( createMirrorWithId( A_GLOBAL_MIRROR_ID ) );
 
-        requestPopulator.populateFromSettings( request, settings );
+        configurationProcessor.populateFromSettings( request, settings );
 
         List<Mirror> mirrors = request.getMirrors();
         assertEquals( 1, mirrors.size() );
@@ -107,7 +108,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
         settings.addProfile( profile );
         settings.addActiveProfile( "aProfile" );
 
-        requestPopulator.populateFromSettings( request, settings );
+        configurationProcessor.populateFromSettings( request, settings );
 
         List<Mirror> mirrors = request.getMirrors();
         assertEquals( 1, mirrors.size() );
@@ -125,7 +126,7 @@ public class DefaultMavenExecutionRequestPopulatorTest
         settings.addProfile( profile );
         settings.addActiveProfile( "aProfile" );
 
-        requestPopulator.populateFromSettings( request, settings );
+        configurationProcessor.populateFromSettings( request, settings );
 
         List<Mirror> mirrors = request.getMirrors();
         assertEquals( 2, mirrors.size() );
@@ -133,12 +134,11 @@ public class DefaultMavenExecutionRequestPopulatorTest
         assertEquals( A_PROFILE_MIRROR_ID, mirrors.get( 1 ).getId() );
     }
 
-    private Mirror createMirrorWithId(String id)
+    private Mirror createMirrorWithId( String id )
     {
         Mirror mirror = new Mirror();
         mirror.setId( id );
         return mirror;
     }
-
 
 }

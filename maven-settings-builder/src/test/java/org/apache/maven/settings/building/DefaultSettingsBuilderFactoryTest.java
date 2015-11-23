@@ -19,27 +19,38 @@ package org.apache.maven.settings.building;
  * under the License.
  */
 
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 
-import junit.framework.TestCase;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Benjamin Bentmann
  */
 public class DefaultSettingsBuilderFactoryTest
-    extends TestCase
 {
 
-    private File getSettings( String name )
+    private SettingsBuilder builder;
+    private DefaultSettingsBuildingRequest request;
+
+    @Before
+    public void setUp() throws Exception
     {
-        return new File( "src/test/resources/settings/factory/" + name + ".xml" ).getAbsoluteFile();
+        builder = new DefaultSettingsBuilderFactory().newInstance();
+        assertNotNull( builder );
+
+        request = new DefaultSettingsBuildingRequest();
+        request.setSystemProperties( System.getProperties() );
     }
 
-    public void testCompleteWiring()
+    @Test
+    public void completeWiring()
         throws Exception
     {
-        SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
-        assertNotNull( builder );
 
         DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
         request.setSystemProperties( System.getProperties() );
@@ -48,6 +59,39 @@ public class DefaultSettingsBuilderFactoryTest
         SettingsBuildingResult result = builder.build( request );
         assertNotNull( result );
         assertNotNull( result.getEffectiveSettings() );
+    }
+
+    @Test
+    public void globalMirrorDeclarationCanBeBuild()
+        throws Exception
+    {
+        request.setUserSettingsFile( getSettings( "mirrors-global" ) );
+
+        SettingsBuildingResult result = builder.build( request );
+        assertNotNull( result );
+        assertNotNull( result.getEffectiveSettings() );
+        assertThat( result.getEffectiveSettings().getMirrors().size(), is( 1 ) );
+        assertThat( result.getEffectiveSettings().getMirrors().get( 0 ).getId(), is( "global-mirror-uk" ) );
+    }
+
+    @Test
+    public void mirrorDeclarationWithinProfileCanBeBuild()
+        throws Exception
+    {
+        request.setUserSettingsFile( getSettings( "mirrors-profiled" ) );
+
+        SettingsBuildingResult result = builder.build( request );
+        assertNotNull( result );
+        assertNotNull( result.getEffectiveSettings() );
+        assertThat( result.getEffectiveSettings().getMirrors().size(), is( 0 ) );
+        assertThat( result.getEffectiveSettings().getProfiles().size(), is( 1 ) );
+        assertThat( result.getEffectiveSettings().getProfiles().get( 0 ).getMirrors().size(), is( 1 ) );
+        assertThat( result.getEffectiveSettings().getProfiles().get( 0 ).getMirrors().get( 0 ).getId(), is( "profiled-mirror-uk" ) );
+    }
+
+    private File getSettings( String name )
+    {
+        return new File( "src/test/resources/settings/factory/" + name + ".xml" ).getAbsoluteFile();
     }
 
 }

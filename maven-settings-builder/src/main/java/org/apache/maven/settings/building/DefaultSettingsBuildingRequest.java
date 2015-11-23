@@ -43,6 +43,8 @@ public class DefaultSettingsBuildingRequest
 
     private Properties userProperties;
 
+    private CommandLineSettings commandLineSettings;
+
     @Override
     public File getGlobalSettingsFile()
     {
@@ -152,6 +154,28 @@ public class DefaultSettingsBuildingRequest
         else
         {
             this.userProperties = null;
+        }
+
+        return this;
+    }
+
+    @Override
+    public CommandLineSettings getCommandLineSettings()
+    {
+        if ( commandLineSettings == null )
+        {
+            commandLineSettings = new CommandLineSettings();
+        }
+
+        return commandLineSettings;
+    }
+
+    @Override
+    public SettingsBuildingRequest setCommandLineSettings( CommandLineSettings commandLineSettings )
+    {
+        if ( commandLineSettings != null )
+        {
+            this.commandLineSettings = commandLineSettings;
         }
 
         return this;

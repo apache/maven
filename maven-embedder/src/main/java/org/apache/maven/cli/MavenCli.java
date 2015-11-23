@@ -150,6 +150,8 @@ public class MavenCli
 
     private static final String MVN_MAVEN_CONFIG = ".mvn/maven.config";
 
+    private FileResolver fileResolver = new FileResolver(  );
+
     private ClassWorld classWorld;
 
     private LoggerManager plexusLoggerManager;
@@ -453,7 +455,7 @@ public class MavenCli
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
-            logFile = resolveFile( logFile, cliRequest.workingDirectory );
+            logFile = fileResolver.resolveFile( logFile, cliRequest.workingDirectory );
 
             // redirect stdout and stderr to file
             try
@@ -753,7 +755,7 @@ public class MavenCli
         {
             for ( String jar : StringUtils.split( extClassPath, File.pathSeparator ) )
             {
-                File file = resolveFile( new File( jar ), cliRequest.workingDirectory );
+                File file = fileResolver.resolveFile( new File( jar ), cliRequest.workingDirectory );
 
                 slf4jLogger.debug( "  Included " + file );
 
@@ -1063,7 +1065,7 @@ public class MavenCli
         {
             userToolchainsFile =
                 new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
-            userToolchainsFile = resolveFile( userToolchainsFile, cliRequest.workingDirectory );
+            userToolchainsFile = fileResolver.resolveFile( userToolchainsFile, cliRequest.workingDirectory );
 
             if ( !userToolchainsFile.isFile() )
             {
@@ -1082,7 +1084,7 @@ public class MavenCli
         {
             globalToolchainsFile =
                 new File( cliRequest.commandLine.getOptionValue( CLIManager.ALTERNATE_GLOBAL_TOOLCHAINS ) );
-            globalToolchainsFile = resolveFile( globalToolchainsFile, cliRequest.workingDirectory );
+            globalToolchainsFile = fileResolver.resolveFile( globalToolchainsFile, cliRequest.workingDirectory );
 
             if ( !globalToolchainsFile.isFile() )
             {
@@ -1238,43 +1240,7 @@ public class MavenCli
 
         File baseDirectory = new File( workingDirectory, "" ).getAbsoluteFile();
 
-        // ----------------------------------------------------------------------
-        // Profile Activation
-        // ----------------------------------------------------------------------
-
-        List<String> activeProfiles = new ArrayList<>();
-
-        List<String> inactiveProfiles = new ArrayList<>();
-
-        if ( commandLine.hasOption( CLIManager.ACTIVATE_PROFILES ) )
-        {
-            String[] profileOptionValues = commandLine.getOptionValues( CLIManager.ACTIVATE_PROFILES );
-            if ( profileOptionValues != null )
-            {
-                for ( String profileOptionValue : profileOptionValues )
-                {
-                    StringTokenizer profileTokens = new StringTokenizer( profileOptionValue, "," );
-
-                    while ( profileTokens.hasMoreTokens() )
-                    {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if ( profileAction.startsWith( "-" ) || profileAction.startsWith( "!" ) )
-                        {
-                            inactiveProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else if ( profileAction.startsWith( "+" ) )
-                        {
-                            activeProfiles.add( profileAction.substring( 1 ) );
-                        }
-                        else
-                        {
-                            activeProfiles.add( profileAction );
-                        }
-                    }
-                }
-            }
-        }
+        ActiveProfileArgumentParser activeProfileArguments = new ActiveProfileArgumentParser( commandLine );
 
         TransferListener transferListener;
 
@@ -1311,7 +1277,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.ALTERNATE_USER_TOOLCHAINS ) )
         {
             userToolchainsFile = new File( commandLine.getOptionValue( CLIManager.ALTERNATE_USER_TOOLCHAINS ) );
-            userToolchainsFile = resolveFile( userToolchainsFile, workingDirectory );
+            userToolchainsFile = fileResolver.resolveFile( userToolchainsFile, workingDirectory );
         }
         else
         {
@@ -1323,8 +1289,8 @@ public class MavenCli
             reactorFailureBehaviour ) // default: fail fast
             .setRecursive( recursive ) // default: true
             .setShowErrors( showErrors ) // default: false
-            .addActiveProfiles( activeProfiles ) // optional
-            .addInactiveProfiles( inactiveProfiles ) // optional
+            .addActiveProfiles( activeProfileArguments.getActiveProfiles() ) // optional
+            .addInactiveProfiles( activeProfileArguments.getInactiveProfiles() ) // optional
             .setExecutionListener( executionListener ).setTransferListener(
             transferListener ) // default: batch mode which goes along with interactive
             .setUpdateSnapshots( updateSnapshots ) // default: false
@@ -1334,7 +1300,7 @@ public class MavenCli
 
         if ( alternatePomFile != null )
         {
-            File pom = resolveFile( new File( alternatePomFile ), workingDirectory );
+            File pom = fileResolver.resolveFile( new File( alternatePomFile ), workingDirectory );
             if ( pom.isDirectory() )
             {
                 pom = new File( pom, "pom.xml" );
@@ -1475,27 +1441,6 @@ public class MavenCli
     {
         int procs = Runtime.getRuntime().availableProcessors();
         return (int) ( Float.valueOf( threadConfiguration.replace( "C", "" ) ) * procs );
-    }
-
-    static File resolveFile( File file, String workingDirectory )
-    {
-        if ( file == null )
-        {
-            return null;
-        }
-        else if ( file.isAbsolute() )
-        {
-            return file;
-        }
-        else if ( file.getPath().startsWith( File.separator ) )
-        {
-            // drive-relative Windows path
-            return file.getAbsoluteFile();
-        }
-        else
-        {
-            return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
-        }
     }
 
     // ----------------------------------------------------------------------
