@@ -19,14 +19,16 @@ package org.apache.maven.model.inheritance;
  * under the License.
  */
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.ModelBase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.ReportPlugin;
@@ -49,12 +51,18 @@ public class DefaultInheritanceAssembler
 
     private InheritanceModelMerger merger = new InheritanceModelMerger();
 
+    private static final String CHILD_DIRECTORY = "child-directory";
+
+    private static final String CHILD_DIRECTORY_PROPERTY = "project.directory";
+
     @Override
     public void assembleModelInheritance( Model child, Model parent, ModelBuildingRequest request,
                                           ModelProblemCollector problems )
     {
         Map<Object, Object> hints = new HashMap<>();
-        hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent ) );
+        String childPath = child.getProperties().getProperty( CHILD_DIRECTORY_PROPERTY, child.getArtifactId() );
+        hints.put( CHILD_DIRECTORY, childPath );
+        hints.put( MavenModelMerger.CHILD_PATH_ADJUSTMENT, getChildPathAdjustment( child, parent, childPath ) );
         merger.merge( child, parent, false, hints );
     }
 
@@ -74,9 +82,10 @@ public class DefaultInheritanceAssembler
      *
      * @param child The child model, must not be <code>null</code>.
      * @param parent The parent model, may be <code>null</code>.
+     * @param childDirectory The directory defined in child model, may be <code>null</code>.
      * @return The path adjustment, can be empty but never <code>null</code>.
      */
-    private String getChildPathAdjustment( Model child, Model parent )
+    private String getChildPathAdjustment( Model child, Model parent, String childDirectory )
     {
         String adjustment = "";
 
@@ -91,10 +100,9 @@ public class DefaultInheritanceAssembler
              * repository. In other words, modules where artifactId != moduleDirName will see different effective URLs
              * depending on how the model was constructed (from filesystem or from repository).
              */
-            File childDirectory = child.getProjectDirectory();
-            if ( childDirectory != null )
+            if ( child.getProjectDirectory() != null )
             {
-                childName = childDirectory.getName();
+                childName = child.getProjectDirectory().getName();
             }
 
             for ( String module : parent.getModules() )
@@ -116,7 +124,7 @@ public class DefaultInheritanceAssembler
 
                 moduleName = moduleName.substring( lastSlash + 1 );
 
-                if ( moduleName.equals( childName ) && lastSlash >= 0 )
+                if ( ( moduleName.equals( childName ) || ( moduleName.equals( childDirectory ) ) ) && lastSlash >= 0 )
                 {
                     adjustment = module.substring( 0, lastSlash );
                     break;
@@ -134,18 +142,16 @@ public class DefaultInheritanceAssembler
         @Override
         protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
         {
-            Object artifactId = context.get( ARTIFACT_ID );
+            Object childDirectory = context.get( CHILD_DIRECTORY );
             Object childPathAdjustment = context.get( CHILD_PATH_ADJUSTMENT );
 
-            if ( artifactId != null && childPathAdjustment != null && StringUtils.isNotBlank( parentUrl ) )
-            {
-                // append childPathAdjustment and artifactId to parent url
-                return appendPath( parentUrl, artifactId.toString(), childPathAdjustment.toString() );
-            }
-            else
+            if ( StringUtils.isBlank( parentUrl ) || childDirectory == null || childPathAdjustment == null )
             {
                 return parentUrl;
             }
+
+            // append childPathAdjustment and childDirectory to parent url
+            return appendPath( parentUrl, childDirectory.toString(), childPathAdjustment.toString() );
         }
 
         private String appendPath( String parentUrl, String childPath, String pathAdjustment )
@@ -187,6 +193,38 @@ public class DefaultInheritanceAssembler
                 if ( initialUrlEndsWithSlash && !path.endsWith( "/" ) )
                 {
                     url.append( '/' );
+                }
+            }
+        }
+
+        @Override
+        protected void mergeModelBase_Properties( ModelBase target, ModelBase source, boolean sourceDominant,
+                                                  Map<Object, Object> context )
+        {
+            Properties merged = new Properties();
+            if ( sourceDominant )
+            {
+                merged.putAll( target.getProperties() );
+                putAll( merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY );
+            }
+            else
+            {
+                putAll( merged, source.getProperties(), CHILD_DIRECTORY_PROPERTY );
+                merged.putAll( target.getProperties() );
+            }
+            target.setProperties( merged );
+            target.setLocation( "properties",
+                                InputLocation.merge( target.getLocation( "properties" ),
+                                                     source.getLocation( "properties" ), sourceDominant ) );
+        }
+
+        private void putAll( Map<Object, Object> s, Map<Object, Object> t, Object excludeKey )
+        {
+            for ( Map.Entry<Object, Object> e : t.entrySet() )
+            {
+                if ( !e.getKey().equals( excludeKey ) )
+                {
+                    s.put( e.getKey(), e.getValue() );
                 }
             }
         }

@@ -245,7 +245,7 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
             ]]>
           </description>
           <type>String</type>
@@ -2142,7 +2142,7 @@
             <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
             and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property) 
             ]]>
           </description>
           <type>String</type>
@@ -2154,7 +2154,7 @@
             <![CDATA[
             Just like <code>connection</code>, but for developers, i.e. this scm connection
             will not be read only.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
             ]]>
           </description>
           <type>String</type>
@@ -2172,7 +2172,7 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
             ]]>
           </description>
           <type>String</type>
@@ -2605,7 +2605,7 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
-            <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
+            <br /><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
             ]]>
           </description>
           <type>String</type>

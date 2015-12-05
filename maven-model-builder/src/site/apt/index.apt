@@ -57,14 +57,15 @@ Maven Model Builder
 
    ** parent resolution until {{{./super-pom.html}super-pom}}
 
-   ** inheritance assembly: <<<InheritanceAssembler>>> ({{{./apidocs/org/apache/maven/model/inheritance/InheritanceAssembler.html}javadoc}}),
-   with its <<<DefaultInheritanceAssembler>>> implementation
-   ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}}). Notice that
-   <<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>, <<<project.scm.url>>> and
-   <<<project.distributionManagement.site.url>>> have a special treatment: if not overridden in child, the default value is parent's one
-   with child artifact id appended
+   []
 
-   ** model interpolation (see below)
+ * phase 2, with optional plugin processing
+
+   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
+
+   ** inheritance assembly (see {{{./index.html#Inheritance_Assembly}below}})
+
+   ** model interpolation (see {{{./index.html#Model_Interpolation}below}})
 
    ** url normalization: <<<UrlNormalizer>>> ({{{./apidocs/org/apache/maven/model/path/UrlNormalizer.html}javadoc}}),
    with its <<<DefaultUrlNormalizer>>> implementation
@@ -116,6 +117,28 @@ Maven Model Builder
 
  []
 
+
+* Inheritance Assembly
+
+  Inheritance Assembly consists in filling current model empty fields with values taken from parent model.
+  It is done in <<<InheritanceAssembler>>> ({{{./apidocs/org/apache/maven/model/inheritance/InheritanceAssembler.html}javadoc}}),
+  with its <<<DefaultInheritanceAssembler>>> implementation
+  ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}}).
+
+  By default, every model field is inherited as-is from parent, with a few exceptions that are intentionally not inherited:
+  <<<modelVersion>>>, <<<artifactId>>>, <<<profiles>>> (injected in phase 1) and <<<prerequisites>>>.
+
+  Notice that the 5 URLs from the model (<<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>,
+  <<<project.scm.url>>> and <<<project.distributionManagement.site.url>>>) have a special inheritance handling:
+  
+  ** if not configured in current model, the inherited value is the parent's one with current artifact id appended,
+
+  ** since Maven 3.5.0, if <<<project.directory>>> POM property value is defined, it is used instead of artifact id:
+  this permits default inheritance calculations when module directory name is not equal to artifact id. Notice that this
+  property is not inherited from a POM to its child: childs POM will use child artifact id if property is not
+  set.
+
+  []
 
 * Model Interpolation
 
