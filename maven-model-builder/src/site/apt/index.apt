@@ -62,7 +62,7 @@ Maven Model Builder
    ({{{./xref/org/apache/maven/model/inheritance/DefaultInheritanceAssembler.html}source}}). Notice that
    <<<project.url>>>, <<<project.scm.connection>>>, <<<project.scm.developerConnection>>>, <<<project.scm.url>>> and
    <<<project.distributionManagement.site.url>>> have a special treatment: if not overridden in child, the default value is parent's one
-   with child artifact id appended
+   with child artifact id appended, or <<<project.directory>>> property value if directory is not equals to artifact id
 
    ** model interpolation (see below)
 

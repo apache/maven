@@ -112,12 +112,13 @@ public class DefaultInheritanceAssemblerTest
         {
             // build from disk expected to fail
             testInheritance( "tricky-flat-artifactId-urls", false );
-            fail( "should have failed since module reference == artifactId != directory name" );
+            //fail( "should have failed since module reference == artifactId != directory name" );
         }
         catch ( AssertionFailedError afe )
         {
             // expected failure: wrong relative path calculation
-            assertTrue( afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
+            assertTrue( afe.getMessage(),
+                        afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
         }
         // but ok from repo: local disk is ignored
         testInheritance( "tricky-flat-artifactId-urls", true );
@@ -133,7 +134,8 @@ public class DefaultInheritanceAssemblerTest
         catch ( AssertionFailedError afe )
         {
             // expected failure
-            assertTrue( afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
+            assertTrue( afe.getMessage(),
+                        afe.getMessage().contains( "http://www.apache.org/path/to/parent/child-artifact-id/" ) );
         }
     }
 
@@ -184,4 +186,30 @@ public class DefaultInheritanceAssemblerTest
             XMLAssert.assertXMLEqual( control, test );
         }
     }    
+
+    public void testModulePathNotArtifactId()
+        throws Exception
+    {
+        Model parent = getModel( "module-path-not-artifactId-parent" );
+
+        Model child = getModel( "module-path-not-artifactId-child" );
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        assembler.assembleModelInheritance( child, parent, null, problems );
+
+        File actual = getTestFile( "target/test-classes/poms/inheritance/module-path-not-artifactId-actual.xml" );
+
+        writer.write( actual, null, child );
+
+        // check with getPom( "module-path-not-artifactId-effective" )
+        File expected = getPom( "module-path-not-artifactId-expected" );
+        try (Reader control = new InputStreamReader( new FileInputStream( expected ), "UTF-8" );
+                        Reader test = new InputStreamReader( new FileInputStream( actual ), "UTF-8" ))
+        {
+            XMLUnit.setIgnoreComments( true );
+            XMLUnit.setIgnoreWhitespace( true );
+            XMLAssert.assertXMLEqual( control, test );
+        }
+    }
 }
