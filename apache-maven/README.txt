@@ -16,7 +16,7 @@
   Release Notes
   -------------
 
-  The full list of changes can be found at http://maven.apache.org/release-notes.html.
+  The full list of changes can be found at http://maven.apache.org/docs/history.html.
 
   System Requirements
   -------------------
