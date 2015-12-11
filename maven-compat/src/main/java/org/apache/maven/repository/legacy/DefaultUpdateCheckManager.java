@@ -259,7 +259,7 @@ public class DefaultUpdateCheckManager
                 }
 
                 getLogger().debug( "Writing resolution-state to: " + touchfile );
-                channel.position( 0 );
+                channel.truncate( 0 );
                 props.store( Channels.newOutputStream( channel ), "Last modified on: " + new Date() );
 
                 lock.release();
