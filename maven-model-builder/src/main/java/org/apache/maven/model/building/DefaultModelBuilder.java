@@ -333,7 +333,7 @@ public class DefaultModelBuilder
                 currentData = superData;
             }
             else if ( currentData == resultData )
-            { // First iteration - add initial parent id after version resolution.
+            { // First iteration - add initial id after version resolution.
                 currentData.setGroupId( currentData.getRawModel().getGroupId() == null ? parentData.getGroupId()
                                                                                       : currentData.getRawModel()
                                                                                           .getGroupId() );
@@ -938,6 +938,28 @@ public class DefaultModelBuilder
                     // version skew drop back to resolution from the repository
                     return null;
                 }
+
+                // Validate versions aren't inherited when using parent ranges the same way as when read externally.
+                if ( childModel.getVersion() == null )
+                {
+                    // Message below is checked for in the MNG-2199 core IT.
+                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
+                        .setMessage( "Version must be a constant" ).setLocation( childModel.getLocation( "" ) ) );
+
+                }
+                else
+                {
+                    if ( childModel.getVersion().contains( "${" ) )
+                    {
+                        // Message below is checked for in the MNG-2199 core IT.
+                        problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
+                            .setMessage( "Version must be a constant" )
+                            .setLocation( childModel.getLocation( "version" ) ) );
+
+                    }
+                }
+
+                // MNG-2199: What else to check here ?
             }
             catch ( InvalidVersionSpecificationException e )
             {
@@ -1001,6 +1023,7 @@ public class DefaultModelBuilder
         }
         catch ( UnresolvableModelException e )
         {
+            // Message below is checked for in the MNG-2199 core IT.
             StringBuilder buffer = new StringBuilder( 256 );
             buffer.append( "Non-resolvable parent POM" );
             if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
@@ -1048,15 +1071,16 @@ public class DefaultModelBuilder
         {
             if ( childModel.getVersion() == null )
             {
+                // Message below is checked for in the MNG-2199 core IT.
                 problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
                     .setMessage( "Version must be a constant" ).setLocation( childModel.getLocation( "" ) ) );
 
             }
             else
             {
-                if ( childModel.getVersion()
-                               .contains( "${" ) )
+                if ( childModel.getVersion().contains( "${" ) )
                 {
+                    // Message below is checked for in the MNG-2199 core IT.
                     problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
                         .setMessage( "Version must be a constant" )
                         .setLocation( childModel.getLocation( "version" ) ) );

@@ -27,6 +27,7 @@ import java.util.Collection;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.spi.connector.ArtifactDownload;
 import org.eclipse.aether.spi.connector.ArtifactUpload;
@@ -35,6 +36,8 @@ import org.eclipse.aether.spi.connector.MetadataUpload;
 import org.eclipse.aether.spi.connector.RepositoryConnector;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.eclipse.aether.transfer.ArtifactTransferException;
+import org.eclipse.aether.transfer.MetadataNotFoundException;
+import org.eclipse.aether.transfer.MetadataTransferException;
 
 /**
  * @author Benjamin Bentmann
@@ -89,6 +92,28 @@ public class TestRepositoryConnector
                 }
             }
         }
+        if ( metadataDownloads != null )
+        {
+            for ( final MetadataDownload download : metadataDownloads )
+            {
+                File remoteFile = new File( basedir, path( download.getMetadata() ) );
+                try
+                {
+                    FileUtils.copyFile( remoteFile, download.getFile() );
+                }
+                catch ( IOException e )
+                {
+                    if ( !remoteFile.exists() )
+                    {
+                        download.setException( new MetadataNotFoundException( download.getMetadata(), repository ) );
+                    }
+                    else
+                    {
+                        download.setException( new MetadataTransferException( download.getMetadata(), repository, e ) );
+                    }
+                }
+            }
+        }
     }
 
     private String path( Artifact artifact )
@@ -109,6 +134,19 @@ public class TestRepositoryConnector
         }
 
         path.append( '.' ).append( artifact.getExtension() );
+
+        return path.toString();
+    }
+
+    private String path( Metadata metadata )
+    {
+        StringBuilder path = new StringBuilder( 128 );
+
+        path.append( metadata.getGroupId().replace( '.', '/' ) ).append( '/' );
+
+        path.append( metadata.getArtifactId() ).append( '/' );
+
+        path.append( "maven-metadata.xml" );
 
         return path.toString();
     }

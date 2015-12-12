@@ -63,6 +63,7 @@ public class DefaultProjectBuildingRequest
 
     private boolean resolveDependencies;
 
+    @Deprecated
     private boolean resolveVersionRanges;
 
     private RepositoryMerging repositoryMerging = RepositoryMerging.POM_DOMINANT;
@@ -218,14 +219,24 @@ public class DefaultProjectBuildingRequest
         return resolveDependencies;
     }
 
-    /** @since 3.2.2 */
+    /**
+     * @since 3.2.2
+     * @deprecated This got added when implementing MNG-2199 and is no longer used.
+     * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
+     */
+    @Deprecated
     public ProjectBuildingRequest setResolveVersionRanges( boolean value )
     {
         this.resolveVersionRanges = value;
         return this;
     }
 
-    /** @since 3.2.2 */
+    /**
+     * @since 3.2.2
+     * @deprecated This got added when implementing MNG-2199 and is no longer used.
+     * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
+     */
+    @Deprecated
     public boolean isResolveVersionRanges()
     {
         return this.resolveVersionRanges;

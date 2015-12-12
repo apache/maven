@@ -228,6 +228,7 @@ public class ProjectModelResolver
                      && versionRangeResult.getVersionConstraint().getRange() != null
                      && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
             {
+                // Message below is checked for in the MNG-2199 core IT.
                 throw new UnresolvableModelException( "The requested version range '" + parent.getVersion()
                                                           + "' does not specify an upper bound", parent.getGroupId(),
                                                       parent.getArtifactId(), parent.getVersion() );
