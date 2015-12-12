@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng2199</groupId>
+  <artifactId>local-parent</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  <name>Maven Integration Test :: MNG-2199 :: Invalid Local Version Inheritance</name>
+  <description>Verifies that the build fails when using a parent version range in combination with an inherited version.</description>
+</project>

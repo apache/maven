@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <groupId>org.apache.maven.its.mng2199</groupId>
+    <artifactId>local-parent</artifactId>
+    <version>[1,2]</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>expression</artifactId>
+  <!-- Must not use expressions, when using version ranges. -->
+  <version>${project.parent.version}</version>
+</project>

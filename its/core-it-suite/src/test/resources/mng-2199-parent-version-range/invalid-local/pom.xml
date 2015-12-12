@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its.mng2199</groupId>
+  <artifactId>local-parent</artifactId>
+  <version>1</version>
+  <packaging>pom</packaging>
+  <name>Maven Integration Test :: MNG-2199 :: Invalid Local Parent Version</name>
+  <description>Verifies that the build fails when using a parent version range not matching what is on disk (fallback to remote is not tested here - the parent does not exist anywhere but on disk).</description>
+</project>
