@@ -983,7 +983,8 @@ public class DefaultModelBuilder
     {
         problems.setSource( childModel );
 
-        Parent parent = childModel.getParent().clone();
+        // Note: The 'ModelResolver' will update the version property for any parent version ranges.
+        Parent parent = childModel.getParent();
 
         String groupId = parent.getGroupId();
         String artifactId = parent.getArtifactId();
