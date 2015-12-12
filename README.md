@@ -12,12 +12,12 @@ Maven is available under the [Apache License, Version 2.0](http://www.apache.org
 If you want to bootstrap Maven, you'll need:
 
 - Java 1.7+
-- Maven 3.3.1 or later
+- Maven 3.0.5 or later
 
 Run Maven, specifying a location into which the completed Maven distro should be installed:
 
 ```
-mvn -Dmaven.home="$HOME/app/maven/apache-maven-3.4.x-SNAPSHOT" clean package
+mvn -DdistributionTargetFolder="$HOME/app/maven/apache-maven-3.4.x-SNAPSHOT" clean package
 ```
 
 Once the build completes, you should have a new Maven distro ready to roll in that directory!

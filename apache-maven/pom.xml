@@ -185,7 +185,7 @@
       <id>create-distribution-in-folder</id>
       <activation>
         <property>
-          <name>maven.home</name>
+          <name>distributionTargetFolder</name>
         </property>
       </activation>
       <build>
@@ -203,7 +203,7 @@
                   <finalName>./</finalName>
                   <appendAssemblyId>false</appendAssemblyId>
                   <attach>false</attach>
-                  <outputDirectory>${maven.home}</outputDirectory>
+                  <outputDirectory>${distributionTargetFolder}</outputDirectory>
                   <descriptors>
                     <descriptor>src/main/assembly/dir.xml</descriptor>
                   </descriptors>
