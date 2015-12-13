@@ -43,7 +43,6 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.Extension;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Parent;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.ReportPlugin;
@@ -613,11 +612,32 @@ public class DefaultProjectBuilder
         project.setModel( model );
         project.setOriginalModel( result.getRawModel() );
         project.setFile( model.getPomFile() );
-        Parent p = model.getParent();
-        if ( p != null )
+
+        Model parentModel = null;
+        if ( !result.getModelIds().get( 1 ).isEmpty() )
         {
-            project.setParentArtifact( repositorySystem.createProjectArtifact( p.getGroupId(), p.getArtifactId(),
-                                                                               p.getVersion() ) );
+            // Note: The parent model already got resolved by the ModelBuilder based on model.getParent().
+            parentModel = result.getRawModel( result.getModelIds().get( 1 ) );
+        }
+
+        if ( parentModel != null )
+        {
+            String parentGroupId = parentModel.getGroupId();
+            if ( parentGroupId == null && parentModel.getParent() != null )
+            {
+                parentGroupId = parentModel.getParent().getGroupId();
+            }
+
+            String parentVersion = parentModel.getVersion();
+            if ( parentVersion == null && parentModel.getParent() != null )
+            {
+                parentVersion = parentModel.getParent().getVersion();
+            }
+
+            project.setParentArtifact( repositorySystem.createProjectArtifact( parentGroupId,
+                                                                               parentModel.getArtifactId(),
+                                                                               parentVersion ) );
+
             // org.apache.maven.its.mng4834:parent:0.1
             String parentModelId = result.getModelIds().get( 1 );
             File parentPomFile = result.getRawModel( parentModelId ).getPomFile();

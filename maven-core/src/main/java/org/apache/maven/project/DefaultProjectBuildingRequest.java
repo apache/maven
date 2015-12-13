@@ -226,7 +226,6 @@ public class DefaultProjectBuildingRequest
      * @since 3.2.2
      * @deprecated This got added when implementing MNG-2199 and is no longer used.
      * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
-     * Commit 8c863b01af76d990b7650add5cb98efda4c83533 moved parent version range resolution to the 'ModelBuilder'.
      */
     @Deprecated
     public ProjectBuildingRequest setResolveVersionRanges( boolean value )
@@ -239,7 +238,6 @@ public class DefaultProjectBuildingRequest
      * @since 3.2.2
      * @deprecated This got added when implementing MNG-2199 and is no longer used.
      * Commit 6cf9320942c34bc68205425ab696b1712ace9ba4 updated the way 'MavenProject' objects are initialized.
-     * Commit 8c863b01af76d990b7650add5cb98efda4c83533 moved parent version range resolution to the 'ModelBuilder'.
      */
     @Deprecated
     public boolean isResolveVersionRanges()

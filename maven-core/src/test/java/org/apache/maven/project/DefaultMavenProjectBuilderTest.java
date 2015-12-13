@@ -189,4 +189,134 @@ public class DefaultMavenProjectBuilderTest
         request.setResolveDependencies( true );
         projectBuilder.build( pomFile, request );
     }
+
+    /**
+     * Tests whether local version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildValidParentVersionRangeLocally() throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/parent-version-range-local-valid/child/pom.xml" );
+
+        final MavenProject childProject = getProject( f1 );
+
+        assertNotNull( childProject.getParentArtifact() );
+        assertEquals( childProject.getParentArtifact().getVersion(), "1" );
+        assertNotNull( childProject.getParent() );
+        assertEquals( childProject.getParent().getVersion(), "1" );
+        assertNotNull( childProject.getModel().getParent() );
+        assertEquals( childProject.getModel().getParent().getVersion(), "[1,10]" );
+    }
+
+    /**
+     * Tests whether local version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeLocallyWithoutChildVersion() throws Exception
+    {
+        File f1 =
+            getTestFile( "src/test/resources/projects/parent-version-range-local-child-without-version/child/pom.xml" );
+
+        try
+        {
+            getProject( f1 );
+            fail( "Expected 'ProjectBuildingException' not thrown." );
+        }
+        catch ( final ProjectBuildingException e )
+        {
+            assertNotNull( e.getMessage() );
+            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+        }
+    }
+
+    /**
+     * Tests whether local version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeLocallyWithChildVersionExpression() throws Exception
+    {
+        File f1 =
+            getTestFile(
+                "src/test/resources/projects/parent-version-range-local-child-version-expression/child/pom.xml" );
+
+        try
+        {
+            getProject( f1 );
+            fail( "Expected 'ProjectBuildingException' not thrown." );
+        }
+        catch ( final ProjectBuildingException e )
+        {
+            assertNotNull( e.getMessage() );
+            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+        }
+    }
+
+    /**
+     * Tests whether external version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeExternally() throws Exception
+    {
+        File f1 = getTestFile( "src/test/resources/projects/parent-version-range-external-valid/pom.xml" );
+
+        final MavenProject childProject = this.getProjectFromRemoteRepository( f1 );
+
+        assertNotNull( childProject.getParentArtifact() );
+        assertEquals( childProject.getParentArtifact().getVersion(), "1" );
+        assertNotNull( childProject.getParent() );
+        assertEquals( childProject.getParent().getVersion(), "1" );
+        assertNotNull( childProject.getModel().getParent() );
+        assertEquals( childProject.getModel().getParent().getVersion(), "[1,1]" );
+    }
+
+    /**
+     * Tests whether external version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeExternallyWithoutChildVersion() throws Exception
+    {
+        File f1 =
+            getTestFile(
+                "src/test/resources/projects/parent-version-range-external-child-without-version/pom.xml" );
+
+        try
+        {
+            this.getProjectFromRemoteRepository( f1 );
+            fail( "Expected 'ProjectBuildingException' not thrown." );
+        }
+        catch ( final ProjectBuildingException e )
+        {
+            assertNotNull( e.getMessage() );
+            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+        }
+    }
+
+    /**
+     * Tests whether external version range parent references are build correctly.
+     *
+     * @throws Exception
+     */
+    public void testBuildParentVersionRangeExternallyWithChildVersionExpression() throws Exception
+    {
+        File f1 =
+            getTestFile(
+                "src/test/resources/projects/parent-version-range-external-child-version-expression/pom.xml" );
+
+        try
+        {
+            this.getProjectFromRemoteRepository( f1 );
+            fail( "Expected 'ProjectBuildingException' not thrown." );
+        }
+        catch ( final ProjectBuildingException e )
+        {
+            assertNotNull( e.getMessage() );
+            assertTrue( e.getMessage().contains( "Version must be a constant" ) );
+        }
+    }
+
 }
