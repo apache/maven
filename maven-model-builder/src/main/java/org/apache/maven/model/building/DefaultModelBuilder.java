@@ -1122,8 +1122,12 @@ public class DefaultModelBuilder
         {
             Dependency dependency = it.next();
 
-            if ( !"pom".equals( dependency.getType() ) || !"import".equals( dependency.getScope() ) )
+            boolean declaredDependency = !"pom".equals( dependency.getType() ) 
+                                                    || !"import".equals( dependency.getScope() );
+            
+            if ( declaredDependency )
             {
+                depMngt.addDeclaredDependency( dependency );
                 continue;
             }
 
@@ -1271,6 +1275,7 @@ public class DefaultModelBuilder
             }
 
             importMngts.add( importMngt );
+            depMngt.addImportedDependencyManagement( importMngt );
         }
 
         importIds.remove( importing );
