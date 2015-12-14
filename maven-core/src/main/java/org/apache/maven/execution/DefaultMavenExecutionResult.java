@@ -64,8 +64,10 @@ public class DefaultMavenExecutionResult
 
     public List<MavenProject> getTopologicallySortedProjects()
     {
-        return null == topologicallySortedProjects ? Collections.<MavenProject>emptyList()
-                        : topologicallySortedProjects;
+        return null == topologicallySortedProjects
+                   ? Collections.<MavenProject>emptyList()
+                   : Collections.unmodifiableList( topologicallySortedProjects );
+
     }
 
     public DependencyResolutionResult getDependencyResolutionResult()

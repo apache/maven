@@ -99,6 +99,7 @@ public class ResolutionNode
 
                 children.add( new ResolutionNode( a, remoteRepositories, this ) );
             }
+            children = Collections.unmodifiableList( children );
         }
         else
         {

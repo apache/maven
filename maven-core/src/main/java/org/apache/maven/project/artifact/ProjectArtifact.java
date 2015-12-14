@@ -56,7 +56,10 @@ public class ProjectArtifact
     public List<Dependency> getManagedDependencies()
     {
         DependencyManagement depMngt = project.getDependencyManagement();
-        return ( depMngt != null ) ? depMngt.getDependencies() : Collections.<Dependency>emptyList();
+        return ( depMngt != null )
+                   ? Collections.unmodifiableList( depMngt.getDependencies() )
+                   : Collections.<Dependency>emptyList();
+
     }
 
     static class PomArtifactHandler

@@ -125,7 +125,10 @@ public class ArtifactResolutionResult
 
     public List<Artifact> getMissingArtifacts()
     {
-        return missingArtifacts == null ? Collections.<Artifact>emptyList() : missingArtifacts;
+        return missingArtifacts == null
+                   ? Collections.<Artifact>emptyList()
+                   : Collections.unmodifiableList( missingArtifacts );
+
     }
 
     public ArtifactResolutionResult addMissingArtifact( Artifact artifact )
@@ -160,7 +163,10 @@ public class ArtifactResolutionResult
 
     public List<Exception> getExceptions()
     {
-        return exceptions == null ? Collections.<Exception>emptyList() : exceptions;
+        return exceptions == null
+                   ? Collections.<Exception>emptyList()
+                   : Collections.unmodifiableList( exceptions );
+
     }
 
     // ------------------------------------------------------------------------
@@ -197,7 +203,10 @@ public class ArtifactResolutionResult
 
     public List<Exception> getVersionRangeViolations()
     {
-        return versionRangeViolations == null ? Collections.<Exception>emptyList() : versionRangeViolations;
+        return versionRangeViolations == null
+                   ? Collections.<Exception>emptyList()
+                   : Collections.unmodifiableList( versionRangeViolations );
+
     }
 
     // ------------------------------------------------------------------------
@@ -229,8 +238,10 @@ public class ArtifactResolutionResult
 
     public List<ArtifactResolutionException> getMetadataResolutionExceptions()
     {
-        return metadataResolutionExceptions == null ? Collections.<ArtifactResolutionException>emptyList()
-                        : metadataResolutionExceptions;
+        return metadataResolutionExceptions == null
+                   ? Collections.<ArtifactResolutionException>emptyList()
+                   : Collections.unmodifiableList( metadataResolutionExceptions );
+
     }
 
     // ------------------------------------------------------------------------
@@ -262,7 +273,7 @@ public class ArtifactResolutionResult
             return Collections.emptyList();
         }
 
-        return errorArtifactExceptions;
+        return Collections.unmodifiableList( errorArtifactExceptions );
     }
 
     // ------------------------------------------------------------------------
@@ -299,7 +310,7 @@ public class ArtifactResolutionResult
             return Collections.emptyList();
         }
 
-        return circularDependencyExceptions;
+        return Collections.unmodifiableList( circularDependencyExceptions );
     }
 
     // ------------------------------------------------------------------------
@@ -313,7 +324,7 @@ public class ArtifactResolutionResult
             return Collections.emptyList();
         }
 
-        return repositories;
+        return Collections.unmodifiableList( repositories );
     }
 
     public ArtifactResolutionResult setRepositories( final List<ArtifactRepository> repositories )

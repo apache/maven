@@ -256,7 +256,7 @@ public class DefaultArtifactRepository
     {
         if ( mirroredRepositories != null )
         {
-            this.mirroredRepositories = mirroredRepositories;
+            this.mirroredRepositories = Collections.unmodifiableList( mirroredRepositories );
         }
         else
         {

@@ -401,7 +401,7 @@ public class MavenArtifactRepository
     {
         if ( mirroredRepositories != null )
         {
-            this.mirroredRepositories = mirroredRepositories;
+            this.mirroredRepositories = Collections.unmodifiableList( mirroredRepositories );
         }
         else
         {

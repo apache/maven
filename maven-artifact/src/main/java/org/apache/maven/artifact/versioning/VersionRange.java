@@ -261,7 +261,7 @@ public class VersionRange
         }
         else
         {
-            restrictions = intersection( r1, r2 );
+            restrictions = Collections.unmodifiableList( intersection( r1, r2 ) );
         }
 
         ArtifactVersion version = null;

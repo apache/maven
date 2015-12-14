@@ -136,7 +136,7 @@ public class ModelBuildingException
         {
             return Collections.emptyList();
         }
-        return result.getProblems();
+        return Collections.unmodifiableList( result.getProblems() );
     }
 
     private static String toMessage( ModelBuildingResult result )

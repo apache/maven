@@ -778,7 +778,7 @@ public class MavenProject
         {
             return Collections.emptyList();
         }
-        return getModel().getBuild().getPlugins();
+        return Collections.unmodifiableList( getModel().getBuild().getPlugins() );
     }
 
     public List<String> getModules()
@@ -1079,7 +1079,7 @@ public class MavenProject
         }
         else
         {
-            return build.getExtensions();
+            return Collections.unmodifiableList( build.getExtensions() );
         }
     }
 
@@ -1605,7 +1605,7 @@ public class MavenProject
         {
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_PROVIDED.equals( a.getScope() )
-                || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
+                     || Artifact.SCOPE_SYSTEM.equals( a.getScope() ) )
             {
                 Dependency dependency = new Dependency();
 
@@ -1619,7 +1619,7 @@ public class MavenProject
                 list.add( dependency );
             }
         }
-        return list;
+        return Collections.unmodifiableList( list );
     }
 
     @Deprecated
@@ -1663,7 +1663,7 @@ public class MavenProject
 
             list.add( dependency );
         }
-        return list;
+        return Collections.unmodifiableList( list );
     }
 
     @Deprecated // used by the Maven ITs
@@ -1678,7 +1678,7 @@ public class MavenProject
 
         List<Dependency> list = new ArrayList<>( artifacts.size() );
 
-        for ( Artifact a : getArtifacts()  )
+        for ( Artifact a : getArtifacts() )
         {
             // TODO: let the scope handler deal with this
             if ( Artifact.SCOPE_COMPILE.equals( a.getScope() ) || Artifact.SCOPE_RUNTIME.equals( a.getScope() ) )
@@ -1695,7 +1695,7 @@ public class MavenProject
                 list.add( dependency );
             }
         }
-        return list;
+        return Collections.unmodifiableList( list );
     }
 
     @Deprecated
@@ -1791,7 +1791,7 @@ public class MavenProject
                 list.add( dependency );
             }
         }
-        return list;
+        return Collections.unmodifiableList( list );
     }
 
     @Deprecated
@@ -1863,8 +1863,7 @@ public class MavenProject
         {
             return Collections.emptyList();
         }
-        return getModel().getReporting().getPlugins();
-
+        return Collections.unmodifiableList( getModel().getReporting().getPlugins() );
     }
 
     @Deprecated

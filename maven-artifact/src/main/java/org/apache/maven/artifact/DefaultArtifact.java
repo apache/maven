@@ -272,7 +272,7 @@ public class DefaultArtifact
             return Collections.emptyList();
         }
 
-        return metadataMap.values();
+        return Collections.unmodifiableCollection( metadataMap.values() );
     }
 
     // ----------------------------------------------------------------------
