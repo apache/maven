@@ -772,7 +772,9 @@ public class MavenCli
 
                 BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
 
-                return resolver.loadCoreExtensions( request, providedArtifacts, extensions );
+                return Collections.unmodifiableList( resolver.loadCoreExtensions( request, providedArtifacts,
+                                                                                  extensions ) );
+
             }
             finally
             {
