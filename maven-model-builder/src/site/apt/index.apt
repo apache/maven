@@ -86,7 +86,7 @@ Maven Model Builder
    with its <<<DefaultLifecycleBindingsInjector>>> implementation
    ({{{./xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
 
-   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
+   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section) with dependency mediation using "nearest distance" definition
 
    ** dependency management injection: <<<DependencyManagementInjector>>> ({{{./apidocs/org/apache/maven/model/management/DependencyManagementInjector.html}javadoc}}),
    with its <<<DefaultDependencyManagementInjector>>> implementation
