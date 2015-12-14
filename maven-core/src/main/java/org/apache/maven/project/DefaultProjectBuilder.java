@@ -809,6 +809,7 @@ public class DefaultProjectBuilder
                         map.put( d.getManagementKey(), artifact );
                     }
                 }
+                map = Collections.unmodifiableMap( map );
             }
             else
             {

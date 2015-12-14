@@ -100,7 +100,7 @@ public class DefaultPluginPrefixRequest
     {
         if ( pluginGroups != null )
         {
-            this.pluginGroups = pluginGroups;
+            this.pluginGroups = Collections.unmodifiableList( pluginGroups );
         }
         else
         {
@@ -131,7 +131,7 @@ public class DefaultPluginPrefixRequest
     {
         if ( repositories != null )
         {
-            this.repositories = repositories;
+            this.repositories = Collections.unmodifiableList( repositories );
         }
         else
         {

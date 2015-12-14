@@ -140,7 +140,7 @@ public class DefaultPluginVersionRequest
     {
         if ( repositories != null )
         {
-            this.repositories = repositories;
+            this.repositories = Collections.unmodifiableList( repositories );
         }
         else
         {
