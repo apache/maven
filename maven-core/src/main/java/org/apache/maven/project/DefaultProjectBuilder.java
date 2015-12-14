@@ -786,7 +786,7 @@ public class DefaultProjectBuilder
             List<Dependency> deps;
             DependencyManagement dependencyManagement = project.getDependencyManagement();
             if ( ( dependencyManagement != null ) && ( ( deps = dependencyManagement.getDependencies() ) != null )
-                && ( deps.size() > 0 ) )
+                     && ( deps.size() > 0 ) )
             {
                 map = new HashMap<>();
                 for ( Dependency d : dependencyManagement.getDependencies() )
@@ -798,6 +798,7 @@ public class DefaultProjectBuilder
                         map.put( d.getManagementKey(), artifact );
                     }
                 }
+                map = Collections.unmodifiableMap( map );
             }
             else
             {
