@@ -260,7 +260,7 @@ public class MavenProject
 
     /**
      * Sets project {@code file} without changing project {@code basedir}.
-     * 
+     *
      * @since 3.2.4
      */
     public void setPomFile( File file )
@@ -909,19 +909,65 @@ public class MavenProject
     }
 
     /**
-     * Add or replace an artifact. This method is now deprecated. Use the @{MavenProjectHelper} to attach artifacts to a
-     * project. In spite of the 'throws' declaration on this API, this method has never thrown an exception since Maven
-     * 3.0.x. Historically, it logged and ignored a second addition of the same g/a/v/c/t. Now it replaces the file for
-     * the artifact, so that plugins (e.g. shade) can change the pathname of the file for a particular set of
-     * coordinates.
+     * Adds an artifact to the list of attached artifacts.
      *
-     * @param artifact the artifact to add or replace.
-     * @throws DuplicateArtifactAttachmentException
+     * @param artifact The artifact to add.
+     *
+     * @throws DuplicateArtifactAttachmentException if the same artifact already is attached to this project.
+     *
+     * @see #isArtifactAttached(org.apache.maven.artifact.Artifact)
+     * @see #getAttachedArtifacts()
+     *
+     * @deprecated Please use {@link MavenProjectHelper} to attach artifacts to a project.
      */
+    @Deprecated
     public void addAttachedArtifact( Artifact artifact )
         throws DuplicateArtifactAttachmentException
     {
-        getAttachedArtifacts().add( artifact );
+        if ( artifact == null )
+        {
+            throw new NullPointerException( "artifact" );
+        }
+
+// MNG-5868: The following is the former Javadoc comment of this method. I added method 'isArtifactAttached' to provide
+//           a way for people to test for a possible 'DuplicateArtifactAttachmentException' and updated this method to
+//           throw that exception. Regarding the former comment: "Now it replaces the file for the artifact, so that
+//           plugins (e.g. shade) can change the pathname of the file for a particular set of coordinates." is not what
+//           this method did before the update. It just added duplicate artifacts to the list of attached artifacts.
+
+// Former Javadoc comment:
+// -----------------------
+// Add or replace an artifact. This method is now deprecated. Use the @{MavenProjectHelper} to attach artifacts to a
+// project. In spite of the 'throws' declaration on this API, this method has never thrown an exception since Maven
+// 3.0.x. Historically, it logged and ignored a second addition of the same g/a/v/c/t. Now it replaces the file for
+// the artifact, so that plugins (e.g. shade) can change the pathname of the file for a particular set of
+// coordinates.
+
+        if ( this.isArtifactAttached( artifact ) )
+        {
+            throw new DuplicateArtifactAttachmentException( this, artifact );
+        }
+
+        this.attachedArtifacts.add( artifact );
+    }
+
+    /**
+     * Tests a given artifact to be contained in the list of attached artifacts.
+     *
+     * @param artifact The artifact to test.
+     *
+     * @return {@code true}, if the list of attached artifacts contains {@code artifact}; {@code false}, else.
+     *
+     * @since 3.4
+     */
+    public boolean isArtifactAttached( final Artifact artifact )
+    {
+        if ( artifact == null )
+        {
+            throw new NullPointerException( "artifact" );
+        }
+
+        return this.getAttachedArtifacts().contains( artifact );
     }
 
     public List<Artifact> getAttachedArtifacts()
@@ -930,7 +976,7 @@ public class MavenProject
         {
             attachedArtifacts = new ArrayList<>();
         }
-        return attachedArtifacts;
+        return Collections.unmodifiableList( attachedArtifacts );
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
