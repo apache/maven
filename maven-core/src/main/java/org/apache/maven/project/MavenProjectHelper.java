@@ -34,20 +34,16 @@ public interface MavenProjectHelper
      * @param project project reference.
      * @param artifactFile artifact file.
      * @param artifactClassifier artifact classifier.
-     * @throws DuplicateArtifactAttachmentException if the same artifact already is attached to this project.
      */
-    void attachArtifact( MavenProject project, File artifactFile, String artifactClassifier )
-        throws DuplicateArtifactAttachmentException;
+    void attachArtifact( MavenProject project, File artifactFile, String artifactClassifier );
 
     /**
      * * See {@link #attachArtifact(MavenProject, String, String, java.io.File)}, but with classifier set to null.
      * @param project project reference.
      * @param artifactType artifact type.
      * @param artifactFile arrifact file.
-     * @throws DuplicateArtifactAttachmentException if the same artifact already is attached to this project.
      */
-    void attachArtifact( MavenProject project, String artifactType, File artifactFile )
-        throws DuplicateArtifactAttachmentException;
+    void attachArtifact( MavenProject project, String artifactType, File artifactFile );
 
     /**
      * Add or replace an artifact to the current project.
@@ -55,10 +51,8 @@ public interface MavenProjectHelper
      * @param artifactType the type (e.g. jar) or null.
      * @param artifactClassifier the classifier or null.
      * @param artifactFile the file for the artifact.
-     * @throws DuplicateArtifactAttachmentException if the same artifact already is attached to this project.
      */
-    void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile )
-        throws DuplicateArtifactAttachmentException;
+    void attachArtifact( MavenProject project, String artifactType, String artifactClassifier, File artifactFile );
 
     /**
      * Add a resource directory to the project.
