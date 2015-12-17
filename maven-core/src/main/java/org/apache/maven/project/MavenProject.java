@@ -914,19 +914,38 @@ public class MavenProject
     }
 
     /**
-     * Add or replace an artifact. This method is now deprecated. Use the @{MavenProjectHelper} to attach artifacts to a
-     * project. In spite of the 'throws' declaration on this API, this method has never thrown an exception since Maven
-     * 3.0.x. Historically, it logged and ignored a second addition of the same g/a/v/c/t. Now it replaces the file for
-     * the artifact, so that plugins (e.g. shade) can change the pathname of the file for a particular set of
-     * coordinates.
+     * Adds or replaces an artifact.
      *
-     * @param artifact the artifact to add or replace.
-     * @throws DuplicateArtifactAttachmentException
+     * @param artifact The artifact to add or replace.
+     *
+     * @deprecated Please use {@link MavenProjectHelper}
+     * @see https://issues.apache.org/jira/browse/MNG-5868
+     * @see https://issues.apache.org/jira/browse/MNG-5387
+     * @see https://issues.apache.org/jira/browse/MNG-4013
+     * @see https://issues.apache.org/jira/browse/MNG-3119
      */
+    @Deprecated
     public void addAttachedArtifact( Artifact artifact )
-        throws DuplicateArtifactAttachmentException
     {
-        getAttachedArtifacts().add( artifact );
+        getAttachedArtifacts();
+        assert attachedArtifacts != null : "Unexpected missing attached artifacts.";
+
+        boolean replaced = false;
+        for ( int i = 0, s0 = attachedArtifacts.size(); i < s0; i++ )
+        {
+            final Artifact a = attachedArtifacts.get( i );
+
+            if ( a.equals( artifact ) )
+            {
+                attachedArtifacts.set( i, artifact );
+                replaced = true;
+            }
+        }
+
+        if ( !replaced )
+        {
+            attachedArtifacts.add( artifact );
+        }
     }
 
     public List<Artifact> getAttachedArtifacts()
@@ -935,7 +954,7 @@ public class MavenProject
         {
             attachedArtifacts = new ArrayList<>();
         }
-        return attachedArtifacts;
+        return Collections.unmodifiableList( attachedArtifacts );
     }
 
     public Xpp3Dom getGoalConfiguration( String pluginGroupId, String pluginArtifactId, String executionId,
