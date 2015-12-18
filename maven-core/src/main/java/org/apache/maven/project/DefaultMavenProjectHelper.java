@@ -93,7 +93,13 @@ public class DefaultMavenProjectHelper
 
     public void attachArtifact( MavenProject project, Artifact artifact )
     {
+        final int size = project.getAttachedArtifacts().size();
         project.addAttachedArtifact( artifact );
+
+        if ( project.getAttachedArtifacts().size() == size && this.getLogger().isInfoEnabled() )
+        {
+            this.getLogger().info( String.format( "Replaced artifact %s.", artifact ) );
+        }
     }
 
     public void addResource( MavenProject project, String resourceDirectory, List<String> includes,
