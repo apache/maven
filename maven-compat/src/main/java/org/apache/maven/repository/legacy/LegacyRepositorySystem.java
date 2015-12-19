@@ -144,6 +144,9 @@ public class LegacyRepositorySystem
         }
         catch ( InvalidVersionSpecificationException e )
         {
+            // MNG-5368: Log a message instead of returning 'null' silently.
+            this.logger.error( String.format( "Invalid version specification '%s' creating dependency artifact '%s'.",
+                                              d.getVersion(), d ), e );
             return null;
         }
 
@@ -180,6 +183,11 @@ public class LegacyRepositorySystem
         }
         catch ( InvalidVersionSpecificationException e )
         {
+            // MNG-5368: Log a message instead of returning 'null' silently.
+            this.logger.error( String.format(
+                "Invalid version specification '%s' creating extension artifact '%s:%s:%s'.",
+                version, groupId, artifactId, version, e ) );
+
             return null;
         }
 
@@ -193,18 +201,24 @@ public class LegacyRepositorySystem
 
     public Artifact createPluginArtifact( Plugin plugin )
     {
+        String version = plugin.getVersion();
+        if ( StringUtils.isEmpty( version ) )
+        {
+            version = "RELEASE";
+        }
+
         VersionRange versionRange;
         try
         {
-            String version = plugin.getVersion();
-            if ( StringUtils.isEmpty( version ) )
-            {
-                version = "RELEASE";
-            }
             versionRange = VersionRange.createFromVersionSpec( version );
         }
         catch ( InvalidVersionSpecificationException e )
         {
+            // MNG-5368: Log a message instead of returning 'null' silently.
+            this.logger.error( String.format(
+                "Invalid version specification '%s' creating plugin artifact '%s'.",
+                version, plugin, e ) );
+
             return null;
         }
 
