@@ -183,7 +183,7 @@ if [ -z "$JAVA_HOME" ] ; then
 fi
 
 CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
-CLASSWORDS_JAR=`echo "${M2_HOME}"/boot/plexus-classworlds-*.jar`
+CLASSWORLDS_JAR=`echo "${M2_HOME}"/boot/plexus-classworlds-*.jar`
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
