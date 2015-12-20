@@ -101,6 +101,7 @@ public class DefaultMavenProjectBuilder
                 {
                     request.setActiveProfileIds( req.getActiveProfiles() );
                     request.setInactiveProfileIds( req.getInactiveProfiles() );
+                    request.setGoals( request.getGoals() );
                 }
             }
         }

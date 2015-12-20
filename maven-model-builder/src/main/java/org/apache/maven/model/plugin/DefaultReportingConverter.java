@@ -66,6 +66,12 @@ public class DefaultReportingConverter
         {
             sitePlugin = new Plugin();
             sitePlugin.setArtifactId( "maven-site-plugin" );
+
+            // MNG-5359: Since the site plugin is no longer added if not requested by the user, a version needs to be
+            //           provided here. This version should be kept in sync with the version declared for the 'site'
+            //           lifecycle. Prior to MNG-5359, findSitePlugin( build ) never returned 'null'.
+            sitePlugin.setVersion( "3.3" );
+
             PluginManagement pluginManagement = build.getPluginManagement();
             if ( pluginManagement == null )
             {

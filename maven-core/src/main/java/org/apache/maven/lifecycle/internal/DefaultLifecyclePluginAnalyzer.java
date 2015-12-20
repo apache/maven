@@ -33,6 +33,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -120,6 +121,68 @@ public class DefaultLifecyclePluginAnalyzer
                     if ( goals != null )
                     {
                         parseLifecyclePhaseDefinitions( plugins, phase, goals );
+                    }
+                }
+            }
+        }
+
+        return plugins.keySet();
+    }
+
+    @Override
+    public Set<Plugin> getPlugins( final String packaging, final Set<String> phases )
+    {
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Looking up lifecyle mappings for packaging " + packaging + " from "
+                              + Thread.currentThread().getContextClassLoader() );
+        }
+
+        final LifecycleMapping lifecycleMappingForPackaging = this.lifecycleMappings.get( packaging );
+        final Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
+
+        for ( final Lifecycle lifecycle : this.getOrderedLifecycles() )
+        {
+            org.apache.maven.lifecycle.mapping.Lifecycle lifecycleConfiguration =
+                lifecycleMappingForPackaging.getLifecycles().get( lifecycle.getId() );
+
+            Map<String, LifecyclePhase> phaseToGoalMapping = null;
+
+            if ( lifecycleConfiguration != null )
+            {
+                phaseToGoalMapping = lifecycleConfiguration.getLifecyclePhases();
+            }
+            else if ( lifecycle.getDefaultLifecyclePhases() != null )
+            {
+                phaseToGoalMapping = lifecycle.getDefaultLifecyclePhases();
+            }
+
+            if ( phaseToGoalMapping != null )
+            {
+                final Collection<String> lifecyclePhases = new ArrayList<>();
+
+                if ( lifecycleConfiguration != null && lifecycle.getPhases() != null )
+                {
+                    lifecyclePhases.addAll( lifecycle.getPhases() );
+                }
+                else if ( lifecycle.getDefaultLifecyclePhases() != null )
+                {
+                    lifecyclePhases.addAll( lifecycle.getDefaultLifecyclePhases().keySet() );
+                }
+
+                lifecyclePhases.retainAll( phases );
+                if ( !lifecyclePhases.isEmpty() )
+                {
+                    for ( final Map.Entry<String, LifecyclePhase> goalsForLifecyclePhase
+                              : phaseToGoalMapping.entrySet() )
+                    {
+                        final String phase = goalsForLifecyclePhase.getKey();
+                        final LifecyclePhase goals = goalsForLifecyclePhase.getValue();
+
+                        if ( goals != null )
+                        {
+                            parseLifecyclePhaseDefinitions( plugins, phase, goals );
+                        }
                     }
                 }
             }

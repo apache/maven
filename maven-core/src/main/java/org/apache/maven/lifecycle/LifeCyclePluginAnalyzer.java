@@ -28,5 +28,20 @@ import org.apache.maven.model.Plugin;
  */
 public interface LifeCyclePluginAnalyzer
 {
+
+    @Deprecated
     Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
+
+    /**
+     * Gets the lifecycle {@code Plugin}s for a given packaging and set of phases.
+     *
+     * @param packaging The packaging to get plugins for.
+     * @param phases The phases to get plugins for.
+     *
+     * @return All lifecycle {@code Plugin}s for the given {@code packaging} and {@code phases}.
+     *
+     * @since 3.4
+     */
+    Set<Plugin> getPlugins( String packaging, Set<String> phases );
+
 }

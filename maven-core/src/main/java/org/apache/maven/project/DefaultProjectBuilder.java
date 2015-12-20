@@ -272,6 +272,7 @@ public class DefaultProjectBuilder
         request.setBuildStartTime( configuration.getBuildStartTime() );
         request.setModelResolver( resolver );
         request.setModelCache( new ReactorModelCache() );
+        request.setGoals( configuration.getGoals() );
 
         return request;
     }

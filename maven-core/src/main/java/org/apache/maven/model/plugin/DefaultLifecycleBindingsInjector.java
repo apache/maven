@@ -22,10 +22,12 @@ package org.apache.maven.model.plugin;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Set;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -35,9 +37,6 @@ import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
-import org.apache.maven.model.building.ModelProblem.Severity;
-import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -55,21 +54,34 @@ public class DefaultLifecycleBindingsInjector
     private LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
 
     @Requirement
-    private LifeCyclePluginAnalyzer lifecycle;
+    private LifeCyclePluginAnalyzer lifecyclePluginAnalyzer;
 
     public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        String packaging = model.getPackaging();
+        final Set<String> phases = new HashSet<>();
 
-        Collection<Plugin> defaultPlugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
-
-        if ( defaultPlugins == null )
+        if ( request.getGoals() != null )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Unknown packaging: " + packaging )
-                    .setLocation( model.getLocation( "packaging" ) ) );
+            for ( final String goal : request.getGoals() )
+            {
+                if ( !this.isGoalSpecification( goal ) )
+                {
+                    phases.add( goal );
+                }
+            }
         }
-        else if ( !defaultPlugins.isEmpty() )
+
+        final String packaging = model.getPackaging();
+
+        // MNG-5359: request.setGoals() may not have been called since the goals got added for MNG-5359 in 3.4. In this
+        //           case fall back to the pre 3.4 behaviour. Usages of ProjectBuildingRequest and ModelBuildingRequest
+        //           without setting the goals should behave the same way as before.
+        final Collection<Plugin> defaultPlugins =
+            request.getGoals() == null
+                ? lifecyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles( packaging )
+                : lifecyclePluginAnalyzer.getPlugins( packaging, phases );
+
+        if ( !defaultPlugins.isEmpty() )
         {
             Model lifecycleModel = new Model();
             lifecycleModel.setBuild( new Build() );
@@ -77,6 +89,12 @@ public class DefaultLifecycleBindingsInjector
 
             merger.merge( model, lifecycleModel );
         }
+    }
+
+    // Copied from 'DefaultLifecycleTaskSegmentCalculator'.
+    private boolean isGoalSpecification( String task )
+    {
+        return task.indexOf( ':' ) >= 0;
     }
 
     protected static class LifecycleBindingsMerger

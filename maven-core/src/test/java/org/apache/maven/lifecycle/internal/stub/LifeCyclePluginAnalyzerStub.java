@@ -53,6 +53,12 @@ public class LifeCyclePluginAnalyzerStub
         return plugins;
     }
 
+    @Override
+    public Set<Plugin> getPlugins( final String packaging, final Set<String> phases )
+    {
+        return Collections.emptySet();
+    }
+
     private Plugin newPlugin( String artifactId, String... goals )
     {
         Plugin plugin = new Plugin();
