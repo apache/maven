@@ -38,7 +38,8 @@ public interface LifeCyclePluginAnalyzer
      * @param packaging The packaging to get plugins for.
      * @param phases The phases to get plugins for.
      *
-     * @return All lifecycle {@code Plugin}s for the given {@code packaging} and {@code phases}.
+     * @return All lifecycle {@code Plugin}s for the given {@code packaging} and {@code phases}
+     * or {@code null}, if {@code packaging} does not identify a supported packaging.
      *
      * @since 3.4
      */

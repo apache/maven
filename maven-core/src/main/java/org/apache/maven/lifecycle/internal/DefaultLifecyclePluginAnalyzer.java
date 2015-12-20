@@ -139,6 +139,12 @@ public class DefaultLifecyclePluginAnalyzer
         }
 
         final LifecycleMapping lifecycleMappingForPackaging = this.lifecycleMappings.get( packaging );
+
+        if ( lifecycleMappingForPackaging == null )
+        {
+            return null;
+        }
+
         final Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
 
         for ( final Lifecycle lifecycle : this.getOrderedLifecycles() )
@@ -215,25 +221,25 @@ public class DefaultLifecyclePluginAnalyzer
         List<LifecycleMojo> mojos = goals.getMojos();
         if ( mojos != null )
         {
-            
+
             for ( int i = 0; i < mojos.size(); i++ )
             {
                 LifecycleMojo mojo = mojos.get( i );
-                
+
                 GoalSpec gs = parseGoalSpec( mojo.getGoal() );
-    
+
                 if ( gs == null )
                 {
                     logger.warn( "Ignored invalid goal specification '" + mojo.getGoal()
                             + "' from lifecycle mapping for phase " + phase );
                     continue;
                 }
-    
+
                 Plugin plugin = new Plugin();
                 plugin.setGroupId( gs.groupId );
                 plugin.setArtifactId( gs.artifactId );
                 plugin.setVersion( gs.version );
-    
+
                 Plugin existing = plugins.get( plugin );
                 if ( existing != null )
                 {
@@ -247,14 +253,14 @@ public class DefaultLifecyclePluginAnalyzer
                 {
                     plugins.put( plugin, plugin );
                 }
-    
+
                 PluginExecution execution = new PluginExecution();
                 execution.setId( getExecutionId( plugin, gs.goal ) );
                 execution.setPhase( phase );
                 execution.setPriority( i - mojos.size() );
                 execution.getGoals().add( gs.goal );
                 execution.setConfiguration( mojo.getConfiguration() );
-                
+
                 plugin.setDependencies( mojo.getDependencies() );
                 plugin.getExecutions().add( execution );
             }
