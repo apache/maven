@@ -30,7 +30,8 @@ public interface LifeCyclePluginAnalyzer
 {
 
     @Deprecated
-    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
+    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
+        throws LifecycleMappingNotFoundException;
 
     /**
      * Gets the lifecycle {@code Plugin}s for a given packaging and set of phases.
@@ -38,11 +39,12 @@ public interface LifeCyclePluginAnalyzer
      * @param packaging The packaging to get plugins for.
      * @param phases The phases to get plugins for.
      *
-     * @return All lifecycle {@code Plugin}s for the given {@code packaging} and {@code phases}
-     * or {@code null}, if {@code packaging} does not identify a supported packaging.
+     * @return All lifecycle {@code Plugin}s for the given {@code packaging} and {@code phases}.
      *
+     * @throws LifecycleMappingNotFoundException if {@code packaging} does not identify a supported packaging.
      * @since 3.4
      */
-    Set<Plugin> getPlugins( String packaging, Set<String> phases );
+    Set<Plugin> getPlugins( String packaging, Set<String> phases )
+        throws LifecycleMappingNotFoundException;
 
 }

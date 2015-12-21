@@ -54,7 +54,8 @@ public interface LifecycleExecutor
      * @deprecated Please use {@link LifeCyclePluginAnalyzer}.
      */
     @Deprecated
-    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
+    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
+        throws LifecycleMappingNotFoundException;
 
     MavenExecutionPlan calculateExecutionPlan( MavenSession session, String... tasks )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,

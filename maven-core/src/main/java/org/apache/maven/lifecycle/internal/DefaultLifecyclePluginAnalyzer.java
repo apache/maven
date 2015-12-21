@@ -19,19 +19,6 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
-import org.apache.maven.lifecycle.DefaultLifecycles;
-import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
-import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.mapping.LifecycleMapping;
-import org.apache.maven.lifecycle.mapping.LifecycleMojo;
-import org.apache.maven.lifecycle.mapping.LifecyclePhase;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,6 +28,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.maven.lifecycle.DefaultLifecycles;
+import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
+import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.LifecycleMappingNotFoundException;
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.lifecycle.mapping.LifecycleMojo;
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @since 3.0
@@ -80,6 +81,7 @@ public class DefaultLifecyclePluginAnalyzer
     //
 
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
+        throws LifecycleMappingNotFoundException
     {
         if ( logger.isDebugEnabled() )
         {
@@ -91,7 +93,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         if ( lifecycleMappingForPackaging == null )
         {
-            return null;
+            throw new LifecycleMappingNotFoundException( packaging );
         }
 
         Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
@@ -131,6 +133,7 @@ public class DefaultLifecyclePluginAnalyzer
 
     @Override
     public Set<Plugin> getPlugins( final String packaging, final Set<String> phases )
+        throws LifecycleMappingNotFoundException
     {
         if ( logger.isDebugEnabled() )
         {
@@ -142,7 +145,7 @@ public class DefaultLifecyclePluginAnalyzer
 
         if ( lifecycleMappingForPackaging == null )
         {
-            return null;
+            throw new LifecycleMappingNotFoundException( packaging );
         }
 
         final Map<Plugin, Plugin> plugins = new LinkedHashMap<>();

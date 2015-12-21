@@ -20,15 +20,17 @@ package org.apache.maven.model.plugin;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Set;
+
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
+import org.apache.maven.lifecycle.LifecycleMappingNotFoundException;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -43,6 +45,7 @@ import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Handles injection of plugin executions induced by the lifecycle bindings for a packaging.
@@ -61,43 +64,65 @@ public class DefaultLifecycleBindingsInjector
 
     public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        final Set<String> phases = new HashSet<>();
-
-        if ( request.getGoals() != null )
+        try
         {
-            for ( final String goal : request.getGoals() )
+            final Set<String> phases = new HashSet<>();
+
+            if ( request.getGoals() != null )
             {
-                if ( !this.isGoalSpecification( goal ) )
+                if ( !request.getGoals().isEmpty() )
                 {
-                    phases.add( goal );
+                    // Command line goals.
+                    for ( final String goal : request.getGoals() )
+                    {
+                        if ( !this.isGoalSpecification( goal ) )
+                        {
+                            phases.add( goal );
+                        }
+                    }
+                }
+                else if ( model.getBuild() != null && model.getBuild().getDefaultGoal() != null )
+                {
+                    // No command line goals -> default goal(s).
+                    // Copied from 'DefaultLifecycleTaskSegmentCalculator'.
+                    if ( !StringUtils.isEmpty( model.getBuild().getDefaultGoal() ) )
+                    {
+                        for ( final String goal
+                                  : Arrays.asList( StringUtils.split( model.getBuild().getDefaultGoal() ) ) )
+                        {
+                            if ( !this.isGoalSpecification( goal ) )
+                            {
+                                phases.add( goal );
+                            }
+                        }
+                    }
                 }
             }
+
+            // MNG-5359: request.setGoals() may not have been called since the goals got added for MNG-5359 in 3.4. In
+            //           this case fall back to the pre 3.4 behaviour. Usages of ProjectBuildingRequest and
+            //           ModelBuildingRequest without setting the goals should behave the same way as before.
+            final Collection<Plugin> defaultPlugins =
+                request.getGoals() == null
+                    ? lifecyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles( model.getPackaging() )
+                    : lifecyclePluginAnalyzer.getPlugins( model.getPackaging(), phases );
+
+            if ( !defaultPlugins.isEmpty() )
+            {
+                Model lifecycleModel = new Model();
+                lifecycleModel.setBuild( new Build() );
+                lifecycleModel.getBuild().getPlugins().addAll( defaultPlugins );
+
+                merger.merge( model, lifecycleModel );
+            }
         }
-
-        final String packaging = model.getPackaging();
-
-        // MNG-5359: request.setGoals() may not have been called since the goals got added for MNG-5359 in 3.4. In this
-        //           case fall back to the pre 3.4 behaviour. Usages of ProjectBuildingRequest and ModelBuildingRequest
-        //           without setting the goals should behave the same way as before.
-        final Collection<Plugin> defaultPlugins =
-            request.getGoals() == null
-                ? lifecyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles( packaging )
-                : lifecyclePluginAnalyzer.getPlugins( packaging, phases );
-
-        if ( defaultPlugins == null )
+        catch ( final LifecycleMappingNotFoundException e )
         {
             problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
-                    setMessage( "Unknown packaging: " + packaging ).
-                    setLocation( model.getLocation( "packaging" ) ) );
+                setException( e ).
+                setMessage( "Unknown packaging: " + model.getPackaging() ).
+                setLocation( model.getLocation( "packaging" ) ) );
 
-        }
-        else if ( !defaultPlugins.isEmpty() )
-        {
-            Model lifecycleModel = new Model();
-            lifecycleModel.setBuild( new Build() );
-            lifecycleModel.getBuild().getPlugins().addAll( defaultPlugins );
-
-            merger.merge( model, lifecycleModel );
         }
     }
 
