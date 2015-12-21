@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,6 +33,7 @@ import java.util.Set;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.apache.maven.lifecycle.LifecycleMappingNotFoundException;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.apache.maven.lifecycle.mapping.LifecycleMojo;
@@ -62,6 +64,12 @@ public class DefaultLifecyclePluginAnalyzer
 
     @Requirement
     private DefaultLifecycles defaultLifeCycles;
+
+    @Requirement( hint = DefaultLifecycleMappingDelegate.HINT )
+    private LifecycleMappingDelegate defaultLifecycleMappingDelegate;
+
+    @Requirement
+    private Map<String, LifecycleMappingDelegate> lifecycleMappingDelegates;
 
     @Requirement
     private Logger logger;
@@ -149,6 +157,23 @@ public class DefaultLifecyclePluginAnalyzer
         }
 
         final Map<Plugin, Plugin> plugins = new LinkedHashMap<>();
+        final Set<String> requiredLifecycles = new HashSet<>();
+
+        for ( final Lifecycle lifecycle : this.defaultLifeCycles.getLifeCycles() )
+        {
+            // Keep in sync with
+            //   DefaultLifecycleExecutionPlanCalculator#calculateLifecycleMappings( MavenSession session,
+            //                                                                       MavenProject project,
+            //                                                                       String lifecyclePhase )
+            final LifecycleMappingDelegate lifecycleMappingDelegate =
+                Arrays.binarySearch( DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId() ) >= 0
+                    ? defaultLifecycleMappingDelegate
+                    : lifecycleMappingDelegates.containsKey( lifecycle.getId() )
+                          ? lifecycleMappingDelegates.get( lifecycle.getId() )
+                          : defaultLifecycleMappingDelegate;
+
+            requiredLifecycles.addAll( lifecycleMappingDelegate.getRequiredLifecycles() );
+        }
 
         for ( final Lifecycle lifecycle : this.getOrderedLifecycles() )
         {
@@ -180,7 +205,28 @@ public class DefaultLifecyclePluginAnalyzer
                 }
 
                 lifecyclePhases.retainAll( phases );
-                if ( !lifecyclePhases.isEmpty() )
+
+                if ( this.logger.isDebugEnabled() )
+                {
+                    if ( requiredLifecycles.contains( lifecycle.getId() ) )
+                    {
+                        this.logger.debug( String.format(
+                            "Injecting build plugins of lifecyle '%s' required by a lifecycle mapping delegate.",
+                            lifecycle.getId() ) );
+
+                    }
+                    else if ( !lifecyclePhases.isEmpty() )
+                    {
+                        this.logger.debug( String.format(
+                            "Injecting build plugins of lifecyle '%s' required by a lifecycle phase.",
+                            lifecycle.getId() ) );
+
+                    }
+                }
+
+                // Adds the plugins from the lifecycle if required by a 'LifecycleMappingDelegate' or by a phase getting
+                // executed.
+                if ( requiredLifecycles.contains( lifecycle.getId() ) || !lifecyclePhases.isEmpty() )
                 {
                     for ( final Map.Entry<String, LifecyclePhase> goalsForLifecyclePhase
                               : phaseToGoalMapping.entrySet() )

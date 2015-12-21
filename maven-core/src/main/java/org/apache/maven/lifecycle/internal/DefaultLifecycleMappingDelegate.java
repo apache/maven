@@ -20,9 +20,12 @@ package org.apache.maven.lifecycle.internal;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.maven.execution.MavenSession;
@@ -50,6 +53,15 @@ public class DefaultLifecycleMappingDelegate
 
     @Requirement
     private BuildPluginManager pluginManager;
+
+    @Override
+    public Set<String> getRequiredLifecycles()
+    {
+        // The default delegate requires the default lifecycle to operate.
+        final Set<String> requiredLifecycles = new HashSet<>();
+        requiredLifecycles.add( "default" );
+        return Collections.unmodifiableSet( requiredLifecycles );
+    }
 
     public Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
                                                                         Lifecycle lifecycle, String lifecyclePhase )

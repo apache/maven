@@ -21,6 +21,7 @@ package org.apache.maven.lifecycle;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -45,6 +46,16 @@ import org.apache.maven.project.MavenProject;
  */
 public interface LifecycleMappingDelegate
 {
+
+    /**
+     * Gets a set of lifecycle identifiers of lifecycles this delegate is requiring to operate.
+     *
+     * @return An unmodifiable set of lifecycle identifiers of lifecycles this delegate is requiring to operate.
+     *
+     * @since 3.4
+     */
+    Set<String> getRequiredLifecycles();
+
     Map<String, List<MojoExecution>> calculateLifecycleMappings( MavenSession session, MavenProject project,
                                                                  Lifecycle lifecycle, String lifecyclePhase )
         throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
