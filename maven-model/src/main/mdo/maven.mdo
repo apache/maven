@@ -184,7 +184,21 @@
           <description>
             <![CDATA[
             The URL to the project's homepage.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property), or just parent value if 
+            <code>child.urls.inherit.append.path="false"</code>
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="child.inherit.append.path">
+          <name>childInheritAppendPath</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            When childs inherit from urls, append path or not?. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>
+            <br /><b>Default value is</b>: <code>true</code>
             ]]>
           </description>
           <type>String</type>
@@ -400,6 +414,22 @@
     public String toString()
     {
         return getId();
+    }
+            ]]>
+          </code>
+        </codeSegment>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    public boolean isChildInheritAppendPath()
+    {
+        return ( childInheritAppendPath != null ) ? Boolean.parseBoolean( childInheritAppendPath ) : true;
+    }
+
+    public void setChildInheritAppendPath( boolean childInheritAppendPath )
+    {
+        this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
     }
             ]]>
           </code>
@@ -1613,12 +1643,44 @@
           <description>
             <![CDATA[
             The URL to the project's browsable SCM repository, such as ViewVC or Fisheye.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property), or just parent value if 
+            <code>child.urls.inherit.append.path="false"</code>
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="child.inherit.append.path">
+          <name>childInheritAppendPath</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            When childs inherit from urls, append path or not?. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>
+            <br /><b>Default value is</b>: <code>true</code>
             ]]>
           </description>
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    public boolean isChildInheritAppendPath()
+    {
+        return ( childInheritAppendPath != null ) ? Boolean.parseBoolean( childInheritAppendPath ) : true;
+    }
+
+    public void setChildInheritAppendPath( boolean childInheritAppendPath )
+    {
+        this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
     <class>
       <name>FileSet</name>
@@ -1938,12 +2000,44 @@
           <description>
             <![CDATA[
             The url of the location where website is deployed, in the form <code>protocol://hostname/path</code>.
-            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property)
+            <br><b>Default value is</b>: parent value [+ path adjustment] + (artifactId or <code>project.directory</code> property), or just parent value if 
+            <code>child.urls.inherit.append.path="false"</code>
+            ]]>
+          </description>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true" xml.tagName="child.inherit.append.path">
+          <name>childInheritAppendPath</name>
+          <version>4.0.0+</version>
+          <description>
+            <![CDATA[
+            When childs inherit from urls, append path or not?. Note: While the type
+            of this field is <code>String</code> for technical reasons, the semantic type is actually
+            <code>Boolean</code>
+            <br /><b>Default value is</b>: <code>true</code>
             ]]>
           </description>
           <type>String</type>
         </field>
       </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>4.0.0+</version>
+          <code>
+            <![CDATA[
+    public boolean isChildInheritAppendPath()
+    {
+        return ( childInheritAppendPath != null ) ? Boolean.parseBoolean( childInheritAppendPath ) : true;
+    }
+
+    public void setChildInheritAppendPath( boolean childInheritAppendPath )
+    {
+        this.childInheritAppendPath = String.valueOf( childInheritAppendPath );
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
     </class>
 
     <class java.clone="deep">
