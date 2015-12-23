@@ -102,7 +102,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -466,7 +466,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -485,7 +485,7 @@ public class MavenModelMerger
             }
             else if ( target.getUrl() == null )
             {
-                target.setUrl( extrapolateChildUrl( src, context ) );
+                target.setUrl( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
                 target.setLocation( "url", source.getLocation( "url" ) );
             }
         }
@@ -504,7 +504,7 @@ public class MavenModelMerger
             }
             else if ( target.getConnection() == null )
             {
-                target.setConnection( extrapolateChildUrl( src, context ) );
+                target.setConnection( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
                 target.setLocation( "connection", source.getLocation( "connection" ) );
             }
         }
@@ -524,7 +524,7 @@ public class MavenModelMerger
             }
             else if ( target.getDeveloperConnection() == null )
             {
-                target.setDeveloperConnection( extrapolateChildUrl( src, context ) );
+                target.setDeveloperConnection( extrapolateChildUrl( src, source.isChildInheritAppendPath(), context ) );
                 target.setLocation( "developerConnection", source.getLocation( "developerConnection" ) );
             }
         }
@@ -670,7 +670,7 @@ public class MavenModelMerger
         return exclusion.getGroupId() + ':' + exclusion.getArtifactId();
     }
 
-    protected String extrapolateChildUrl( String parentUrl, Map<Object, Object> context )
+    protected String extrapolateChildUrl( String parentUrl, boolean appendPath, Map<Object, Object> context )
     {
         return parentUrl;
     }
