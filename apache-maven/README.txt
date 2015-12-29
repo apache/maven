@@ -39,7 +39,7 @@
   Installing Maven
   ----------------
 
-  1) Unpack the archive where you would like to store the binaries, eg:
+  1) Unpack the archive where you would like to store the binaries, e.g.:
 
     Unix-based operating systems (Linux, Solaris and Mac OS X)
       tar zxvf apache-maven-3.x.y.tar.gz
@@ -48,7 +48,7 @@
 
   2) A directory called "apache-maven-3.x.y" will be created.
 
-  3) Add the bin directory to your PATH, eg:
+  3) Add the bin directory to your PATH, e.g.:
 
     Unix-based operating systems (Linux, Solaris and Mac OS X)
       export PATH=/usr/local/apache-maven-3.x.y/bin:$PATH

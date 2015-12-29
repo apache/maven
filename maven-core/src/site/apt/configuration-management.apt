@@ -120,7 +120,7 @@ Unified source directory
  problems with the current solution are:
  1. information is duplicate. once in POM's dependencies and once in the
  maven.multiproject.includes property.
- 2. it works without problems only for projects with relative paths, eg. from
+ 2. it works without problems only for projects with relative paths, e.g., from
  one CVS repository.. for projects from multiple SCM repositories it's harder
  to maintain the same relative links on all developer computers.
  not sure the unified source directory structure addresses this issue.

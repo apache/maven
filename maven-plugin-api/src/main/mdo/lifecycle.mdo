@@ -84,7 +84,7 @@ under the License.
           <required>true</required>
           <version>1.0.0</version>
           <type>String</type>
-          <description>The ID of this phase, eg &lt;code&gt;generate-sources&lt;/code&gt;.</description>
+          <description>The ID of this phase, e.g., &lt;code&gt;generate-sources&lt;/code&gt;.</description>
         </field>
         <field>
           <name>executions</name>
