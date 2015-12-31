@@ -16,8 +16,6 @@
 ## specific language governing permissions and limitations
 ## under the License.
 ##
-## $Date: 2008-03-09 23:17:06 -0700 (Sun, 09 Mar 2008) $ $Rev: 635446 $
-##
 
 Apache Maven includes a number of components and libraries with separate 
 copyright notices and license terms. Your use of those components are 
