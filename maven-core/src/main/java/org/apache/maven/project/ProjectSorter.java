@@ -90,6 +90,15 @@ public class ProjectSorter
 
             if ( conflictingProject != null )
             {
+                // skip DuplicateProjectException if they are physically the same pom.xml
+                if ( project.getFile() != null && project.getFile().equals( conflictingProject.getFile() ) )
+                {
+                    continue;
+                }
+
+            }
+            else
+            {
                 throw new DuplicateProjectException( projectId, conflictingProject.getFile(), project.getFile(),
                                                      "Project '" + projectId + "' is duplicated in the reactor" );
             }
