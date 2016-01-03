@@ -2969,29 +2969,6 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field>
-          <name>declaredDependencies</name>
-          <version>4.0.0+</version>
-          <description>The dependencies specified here are specified directly in the 
-            dependency management section of a POM and are not imported.
-            This allows finding "distance" using standard maven metric while
-            resolving conflicts.</description>
-          <association>
-            <type>Dependency</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
-        <field>
-          <name>importedDependencyManagements</name>
-          <version>4.0.0+</version>
-          <description>The dependency managements specified here reflect imported POMs.
-          This allows find "distance" using standard maven metric while
-          resolving conflicts.</description>
-          <association>
-            <type>DependencyManagement</type>
-            <multiplicity>*</multiplicity>
-          </association>
-        </field>
       </fields>
     </class>
     <class>

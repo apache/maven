@@ -38,6 +38,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.composition.DependencyManagementGraph;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -135,6 +136,8 @@ public class DefaultModelBuilder
     @Requirement
     private ReportingConverter reportingConverter;
 
+    private DependencyManagementGraph dependencyManagementGraph = new DependencyManagementGraph();
+    
     public DefaultModelBuilder setModelProcessor( ModelProcessor modelProcessor )
     {
         this.modelProcessor = modelProcessor;
@@ -1127,7 +1130,7 @@ public class DefaultModelBuilder
             
             if ( declaredDependency )
             {
-                depMngt.addDeclaredDependency( dependency );
+                dependencyManagementGraph.addDeclaredDependency( depMngt, dependency );
                 continue;
             }
 
@@ -1275,12 +1278,13 @@ public class DefaultModelBuilder
             }
 
             importMngts.add( importMngt );
-            depMngt.addImportedDependencyManagement( importMngt );
+            dependencyManagementGraph.addImportedDependencyManagement( depMngt, importMngt );
         }
 
         importIds.remove( importing );
 
-        dependencyManagementImporter.importManagement( model, importMngts, request, problems );
+        dependencyManagementImporter.importManagement( model, importMngts, request, problems,
+                                                       dependencyManagementGraph );
     }
 
     private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,

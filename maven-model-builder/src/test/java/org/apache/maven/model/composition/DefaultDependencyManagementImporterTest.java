@@ -57,22 +57,25 @@ public class DefaultDependencyManagementImporterTest
 
     private DefaultDependencyManagementImporter defaultDependencyManagementImporter;
 
+    private DependencyManagementGraph dependencyManagementGraph;
+
     @Before
     public void prepare()
     {
+        dependencyManagementGraph = new DependencyManagementGraph();
         dependency_1_0 = createDependency( "DefaultDependencyManagementImporterTest", "dep", "1.0" );
         dependency_1_1 = createDependency( "DefaultDependencyManagementImporterTest", "dep", "1.1" );
 
         depMgmt_1_0 = new DependencyManagement();
         depMgmt_1_0.addDependency( dependency_1_0 );
-        depMgmt_1_0.addDeclaredDependency( dependency_1_0 );
+        dependencyManagementGraph.addDeclaredDependency( depMgmt_1_0, dependency_1_0 );
 
         depMgmt_1_1 = new DependencyManagement();
         depMgmt_1_1.addDependency( dependency_1_1 );
-        depMgmt_1_1.addDeclaredDependency( dependency_1_1 );
+        dependencyManagementGraph.addDeclaredDependency( depMgmt_1_1, dependency_1_1 );
 
         import_1_0 = new DependencyManagement();
-        import_1_0.addImportedDependencyManagement( depMgmt_1_0 );
+        dependencyManagementGraph.addImportedDependencyManagement( import_1_0, depMgmt_1_0 );
         import_1_0.addDependency( dependency_1_0 );
 
         defaultDependencyManagementImporter = new DefaultDependencyManagementImporter();
@@ -86,7 +89,8 @@ public class DefaultDependencyManagementImporterTest
         List<DependencyManagement> sources = ImmutableList.of( import_1_0, depMgmt_1_1 );
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        defaultDependencyManagementImporter.importManagement( target, sources, request, problems );
+        defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
+                                                              dependencyManagementGraph );
 
         List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
         assertEquals( 1, dependencies.size() );
@@ -104,7 +108,8 @@ public class DefaultDependencyManagementImporterTest
         List<DependencyManagement> sources = ImmutableList.of( depMgmt_1_1, import_1_0 );
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        defaultDependencyManagementImporter.importManagement( target, sources, request, problems );
+        defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
+                                                              dependencyManagementGraph );
 
         List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
         assertEquals( 1, dependencies.size() );
@@ -125,7 +130,8 @@ public class DefaultDependencyManagementImporterTest
         List<DependencyManagement> sources = ImmutableList.of( import_1_0, depMgmt_1_1 );
         SimpleProblemCollector problems = new SimpleProblemCollector();
 
-        defaultDependencyManagementImporter.importManagement( target, sources, request, problems );
+        defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
+                                                              dependencyManagementGraph );
 
         List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
         assertEquals( 1, dependencies.size() );
@@ -135,33 +141,7 @@ public class DefaultDependencyManagementImporterTest
         assertEquals( 0, problems.getErrors().size() );
     }
 
-    @Test
-    public void testDepthOfADirectDependency()
-    {
-        Optional<Integer> depth =
-            defaultDependencyManagementImporter.findDeclaredDependencyDepth( depMgmt_1_1, dependency_1_1 );
-        assertTrue( depth.isPresent() );
-        assertEquals( 0, (int) depth.get() );
-    }
-
-    @Test
-    public void testDepthOfAIndirectDependency()
-    {
-        Optional<Integer> depth =
-            defaultDependencyManagementImporter.findDeclaredDependencyDepth( import_1_0, dependency_1_0 );
-        assertTrue( depth.isPresent() );
-        assertEquals( 1, (int) depth.get() );
-    }
-
-    @Test
-    public void testDepthOfAMissingDependency()
-    {
-        Optional<Integer> depth =
-            defaultDependencyManagementImporter.findDeclaredDependencyDepth( import_1_0, dependency_1_1 );
-        assertFalse( depth.isPresent() );
-    }
-
-    private Dependency createDependency( String groupId, String artifactId, String version )
+    static Dependency createDependency( String groupId, String artifactId, String version )
     {
         Dependency dependency = new Dependency();
 
