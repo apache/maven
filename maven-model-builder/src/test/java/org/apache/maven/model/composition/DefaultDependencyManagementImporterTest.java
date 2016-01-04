@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -84,7 +85,7 @@ public class DefaultDependencyManagementImporterTest
     @Test
     public void testDependencyManagementFromCloserImport()
     {
-        Model target = new Model();
+        Model target = createModelWithNearestMatchEnabled();
         ModelBuildingRequest request = null;
         List<DependencyManagement> sources = ImmutableList.of( import_1_0, depMgmt_1_1 );
         SimpleProblemCollector problems = new SimpleProblemCollector();
@@ -92,18 +93,29 @@ public class DefaultDependencyManagementImporterTest
         defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
                                                               dependencyManagementGraph );
 
-        List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
-        assertEquals( 1, dependencies.size() );
-        assertEquals( dependency_1_1, dependencies.get( 0 ) );
-        assertEquals( 0, problems.getWarnings().size() );
-        assertEquals( 0, problems.getFatals().size() );
-        assertEquals( 0, problems.getErrors().size() );
+        assertDependencyVersion( target, dependency_1_1 );
+        assertNoProblems( problems );
+    }
+
+    @Test
+    public void testDependencyManagementFromFirstMatchImport()
+    {
+        Model target = createStandardModel();
+        ModelBuildingRequest request = null;
+        List<DependencyManagement> sources = ImmutableList.of( import_1_0, depMgmt_1_1 );
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
+                                                              dependencyManagementGraph );
+
+        assertDependencyVersion( target, dependency_1_0 );
+        assertNoProblems( problems );
     }
 
     @Test
     public void testDependencyManagementFromCloserImportWithoutDepthCheck()
     {
-        Model target = new Model();
+        Model target = createModelWithNearestMatchEnabled();
         ModelBuildingRequest request = null;
         List<DependencyManagement> sources = ImmutableList.of( depMgmt_1_1, import_1_0 );
         SimpleProblemCollector problems = new SimpleProblemCollector();
@@ -111,12 +123,8 @@ public class DefaultDependencyManagementImporterTest
         defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
                                                               dependencyManagementGraph );
 
-        List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
-        assertEquals( 1, dependencies.size() );
-        assertEquals( dependency_1_1, dependencies.get( 0 ) );
-        assertEquals( 0, problems.getWarnings().size() );
-        assertEquals( 0, problems.getFatals().size() );
-        assertEquals( 0, problems.getErrors().size() );
+        assertDependencyVersion( target, dependency_1_1 );
+        assertNoProblems( problems );
     }
 
     @Test
@@ -124,7 +132,7 @@ public class DefaultDependencyManagementImporterTest
     {
         DependencyManagement dependencyManagement = new DependencyManagement();
         dependencyManagement.addDependency( dependency_1_0 );
-        Model target = new Model();
+        Model target = createModelWithNearestMatchEnabled();
         target.setDependencyManagement( dependencyManagement );
         ModelBuildingRequest request = null;
         List<DependencyManagement> sources = ImmutableList.of( import_1_0, depMgmt_1_1 );
@@ -133,12 +141,8 @@ public class DefaultDependencyManagementImporterTest
         defaultDependencyManagementImporter.importManagement( target, sources, request, problems,
                                                               dependencyManagementGraph );
 
-        List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
-        assertEquals( 1, dependencies.size() );
-        assertEquals( dependency_1_0, dependencies.get( 0 ) );
-        assertEquals( 0, problems.getWarnings().size() );
-        assertEquals( 0, problems.getFatals().size() );
-        assertEquals( 0, problems.getErrors().size() );
+        assertDependencyVersion( target, dependency_1_0 );
+        assertNoProblems( problems );
     }
 
     static Dependency createDependency( String groupId, String artifactId, String version )
@@ -150,5 +154,40 @@ public class DefaultDependencyManagementImporterTest
         dependency.setVersion( version );
 
         return dependency;
+    }
+
+    private void assertDependencyVersion( Model target, Dependency dependency )
+    {
+        List<Dependency> dependencies = target.getDependencyManagement().getDependencies();
+        assertEquals( 1, dependencies.size() );
+        assertEquals( dependency, dependencies.get( 0 ) );
+    }
+
+    private void assertNoProblems( SimpleProblemCollector problems )
+    {
+        assertEquals( 0, problems.getWarnings().size() );
+        assertEquals( 0, problems.getFatals().size() );
+        assertEquals( 0, problems.getErrors().size() );
+    }
+
+    private Model createModelWithNearestMatchEnabled()
+    {
+
+        Model model = createStandardModel();
+
+        Properties properties = new Properties();
+        properties.setProperty( "org.apache.maven.model.composition.DependencyManagementImporter.nearestMatchEnabled",
+                                "true" );
+        model.setProperties( properties );
+
+        return model;
+    }
+
+    private Model createStandardModel()
+    {
+
+        Model model = new Model();
+
+        return model;
     }
 }

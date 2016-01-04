@@ -47,6 +47,8 @@ import com.google.common.base.Optional;
 public class DefaultDependencyManagementImporter
     implements DependencyManagementImporter
 {
+    private static final String PROPERTY_NEAREST_MATCH_ENABLED =
+        "org.apache.maven.model.composition.DependencyManagementImporter.nearestMatchEnabled";
 
     @Override
     public void importManagement( Model target, List<? extends DependencyManagement> sources,
@@ -84,7 +86,7 @@ public class DefaultDependencyManagementImporter
                     {
                         storeDependency( dependencies, dependencySources, source, dependency, key );
                     }
-                    else if ( !directDependencies.contains( key ) )
+                    else if ( nearestMatchEnabled( target ) && !directDependencies.contains( key ) )
                     {
                         // non-direct dependency - check source depths to determine distance
                         DependencyManagement sourceDepMngt = dependencySources.get( key );
@@ -107,14 +109,14 @@ public class DefaultDependencyManagementImporter
                             }
                             else
                             {
-                                String message = "Invalid state - current source depth not found for "
+                                String message = "[MNG-5947] Invalid state - current source depth not found for "
                                     + dependency.getManagementKey() + " in " + describeTarget( target );
                                 addProblem( problems, dependency, message );
                             }
                         }
                         else
                         {
-                            String msg = "Invalid state - previous source depth not found for "
+                            String msg = "[MNG-5947] Invalid state - previous source depth not found for "
                                 + dependency.getManagementKey() + " in " + describeTarget( target );
                             addProblem( problems, dependency, msg );
                         }
@@ -122,7 +124,7 @@ public class DefaultDependencyManagementImporter
                 }
             }
 
-            depMngt.setDependencies( new ArrayList<Dependency>( dependencies.values() ) );
+            depMngt.setDependencies( new ArrayList<>( dependencies.values() ) );
         }
     }
 
@@ -131,6 +133,12 @@ public class DefaultDependencyManagementImporter
     {
         dependencies.put( key, dependency );
         dependencySources.put( key, source );
+    }
+
+    private boolean nearestMatchEnabled( Model target )
+    {
+        String propValue = target.getProperties().getProperty( PROPERTY_NEAREST_MATCH_ENABLED );
+        return Boolean.parseBoolean( propValue );
     }
 
     private void addProblem( ModelProblemCollector problems, Dependency dependency, String message )
