@@ -106,8 +106,13 @@ public class Lifecycle
     }
 
     @Deprecated
-    public void setPhases( Map<String, LifecyclePhase> phases )
+    public void setPhases( Map<String, String> phases )
     {
-        setLifecyclePhases( phases );
+        Map<String, LifecyclePhase> lphases = new LinkedHashMap<>();
+        for ( Map.Entry<String, String> e: phases.entrySet() )
+        {
+            lphases.put( e.getKey(), new LifecyclePhase( e.getValue() ) );
+        }
+        setLifecyclePhases( lphases );
     }
 }
