@@ -79,8 +79,10 @@ under the License.
     <module>maven-it-plugin-plexus-lifecycle</module>
     <module>maven-it-plugin-settings</module>
     <module>mng5805-extension</module>
+    <module>mng5805-extension2</module>
     <module>mng5805-plugin</module>
     <module>mng5805-plugin-dep</module>
+    <module>mng5958-extension</module>
   </modules>
 
   <scm>

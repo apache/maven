@@ -4,19 +4,19 @@ import java.io.File;
 
 import org.apache.maven.it.util.ResourceExtractor;
 
-public class MavenITmng5805PkgTypeMojoConfiguration
+public class MavenITmng5805PkgTypeMojoConfiguration2
     extends AbstractMavenIntegrationTestCase
 {
 
-    public MavenITmng5805PkgTypeMojoConfiguration()
+    public MavenITmng5805PkgTypeMojoConfiguration2()
     {
-        super( "(3.3.3,3.5.0)" );
+        super( "(3.3.3,)" );
     }
 
     public void testPkgTypeMojoConfiguration()
         throws Exception
     {
-        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5805-pkg-type-mojo-configuration" );
+        File testDir = ResourceExtractor.simpleExtractResources( getClass(), "/mng-5805-pkg-type-mojo-configuration2" );
         
         Verifier verifier;
         
