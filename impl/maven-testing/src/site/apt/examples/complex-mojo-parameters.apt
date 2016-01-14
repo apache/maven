@@ -60,7 +60,7 @@ public class MyMojo
     /**
      * The Maven Project.
      */
-    @Component
+    @Parameter( defaultValue = "${project}", readonly = true )
     protected MavenProject project;
 
     /**
@@ -72,7 +72,7 @@ public class MyMojo
     /**
      * The Maven Settings.
      */
-    @Component
+    @Parameter( defaultValue = "${settings}", readonly = true )
     private Settings settings;
 
     ...
