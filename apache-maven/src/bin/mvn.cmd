@@ -97,29 +97,30 @@ set MAVEN_CMD_LINE_ARGS=%*
 set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
 if not "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
 
-set EXEC_DIR=%CD%
-set WDIR=%EXEC_DIR%
+set "EXEC_DIR=%CD%"
+set "WDIR=%EXEC_DIR%"
+
 :findBaseDir
 if exist "%WDIR%\.mvn" goto baseDirFound
 cd ..
 IF "%WDIR%"=="%CD%" goto baseDirNotFound
-set WDIR=%CD%
+set "WDIR=%CD%"
 goto findBaseDir
 
 :baseDirFound
-set MAVEN_PROJECTBASEDIR=%WDIR%
+set "MAVEN_PROJECTBASEDIR=%WDIR%"
 cd "%EXEC_DIR%"
 goto endDetectBaseDir
 
 :baseDirNotFound
 if "_%EXEC_DIR:~-1%"=="_\" set EXEC_DIR=%EXEC_DIR:~0,-1%
-
-set MAVEN_PROJECTBASEDIR=%EXEC_DIR%
+set "MAVEN_PROJECTBASEDIR=%EXEC_DIR%"
 cd "%EXEC_DIR%"
 
 :endDetectBaseDir
 
-if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
+set "jvmConfig=\.mvn\jvm.config"
+if not exist "%MAVEN_PROJECTBASEDIR%%jvmConfig%"  goto endReadAdditionalConfig
 
 @setlocal EnableExtensions EnableDelayedExpansion
 for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
