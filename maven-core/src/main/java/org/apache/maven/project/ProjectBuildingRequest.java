@@ -185,26 +185,6 @@ public interface ProjectBuildingRequest
     ProjectBuildingRequest setResolveVersionRanges( boolean value );
 
     /**
-     * Gets the goals the user requested to execute.
-     *
-     * @return An unmodifiable set of goals to execute or {@code null}.
-     *
-     * @since 3.4
-     */
-    List<String> getGoals();
-
-    /**
-     * Sets the goals the user requested to execute.
-     *
-     * @param value Set of goals the user requested to execute or {@code null}.
-     *
-     * @return This request, newver {@code null}.
-     *
-     * @since 3.4
-     */
-    ProjectBuildingRequest setGoals( List<String> value );
-
-    /**
      * The possible merge modes for combining remote repositories.
      */
     enum RepositoryMerging

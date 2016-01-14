@@ -282,17 +282,4 @@ class FilterModelBuildingRequest
         return this;
     }
 
-    @Override
-    public List<String> getGoals()
-    {
-        return request.getGoals();
-    }
-
-    @Override
-    public ModelBuildingRequest setGoals( final List<String> value )
-    {
-        request.setGoals( value );
-        return this;
-    }
-
 }

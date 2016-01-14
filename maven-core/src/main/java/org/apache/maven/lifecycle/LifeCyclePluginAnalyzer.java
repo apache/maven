@@ -20,8 +20,6 @@ package org.apache.maven.lifecycle;
  */
 
 import java.util.Set;
-
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 
 /**
@@ -30,23 +28,5 @@ import org.apache.maven.model.Plugin;
  */
 public interface LifeCyclePluginAnalyzer
 {
-
-    @Deprecated
-    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
-        throws LifecycleMappingNotFoundException;
-
-    /**
-     * Gets a set of default build {@code Plugin}s for a given {@code Model} and a Maven execution with the given goals.
-     *
-     * @param model The model to get the default build {@code Plugin}s for.
-     * @param goals A set of goals of the current Maven invokation.
-     *
-     * @return A set of default build {@code Plugin}s for {@code Model}.
-     *
-     * @throws LifecycleMappingNotFoundException if {@code model} does not declare a supported packaging.
-     * @since 3.4
-     */
-    Set<Plugin> getDefaultBuildPlugins( Model model, Set<String> goals )
-        throws LifecycleMappingNotFoundException;
-
+    Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging );
 }

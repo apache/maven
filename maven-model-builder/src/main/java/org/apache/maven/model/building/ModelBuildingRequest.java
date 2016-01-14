@@ -335,23 +335,4 @@ public interface ModelBuildingRequest
 
     ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver );
 
-    /**
-     * Gets the goals the user requested to execute.
-     *
-     * @return An unmodifiable set of goals to execute or {@code null}.
-     *
-     * @since 3.4
-     */
-    List<String> getGoals();
-
-    /**
-     * Sets the goals the user requested to execute.
-     *
-     * @param value Set of goals the user requested to execute or {@code null}.
-     *
-     * @return This request, newver {@code null}.
-     *
-     * @since 3.4
-     */
-    ModelBuildingRequest setGoals( List<String> value );
 }

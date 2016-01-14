@@ -66,9 +66,9 @@ public class DefaultLifecycles
         this.lifecycles = lifecycles;
     }
 
-    public Lifecycle get( String phase )
+    public Lifecycle get( String key )
     {
-        return getPhaseToLifecycleMap().get( phase );
+        return getPhaseToLifecycleMap().get( key );
     }
 
     /**

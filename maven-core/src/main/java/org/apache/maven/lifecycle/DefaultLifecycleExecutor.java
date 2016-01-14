@@ -100,10 +100,7 @@ public class DefaultLifecycleExecutor
     // TODO: This whole method could probably removed by injecting lifeCyclePluginAnalyzer straight into client site.
     // TODO: But for some reason the whole plexus appcontext refuses to start when I try this.
 
-    @Override
-    @Deprecated
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
-        throws LifecycleMappingNotFoundException
     {
         return lifeCyclePluginAnalyzer.getPluginsBoundByDefaultToAllLifecycles( packaging );
     }

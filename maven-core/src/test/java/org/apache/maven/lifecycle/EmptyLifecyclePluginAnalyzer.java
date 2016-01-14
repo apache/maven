@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 
@@ -33,7 +32,6 @@ import org.apache.maven.model.PluginExecution;
 public class EmptyLifecyclePluginAnalyzer
     implements LifeCyclePluginAnalyzer
 {
-
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         Set<Plugin> plugins;
@@ -56,12 +54,6 @@ public class EmptyLifecyclePluginAnalyzer
         }
 
         return plugins;
-    }
-
-    @Override
-    public Set<Plugin> getDefaultBuildPlugins( final Model model, final Set<String> goals )
-    {
-        return Collections.emptySet();
     }
 
     private Plugin newPlugin( String artifactId, String... goals )

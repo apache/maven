@@ -21,7 +21,6 @@ package org.apache.maven.model.building;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -74,8 +73,6 @@ public class DefaultModelBuildingRequest
 
     private WorkspaceModelResolver workspaceResolver;
 
-    private List<String> goals;
-
     /**
      * Creates an empty request.
      */
@@ -104,7 +101,6 @@ public class DefaultModelBuildingRequest
         setModelResolver( request.getModelResolver() );
         setModelBuildingListener( request.getModelBuildingListener() );
         setModelCache( request.getModelCache() );
-        setGoals( request.getGoals() );
     }
 
     @Override
@@ -406,19 +402,6 @@ public class DefaultModelBuildingRequest
     public ModelBuildingRequest setWorkspaceModelResolver( WorkspaceModelResolver workspaceResolver )
     {
         this.workspaceResolver = workspaceResolver;
-        return this;
-    }
-
-    @Override
-    public List<String> getGoals()
-    {
-        return this.goals;
-    }
-
-    @Override
-    public ModelBuildingRequest setGoals( final List<String> value )
-    {
-        this.goals = value != null ? Collections.unmodifiableList( value ) : null;
         return this;
     }
 

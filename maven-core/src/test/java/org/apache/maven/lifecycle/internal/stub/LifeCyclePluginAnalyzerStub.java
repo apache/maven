@@ -15,14 +15,13 @@
 
 package org.apache.maven.lifecycle.internal.stub;
 
+import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 
 /**
  * @author Kristian Rosenvold
@@ -30,7 +29,6 @@ import org.apache.maven.model.PluginExecution;
 public class LifeCyclePluginAnalyzerStub
     implements LifeCyclePluginAnalyzer
 {
-
     public Set<Plugin> getPluginsBoundByDefaultToAllLifecycles( String packaging )
     {
         Set<Plugin> plugins;
@@ -53,12 +51,6 @@ public class LifeCyclePluginAnalyzerStub
         }
 
         return plugins;
-    }
-
-    @Override
-    public Set<Plugin> getDefaultBuildPlugins( final Model model, final Set<String> goals )
-    {
-        return Collections.emptySet();
     }
 
     private Plugin newPlugin( String artifactId, String... goals )
