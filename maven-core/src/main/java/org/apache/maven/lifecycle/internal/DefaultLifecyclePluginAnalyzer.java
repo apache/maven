@@ -171,42 +171,9 @@ public class DefaultLifecyclePluginAnalyzer
 
                     if ( goals != null )
                     {
-                        parseLifecyclePhaseDefinitions( plugins, phase, goals );
-                    }
+                        parseLifecyclePhaseDefinitions( plugins, phase, goals, lifecycle, lifecycleModel,
+                                                        pluginManagement );
 
-                    if ( pluginManagement != null )
-                    {
-                        for ( final Plugin plugin : plugins.keySet() )
-                        {
-                            final Plugin managedPlugin = this.getManagedPlugin( pluginManagement, plugin );
-
-                            if ( managedPlugin != null )
-                            {
-                                final List<PluginExecution> defaultExecutions =
-                                    new ArrayList<>( managedPlugin.getExecutions().size() );
-
-                                for ( final PluginExecution pluginExecution : managedPlugin.getExecutions() )
-                                {
-                                    // What if the plugin's default phase (== null) is not from the current lifecyle?
-                                    if ( pluginExecution.getPhase() == null
-                                             || lifecycle.getPhases().contains( pluginExecution.getPhase() ) )
-                                    {
-                                        defaultExecutions.add( pluginExecution );
-                                    }
-                                }
-
-                                final Plugin defaultManagedPlugin =
-                                    this.getManagedPlugin( lifecycleModel.getBuild().getPluginManagement(),
-                                                           managedPlugin );
-
-                                for ( final PluginExecution pluginExecution : defaultExecutions )
-                                {
-                                    defaultManagedPlugin.addExecution( pluginExecution );
-                                }
-
-                                managedPlugin.getExecutions().removeAll( defaultExecutions );
-                            }
-                        }
                     }
                 }
             }
@@ -237,7 +204,9 @@ public class DefaultLifecyclePluginAnalyzer
         return lifecycles;
     }
 
-    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals )
+    private void parseLifecyclePhaseDefinitions( Map<Plugin, Plugin> plugins, String phase, LifecyclePhase goals,
+                                                 final Lifecycle lifecycle, final Model lifecycleModel,
+                                                 final PluginManagement pluginManagement )
     {
         List<LifecycleMojo> mojos = goals.getMojos();
 
@@ -284,6 +253,38 @@ public class DefaultLifecyclePluginAnalyzer
 
                 plugin.setDependencies( mojo.getDependencies() );
                 plugin.getExecutions().add( execution );
+
+                if ( pluginManagement != null )
+                {
+                    final Plugin managedPlugin = this.getManagedPlugin( pluginManagement, plugin );
+
+                    if ( managedPlugin != null )
+                    {
+                        final List<PluginExecution> defaultExecutions =
+                            new ArrayList<>( managedPlugin.getExecutions().size() );
+
+                        for ( final PluginExecution pluginExecution : managedPlugin.getExecutions() )
+                        {
+                            // What if the plugin's default phase (== null) is not from the lifecyle?
+                            if ( pluginExecution.getPhase() == null
+                                     || lifecycle.getPhases().contains( pluginExecution.getPhase() ) )
+                            {
+                                defaultExecutions.add( pluginExecution );
+                            }
+                        }
+
+                        final Plugin defaultManagedPlugin =
+                            this.getManagedPlugin( lifecycleModel.getBuild().getPluginManagement(),
+                                                   managedPlugin );
+
+                        for ( final PluginExecution pluginExecution : defaultExecutions )
+                        {
+                            defaultManagedPlugin.addExecution( pluginExecution );
+                        }
+
+                        managedPlugin.getExecutions().removeAll( defaultExecutions );
+                    }
+                }
             }
         }
     }
