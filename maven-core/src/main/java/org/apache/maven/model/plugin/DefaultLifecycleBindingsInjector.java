@@ -20,13 +20,12 @@ package org.apache.maven.model.plugin;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
+import org.apache.maven.lifecycle.LifecycleMappingNotFoundException;
+import org.apache.maven.lifecycle.LifecyclePluginAnalyzer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -34,9 +33,9 @@ import org.apache.maven.model.PluginContainer;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
 import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
+import org.apache.maven.model.building.ModelProblemCollector;
 import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.merge.MavenModelMerger;
 import org.codehaus.plexus.component.annotations.Component;
@@ -55,27 +54,34 @@ public class DefaultLifecycleBindingsInjector
     private LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
 
     @Requirement
-    private LifeCyclePluginAnalyzer lifecycle;
+    private LifecyclePluginAnalyzer lifecyclePluginAnalyzer;
 
+    @Override
     public void injectLifecycleBindings( Model model, ModelBuildingRequest request, ModelProblemCollector problems )
     {
-        String packaging = model.getPackaging();
-
-        Collection<Plugin> defaultPlugins = lifecycle.getPluginsBoundByDefaultToAllLifecycles( packaging );
-
-        if ( defaultPlugins == null )
+        try
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Unknown packaging: " + packaging )
-                    .setLocation( model.getLocation( "packaging" ) ) );
-        }
-        else if ( !defaultPlugins.isEmpty() )
-        {
-            Model lifecycleModel = new Model();
-            lifecycleModel.setBuild( new Build() );
-            lifecycleModel.getBuild().getPlugins().addAll( defaultPlugins );
+            final Model lifecycleModel = this.lifecyclePluginAnalyzer.getLifecycleModel( model );
+
+            if ( model.getBuild() == null )
+            {
+                model.setBuild( new Build() );
+            }
+
+            final PluginManagement pluginManagement = model.getBuild().getPluginManagement();
+
+            model.getBuild().setPluginManagement( lifecycleModel.getBuild().getPluginManagement() );
 
             merger.merge( model, lifecycleModel );
+
+            model.getBuild().setPluginManagement( pluginManagement );
+        }
+        catch ( final LifecycleMappingNotFoundException e )
+        {
+            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                .setException( e )
+                .setLocation( model.getLocation( "packaging" ) ) );
+
         }
     }
 

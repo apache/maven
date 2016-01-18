@@ -50,7 +50,7 @@ public class LifecycleExecutorSubModulesTest
     private LifecycleExecutionPlanCalculator lifeCycleExecutionPlanCalculator;
 
     @Requirement
-    private LifeCyclePluginAnalyzer lifeCyclePluginAnalyzer;
+    private LifecyclePluginAnalyzer lifeCyclePluginAnalyzer;
 
     @Requirement
     private LifecycleTaskSegmentCalculator lifeCycleTaskSegmentCalculator;
@@ -65,7 +65,7 @@ public class LifecycleExecutorSubModulesTest
         lifeCycleBuilder = lookup( LifecycleModuleBuilder.class );
         lifeCycleDependencyResolver = lookup( LifecycleDependencyResolver.class );
         lifeCycleExecutionPlanCalculator = lookup( LifecycleExecutionPlanCalculator.class );
-        lifeCyclePluginAnalyzer = lookup( LifeCyclePluginAnalyzer.class );
+        lifeCyclePluginAnalyzer = lookup( LifecyclePluginAnalyzer.class );
         lifeCycleTaskSegmentCalculator = lookup( LifecycleTaskSegmentCalculator.class );
         lookup( ExceptionHandler.class );
     }

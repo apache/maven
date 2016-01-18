@@ -2,7 +2,7 @@
 <plexus>
   <components>
     <component>
-      <role>org.apache.maven.lifecycle.LifeCyclePluginAnalyzer</role>
+      <role>org.apache.maven.lifecycle.LifecyclePluginAnalyzer</role>
       <implementation>org.apache.maven.project.EmptyLifecyclePluginAnalyzer</implementation>
     </component>
   </components>
