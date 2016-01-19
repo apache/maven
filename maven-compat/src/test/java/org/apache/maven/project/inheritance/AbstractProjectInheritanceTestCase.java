@@ -33,7 +33,7 @@ public abstract class AbstractProjectInheritanceTestCase
     {
         String className = getClass().getPackage().getName();
 
-        return className.substring( className.lastIndexOf( "." ) + 1 );
+        return className.substring( className.lastIndexOf( '.' ) + 1 );
     }
 
     protected File projectFile( String name )

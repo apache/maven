@@ -175,11 +175,11 @@ public class DefaultArtifactRepository
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 256 );
 
-        sb.append( "       id: " ).append( getId() ).append( "\n" );
-        sb.append( "      url: " ).append( getUrl() ).append( "\n" );
-        sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( "\n" );
+        sb.append( "       id: " ).append( getId() ).append( '\n' );
+        sb.append( "      url: " ).append( getUrl() ).append( '\n' );
+        sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( '\n' );
 
         if ( snapshots != null )
         {

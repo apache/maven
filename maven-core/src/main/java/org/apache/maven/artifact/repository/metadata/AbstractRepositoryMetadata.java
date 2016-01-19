@@ -197,7 +197,7 @@ public abstract class AbstractRepositoryMetadata
 
     public String extendedToString()
     {
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder( 256 );
 
         buffer.append( "\nRepository Metadata\n--------------------------" );
         buffer.append( "\nGroupId: " ).append( getGroupId() );

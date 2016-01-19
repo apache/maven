@@ -174,7 +174,7 @@ public class ExecutionEventLogger
                     buffer.append( chars( ' ', padSize ) );
                 }
                 buffer.append( buildTimeDuration );
-                buffer.append( "]" );
+                buffer.append( ']' );
             }
             else if ( buildSummary instanceof BuildFailure )
             {
@@ -187,7 +187,7 @@ public class ExecutionEventLogger
                     buffer.append( chars( ' ', padSize ) );
                 }
                 buffer.append( buildTimeDuration );
-                buffer.append( "]" );
+                buffer.append( ']' );
             }
 
             logger.info( buffer.toString() );

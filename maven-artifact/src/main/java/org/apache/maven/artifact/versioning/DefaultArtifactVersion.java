@@ -111,7 +111,7 @@ public class DefaultArtifactVersion
     {
         comparable = new ComparableVersion( version );
 
-        int index = version.indexOf( "-" );
+        int index = version.indexOf( '-' );
 
         String part1;
         String part2 = null;

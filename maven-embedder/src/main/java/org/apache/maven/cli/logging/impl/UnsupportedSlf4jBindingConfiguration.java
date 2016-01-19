@@ -59,7 +59,7 @@ public class UnsupportedSlf4jBindingConfiguration
         for ( Map.Entry<URL, Set<Object>> entry : supported.entrySet() )
         {
             StringBuilder sb = new StringBuilder();
-            sb.append( "(from " ).append( entry.getKey().toExternalForm() ).append( ")" );
+            sb.append( "(from " ).append( entry.getKey().toExternalForm() ).append( ')' );
 
             for ( Object binding : entry.getValue() )
             {

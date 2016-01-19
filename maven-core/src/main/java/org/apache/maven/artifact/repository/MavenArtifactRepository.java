@@ -132,15 +132,15 @@ public class MavenArtifactRepository
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 256 );
 
-        sb.append( "      id: " ).append( getId() ).append( "\n" );
-        sb.append( "      url: " ).append( getUrl() ).append( "\n" );
-        sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( "\n" );
+        sb.append( "      id: " ).append( getId() ).append( '\n' );
+        sb.append( "      url: " ).append( getUrl() ).append( '\n' );
+        sb.append( "   layout: " ).append( layout != null ? layout : "none" ).append( '\n' );
 
         if ( proxy != null )
         {
-            sb.append( "    proxy: " ).append( proxy.getHost() ).append( ":" ).append( proxy.getPort() ).append( "\n" );
+            sb.append( "    proxy: " ).append( proxy.getHost() ).append( ':' ).append( proxy.getPort() ).append( '\n' );
         }
 
         if ( snapshots != null )
@@ -220,7 +220,7 @@ public class MavenArtifactRepository
      */
     private static String protocol( final String url )
     {
-        final int pos = url.indexOf( ":" );
+        final int pos = url.indexOf( ':' );
 
         if ( pos == -1 )
         {
@@ -257,7 +257,7 @@ public class MavenArtifactRepository
                 else
                 {
                     // Now we expect the host
-                    int index = retValue.indexOf( "/" );
+                    int index = retValue.indexOf( '/' );
                     if ( index >= 0 )
                     {
                         retValue = retValue.substring( index + 1 );

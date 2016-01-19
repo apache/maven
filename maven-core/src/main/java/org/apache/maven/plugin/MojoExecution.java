@@ -175,7 +175,7 @@ public class MojoExecution
         {
             buffer.append( mojoDescriptor.getId() );
         }
-        buffer.append( " {execution: " ).append( executionId ).append( "}" );
+        buffer.append( " {execution: " ).append( executionId ).append( '}' );
         return buffer.toString();
     }
 

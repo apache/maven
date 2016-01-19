@@ -51,7 +51,7 @@ public class ModelProblemUtils
         File pomFile = model.getPomFile();
         if ( pomFile != null )
         {
-            buffer.append( " (" ).append( pomFile ).append( ")" );
+            buffer.append( " (" ).append( pomFile ).append( ')' );
         }
 
         return buffer.toString();
