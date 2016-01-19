@@ -160,7 +160,7 @@ public class PluginParameterExpressionEvaluator
             int index = expr.indexOf( "${" );
             if ( index >= 0 )
             {
-                int lastIndex = expr.indexOf( "}", index );
+                int lastIndex = expr.indexOf( '}', index );
                 if ( lastIndex >= 0 )
                 {
                     String retVal = expr.substring( 0, index );
@@ -213,7 +213,7 @@ public class PluginParameterExpressionEvaluator
         {
             try
             {
-                int pathSeparator = expression.indexOf( "/" );
+                int pathSeparator = expression.indexOf( '/' );
 
                 if ( pathSeparator > 0 )
                 {
@@ -253,7 +253,7 @@ public class PluginParameterExpressionEvaluator
         {
             try
             {
-                int pathSeparator = expression.indexOf( "/" );
+                int pathSeparator = expression.indexOf( '/' );
 
                 if ( pathSeparator > 0 )
                 {
@@ -285,7 +285,7 @@ public class PluginParameterExpressionEvaluator
         {
             try
             {
-                int pathSeparator = expression.indexOf( "/" );
+                int pathSeparator = expression.indexOf( '/' );
 
                 if ( pathSeparator > 0 )
                 {
@@ -313,7 +313,7 @@ public class PluginParameterExpressionEvaluator
         {
             try
             {
-                int pathSeparator = expression.indexOf( "/" );
+                int pathSeparator = expression.indexOf( '/' );
 
                 PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
@@ -342,7 +342,7 @@ public class PluginParameterExpressionEvaluator
         {
             try
             {
-                int pathSeparator = expression.indexOf( "/" );
+                int pathSeparator = expression.indexOf( '/' );
 
                 if ( pathSeparator > 0 )
                 {
@@ -368,7 +368,7 @@ public class PluginParameterExpressionEvaluator
         }
         else if ( expression.startsWith( "basedir" ) )
         {
-            int pathSeparator = expression.indexOf( "/" );
+            int pathSeparator = expression.indexOf( '/' );
 
             if ( pathSeparator > 0 )
             {
@@ -447,7 +447,7 @@ public class PluginParameterExpressionEvaluator
 
     private String stripTokens( String expr )
     {
-        if ( expr.startsWith( "${" ) && ( expr.indexOf( "}" ) == expr.length() - 1 ) )
+        if ( expr.startsWith( "${" ) && ( expr.indexOf( '}' ) == expr.length() - 1 ) )
         {
             expr = expr.substring( 2, expr.length() - 1 );
         }

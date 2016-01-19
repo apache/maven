@@ -1549,7 +1549,7 @@ public class MavenCli
 
         String value;
 
-        int i = property.indexOf( "=" );
+        int i = property.indexOf( '=' );
 
         if ( i <= 0 )
         {

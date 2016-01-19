@@ -160,7 +160,7 @@ public class ArtifactRepositoryPolicy
         buffer.append( checksumPolicy );
         buffer.append( ", updates=" );
         buffer.append( updatePolicy );
-        buffer.append( "}" );
+        buffer.append( '}' );
         return buffer.toString();
     }
 

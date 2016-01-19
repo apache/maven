@@ -333,21 +333,19 @@ public class MetadataResolutionResult
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        if ( artifacts == null )
+            return "";
 
-        if ( artifacts != null )
+        StringBuilder sb = new StringBuilder( 256 );
+        int i = 1;
+        sb.append( "---------\n" );
+        sb.append( artifacts.size() ).append( '\n' );
+        for ( Artifact a : artifacts )
         {
-            int i = 1;
-            sb.append( "---------" ).append( "\n" );
-            sb.append( artifacts.size() ).append( "\n" );
-            for ( Artifact a : artifacts )
-            {
-                sb.append( i ).append( " " ).append( a ).append( "\n" );
-                i++;
-            }
-            sb.append( "---------" ).append( "\n" );
+            sb.append( i ).append( ' ' ).append( a ).append( '\n' );
+            i++;
         }
-
+        sb.append( "---------\n" );
         return sb.toString();
     }
 

@@ -242,7 +242,7 @@ public class ArtifactTransferEvent
 
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder( 64 );
 
         sb.append( "TransferEvent[" );
 
@@ -259,7 +259,7 @@ public class ArtifactTransferEvent
                 break;
         }
 
-        sb.append( "|" );
+        sb.append( '|' );
         switch ( this.getEventType() )
         {
             case TRANSFER_COMPLETED:
@@ -282,9 +282,9 @@ public class ArtifactTransferEvent
                 break;
         }
 
-        sb.append( "|" );
-        sb.append( this.getLocalFile() ).append( "|" );
-        sb.append( "]" );
+        sb.append( '|' );
+        sb.append( this.getLocalFile() ).append( '|' );
+        sb.append( ']' );
 
         return sb.toString();
     }

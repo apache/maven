@@ -59,7 +59,7 @@ public class LegacyLocalRepositoryManager
 
         path.append( artifact.getGroupId() ).append( '/' );
 
-        path.append( artifact.getExtension() ).append( 's' ).append( '/' );
+        path.append( artifact.getExtension() ).append( "s/" );
 
         path.append( artifact.getArtifactId() ).append( '-' ).append( artifact.getVersion() );
 

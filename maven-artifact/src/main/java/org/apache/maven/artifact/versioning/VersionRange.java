@@ -104,8 +104,8 @@ public class VersionRange
 
         while ( process.startsWith( "[" ) || process.startsWith( "(" ) )
         {
-            int index1 = process.indexOf( ")" );
-            int index2 = process.indexOf( "]" );
+            int index1 = process.indexOf( ')' );
+            int index2 = process.indexOf( ']' );
 
             int index = index2;
             if ( index2 < 0 || index1 < index2 )
@@ -171,7 +171,7 @@ public class VersionRange
 
         Restriction restriction;
 
-        int index = process.indexOf( "," );
+        int index = process.indexOf( ',' );
 
         if ( index < 0 )
         {
