@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import java.util.Arrays;
 import java.util.List;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 
 /**
@@ -55,7 +56,7 @@ public class LifecyclePhaseTest
         assertNotNull( phase.getMojos() );
         assertEquals( 0, phase.getMojos().size() );
         
-        phase.set( "jar:jar, war:war" );
+        phase.set( "jar:jar:jar, war:war:war" );
         
         List<LifecycleMojo> mojos = phase.getMojos();
         assertNotNull( mojos );
@@ -63,11 +64,65 @@ public class LifecyclePhaseTest
         
         LifecycleMojo mojo1 = mojos.get(0);
         assertNotNull( mojo1 );
-        assertEquals( "jar:jar", mojo1.getGoal() );
+        assertEquals( "jar:jar:jar", mojo1.getGoal() );
         
         LifecycleMojo mojo2 = mojos.get(1);
         assertNotNull( mojo2 );
-        assertEquals( "war:war", mojo2.getGoal() );
+        assertEquals( "war:war:war", mojo2.getGoal() );
+    }
+
+    @Test
+    public void testIncludedConfigurations()
+    {
+        String configuration = "\t<merge>true</merge>\n" + 
+                "\t<scope>compile,deploy[production/],test</scope>\n" +
+                "\t<version>snapshot:1.5</version>\n";
+
+        LifecyclePhase phase = new LifecyclePhase();
+        assertNull( phase.getMojos() );
+
+        phase.set( "" );
+        assertNotNull( phase.getMojos() );
+        assertEquals( 0, phase.getMojos().size() );
+
+        phase.set( " org.jar:jar:3.0:jar-jar[" + configuration + "], war:war:war[" + configuration + "]" );
+
+        List<LifecycleMojo> mojos = phase.getMojos();
+        assertNotNull( mojos );
+        assertEquals( 2, mojos.size() );
+
+        LifecycleMojo mojo1 = mojos.get(0);
+        assertNotNull( mojo1 );
+        assertEquals( "org.jar:jar:3.0:jar-jar", mojo1.getGoal());
+        Xpp3Dom configuration1 = mojo1.getConfiguration();
+        assertNotNull( configuration1 );
+        assertEquals( "configuration", configuration1.getName() );
+        assertEquals( 3, configuration1.getChildCount() );
+
+        LifecycleMojo mojo2 = mojos.get(1);
+        assertNotNull( mojo2 );
+        assertEquals( "war:war:war", mojo2.getGoal() );
+        Xpp3Dom configuration2 = mojo2.getConfiguration();
+        assertNotNull( configuration2 );
+        assertEquals( "configuration", configuration2.getName() );
+        assertEquals( 3, configuration2.getChildCount() );
+    }
+
+    @Test
+    public void testEmptySet()
+    {
+        LifecyclePhase phase = new LifecyclePhase();
+        assertNull( phase.getMojos() );
+
+        phase.set( "" );
+        assertNotNull( phase.getMojos() );
+        assertEquals( 0, phase.getMojos().size() );
+
+        phase.set( " \\n\\t  " );
+
+        List<LifecycleMojo> mojos = phase.getMojos();
+        assertNotNull( mojos );
+        assertEquals( 0, mojos.size() );
     }
 }
 

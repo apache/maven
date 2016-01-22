@@ -19,17 +19,30 @@ package org.apache.maven.lifecycle.mapping;
  * under the License.
  */
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+/**
+ * Comma delimited multiple goals. The goal may be specified using:
+ * <ul>
+ * <li>&lt;groupId&gt;:&lt;artifactId&gt;:&lt;goal&gt;</li>
+ * <li>&lt;groupId&gt;:&lt;artifactId&gt;:&lt;version&gt;:&lt;goal&gt;
+ * <li>&lt;groupId&gt;:&lt;artifactId&gt;:&lt;version&gt;:&lt;goal&gt;[&lt;configuration&gt;]
+ * </li>
+ */
 public class LifecyclePhase
 {
-    
     private List<LifecycleMojo> mojos;
     
     public LifecyclePhase()
@@ -57,12 +70,40 @@ public class LifecyclePhase
         
         if ( StringUtils.isNotEmpty( goals ) )
         {
-            String[] mojoGoals = StringUtils.split( goals, "," );
-            
-            for ( String mojoGoal: mojoGoals )
+            // match <groupId>:<artifactId>:<version>:<goal>
+            String goalRegex = "(?<goal>[^:\\[,\\s]+(?::[^:\\[,\\s]+){2,3})";
+
+            // match [<configuration>]
+            String configurationRegex = "(?:\\[(?<configuration>(?:[^\\]]|(?:(?<=/)\\]))*)\\])?";
+
+            Pattern pattern = Pattern.compile( goalRegex + configurationRegex );
+            Matcher matcher = pattern.matcher( goals );
+
+            while ( matcher.find() )
             {
+                String goal = matcher.group( "goal" );
+                String configuration = matcher.group( "configuration" );
+
                 LifecycleMojo lifecycleMojo = new LifecycleMojo();
-                lifecycleMojo.setGoal( mojoGoal.trim() );
+                lifecycleMojo.setGoal( goal );
+
+                if ( configuration != null )
+                {
+                    // replace escaped /]
+                    configuration = configuration.replace( "/]", "]" );
+
+                    // add root configuration tag
+                    configuration = "<configuration>" + configuration + "</configuration>";
+
+                    try
+                    {
+                        lifecycleMojo.setConfiguration( Xpp3DomBuilder.build( new StringReader( configuration ) ) );
+                    }
+                    catch ( XmlPullParserException | IOException e )
+                    {
+                        throw new IllegalArgumentException( e );
+                    }
+                }
                 mojos.add( lifecycleMojo );
             }
         }
