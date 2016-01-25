@@ -247,13 +247,13 @@ Mappings to default lifecycle, specific for each packaging.
             <!-- START SNIPPET: ear-lifecycle -->
             <phases>
               <generate-resources>
-                org.apache.maven.plugins:maven-war-plugin:2.9.1:generate-application-xml
+                org.apache.maven.plugins:maven-ear-plugin:2.9.1:generate-application-xml
               </generate-resources>
               <process-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.7:resources
               </process-resources>
               <package>
-                org.apache.maven.plugins:maven-war-plugin:2.9.1:ear
+                org.apache.maven.plugins:maven-ear-plugin:2.9.1:ear
               </package>
               <install>
                 org.apache.maven.plugins:maven-install-plugin:2.5.2:install
