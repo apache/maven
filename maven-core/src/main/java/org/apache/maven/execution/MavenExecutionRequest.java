@@ -28,6 +28,7 @@ import java.util.Properties;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
+import org.apache.maven.lifecycle.internal.builder.Builder;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.ProjectBuildingRequest;
 //

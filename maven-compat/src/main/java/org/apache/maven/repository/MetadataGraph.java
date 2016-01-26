@@ -55,9 +55,6 @@ public class MetadataGraph
 
     /**
      * find a node by the GAV (metadata)
-     *
-     * @param md
-     * @return
      */
     public MetadataGraphNode findNode( MavenArtifactMetadata md )
     {
@@ -76,8 +73,6 @@ public class MetadataGraph
 
     /**
      * getter
-     *
-     * @return
      */
     public MetadataGraphNode getEntry()
     {
@@ -86,8 +81,6 @@ public class MetadataGraph
 
     /**
      * getter
-     *
-     * @return
      */
     public Collection<MetadataGraphNode> getNodes()
     {

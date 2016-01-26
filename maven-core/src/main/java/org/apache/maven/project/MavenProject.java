@@ -914,10 +914,10 @@ public class MavenProject
      * @param artifact The artifact to add or replace.
      *
      * @deprecated Please use {@link MavenProjectHelper}
-     * @see https://issues.apache.org/jira/browse/MNG-5868
-     * @see https://issues.apache.org/jira/browse/MNG-5387
-     * @see https://issues.apache.org/jira/browse/MNG-4013
-     * @see https://issues.apache.org/jira/browse/MNG-3119
+     * @see "https://issues.apache.org/jira/browse/MNG-5868"
+     * @see "https://issues.apache.org/jira/browse/MNG-5387"
+     * @see "https://issues.apache.org/jira/browse/MNG-4013"
+     * @see "https://issues.apache.org/jira/browse/MNG-3119"
      */
     @Deprecated
     public void addAttachedArtifact( Artifact artifact )

@@ -158,7 +158,7 @@ public class Proxy
     }
 
     /**
-     * @param type the type of the proxy server like <i>SOCKSv4</i>
+     * @param protocol the type of the proxy server like <i>SOCKSv4</i>
      */
     public void setProtocol( String protocol )
     {

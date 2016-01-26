@@ -84,8 +84,6 @@ public class DefaultArtifactFilterManager
 
     /**
      * Returns the artifact filter for the standard core artifacts.
-     *
-     * @see org.apache.maven.ArtifactFilterManager#getExtensionDependencyFilter()
      */
     public ArtifactFilter getCoreArtifactFilter()
     {

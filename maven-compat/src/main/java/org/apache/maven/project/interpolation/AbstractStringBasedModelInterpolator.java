@@ -188,8 +188,6 @@ public abstract class AbstractStringBasedModelInterpolator
      *       with the value, and continue to find other expressions.</li>
      *   <li>If the value is null, get it from the model properties.</li>
      *   <li>
-     * @param overrideContext
-     * @param outputDebugMessages
      */
     public String interpolate( String src,
                                Model model,
