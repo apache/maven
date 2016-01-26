@@ -388,14 +388,16 @@ public interface MavenExecutionRequest
     MavenExecutionRequest setUseLegacyLocalRepository( boolean useLegacyLocalRepository );
 
     /**
-     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification of the builder's id.
+     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification of the
+     * builder's id.
      *
      * @since 3.2.0
      */
     MavenExecutionRequest setBuilderId( String builderId );
 
     /**
-     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification of the builders id.
+     * Controls the {@link org.apache.maven.lifecycle.internal.builder.Builder} used by Maven by specification of the
+     * builders id.
      *
      * @since 3.2.0
      */
