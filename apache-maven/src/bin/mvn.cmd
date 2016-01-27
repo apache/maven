@@ -24,6 +24,7 @@
 @REM JAVA_HOME - location of a JDK home dir
 @REM
 @REM Optional ENV vars
+@REM M2_HOME - location of maven2's installed home dir
 @REM MAVEN_BATCH_ECHO - set to 'on' to enable the echoing of the batch commands
 @REM MAVEN_BATCH_PAUSE - set to 'on' to wait for a key stroke before ending
 @REM MAVEN_OPTS - parameters passed to the Java VM when running Maven
@@ -76,20 +77,34 @@ echo.
 goto error
 
 :chkMHome
-SET "MVN_HOME=%~dp0.."
-if not "%MVN_HOME%"=="" goto valMHome
+if not "%M2_HOME%"=="" goto valMHome
+
+SET "M2_HOME=%~dp0.."
+if not "%M2_HOME%"=="" goto valMHome
+
+echo.
+echo Error: M2_HOME not found in your environment. >&2
+echo Please set the M2_HOME variable in your environment to match the >&2
+echo location of the Maven installation. >&2
+echo.
 goto error
 
 :valMHome
 
 :stripMHome
-if not "_%MVN_HOME:~-1%"=="_\" goto checkMCmd
-set "MVN_HOME=%MVN_HOME:~0,-1%"
+if not "_%M2_HOME:~-1%"=="_\" goto checkMCmd
+set "M2_HOME=%M2_HOME:~0,-1%"
 goto stripMHome
 
 :checkMCmd
-if exist "%MVN_HOME%\bin\mvn.cmd" goto init
+if exist "%M2_HOME%\bin\mvn.cmd" goto init
 
+echo.
+echo Error: M2_HOME is set to an invalid directory. >&2
+echo M2_HOME = "%M2_HOME%" >&2
+echo Please set the M2_HOME variable in your environment to match the >&2
+echo location of the Maven installation >&2
+echo.
 goto error
 @REM ==== END VALIDATION ====
 
@@ -136,11 +151,11 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
-for %%i in ("%MVN_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%M2_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
 
 set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
-%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%MVN_HOME%\bin\m2.conf" "-Dmaven.home=%MVN_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
