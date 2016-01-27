@@ -76,19 +76,19 @@ echo.
 goto error
 
 :chkMHome
-SET "M2_HOME=%~dp0.."
-if not "%M2_HOME%"=="" goto valMHome
+SET "MVN_HOME=%~dp0.."
+if not "%MVN_HOME%"=="" goto valMHome
 goto error
 
 :valMHome
 
 :stripMHome
-if not "_%M2_HOME:~-1%"=="_\" goto checkMCmd
-set "M2_HOME=%M2_HOME:~0,-1%"
+if not "_%MVN_HOME:~-1%"=="_\" goto checkMCmd
+set "MVN_HOME=%MVN_HOME:~0,-1%"
 goto stripMHome
 
 :checkMCmd
-if exist "%M2_HOME%\bin\mvn.cmd" goto init
+if exist "%MVN_HOME%\bin\mvn.cmd" goto init
 
 goto error
 @REM ==== END VALIDATION ====
@@ -136,11 +136,11 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
-for %%i in ("%M2_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%MVN_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
 
 set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
-%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%MVN_HOME%\bin\m2.conf" "-Dmaven.home=%MVN_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
