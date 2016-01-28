@@ -273,6 +273,14 @@ public class DefaultProjectDependenciesResolver
                     appendManagementSource( buffer, art, "version" );
                     buffer.append( ')' );
                 }
+
+                Boolean premanagedOptional = DependencyManagerUtils.getPremanagedOptional( node );
+                if ( premanagedOptional != null && !premanagedOptional.equals( dep.getOptional() ) )
+                {
+                    buffer.append( " (optionality managed from " ).append( premanagedOptional );
+                    appendManagementSource( buffer, art, "optional" );
+                    buffer.append( ')' );
+                }
             }
             else
             {
