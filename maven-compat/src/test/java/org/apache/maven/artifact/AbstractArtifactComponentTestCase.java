@@ -360,8 +360,9 @@ public abstract class AbstractArtifactComponentTestCase
         DependencyGraphTransformer transformer =
             new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
                                   new SimpleOptionalitySelector(), new JavaScopeDeriver() );
-        new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
-        session.setDependencyGraphTransformer( transformer );
+
+        session.setDependencyGraphTransformer(
+            new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() ) );
 
         LocalRepository localRepo = new LocalRepository( localRepository().getBasedir() );
         session.setLocalRepositoryManager(
