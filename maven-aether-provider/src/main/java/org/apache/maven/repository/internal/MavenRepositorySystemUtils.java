@@ -106,8 +106,9 @@ public final class MavenRepositorySystemUtils
         DependencyGraphTransformer transformer =
             new ConflictResolver( new NearestVersionSelector(), new JavaScopeSelector(),
                                   new SimpleOptionalitySelector(), new JavaScopeDeriver() );
-        new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() );
-        session.setDependencyGraphTransformer( transformer );
+
+        session.setDependencyGraphTransformer(
+            new ChainedDependencyGraphTransformer( transformer, new JavaDependencyContextRefiner() ) );
 
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
         stereotypes.add( new DefaultArtifactType( "pom" ) );
