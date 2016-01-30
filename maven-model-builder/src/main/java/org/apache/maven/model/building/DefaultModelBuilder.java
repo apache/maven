@@ -1208,7 +1208,13 @@ public class DefaultModelBuilder
                     final ModelSource importSource;
                     try
                     {
-                        importSource = modelResolver.resolveModel( groupId, artifactId, version );
+                        //https://issues.apache.org/jira/browse/MNG-4463 allow pom import via version range
+                        Parent parent = new Parent();
+                        parent.setGroupId( groupId );
+                        parent.setArtifactId( artifactId );
+                        parent.setVersion( version );
+                        
+                        importSource = modelResolver.resolveModel( parent );
                     }
                     catch ( UnresolvableModelException e )
                     {
