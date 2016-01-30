@@ -19,6 +19,7 @@ package org.apache.maven.model.resolution;
  * under the License.
  */
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelSource;
@@ -47,13 +48,44 @@ public interface ModelResolver
 
     /**
      * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.
+     * <p>
+     * Unlike the {@link #resolveModel(java.lang.String, java.lang.String, java.lang.String)} method, this method
+     * supports version ranges and updates the given {@code parent} instance to match the returned {@code ModelSource}.
+     * If {@code parent} declares a version range, the version corresponding to the returned {@code ModelSource} will
+     * be set on the given {@code parent}.
+     * </p>
      *
      * @param parent The parent coordinates to resolve, must not be {@code null}.
+     *
      * @return The source of the requested POM, never {@code null}.
+     *
      * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
      * @since 3.2.2
+     *
+     * @see Parent#clone()
      */
     ModelSource resolveModel( Parent parent )
+        throws UnresolvableModelException;
+
+    /**
+     * Tries to resolve the POM for the specified dependency coordinates possibly updating {@code dependency}.
+     * <p>
+     * Unlike the {@link #resolveModel(java.lang.String, java.lang.String, java.lang.String)} method, this method
+     * supports version ranges and updates the given {@code dependency} instance to match the returned
+     * {@code ModelSource}. If {@code dependency} declares a version range, the version corresponding to the returned
+     * {@code ModelSource} will be set on the given {@code dependency}.
+     * </p>
+     *
+     * @param dependency The dependency coordinates to resolve, must not be {@code null}.
+     *
+     * @return The source of the requested POM, never {@code null}.
+     *
+     * @throws UnresolvableModelException If the POM could not be resolved from any configured repository.
+     * @since 3.4
+     *
+     * @see Dependency#clone()
+     */
+    ModelSource resolveModel( Dependency dependency )
         throws UnresolvableModelException;
 
     /**
