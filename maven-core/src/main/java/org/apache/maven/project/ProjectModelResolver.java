@@ -28,7 +28,7 @@ import java.util.Set;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
-
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
@@ -203,24 +203,26 @@ public class ProjectModelResolver
         return new FileModelSource( pomFile );
     }
 
-    public ModelSource resolveModel( Parent parent )
+    @Override
+    public ModelSource resolveModel( final Parent parent )
         throws UnresolvableModelException
     {
-        Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom",
-                                                 parent.getVersion() );
-
-        VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
-        versionRangeRequest.setTrace( trace );
-
         try
         {
-            VersionRangeResult versionRangeResult = resolver.resolveVersionRange( session, versionRangeRequest );
+            final Artifact artifact = new DefaultArtifact( parent.getGroupId(), parent.getArtifactId(), "", "pom",
+                                                           parent.getVersion() );
+
+            final VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
+            versionRangeRequest.setTrace( trace );
+
+            final VersionRangeResult versionRangeResult = resolver.resolveVersionRange( session, versionRangeRequest );
 
             if ( versionRangeResult.getHighestVersion() == null )
             {
-                throw new UnresolvableModelException( "No versions matched the requested range '" + parent.getVersion()
-                                                          + "'", parent.getGroupId(), parent.getArtifactId(),
-                                                      parent.getVersion() );
+                throw new UnresolvableModelException(
+                    String.format( "No versions matched the requested parent version range '%s'",
+                                   parent.getVersion() ),
+                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
 
             }
 
@@ -229,21 +231,69 @@ public class ProjectModelResolver
                      && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
             {
                 // Message below is checked for in the MNG-2199 core IT.
-                throw new UnresolvableModelException( "The requested version range '" + parent.getVersion()
-                                                          + "' does not specify an upper bound", parent.getGroupId(),
-                                                      parent.getArtifactId(), parent.getVersion() );
+                throw new UnresolvableModelException(
+                    String.format( "The requested parent version range '%s' does not specify an upper bound",
+                                   parent.getVersion() ),
+                    parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
 
             }
 
             parent.setVersion( versionRangeResult.getHighestVersion().toString() );
+
+            return resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
         }
-        catch ( VersionRangeResolutionException e )
+        catch ( final VersionRangeResolutionException e )
         {
             throw new UnresolvableModelException( e.getMessage(), parent.getGroupId(), parent.getArtifactId(),
                                                   parent.getVersion(), e );
 
         }
+    }
 
-        return resolveModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+    @Override
+    public ModelSource resolveModel( final Dependency dependency )
+        throws UnresolvableModelException
+    {
+        try
+        {
+            final Artifact artifact = new DefaultArtifact( dependency.getGroupId(), dependency.getArtifactId(), "",
+                                                           "pom", dependency.getVersion() );
+
+            final VersionRangeRequest versionRangeRequest = new VersionRangeRequest( artifact, repositories, context );
+            versionRangeRequest.setTrace( trace );
+
+            final VersionRangeResult versionRangeResult = resolver.resolveVersionRange( session, versionRangeRequest );
+
+            if ( versionRangeResult.getHighestVersion() == null )
+            {
+                throw new UnresolvableModelException(
+                    String.format( "No versions matched the requested dependency version range '%s'",
+                                   dependency.getVersion() ),
+                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+
+            }
+
+            if ( versionRangeResult.getVersionConstraint() != null
+                     && versionRangeResult.getVersionConstraint().getRange() != null
+                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+            {
+                // Message below is checked for in the MNG-4463 core IT.
+                throw new UnresolvableModelException(
+                    String.format( "The requested dependency version range '%s' does not specify an upper bound",
+                                   dependency.getVersion() ),
+                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+
+            }
+
+            dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
+
+            return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+        }
+        catch ( VersionRangeResolutionException e )
+        {
+            throw new UnresolvableModelException( e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(),
+                                                  dependency.getVersion(), e );
+
+        }
     }
 }
