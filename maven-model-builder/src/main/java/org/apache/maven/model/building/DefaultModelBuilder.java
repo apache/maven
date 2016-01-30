@@ -1353,7 +1353,25 @@ public class DefaultModelBuilder
                     final ModelSource importSource;
                     try
                     {
-                        importSource = modelResolver.resolveModel( groupId, artifactId, version );
+                        dependency = dependency.clone();
+                        importSource = modelResolver.resolveModel( dependency );
+                        final String resolvedId =
+                            dependency.getGroupId() + ':' + dependency.getArtifactId() + ':' + dependency.getVersion();
+
+                        if ( !imported.equals( resolvedId ) && importIds.contains( resolvedId ) )
+                        {
+                            // A version range has been resolved to a cycle.
+                            String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                            for ( String modelId : importIds )
+                            {
+                                message += modelId + " -> ";
+                            }
+                            message += resolvedId;
+                            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
+                                setMessage( message ) );
+
+                            continue;
+                        }
                     }
                     catch ( UnresolvableModelException e )
                     {
