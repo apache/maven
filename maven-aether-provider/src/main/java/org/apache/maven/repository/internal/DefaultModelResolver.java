@@ -254,6 +254,17 @@ class DefaultModelResolver
 
             }
 
+            if ( versionRangeResult.getVersionConstraint() != null
+                     && versionRangeResult.getVersionConstraint().getRange() != null
+                     && versionRangeResult.getVersionConstraint().getRange().getUpperBound() == null )
+            {
+                throw new UnresolvableModelException(
+                    String.format( "The requested dependency version range '%s' does not specify an upper bound",
+                                   dependency.getVersion() ),
+                    dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+
+            }
+
             dependency.setVersion( versionRangeResult.getHighestVersion().toString() );
 
             return resolveModel( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
