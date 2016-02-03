@@ -24,8 +24,6 @@
         <groupId>maven-test</groupId>
         <artifactId>t06-d</artifactId>
         <version>1.0</version>
-        <scope>test</scope>
-        <optional>false</optional>
       </dependency>
     </dependencies>
   </dependencyManagement>
