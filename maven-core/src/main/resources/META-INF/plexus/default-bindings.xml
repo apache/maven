@@ -70,13 +70,13 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:2.7:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.7:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.19.1:test
@@ -114,13 +114,13 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:2.7:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.7:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.19.1:test
@@ -158,7 +158,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:2.7:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:compile
               </compile>
               <process-classes>
                 org.apache.maven.plugins:maven-plugin-plugin:3.3:descriptor
@@ -167,7 +167,7 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:2.7:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.19.1:test
@@ -206,13 +206,13 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:2.7:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.7:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.19.1:test
@@ -285,13 +285,13 @@ Mappings to default lifecycle, specific for each packaging.
                 org.apache.maven.plugins:maven-resources-plugin:2.7:resources
               </process-resources>
               <compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:compile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:compile
               </compile>
               <process-test-resources>
                 org.apache.maven.plugins:maven-resources-plugin:2.7:testResources
               </process-test-resources>
               <test-compile>
-                org.apache.maven.plugins:maven-compiler-plugin:3.5:testCompile
+                org.apache.maven.plugins:maven-compiler-plugin:3.5.1:testCompile
               </test-compile>
               <test>
                 org.apache.maven.plugins:maven-surefire-plugin:2.19.1:test
