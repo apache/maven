@@ -316,7 +316,12 @@ public class RepositoryUtils
             exclusions.add( toExclusion( exclusion ) );
         }
 
-        Dependency result = new Dependency( artifact, dependency.getScope(), dependency.isOptional(), exclusions );
+        Dependency result = new Dependency( artifact,
+                                            dependency.getScope(),
+                                            dependency.getOptional() != null
+                                                ? dependency.isOptional()
+                                                : null,
+                                            exclusions );
 
         return result;
     }
