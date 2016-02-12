@@ -19,15 +19,15 @@ package org.apache.maven.cli;
  * under the License.
  */
 
-import org.codehaus.plexus.util.Os;
-import org.slf4j.Logger;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Properties;
-import java.util.TimeZone;
+
+import org.codehaus.plexus.util.Os;
+import org.slf4j.Logger;
 
 /**
  * Utility class used to report errors, statistics, application version info, etc.
@@ -152,24 +152,8 @@ public final class CLIReportingUtils
 
     public static String formatTimestamp( long timestamp )
     {
-        // Manual construction of the tz offset because only Java 7 is aware of ISO 8601 time zones
-        TimeZone tz = TimeZone.getDefault();
-        int offset = tz.getRawOffset();
-
-        // Raw offset ignores DST, so check if we are in DST now and add the offset
-        if ( tz.inDaylightTime( new Date( timestamp ) ) )
-        {
-            offset += tz.getDSTSavings();
-        }
-
-        // CHECKSTYLE_OFF: MagicNumber
-        long m = Math.abs( ( offset / ONE_MINUTE ) % 60 );
-        long h = Math.abs( ( offset / ONE_HOUR ) % 24 );
-        // CHECKSTYLE_ON: MagicNumber
-
-        int offsetDir = (int) Math.signum( (float) offset );
-        char offsetSign = offsetDir >= 0 ? '+' : '-';
-        return String.format( "%tFT%<tT%s%02d:%02d", timestamp, offsetSign, h, m );
+        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ssXXX" );
+        return sdf.format( new Date( timestamp ) );
     }
 
     public static String formatDuration( long duration )
