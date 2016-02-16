@@ -43,6 +43,6 @@ public interface DependencyManagementImporter
      * @param problems The container used to collect problems that were encountered, must not be {@code null}.
      */
     void importManagement( Model target, List<? extends DependencyManagement> sources, ModelBuildingRequest request,
-                           ModelProblemCollector problems );
+                           ModelProblemCollector problems, DependencyManagementGraph dependencyManagementGraph );
 
 }
