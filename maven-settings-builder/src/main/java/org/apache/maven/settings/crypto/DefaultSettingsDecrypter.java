@@ -21,6 +21,7 @@ package org.apache.maven.settings.crypto;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
@@ -44,6 +45,15 @@ public class DefaultSettingsDecrypter
 
     @Requirement( hint = "maven" )
     private SecDispatcher securityDispatcher;
+
+    /**
+     * @since 3.4
+     */
+    public DefaultSettingsDecrypter setSecurityDispatcher( final SecDispatcher value )
+    {
+        this.securityDispatcher = Objects.requireNonNull( value );
+        return this;
+    }
 
     @Override
     public SettingsDecryptionResult decrypt( SettingsDecryptionRequest request )
