@@ -20,9 +20,13 @@ package org.apache.maven.cli.transfer;
  */
 
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
@@ -36,32 +40,58 @@ public class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
 
-    private Map<TransferResource, Long> downloads = new ConcurrentHashMap<>();
+    private Map<TransferResource, Long> transfers = Collections.synchronizedMap(
+                                                        new LinkedHashMap<TransferResource, Long>() );
 
+    private boolean printResourceNames;
     private int lastLength;
 
-    public ConsoleMavenTransferListener( PrintStream out )
+    public ConsoleMavenTransferListener( PrintStream out, boolean printResourceNames )
     {
         super( out );
+        this.printResourceNames = printResourceNames;
     }
 
     @Override
-    public void transferProgressed( TransferEvent event )
+    public synchronized void transferInitiated( TransferEvent event )
+    {
+        overridePreviousTransfer( event );
+
+        super.transferInitiated( event );
+    }
+
+    @Override
+    public synchronized void transferCorrupted( TransferEvent event )
+        throws TransferCancelledException
+    {
+        overridePreviousTransfer( event );
+
+        super.transferCorrupted( event );
+    }
+
+    @Override
+    public synchronized void transferProgressed( TransferEvent event )
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-        downloads.put( resource, event.getTransferredBytes() );
+        transfers.put( resource, event.getTransferredBytes() );
 
-        StringBuilder buffer = new StringBuilder( 64 );
+        StringBuilder buffer = new StringBuilder( 128 );
+        buffer.append( "Progress (" ).append(  transfers.size() ).append( "): " );
 
-        for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
+        synchronized ( transfers )
         {
-            long total = entry.getKey().getContentLength();
-            Long complete = entry.getValue();
-            // NOTE: This null check guards against http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6312056
-            if ( complete != null )
+            Iterator<Map.Entry<TransferResource, Long>> entries = transfers.entrySet().iterator();
+            while ( entries.hasNext() )
             {
-                buffer.append( getStatus( complete, total ) ).append( "  " );
+                Map.Entry<TransferResource, Long> entry = entries.next();
+                long total = entry.getKey().getContentLength();
+                Long complete = entry.getValue();
+                buffer.append( getStatus( entry.getKey().getResourceName(), complete, total ) );
+                if ( entries.hasNext() )
+                {
+                    buffer.append( " | " );
+                }
             }
         }
 
@@ -69,28 +99,29 @@ public class ConsoleMavenTransferListener
         lastLength = buffer.length();
         pad( buffer, pad );
         buffer.append( '\r' );
-
-        out.print( buffer.toString() );
+        out.print( buffer );
+        out.flush();
     }
 
-    private String getStatus( long complete, long total )
+    private String getStatus( String resourceName, long complete, long total )
     {
-        if ( total >= 1024 )
+        FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
+        StringBuilder status = new StringBuilder();
+
+        if ( printResourceNames )
         {
-            return toKB( complete ) + "/" + toKB( total ) + " KB ";
+            status.append( StringUtils.substringAfterLast( resourceName,  "/" ) );
+            status.append( " (" );
         }
-        else if ( total >= 0 )
+
+        status.append( format.formatProgress( complete, total ) );
+
+        if ( printResourceNames )
         {
-            return complete + "/" + total + " B ";
+            status.append( ")" );
         }
-        else if ( complete >= 1024 )
-        {
-            return toKB( complete ) + " KB ";
-        }
-        else
-        {
-            return complete + " B ";
-        }
+
+        return status.toString();
     }
 
     private void pad( StringBuilder buffer, int spaces )
@@ -105,29 +136,34 @@ public class ConsoleMavenTransferListener
     }
 
     @Override
-    public void transferSucceeded( TransferEvent event )
+    public synchronized void transferSucceeded( TransferEvent event )
     {
-        transferCompleted( event );
+        transfers.remove( event.getResource() );
+        overridePreviousTransfer( event );
 
         super.transferSucceeded( event );
     }
 
     @Override
-    public void transferFailed( TransferEvent event )
+    public synchronized void transferFailed( TransferEvent event )
     {
-        transferCompleted( event );
+        transfers.remove( event.getResource() );
+        overridePreviousTransfer( event );
 
         super.transferFailed( event );
     }
 
-    private void transferCompleted( TransferEvent event )
+    private void overridePreviousTransfer( TransferEvent event )
     {
-        downloads.remove( event.getResource() );
-
-        StringBuilder buffer = new StringBuilder( 64 );
-        pad( buffer, lastLength );
-        buffer.append( '\r' );
-        out.print( buffer.toString() );
+        if ( lastLength > 0 )
+        {
+            StringBuilder buffer = new StringBuilder( 128 );
+            pad( buffer, lastLength );
+            buffer.append( '\r' );
+            out.print( buffer );
+            out.flush();
+            lastLength = 0;
+        }
     }
 
 }

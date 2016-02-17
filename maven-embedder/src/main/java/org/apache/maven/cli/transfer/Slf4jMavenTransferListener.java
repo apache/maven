@@ -19,10 +19,9 @@ package org.apache.maven.cli.transfer;
  * under the License.
  */
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -50,9 +49,10 @@ public class Slf4jMavenTransferListener
     @Override
     public void transferInitiated( TransferEvent event )
     {
-        String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
+        String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-        out.info( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
+        TransferResource resource = event.getResource();
+        out.info( action + ": " + resource.getRepositoryUrl() + resource.getResourceName() );
     }
 
     @Override
@@ -60,7 +60,6 @@ public class Slf4jMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-
         out.warn( event.getException().getMessage() + " for " + resource.getRepositoryUrl()
             + resource.getResourceName() );
     }
@@ -70,28 +69,21 @@ public class Slf4jMavenTransferListener
     {
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        if ( contentLength >= 0 )
+
+        FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
+        String result = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
+        String len = format.format( contentLength );
+
+        String throughput = "";
+        long duration = System.currentTimeMillis() - resource.getTransferStartTime();
+        if ( duration > 0L )
         {
-            String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
-            String len = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
-
-            String throughput = "";
-            long duration = System.currentTimeMillis() - resource.getTransferStartTime();
-            if ( duration > 0 )
-            {
-                DecimalFormat format = new DecimalFormat( "0.0", new DecimalFormatSymbols( Locale.ENGLISH ) );
-                double kbPerSec = ( contentLength / 1024.0 ) / ( duration / 1000.0 );
-                throughput = " at " + format.format( kbPerSec ) + " KB/sec";
-            }
-
-            out.info( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-                + throughput + ")" );
+            double bytesPerSecond = contentLength / ( duration / 1000.0 );
+            throughput = " at " + format.format( (long) bytesPerSecond ) + "/s";
         }
-    }
 
-    protected long toKB( long bytes )
-    {
-        return ( bytes + 1023 ) / 1024;
+        out.info( result + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
+            + throughput + ")" );
     }
 
 }
