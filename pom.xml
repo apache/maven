@@ -54,7 +54,7 @@
     <plexusUtilsVersion>3.0.22</plexusUtilsVersion>
     <guavaVersion>19.0</guavaVersion>
     <guiceVersion>4.0</guiceVersion>
-    <sisuInjectVersion>0.3.2</sisuInjectVersion>
+    <sisuInjectVersion>0.3.3</sisuInjectVersion>
     <wagonVersion>2.10</wagonVersion>
     <securityDispatcherVersion>1.4</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
