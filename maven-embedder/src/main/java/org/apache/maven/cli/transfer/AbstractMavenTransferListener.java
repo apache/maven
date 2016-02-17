@@ -22,6 +22,7 @@ package org.apache.maven.cli.transfer;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.FieldPosition;
 import java.util.Locale;
 
 import org.eclipse.aether.transfer.AbstractTransferListener;
@@ -33,6 +34,62 @@ public abstract class AbstractMavenTransferListener
     extends AbstractTransferListener
 {
 
+    // CHECKSTYLE_OFF: LineLength
+    /**
+     * Formats file length with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
+     * (GB, MB, kB) and using the pattern <code>###0.#</code> by default.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/Metric_prefix">https://en.wikipedia.org/wiki/Metric_prefix</a>
+     * @see <a href="https://en.wikipedia.org/wiki/Binary_prefix">https://en.wikipedia.org/wiki/Binary_prefix</a>
+     * @see <a
+     *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
+     */
+    // CHECKSTYLE_ON: LineLength
+    static class FileDecimalFormat
+        extends DecimalFormat
+    {
+        private static final long serialVersionUID = -684999256062614038L;
+
+        /**
+         * Default constructor
+         *
+         * @param locale
+         */
+        public FileDecimalFormat( Locale locale )
+        {
+            super( "###0.#", new DecimalFormatSymbols( locale ) );
+        }
+
+        /** {@inheritDoc} */
+        public StringBuffer format( long fs, StringBuffer result, FieldPosition fieldPosition )
+        {
+            if ( fs > 1000L * 1000L * 1000L )
+            {
+                result = super.format( (float) fs / ( 1000L * 1000L * 1000L ), result, fieldPosition );
+                result.append( " GB" );
+                return result;
+            }
+
+            if ( fs > 1000L * 1000L )
+            {
+                result = super.format( (float) fs / ( 1000L * 1000L ), result, fieldPosition );
+                result.append( " MB" );
+                return result;
+            }
+
+            if ( fs > 1000L )
+            {
+                result = super.format( (float) fs / ( 1000L ), result, fieldPosition );
+                result.append( " kB" );
+                return result;
+            }
+
+            result = super.format( fs, result, fieldPosition );
+            result.append( " B" );
+            return result;
+        }
+    }
+
     protected PrintStream out;
 
     protected AbstractMavenTransferListener( PrintStream out )
@@ -43,9 +100,10 @@ public abstract class AbstractMavenTransferListener
     @Override
     public void transferInitiated( TransferEvent event )
     {
-        String message = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
+        String type = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
 
-        out.println( message + ": " + event.getResource().getRepositoryUrl() + event.getResource().getResourceName() );
+        TransferResource resource = event.getResource();
+        out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() );
     }
 
     @Override
@@ -53,7 +111,6 @@ public abstract class AbstractMavenTransferListener
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
-
         out.println( "[WARNING] " + event.getException().getMessage() + " for " + resource.getRepositoryUrl()
             + resource.getResourceName() );
     }
@@ -63,28 +120,21 @@ public abstract class AbstractMavenTransferListener
     {
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
-        if ( contentLength >= 0 )
+
+        DecimalFormat format = new FileDecimalFormat( Locale.ENGLISH );
+        String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
+        String len = format.format( contentLength );
+
+        String throughput = "";
+        long duration = System.currentTimeMillis() - resource.getTransferStartTime();
+        if ( duration > 0L )
         {
-            String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
-            String len = contentLength >= 1024 ? toKB( contentLength ) + " KB" : contentLength + " B";
-
-            String throughput = "";
-            long duration = System.currentTimeMillis() - resource.getTransferStartTime();
-            if ( duration > 0 )
-            {
-                DecimalFormat format = new DecimalFormat( "0.0", new DecimalFormatSymbols( Locale.ENGLISH ) );
-                double kbPerSec = ( contentLength / 1024.0 ) / ( duration / 1000.0 );
-                throughput = " at " + format.format( kbPerSec ) + " KB/sec";
-            }
-
-            out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-                + throughput + ")" );
+            double bytesPerSecond = contentLength / ( duration / 1000.0 );
+            throughput = " at " + format.format( (long) bytesPerSecond ) + "/s";
         }
-    }
 
-    protected long toKB( long bytes )
-    {
-        return ( bytes + 1023 ) / 1024;
+        out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
+            + throughput + ")" );
     }
 
 }

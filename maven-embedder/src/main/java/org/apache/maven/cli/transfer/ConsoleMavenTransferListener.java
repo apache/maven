@@ -20,6 +20,9 @@ package org.apache.maven.cli.transfer;
  */
 
 import java.io.PrintStream;
+import java.text.DecimalFormat;
+import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -46,22 +49,42 @@ public class ConsoleMavenTransferListener
     }
 
     @Override
-    public void transferProgressed( TransferEvent event )
+    public synchronized void transferInitiated( TransferEvent event )
+    {
+        overridePreviousTransfer( event );
+
+        super.transferInitiated( event );
+    }
+
+    @Override
+    public synchronized void transferCorrupted( TransferEvent event )
+        throws TransferCancelledException
+    {
+        overridePreviousTransfer( event );
+
+        super.transferCorrupted( event );
+    }
+
+    @Override
+    public synchronized void transferProgressed( TransferEvent event )
         throws TransferCancelledException
     {
         TransferResource resource = event.getResource();
         downloads.put( resource, event.getTransferredBytes() );
 
-        StringBuilder buffer = new StringBuilder( 64 );
+        StringBuilder buffer = new StringBuilder( 128 );
+        buffer.append( "Progress: " );
 
-        for ( Map.Entry<TransferResource, Long> entry : downloads.entrySet() )
+        Iterator<Map.Entry<TransferResource, Long>> iter = downloads.entrySet().iterator();
+        while ( iter.hasNext() )
         {
+            Map.Entry<TransferResource, Long> entry = iter.next();
             long total = entry.getKey().getContentLength();
             Long complete = entry.getValue();
-            // NOTE: This null check guards against http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6312056
-            if ( complete != null )
+            buffer.append( getStatus( complete, total ) );
+            if ( iter.hasNext() )
             {
-                buffer.append( getStatus( complete, total ) ).append( "  " );
+                buffer.append( " | " );
             }
         }
 
@@ -69,28 +92,20 @@ public class ConsoleMavenTransferListener
         lastLength = buffer.length();
         pad( buffer, pad );
         buffer.append( '\r' );
-
         out.print( buffer.toString() );
+        out.flush();
     }
 
     private String getStatus( long complete, long total )
     {
-        if ( total >= 1024 )
+        DecimalFormat format = new FileDecimalFormat( Locale.ENGLISH );
+        String status = format.format( complete );
+        if ( total > 0 && complete != total )
         {
-            return toKB( complete ) + "/" + toKB( total ) + " KB ";
+            status += "/" + format.format( total );
         }
-        else if ( total >= 0 )
-        {
-            return complete + "/" + total + " B ";
-        }
-        else if ( complete >= 1024 )
-        {
-            return toKB( complete ) + " KB ";
-        }
-        else
-        {
-            return complete + " B ";
-        }
+
+        return status;
     }
 
     private void pad( StringBuilder buffer, int spaces )
@@ -105,29 +120,34 @@ public class ConsoleMavenTransferListener
     }
 
     @Override
-    public void transferSucceeded( TransferEvent event )
+    public synchronized void transferSucceeded( TransferEvent event )
     {
-        transferCompleted( event );
+        downloads.remove( event.getResource() );
+        overridePreviousTransfer( event );
 
         super.transferSucceeded( event );
     }
 
     @Override
-    public void transferFailed( TransferEvent event )
+    public synchronized void transferFailed( TransferEvent event )
     {
-        transferCompleted( event );
+        downloads.remove( event.getResource() );
+        overridePreviousTransfer( event );
 
         super.transferFailed( event );
     }
 
-    private void transferCompleted( TransferEvent event )
+    private void overridePreviousTransfer( TransferEvent event )
     {
-        downloads.remove( event.getResource() );
-
-        StringBuilder buffer = new StringBuilder( 64 );
-        pad( buffer, lastLength );
-        buffer.append( '\r' );
-        out.print( buffer.toString() );
+        if ( lastLength > 0 )
+        {
+            StringBuilder buffer = new StringBuilder( 128 );
+            pad( buffer, lastLength );
+            buffer.append( '\r' );
+            out.print( buffer.toString() );
+            out.flush();
+            lastLength = 0;
+        }
     }
 
 }
