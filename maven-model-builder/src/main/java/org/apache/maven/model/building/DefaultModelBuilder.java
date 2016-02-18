@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -86,6 +87,7 @@ import static org.apache.maven.model.building.Result.newResult;
 public class DefaultModelBuilder
     implements ModelBuilder
 {
+
     @Requirement
     private ModelProcessor modelProcessor;
 
@@ -253,8 +255,8 @@ public class DefaultModelBuilder
         DefaultProfileActivationContext profileActivationContext = getProfileActivationContext( request );
 
         problems.setSource( "(external profiles)" );
-        List<Profile> activeExternalProfiles = profileSelector.getActiveProfiles( request.getProfiles(),
-                                                                                  profileActivationContext, problems );
+        List<Profile> activeExternalProfiles =
+            profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext, problems );
 
         result.setActiveExternalProfiles( activeExternalProfiles );
 
@@ -301,8 +303,9 @@ public class DefaultModelBuilder
 
             profileActivationContext.setProjectProperties( tmpModel.getProperties() );
 
-            List<Profile> activePomProfiles = profileSelector.getActiveProfiles( rawModel.getProfiles(),
-                                                                                 profileActivationContext, problems );
+            List<Profile> activePomProfiles =
+                profileSelector.getActiveProfiles( rawModel.getProfiles(), profileActivationContext, problems );
+
             currentData.setActiveProfiles( activePomProfiles );
 
             Map<String, Activation> interpolatedActivations = getProfileActivations( rawModel, false );
@@ -337,13 +340,13 @@ public class DefaultModelBuilder
             }
             else if ( currentData == resultData )
             { // First iteration - add initial id after version resolution.
-                currentData.setGroupId( currentData.getRawModel().getGroupId() == null ? parentData.getGroupId()
-                                                                                      : currentData.getRawModel()
-                                                                                          .getGroupId() );
+                currentData.setGroupId( currentData.getRawModel().getGroupId() == null
+                                            ? parentData.getGroupId()
+                                            : currentData.getRawModel().getGroupId() );
 
-                currentData.setVersion( currentData.getRawModel().getVersion() == null ? parentData.getVersion()
-                                                                                      : currentData.getRawModel()
-                                                                                          .getVersion() );
+                currentData.setVersion( currentData.getRawModel().getVersion() == null
+                                            ? parentData.getVersion()
+                                            : currentData.getRawModel().getVersion() );
 
                 currentData.setArtifactId( currentData.getRawModel().getArtifactId() );
                 parentIds.add( currentData.getId() );
@@ -362,8 +365,9 @@ public class DefaultModelBuilder
                 }
                 message += parentData.getId();
 
-                problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL, ModelProblem.Version.BASE )
-                    .setMessage( message ) );
+                problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.FATAL,
+                                                                ModelProblem.Version.BASE ).
+                    setMessage( message ) );
 
                 throw problems.newModelBuildingException();
             }
@@ -376,23 +380,33 @@ public class DefaultModelBuilder
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
-        // inheritance assembly
-        assembleInheritance( lineage, request, problems );
+        // [MNG-4052] import scope dependencies prefer to download pom rather than find it in the current project
+        // [MNG-5971] Imported dependencies should be available to inheritance processing
+        //
+        // This first phase of model building is used for building models holding just enough information to map
+        // groupId:artifactId:version to pom files and to provide modules to build. For this, inheritance and
+        // interpolation needs to be performed. A temporary model is built in phase 1 applying inheritance and
+        // interpolation to fill in those values but is not returned. The rest of the model building takes place in
+        // phase 2.
+        final DefaultModelProblemCollector intermediateProblems = new DefaultModelProblemCollector( result );
+        final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
+        for ( final ModelData modelData : lineage )
+        {
+            intermediateLineage.add( modelData.getModel().clone() );
+        }
+        assembleInheritance( intermediateLineage, request, intermediateProblems );
+
+        Model intermediateModel = intermediateLineage.get( 0 );
+        intermediateModel = interpolateModel( intermediateModel, request, intermediateProblems );
 
         Model resultModel = resultData.getModel();
 
+        resultModel.setGroupId( intermediateModel.getGroupId() );
+        resultModel.setArtifactId( intermediateModel.getArtifactId() );
+        resultModel.setVersion( intermediateModel.getVersion() );
+
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
-
-        // model interpolation
-        resultModel = interpolateModel( resultModel, request, problems );
-        resultData.setModel( resultModel );
-
-        // url normalization
-        modelUrlNormalizer.normalize( resultModel, request );
-
-        // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver( request.getModelResolver(), resultModel, problems, true );
 
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );
@@ -407,6 +421,7 @@ public class DefaultModelBuilder
             result.addModelId( modelId );
             result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
             result.setRawModel( modelId, currentData.getRawModel() );
+            result.setEffectiveModel( modelId, currentData.getModel() );
         }
 
         if ( !request.isTwoPhaseBuilding() )
@@ -421,19 +436,39 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
         throws ModelBuildingException
     {
-        return build( request, result, new LinkedHashSet<String>() );
-    }
-
-    private ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result,
-                                       Collection<String> imports )
-        throws ModelBuildingException
-    {
         // phase 2
         Model resultModel = result.getEffectiveModel();
+
+        // Reset to on-disk values to not suppress any warnings from phase 1.
+        resultModel.setGroupId( result.getRawModel().getGroupId() );
+        resultModel.setArtifactId( result.getRawModel().getArtifactId() );
+        resultModel.setVersion( result.getRawModel().getVersion() );
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
+
+        final List<Model> lineage = new ArrayList<>( result.getModelIds().size() );
+
+        for ( final String modelId : result.getModelIds() )
+        {
+            lineage.add( result.getEffectiveModel( modelId ) );
+        }
+
+        // [MNG-5971] Imported dependencies should be available to inheritance processing
+        processImports( lineage, "include", "pom", request, problems );
+        problems.setSource( resultModel );
+
+        // inheritance assembly
+        assembleInheritance( lineage, request, problems );
+
+        resultModel = interpolateModel( resultModel, request, problems );
+
+        // url normalization
+        modelUrlNormalizer.normalize( resultModel, request );
+
+        // Now the fully interpolated model is available: reconfigure the resolver
+        configureResolver( request.getModelResolver(), resultModel, problems, true );
 
         // model path translation
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
@@ -454,8 +489,7 @@ public class DefaultModelBuilder
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
 
-        // dependency management import
-        importDependencyManagement( resultModel, request, problems, imports );
+        this.importDependencyManagement( resultModel, "import", request, problems, new HashSet<String>() );
 
         // dependency management injection
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
@@ -488,10 +522,13 @@ public class DefaultModelBuilder
     @Override
     public Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking )
     {
-        final ModelBuildingRequest request = new DefaultModelBuildingRequest().setValidationLevel( validationLevel )
-            .setLocationTracking( locationTracking );
+        final ModelBuildingRequest request = new DefaultModelBuildingRequest().
+            setValidationLevel( validationLevel ).
+            setLocationTracking( locationTracking );
+
         final DefaultModelProblemCollector collector =
             new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
+
         try
         {
             return newResult( readModel( null, pomFile, request, collector ), collector.getProblems() );
@@ -556,15 +593,17 @@ public class DefaultModelBuilder
 
                 if ( pomFile != null )
                 {
-                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V20 )
-                        .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                        .setException( e ) );
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.V20 ).
+                        setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() ).
+                        setException( e ) );
+
                 }
                 else
                 {
-                    problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
-                        .setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                        .setException( e ) );
+                    problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 ).
+                        setMessage( "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage() ).
+                        setException( e ) );
+
                 }
             }
 
@@ -576,14 +615,16 @@ public class DefaultModelBuilder
         }
         catch ( ModelParseException e )
         {
-            problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                .setMessage( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage() )
-                .setException( e ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ).
+                setMessage( "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage() ).
+                setException( e ) );
+
             throw problems.newModelBuildingException();
         }
         catch ( IOException e )
         {
             String msg = e.getMessage();
+
             if ( msg == null || msg.length() <= 0 )
             {
                 // NOTE: There's java.nio.charset.MalformedInputException and sun.io.MalformedInputException
@@ -596,14 +637,18 @@ public class DefaultModelBuilder
                     msg = e.getClass().getSimpleName();
                 }
             }
-            problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                .setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg ).setException( e ) );
+
+            problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ).
+                setMessage( "Non-readable POM " + modelSource.getLocation() + ": " + msg ).
+                setException( e ) );
+
             throw problems.newModelBuildingException();
         }
 
         model.setPomFile( pomFile );
 
         problems.setSource( model );
+
         modelValidator.validateRawModel( model, request, problems );
 
         if ( hasFatalErrors( problems ) )
@@ -652,9 +697,11 @@ public class DefaultModelBuilder
             }
             catch ( InvalidRepositoryException e )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
-                    .setLocation( repository.getLocation( "" ) ).setException( e ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
+                    setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() ).
+                    setLocation( repository.getLocation( "" ) ).
+                    setException( e ) );
+
             }
         }
     }
@@ -706,21 +753,150 @@ public class DefaultModelBuilder
             if ( versions.get( key ) == null && managedVersions.get( key ) == null )
             {
                 InputLocation location = plugins.get( key ).getLocation( "" );
-                problems
-                    .add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
-                        .setMessage( "'build.plugins.plugin.version' for " + key + " is missing." )
-                        .setLocation( location ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 ).
+                    setMessage( "'build.plugins.plugin.version' for " + key + " is missing." ).
+                    setLocation( location ) );
+
             }
         }
     }
 
-    private void assembleInheritance( List<ModelData> lineage, ModelBuildingRequest request,
+    private void processImports( final List<Model> lineage, final String scope, final String packaging,
+                                 final ModelBuildingRequest request, final DefaultModelProblemCollector problems )
+    {
+        // [MNG-5971] Imported dependencies should be available to inheritance processing
+        // It's not possible to support all ${project.xyz} properties in dependency management import declarations
+        // because import processing is performed before the final inheritance processing is performed. So the set of
+        // ${project.xyz} properties supported in dependency management import declarations is limited.
+
+        final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
+
+        for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
+        {
+            intermediateLineage.add( lineage.get( i ).clone() );
+        }
+
+        for ( int i = intermediateLineage.size() - 2; i >= 0; i-- )
+        {
+            final Model parent = intermediateLineage.get( i + 1 );
+            final Model child = intermediateLineage.get( i );
+
+            if ( child.getGroupId() == null )
+            {
+                // Support ${project.groupId} in dependency management import declarations.
+                child.setGroupId( parent.getGroupId() );
+            }
+            if ( child.getVersion() == null )
+            {
+                // Support ${project.version} in dependency management import declarations.
+                child.setVersion( parent.getVersion() );
+            }
+
+            final Properties properties = new Properties();
+            properties.putAll( parent.getProperties() );
+            properties.putAll( child.getProperties() );
+            child.setProperties( properties );
+
+            final List<Repository> repositories = new ArrayList<>();
+            repositories.addAll( child.getRepositories() );
+
+            for ( final Repository parentRepository : parent.getRepositories() )
+            {
+                if ( !repositories.contains( parentRepository ) )
+                {
+                    repositories.add( parentRepository );
+                }
+            }
+
+            child.setRepositories( repositories );
+        }
+
+        final Properties effectiveProperties = intermediateLineage.get( 0 ).getProperties();
+
+        final DefaultModelProblemCollector intermediateProblems =
+            new DefaultModelProblemCollector( new DefaultModelBuildingResult() );
+
+        // Interpolates the intermediate model.
+        // MNG-6079: Uses the effective properties of the result model to support property overriding.
+        for ( int i = 0, s0 = intermediateLineage.size(); i < s0; i++ )
+        {
+            final Model model = intermediateLineage.get( i );
+            model.setProperties( effectiveProperties );
+            intermediateProblems.setSource( model );
+            this.interpolateModel( model, request, intermediateProblems );
+        }
+
+        // Exchanges 'include' scope dependencies in the original lineage with possibly interpolated values.
+        for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
+        {
+            final Model model = lineage.get( i );
+
+            if ( model.getDependencyManagement() != null )
+            {
+                for ( int j = 0, s1 = model.getDependencyManagement().getDependencies().size(); j < s1; j++ )
+                {
+                    final Dependency dependency = model.getDependencyManagement().getDependencies().get( j );
+
+                    if ( scope.equals( dependency.getScope() ) && packaging.equals( dependency.getType() ) )
+                    {
+                        final Dependency interpolated =
+                            intermediateLineage.get( i ).getDependencyManagement().getDependencies().get( j );
+
+                        model.getDependencyManagement().getDependencies().set( j, interpolated );
+                    }
+                }
+            }
+        }
+
+        // [MNG-4488] [regression] Parent POMs resolved from repository are validated in strict mode
+        ModelBuildingRequest lenientRequest = request;
+        if ( request.getValidationLevel() > ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            lenientRequest = new FilterModelBuildingRequest( request )
+            {
+
+                @Override
+                public int getValidationLevel()
+                {
+                    return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+                }
+
+            };
+        }
+
+        // Sets up the resolver to use the effective repositories to support repository overriding.
+        if ( lenientRequest.getModelResolver() != null )
+        {
+            for ( Repository repository : intermediateLineage.get( 0 ).getRepositories() )
+            {
+                try
+                {
+                    lenientRequest.getModelResolver().addRepository( repository, true );
+                }
+                catch ( InvalidRepositoryException e )
+                {
+                    problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
+                        .setMessage( "Invalid repository " + repository.getId() + ": " + e.getMessage() )
+                        .setLocation( repository.getLocation( "" ) ).setException( e ) );
+
+                }
+            }
+        }
+
+        // Imports dependencies into the original model using the effective repositories.
+        for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
+        {
+            this.importDependencyManagement( lineage.get( i ), scope, lenientRequest, problems, new HashSet<String>() );
+        }
+    }
+
+    private void assembleInheritance( List<Model> lineage, ModelBuildingRequest request,
                                       ModelProblemCollector problems )
     {
         for ( int i = lineage.size() - 2; i >= 0; i-- )
         {
-            Model parent = lineage.get( i + 1 ).getModel();
-            Model child = lineage.get( i ).getModel();
+            Model parent = lineage.get( i + 1 );
+            Model child = lineage.get( i );
             inheritanceAssembler.assembleModelInheritance( child, parent, request, problems );
         }
     }
@@ -858,10 +1034,11 @@ public class DefaultModelBuilder
 
             if ( !"pom".equals( parentModel.getPackaging() ) )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
-                                     + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" )
-                    .setLocation( parentModel.getLocation( "packaging" ) ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
+                    setMessage( "Invalid packaging for parent POM " + ModelProblemUtils.toSourceHint( parentModel )
+                                    + ", must be \"pom\" but is \"" + parentModel.getPackaging() + "\"" ).
+                    setLocation( parentModel.getLocation( "packaging" ) ) );
+
             }
         }
         else
@@ -903,11 +1080,15 @@ public class DefaultModelBuilder
             {
                 candidateModel =
                     resolver.resolveRawModel( parent.getGroupId(), parent.getArtifactId(), parent.getVersion() );
+
             }
             catch ( UnresolvableModelException e )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ) //
-                .setMessage( e.getMessage().toString() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ).
+                    setMessage( e.getMessage().toString() ).
+                    setLocation( parent.getLocation( "" ) ).
+                    setException( e ) );
+
                 throw problems.newModelBuildingException();
             }
             if ( candidateModel == null )
@@ -922,7 +1103,6 @@ public class DefaultModelBuilder
         // have a model that is suitable, yet more checks are done here and the one for the version is problematic
         // before because with parents as ranges it will never work in this scenario.
         //
-
         String groupId = candidateModel.getGroupId();
         if ( groupId == null && candidateModel.getParent() != null )
         {
@@ -936,7 +1116,7 @@ public class DefaultModelBuilder
         }
 
         if ( groupId == null || !groupId.equals( parent.getGroupId() ) || artifactId == null
-            || !artifactId.equals( parent.getArtifactId() ) )
+                 || !artifactId.equals( parent.getArtifactId() ) )
         {
             StringBuilder buffer = new StringBuilder( 256 );
             buffer.append( "'parent.relativePath'" );
@@ -949,8 +1129,10 @@ public class DefaultModelBuilder
             buffer.append( parent.getArtifactId() ).append( ", please verify your project structure" );
 
             problems.setSource( childModel );
-            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE )
-                .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.WARNING, Version.BASE ).
+                setMessage( buffer.toString() ).
+                setLocation( parent.getLocation( "" ) ) );
+
             return null;
         }
         if ( version != null && parent.getVersion() != null && !version.equals( parent.getVersion() ) )
@@ -1006,7 +1188,6 @@ public class DefaultModelBuilder
         /*
          * if ( version == null || !version.equals( parent.getVersion() ) ) { return null; }
          */
-
         ModelData parentData = new ModelData( candidateSource, candidateModel, groupId, artifactId, version );
 
         return parentData;
@@ -1044,7 +1225,8 @@ public class DefaultModelBuilder
         ModelResolver modelResolver = request.getModelResolver();
 
         Validate.notNull( modelResolver, "request.modelResolver cannot be null (parent POM %s and POM %s)",
-            ModelProblemUtils.toId( groupId, artifactId, version ), ModelProblemUtils.toSourceHint( childModel ) );
+                          ModelProblemUtils.toId( groupId, artifactId, version ),
+                          ModelProblemUtils.toSourceHint( childModel ) );
 
         ModelSource modelSource;
         try
@@ -1077,8 +1259,11 @@ public class DefaultModelBuilder
                 }
             }
 
-            problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                .setMessage( buffer.toString() ).setLocation( parent.getLocation( "" ) ).setException( e ) );
+            problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE ).
+                setMessage( buffer.toString() ).
+                setLocation( parent.getLocation( "" ) ).
+                setException( e ) );
+
             throw problems.newModelBuildingException();
         }
 
@@ -1087,11 +1272,13 @@ public class DefaultModelBuilder
         {
             lenientRequest = new FilterModelBuildingRequest( request )
             {
+
                 @Override
                 public int getValidationLevel()
                 {
                     return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
                 }
+
             };
         }
 
@@ -1102,8 +1289,9 @@ public class DefaultModelBuilder
             if ( childModel.getVersion() == null )
             {
                 // Message below is checked for in the MNG-2199 core IT.
-                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
-                    .setMessage( "Version must be a constant" ).setLocation( childModel.getLocation( "" ) ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 ).
+                    setMessage( "Version must be a constant" ).
+                    setLocation( childModel.getLocation( "" ) ) );
 
             }
             else
@@ -1111,9 +1299,9 @@ public class DefaultModelBuilder
                 if ( childModel.getVersion().contains( "${" ) )
                 {
                     // Message below is checked for in the MNG-2199 core IT.
-                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 )
-                        .setMessage( "Version must be a constant" )
-                        .setLocation( childModel.getLocation( "version" ) ) );
+                    problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.V31 ).
+                        setMessage( "Version must be a constant" ).
+                        setLocation( childModel.getLocation( "version" ) ) );
 
                 }
             }
@@ -1133,7 +1321,7 @@ public class DefaultModelBuilder
     }
 
     @SuppressWarnings( "checkstyle:methodlength" )
-    private void importDependencyManagement( Model model, ModelBuildingRequest request,
+    private void importDependencyManagement( Model model, String scope, ModelBuildingRequest request,
                                              DefaultModelProblemCollector problems, Collection<String> importIds )
     {
         DependencyManagement depMgmt = model.getDependencyManagement();
@@ -1142,6 +1330,8 @@ public class DefaultModelBuilder
         {
             return;
         }
+
+        problems.setSource( model );
 
         String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
 
@@ -1153,7 +1343,7 @@ public class DefaultModelBuilder
         {
             Dependency dependency = it.next();
 
-            if ( !"pom".equals( dependency.getType() ) || !"import".equals( dependency.getScope() ) )
+            if ( !"pom".equals( dependency.getType() ) || !scope.equals( dependency.getScope() ) )
             {
                 continue;
             }
@@ -1174,18 +1364,20 @@ public class DefaultModelBuilder
             }
             if ( artifactId == null || artifactId.length() <= 0 )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
+                    setMessage( "'dependencyManagement.dependencies.dependency.artifactId' for "
+                                    + dependency.getManagementKey() + " is missing." ).
+                    setLocation( dependency.getLocation( "" ) ) );
+
                 continue;
             }
             if ( version == null || version.length() <= 0 )
             {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencyManagement.dependencies.dependency.version' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
+                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
+                    setMessage( "'dependencyManagement.dependencies.dependency.version' for "
+                                    + dependency.getManagementKey() + " is missing." ).
+                    setLocation( dependency.getLocation( "" ) ) );
+
                 continue;
             }
 
@@ -1193,14 +1385,13 @@ public class DefaultModelBuilder
 
             if ( importIds.contains( imported ) )
             {
-                String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
                 for ( String modelId : importIds )
                 {
                     message += modelId + " -> ";
                 }
                 message += imported;
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
-
                 continue;
             }
 
@@ -1216,6 +1407,7 @@ public class DefaultModelBuilder
                             + " (parent POM %s and POM %s)",
                         ModelProblemUtils.toId( groupId, artifactId, version ),
                         ModelProblemUtils.toSourceHint( model ) ) );
+
                 }
 
                 Model importModel = null;
@@ -1463,9 +1655,11 @@ public class DefaultModelBuilder
 
     private boolean containsCoordinates( String message, String groupId, String artifactId, String version )
     {
-        return message != null && ( groupId == null || message.contains( groupId ) )
-            && ( artifactId == null || message.contains( artifactId ) )
-            && ( version == null || message.contains( version ) );
+        return message != null
+                   && ( groupId == null || message.contains( groupId ) )
+                   && ( artifactId == null || message.contains( artifactId ) )
+                   && ( version == null || message.contains( version ) );
+
     }
 
     protected boolean hasModelErrors( ModelProblemCollectorExt problems )

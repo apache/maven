@@ -57,6 +57,12 @@ Maven Model Builder
 
    ** parent resolution until {{{./super-pom.html}super-pom}}
 
+   []
+
+ * phase 2, with optional plugin processing
+
+   ** dependency management include processing (for dependencies of type <<<pom>>> and scope <<<include>>> in the <<<\<dependencyManagement\>>>> section)
+
    ** inheritance assembly (see {{{./index.html#Inheritance_Assembly}below}})
 
    ** model interpolation (see {{{./index.html#Model_Interpolation}below}})
@@ -64,10 +70,6 @@ Maven Model Builder
    ** url normalization: <<<UrlNormalizer>>> ({{{./apidocs/org/apache/maven/model/path/UrlNormalizer.html}javadoc}}),
    with its <<<DefaultUrlNormalizer>>> implementation
    ({{{./xref/org/apache/maven/model/path/DefaultUrlNormalizer.html}source}})
-
-   []
-
- * phase 2, with optional plugin processing
 
    ** model path translation: <<<ModelPathTranslator>>> ({{{./apidocs/org/apache/maven/model/path/ModelPathTranslator.html}javadoc}}),
    with its <<<DefaultModelPathTranslator>>> implementation
@@ -81,7 +83,7 @@ Maven Model Builder
    with its <<<DefaultLifecycleBindingsInjector>>> implementation
    ({{{./xref/org/apache/maven/model/plugin/DefaultLifecycleBindingsInjector.html}source}})
 
-   ** dependency management import (for dependencies of type <<<pom>>> in the <<<\<dependencyManagement\>>>> section)
+   ** dependency management import processing (for dependencies of type <<<pom>>> and scope <<<import>>> in the <<<\<dependencyManagement\>>>> section)
 
    ** dependency management injection: <<<DependencyManagementInjector>>> ({{{./apidocs/org/apache/maven/model/management/DependencyManagementInjector.html}javadoc}}),
    with its <<<DefaultDependencyManagementInjector>>> implementation

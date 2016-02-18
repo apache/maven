@@ -69,6 +69,18 @@ public interface ModelBuildingResult
     Model getRawModel( String modelId );
 
     /**
+     * Gets the effective model for a given identifier. The model identifier should be from the collection obtained by
+     * {@link #getModelIds()}. As a special case, an empty string can be used as the identifier for the super POM.
+     *
+     * @param modelId The identifier of the desired effective model, must not be {@code null}.
+     *
+     * @return The effective model or {@code null} if the specified model id does not refer to a known model.
+     *
+     * @since 3.6
+     */
+    Model getEffectiveModel( String modelId );
+
+    /**
      * Gets the profiles from the specified model that were active during model building. The model identifier should be
      * from the collection obtained by {@link #getModelIds()}. As a special case, an empty string can be used as the
      * identifier for the super POM.
