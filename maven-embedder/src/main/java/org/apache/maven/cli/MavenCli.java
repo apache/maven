@@ -1007,13 +1007,13 @@ public class MavenCli
         // present supplied by the user. The rule is that we only allow the execution of one ConfigurationProcessor.
         // If there is more than one then we execute the one supplied by the user, otherwise we execute the
         // the default SettingsXmlConfigurationProcessor.
-        // 
+        //
         int userSuppliedConfigurationProcessorCount = configurationProcessors.size() - 1;
 
         if ( userSuppliedConfigurationProcessorCount == 0 )
         {
             //
-            // Our settings.xml source is historically how we have configured Maven from the CLI so we are going to 
+            // Our settings.xml source is historically how we have configured Maven from the CLI so we are going to
             // have to honour its existence forever. So let's run it.
             //
             configurationProcessors.get( SettingsXmlConfigurationProcessor.HINT ).process( cliRequest );
@@ -1290,7 +1290,7 @@ public class MavenCli
             // If we're logging to a file then we don't want the console transfer listener as it will spew
             // download progress all over the place
             //
-            transferListener = getConsoleTransferListener();
+            transferListener = getConsoleTransferListener( cliRequest.commandLine.hasOption( CLIManager.DEBUG ) );
         }
         else
         {
@@ -1590,9 +1590,9 @@ public class MavenCli
     // Customizations available via the CLI
     //
 
-    protected TransferListener getConsoleTransferListener()
+    protected TransferListener getConsoleTransferListener( boolean printResourceNames )
     {
-        return new ConsoleMavenTransferListener( System.out );
+        return new ConsoleMavenTransferListener( System.out, printResourceNames );
     }
 
     protected TransferListener getBatchTransferListener()
