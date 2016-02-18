@@ -19,6 +19,9 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
@@ -123,6 +126,38 @@ interface ModelCacheTag<T>
 
         @Override
         public DependencyManagement fromCache( DependencyManagement data )
+        {
+            return intoCache( data );
+        }
+
+    };
+
+    /**
+     * The tag used to denote an effective dependencies section from an imported model.
+     */
+    ModelCacheTag<List<? extends Dependency>> DEPENDENCIES = new ModelCacheTag<List<? extends Dependency>>()
+    {
+
+        @Override
+        public String getName()
+        {
+            return "dependencies";
+        }
+
+        @Override
+        public Class<List<? extends Dependency>> getType()
+        {
+            return (Class<List<? extends Dependency>>) (Class) List.class;
+        }
+
+        @Override
+        public List<? extends Dependency> intoCache( List<? extends Dependency> data )
+        {
+            return ( data != null ) ? new ArrayList<>( data ) : null;
+        }
+
+        @Override
+        public List<? extends Dependency> fromCache( List<? extends Dependency> data )
         {
             return intoCache( data );
         }

@@ -23,49 +23,44 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * Handles the import of dependency management from other models into the target model.
+ * Handles the import of dependencies from other models into the target model.
  *
- * @author Benjamin Bentmann
+ * @author Christian Schulte
  */
-@Component( role = DependencyManagementImporter.class )
-public class DefaultDependencyManagementImporter
-    implements DependencyManagementImporter
+@Component( role = DependenciesImporter.class )
+public class DefaultDependenciesImporter
+    implements DependenciesImporter
 {
 
     @Override
-    public void importManagement( final Model target, final List<? extends DependencyManagement> sources,
-                                  final ModelBuildingRequest request, final ModelProblemCollector problems )
+    public void importDependencies( final Model target, final List<? extends List<? extends Dependency>> sources,
+                                    final ModelBuildingRequest request, final ModelProblemCollector problems )
     {
         if ( sources != null && !sources.isEmpty() )
         {
             final Map<String, Dependency> targetDependencies = new LinkedHashMap<>();
-            final DependencyManagement targetDependencyManagement = target.getDependencyManagement() != null
-                                                                        ? target.getDependencyManagement()
-                                                                        : new DependencyManagement();
 
-            for ( final Dependency targetDependency : targetDependencyManagement.getDependencies() )
+            for ( final Dependency targetDependency : target.getDependencies() )
             {
                 targetDependencies.put( targetDependency.getManagementKey(), targetDependency );
             }
 
             final List<Dependency> sourceDependencies = new ArrayList<>( 128 );
 
-            for ( final DependencyManagement source : sources )
+            for ( final List<? extends Dependency> source : sources )
             {
-                for ( final Dependency sourceDependency : source.getDependencies() )
+                for ( final Dependency sourceDependency : source )
                 {
                     if ( !targetDependencies.containsKey( sourceDependency.getManagementKey() ) )
                     {
-                        // Intentionally does not check for conflicts in the source dependency managements. We want
+                        // Intentionally does not check for conflicts in the source dependencies. We want
                         // such conflicts to be resolved manually instead of silently getting dropped.
                         sourceDependencies.add( sourceDependency );
                     }
@@ -75,8 +70,8 @@ public class DefaultDependencyManagementImporter
             final List<Dependency> dependencies = new ArrayList<>( targetDependencies.values() );
             dependencies.addAll( sourceDependencies );
 
-            targetDependencyManagement.setDependencies( dependencies );
-            target.setDependencyManagement( targetDependencyManagement );
+            target.getDependencies().clear();
+            target.getDependencies().addAll( dependencies );
         }
     }
 

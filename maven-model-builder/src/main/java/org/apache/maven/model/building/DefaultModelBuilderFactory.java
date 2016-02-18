@@ -20,7 +20,9 @@ package org.apache.maven.model.building;
  */
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.composition.DefaultDependenciesImporter;
 import org.apache.maven.model.composition.DefaultDependencyManagementImporter;
+import org.apache.maven.model.composition.DependenciesImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.DefaultInheritanceAssembler;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
@@ -169,6 +171,11 @@ public class DefaultModelBuilderFactory
         return new DefaultDependencyManagementImporter();
     }
 
+    protected DependenciesImporter newDependenciesImporter()
+    {
+        return new DefaultDependenciesImporter();
+    }
+
     protected DependencyManagementInjector newDependencyManagementInjector()
     {
         return new DefaultDependencyManagementInjector();
@@ -219,6 +226,7 @@ public class DefaultModelBuilderFactory
         modelBuilder.setProfileSelector( newProfileSelector() );
         modelBuilder.setSuperPomProvider( newSuperPomProvider() );
         modelBuilder.setDependencyManagementImporter( newDependencyManagementImporter() );
+        modelBuilder.setDependenciesImporter( newDependenciesImporter() );
         modelBuilder.setDependencyManagementInjector( newDependencyManagementInjector() );
         modelBuilder.setLifecycleBindingsInjector( newLifecycleBindingsInjector() );
         modelBuilder.setPluginManagementInjector( newPluginManagementInjector() );
