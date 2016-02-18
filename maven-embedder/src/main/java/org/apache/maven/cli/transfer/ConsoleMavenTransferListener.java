@@ -73,7 +73,7 @@ public class ConsoleMavenTransferListener
         downloads.put( resource, event.getTransferredBytes() );
 
         StringBuilder buffer = new StringBuilder( 128 );
-        buffer.append( "Progress: " );
+        buffer.append( "Progress (" ).append(  downloads.size() ).append( "): " );
 
         Iterator<Map.Entry<TransferResource, Long>> iter = downloads.entrySet().iterator();
         while ( iter.hasNext() )
