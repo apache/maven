@@ -73,8 +73,6 @@ public interface ModelBuildingRequest
 
     /**
      * Set raw model.
-     *
-     * @param model
      */
     ModelBuildingRequest setRawModel( Model rawModel );
 

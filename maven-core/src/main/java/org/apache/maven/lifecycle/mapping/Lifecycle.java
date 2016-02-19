@@ -75,8 +75,6 @@ public class Lifecycle
 
     /**
      * Method setLifecyclePhases
-     *
-     * @param phases
      */
     public void setLifecyclePhases( Map<String, LifecyclePhase> lifecyclePhases )
     {

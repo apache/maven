@@ -56,11 +56,7 @@ public interface ModelBuilder
         throws ModelBuildingException;
 
     /**
-     * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model
-     *
-     * @param request
-     * @return
-     * @throws ModelBuildingException
+     * Performs only the part of {@link ModelBuilder#build(ModelBuildingRequest)} that loads the raw model.
      */
     Result<? extends Model> buildRawModel( File pomFile, int validationLevel, boolean locationTracking );
 

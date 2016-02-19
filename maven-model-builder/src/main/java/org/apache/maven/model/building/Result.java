@@ -54,10 +54,7 @@ public class Result<T>
 {
 
     /**
-     * Success without warnings
-     * 
-     * @param model
-     * @return
+     * Success without warnings.
      */
     public static <T> Result<T> success( T model )
     {
@@ -65,11 +62,7 @@ public class Result<T>
     }
 
     /**
-     * Success with warnings
-     * 
-     * @param model
-     * @param problems
-     * @return
+     * Success with warnings.
      */
     public static <T> Result<T> success( T model, Iterable<? extends ModelProblem> problems )
     {
@@ -78,11 +71,7 @@ public class Result<T>
     }
 
     /**
-     * Success with warnings
-     * 
-     * @param model
-     * @param results
-     * @return
+     * Success with warnings.
      */
     public static <T> Result<T> success( T model, Result<?>... results )
     {
@@ -90,10 +79,7 @@ public class Result<T>
     }
 
     /**
-     * Error with problems describing the cause
-     *
-     * @param problems
-     * @return
+     * Error with problems describing the cause.
      */
     public static <T> Result<T> error( Iterable<? extends ModelProblem> problems )
     {
@@ -116,11 +102,7 @@ public class Result<T>
     }
 
     /**
-     * Error with partial result and problems describing the cause
-     *
-     * @param model
-     * @param problems
-     * @return
+     * Error with partial result and problems describing the cause.
      */
     public static <T> Result<T> error( T model, Iterable<? extends ModelProblem> problems )
     {
@@ -128,11 +110,7 @@ public class Result<T>
     }
 
     /**
-     * New result - determine whether error or success by checking problems for errors
-     * 
-     * @param model
-     * @param problems
-     * @return
+     * New result - determine whether error or success by checking problems for errors.
      */
     public static <T> Result<T> newResult( T model, Iterable<? extends ModelProblem> problems )
     {
@@ -142,10 +120,6 @@ public class Result<T>
     /**
      * New result consisting of given result and new problem. Convenience for newResult(result.get(),
      * concat(result.getProblems(),problems)).
-     * 
-     * @param result
-     * @param problem
-     * @return
      */
     public static <T> Result<T> addProblem( Result<T> result, ModelProblem problem )
     {
@@ -153,11 +127,7 @@ public class Result<T>
     }
 
     /**
-     * New result that includes the given
-     *
-     * @param result
-     * @param problems
-     * @return
+     * New result that includes the given.
      */
     public static <T> Result<T> addProblems( Result<T> result, Iterable<? extends ModelProblem> problems )
     {
@@ -172,9 +142,6 @@ public class Result<T>
 
     /**
      * Turns the given results into a single result by combining problems and models into single collection.
-     * 
-     * @param results
-     * @return
      */
     public static <T> Result<Iterable<T>> newResultSet( Iterable<? extends Result<? extends T>> results )
     {
