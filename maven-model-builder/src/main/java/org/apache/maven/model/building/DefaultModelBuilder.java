@@ -384,6 +384,9 @@ public class DefaultModelBuilder
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
+        // include processing
+        includeDependencies( lineage, request, problems );
+
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
 
@@ -616,9 +619,6 @@ public class DefaultModelBuilder
 
         problems.setSource( model );
 
-        this.importDependencyManagement( model, "include", request, problems, new HashSet<String>() );
-        this.importDependencies( model, "include", request, problems, new HashSet<String>() );
-
         modelValidator.validateRawModel( model, request, problems );
 
         if ( hasFatalErrors( problems ) )
@@ -725,6 +725,82 @@ public class DefaultModelBuilder
                     .add( new ModelProblemCollectorRequest( Severity.WARNING, Version.V20 )
                         .setMessage( "'build.plugins.plugin.version' for " + key + " is missing." )
                         .setLocation( location ) );
+            }
+        }
+    }
+
+    private void includeDependencies( final List<ModelData> lineage, final ModelBuildingRequest request,
+                                      final DefaultModelProblemCollector problems )
+    {
+        // Creates an intermediate model with property inheritance and interpolation.
+        final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
+
+        for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
+        {
+            final Model model = lineage.get( i ).getModel();
+            intermediateLineage.add( model.clone() );
+        }
+
+        for ( int i = intermediateLineage.size() - 2; i >= 0; i-- )
+        {
+            final Model parent = intermediateLineage.get( i + 1 );
+            final Model child = intermediateLineage.get( i );
+
+            final Properties properties = new Properties();
+            properties.putAll( parent.getProperties() );
+            properties.putAll( child.getProperties() );
+            child.setProperties( properties );
+        }
+
+        for ( int i = 0, s0 = intermediateLineage.size(); i < s0; i++ )
+        {
+            final Model model = intermediateLineage.get( i );
+            this.interpolateModel( model, request, problems );
+        }
+
+        // Exchanges 'include' scope dependencies in the original lineage with possibly interpolated values.
+        for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
+        {
+            final Model model = lineage.get( i ).getModel();
+
+            if ( model.getDependencyManagement() != null )
+            {
+                for ( int j = 0, s1 = model.getDependencyManagement().getDependencies().size(); j < s1; j++ )
+                {
+                    final Dependency dependency = model.getDependencyManagement().getDependencies().get( j );
+
+                    if ( "include".equals( dependency.getScope() ) && "pom".equals( dependency.getType() ) )
+                    {
+                        final Dependency interpolated =
+                            intermediateLineage.get( i ).getDependencyManagement().getDependencies().get( j );
+
+                        model.getDependencyManagement().getDependencies().set( j, interpolated );
+                    }
+                }
+            }
+
+            for ( int j = 0, s1 = model.getDependencies().size(); j < s1; j++ )
+            {
+                final Dependency dependency = model.getDependencies().get( j );
+
+                if ( "include".equals( dependency.getScope() ) && "pom".equals( dependency.getType() ) )
+                {
+                    final Dependency interpolated = intermediateLineage.get( i ).getDependencies().get( j );
+                    model.getDependencies().set( j, interpolated );
+                }
+            }
+        }
+
+        // Performs inclusion of dependencies in the original lineage.
+        for ( int i = 0, s0 = lineage.size(), superModelIdx = lineage.size() - 1; i < s0; i++ )
+        {
+            final Model model = lineage.get( i ).getModel();
+            this.importDependencyManagement( model, "include", request, problems, new HashSet<String>() );
+            this.importDependencies( model, "include", request, problems, new HashSet<String>() );
+
+            if ( i != superModelIdx )
+            {
+                modelValidator.validateRawModel( model, request, problems );
             }
         }
     }
@@ -1187,7 +1263,6 @@ public class DefaultModelBuilder
                 }
                 message += imported;
                 problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
-
                 continue;
             }
 
