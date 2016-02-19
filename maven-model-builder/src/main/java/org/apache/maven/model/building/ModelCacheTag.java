@@ -19,9 +19,6 @@ package org.apache.maven.model.building;
  * under the License.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 
@@ -54,6 +51,7 @@ interface ModelCacheTag<T>
      * cache is populated but the state of the cache must not change so we need to make a copy.
      *
      * @param data The data to store in the cache, must not be {@code null}.
+     *
      * @return The data being stored in the cache, never {@code null}.
      */
     T intoCache( T data );
@@ -63,6 +61,7 @@ interface ModelCacheTag<T>
      * cache is queried but the state of the cache must not change so we need to make a copy.
      *
      * @param data The data to retrieve from the cache, must not be {@code null}.
+     *
      * @return The data being retrieved from the cache, never {@code null}.
      */
     T fromCache( T data );
@@ -126,38 +125,6 @@ interface ModelCacheTag<T>
 
         @Override
         public DependencyManagement fromCache( DependencyManagement data )
-        {
-            return intoCache( data );
-        }
-
-    };
-
-    /**
-     * The tag used to denote an effective dependencies section from an imported model.
-     */
-    ModelCacheTag<List<? extends Dependency>> DEPENDENCIES = new ModelCacheTag<List<? extends Dependency>>()
-    {
-
-        @Override
-        public String getName()
-        {
-            return "dependencies";
-        }
-
-        @Override
-        public Class<List<? extends Dependency>> getType()
-        {
-            return (Class<List<? extends Dependency>>) (Class) List.class;
-        }
-
-        @Override
-        public List<? extends Dependency> intoCache( List<? extends Dependency> data )
-        {
-            return ( data != null ) ? new ArrayList<>( data ) : null;
-        }
-
-        @Override
-        public List<? extends Dependency> fromCache( List<? extends Dependency> data )
         {
             return intoCache( data );
         }

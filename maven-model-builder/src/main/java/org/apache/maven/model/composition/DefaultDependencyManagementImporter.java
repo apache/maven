@@ -20,12 +20,14 @@ package org.apache.maven.model.composition;
  */
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelProblemCollector;
@@ -45,6 +47,9 @@ public class DefaultDependencyManagementImporter
     public void importManagement( final Model target, final List<? extends DependencyManagement> sources,
                                   final ModelBuildingRequest request, final ModelProblemCollector problems )
     {
+        // Intentionally does not check for conflicts in the source dependencies. We want such conflicts to be resolved
+        // manually instead of silently getting dropped.
+
         if ( sources != null && !sources.isEmpty() )
         {
             final Map<String, Dependency> targetDependencies = new LinkedHashMap<>();
@@ -59,7 +64,7 @@ public class DefaultDependencyManagementImporter
                 targetDependencies.put( targetDependency.getManagementKey(), targetDependency );
             }
 
-            final List<Dependency> sourceDependencies = new ArrayList<>( 128 );
+            final Map<String, List<Dependency>> sourceDependencies = new LinkedHashMap<>();
 
             for ( final DependencyManagement source : sources )
             {
@@ -67,15 +72,131 @@ public class DefaultDependencyManagementImporter
                 {
                     if ( !targetDependencies.containsKey( sourceDependency.getManagementKey() ) )
                     {
-                        // Intentionally does not check for conflicts in the source dependency managements. We want
-                        // such conflicts to be resolved manually instead of silently getting dropped.
-                        sourceDependencies.add( sourceDependency );
+                        List<Dependency> conflictingDependencies =
+                            sourceDependencies.get( sourceDependency.getManagementKey() );
+
+                        if ( conflictingDependencies == null )
+                        {
+                            conflictingDependencies = new ArrayList<>();
+                            sourceDependencies.put( sourceDependency.getManagementKey(), conflictingDependencies );
+                        }
+
+                        conflictingDependencies.add( sourceDependency );
                     }
                 }
             }
 
-            targetDependencyManagement.getDependencies().addAll( sourceDependencies );
+            for ( final List<Dependency> conflictingDependencies : sourceDependencies.values() )
+            {
+                targetDependencyManagement.getDependencies().
+                    addAll( this.removeRedundantDependencies( conflictingDependencies ) );
+
+            }
         }
+    }
+
+    private List<Dependency> removeRedundantDependencies( final List<Dependency> candidateDependencies )
+    {
+        final List<Dependency> resultDependencies = new ArrayList<>( candidateDependencies.size() );
+
+        while ( !candidateDependencies.isEmpty() )
+        {
+            final Dependency resultDependency = candidateDependencies.remove( 0 );
+            resultDependencies.add( resultDependency );
+
+            // Removes redundant dependencies.
+            for ( final Iterator<Dependency> it = candidateDependencies.iterator(); it.hasNext(); )
+            {
+                final Dependency candidateDependency = it.next();
+                it.remove();
+
+                boolean redundant = true;
+
+                redundancy_check:
+                {
+                    if ( !( resultDependency.getOptional() != null
+                            ? resultDependency.getOptional().equals( candidateDependency.getOptional() )
+                            : candidateDependency.getOptional() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    if ( !( resultDependency.getScope() != null
+                            ? resultDependency.getScope().equals( candidateDependency.getScope() )
+                            : candidateDependency.getScope() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    if ( !( resultDependency.getSystemPath() != null
+                            ? resultDependency.getSystemPath().equals( candidateDependency.getSystemPath() )
+                            : candidateDependency.getSystemPath() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    if ( !( resultDependency.getVersion() != null
+                            ? resultDependency.getVersion().equals( candidateDependency.getVersion() )
+                            : candidateDependency.getVersion() == null ) )
+                    {
+                        redundant = false;
+                        break redundancy_check;
+                    }
+
+                    for ( int i = 0, s0 = resultDependency.getExclusions().size(); i < s0; i++ )
+                    {
+                        final Exclusion resultExclusion = resultDependency.getExclusions().get( i );
+
+                        if ( !containsExclusion( candidateDependency.getExclusions(), resultExclusion ) )
+                        {
+                            redundant = false;
+                            break redundancy_check;
+                        }
+                    }
+
+                    for ( int i = 0, s0 = candidateDependency.getExclusions().size(); i < s0; i++ )
+                    {
+                        final Exclusion candidateExclusion = candidateDependency.getExclusions().get( i );
+
+                        if ( !containsExclusion( resultDependency.getExclusions(), candidateExclusion ) )
+                        {
+                            redundant = false;
+                            break redundancy_check;
+                        }
+                    }
+                }
+
+                if ( !redundant )
+                {
+                    resultDependencies.add( candidateDependency );
+                }
+            }
+        }
+
+        return resultDependencies;
+    }
+
+    private static boolean containsExclusion( final List<Exclusion> exclusions, final Exclusion exclusion )
+    {
+        for ( int i = 0, s0 = exclusions.size(); i < s0; i++ )
+        {
+            final Exclusion current = exclusions.get( i );
+
+            if ( ( exclusion.getArtifactId() != null
+                   ? exclusion.getArtifactId().equals( current.getArtifactId() )
+                   : current.getArtifactId() == null )
+                     && ( exclusion.getGroupId() != null
+                          ? exclusion.getGroupId().equals( current.getGroupId() )
+                          : current.getGroupId() == null ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

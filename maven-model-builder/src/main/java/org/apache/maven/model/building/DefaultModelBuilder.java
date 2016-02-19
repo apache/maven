@@ -38,7 +38,6 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
-import org.apache.maven.model.composition.DependenciesImporter;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -125,9 +124,6 @@ public class DefaultModelBuilder
     @Requirement
     private DependencyManagementImporter dependencyManagementImporter;
 
-    @Requirement
-    private DependenciesImporter dependenciesImporter;
-
     @Requirement( optional = true )
     private LifecycleBindingsInjector lifecycleBindingsInjector;
 
@@ -203,12 +199,6 @@ public class DefaultModelBuilder
     public DefaultModelBuilder setDependencyManagementImporter( DependencyManagementImporter depMngmntImporter )
     {
         this.dependencyManagementImporter = depMngmntImporter;
-        return this;
-    }
-
-    public DefaultModelBuilder setDependenciesImporter( DependenciesImporter dependenciesImporter )
-    {
-        this.dependenciesImporter = dependenciesImporter;
         return this;
     }
 
@@ -384,8 +374,8 @@ public class DefaultModelBuilder
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
-        // include processing
-        includeDependencies( lineage, request, problems );
+        // import processing
+        processImports( lineage, request, problems );
 
         // inheritance assembly
         assembleInheritance( lineage, request, problems );
@@ -464,15 +454,6 @@ public class DefaultModelBuilder
             // lifecycle bindings injection
             lifecycleBindingsInjector.injectLifecycleBindings( resultModel, request, problems );
         }
-
-        // dependency management import
-        importDependencyManagement( resultModel, "import", request, problems, managementImports );
-
-        // dependencies import
-        importDependencies( resultModel, "import", request, problems, dependencyImports );
-
-        // re-validate after 'import' to warn for possible duplicates introduced by import
-        modelValidator.validateRawModel( resultModel, request, problems );
 
         // dependency management injection
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
@@ -732,8 +713,8 @@ public class DefaultModelBuilder
         }
     }
 
-    private void includeDependencies( final List<ModelData> lineage, final ModelBuildingRequest request,
-                                      final DefaultModelProblemCollector problems )
+    private void processImports( final List<ModelData> lineage, final ModelBuildingRequest request,
+                                 final DefaultModelProblemCollector problems )
     {
         // Creates an intermediate model with property inheritance and interpolation.
         final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
@@ -753,11 +734,25 @@ public class DefaultModelBuilder
             properties.putAll( parent.getProperties() );
             properties.putAll( child.getProperties() );
             child.setProperties( properties );
+
+            final List<Repository> repositories = new ArrayList<>();
+            repositories.addAll( child.getRepositories() );
+
+            for ( final Repository parentRepository : parent.getRepositories() )
+            {
+                if ( !repositories.contains( parentRepository ) )
+                {
+                    repositories.add( parentRepository );
+                }
+            }
+
+            child.setRepositories( repositories );
         }
 
         for ( int i = 0, s0 = intermediateLineage.size(); i < s0; i++ )
         {
             final Model model = intermediateLineage.get( i );
+            problems.setSource( model );
             this.interpolateModel( model, request, problems );
         }
 
@@ -772,7 +767,7 @@ public class DefaultModelBuilder
                 {
                     final Dependency dependency = model.getDependencyManagement().getDependencies().get( j );
 
-                    if ( "include".equals( dependency.getScope() ) && "pom".equals( dependency.getType() ) )
+                    if ( "import".equals( dependency.getScope() ) && "pom".equals( dependency.getType() ) )
                     {
                         final Dependency interpolated =
                             intermediateLineage.get( i ).getDependencyManagement().getDependencies().get( j );
@@ -781,28 +776,18 @@ public class DefaultModelBuilder
                     }
                 }
             }
-
-            for ( int j = 0, s1 = model.getDependencies().size(); j < s1; j++ )
-            {
-                final Dependency dependency = model.getDependencies().get( j );
-
-                if ( "include".equals( dependency.getScope() ) && "pom".equals( dependency.getType() ) )
-                {
-                    final Dependency interpolated = intermediateLineage.get( i ).getDependencies().get( j );
-                    model.getDependencies().set( j, interpolated );
-                }
-            }
         }
 
         // Performs inclusion of dependencies in the original lineage.
         for ( int i = 0, s0 = lineage.size(), superModelIdx = lineage.size() - 1; i < s0; i++ )
         {
             final Model model = lineage.get( i ).getModel();
-            this.importDependencyManagement( model, "include", request, problems, new HashSet<String>() );
-            this.importDependencies( model, "include", request, problems, new HashSet<String>() );
+            this.configureResolver( request.getModelResolver(), intermediateLineage.get( i ), problems, true );
+            this.importDependencyManagement( model, "import", request, problems, new HashSet<String>() );
 
             if ( i != superModelIdx )
             {
+                problems.setSource( model );
                 modelValidator.validateRawModel( model, request, problems );
             }
         }
@@ -1204,6 +1189,8 @@ public class DefaultModelBuilder
             return;
         }
 
+        problems.setSource( model );
+
         String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
 
         importIds.add( importing );
@@ -1390,194 +1377,6 @@ public class DefaultModelBuilder
         importIds.remove( importing );
 
         dependencyManagementImporter.importManagement( model, importMngts, request, problems );
-    }
-
-    private void importDependencies( final Model model, final String scope, final ModelBuildingRequest request,
-                                     final DefaultModelProblemCollector problems, final Collection<String> importIds )
-    {
-        final String importing = model.getGroupId() + ':' + model.getArtifactId() + ':' + model.getVersion();
-
-        importIds.add( importing );
-
-        final WorkspaceModelResolver workspaceResolver = request.getWorkspaceModelResolver();
-        final ModelResolver modelResolver = request.getModelResolver();
-
-        ModelBuildingRequest importRequest = null;
-
-        List<List<? extends Dependency>> imports = null;
-
-        for ( final Iterator<Dependency> it = model.getDependencies().iterator(); it.hasNext(); )
-        {
-            Dependency dependency = it.next();
-
-            if ( !"pom".equals( dependency.getType() ) || !scope.equals( dependency.getScope() ) )
-            {
-                continue;
-            }
-
-            it.remove();
-
-            final String groupId = dependency.getGroupId();
-            final String artifactId = dependency.getArtifactId();
-            final String version = dependency.getVersion();
-
-            if ( groupId == null || groupId.length() <= 0 )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencies.dependency.groupId' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
-                continue;
-            }
-            if ( artifactId == null || artifactId.length() <= 0 )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencies.dependency.artifactId' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
-                continue;
-            }
-            if ( version == null || version.length() <= 0 )
-            {
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                    .setMessage( "'dependencies.dependency.version' for "
-                                     + dependency.getManagementKey() + " is missing." )
-                    .setLocation( dependency.getLocation( "" ) ) );
-                continue;
-            }
-
-            final String imported = groupId + ':' + artifactId + ':' + version;
-
-            if ( importIds.contains( imported ) )
-            {
-                String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
-                for ( String modelId : importIds )
-                {
-                    message += modelId + " -> ";
-                }
-                message += imported;
-                problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).setMessage( message ) );
-                continue;
-            }
-
-            List<? extends Dependency> importDependencies =
-                getCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.DEPENDENCIES );
-
-            if ( importDependencies == null )
-            {
-                if ( workspaceResolver == null && modelResolver == null )
-                {
-                    throw new NullPointerException( String.format(
-                        "request.workspaceModelResolver and request.modelResolver cannot be null"
-                            + " (parent POM %s and POM %s)",
-                        ModelProblemUtils.toId( groupId, artifactId, version ),
-                        ModelProblemUtils.toSourceHint( model ) ) );
-                }
-
-                Model importModel = null;
-                if ( workspaceResolver != null )
-                {
-                    try
-                    {
-                        importModel = workspaceResolver.resolveEffectiveModel( groupId, artifactId, version );
-                    }
-                    catch ( UnresolvableModelException e )
-                    {
-                        problems.add( new ModelProblemCollectorRequest( Severity.FATAL, Version.BASE )
-                            .setMessage( e.getMessage().toString() ).setException( e ) );
-                        continue;
-                    }
-                }
-
-                // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
-                if ( importModel == null )
-                {
-                    final ModelSource importSource;
-                    try
-                    {
-                        dependency = dependency.clone();
-                        importSource = modelResolver.resolveModel( dependency );
-                        final String resolvedId =
-                            dependency.getGroupId() + ':' + dependency.getArtifactId() + ':' + dependency.getVersion();
-
-                        if ( !imported.equals( resolvedId ) && importIds.contains( resolvedId ) )
-                        {
-                            // A version range has been resolved to a cycle.
-                            String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
-                            for ( String modelId : importIds )
-                            {
-                                message += modelId + " -> ";
-                            }
-                            message += resolvedId;
-                            problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE ).
-                                setMessage( message ) );
-
-                            continue;
-                        }
-                    }
-                    catch ( UnresolvableModelException e )
-                    {
-                        StringBuilder buffer = new StringBuilder( 256 );
-                        buffer.append( "Non-resolvable " + scope + " POM" );
-                        if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
-                        {
-                            buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
-                        }
-                        buffer.append( ": " ).append( e.getMessage() );
-
-                        problems.add( new ModelProblemCollectorRequest( Severity.ERROR, Version.BASE )
-                            .setMessage( buffer.toString() ).setLocation( dependency.getLocation( "" ) )
-                            .setException( e ) );
-                        continue;
-                    }
-
-                    if ( importRequest == null )
-                    {
-                        importRequest = new DefaultModelBuildingRequest();
-                        importRequest.setValidationLevel( ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL );
-                        importRequest.setModelCache( request.getModelCache() );
-                        importRequest.setSystemProperties( request.getSystemProperties() );
-                        importRequest.setUserProperties( request.getUserProperties() );
-                        importRequest.setLocationTracking( request.isLocationTracking() );
-                    }
-
-                    importRequest.setModelSource( importSource );
-                    importRequest.setModelResolver( modelResolver.newCopy() );
-
-                    final ModelBuildingResult importResult;
-                    try
-                    {
-                        importResult = build( importRequest );
-                    }
-                    catch ( ModelBuildingException e )
-                    {
-                        problems.addAll( e.getProblems() );
-                        continue;
-                    }
-
-                    problems.addAll( importResult.getProblems() );
-
-                    importModel = importResult.getEffectiveModel();
-                }
-
-                importDependencies = importModel.getDependencies();
-
-                putCache( request.getModelCache(), groupId, artifactId, version, ModelCacheTag.DEPENDENCIES,
-                          importDependencies );
-
-            }
-
-            if ( imports == null )
-            {
-                imports = new ArrayList<>();
-            }
-
-            imports.add( importDependencies );
-        }
-
-        importIds.remove( importing );
-
-        dependenciesImporter.importDependencies( model, imports, request, problems );
     }
 
     private <T> void putCache( ModelCache modelCache, String groupId, String artifactId, String version,
