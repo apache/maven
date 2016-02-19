@@ -52,6 +52,8 @@ public class DefaultDependencyManagementImporter
                                                                         ? target.getDependencyManagement()
                                                                         : new DependencyManagement();
 
+            target.setDependencyManagement( targetDependencyManagement );
+
             for ( final Dependency targetDependency : targetDependencyManagement.getDependencies() )
             {
                 targetDependencies.put( targetDependency.getManagementKey(), targetDependency );
@@ -72,11 +74,7 @@ public class DefaultDependencyManagementImporter
                 }
             }
 
-            final List<Dependency> dependencies = new ArrayList<>( targetDependencies.values() );
-            dependencies.addAll( sourceDependencies );
-
-            targetDependencyManagement.setDependencies( dependencies );
-            target.setDependencyManagement( targetDependencyManagement );
+            targetDependencyManagement.getDependencies().addAll( sourceDependencies );
         }
     }
 

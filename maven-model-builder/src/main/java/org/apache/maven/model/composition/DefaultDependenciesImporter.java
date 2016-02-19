@@ -67,11 +67,7 @@ public class DefaultDependenciesImporter
                 }
             }
 
-            final List<Dependency> dependencies = new ArrayList<>( targetDependencies.values() );
-            dependencies.addAll( sourceDependencies );
-
-            target.getDependencies().clear();
-            target.getDependencies().addAll( dependencies );
+            target.getDependencies().addAll( sourceDependencies );
         }
     }
 

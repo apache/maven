@@ -471,6 +471,9 @@ public class DefaultModelBuilder
         // dependencies import
         importDependencies( resultModel, "import", request, problems, dependencyImports );
 
+        // re-validate after 'import' to warn for possible duplicates introduced by import
+        modelValidator.validateRawModel( resultModel, request, problems );
+
         // dependency management injection
         dependencyManagementInjector.injectManagement( resultModel, request, problems );
 
@@ -1256,7 +1259,7 @@ public class DefaultModelBuilder
 
             if ( importIds.contains( imported ) )
             {
-                String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
                 for ( String modelId : importIds )
                 {
                     message += modelId + " -> ";
@@ -1309,7 +1312,7 @@ public class DefaultModelBuilder
                         if ( !imported.equals( resolvedId ) && importIds.contains( resolvedId ) )
                         {
                             // A version range has been resolved to a cycle.
-                            String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                            String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
                             for ( String modelId : importIds )
                             {
                                 message += modelId + " -> ";
@@ -1324,7 +1327,7 @@ public class DefaultModelBuilder
                     catch ( UnresolvableModelException e )
                     {
                         StringBuilder buffer = new StringBuilder( 256 );
-                        buffer.append( "Non-resolvable import POM" );
+                        buffer.append( "Non-resolvable " + scope + " POM" );
                         if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
                         {
                             buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
@@ -1447,7 +1450,7 @@ public class DefaultModelBuilder
 
             if ( importIds.contains( imported ) )
             {
-                String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
                 for ( String modelId : importIds )
                 {
                     message += modelId + " -> ";
@@ -1500,7 +1503,7 @@ public class DefaultModelBuilder
                         if ( !imported.equals( resolvedId ) && importIds.contains( resolvedId ) )
                         {
                             // A version range has been resolved to a cycle.
-                            String message = "The dependencies of type=pom and with scope=import form a cycle: ";
+                            String message = "The dependencies of type=pom and scope=" + scope + " form a cycle: ";
                             for ( String modelId : importIds )
                             {
                                 message += modelId + " -> ";
@@ -1515,7 +1518,7 @@ public class DefaultModelBuilder
                     catch ( UnresolvableModelException e )
                     {
                         StringBuilder buffer = new StringBuilder( 256 );
-                        buffer.append( "Non-resolvable import POM" );
+                        buffer.append( "Non-resolvable " + scope + " POM" );
                         if ( !containsCoordinates( e.getMessage(), groupId, artifactId, version ) )
                         {
                             buffer.append( ' ' ).append( ModelProblemUtils.toId( groupId, artifactId, version ) );
