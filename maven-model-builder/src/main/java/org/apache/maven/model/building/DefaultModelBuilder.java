@@ -374,7 +374,7 @@ public class DefaultModelBuilder
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
-        // import processing
+        // [MNG-5971] Imported dependencies should be available to inheritance processing
         processImports( lineage, request, problems );
 
         // inheritance assembly
@@ -716,7 +716,9 @@ public class DefaultModelBuilder
     private void processImports( final List<ModelData> lineage, final ModelBuildingRequest request,
                                  final DefaultModelProblemCollector problems )
     {
-        // Creates an intermediate model with property inheritance and interpolation.
+        // [MNG-5971] Imported dependencies should be available to inheritance processing
+
+        // Creates an intermediate model with property and repository inheritance.
         final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
 
         for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
@@ -749,6 +751,7 @@ public class DefaultModelBuilder
             child.setRepositories( repositories );
         }
 
+        // Interpolates the intermediate model.
         for ( int i = 0, s0 = intermediateLineage.size(); i < s0; i++ )
         {
             final Model model = intermediateLineage.get( i );
@@ -756,7 +759,7 @@ public class DefaultModelBuilder
             this.interpolateModel( model, request, problems );
         }
 
-        // Exchanges 'include' scope dependencies in the original lineage with possibly interpolated values.
+        // Exchanges 'import' scope dependencies in the original lineage with possibly interpolated values.
         for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
         {
             final Model model = lineage.get( i ).getModel();
@@ -778,7 +781,7 @@ public class DefaultModelBuilder
             }
         }
 
-        // Performs inclusion of dependencies in the original lineage.
+        // Imports dependencies into the original model using the repositories of the intermediate model.
         for ( int i = 0, s0 = lineage.size(), superModelIdx = lineage.size() - 1; i < s0; i++ )
         {
             final Model model = lineage.get( i ).getModel();
