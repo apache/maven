@@ -781,17 +781,33 @@ public class DefaultModelBuilder
             }
         }
 
+        // [MNG-4488] [regression] Parent POMs resolved from repository are validated in strict mode
+        ModelBuildingRequest lenientRequest = request;
+        if ( request.getValidationLevel() > ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0 )
+        {
+            lenientRequest = new FilterModelBuildingRequest( request )
+            {
+
+                @Override
+                public int getValidationLevel()
+                {
+                    return ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+                }
+
+            };
+        }
+
         // Imports dependencies into the original model using the repositories of the intermediate model.
         for ( int i = 0, s0 = lineage.size(), superModelIdx = lineage.size() - 1; i < s0; i++ )
         {
             final Model model = lineage.get( i ).getModel();
-            this.configureResolver( request.getModelResolver(), intermediateLineage.get( i ), problems, true );
-            this.importDependencyManagement( model, "import", request, problems, new HashSet<String>() );
+            this.configureResolver( lenientRequest.getModelResolver(), intermediateLineage.get( i ), problems, true );
+            this.importDependencyManagement( model, "import", lenientRequest, problems, new HashSet<String>() );
 
             if ( i != superModelIdx )
             {
                 problems.setSource( model );
-                modelValidator.validateRawModel( model, request, problems );
+                modelValidator.validateRawModel( model, lenientRequest, problems );
             }
         }
     }
