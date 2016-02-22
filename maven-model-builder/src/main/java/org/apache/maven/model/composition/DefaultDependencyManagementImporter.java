@@ -30,7 +30,9 @@ import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
@@ -72,25 +74,49 @@ public class DefaultDependencyManagementImporter
                 {
                     if ( !targetDependencies.containsKey( sourceDependency.getManagementKey() ) )
                     {
-                        List<Dependency> conflictingDependencies =
+                        List<Dependency> conflictCanditates =
                             sourceDependencies.get( sourceDependency.getManagementKey() );
 
-                        if ( conflictingDependencies == null )
+                        if ( conflictCanditates == null )
                         {
-                            conflictingDependencies = new ArrayList<>();
-                            sourceDependencies.put( sourceDependency.getManagementKey(), conflictingDependencies );
+                            conflictCanditates = new ArrayList<>();
+                            sourceDependencies.put( sourceDependency.getManagementKey(), conflictCanditates );
                         }
 
-                        conflictingDependencies.add( sourceDependency );
+                        conflictCanditates.add( sourceDependency );
                     }
                 }
             }
 
-            for ( final List<Dependency> conflictingDependencies : sourceDependencies.values() )
+            for ( final List<Dependency> conflictCanditates : sourceDependencies.values() )
             {
-                targetDependencyManagement.getDependencies().
-                    addAll( this.removeRedundantDependencies( conflictingDependencies ) );
+                final List<Dependency> conflictingDependencies =
+                    this.removeRedundantDependencies( conflictCanditates );
 
+                targetDependencyManagement.getDependencies().addAll( conflictingDependencies );
+
+                if ( conflictingDependencies.size() > 1 )
+                {
+                    final StringBuilder conflictsBuilder = new StringBuilder( conflictingDependencies.size() * 128 );
+
+                    for ( final Dependency dependency : conflictingDependencies )
+                    {
+                        conflictsBuilder.append( ", '" ).append( dependency.getLocation( "" ) ).append( '\'' );
+                    }
+
+                    problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.WARNING,
+                                                                    ModelProblem.Version.BASE ).
+                        setMessage( String.format(
+                                "Multiple conflicting imports of dependency '%1$s' into model '%2$s' @ '%3$s' (%4$s). "
+                                    + "To resolve this conflict, either declare the dependency directly "
+                                    + "in model '%2$s' to override what gets imported or rearrange the causing "
+                                    + "imports in the inheritance hierarchy to apply standard override logic. "
+                                    + "Without resolving this conflict, your build relies on indeterministic "
+                                    + "behaviour.",
+                                conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
+                                target.getPomFile().getAbsolutePath(), conflictsBuilder.substring( 2 ) ) ) );
+
+                }
             }
         }
     }
