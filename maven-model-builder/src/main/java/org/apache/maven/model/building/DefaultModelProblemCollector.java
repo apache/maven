@@ -146,7 +146,7 @@ class DefaultModelProblemCollector
     {
         int line = -1;
         int column = -1;
-        String source = null;
+        String src = null;
         String modelId = null;
 
         if ( req.getLocation() != null )
@@ -156,15 +156,17 @@ class DefaultModelProblemCollector
             if ( req.getLocation().getSource() != null )
             {
                 modelId = req.getLocation().getSource().getModelId();
-                source = req.getLocation().getSource().getLocation();
+                src = req.getLocation().getSource().getLocation();
             }
         }
 
-        if ( modelId == null )
-        {
-            modelId = getModelId();
-            source = getSource();
-        }
+        modelId = modelId != null
+                      ? this.getModelId() + " [" + modelId + "]"
+                      : this.getModelId();
+
+        src = src != null
+                  ? this.getSource() + " [" + src + "]"
+                  : this.getSource();
 
         if ( line <= 0 && column <= 0 && req.getException() instanceof ModelParseException )
         {
@@ -174,7 +176,7 @@ class DefaultModelProblemCollector
         }
 
         ModelProblem problem =
-            new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), source, line, column,
+            new DefaultModelProblem( req.getMessage(), req.getSeverity(), req.getVersion(), src, line, column,
                                      modelId, req.getException() );
 
         add( problem );
