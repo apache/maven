@@ -39,11 +39,13 @@ class DefaultModelBuildingResult
 
     private Model effectiveModel;
 
-    private List<String> modelIds;
+    private final List<String> modelIds;
 
-    private Map<String, Model> rawModels;
+    private final Map<String, Model> rawModels;
 
-    private Map<String, List<Profile>> activePomProfiles;
+    private final Map<String, Model> effectiveModels;
+
+    private final Map<String, List<Profile>> activePomProfiles;
 
     private List<Profile> activeExternalProfiles;
 
@@ -56,6 +58,7 @@ class DefaultModelBuildingResult
         activePomProfiles = new HashMap<>();
         activeExternalProfiles = new ArrayList<>();
         problems = new ArrayList<>();
+        effectiveModels = new HashMap<>();
     }
 
     @Override
@@ -105,6 +108,23 @@ class DefaultModelBuildingResult
         Validate.notNull( modelId, "modelId cannot null" );
 
         rawModels.put( modelId, rawModel );
+
+        return this;
+    }
+
+    @Override
+    public Model getEffectiveModel( final String modelId )
+    {
+        return this.effectiveModels.get( modelId );
+    }
+
+    public DefaultModelBuildingResult setEffectiveModel( final String modelId, final Model model )
+    {
+        // Intentionally notNull because Super POM may not contain a modelId
+        Validate.notNull( modelId, "modelId must not be null" );
+        Validate.notNull( model, "model must not be null" );
+
+        this.effectiveModels.put( modelId, model );
 
         return this;
     }

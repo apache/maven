@@ -335,13 +335,13 @@ public class DefaultModelBuilder
             }
             else if ( currentData == resultData )
             { // First iteration - add initial id after version resolution.
-                currentData.setGroupId( currentData.getRawModel().getGroupId() == null ? parentData.getGroupId()
-                                                                                      : currentData.getRawModel()
-                                                                                          .getGroupId() );
+                currentData.setGroupId( currentData.getRawModel().getGroupId() == null
+                                            ? parentData.getGroupId()
+                                            : currentData.getRawModel().getGroupId() );
 
-                currentData.setVersion( currentData.getRawModel().getVersion() == null ? parentData.getVersion()
-                                                                                      : currentData.getRawModel()
-                                                                                          .getVersion() );
+                currentData.setVersion( currentData.getRawModel().getVersion() == null
+                                            ? parentData.getVersion()
+                                            : currentData.getRawModel().getVersion() );
 
                 currentData.setArtifactId( currentData.getRawModel().getArtifactId() );
                 parentIds.add( currentData.getId() );
@@ -374,26 +374,40 @@ public class DefaultModelBuilder
         problems.setSource( inputModel );
         checkPluginVersions( lineage, request, problems );
 
+        // [MNG-4052] import scope dependencies prefer to download pom rather than find it in the current project
         // [MNG-5971] Imported dependencies should be available to inheritance processing
-        processImports( lineage, request, problems );
+        //
+        // This first phase of model building is used for building models holding just enough information to map
+        // groupId:artifactId:version to pom files and to provide modules to build. For this, inheritance and
+        // interpolation needs to be performed. A temporary model is built in phase 1 applying inheritance and
+        // interpolation to fill in those values but is not returned. The rest of the model building takes place in
+        // phase 2.
+        final List<ModelData> intermediateLineage = new ArrayList<>( lineage.size() );
+        for ( final ModelData modelData : lineage )
+        {
+            final ModelData intermediateModel = new ModelData( modelData.getSource(), modelData.getModel().clone() );
+            intermediateModel.setRawModel( modelData.getRawModel().clone() );
+            intermediateModel.setActiveProfiles( modelData.getActiveProfiles() );
+            intermediateModel.setArtifactId( modelData.getArtifactId() );
+            intermediateModel.setGroupId( modelData.getGroupId() );
+            intermediateModel.setVersion( modelData.getVersion() );
+            intermediateLineage.add( intermediateModel );
+        }
 
         // inheritance assembly
-        assembleInheritance( lineage, request, problems );
+        assembleInheritance( intermediateLineage, request, problems );
+
+        Model intermediateModel = intermediateLineage.get( 0 ).getModel();
+        intermediateModel = interpolateModel( intermediateModel, request, problems );
 
         Model resultModel = resultData.getModel();
 
+        resultModel.setGroupId( intermediateModel.getGroupId() );
+        resultModel.setArtifactId( intermediateModel.getArtifactId() );
+        resultModel.setVersion( intermediateModel.getVersion() );
+
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
-
-        // model interpolation
-        resultModel = interpolateModel( resultModel, request, problems );
-        resultData.setModel( resultModel );
-
-        // url normalization
-        modelUrlNormalizer.normalize( resultModel, request );
-
-        // Now the fully interpolated model is available: reconfigure the resolver
-        configureResolver( request.getModelResolver(), resultModel, problems, true );
 
         resultData.setGroupId( resultModel.getGroupId() );
         resultData.setArtifactId( resultModel.getArtifactId() );
@@ -408,6 +422,7 @@ public class DefaultModelBuilder
             result.addModelId( modelId );
             result.setActivePomProfiles( modelId, currentData.getActiveProfiles() );
             result.setRawModel( modelId, currentData.getRawModel() );
+            result.setEffectiveModel( modelId, currentData.getModel() );
         }
 
         if ( !request.isTwoPhaseBuilding() )
@@ -422,19 +437,33 @@ public class DefaultModelBuilder
     public ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result )
         throws ModelBuildingException
     {
-        return build( request, result, new LinkedHashSet<String>(), new LinkedHashSet<String>() );
-    }
-
-    private ModelBuildingResult build( ModelBuildingRequest request, ModelBuildingResult result,
-                                       Collection<String> managementImports, Collection<String> dependencyImports )
-        throws ModelBuildingException
-    {
         // phase 2
         Model resultModel = result.getEffectiveModel();
 
         DefaultModelProblemCollector problems = new DefaultModelProblemCollector( result );
         problems.setSource( resultModel );
         problems.setRootModel( resultModel );
+
+        final List<ModelData> lineage = new ArrayList<>( result.getModelIds().size() );
+
+        for ( final String modelId : result.getModelIds() )
+        {
+            lineage.add( new ModelData( null, result.getEffectiveModel( modelId ) ) );
+        }
+
+        // [MNG-5971] Imported dependencies should be available to inheritance processing
+        processImports( lineage, request, problems );
+
+        // inheritance assembly
+        assembleInheritance( lineage, request, problems );
+
+        resultModel = interpolateModel( resultModel, request, problems );
+
+        // url normalization
+        modelUrlNormalizer.normalize( resultModel, request );
+
+        // Now the fully interpolated model is available: reconfigure the resolver
+        configureResolver( request.getModelResolver(), resultModel, problems, true );
 
         // model path translation
         modelPathTranslator.alignToBaseDirectory( resultModel, resultModel.getProjectDirectory(), request );
@@ -718,7 +747,7 @@ public class DefaultModelBuilder
     {
         // [MNG-5971] Imported dependencies should be available to inheritance processing
 
-        // Creates an intermediate model with property and repository inheritance.
+        // Creates an intermediate model with only property and repository inheritance.
         final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
 
         for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
