@@ -107,14 +107,16 @@ public class DefaultDependencyManagementImporter
                     problems.add( new ModelProblemCollectorRequest( ModelProblem.Severity.WARNING,
                                                                     ModelProblem.Version.BASE ).
                         setMessage( String.format(
-                                "Multiple conflicting imports of dependency '%1$s' into model '%2$s' @ '%3$s' (%4$s). "
+                                "Multiple conflicting imports of dependency '%1$s' into model '%2$s'%3$s(%4$s). "
                                     + "To resolve this conflict, either declare the dependency directly "
                                     + "in model '%2$s' to override what gets imported or rearrange the causing "
                                     + "imports in the inheritance hierarchy to apply standard override logic. "
                                     + "Without resolving this conflict, your build relies on indeterministic "
                                     + "behaviour.",
                                 conflictingDependencies.get( 0 ).getManagementKey(), target.getId(),
-                                target.getPomFile().getAbsolutePath(), conflictsBuilder.substring( 2 ) ) ) );
+                                target.getPomFile() != null
+                                    ? " @ '" + target.getPomFile().getAbsolutePath() + "' "
+                                    : " ", conflictsBuilder.substring( 2 ) ) ) );
 
                 }
             }
