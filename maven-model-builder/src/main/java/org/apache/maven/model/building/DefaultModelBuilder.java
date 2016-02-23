@@ -843,12 +843,6 @@ public class DefaultModelBuilder
             final Model model = lineage.get( i );
             this.configureResolver( lenientRequest.getModelResolver(), intermediateLineage.get( i ), problems, true );
             this.importDependencyManagement( model, "import", lenientRequest, problems, new HashSet<String>() );
-
-            if ( i != superModelIdx )
-            {
-                problems.setSource( model );
-                modelValidator.validateRawModel( model, lenientRequest, problems );
-            }
         }
     }
 
