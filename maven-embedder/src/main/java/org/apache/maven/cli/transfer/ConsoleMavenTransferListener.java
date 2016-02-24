@@ -79,7 +79,7 @@ public class ConsoleMavenTransferListener
         StringBuilder buffer = new StringBuilder( 128 );
         buffer.append( "Progress (" ).append(  transfers.size() ).append( "): " );
 
-        synchronized( transfers )
+        synchronized ( transfers )
         {
             Iterator<Map.Entry<TransferResource, Long>> entries = transfers.entrySet().iterator();
             while ( entries.hasNext() )
