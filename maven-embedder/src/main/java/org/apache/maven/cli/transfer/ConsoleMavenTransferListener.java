@@ -20,11 +20,11 @@ package org.apache.maven.cli.transfer;
  */
 
 import java.io.PrintStream;
-import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.aether.transfer.TransferCancelledException;
@@ -40,7 +40,8 @@ public class ConsoleMavenTransferListener
     extends AbstractMavenTransferListener
 {
 
-    private Map<TransferResource, Long> transfers = new ConcurrentHashMap<>();
+    private Map<TransferResource, Long> transfers = Collections.synchronizedMap(
+                                                        new LinkedHashMap<TransferResource, Long>() );
 
     private boolean printResourceNames;
     private int lastLength;
@@ -78,16 +79,19 @@ public class ConsoleMavenTransferListener
         StringBuilder buffer = new StringBuilder( 128 );
         buffer.append( "Progress (" ).append(  transfers.size() ).append( "): " );
 
-        Iterator<Map.Entry<TransferResource, Long>> iter = transfers.entrySet().iterator();
-        while ( iter.hasNext() )
+        synchronized( transfers )
         {
-            Map.Entry<TransferResource, Long> entry = iter.next();
-            long total = entry.getKey().getContentLength();
-            Long complete = entry.getValue();
-            buffer.append( getStatus( entry.getKey().getResourceName(), complete, total ) );
-            if ( iter.hasNext() )
+            Iterator<Map.Entry<TransferResource, Long>> entries = transfers.entrySet().iterator();
+            while ( entries.hasNext() )
             {
-                buffer.append( " | " );
+                Map.Entry<TransferResource, Long> entry = entries.next();
+                long total = entry.getKey().getContentLength();
+                Long complete = entry.getValue();
+                buffer.append( getStatus( entry.getKey().getResourceName(), complete, total ) );
+                if ( entries.hasNext() )
+                {
+                    buffer.append( " | " );
+                }
             }
         }
 
@@ -101,7 +105,7 @@ public class ConsoleMavenTransferListener
 
     private String getStatus( String resourceName, long complete, long total )
     {
-        DecimalFormat format = new FileDecimalFormat( Locale.ENGLISH );
+        FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
         StringBuilder status = new StringBuilder();
 
         if ( printResourceNames )
@@ -110,11 +114,7 @@ public class ConsoleMavenTransferListener
             status.append( " (" );
         }
 
-        status.append( format.format( complete ) );
-        if ( total > 0 && complete != total )
-        {
-            status.append( "/" ).append( format.format( total ) );
-        }
+        status.append( format.formatProgress( complete, total ) );
 
         if ( printResourceNames )
         {

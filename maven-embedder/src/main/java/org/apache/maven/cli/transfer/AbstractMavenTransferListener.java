@@ -22,9 +22,9 @@ package org.apache.maven.cli.transfer;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.FieldPosition;
 import java.util.Locale;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -36,8 +36,9 @@ public abstract class AbstractMavenTransferListener
 
     // CHECKSTYLE_OFF: LineLength
     /**
-     * Formats file length with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
-     * (GB, MB, kB) and using the pattern <code>###0.#</code> by default.
+     * Formats file size with the associated <a href="https://en.wikipedia.org/wiki/Metric_prefix">SI</a> prefix
+     * (GB, MB, kB) and using the patterns <code>#0.0</code> for numbers between 1 and 10
+     * and <code>###0</code> for numbers between 10 and 1000+ by default.
      *
      * @see <a href="https://en.wikipedia.org/wiki/Metric_prefix">https://en.wikipedia.org/wiki/Metric_prefix</a>
      * @see <a href="https://en.wikipedia.org/wiki/Binary_prefix">https://en.wikipedia.org/wiki/Binary_prefix</a>
@@ -45,48 +46,163 @@ public abstract class AbstractMavenTransferListener
      *      href="https://en.wikipedia.org/wiki/Octet_%28computing%29">https://en.wikipedia.org/wiki/Octet_(computing)</a>
      */
     // CHECKSTYLE_ON: LineLength
-    static class FileDecimalFormat
-        extends DecimalFormat
+    // TODO Move me to Maven Shared Utils
+    static class FileSizeFormat
     {
-        private static final long serialVersionUID = -684999256062614038L;
-
-        /**
-         * Default constructor
-         *
-         * @param locale
-         */
-        public FileDecimalFormat( Locale locale )
+        static enum ScaleUnit
         {
-            super( "###0.#", new DecimalFormatSymbols( locale ) );
+            BYTE
+            {
+                @Override
+                public long bytes()
+                {
+                    return 1L;
+                }
+
+                @Override
+                public String symbol()
+                {
+                    return "B";
+                }
+            },
+            KILOBYTE
+            {
+                @Override
+                public long bytes()
+                {
+                    return 1000L;
+                }
+
+                @Override
+                public String symbol()
+                {
+                    return "kB";
+                }
+            },
+            MEGABYTE
+            {
+                @Override
+                public long bytes()
+                {
+                    return KILOBYTE.bytes() * KILOBYTE.bytes();
+                }
+
+                @Override
+                public String symbol()
+                {
+                    return "MB";
+                }
+            },
+            GIGABYTE
+            {
+                @Override
+                public long bytes()
+                {
+                    return MEGABYTE.bytes() * KILOBYTE.bytes();
+                };
+
+                @Override
+                public String symbol()
+                {
+                    return "GB";
+                }
+            };
+
+            public abstract long bytes();
+            public abstract String symbol();
+
+            public static ScaleUnit getScaleUnit( long size )
+            {
+                Validate.isTrue( size >= 0, "File size cannot be negative: %s", size );
+
+                if ( size >= GIGABYTE.bytes() )
+                {
+                    return GIGABYTE;
+                }
+                else if ( size >= MEGABYTE.bytes() )
+                {
+                    return MEGABYTE;
+                }
+                else if ( size >= KILOBYTE.bytes() )
+                {
+                    return KILOBYTE;
+                }
+                else
+                {
+                    return BYTE;
+                }
+            }
         }
 
-        /** {@inheritDoc} */
-        public StringBuffer format( long fs, StringBuffer result, FieldPosition fieldPosition )
+        private DecimalFormat smallFormat;
+        private DecimalFormat largeFormat;
+
+        public FileSizeFormat( Locale locale )
         {
-            if ( fs > 1000L * 1000L * 1000L )
+            smallFormat = new DecimalFormat( "#0.0", new DecimalFormatSymbols( locale ) );
+            largeFormat = new DecimalFormat( "###0", new DecimalFormatSymbols( locale ) );
+        }
+
+        public String format( long size )
+        {
+            return format( size, null );
+        }
+
+        public String format( long size, ScaleUnit unit )
+        {
+            return format( size, unit, false );
+        }
+
+        public String format( long size, ScaleUnit unit, boolean omitSymbol )
+        {
+            Validate.isTrue( size >= 0, "File size cannot be negative: %s", size );
+
+            if ( unit == null )
             {
-                result = super.format( (float) fs / ( 1000L * 1000L * 1000L ), result, fieldPosition );
-                result.append( " GB" );
-                return result;
+                unit = ScaleUnit.getScaleUnit( size );
             }
 
-            if ( fs > 1000L * 1000L )
+            double scaledSize = (double) size / unit.bytes();
+            String scaledSymbol = " " + unit.symbol();
+
+            if ( omitSymbol )
             {
-                result = super.format( (float) fs / ( 1000L * 1000L ), result, fieldPosition );
-                result.append( " MB" );
-                return result;
+                scaledSymbol = "";
             }
 
-            if ( fs > 1000L )
+            if ( unit == ScaleUnit.BYTE )
             {
-                result = super.format( (float) fs / ( 1000L ), result, fieldPosition );
-                result.append( " kB" );
-                return result;
+                return largeFormat.format( size ) + scaledSymbol;
             }
 
-            result = super.format( fs, result, fieldPosition );
-            result.append( " B" );
-            return result;
+            if ( scaledSize < 0.05 || scaledSize >= 10.0 )
+            {
+                return largeFormat.format( scaledSize ) + scaledSymbol;
+            }
+            else
+            {
+                return smallFormat.format( scaledSize ) + scaledSymbol;
+            }
+        }
+
+        public String formatProgress( long progressedSize, long size )
+        {
+            Validate.isTrue( progressedSize >= 0L, "Progressed file size cannot be negative: %s", progressedSize );
+            Validate.isTrue( size >= 0L && progressedSize <= size || size < 0L,
+                "Progressed file size cannot be bigger than size: %s > %s", progressedSize, size );
+
+            if ( size >= 0 && progressedSize != size )
+            {
+                ScaleUnit unit = ScaleUnit.getScaleUnit( size );
+                String formattedProgressedSize = format( progressedSize, unit, true );
+                String formattedSize = format( size, unit );
+
+                return formattedProgressedSize + "/" + formattedSize;
+            }
+            else
+            {
+                return format( progressedSize );
+            }
         }
     }
 
@@ -121,7 +237,7 @@ public abstract class AbstractMavenTransferListener
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
 
-        DecimalFormat format = new FileDecimalFormat( Locale.ENGLISH );
+        FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
         String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
         String len = format.format( contentLength );
 

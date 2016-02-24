@@ -19,10 +19,9 @@ package org.apache.maven.cli.transfer;
  * under the License.
  */
 
-import java.text.DecimalFormat;
 import java.util.Locale;
 
-import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileDecimalFormat;
+import org.apache.maven.cli.transfer.AbstractMavenTransferListener.FileSizeFormat;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -71,7 +70,7 @@ public class Slf4jMavenTransferListener
         TransferResource resource = event.getResource();
         long contentLength = event.getTransferredBytes();
 
-        DecimalFormat format = new FileDecimalFormat( Locale.ENGLISH );
+        FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
         String type = ( event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploaded" : "Downloaded" );
         String len = format.format( contentLength );
 
