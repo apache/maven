@@ -21,11 +21,8 @@ package org.apache.maven.cli.configuration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
-import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.Source;
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.CliRequest;
@@ -33,7 +30,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequestPopulationException;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Repository;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.SettingsUtils;
@@ -42,7 +38,6 @@ import org.apache.maven.settings.building.SettingsBuilder;
 import org.apache.maven.settings.building.SettingsBuildingRequest;
 import org.apache.maven.settings.building.SettingsBuildingResult;
 import org.apache.maven.settings.building.SettingsProblem;
-import org.apache.maven.settings.crypto.SettingsDecrypter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
@@ -54,6 +49,7 @@ import org.slf4j.Logger;
 public class SettingsXmlConfigurationProcessor
     implements ConfigurationProcessor
 {
+
     public static final String HINT = "settings";
 
     public static final String USER_HOME = System.getProperty( "user.home" );
@@ -70,9 +66,6 @@ public class SettingsXmlConfigurationProcessor
 
     @Requirement
     private SettingsBuilder settingsBuilder;
-
-    @Requirement
-    private SettingsDecrypter settingsDecrypter;
 
     @Override
     public void process( CliRequest cliRequest )
@@ -91,8 +84,9 @@ public class SettingsXmlConfigurationProcessor
 
             if ( !userSettingsFile.isFile() )
             {
-                throw new FileNotFoundException( "The specified user settings file does not exist: "
-                    + userSettingsFile );
+                throw new FileNotFoundException( String.format( "The specified user settings file does not exist: %s",
+                                                                userSettingsFile ) );
+
             }
         }
         else
@@ -109,8 +103,9 @@ public class SettingsXmlConfigurationProcessor
 
             if ( !globalSettingsFile.isFile() )
             {
-                throw new FileNotFoundException( "The specified global settings file does not exist: "
-                    + globalSettingsFile );
+                throw new FileNotFoundException( String.format( "The specified global settings file does not exist: %s",
+                                                                globalSettingsFile ) );
+
             }
         }
         else
@@ -132,10 +127,13 @@ public class SettingsXmlConfigurationProcessor
             request.getEventSpyDispatcher().onEvent( settingsRequest );
         }
 
-        logger.debug( "Reading global settings from "
-            + getLocation( settingsRequest.getGlobalSettingsSource(), settingsRequest.getGlobalSettingsFile() ) );
-        logger.debug( "Reading user settings from "
-            + getLocation( settingsRequest.getUserSettingsSource(), settingsRequest.getUserSettingsFile() ) );
+        logger.debug( String.format( "Reading global settings from %s",
+                                     getLocation( settingsRequest.getGlobalSettingsSource(),
+                                                  settingsRequest.getGlobalSettingsFile() ) ) );
+
+        logger.debug( String.format( "Reading user settings from %s",
+                                     getLocation( settingsRequest.getUserSettingsSource(),
+                                                  settingsRequest.getUserSettingsFile() ) ) );
 
         SettingsBuildingResult settingsResult = settingsBuilder.build( settingsRequest );
 
@@ -221,43 +219,13 @@ public class SettingsXmlConfigurationProcessor
             request.addMirror( mirror );
         }
 
-        request.setActiveProfiles( settings.getActiveProfiles() );
+        request.addActiveProfiles( settings.getActiveProfiles() );
 
         for ( org.apache.maven.settings.Profile rawProfile : settings.getProfiles() )
         {
             request.addProfile( SettingsUtils.convertFromSettingsProfile( rawProfile ) );
-
-            if ( settings.getActiveProfiles().contains( rawProfile.getId() ) )
-            {
-                List<Repository> remoteRepositories = rawProfile.getRepositories();
-                for ( Repository remoteRepository : remoteRepositories )
-                {
-                    try
-                    {
-                        request.addRemoteRepository( 
-                            MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
-                    }
-                    catch ( InvalidRepositoryException e )
-                    {
-                        // do nothing for now
-                    }
-                }
-                
-                List<Repository> pluginRepositories = rawProfile.getPluginRepositories();
-                for ( Repository pluginRepository : pluginRepositories )
-                {
-                    try
-                    {
-                        request.addPluginArtifactRepository( 
-                            MavenRepositorySystem.buildArtifactRepository( pluginRepository ) );
-                    }
-                    catch ( InvalidRepositoryException e )
-                    {
-                        // do nothing for now
-                    }
-                }                
-            }
         }
+
         return request;
     }
 
@@ -290,4 +258,5 @@ public class SettingsXmlConfigurationProcessor
             return new File( workingDirectory, file.getPath() ).getAbsoluteFile();
         }
     }
+
 }

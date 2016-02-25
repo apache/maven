@@ -19,6 +19,29 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import java.io.BufferedInputStream;
+import java.io.Console;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.google.inject.AbstractModule;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
@@ -27,6 +50,8 @@ import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
+import org.apache.maven.artifact.InvalidRepositoryException;
+import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Problem;
 import org.apache.maven.building.Source;
@@ -58,7 +83,15 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.model.Profile;
+import org.apache.maven.model.Repository;
+import org.apache.maven.model.building.DefaultModelProblem;
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.apache.maven.model.building.ModelProcessor;
+import org.apache.maven.model.profile.DefaultProfileActivationContext;
+import org.apache.maven.model.profile.ProfileSelector;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
@@ -89,29 +122,6 @@ import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
-
-import java.io.BufferedInputStream;
-import java.io.Console;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.apache.maven.shared.utils.logging.MessageUtils.buffer;
 
@@ -166,6 +176,8 @@ public class MavenCli
     private DefaultSecDispatcher dispatcher;
 
     private Map<String, ConfigurationProcessor> configurationProcessors;
+
+    private ProfileSelector profileSelector;
 
     public MavenCli()
     {
@@ -288,6 +300,7 @@ public class MavenCli
             encryption( cliRequest );
             repository( cliRequest );
             resolution( cliRequest );
+            profiles( cliRequest );
             return execute( cliRequest );
         }
         catch ( ExitException e )
@@ -687,6 +700,8 @@ public class MavenCli
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
 
+        profileSelector = container.lookup( ProfileSelector.class );
+
         return container;
     }
 
@@ -750,6 +765,10 @@ public class MavenCli
                 request = populateRequest( cliRequest, request );
 
                 request = executionRequestPopulator.populateDefaults( request );
+
+                profileSelector = container.lookup( ProfileSelector.class );
+
+                profiles( request );
 
                 BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
 
@@ -940,8 +959,8 @@ public class MavenCli
     private void repository( CliRequest cliRequest )
         throws Exception
     {
-        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY ) || Boolean.getBoolean(
-            "maven.legacyLocalRepo" ) )
+        if ( cliRequest.commandLine.hasOption( CLIManager.LEGACY_LOCAL_REPOSITORY )
+                 || Boolean.getBoolean( "maven.legacyLocalRepo" ) )
         {
             cliRequest.request.setUseLegacyLocalRepository( true );
         }
@@ -954,6 +973,97 @@ public class MavenCli
                  || Boolean.getBoolean( "maven.legacyReactorResolution" ) )
         {
             cliRequest.request.setUseLegacyReactorResolution( true );
+        }
+    }
+
+    private void profiles( final CliRequest request )
+    {
+        this.profiles( request.getRequest() );
+    }
+
+    private void profiles( final MavenExecutionRequest request )
+    {
+        // Adds repositories from profiles.
+        final DefaultProfileActivationContext profileActivationContext = new DefaultProfileActivationContext();
+        profileActivationContext.setActiveProfileIds( request.getActiveProfiles() );
+        profileActivationContext.setInactiveProfileIds( request.getInactiveProfiles() );
+        profileActivationContext.setSystemProperties( request.getSystemProperties() );
+        profileActivationContext.setUserProperties( request.getUserProperties() );
+        profileActivationContext.setProjectDirectory( request.getPom() != null
+                                                          ? request.getPom().getParentFile()
+                                                          : null );
+
+        final List<ModelProblem> modelProblems = new ArrayList<>();
+        final List<Profile> activeProfiles =
+            this.profileSelector.getActiveProfiles( request.getProfiles(), profileActivationContext,
+                                                    new ModelProblemCollector()
+                                                    {
+
+                                                        @Override
+                                                        public void add( final ModelProblemCollectorRequest req )
+                                                        {
+                                                            modelProblems.add( new DefaultModelProblem(
+                                                                    req.getMessage(), req.getSeverity(),
+                                                                    req.getVersion(), Profile.SOURCE_SETTINGS, -1, -1,
+                                                                    null, req.getException() ) );
+
+                                                        }
+
+                                                    } );
+
+        if ( !modelProblems.isEmpty() )
+        {
+            slf4jLogger.warn( "" );
+            slf4jLogger.warn( "Some problems were encountered while processing profiles" );
+
+            for ( final ModelProblem problem : modelProblems )
+            {
+                slf4jLogger.warn( problem.getMessage(), problem.getException() );
+            }
+
+            slf4jLogger.warn( "" );
+        }
+
+        if ( !activeProfiles.isEmpty() )
+        {
+            for ( final Profile profile : activeProfiles )
+            {
+                final List<Repository> remoteRepositories = profile.getRepositories();
+
+                for ( final Repository remoteRepository : remoteRepositories )
+                {
+                    try
+                    {
+                        request.addRemoteRepository(
+                            MavenRepositorySystem.buildArtifactRepository( remoteRepository ) );
+
+                    }
+                    catch ( final InvalidRepositoryException e )
+                    {
+                        slf4jLogger.warn( String.format( "Failure adding repository '%s' from profile '%s'.",
+                                                         remoteRepository.getId(), profile.getId() ), e );
+
+                    }
+                }
+
+                final List<Repository> pluginRepositories = profile.getPluginRepositories();
+
+                for ( final Repository pluginRepository : pluginRepositories )
+                {
+                    try
+                    {
+                        request.addPluginArtifactRepository(
+                            MavenRepositorySystem.buildArtifactRepository( pluginRepository ) );
+
+                    }
+                    catch ( InvalidRepositoryException e )
+                    {
+                        slf4jLogger.warn( String.format( "Failure adding plugin repository '%s' from profile '%s'.",
+                                                         pluginRepository.getId(), profile.getId() ), e );
+
+                    }
+                }
+            }
         }
     }
 

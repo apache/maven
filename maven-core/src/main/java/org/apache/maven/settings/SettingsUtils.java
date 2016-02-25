@@ -139,7 +139,7 @@ public final class SettingsUtils
 
         profile.setId( settingsProfile.getId() );
 
-        profile.setSource( "settings.xml" );
+        profile.setSource( org.apache.maven.model.Profile.SOURCE_SETTINGS );
 
         Activation settingsActivation = settingsProfile.getActivation();
 
