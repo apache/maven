@@ -280,9 +280,9 @@ public class MavenCli
             properties( cliRequest );
             localContainer = container( cliRequest );
             commands( cliRequest );
+            populateRequest( cliRequest );
             configure( cliRequest );
             toolchains( cliRequest );
-            populateRequest( cliRequest );
             encryption( cliRequest );
             repository( cliRequest );
             return execute( cliRequest );
