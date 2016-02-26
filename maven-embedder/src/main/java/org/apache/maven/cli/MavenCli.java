@@ -296,6 +296,7 @@ public class MavenCli
             populateRequest( cliRequest );
             encryption( cliRequest );
             repository( cliRequest );
+            profiles( cliRequest );
             return execute( cliRequest );
         }
         catch ( ExitException e )
@@ -670,6 +671,10 @@ public class MavenCli
 
                 request = executionRequestPopulator.populateDefaults( request );
 
+                profileSelector = container.lookup( ProfileSelector.class );
+
+                profiles( request );
+
                 BootstrapCoreExtensionManager resolver = container.lookup( BootstrapCoreExtensionManager.class );
 
                 return Collections.unmodifiableList( resolver.loadCoreExtensions( request, providedArtifacts,
@@ -866,9 +871,16 @@ public class MavenCli
         {
             cliRequest.request.setUseLegacyLocalRepository( true );
         }
+    }
 
-        // Adds repositories from settings profiles.
-        final MavenExecutionRequest request = cliRequest.getRequest();
+    private void profiles( final CliRequest request )
+    {
+        this.profiles( request.getRequest() );
+    }
+
+    private void profiles( final MavenExecutionRequest request )
+    {
+        // Adds repositories from profiles.
         final DefaultProfileActivationContext profileActivationContext = new DefaultProfileActivationContext();
         profileActivationContext.setActiveProfileIds( request.getActiveProfiles() );
         profileActivationContext.setInactiveProfileIds( request.getInactiveProfiles() );
