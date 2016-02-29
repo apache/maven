@@ -2912,19 +2912,6 @@
           <description>The build lifecycle phase to bind the goals in this execution to. If omitted,
             the goals will be bound to the default phase specified by the plugin. </description>
         </field>
-        <field xml.transient="true">
-          <name>priority</name>
-          <version>4.0.0+</version>
-          <type>int</type>
-          <description>
-            <![CDATA[
-            The priority of this execution compared to other executions which are bound to the same phase.
-            <strong>Warning:</strong> This is an internal utility property that is only public for technical reasons,
-            it is not part of the public API. In particular, this property can be changed or deleted without prior
-            notice.
-            ]]>
-          </description>
-        </field>
         <field>
           <name>goals</name>
           <version>4.0.0+</version>
