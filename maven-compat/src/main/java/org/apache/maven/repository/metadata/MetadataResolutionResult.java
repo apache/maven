@@ -115,11 +115,7 @@ public class MetadataResolutionResult
         {
             return conflictResolver.resolveConflicts( getGraph(), ArtifactScopeEnum.runtime );
         }
-        else if ( requestType.equals( MetadataResolutionRequestTypeEnum.classpathRuntime ) )
-        {
-            return conflictResolver.resolveConflicts( getGraph(), ArtifactScopeEnum.test );
-        }
-        else if ( requestType.equals( MetadataResolutionRequestTypeEnum.classpathRuntime ) )
+        else if ( requestType.equals( MetadataResolutionRequestTypeEnum.classpathTest ) )
         {
             return conflictResolver.resolveConflicts( getGraph(), ArtifactScopeEnum.test );
         }
