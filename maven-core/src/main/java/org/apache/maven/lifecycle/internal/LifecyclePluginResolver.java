@@ -19,6 +19,9 @@ package org.apache.maven.lifecycle.internal;
  * under the License.
  */
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginManagement;
@@ -29,9 +32,6 @@ import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @since 3.0
@@ -45,7 +45,6 @@ public class LifecyclePluginResolver
 {
     @Requirement
     private PluginVersionResolver pluginVersionResolver;
-
 
     public LifecyclePluginResolver( PluginVersionResolver pluginVersionResolver )
     {
@@ -65,9 +64,8 @@ public class LifecyclePluginResolver
         {
             if ( plugin.getVersion() == null )
             {
-                PluginVersionRequest request =
-                    new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
-                                                     project.getRemotePluginRepositories() );
+                PluginVersionRequest request = new DefaultPluginVersionRequest( plugin, session.getRepositorySession(),
+                                                                                project.getRemotePluginRepositories() );
                 plugin.setVersion( pluginVersionResolver.resolve( request ).getVersion() );
             }
             versions.put( plugin.getKey(), plugin.getVersion() );
