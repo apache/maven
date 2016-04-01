@@ -87,8 +87,6 @@ public class DefaultPluginVersionResolver
     public PluginVersionResult resolve( PluginVersionRequest request )
         throws PluginVersionResolutionException
     {
-        logger.debug( "Resolving plugin version for " + request.getGroupId() + ":" + request.getArtifactId() );
-
         PluginVersionResult result = resolveFromProject( request );
 
         if ( result == null )
@@ -103,8 +101,8 @@ public class DefaultPluginVersionResolver
         }
         else if ( logger.isDebugEnabled() )
         {
-            logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId()
-                + " to " + result.getVersion() + " from POM " + request.getPom() );
+            logger.debug( "Resolved plugin version for " + request.getGroupId() + ":" + request.getArtifactId() + " to "
+                + result.getVersion() + " from POM " + request.getPom() );
         }
 
         return result;
