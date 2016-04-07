@@ -61,11 +61,11 @@ public class JdkVersionProfileActivatorTest
     {
         Profile p = new Profile();
 
-        assertActivation( false, p, newContext( null, null ) );
+        assertActivation( false, p, newContext( null, null, null ) );
 
         p.setActivation( new Activation() );
 
-        assertActivation( false, p, newContext( null, null ) );
+        assertActivation( false, p, newContext( null, null, null ) );
     }
 
     public void testPrefix()
@@ -73,14 +73,14 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "1.4" );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.4" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.4.2" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.4.2_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.4.2_09-b03" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.4" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.4.2" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.4.2_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.4.2_09-b03" ), null ) );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.3" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3" ), null ) );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.5" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.5" ), null ) );
     }
 
     public void testPrefixNegated()
@@ -88,14 +88,14 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "!1.4" );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.4" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09-b03" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09-b03" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.3" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.3" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5" ), null ) );
     }
 
     public void testVersionRangeInclusiveBounds()
@@ -103,21 +103,21 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "[1.5,1.6]" );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.4" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09-b03" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09-b03" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.6" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.6.0" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09-b03" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6.0" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09-b03" ), null ) );
     }
 
     public void testVersionRangeExclusiveBounds()
@@ -125,22 +125,22 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "(1.3,1.6)" );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.3" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.3.0" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.3.0_09" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.3.0_09-b03" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3.0" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3.0_09" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.3.0_09-b03" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.3.1" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.3.1_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.3.1_09-b03" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.3.1" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.3.1_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.3.1_09-b03" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ), null ) );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.6" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.6" ), null ) );
     }
 
     public void testVersionRangeInclusiveLowerBound()
@@ -148,21 +148,21 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "[1.5,)" );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.4" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09-b03" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.4.2_09-b03" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ), null ) );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.6" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.6.0" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09-b03" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6.0" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.6.0_09-b03" ), null ) );
     }
 
     public void testVersionRangeExclusiveUpperBound()
@@ -170,16 +170,16 @@ public class JdkVersionProfileActivatorTest
     {
         Profile profile = newProfile( "(,1.6)" );
 
-        assertActivation( true, profile, newContext( null, newProperties( "1.5" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ) ) );
-        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ) ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.0_09-b03" ), null ) );
+        assertActivation( true, profile, newContext( null, newProperties( "1.5.1" ), null ) );
 
-        assertActivation( false, profile, newContext( null, newProperties( "1.6" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.6.0" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.6.0_09" ) ) );
-        assertActivation( false, profile, newContext( null, newProperties( "1.6.0_09-b03" ) ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.6" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.6.0" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.6.0_09" ), null ) );
+        assertActivation( false, profile, newContext( null, newProperties( "1.6.0_09-b03" ), null ) );
     }
 
 }

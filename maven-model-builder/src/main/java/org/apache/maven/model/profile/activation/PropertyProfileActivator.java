@@ -80,6 +80,10 @@ public class PropertyProfileActivator
         {
             sysValue = context.getSystemProperties().get( name );
         }
+        if ( sysValue == null )
+        {
+            sysValue = context.getProjectProperties().get( name );
+        }
 
         String propValue = property.getValue();
         if ( StringUtils.isNotEmpty( propValue ) )
@@ -90,9 +94,23 @@ public class PropertyProfileActivator
                 reverseValue = true;
                 propValue = propValue.substring( 1 );
             }
+            boolean regexValue = false;
+            if ( propValue.startsWith( "~" ) )
+            {
+                regexValue = true;
+                propValue = propValue.substring( 1 );
+            }
 
             // we have a value, so it has to match the system value...
-            boolean result = propValue.equals( sysValue );
+            boolean result;
+            if ( regexValue )
+            {
+                result = sysValue != null && sysValue.matches( propValue );
+            }
+            else
+            {
+                result = propValue.equals( sysValue );
+            }
 
             return reverseValue ? !result : result;
         }

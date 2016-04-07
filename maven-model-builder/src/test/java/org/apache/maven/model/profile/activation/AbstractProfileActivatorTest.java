@@ -69,10 +69,10 @@ public abstract class AbstractProfileActivatorTest<T extends ProfileActivator>
         super.tearDown();
     }
 
-    protected ProfileActivationContext newContext( final Properties userProperties, final Properties systemProperties )
+    protected ProfileActivationContext newContext( final Properties userProperties, final Properties systemProperties, final Properties projectProperties )
     {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext();
-        return context.setUserProperties( userProperties ).setSystemProperties( systemProperties );
+        return context.setUserProperties( userProperties ).setSystemProperties( systemProperties ).setProjectProperties( projectProperties );
     }
 
     protected void assertActivation( boolean active, Profile profile, ProfileActivationContext context )
