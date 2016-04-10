@@ -188,7 +188,7 @@ Maven Model Builder
 | <<<env.*>>>\
 <<<*>>> | environment variables | <<<$\{env.PATH\}>>> |
 *----+------+------+
-| <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.xml/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
+| <<<settings.*>>> | Local user settings (see {{{../maven-settings/settings.html}settings reference}}) | <<<$\{settings.localRepository\}>>> |
 *----+------+------+
 
 **  Notice
