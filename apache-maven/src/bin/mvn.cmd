@@ -1,4 +1,3 @@
-@REM ----------------------------------------------------------------------------
 @REM Licensed to the Apache Software Foundation (ASF) under one
 @REM or more contributor license agreements.  See the NOTICE file
 @REM distributed with this work for additional information
@@ -15,23 +14,18 @@
 @REM KIND, either express or implied.  See the License for the
 @REM specific language governing permissions and limitations
 @REM under the License.
-@REM ----------------------------------------------------------------------------
 
-@REM ----------------------------------------------------------------------------
-@REM Maven2 Start Up Batch script
+@REM -----------------------------------------------------------------------------
+@REM Apache Maven Startup Script
 @REM
-@REM Required ENV vars:
-@REM JAVA_HOME - location of a JDK home dir
+@REM Environment Variable Prerequisites
 @REM
-@REM Optional ENV vars
-@REM M2_HOME - location of maven2's installed home dir
-@REM MAVEN_BATCH_ECHO - set to 'on' to enable the echoing of the batch commands
-@REM MAVEN_BATCH_PAUSE - set to 'on' to wait for a key stroke before ending
-@REM MAVEN_OPTS - parameters passed to the Java VM when running Maven
-@REM     e.g. to debug Maven itself, use
-@REM set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
-@REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
-@REM ----------------------------------------------------------------------------
+@REM   JAVA_HOME          Must point at your Java Development Kit installation.
+@REM   MAVEN_BATCH_ECHO  (Optional) Set to 'on' to enable the echoing of the batch commands.
+@REM   MAVEN_BATCH_PAUSE (Optional) set to 'on' to wait for a key stroke before ending.
+@REM   MAVEN_OPTS        (Optional) Java runtime options used when Maven is executed.
+@REM   MAVEN_SKIP_RC     (Optional) Flag to disable loading of mavenrc files.
+@REM -----------------------------------------------------------------------------
 
 @REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
 @echo off
@@ -74,34 +68,19 @@ echo.
 goto error
 
 :chkMHome
-if not "%M2_HOME%"=="" goto valMHome
-
-SET "M2_HOME=%~dp0.."
-if not "%M2_HOME%"=="" goto valMHome
-
-echo.
-echo Error: M2_HOME not found in your environment. >&2
-echo Please set the M2_HOME variable in your environment to match the >&2
-echo location of the Maven installation. >&2
-echo.
+set "MAVEN_HOME=%~dp0.."
+if not "%MAVEN_HOME%"=="" goto valMHome
 goto error
 
 :valMHome
 
 :stripMHome
-if not "_%M2_HOME:~-1%"=="_\" goto checkMCmd
-set "M2_HOME=%M2_HOME:~0,-1%"
+if not "_%MAVEN_HOME:~-1%"=="_\" goto checkMCmd
+set "MAVEN_HOME=%MAVEN_HOME:~0,-1%"
 goto stripMHome
 
 :checkMCmd
-if exist "%M2_HOME%\bin\mvn.cmd" goto init
-
-echo.
-echo Error: M2_HOME is set to an invalid directory. >&2
-echo M2_HOME = "%M2_HOME%" >&2
-echo Please set the M2_HOME variable in your environment to match the >&2
-echo location of the Maven installation >&2
-echo.
+if exist "%MAVEN_HOME%\bin\mvn.cmd" goto init
 goto error
 @REM ==== END VALIDATION ====
 
@@ -109,19 +88,19 @@ goto error
 
 set MAVEN_CMD_LINE_ARGS=%*
 
-@REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
+@REM Find the project basedir, i.e., the directory that contains the folder ".mvn".
 @REM Fallback to current working directory if not found.
 
 set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
-IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
+if not "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
 
 set "EXEC_DIR=%CD%"
 set "WDIR=%EXEC_DIR%"
 
 :findBaseDir
-IF EXIST "%WDIR%\.mvn" goto baseDirFound
+if exist "%WDIR%\.mvn" goto baseDirFound
 cd ..
-IF "%WDIR%"=="%CD%" goto baseDirNotFound
+if "%WDIR%"=="%CD%" goto baseDirNotFound
 set "WDIR=%CD%"
 goto findBaseDir
 
@@ -138,7 +117,7 @@ cd "%EXEC_DIR%"
 :endDetectBaseDir
 
 set "jvmConfig=\.mvn\jvm.config"
-IF NOT EXIST "%MAVEN_PROJECTBASEDIR%%jvmConfig%"  goto endReadAdditionalConfig
+if not exist "%MAVEN_PROJECTBASEDIR%%jvmConfig%"  goto endReadAdditionalConfig
 
 @setlocal EnableExtensions EnableDelayedExpansion
 for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
@@ -146,13 +125,13 @@ for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do s
 
 :endReadAdditionalConfig
 
-SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
+set MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 
-for %%i in ("%M2_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
+for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
 
 set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
-%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%M2_HOME%\bin\m2.conf" "-Dmaven.home=%M2_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
+%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %CLASSWORLDS_JAR% "-Dclassworlds.conf=%MAVEN_HOME%\bin\m2.conf" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %CLASSWORLDS_LAUNCHER% %MAVEN_CMD_LINE_ARGS%
 if ERRORLEVEL 1 goto error
 goto end
 
