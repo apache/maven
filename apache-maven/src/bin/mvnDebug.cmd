@@ -1,4 +1,3 @@
-@REM ----------------------------------------------------------------------------
 @REM Licensed to the Apache Software Foundation (ASF) under one
 @REM or more contributor license agreements.  See the NOTICE file
 @REM distributed with this work for additional information
@@ -15,15 +14,18 @@
 @REM KIND, either express or implied.  See the License for the
 @REM specific language governing permissions and limitations
 @REM under the License.
-@REM ----------------------------------------------------------------------------
 
-@REM ----------------------------------------------------------------------------
-@REM Maven2 Start Up Batch script to run mvn.cmd with the following additional
-@REM Java VM settings:
+@REM -----------------------------------------------------------------------------
+@REM Apache Maven Debug Script
 @REM
-@REM     -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+@REM Environment Variable Prerequisites
 @REM
-@REM ----------------------------------------------------------------------------
+@REM   JAVA_HOME          Must point at your Java Development Kit installation.
+@REM   MAVEN_BATCH_ECHO  (Optional) Set to 'on' to enable the echoing of the batch commands.
+@REM   MAVEN_BATCH_PAUSE (Optional) set to 'on' to wait for a key stroke before ending.
+@REM   MAVEN_OPTS        (Optional) Java runtime options used when Maven is executed.
+@REM   MAVEN_SKIP_RC     (Optional) Flag to disable loading of mavenrc files.
+@REM -----------------------------------------------------------------------------
 
 @setlocal
 @set MAVEN_DEBUG_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000

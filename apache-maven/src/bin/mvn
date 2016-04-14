@@ -1,5 +1,5 @@
 #!/bin/sh
-# ----------------------------------------------------------------------------
+
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,23 +16,16 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-# ----------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------
-# Maven2 Start Up Batch script
+# -----------------------------------------------------------------------------
+# Apache Maven Startup Script
 #
-# Required ENV vars:
-# ------------------
-#   JAVA_HOME - location of a JDK home dir
+# Environment Variable Prerequisites
 #
-# Optional ENV vars
-# -----------------
-#   M2_HOME - location of maven2's installed home dir
-#   MAVEN_OPTS - parameters passed to the Java VM when running Maven
-#     e.g. to debug Maven itself, use
-#       set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
-#   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
-# ----------------------------------------------------------------------------
+#   JAVA_HOME       Must point at your Java Development Kit installation.
+#   MAVEN_OPTS      (Optional) Java runtime options used when Maven is executed.
+#   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
+# -----------------------------------------------------------------------------
 
 if [ -z "$MAVEN_SKIP_RC" ] ; then
 
@@ -46,12 +39,12 @@ if [ -z "$MAVEN_SKIP_RC" ] ; then
 
 fi
 
-# OS specific support.  $var _must_ be set to either true or false.
+# OS specific support. $var _must_ be set to either true or false.
 cygwin=false;
 darwin=false;
-mingw=false
+mingw=false;
 case "`uname`" in
-  CYGWIN*) cygwin=true ;;
+  CYGWIN*) cygwin=true;;
   MINGW*) mingw=true;;
   Darwin*) darwin=true
            #
@@ -94,46 +87,43 @@ if [ -z "$JAVA_HOME" ] ; then
   fi
 fi
 
-if [ -z "$M2_HOME" ] ; then
-  ## resolve links - $0 may be a link to maven's home
-  PRG="$0"
+## resolve links - $0 may be a link to Maven's home
+PRG="$0"
 
-  # need this for relative symlinks
-  while [ -h "$PRG" ] ; do
-    ls=`ls -ld "$PRG"`
-    link=`expr "$ls" : '.*-> \(.*\)$'`
-    if expr "$link" : '/.*' > /dev/null; then
-      PRG="$link"
-    else
-      PRG="`dirname "$PRG"`/$link"
-    fi
-  done
+# need this for relative symlinks
+while [ -h "$PRG" ] ; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG="`dirname "$PRG"`/$link"
+  fi
+done
 
-  saveddir=`pwd`
+saveddir=`pwd`
 
-  M2_HOME=`dirname "$PRG"`/..
+MAVEN_HOME=`dirname "$PRG"`/..
 
-  # make it fully qualified
-  M2_HOME=`cd "$M2_HOME" && pwd`
+# make it fully qualified
+MAVEN_HOME=`cd "$MAVEN_HOME" && pwd`
 
-  cd "$saveddir"
-  # echo Using m2 at $M2_HOME
-fi
+cd "$saveddir"
 
-# For Cygwin, ensure paths are in UNIX format before anything is touched
+# For Cygwin, ensure paths are in Unix format before anything is touched
 if $cygwin ; then
-  [ -n "$M2_HOME" ] &&
-    M2_HOME=`cygpath --unix "$M2_HOME"`
+  [ -n "$MAVEN_HOME" ] &&
+    MAVEN_HOME=`cygpath --unix "$MAVEN_HOME"`
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
   [ -n "$CLASSPATH" ] &&
     CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
 fi
 
-# For Migwn, ensure paths are in UNIX format before anything is touched
+# For MinGW, ensure paths are in Unix format before anything is touched
 if $mingw ; then
-  [ -n "$M2_HOME" ] &&
-    M2_HOME="`(cd "$M2_HOME"; pwd)`"
+  [ -n "$MAVEN_HOME" ] &&
+    MAVEN_HOME="`(cd "$MAVEN_HOME"; pwd)`"
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME="`(cd "$JAVA_HOME"; pwd)`"
   # TODO classpath?
@@ -182,13 +172,13 @@ if [ -z "$JAVA_HOME" ] ; then
   echo "Warning: JAVA_HOME environment variable is not set."
 fi
 
-CLASSWORLDS_JAR=`echo "${M2_HOME}"/boot/plexus-classworlds-*.jar`
+CLASSWORLDS_JAR=`echo "${MAVEN_HOME}"/boot/plexus-classworlds-*.jar`
 CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
 # For Cygwin, switch paths to Windows format before running java
-if $cygwin; then
-  [ -n "$M2_HOME" ] &&
-    M2_HOME=`cygpath --path --windows "$M2_HOME"`
+if $cygwin ; then
+  [ -n "$MAVEN_HOME" ] &&
+    MAVEN_HOME=`cygpath --path --windows "$MAVEN_HOME"`
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --path --windows "$JAVA_HOME"`
   [ -n "$CLASSPATH" ] &&
@@ -225,8 +215,8 @@ MAVEN_PROJECTBASEDIR="${MAVEN_BASEDIR:-$(find_maven_basedir)}"
 MAVEN_OPTS="$(concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config") $MAVEN_OPTS"
 
 # For Cygwin, switch project base directory path to Windows format before
-# executing Maven. Otherwise this will cause Maven not to consider it.
-if $cygwin; then
+# executing Maven otherwise this will cause Maven not to consider it.
+if $cygwin ; then
   [ -n "$MAVEN_PROJECTBASEDIR" ] &&
   MAVEN_PROJECTBASEDIR=`cygpath --path --windows "$MAVEN_PROJECTBASEDIR"`
 fi
@@ -242,7 +232,7 @@ exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
   -classpath "${CLASSWORLDS_JAR}" \
-  "-Dclassworlds.conf=${M2_HOME}/bin/m2.conf" \
-  "-Dmaven.home=${M2_HOME}" "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
+  "-Dclassworlds.conf=${MAVEN_HOME}/bin/m2.conf" \
+  "-Dmaven.home=${MAVEN_HOME}" "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
   "-Dlibrary.jansi.path=${MAVEN_HOME}/lib/ext" \
   ${CLASSWORLDS_LAUNCHER} "$@"
