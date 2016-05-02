@@ -80,17 +80,6 @@ Artifact handlers are required by the dependency resolution mechanism.
         <addedToClasspath>true</addedToClasspath>
       </configuration>
     </component>
-    <component>
-      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
-      <role-hint>ejb3</role-hint>
-      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
-      <configuration>
-        <type>ejb3</type>
-        <includesDependencies>true</includesDependencies>
-        <language>java</language>
-        <addedToClasspath>false</addedToClasspath>
-      </configuration>
-    </component>
 
     <!--
      | TEST JAR
