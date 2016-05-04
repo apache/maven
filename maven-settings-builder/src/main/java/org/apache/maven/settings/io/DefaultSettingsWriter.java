@@ -64,8 +64,10 @@ public class DefaultSettingsWriter
 
         try
         {
-            SettingsXpp3Writer w = new SettingsXpp3Writer();
-            w.write( output, settings );
+            new SettingsXpp3Writer().write( output, settings );
+
+            output.close();
+            output = null;
         }
         finally
         {
@@ -80,20 +82,14 @@ public class DefaultSettingsWriter
         Validate.notNull( output, "output cannot be null" );
         Validate.notNull( settings, "settings cannot be null" );
 
-        try
+        String encoding = settings.getModelEncoding();
+        // TODO Use StringUtils here
+        if ( encoding == null || encoding.length() <= 0 )
         {
-            String encoding = settings.getModelEncoding();
-            // TODO Use StringUtils here
-            if ( encoding == null || encoding.length() <= 0 )
-            {
-                encoding = "UTF-8";
-            }
-            write( new OutputStreamWriter( output, encoding ), options, settings );
+            encoding = "UTF-8";
         }
-        finally
-        {
-            IOUtil.close( output );
-        }
+
+        write( new OutputStreamWriter( output, encoding ), options, settings );
     }
 
 }

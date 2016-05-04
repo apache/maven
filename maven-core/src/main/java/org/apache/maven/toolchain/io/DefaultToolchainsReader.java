@@ -64,8 +64,13 @@ public class DefaultToolchainsReader
 
         try
         {
-            MavenToolchainsXpp3Reader r = new MavenToolchainsXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            final PersistedToolchains persistedToolchains =
+                new MavenToolchainsXpp3Reader().read( input, isStrict( options ) );
+
+            input.close();
+            input = null;
+
+            return persistedToolchains;
         }
         catch ( XmlPullParserException e )
         {
@@ -85,8 +90,13 @@ public class DefaultToolchainsReader
 
         try
         {
-            MavenToolchainsXpp3Reader r = new MavenToolchainsXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            final PersistedToolchains persistedToolchains =
+                new MavenToolchainsXpp3Reader().read( input, isStrict( options ) );
+
+            input.close();
+            input = null;
+
+            return persistedToolchains;
         }
         catch ( XmlPullParserException e )
         {

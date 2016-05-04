@@ -62,8 +62,12 @@ public class DefaultSettingsReader
 
         try
         {
-            SettingsXpp3Reader r = new SettingsXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            final Settings settings = new SettingsXpp3Reader().read( input, isStrict( options ) );
+
+            input.close();
+            input = null;
+
+            return settings;
         }
         catch ( XmlPullParserException e )
         {
@@ -83,8 +87,12 @@ public class DefaultSettingsReader
 
         try
         {
-            SettingsXpp3Reader r = new SettingsXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            final Settings settings = new SettingsXpp3Reader().read( input, isStrict( options ) );
+
+            input.close();
+            input = null;
+
+            return settings;
         }
         catch ( XmlPullParserException e )
         {

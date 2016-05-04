@@ -60,8 +60,12 @@ public class DefaultMetadataReader
 
         try
         {
-            MetadataXpp3Reader r = new MetadataXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            final Metadata metadata = new MetadataXpp3Reader().read( input, isStrict( options ) );
+
+            input.close();
+            input = null;
+
+            return metadata;
         }
         catch ( XmlPullParserException e )
         {
@@ -80,8 +84,12 @@ public class DefaultMetadataReader
 
         try
         {
-            MetadataXpp3Reader r = new MetadataXpp3Reader();
-            return r.read( input, isStrict( options ) );
+            final Metadata metadata = new MetadataXpp3Reader().read( input, isStrict( options ) );
+
+            input.close();
+            input = null;
+
+            return metadata;
         }
         catch ( XmlPullParserException e )
         {

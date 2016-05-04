@@ -26,7 +26,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.aether.RepositoryCache;
 import org.eclipse.aether.RepositoryEvent;
@@ -338,8 +337,13 @@ public class DefaultVersionResolver
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
                         fis = new FileInputStream( metadata.getFile() );
+
                         org.apache.maven.artifact.repository.metadata.Metadata m =
                             new MetadataXpp3Reader().read( fis, false );
+
+                        fis.close();
+                        fis = null;
+
                         versioning = m.getVersioning();
 
                         /*
@@ -374,7 +378,17 @@ public class DefaultVersionResolver
         }
         finally
         {
-            IOUtil.close( fis );
+            try
+            {
+                if ( fis != null )
+                {
+                    fis.close();
+                }
+            }
+            catch ( final IOException e )
+            {
+                this.logger.warn( "Failure closing file.", e );
+            }
         }
 
         return ( versioning != null ) ? versioning : new Versioning();
