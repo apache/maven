@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
@@ -56,29 +56,19 @@ import org.codehaus.plexus.interpolation.ValueSource;
 public abstract class AbstractStringBasedModelInterpolator
     implements ModelInterpolator
 {
-    private static final List<String> PROJECT_PREFIXES = Arrays.asList( "pom.", "project." );
+    private static final List<String> PROJECT_PREFIXES =
+        Collections.unmodifiableList( Arrays.asList( "pom.", "project." ) );
 
-    private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
-
-    static
-    {
-        Collection<String> translatedPrefixes = new HashSet<>();
-
-        // MNG-1927, MNG-2124, MNG-3355:
-        // If the build section is present and the project directory is non-null, we should make
-        // sure interpolation of the directories below uses translated paths.
-        // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
-        // code below...
-        translatedPrefixes.add( "build.directory" );
-        translatedPrefixes.add( "build.outputDirectory" );
-        translatedPrefixes.add( "build.testOutputDirectory" );
-        translatedPrefixes.add( "build.sourceDirectory" );
-        translatedPrefixes.add( "build.testSourceDirectory" );
-        translatedPrefixes.add( "build.scriptSourceDirectory" );
-        translatedPrefixes.add( "reporting.outputDirectory" );
-
-        TRANSLATED_PATH_EXPRESSIONS = translatedPrefixes;
-    }
+    // MNG-1927, MNG-2124, MNG-3355:
+    // If the build section is present and the project directory is non-null, we should make
+    // sure interpolation of the directories below uses translated paths.
+    // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
+    // code below...
+    private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS =
+        Collections.unmodifiableList( Arrays.asList( "build.directory", "build.outputDirectory",
+                                                     "build.testOutputDirectory", "build.sourceDirectory",
+                                                     "build.testSourceDirectory", "build.scriptSourceDirectory",
+                                                     "reporting.outputDirectory" ) );
 
     @Requirement
     private PathTranslator pathTranslator;
