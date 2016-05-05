@@ -22,10 +22,10 @@ package org.apache.maven.model.interpolation;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -48,6 +48,8 @@ import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.ValueSource;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
  *
@@ -64,11 +66,10 @@ public abstract class AbstractStringBasedModelInterpolator
     // sure interpolation of the directories below uses translated paths.
     // Afterward, we'll double back and translate any paths that weren't covered during interpolation via the
     // code below...
-    private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS =
-        Collections.unmodifiableList( Arrays.asList( "build.directory", "build.outputDirectory",
-                                                     "build.testOutputDirectory", "build.sourceDirectory",
-                                                     "build.testSourceDirectory", "build.scriptSourceDirectory",
-                                                     "reporting.outputDirectory" ) );
+    private static final Set<String> TRANSLATED_PATH_EXPRESSIONS =
+        ImmutableSet.of( "build.directory", "build.outputDirectory", "build.testOutputDirectory",
+                         "build.sourceDirectory", "build.testSourceDirectory", "build.scriptSourceDirectory",
+                         "reporting.outputDirectory" );
 
     @Requirement
     private PathTranslator pathTranslator;
