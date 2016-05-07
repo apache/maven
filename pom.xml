@@ -51,7 +51,7 @@
     <junitVersion>4.12</junitVersion>
     <plexusVersion>1.6</plexusVersion>
     <plexusInterpolationVersion>1.22</plexusInterpolationVersion>
-    <plexusUtilsVersion>3.0.23</plexusUtilsVersion>
+    <plexusUtilsVersion>3.0.24</plexusUtilsVersion>
     <guavaVersion>19.0</guavaVersion>
     <guiceVersion>4.0</guiceVersion>
     <sisuInjectVersion>0.3.3</sisuInjectVersion>
