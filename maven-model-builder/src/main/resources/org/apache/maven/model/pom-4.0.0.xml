@@ -63,7 +63,7 @@ under the License.
         <directory>${project.basedir}/src/main/resources</directory>
       </resource>
       <resource>
-        <directory>${project.basedir}/src/main/filtered-resources</directory>
+        <directory>${project.basedir}/src/main/resources-filtered</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
@@ -72,7 +72,7 @@ under the License.
         <directory>${project.basedir}/src/test/resources</directory>
       </testResource>
       <testResource>
-        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <directory>${project.basedir}/src/test/resources-filtered</directory>
         <filtering>true</filtering>
       </testResource>
     </testResources>
