@@ -57,7 +57,7 @@ import org.eclipse.aether.version.VersionScheme;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -259,27 +259,23 @@ public class DefaultVersionRangeResolver
     {
         Versioning versioning = null;
 
-        FileInputStream fis = null;
         try
         {
             if ( metadata != null )
             {
-
                 try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
                 {
                     syncContext.acquire( null, Collections.singleton( metadata ) );
 
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
-                        fis = new FileInputStream( metadata.getFile() );
+                        try ( InputStream in = new FileInputStream( metadata.getFile() ) )
+                        {
+                            org.apache.maven.artifact.repository.metadata.Metadata m =
+                                new MetadataXpp3Reader().read( in, false );
 
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-
-                        fis.close();
-                        fis = null;
-
-                        versioning = m.getVersioning();
+                            versioning = m.getVersioning();
+                        }
                     }
                 }
             }
@@ -288,20 +284,6 @@ public class DefaultVersionRangeResolver
         {
             invalidMetadata( session, trace, metadata, repository, e );
             result.addException( e );
-        }
-        finally
-        {
-            try
-            {
-                if ( fis != null )
-                {
-                    fis.close();
-                }
-            }
-            catch ( final IOException e )
-            {
-                this.logger.warn( "Failure closing file.", e );
-            }
         }
 
         return ( versioning != null ) ? versioning : new Versioning();

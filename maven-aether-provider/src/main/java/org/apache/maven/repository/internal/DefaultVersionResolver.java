@@ -63,6 +63,7 @@ import javax.inject.Named;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -324,71 +325,51 @@ public class DefaultVersionResolver
     {
         Versioning versioning = null;
 
-        FileInputStream fis = null;
         try
         {
             if ( metadata != null )
             {
-
                 try ( SyncContext syncContext = syncContextFactory.newInstance( session, true ) )
                 {
                     syncContext.acquire( null, Collections.singleton( metadata ) );
 
                     if ( metadata.getFile() != null && metadata.getFile().exists() )
                     {
-                        fis = new FileInputStream( metadata.getFile() );
-
-                        org.apache.maven.artifact.repository.metadata.Metadata m =
-                            new MetadataXpp3Reader().read( fis, false );
-
-                        fis.close();
-                        fis = null;
-
-                        versioning = m.getVersioning();
-
-                        /*
-                         * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
-                         * of the local repository. This is especially troublesome during snapshot resolution so we try
-                         * to handle that gracefully.
-                         */
-                        if ( versioning != null && repository instanceof LocalRepository )
+                        try ( InputStream in = new FileInputStream( metadata.getFile() ) )
                         {
-                            if ( versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
-                            {
-                                Versioning repaired = new Versioning();
-                                repaired.setLastUpdated( versioning.getLastUpdated() );
-                                Snapshot snapshot = new Snapshot();
-                                snapshot.setLocalCopy( true );
-                                repaired.setSnapshot( snapshot );
-                                versioning = repaired;
+                            org.apache.maven.artifact.repository.metadata.Metadata m =
+                                new MetadataXpp3Reader().read( in, false );
 
-                                throw new IOException( "Snapshot information corrupted with remote repository data"
-                                                           + ", please verify that no remote repository uses the id '"
-                                                           + repository.getId() + "'" );
-                            }
+                            versioning = m.getVersioning();
                         }
                     }
                 }
+            }
+
+            /*
+             * NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
+             * of the local repository. This is especially troublesome during snapshot resolution so we try
+             * to handle that gracefully.
+             */
+            if ( versioning != null && repository instanceof LocalRepository
+                     && versioning.getSnapshot() != null && versioning.getSnapshot().getBuildNumber() > 0 )
+            {
+                Versioning repaired = new Versioning();
+                repaired.setLastUpdated( versioning.getLastUpdated() );
+                Snapshot snapshot = new Snapshot();
+                snapshot.setLocalCopy( true );
+                repaired.setSnapshot( snapshot );
+                versioning = repaired;
+
+                throw new IOException( "Snapshot information corrupted with remote repository data"
+                                           + ", please verify that no remote repository uses the id '"
+                                           + repository.getId() + "'" );
             }
         }
         catch ( Exception e )
         {
             invalidMetadata( session, trace, metadata, repository, e );
             result.addException( e );
-        }
-        finally
-        {
-            try
-            {
-                if ( fis != null )
-                {
-                    fis.close();
-                }
-            }
-            catch ( final IOException e )
-            {
-                this.logger.warn( "Failure closing file.", e );
-            }
         }
 
         return ( versioning != null ) ? versioning : new Versioning();

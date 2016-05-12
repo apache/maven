@@ -262,10 +262,8 @@ public class DefaultMavenPluginManager
     private PluginDescriptor parsePluginDescriptor( InputStream is, Plugin plugin, String descriptorLocation )
         throws PluginDescriptorParsingException
     {
-        try
+        try ( Reader reader = ReaderFactory.newXmlReader( is ) )
         {
-            Reader reader = ReaderFactory.newXmlReader( is );
-
             PluginDescriptor pluginDescriptor = builder.build( reader, descriptorLocation );
 
             return pluginDescriptor;
