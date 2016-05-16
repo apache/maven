@@ -88,8 +88,12 @@
       <artifactId>aether-transport-wagon</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <groupId>org.sonatype.gossip</groupId>
+      <artifactId>gossip-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.jansi</groupId>
+      <artifactId>jansi</artifactId>
     </dependency>
   </dependencies>
 
