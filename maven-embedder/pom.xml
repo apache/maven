@@ -89,6 +89,16 @@ under the License.
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.gossip</groupId>
+      <artifactId>gossip-slf4j</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.fusesource.jansi</groupId>
+      <artifactId>jansi</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <optional>true</optional>
