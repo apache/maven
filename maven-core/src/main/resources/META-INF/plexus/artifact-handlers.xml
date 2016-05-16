@@ -190,5 +190,18 @@ Artifact handlers are required by the dependency resolution mechanism.
       </configuration>
     </component>
 
+    <!--
+     | ZIP
+     |-->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>zip</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>zip</type>
+        <addedToClasspath>true</addedToClasspath>
+      </configuration>
+    </component>
+
   </components>
 </component-set>
