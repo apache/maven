@@ -343,8 +343,7 @@ public class MavenCli
             if ( basedirProperty == null )
             {
                 System.err.format(
-                    "-D%s system property is not set." + " Check $M2_HOME environment variable and mvn script match.",
-                    MULTIMODULE_PROJECT_DIRECTORY );
+                    "-D%s system property is not set.", MULTIMODULE_PROJECT_DIRECTORY );
                 throw new ExitException( 1 );
             }
             File basedir = basedirProperty != null ? new File( basedirProperty ) : new File( "" );
