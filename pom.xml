@@ -292,7 +292,7 @@ under the License.
       <dependency>
         <groupId>org.sonatype.gossip</groupId>
         <artifactId>gossip-slf4j</artifactId>
-        <version>1.8</version>
+        <version>1.9-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.fusesource.jansi</groupId>
