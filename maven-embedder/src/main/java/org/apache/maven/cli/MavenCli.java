@@ -467,6 +467,9 @@ public class MavenCli
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
             logFile = resolveFile( logFile, cliRequest.workingDirectory );
 
+            // HACK: disable any colorization when writing log file
+            System.setProperty( "jansi.strip", Boolean.TRUE.toString() );
+
             // redirect stdout and stderr to file
             try
             {
