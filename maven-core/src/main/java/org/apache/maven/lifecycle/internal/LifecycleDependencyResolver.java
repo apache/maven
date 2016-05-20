@@ -37,6 +37,7 @@ import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.plugin.ProjectArtifactsCache;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
 import org.apache.maven.project.DependencyResolutionResult;
@@ -75,6 +76,9 @@ public class LifecycleDependencyResolver
 
     @Inject
     private EventSpyDispatcher eventSpyDispatcher;
+    
+    @Inject
+    private ProjectArtifactsCache projectArtifactsCache;
 
     public LifecycleDependencyResolver()
     {
@@ -123,9 +127,33 @@ public class LifecycleDependencyResolver
                     throw new LifecycleExecutionException( e );
                 }
             }
-
-            Set<Artifact> artifacts =
-                getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts );
+            
+            Set<Artifact> artifacts;
+            ProjectArtifactsCache.Key cacheKey = projectArtifactsCache.createKey( project,  scopesToCollect, 
+                scopesToResolve, aggregating, session.getRepositorySession() );
+            ProjectArtifactsCache.CacheRecord recordArtifacts;
+            recordArtifacts = projectArtifactsCache.get( cacheKey );
+            
+            if ( recordArtifacts != null )
+            {
+                artifacts = recordArtifacts.artifacts;
+            }
+            else
+            {
+                try
+                {
+                    artifacts = getDependencies( project, scopesToCollect, scopesToResolve, session, aggregating, 
+                        projectArtifacts );
+                    recordArtifacts = projectArtifactsCache.put( cacheKey, artifacts );
+                }
+                catch ( LifecycleExecutionException e )
+                {
+                  projectArtifactsCache.put( cacheKey, e );
+                  projectArtifactsCache.register( project, cacheKey, recordArtifacts );
+                    throw e;
+                }
+            }
+            projectArtifactsCache.register( project, cacheKey, recordArtifacts );
 
             project.setResolvedArtifacts( artifacts );
 
