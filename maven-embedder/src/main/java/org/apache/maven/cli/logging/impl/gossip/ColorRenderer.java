@@ -27,7 +27,7 @@ import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.fusesource.jansi.Ansi.ansi;
 
 import org.sonatype.gossip.Event;
-import org.sonatype.gossip.render.PatternRenderer;
+import org.sonatype.gossip.Level;
 
 /**
  * Specialized {@link org.sonatype.gossip.render.Renderer} which is aware of basic Maven log messages to colorize.
@@ -44,20 +44,25 @@ public class ColorRenderer
         assert event != null;
         assert buff != null;
 
-        switch ( event.getLevel() )
+        Level level = event.getLevel();
+        switch ( level )
         {
             case TRACE:
             case DEBUG:
-                buff.append( ansi().a( INTENSITY_BOLD ).fg( YELLOW ).a( event.getLevel().name() ).reset() );
+                buff.append( ansi().a( INTENSITY_BOLD ).fg( YELLOW ).a( level.name() ).reset() );
                 break;
 
             case INFO:
-                buff.append( ansi().a( INTENSITY_BOLD ).fg( GREEN ).a( event.getLevel().name() ).reset() );
+                buff.append( ansi().a( INTENSITY_BOLD ).fg( GREEN ).a( level.name() ).reset() );
                 break;
 
             case WARN:
+                // Maven uses WARNING instead of WARN
+                buff.append( ansi().a( INTENSITY_BOLD ).fg( RED ).a( WARNING ).reset() );
+                break;
+
             case ERROR:
-                buff.append( ansi().a( INTENSITY_BOLD ).fg( RED ).a( event.getLevel().name() ).reset() );
+                buff.append( ansi().a( INTENSITY_BOLD ).fg( RED ).a( level.name() ).reset() );
                 break;
 
             default:
