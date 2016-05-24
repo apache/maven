@@ -21,10 +21,9 @@ package org.apache.maven.cli.logging.impl.gossip;
 
 import java.io.PrintStream;
 
+import com.planet57.gossip.listener.ConsoleListener;
 import org.fusesource.jansi.AnsiConsole;
-
-import com.planet57.gossip.Event;
-import com.planet57.gossip.listener.ListenerSupport;
+import org.fusesource.jansi.internal.CLibrary;
 
 /**
  * Specialized {@link com.planet57.gossip.listener.Listener} which is aware of ANSI streams.
@@ -33,35 +32,41 @@ import com.planet57.gossip.listener.ListenerSupport;
  * @since 3.4.0
  */
 public class ColorConsoleListener
-    extends ListenerSupport
+    extends ConsoleListener
 {
     private PrintStream out;
 
-    private PrintStream getOut()
+    /**
+     * Returns file descriptor identifier for the configured stream.
+     */
+    private int getFileno()
+    {
+        switch ( getStream() )
+        {
+            case OUT:
+                return CLibrary.STDOUT_FILENO;
+
+            case ERR:
+                return CLibrary.STDERR_FILENO;
+
+            default:
+                throw new InternalError();
+        }
+    }
+
+    /**
+     * Returns an ANSI aware wrapped stream.
+     *
+     * Needed so that jansi (limited) logic to detect supported streams is applied and copes with
+     * redirection of stream to file to strip out ANSI sequences.
+     */
+    @Override
+    protected PrintStream getOut()
     {
         if ( out == null )
         {
-            // wrapping has logic which can detect, to some limited degree, if ansi is supported and strip if needed
-            out = new PrintStream( AnsiConsole.wrapOutputStream( System.out ) );
+            out = new PrintStream( AnsiConsole.wrapOutputStream( super.getOut(), getFileno() ) );
         }
         return out;
-    }
-
-    @Override
-    public void onEvent( final Event event ) throws Exception
-    {
-        assert event != null;
-
-        if ( !isLoggable( event ) )
-        {
-            return;
-        }
-
-        PrintStream out = getOut();
-        synchronized ( out )
-        {
-            out.print( render( event ) );
-            out.flush();
-        }
     }
 }
