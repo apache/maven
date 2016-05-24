@@ -19,7 +19,7 @@ package org.apache.maven.cli.logging.impl.gossip;
  * under the License.
  */
 
-import org.sonatype.gossip.Gossip;
+import com.planet57.gossip.Gossip;
 
 import org.apache.maven.cli.logging.BaseSlf4jConfiguration;
 import org.slf4j.MavenSlf4jFriend;
@@ -33,7 +33,7 @@ import org.slf4j.MavenSlf4jFriend;
 public class GossipConfiguration
     extends BaseSlf4jConfiguration
 {
-    private org.sonatype.gossip.Level rootLevel = org.sonatype.gossip.Level.INFO;
+    private com.planet57.gossip.Level rootLevel = com.planet57.gossip.Level.INFO;
 
     @Override
     public void setRootLoggerLevel( final Level level )
@@ -41,15 +41,15 @@ public class GossipConfiguration
         switch ( level )
         {
             case DEBUG:
-                rootLevel = org.sonatype.gossip.Level.DEBUG;
+                rootLevel = com.planet57.gossip.Level.DEBUG;
                 break;
 
             case INFO:
-                rootLevel = org.sonatype.gossip.Level.INFO;
+                rootLevel = com.planet57.gossip.Level.INFO;
                 break;
 
             default:
-                rootLevel = org.sonatype.gossip.Level.ERROR;
+                rootLevel = com.planet57.gossip.Level.ERROR;
                 break;
         }
     }

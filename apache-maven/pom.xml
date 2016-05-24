@@ -92,7 +92,7 @@ under the License.
       <artifactId>aether-transport-wagon</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.gossip</groupId>
+      <groupId>com.planet57.gossip</groupId>
       <artifactId>gossip-slf4j</artifactId>
     </dependency>
     <dependency>

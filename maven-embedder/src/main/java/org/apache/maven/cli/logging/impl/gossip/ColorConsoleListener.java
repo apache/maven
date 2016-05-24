@@ -23,11 +23,11 @@ import java.io.PrintStream;
 
 import org.fusesource.jansi.AnsiConsole;
 
-import org.sonatype.gossip.Event;
-import org.sonatype.gossip.listener.ListenerSupport;
+import com.planet57.gossip.Event;
+import com.planet57.gossip.listener.ListenerSupport;
 
 /**
- * Specialized {@link org.sonatype.gossip.listener.Listener} which is aware of ANSI streams.
+ * Specialized {@link com.planet57.gossip.listener.Listener} which is aware of ANSI streams.
  *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 3.4.0

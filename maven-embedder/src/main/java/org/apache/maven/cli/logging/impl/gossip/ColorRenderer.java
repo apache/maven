@@ -26,11 +26,11 @@ import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.fusesource.jansi.Ansi.ansi;
 
-import org.sonatype.gossip.Event;
-import org.sonatype.gossip.Level;
+import com.planet57.gossip.Event;
+import com.planet57.gossip.Level;
 
 /**
- * Specialized {@link org.sonatype.gossip.render.Renderer} which is aware of basic Maven log messages to colorize.
+ * Specialized {@link com.planet57.gossip.render.Renderer} which is aware of basic Maven log messages to colorize.
  *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 3.4.0

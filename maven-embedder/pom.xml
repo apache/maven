@@ -89,7 +89,7 @@ under the License.
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.gossip</groupId>
+      <groupId>com.planet57.gossip</groupId>
       <artifactId>gossip-slf4j</artifactId>
       <optional>true</optional>
     </dependency>
