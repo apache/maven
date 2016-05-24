@@ -19,17 +19,17 @@ package org.apache.maven.cli.logging.impl.gossip;
  * under the License.
  */
 
-import org.sonatype.gossip.Event;
-import org.sonatype.gossip.Level;
+import com.planet57.gossip.Event;
+import com.planet57.gossip.Level;
 
 /**
- * Specialized {@link org.sonatype.gossip.render.PatternRenderer} to cope with Maven specifics.
+ * Specialized {@link com.planet57.gossip.render.PatternRenderer} to cope with Maven specifics.
  *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 3.4.0
  */
 public class PatternRenderer
-    extends org.sonatype.gossip.render.PatternRenderer
+    extends com.planet57.gossip.render.PatternRenderer
 {
     protected static final String WARNING = "WARNING";
 
