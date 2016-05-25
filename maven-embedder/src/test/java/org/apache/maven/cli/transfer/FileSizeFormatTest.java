@@ -221,16 +221,16 @@ public class FileSizeFormatTest {
     }
 
     @Test( expected = IllegalArgumentException.class )
-    public void testNegativeProgessedSize()
+    public void testNegativeProgressedSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
-        long negativeProgessedSize = -100L;
-        format.formatProgress( negativeProgessedSize, 10L );
+        long negativeProgressedSize = -100L;
+        format.formatProgress( negativeProgressedSize, 10L );
     }
 
     @Test( expected = IllegalArgumentException.class )
-    public void testNegativeProgessedSizeBiggerThanSize()
+    public void testNegativeProgressedSizeBiggerThanSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
