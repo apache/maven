@@ -27,7 +27,7 @@ public class DefaultMirrorSelectorTest
     extends PlexusTestCase
 {
 
-    public void testMirrorWithMirroOfPatternContainingANegationIsNotSelected()
+    public void testMirrorWithMirrorOfPatternContainingANegationIsNotSelected()
     {
         ArtifactRepository repository = new DefaultArtifactRepository( "snapshots.repo", "http://whatever", null );
         String pattern = "external:*, !snapshots.repo";
