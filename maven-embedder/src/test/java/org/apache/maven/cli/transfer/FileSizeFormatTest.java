@@ -257,16 +257,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testProgressedSizeWithZeroSize()
-    {
-         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
-
-         long _0_bytes = 0L;
-         assertEquals( "0 B", format.formatProgress( _0_bytes, _0_bytes ) );
-    }
-
-    @Test
-    public void testProgressedSizeZeroAndSizeZero()
+    public void testProgressedBothZero()
     {
          FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
