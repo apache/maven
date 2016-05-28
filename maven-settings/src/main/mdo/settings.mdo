@@ -33,7 +33,7 @@
     <p>The default location for the settings file is <i>~/.m2/settings.xml</i></p>
     <p>An XSD is available at:</p>
     <ul>
-      <li><a href="http://maven.apache.org/xsd/settings-1.0.0.xsd">http://maven.apache.org/xsd/settings-1.0.0.xsd</a>.</li>
+      <li><a href="https://maven.apache.org/xsd/settings-1.0.0.xsd">https://maven.apache.org/xsd/settings-1.0.0.xsd</a>.</li>
     </ul>
     ]]>
   </description>

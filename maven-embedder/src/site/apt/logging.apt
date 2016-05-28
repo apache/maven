@@ -31,10 +31,10 @@ Maven Logging
 * Logging API
 
  Maven uses
- {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
+ {{{https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
  Container logging API}}, like any other Plexus components, ie
- {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
- / {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
+ {{{https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
+ / {{{https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
 
  Starting with Maven 3.1.0:
 
