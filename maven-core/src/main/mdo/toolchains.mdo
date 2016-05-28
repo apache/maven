@@ -124,9 +124,9 @@
                     <description>
                     <![CDATA[Type of toolchain:<ul>
                     <li><code>jdk</code> for
-                    <a href="http://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain</a>,</li>
+                    <a href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain</a>,</li>
                     <li>other value for
-                    <a href="http://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain</a></li>
+                    <a href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain</a></li>
                     </ul>
                     ]]></description>
                     <type>String</type>

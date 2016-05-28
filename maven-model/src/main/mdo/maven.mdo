@@ -54,8 +54,8 @@
     <p>This is a reference for the Maven project descriptor used in Maven.</p>
     <p>An XSD is available at:</p>
     <ul>
-      <li><a href="http://maven.apache.org/xsd/maven-v3_0_0.xsd">http://maven.apache.org/xsd/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
-      <li><a href="http://maven.apache.org/xsd/maven-4.0.0.xsd">http://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 2.0.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-v3_0_0.xsd">https://maven.apache.org/xsd/maven-v3_0_0.xsd</a> for Maven 1.1.</li>
+      <li><a href="https://maven.apache.org/xsd/maven-4.0.0.xsd">https://maven.apache.org/xsd/maven-4.0.0.xsd</a> for Maven 2.0.</li>
     </ul>
     ]]>
   </description>
@@ -701,7 +701,7 @@
             These dependencies are used to construct a classpath for your
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
-            See <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
+            See <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
             dependency mechanism</a> for more information.
             ]]>
           </description>
@@ -1397,7 +1397,7 @@
             calculate the various classpaths used for compilation, testing, and so on.
             It also assists in determining which artifacts to include in a distribution of
             this project. For more information, see
-            <a href="http://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
+            <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
             dependency mechanism</a>.
             ]]>
           </description>
@@ -2095,8 +2095,8 @@
             The source control management system URL
             that describes the repository and how to connect to the
             repository. For more information, see the
-            <a href="http://maven.apache.org/scm/scm-url-format.html">URL format</a>
-            and <a href="http://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
+            <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
+            and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
             ]]>
           </description>
@@ -2139,8 +2139,8 @@
             The source control management system URL
             that describes the repository and how to connect to the
             repository. For more information, see the
-            <a href="http://maven.apache.org/scm/scm-url-format.html">URL format</a>
-            and <a href="http://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
+            <a href="https://maven.apache.org/scm/scm-url-format.html">URL format</a>
+            and <a href="https://maven.apache.org/scm/scms-overview.html">list of supported SCMs</a>.
             This connection is read-only.
             <br /><b>Default value is</b>: parent value [+ path adjustment] + artifactId
             ]]>
@@ -2642,8 +2642,8 @@
             <li><code>combine.children</code>: available values are <code>merge</code> (default) and <code>append</code>,</li>
             <li><code>combine.self</code>: available values are <code>merge</code> (default) and <code>override</code>.</li>
             </ul>
-            <p>See <a href="http://maven.apache.org/pom.html#Plugins">POM Reference documentation</a> and
-            <a href="http://plexus.codehaus.org/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
+            <p>See <a href="https://maven.apache.org/pom.html#Plugins">POM Reference documentation</a> and
+            <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>
             for more information.</p>
             ]]>
           </description>
