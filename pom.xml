@@ -581,6 +581,7 @@ under the License.
             <exclude>.repository/**</exclude> <!-- jenkins with local maven repository -->
             <exclude>.maven/spy.log</exclude> <!-- hudson maven3 integration log -->
             <exclude>.java-version</exclude>
+            <exclude>README.md</exclude>
           </excludes>
         </configuration>
       </plugin>
