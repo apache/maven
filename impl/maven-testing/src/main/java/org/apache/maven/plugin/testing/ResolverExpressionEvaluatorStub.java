@@ -81,11 +81,11 @@ public class ResolverExpressionEvaluatorStub
             }
         }
 
-        if ( "basedir".equals( expression ) )
+        if ( "basedir".equals( expression ) || "project.basedir".equals( expression ) )
         {
             return PlexusTestCase.getBasedir();
         }
-        else if ( expression.startsWith( "basedir" ) )
+        else if ( expression.startsWith( "basedir" )|| expression.startsWith( "project.basedir" ) )
         {
             int pathSeparator = expression.indexOf( "/" );
 
