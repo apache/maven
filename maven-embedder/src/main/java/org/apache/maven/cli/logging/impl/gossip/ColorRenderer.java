@@ -49,7 +49,7 @@ public class ColorRenderer
         {
             case TRACE:
             case DEBUG:
-                buff.append( ansi().a( INTENSITY_BOLD ).fg( YELLOW ).a( level.name() ).reset() );
+                buff.append( ansi().a( INTENSITY_BOLD ).fg( CYAN ).a( level.name() ).reset() );
                 break;
 
             case INFO:
@@ -58,7 +58,7 @@ public class ColorRenderer
 
             case WARN:
                 // Maven uses WARNING instead of WARN
-                buff.append( ansi().a( INTENSITY_BOLD ).fg( RED ).a( WARNING ).reset() );
+                buff.append( ansi().a( INTENSITY_BOLD ).fg( YELLOW ).a( WARNING ).reset() );
                 break;
 
             case ERROR:
