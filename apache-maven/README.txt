@@ -11,12 +11,12 @@
   Documentation
   -------------
 
-  The most up-to-date documentation can be found at http://maven.apache.org/.
+  The most up-to-date documentation can be found at https://maven.apache.org/.
 
   Release Notes
   -------------
 
-  The full list of changes can be found at http://maven.apache.org/docs/history.html.
+  The full list of changes can be found at https://maven.apache.org/docs/history.html.
 
   System Requirements
   -------------------
@@ -59,7 +59,7 @@
 
   5) Run "mvn --version" to verify that it is correctly installed.
 
-  For complete documentation, see http://maven.apache.org/download.html#Installation
+  For complete documentation, see https://maven.apache.org/download.html#Installation
 
   Licensing
   ---------

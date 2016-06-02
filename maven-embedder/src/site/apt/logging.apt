@@ -31,10 +31,10 @@ Maven Logging
 * Logging API
 
  Maven uses
- {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
+ {{{https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/package-summary.html}Plexus
  Container logging API}}, like any other Plexus components, ie
- {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
- / {{{http://plexus.codehaus.org/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
+ {{{https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/LoggerManager.html}LoggerManager}}
+ / {{{https://codehaus-plexus.github.io/plexus-containers/plexus-container-default/apidocs/org/codehaus/plexus/logging/Logger.html}Logger}}.
 
  Starting with Maven 3.1.0:
 
@@ -54,7 +54,7 @@ Maven Logging
 
  Logging configuration loading is actually done by logging implementation, without any Maven extensions to support merging
  Maven installation configuration with per-user configuration for example:
- `${maven.home}/conf/logging` directory was added to core's classpath (see `${maven.home}/bin/m2.conf`). See your implementation
+ <<<$\{maven.home}/conf/logging>>> directory was added to core's classpath (see <<<$\{maven.home}/bin/m2.conf>>>). See your implementation
  documentation for details on file names, formats, and so on.
 
  During Maven initialization, Maven tweaks default root logging level to match CLI verbosity choice. Since such feature isn't available

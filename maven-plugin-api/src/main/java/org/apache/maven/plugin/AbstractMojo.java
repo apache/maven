@@ -96,7 +96,7 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
  *          The execution of either will not affect the current project, but instead make available the
  *          <code>${executedProject}</code> expression if required. An alternate lifecycle can also be provided:
  *          for more information see the documentation on the
- *          <a href="http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html"
+ *          <a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html"
  *             target="_blank">build lifecycle</a>.
  *      </td>
  *   </tr>
@@ -133,9 +133,9 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
  *   </tr>
  * </table>
  *
- * @see <a href="http://maven.apache.org/guides/plugin/guide-java-plugin-development.html" target="_blank">Guide to Developing Java Plugins</a>
- * @see <a href="http://maven.apache.org/guides/mini/guide-configuring-plugins.html" target="_blank">Guide to Configuring Plug-ins</a>
- * @see <a href="http://maven.apache.org/developers/mojo-api-specification.html" target="_blank">Mojo API Specification</a>
+ * @see <a href="https://maven.apache.org/guides/plugin/guide-java-plugin-development.html" target="_blank">Guide to Developing Java Plugins</a>
+ * @see <a href="https://maven.apache.org/guides/mini/guide-configuring-plugins.html" target="_blank">Guide to Configuring Plug-ins</a>
+ * @see <a href="https://maven.apache.org/developers/mojo-api-specification.html" target="_blank">Mojo API Specification</a>
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author jdcasey

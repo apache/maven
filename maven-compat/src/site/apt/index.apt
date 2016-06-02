@@ -18,19 +18,15 @@
  -----
  Introduction
  -----
- Vincent Siveton
+ Hervé Boutemy
  -----
- 2006-11-04
+ 2016-05-29
  -----
 
-Maven Settings Model
+Maven Compat
 
- This is strictly the model for Maven settings.
+ Maven2 classes maintained as compatibility layer for plugins that need to keep Maven2 compatibility.
 
- The following are generated from this model:
-
-   * {{{./apidocs/index.html}Java sources}} with Reader and Writers for the Xpp3 XML parser
-
-   * A {{{./settings.html}Descriptor Reference}}
-
-   * An {{{https://maven.apache.org/xsd/settings-1.0.0.xsd}XSD}}
+ Plugins should avoid these classes and be updated to use only Maven3 dependencies (and require Maven3): see
+ {{{https://cwiki.apache.org/confluence/display/MAVEN/Plugin+migration+to+Maven3+dependencies} Plugin migration to Maven3 dependencies}}
+ documentation to get hints on how to make the update.

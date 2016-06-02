@@ -33,8 +33,8 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
  * The bean containing the Mojo descriptor.
  * <br/>
  * For more information about the usage tag, have a look to:
- * <a href="http://maven.apache.org/developers/mojo-api-specification.html">
- * http://maven.apache.org/developers/mojo-api-specification.html</a>
+ * <a href="https://maven.apache.org/developers/mojo-api-specification.html">
+ * https://maven.apache.org/developers/mojo-api-specification.html</a>
  *
  * @todo is there a need for the delegation of MavenMojoDescriptor to this?
  * Why not just extend ComponentDescriptor here?

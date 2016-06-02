@@ -221,16 +221,16 @@ public class FileSizeFormatTest {
     }
 
     @Test( expected = IllegalArgumentException.class )
-    public void testNegativeProgessedSize()
+    public void testNegativeProgressedSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
-        long negativeProgessedSize = -100L;
-        format.formatProgress( negativeProgessedSize, 10L );
+        long negativeProgressedSize = -100L;
+        format.formatProgress( negativeProgressedSize, 10L );
     }
 
     @Test( expected = IllegalArgumentException.class )
-    public void testNegativeProgessedSizeBiggerThanSize()
+    public void testNegativeProgressedSizeBiggerThanSize()
     {
         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
@@ -257,16 +257,7 @@ public class FileSizeFormatTest {
     }
 
     @Test
-    public void testProgressedSizeWithZeroSize()
-    {
-         FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
-
-         long _0_bytes = 0L;
-         assertEquals( "0 B", format.formatProgress( _0_bytes, _0_bytes ) );
-    }
-
-    @Test
-    public void testProgressedSizeZeroAndSizeZero()
+    public void testProgressedBothZero()
     {
          FileSizeFormat format = new FileSizeFormat( Locale.ENGLISH );
 
