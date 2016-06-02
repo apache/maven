@@ -83,21 +83,25 @@ public class ColorRenderer
     {
         final String message = event.getMessage();
 
-        if ( message.startsWith( "------------------------------------------------------------------------" ) )
+        if ( message.startsWith( "------------------------------------------------------------------------" )
+             || message.startsWith( ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" )
+             || message.startsWith( "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" ) )
         {
             buff.append( ansi().a( INTENSITY_BOLD ).a( message ).reset() );
         }
-        else if ( message.startsWith( "---" ) && message.endsWith( " ---" ) )
+        else if ( ( message.startsWith( "---" ) && message.endsWith( " ---" ) ) 
+                  || ( message.startsWith( ">>>" ) && message.endsWith( " >>>" ) )
+                  || ( message.startsWith( "<<<" ) && message.endsWith( " <<<" ) ) )
         {
             String[] items = message.split( "\\s" );
-            buff.append( ansi().a( INTENSITY_BOLD ).a( "---" ).reset() );
+            buff.append( ansi().a( INTENSITY_BOLD ).a( items[0] ).reset() );
             buff.append( " " );
             buff.append( ansi().fg( GREEN ).a( items[1] ).reset() );
             buff.append( " " );
             buff.append( ansi().a( INTENSITY_BOLD ).a( items[2] ).reset() );
             buff.append( " @ " );
             buff.append( ansi().fg( CYAN ).a( items[4] ).reset() );
-            buff.append( ansi().a( INTENSITY_BOLD ).a( " ---" ).reset() );
+            buff.append( ansi().a( INTENSITY_BOLD ).a( ' ' + items[5] ).reset() );
         }
         else if ( message.contains( "ERROR" ) || message.contains( "FAILURE" ) || message.contains( "FAILED" ) )
         {
