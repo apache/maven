@@ -108,6 +108,8 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.inject.AbstractModule;
 import org.eclipse.aether.transfer.TransferListener;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,7 +209,12 @@ public class MavenCli
     public static int main( String[] args, ClassWorld classWorld )
     {
         MavenCli cli = new MavenCli();
-        return cli.doMain( new CliRequest( args, classWorld ) );
+
+        AnsiConsole.systemInstall();
+        int result = cli.doMain( new CliRequest( args, classWorld ) );
+        AnsiConsole.systemUninstall();
+
+        return result;
     }
 
     // TODO: need to externalize CliRequest
@@ -217,7 +224,11 @@ public class MavenCli
         return cli.doMain( new CliRequest( args, classWorld ) );
     }
 
-    // This supports painless invocation by the Verifier during embedded execution of the core ITs
+    /**
+     * This supports painless invocation by the Verifier during embedded execution of the core ITs.
+     * See <a href="http://maven.apache.org/shared/maven-verifier/xref/org/apache/maven/it/Embedded3xLauncher.html">
+     * <code>Embedded3xLauncher</code> in <code>maven-verifier</code></a>
+     */
     public int doMain( String[] args, String workingDirectory, PrintStream stdout, PrintStream stderr )
     {
         PrintStream oldout = System.out;
@@ -1286,6 +1297,7 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             request.setInteractiveMode( false );
+            Ansi.setEnabled( false );
         }
 
         boolean noSnapshotUpdates = false;

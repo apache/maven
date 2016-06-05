@@ -118,6 +118,8 @@ under the License.
     <exportedPackage>org.slf4j.spi.*</exportedPackage>
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
 
+    <!-- JAnsi -->
+    <exportedPackage>org.fusesource.jansi.*</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
@@ -156,6 +158,7 @@ under the License.
 
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
+    <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 
     <!--
       | We must also filter out the old or NoClassDefFoundErrors will surface  

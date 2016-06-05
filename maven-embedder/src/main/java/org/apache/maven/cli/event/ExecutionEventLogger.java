@@ -21,6 +21,7 @@ package org.apache.maven.cli.event;
 
 import static org.apache.maven.cli.CLIReportingUtils.formatDuration;
 import static org.apache.maven.cli.CLIReportingUtils.formatTimestamp;
+import static org.fusesource.jansi.Ansi.ansi;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.maven.execution.AbstractExecutionListener;
@@ -34,6 +35,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.StringUtils;
+import org.fusesource.jansi.Ansi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +76,16 @@ public class ExecutionEventLogger
         return buffer.toString();
     }
 
+    private void infoLine( char c )
+    {
+        infoMain( chars( c, LINE_LENGTH ) );
+    }
+
+    private void infoMain( String msg )
+    {
+        logger.info( ansi().bold().a( msg ).reset().toString() );
+    }
+
     @Override
     public void projectDiscoveryStarted( ExecutionEvent event )
     {
@@ -88,9 +100,9 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() && event.getSession().getProjects().size() > 1 )
         {
-            logger.info( chars( '-', LINE_LENGTH ) );
+            infoLine( '-' );
 
-            logger.info( "Reactor Build Order:" );
+            infoMain( "Reactor Build Order:" );
 
             logger.info( "" );
 
@@ -115,15 +127,15 @@ public class ExecutionEventLogger
 
             logStats( event.getSession() );
 
-            logger.info( chars( '-', LINE_LENGTH ) );
+            infoLine( '-' );
         }
     }
 
     private void logReactorSummary( MavenSession session )
     {
-        logger.info( chars( '-', LINE_LENGTH ) );
+        infoLine( '-' );
 
-        logger.info( "Reactor Summary:" );
+        infoMain( "Reactor Summary:" );
 
         logger.info( "" );
 
@@ -149,11 +161,12 @@ public class ExecutionEventLogger
 
             if ( buildSummary == null )
             {
-                buffer.append( "SKIPPED" );
+                buffer.append( ansi().fgYellow().a( "SKIPPED" ).reset() );
             }
             else if ( buildSummary instanceof BuildSuccess )
             {
-                buffer.append( "SUCCESS [" );
+                buffer.append( ansi().bold().fgGreen().a( "SUCCESS" ).reset() );
+                buffer.append( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
                 if ( padSize > 0 )
@@ -165,7 +178,8 @@ public class ExecutionEventLogger
             }
             else if ( buildSummary instanceof BuildFailure )
             {
-                buffer.append( "FAILURE [" );
+                buffer.append( ansi().bold().fgRed().a( "FAILURE" ).reset() );
+                buffer.append( " [" );
                 String buildTimeDuration = formatDuration( buildSummary.getTime() );
                 int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - buildTimeDuration.length();
                 if ( padSize > 0 )
@@ -182,21 +196,23 @@ public class ExecutionEventLogger
 
     private void logResult( MavenSession session )
     {
-        logger.info( chars( '-', LINE_LENGTH ) );
+        infoLine( '-' );
+        Ansi ansi = ansi().bold();
 
         if ( session.getResult().hasExceptions() )
         {
-            logger.info( "BUILD FAILURE" );
+            ansi.fgRed().a( "BUILD FAILURE" );
         }
         else
         {
-            logger.info( "BUILD SUCCESS" );
+            ansi.fgGreen().a( "BUILD SUCCESS" );
         }
+        logger.info( ansi.reset().toString() );
     }
 
     private void logStats( MavenSession session )
     {
-        logger.info( chars( '-', LINE_LENGTH ) );
+        infoLine( '-' );
 
         long finish = System.currentTimeMillis();
 
@@ -222,13 +238,13 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            logger.info( chars( ' ', LINE_LENGTH ) );
-            logger.info( chars( '-', LINE_LENGTH ) );
+            logger.info( "" );
+            infoLine( '-' );
 
-            logger.info( "Skipping " + event.getProject().getName() );
+            infoMain( "Skipping " + event.getProject().getName() );
             logger.info( "This project has been banned from the build due to previous failures." );
 
-            logger.info( chars( '-', LINE_LENGTH ) );
+            infoLine( '-' );
         }
     }
 
@@ -237,12 +253,12 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            logger.info( chars( ' ', LINE_LENGTH ) );
-            logger.info( chars( '-', LINE_LENGTH ) );
+            logger.info( "" );
+            infoLine( '-' );
 
-            logger.info( "Building " + event.getProject().getName() + " " + event.getProject().getVersion() );
+            infoMain( "Building " + event.getProject().getName() + " " + event.getProject().getVersion() );
 
-            logger.info( chars( '-', LINE_LENGTH ) );
+            infoLine( '-' );
         }
     }
 
@@ -264,15 +280,14 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            StringBuilder buffer = new StringBuilder( 128 );
-
-            buffer.append( "--- " );
-            append( buffer, event.getMojoExecution() );
-            append( buffer, event.getProject() );
-            buffer.append( " ---" );
-
             logger.info( "" );
-            logger.info( buffer.toString() );
+
+            Ansi ansi = ansi().bold().a( "--- " ).reset();
+            append( ansi, event.getMojoExecution() );
+            append( ansi, event.getProject() );
+            ansi.bold().a( " ---" ).reset();
+
+            logger.info( ansi.toString() );
         }
     }
 
@@ -285,17 +300,16 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            StringBuilder buffer = new StringBuilder( 128 );
-
-            buffer.append( ">>> " );
-            append( buffer, event.getMojoExecution() );
-            buffer.append( " > " );
-            appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
-            append( buffer, event.getProject() );
-            buffer.append( " >>>" );
-
             logger.info( "" );
-            logger.info( buffer.toString() );
+
+            Ansi ansi = ansi().bold().a( ">>> " ).reset();
+            append( ansi, event.getMojoExecution() );
+            ansi.bold().a( " > " ).reset();
+            appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
+            append( ansi, event.getProject() );
+            ansi.bold().a( " >>>" ).reset();
+
+            logger.info( ansi.toString() );
         }
     }
 
@@ -310,54 +324,55 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() )
         {
-            StringBuilder buffer = new StringBuilder( 128 );
-
-            buffer.append( "<<< " );
-            append( buffer, event.getMojoExecution() );
-            buffer.append( " < " );
-            appendForkInfo( buffer, event.getMojoExecution().getMojoDescriptor() );
-            append( buffer, event.getProject() );
-            buffer.append( " <<<" );
-
             logger.info( "" );
-            logger.info( buffer.toString() );
+
+            Ansi ansi = ansi().bold().a( "<<< " ).reset();
+            append( ansi, event.getMojoExecution() );
+            ansi.bold().a( " < " ).reset();
+            appendForkInfo( ansi, event.getMojoExecution().getMojoDescriptor() );
+            append( ansi, event.getProject() );
+            ansi.bold().a( " <<<" ).reset();
+
+            logger.info( ansi.toString() );
         }
     }
 
-    private void append( StringBuilder buffer, MojoExecution me )
+    private void append( Ansi ansi, MojoExecution me )
     {
-        buffer.append( me.getArtifactId() ).append( ':' ).append( me.getVersion() );
-        buffer.append( ':' ).append( me.getGoal() );
+        ansi.fgGreen().a( me.getArtifactId() ).a( ':' ).a( me.getVersion() );
+        ansi.a( ':' ).a( me.getGoal() ).reset();
         if ( me.getExecutionId() != null )
         {
-            buffer.append( " (" ).append( me.getExecutionId() ).append( ')' );
+            ansi.bold().a( " (" ).a( me.getExecutionId() ).a( ')' ).reset();
         }
     }
 
-    private void appendForkInfo( StringBuilder buffer, MojoDescriptor md )
+    private void appendForkInfo( Ansi ansi, MojoDescriptor md )
     {
+        ansi.bold();
         if ( StringUtils.isNotEmpty( md.getExecutePhase() ) )
         {
             // forked phase
             if ( StringUtils.isNotEmpty( md.getExecuteLifecycle() ) )
             {
-                buffer.append( '[' );
-                buffer.append( md.getExecuteLifecycle() );
-                buffer.append( ']' );
+                ansi.a( '[' );
+                ansi.a( md.getExecuteLifecycle() );
+                ansi.a( ']' );
             }
-            buffer.append( md.getExecutePhase() );
+            ansi.a( md.getExecutePhase() );
         }
         else
         {
             // forked goal
-            buffer.append( ':' );
-            buffer.append( md.getExecuteGoal() );
+            ansi.a( ':' );
+            ansi.a( md.getExecuteGoal() );
         }
+        ansi.reset();
     }
 
-    private void append( StringBuilder buffer, MavenProject project )
+    private void append( Ansi ansi, MavenProject project )
     {
-        buffer.append( " @ " ).append( project.getArtifactId() );
+        ansi.a( " @ " ).fgCyan().a( project.getArtifactId() ).reset();
     }
 
     @Override
@@ -365,13 +380,12 @@ public class ExecutionEventLogger
     {
         if ( logger.isInfoEnabled() && event.getMojoExecution().getForkedExecutions().size() > 1 )
         {
-            logger.info( chars( ' ', LINE_LENGTH ) );
-            logger.info( chars( '>', LINE_LENGTH ) );
+            logger.info( "" );
+            infoLine( '>' );
 
-            logger.info( "Forking " + event.getProject().getName() + " " + event.getProject().getVersion() );
+            infoMain( "Forking " + event.getProject().getName() + " " + event.getProject().getVersion() );
 
-            logger.info( chars( '>', LINE_LENGTH ) );
+            infoLine( '>' );
         }
     }
-
 }
