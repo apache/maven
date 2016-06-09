@@ -755,8 +755,10 @@ public class DefaultModelBuilder
                                  final DefaultModelProblemCollector problems )
     {
         // [MNG-5971] Imported dependencies should be available to inheritance processing
+        // It's not possible to support all ${project.xyz} properties in dependency management import declarations
+        // because import processing is performed before the final inheritance processing is performed. So the set of
+        // ${project.xyz} properties supported in dependency management import declarations is limited.
 
-        // Creates an intermediate model with only property and repository inheritance.
         final List<Model> intermediateLineage = new ArrayList<>( lineage.size() );
 
         for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
@@ -768,6 +770,17 @@ public class DefaultModelBuilder
         {
             final Model parent = intermediateLineage.get( i + 1 );
             final Model child = intermediateLineage.get( i );
+
+            if ( child.getGroupId() == null )
+            {
+                // Support ${project.groupId} in dependency management import declarations.
+                child.setGroupId( parent.getGroupId() );
+            }
+            if ( child.getVersion() == null )
+            {
+                // Support ${project.version} in dependency management import declarations.
+                child.setVersion( parent.getVersion() );
+            }
 
             final Properties properties = new Properties();
             properties.putAll( parent.getProperties() );
@@ -838,7 +851,7 @@ public class DefaultModelBuilder
         }
 
         // Imports dependencies into the original model using the repositories of the intermediate model.
-        for ( int i = 0, s0 = lineage.size(), superModelIdx = lineage.size() - 1; i < s0; i++ )
+        for ( int i = 0, s0 = lineage.size(); i < s0; i++ )
         {
             final Model model = lineage.get( i );
             this.configureResolver( lenientRequest.getModelResolver(), intermediateLineage.get( i ), problems, true );
