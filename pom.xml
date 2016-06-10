@@ -30,7 +30,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.4.0-SNAPSHOT</version>
+  <version>3.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -64,7 +64,7 @@ under the License.
     <cipherVersion>1.7</cipherVersion>
     <modelloVersion>1.8.3</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <aetherVersion>1.0.2.v20150114</aetherVersion>
+    <aetherVersion>1.2.0-SNAPSHOT</aetherVersion>
     <!-- Upgrade of SLF4J blocked by SLF4J-370 (MNG-6023). -->
     <!--   https://issues.apache.org/jira/browse/MNG-6023  -->
     <!--   http://jira.qos.ch/browse/SLF4J-370             -->
@@ -356,32 +356,32 @@ under the License.
       </dependency>
       <!--  Repository -->
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
+        <groupId>org.apache.maven.aether</groupId>
         <artifactId>aether-api</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
+        <groupId>org.apache.maven.aether</groupId>
         <artifactId>aether-spi</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
+        <groupId>org.apache.maven.aether</groupId>
         <artifactId>aether-impl</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
+        <groupId>org.apache.maven.aether</groupId>
         <artifactId>aether-util</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
+        <groupId>org.apache.maven.aether</groupId>
         <artifactId>aether-connector-basic</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
+        <groupId>org.apache.maven.aether</groupId>
         <artifactId>aether-transport-wagon</artifactId>
         <version>${aetherVersion}</version>
       </dependency>
