@@ -97,6 +97,11 @@ under the License.
       <artifactId>logback-classic</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>com.planet57.gossip</groupId>
+      <artifactId>gossip-slf4j</artifactId>
+      <optional>true</optional>
+    </dependency>
     <!-- CLI -->
     <dependency>
       <groupId>commons-cli</groupId>
