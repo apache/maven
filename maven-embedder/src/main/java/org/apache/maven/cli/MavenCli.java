@@ -19,6 +19,8 @@ package org.apache.maven.cli;
  * under the License.
  */
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 import java.io.BufferedInputStream;
 import java.io.Console;
 import java.io.File;
@@ -1011,11 +1013,13 @@ public class MavenCli
 
             if ( !cliRequest.showErrors )
             {
-                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the -e switch." );
+                slf4jLogger.error( "To see the full stack trace of the errors, re-run Maven with the "
+                    + ansi().bold().a( "-e" ).reset() + " switch." );
             }
             if ( !slf4jLogger.isDebugEnabled() )
             {
-                slf4jLogger.error( "Re-run Maven using the -X switch to enable full debug logging." );
+                slf4jLogger.error( "Re-run Maven using the " + ansi().bold().a( "-X" ).reset()
+                    + " switch to enable full debug logging." );
             }
 
             if ( !references.isEmpty() )
@@ -1026,7 +1030,7 @@ public class MavenCli
 
                 for ( Map.Entry<String, String> entry : references.entrySet() )
                 {
-                    slf4jLogger.error( entry.getValue() + " " + entry.getKey() );
+                    slf4jLogger.error( ansi().bold().a( entry.getValue() ).reset() + " " + entry.getKey() );
                 }
             }
 
@@ -1034,7 +1038,8 @@ public class MavenCli
             {
                 slf4jLogger.error( "" );
                 slf4jLogger.error( "After correcting the problems, you can resume the build with the command" );
-                slf4jLogger.error( "  mvn <goals> -rf :" + project.getArtifactId() );
+                slf4jLogger.error( ansi().bold().a( "  mvn <goals> -rf :" )
+                                   .a( project.getArtifactId() ).reset().toString() );
             }
 
             if ( MavenExecutionRequest.REACTOR_FAIL_NEVER.equals( cliRequest.request.getReactorFailureBehavior() ) )
