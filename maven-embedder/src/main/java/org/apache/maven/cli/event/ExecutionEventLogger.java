@@ -161,7 +161,7 @@ public class ExecutionEventLogger
 
             if ( buildSummary == null )
             {
-                buffer.append( ansi().fgYellow().a( "SKIPPED" ).reset() );
+                buffer.append( ansi().bold().fgYellow().a( "SKIPPED" ).reset() );
             }
             else if ( buildSummary instanceof BuildSuccess )
             {
