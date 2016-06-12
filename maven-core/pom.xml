@@ -84,6 +84,10 @@ under the License.
       <groupId>org.eclipse.aether</groupId>
       <artifactId>aether-util</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.fusesource.jansi</groupId>
+      <artifactId>jansi</artifactId>
+    </dependency>
     <!-- Plexus -->
     <dependency>
       <groupId>org.eclipse.sisu</groupId>

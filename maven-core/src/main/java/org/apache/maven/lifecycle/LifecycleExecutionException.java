@@ -19,8 +19,11 @@ package org.apache.maven.lifecycle;
  * under the License.
  */
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
+import org.fusesource.jansi.Ansi;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
@@ -75,34 +78,26 @@ public class LifecycleExecutionException
 
     private static String createMessage( MojoExecution execution, MavenProject project, Throwable cause )
     {
-        StringBuilder buffer = new StringBuilder( 256 );
+        Ansi buffer = ansi( /*256*/ );
 
-        buffer.append( "Failed to execute goal" );
+        buffer.a( "Failed to execute goal" ).reset();
 
         if ( execution != null )
         {
-            buffer.append( ' ' );
-            buffer.append( execution.getGroupId() );
-            buffer.append( ':' );
-            buffer.append( execution.getArtifactId() );
-            buffer.append( ':' );
-            buffer.append( execution.getVersion() );
-            buffer.append( ':' );
-            buffer.append( execution.getGoal() );
-            buffer.append( " (" );
-            buffer.append( execution.getExecutionId() );
-            buffer.append( ')' );
+            buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' ).fgGreen().a( execution.getArtifactId() );
+            buffer.a( ':' ).a( execution.getVersion() ).a( ':' ).a( execution.getGoal() ).reset();
+            buffer.bold().a( " (" ).a( execution.getExecutionId() ).a( ')' ).reset();
         }
 
         if ( project != null )
         {
-            buffer.append( " on project " );
-            buffer.append( project.getArtifactId() );
+            buffer.a( " on project " );
+            buffer.fgCyan().a( project.getArtifactId() ).reset();
         }
 
         if ( cause != null )
         {
-            buffer.append( ": " ).append( cause.getMessage() );
+            buffer.a( ": " ).bold().fgRed().a( cause.getMessage() ).reset();
         }
 
         return buffer.toString();
