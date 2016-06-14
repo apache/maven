@@ -19,12 +19,11 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 /**
  * Exception which is meant to occur when a layout specified for a particular
- * repository doesn't have a corresponding {@link ArtifactRepositoryLayout}
+ * repository doesn't have a corresponding {@link org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout}
  * component in the current container.
  *
  * @author jdcasey

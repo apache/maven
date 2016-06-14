@@ -63,10 +63,19 @@ import org.eclipse.aether.util.ConfigUtils;
 public class DefaultWagonManager
     implements WagonManager
 {
-    private static final String[] CHECKSUM_IDS = { "md5", "sha1" };
 
-    /** have to match the CHECKSUM_IDS */
-    private static final String[] CHECKSUM_ALGORITHMS = { "MD5", "SHA-1" };
+    private static final String[] CHECKSUM_IDS =
+    {
+        "md5", "sha1"
+    };
+
+    /**
+     * have to match the CHECKSUM_IDS
+     */
+    private static final String[] CHECKSUM_ALGORITHMS =
+    {
+        "MD5", "SHA-1"
+    };
 
     @Requirement
     private Logger logger;
@@ -79,7 +88,6 @@ public class DefaultWagonManager
 
     @Requirement
     private LegacySupport legacySupport;
-
 
     //
     // Retriever
@@ -96,14 +104,15 @@ public class DefaultWagonManager
         if ( !policy.isEnabled() )
         {
             logger.debug( "Skipping disabled repository " + repository.getId() + " for resolution of "
-                + artifact.getId() );
+                              + artifact.getId() );
+
         }
         else if ( artifact.isSnapshot() || !artifact.getFile().exists() )
         {
             if ( force || updateCheckManager.isUpdateRequired( artifact, repository ) )
             {
                 logger.debug( "Trying repository " + repository.getId() + " for resolution of " + artifact.getId()
-                    + " from " + remotePath );
+                                  + " from " + remotePath );
 
                 try
                 {
@@ -133,17 +142,21 @@ public class DefaultWagonManager
                 String error = updateCheckManager.getError( artifact, repository );
                 if ( error != null )
                 {
-                    throw new TransferFailedException( "Failure to resolve " + remotePath + " from "
-                        + repository.getUrl() + " was cached in the local repository. "
-                        + "Resolution will not be reattempted until the update interval of " + repository.getId()
-                        + " has elapsed or updates are forced. Original error: " + error );
+                    throw new TransferFailedException(
+                        "Failure to resolve " + remotePath + " from " + repository.getUrl()
+                            + " was cached in the local repository. "
+                            + "Resolution will not be reattempted until the update interval of "
+                            + repository.getId() + " has elapsed or updates are forced. Original error: " + error );
+
                 }
                 else
                 {
-                    throw new ResourceDoesNotExistException( "Failure to resolve " + remotePath + " from "
-                        + repository.getUrl() + " was cached in the local repository. "
-                        + "Resolution will not be reattempted until the update interval of " + repository.getId()
-                        + " has elapsed or updates are forced." );
+                    throw new ResourceDoesNotExistException(
+                        "Failure to resolve " + remotePath + " from " + repository.getUrl()
+                            + " was cached in the local repository. "
+                            + "Resolution will not be reattempted until the update interval of "
+                            + repository.getId() + " has elapsed or updates are forced." );
+
                 }
             }
         }
@@ -174,7 +187,8 @@ public class DefaultWagonManager
                 // because we want to cycle through them all before squawking.
 
                 logger.debug( "Unable to find artifact " + artifact.getId() + " in repository " + repository.getId()
-                    + " (" + repository.getUrl() + ")", e );
+                                  + " (" + repository.getUrl() + ")", e );
+
             }
             catch ( TransferFailedException e )
             {
@@ -183,6 +197,7 @@ public class DefaultWagonManager
                 String msg =
                     "Unable to get artifact " + artifact.getId() + " from repository " + repository.getId() + " ("
                         + repository.getUrl() + "): " + e.getMessage();
+
                 if ( logger.isDebugEnabled() )
                 {
                     logger.warn( msg, e );
@@ -233,6 +248,7 @@ public class DefaultWagonManager
      *
      * @param wagon
      * @param repository
+     *
      * @throws ConnectionException
      * @throws AuthenticationException
      */
@@ -241,13 +257,15 @@ public class DefaultWagonManager
     {
         // MNG-5509
         // See org.eclipse.aether.connector.wagon.WagonRepositoryConnector.connectWagon(Wagon)
-        if( legacySupport.getRepositorySession() != null )
+        if ( legacySupport.getRepositorySession() != null )
         {
-            String userAgent = ConfigUtils.getString( legacySupport.getRepositorySession(), null, ConfigurationProperties.USER_AGENT );
-            if( userAgent == null)
+            String userAgent = ConfigUtils.getString( legacySupport.getRepositorySession(), null,
+                                                      ConfigurationProperties.USER_AGENT );
+
+            if ( userAgent == null )
             {
                 Properties headers = new Properties();
-                    
+
                 headers.put( "User-Agent", ConfigUtils.getString( legacySupport.getRepositorySession(), "Maven",
                                                                   ConfigurationProperties.USER_AGENT ) );
                 try
@@ -269,18 +287,21 @@ public class DefaultWagonManager
         if ( repository.getProxy() != null && logger.isDebugEnabled() )
         {
             logger.debug( "Using proxy " + repository.getProxy().getHost() + ":" + repository.getProxy().getPort()
-                + " for " + repository.getUrl() );
+                              + " for " + repository.getUrl() );
+
         }
 
         if ( repository.getAuthentication() != null && repository.getProxy() != null )
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ), authenticationInfo( repository ),
                            proxyInfo( repository ) );
+
         }
         else if ( repository.getAuthentication() != null )
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
                            authenticationInfo( repository ) );
+
         }
         else if ( repository.getProxy() != null )
         {
@@ -414,10 +435,10 @@ public class DefaultWagonManager
                     }
                     catch ( ChecksumFailedException e )
                     {
-                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
-                        // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
-                        // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
-                        // repository's checksum checking policy.
+                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the 
+                        // checksum doesn't match. This could be a problem with the server (ibiblio HTTP-200 error
+                        // page), so we'll try this up to two times. On the second try, we'll handle it as a bona-fide
+                        // error, based on the repository's checksum checking policy.
                         if ( firstRun )
                         {
                             logger.warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
@@ -507,7 +528,6 @@ public class DefaultWagonManager
             // File.renameTo operation doesn't really work across file systems.
             // So we will attempt to do a File.renameTo for efficiency and atomicity, if this fails
             // then we will use a brute force copy and delete the temporary file.
-
             if ( !temp.renameTo( destination ) )
             {
                 try
@@ -522,7 +542,8 @@ public class DefaultWagonManager
                 catch ( IOException e )
                 {
                     throw new TransferFailedException( "Error copying temporary file to the final destination: "
-                        + e.getMessage(), e );
+                                                           + e.getMessage(), e );
+
                 }
             }
         }
@@ -642,9 +663,9 @@ public class DefaultWagonManager
             cleanupTemporaryFiles( temporaryFiles );
 
             // Remove every checksum listener
-            for ( String aCHECKSUM_IDS : CHECKSUM_IDS )
+            for ( String id : CHECKSUM_IDS )
             {
-                TransferListener checksumListener = checksums.get( aCHECKSUM_IDS );
+                TransferListener checksumListener = checksums.get( id );
                 if ( checksumListener != null )
                 {
                     wagon.removeTransferListener( checksumListener );
@@ -721,7 +742,7 @@ public class DefaultWagonManager
 
             // check for 'ALGO (name) = CHECKSUM' like used by openssl
             if ( expectedChecksum.regionMatches( true, 0, "MD", 0, 2 )
-                || expectedChecksum.regionMatches( true, 0, "SHA", 0, 3 ) )
+                     || expectedChecksum.regionMatches( true, 0, "SHA", 0, 3 ) )
             {
                 int lastSpacePos = expectedChecksum.lastIndexOf( ' ' );
                 expectedChecksum = expectedChecksum.substring( lastSpacePos + 1 );
@@ -752,7 +773,8 @@ public class DefaultWagonManager
             else
             {
                 throw new ChecksumFailedException( "Checksum failed on download: local = '" + actualChecksum
-                    + "'; remote = '" + expectedChecksum + "'" );
+                                                       + "'; remote = '" + expectedChecksum + "'" );
+
             }
         }
         catch ( IOException e )
@@ -814,7 +836,8 @@ public class DefaultWagonManager
         catch ( ComponentLookupException e )
         {
             throw new UnsupportedProtocolException( "Cannot find wagon which supports the requested protocol: "
-                + protocol, e );
+                                                        + protocol, e );
+
         }
 
         return wagon;

@@ -45,9 +45,8 @@ public final class ProjectUtils
     {
     }
 
-    public static List<ArtifactRepository> buildArtifactRepositories( List<Repository> repositories,
-                                                                      ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                                      PlexusContainer c )
+    public static List<ArtifactRepository> buildArtifactRepositories(
+        List<Repository> repositories, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
 
@@ -61,17 +60,15 @@ public final class ProjectUtils
         return remoteRepositories;
     }
 
-    public static ArtifactRepository buildDeploymentArtifactRepository( DeploymentRepository repo,
-                                                                        ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                                        PlexusContainer c )
+    public static ArtifactRepository buildDeploymentArtifactRepository(
+        DeploymentRepository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
         return buildArtifactRepository( repo, artifactRepositoryFactory, c );
     }
 
-    public static ArtifactRepository buildArtifactRepository( Repository repo,
-                                                              ArtifactRepositoryFactory artifactRepositoryFactory,
-                                                              PlexusContainer c )
+    public static ArtifactRepository buildArtifactRepository(
+        Repository repo, ArtifactRepositoryFactory artifactRepositoryFactory, PlexusContainer c )
         throws InvalidRepositoryException
     {
         RepositorySystem repositorySystem = rs( c );
