@@ -474,6 +474,11 @@ public class MavenCli
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
 
+        if ( cliRequest.commandLine.hasOption( CLIManager.BATCH_MODE ) )
+        {
+            Ansi.setEnabled( false );
+        }
+
         if ( cliRequest.commandLine.hasOption( CLIManager.LOG_FILE ) )
         {
             File logFile = new File( cliRequest.commandLine.getOptionValue( CLIManager.LOG_FILE ) );
@@ -1304,7 +1309,6 @@ public class MavenCli
         if ( commandLine.hasOption( CLIManager.BATCH_MODE ) )
         {
             request.setInteractiveMode( false );
-            Ansi.setEnabled( false );
         }
 
         boolean noSnapshotUpdates = false;
