@@ -50,7 +50,7 @@ extends com.planet57.gossip.render.PatternRenderer
                 break;
 
             case INFO:
-                buff.append( ansi().bold().fgGreen().a( level.name() ).reset() );
+                buff.append( ansi().bold().fgBlue().a( level.name() ).reset() );
                 break;
 
             case WARN:
