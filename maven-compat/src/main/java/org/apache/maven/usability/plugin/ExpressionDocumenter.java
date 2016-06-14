@@ -38,7 +38,10 @@ import java.util.Map;
 public class ExpressionDocumenter
 {
 
-    private static final String[] EXPRESSION_ROOTS = { "project", "settings", "session", "plugin", "rootless" };
+    private static final String[] EXPRESSION_ROOTS =
+    {
+        "project", "settings", "session", "plugin", "rootless"
+    };
 
     private static final String EXPRESSION_DOCO_ROOTPATH = "META-INF/maven/plugin-expressions/";
 
@@ -53,10 +56,10 @@ public class ExpressionDocumenter
 
             ClassLoader docLoader = initializeDocLoader();
 
-            for ( String EXPRESSION_ROOT : EXPRESSION_ROOTS )
+            for ( String root : EXPRESSION_ROOTS )
             {
                 try ( InputStream docStream = docLoader.getResourceAsStream(
-                    EXPRESSION_DOCO_ROOTPATH + EXPRESSION_ROOT + ".paramdoc.xml" ) )
+                    EXPRESSION_DOCO_ROOTPATH + root + ".paramdoc.xml" ) )
                 {
                     if ( docStream != null )
                     {
@@ -68,12 +71,12 @@ public class ExpressionDocumenter
                 catch ( IOException e )
                 {
                     throw new ExpressionDocumentationException(
-                        "Failed to read documentation for expression root: " + EXPRESSION_ROOT, e );
+                        "Failed to read documentation for expression root: " + root, e );
                 }
                 catch ( XmlPullParserException e )
                 {
                     throw new ExpressionDocumentationException(
-                        "Failed to parse documentation for expression root: " + EXPRESSION_ROOT, e );
+                        "Failed to parse documentation for expression root: " + root, e );
                 }
 
             }
@@ -161,7 +164,10 @@ public class ExpressionDocumenter
                 "Cannot construct expression documentation classpath" + " resource base.", e );
         }
 
-        return new URLClassLoader( new URL[]{ docResource } );
+        return new URLClassLoader( new URL[]
+        {
+            docResource
+        } );
     }
 
 }

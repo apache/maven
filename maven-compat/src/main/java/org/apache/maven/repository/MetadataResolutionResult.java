@@ -118,7 +118,7 @@ public class MetadataResolutionResult
 
     public List<Artifact> getMissingArtifacts()
     {
-        return missingArtifacts == null ? Collections.<Artifact> emptyList() : missingArtifacts;
+        return missingArtifacts == null ? Collections.<Artifact>emptyList() : missingArtifacts;
     }
 
     public MetadataResolutionResult addMissingArtifact( Artifact artifact )
@@ -148,7 +148,7 @@ public class MetadataResolutionResult
 
     public List<Exception> getExceptions()
     {
-        return exceptions == null ? Collections.<Exception> emptyList() : exceptions;
+        return exceptions == null ? Collections.<Exception>emptyList() : exceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -185,7 +185,7 @@ public class MetadataResolutionResult
 
     public List<Exception> getVersionRangeViolations()
     {
-        return versionRangeViolations == null ? Collections.<Exception> emptyList() : versionRangeViolations;
+        return versionRangeViolations == null ? Collections.<Exception>emptyList() : versionRangeViolations;
     }
 
     // ------------------------------------------------------------------------
@@ -217,7 +217,7 @@ public class MetadataResolutionResult
 
     public List<ArtifactResolutionException> getMetadataResolutionExceptions()
     {
-        return metadataResolutionExceptions == null ? Collections.<ArtifactResolutionException> emptyList()
+        return metadataResolutionExceptions == null ? Collections.<ArtifactResolutionException>emptyList()
                         : metadataResolutionExceptions;
     }
 

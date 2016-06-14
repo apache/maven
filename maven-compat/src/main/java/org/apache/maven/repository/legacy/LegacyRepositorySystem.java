@@ -353,22 +353,21 @@ public class LegacyRepositorySystem
         return artifactResolver.resolve( request );
     }
 
-    /*
-    public void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts )
-    {
-        ProxyInfo proxyInfo = new ProxyInfo();
-        proxyInfo.setHost( host );
-        proxyInfo.setType( protocol );
-        proxyInfo.setPort( port );
-        proxyInfo.setNonProxyHosts( nonProxyHosts );
-        proxyInfo.setUserName( username );
-        proxyInfo.setPassword( password );
-
-        proxies.put( protocol, proxyInfo );
-
-        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
-    }
-    */
+//    public void addProxy( String protocol, String host, int port, String username, String password,
+//                          String nonProxyHosts )
+//    {
+//        ProxyInfo proxyInfo = new ProxyInfo();
+//        proxyInfo.setHost( host );
+//        proxyInfo.setType( protocol );
+//        proxyInfo.setPort( port );
+//        proxyInfo.setNonProxyHosts( nonProxyHosts );
+//        proxyInfo.setUserName( username );
+//        proxyInfo.setPassword( password );
+//
+//        proxies.put( protocol, proxyInfo );
+//
+//        wagonManager.addProxy( protocol, host, port, username, password, nonProxyHosts );
+//    }
 
     public List<ArtifactRepository> getEffectiveRepositories( List<ArtifactRepository> repositories )
     {

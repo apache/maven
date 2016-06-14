@@ -81,7 +81,9 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
     {
-        return injectSession( factory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases ), true );
+        return injectSession( factory.createArtifactRepository( id, url, repositoryLayout, snapshots, releases ),
+                              true );
+
     }
 
     public void setGlobalUpdatePolicy( String updatePolicy )

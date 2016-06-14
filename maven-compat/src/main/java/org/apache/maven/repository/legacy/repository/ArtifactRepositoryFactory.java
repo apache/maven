@@ -37,7 +37,8 @@ public interface ArtifactRepositoryFactory
         throws UnknownRepositoryLayoutException;
 
     @Deprecated
-    ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId, boolean uniqueVersion )
+    ArtifactRepository createDeploymentArtifactRepository( String id, String url, String layoutId,
+                                                           boolean uniqueVersion )
         throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createDeploymentArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
@@ -48,7 +49,8 @@ public interface ArtifactRepositoryFactory
         throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createArtifactRepository( String id, String url, ArtifactRepositoryLayout repositoryLayout,
-                                                 ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases );
+                                                 ArtifactRepositoryPolicy snapshots,
+                                                 ArtifactRepositoryPolicy releases );
 
     void setGlobalUpdatePolicy( String snapshotPolicy );
 
