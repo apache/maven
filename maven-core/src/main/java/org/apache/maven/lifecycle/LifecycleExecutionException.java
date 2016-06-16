@@ -80,27 +80,27 @@ public class LifecycleExecutionException
     {
         Ansi buffer = ansi( /*256*/ );
 
-        buffer.fgRed().a( "Failed to execute goal" );
+        buffer.a( "Failed to execute goal" ).reset();
 
         if ( execution != null )
         {
-            buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' ).a( execution.getArtifactId() ).
-                a( ':' ).a( execution.getVersion() ).a( ':' ).a( execution.getGoal() ).
-                a( " (" ).a( execution.getExecutionId() ).a( ')' );
-
+            buffer.a( ' ' ).a( execution.getGroupId() ).a( ':' ).fgGreen().a( execution.getArtifactId() );
+            buffer.a( ':' ).a( execution.getVersion() ).a( ':' ).a( execution.getGoal() ).reset();
+            buffer.bold().a( " (" ).a( execution.getExecutionId() ).a( ')' ).reset();
         }
 
         if ( project != null )
         {
-            buffer.a( " on project " ).a( project.getArtifactId() );
+            buffer.a( " on project " );
+            buffer.fgCyan().a( project.getArtifactId() ).reset();
         }
 
         if ( cause != null )
         {
-            buffer.a( ": " ).a( cause.getMessage() );
+            buffer.a( ": " ).bold().fgRed().a( cause.getMessage() ).reset();
         }
 
-        return buffer.reset().toString();
+        return buffer.toString();
     }
 
 }
